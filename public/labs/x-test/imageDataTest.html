@@ -1,0 +1,42 @@
+<html>
+<body>
+<script>
+
+var canvas = document.createElement("canvas");
+var ctx = canvas.getContext('2d');
+
+window.onload = function() {
+	canvas.width = 1;
+	canvas.height = 1;
+	ctx.fillStyle = "rgba("+[ 30, 120, 255, 255 ]+")";
+	ctx.fillRect(0, 0, 1, 1); 
+	for (var n = 0; n < 10; n ++) {
+		var imageData = ctx.getImageData(0, 0, 1, 1);
+		var data = imageData.data;
+		var length = data.length;
+		for (var i = 0; i < length; i += 4) {
+			data[i] = data[i];
+			data[i + 1] = data[i + 1];
+			data[i + 2] = data[i + 2];
+		}
+		ctx.putImageData(imageData, 0, 0);
+	}
+	var data = ctx.getImageData(0, 0, 1, 1).data;
+	alert(data[0] + "," + data[1] + "," + data[2])
+	document.body.appendChild(canvas);
+
+	return;
+	(function() {
+		// there is a bug in firefox 3.6 in the color correction that prevent it from returning the proper pixels
+		var canvas = document.createElement("canvas"),
+			ctx = canvas.getContext("2d"),
+			rgb = [ 30, 120, 255, 255 ];
+		ctx.fillStyle = "rgba("+rgb+")";
+		ctx.fillRect(0, 0, 1, 1);       
+		var imageData = ctx.getImageData(0, 0, 1, 1),
+			data = imageData.data;
+		alert("these two values should match: " + data[0] + "," + data[1] + "," + data[2] + " == " + rgb[0] + "," + rgb[1] + "," + rgb[2]);
+	})();
+};
+</script>
+</body>

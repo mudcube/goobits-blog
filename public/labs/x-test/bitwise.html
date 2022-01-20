@@ -1,0 +1,100 @@
+<body>
+<script type="text/javascript" src="inc/Color.Space.js"></script>
+<script type="text/javascript">
+
+window.onload = function() {
+	// Rounding, flooring, and ceiling
+	var bit1 = "Math.round(Math.PI)";
+	var bit2 = "(Math.PI + 0.5) >> 0";
+	// Left bit shifting to multiply by any power of two
+	var bit1 = "999 * 64";
+	var bit2 = "999 << 6";
+	// Right bit shifting to divide by any power of two
+	var bit1 = "999 / 64";
+	var bit2 = "999 >> 6";
+	//
+	var bit1 = 'var a = 1;\
+					 var b = 2;\
+					 var tmp = a;\
+					 a = b;\
+					 b = tmp;';
+	var bit2 = 'var a = 1;\
+					 var b = 2;\
+					 a ^= b;\
+					 b ^= a;\
+					 a ^= b;';
+	//
+	var bit1 = "if(!i) i =1; i ++";
+	var bit2 = "if(!i) i =1; i = -~i;";
+	//
+	var bit1 = "var i = 1; i = -i;";
+	var bit2 = "var i = 1; i = ~i + 1;";
+	//
+	var bit1 = "var x = 131 % 4;";
+	var bit2 = "var x = 131 & (4 - 1);";
+	//
+	var bit1 = "var isEven = (n % 2) == 0;";
+	var bit2 = "var isEven = (n & 1) == 0;";
+	//
+	var bit1 = "var x = -999; var i = Math.abs(x);";
+	var bit2 = "var x = -999; var i = x > 0 ? -x : x;";
+	var bit2 = "var x = -999; var i = x >> 0 ? -x : x;";
+	var bit2 = "var x = -999; var i = (x ^ (x >> 31)) - (x >> 31);	";
+	//
+	var bit1 = "var n = Math.min(size, n);";
+	var bit2 = "var n = (size < n ? size : n)";
+	//
+	var bit1 = "var p = Math.PI";
+	var bit2 = "var p = PI";
+	//
+	var bit1 = "var rgb = { R: 255, G: 0, B: 0 }";
+	var bit2 = "var rgb = [ 255, 0, 0 ]";
+	var bit2 = "var R = 255, G = 0, B = 0;";
+
+	// lets pretend were running it on a image 1000x1000 pixels
+	var size = 1000 * 1000;
+	// example code
+//	var bit1 = "Math.round(Math.PI)"; // standard
+//	var bit2 = "(Math.PI + 0.5) >> 0"; // bitwise
+	// create the speedtest
+	function createFunction(f) {
+		return '(function() { \
+					   var PI = Math.PI;\
+					   var t = (new Date()).getTime();\
+					   for (var n = 0; n < size; n ++) { '+f+' }\
+					   return t - (new Date()).getTime();\
+				   });';
+	};
+	var timeFunctions = {
+		a: eval(createFunction(bit1)),
+		b: eval(createFunction(bit2))
+	};
+	var timeData = { };
+	//
+	function getAverage(type) {
+		var loops = 10;
+		var loopid = 0;	
+		var average = 0;
+		function go() {
+			if (loopid ++ == loops) {
+				timeData[type] = average/loops;
+				if (type == "a") { // get next 
+					setTimeout(function() { getAverage("b"); }, 1);
+				} else { // complete
+					var speedGain = ((timeData.a / timeData.b - 1) * 100);
+					console.log(timeData.a, timeData.b, speedGain + "%");
+				}
+				return;
+			}
+			average += timeFunctions[type]();
+			// setTimeout so browser can rest one loop
+			setTimeout(function() { go(type); }, 1);
+		};
+		go();
+	};
+	setTimeout(function() { getAverage("a"); }, 1);
+
+};
+
+</script>
+</body>

@@ -1,0 +1,49 @@
+ /* MENU */
+
+.menuWrap { width: 162px; position:relative; left:-2px; height:19px; font: 11px/10px arial, helvetica, san-serif; text-align:left; color: #000; margin:10px; }
+.menuWrap .t .l { background: url("media/menuwrap-rnd.png") no-repeat -3px -3px; float:left; width: 3px; height: 3px; }
+.menuWrap .t .c { background: #eee; height:3px; width: 156px; float:left; }
+.menuWrap .t .r { background: url("media/menuwrap-rnd.png") no-repeat 0 -3px; float:right; width: 3px; height: 3px; }
+.menuWrap .b { clear:both; }
+.menuWrap .b .l { background: url("media/menuwrap-rnd.png") no-repeat -3px 0; float:left; width: 3px; height: 3px; }
+.menuWrap .b .c { background: #eee url("media/menubg.png") repeat-x left -12px; height:3px; width: 156px; float:left; }
+.menuWrap .b .r { background: url("media/menuwrap-rnd.png") no-repeat; float:right; width: 3px; height: 3px; }
+
+.menuBox { clear:both; background: #9d9d9d url("media/menubg.png") repeat-x; position: relative; height: 13px; overflow:hidden; -moz-user-select: none; -khtml-user-select: none; user-select: none; }
+.menuBox ul {list-style:none; padding:0; margin:0; position:absolute; width: 100%; z-index:10; }
+.menuBox ul li { padding: 3px 0 4px 7px; cursor: pointer; position:relative; top:-3px; }
+.menuBox ul li.sel { background: url("media/menu-arrows.png") no-repeat right 4px; }
+.menuBox ul.opened li { background: #eee; padding: 3px 0 4px 20px; cursor: pointer; border-bottom: 1px solid #d6d6d6; border-top: 1px solid #fff; }
+.menuBox ul.opened li.sel { background: #eee url("media/menuchk.png") no-repeat 5px 2px; }
+.menuBox ul.opened li:HOVER { background: #284ef4; border-bottom-color: #0d36e6; border-top-color: #284ef4; color: #fff; }
+.menuBox ul.opened li.sel:HOVER { background: #284ef4 url("media/menuchk-dark.png") no-repeat 5px 3px; }
+.menuBox ul li.top,
+.menuBox ul li.top:HOVER { padding:0; border:0; border-bottom:1px solid #eee; }
+.menuBox ul.opened li.top { cursor: default; padding:0; width: 100%; background: none; height: 3px; }
+.menuBox ul.opened li.top .l { background: url("media/menurnd.png") no-repeat -3px -10px; float:left; width: 3px; height: 3px; }
+.menuBox ul.opened li.top .c { background: #eee; height:3px; width: 156px; float:left; }
+.menuBox ul.opened li.top .r { background: url("media/menurnd.png") no-repeat 0 -10px; float:right; width: 3px; height: 3px; }
+.menuBox ul li.bottom { height:0; border:0; }
+.menuBox ul.opened li.bottom { cursor: default; padding:0; width: 100%; background: none; height: 7px; }
+.menuBox ul.opened li.bottom .l { background: url("media/menurnd.png") no-repeat -3px 0; float:left; width: 3px; height: 8px; }
+.menuBox ul.opened li.bottom .c { background: url("media/menu-shadow.png") repeat-x; height:10px; width: 156px; float:left; }
+.menuBox ul.opened li.bottom .r { background: url("media/menurnd.png") no-repeat; float:right; width: 3px; height: 8px; }
+
+/* WINDOWS */
+
+.gui { cursor: move; position: absolute; top: 0; left: 0; z-index: 2; }
+.gui br { CLEAR: both; }
+.gui .TL { background: url('http://www.colorjack.com/software/media/win_LT.png'); width: 16px; height: 26px; float: left; }
+.gui .TM { background: url('http://www.colorjack.com/software/media/win_MT.png'); width: 75px; height: 20px; float: left; text-align: center; padding-top: 6px; color: #fff; font-size: 13px; font-variant: small-caps }
+.gui .TML { float: left; z-index: 10; position: absolute; }
+.gui .TRx { float: right; position: relative; top: 2px; left: 1px }
+.gui .TRx img { float: left; margin: 0; padding: 0 0 0 6px; height: 12px; width: 12px; position: relative; top: 1px; opacity: 0.5; cursor: pointer }
+.gui .TRx img:hover { opacity: 1; }
+.gui .TRx div { width: 1px; background: #1a1a1a; height: 13px; float: left; margin: 1px 0 0 0; opacity: 0.5; display: none; }
+.gui .TR { background: url('http://www.colorjack.com/software/media/win_RT.png'); width: 16px; height: 26px; float: left; }
+.gui .ML { background: url('http://www.colorjack.com/software/media/win_LM.png'); float: left; width: 16px; height: 257px; }
+.gui .MM { background: url('http://www.colorjack.com/software/media/win_MM.png'); float: left; width: 75px; cursor: default; }
+.gui .MR { background: url('http://www.colorjack.com/software/media/win_RM.png'); float: left; width: 16px; height: 257px; }
+.gui .BL { background: url('http://www.colorjack.com/software/media/win_LB.png') 0 -22px; float: left; width: 16px; height: 20px; }
+.gui .BM { background: url('http://www.colorjack.com/software/media/win_MB.png') 0 -22px; float: left; width: 75px; height: 20px; }
+.gui .BR { background: url('http://www.colorjack.com/software/media/win_RB.png') -16px -22px; float: left; width: 16px; height: 20px; }

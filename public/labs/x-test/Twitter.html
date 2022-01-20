@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns = "http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Twitter</title>
+<style type="text/css">
+	body { margin: 20px ; font-family: futura; }
+</style>
+</head>
+<body>
+<script type="text/javascript">
+
+var tweetDiv = document.createElement("div");
+var tweets = undefined;
+function twitter(json) { 
+	tweets = json.results;
+	tweet();
+};
+function tweet() {
+	if (tweets == undefined) return;
+	var result = tweets[Math.random() * tweets.length >> 0];
+	tweetDiv.innerHTML = result.text + " [" + result.from_user + "]";
+};
+window.onload = function() {
+	document.body.appendChild(tweetDiv);
+
+	var script = document.createElement("script")
+	script.type = "text/javascript";
+	script.src = "http://search.twitter.com/search.json?q=%23breathing&rpp=100&callback=twitter";
+	document.body.appendChild(script);	
+};
+
+</script>
+</body>
+</html>
