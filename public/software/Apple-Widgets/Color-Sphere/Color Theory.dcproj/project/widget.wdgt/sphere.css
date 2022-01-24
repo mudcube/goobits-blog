@@ -1,0 +1,52 @@
+body { width: 100%; height: 100%; margin: 0; FONT-FAMILY: arial, helvetica, san-serif; FONT-SIZE: 12px; }
+img { border: 0; }
+br { CLEAR: both; }
+
+/* TOP */
+
+#top { cursor: move; MARGIN: 0 0 0 0; padding: 5px 0 0 7px; COLOR: #444; WIDTH: 100%; -moz-user-select: none; -khtml-user-select: none; user-select: none; z-index: 1000; position: fixed;  }
+
+/* BODY */
+
+#circle { position: absolute; -apple-dashboard-region: dashboard-region(control rectangle 0px 0px 0px 0px); }
+
+#hex { position: absolute; top: 39px; left: 235px; width: 300px; }
+#hex br { clear: both; }
+#hex span { padding: 0 0 0 8px; float: left; }
+#hex img { margin-bottom: 6px; width: 181px; height: 5px; -moz-user-select: none; -khtml-user-select: none; user-select: none; }
+#hex div { margin: 0 0 5px 0; width: 181px; height: 30px; font-family: arial; font-size: 12px; cursor: text; }
+#hex div div { left: 149px; width: 50px; position: absolute; font-size: 11px; }
+
+#curr { position: absolute; height: 400px; width: 400px; cursor: crosshair; color: #fff; }
+#curr div { background: url('media/miniCurr.gif'); width: 9px; height: 9px; z-index: 100; position: absolute; display: none; -moz-user-select: none; -khtml-user-select: none; user-select: none; }
+
+#slide { margin: 10px 0 5px 15px; color: #ccc; font-size: 12px; }
+
+#social { margin: 7px 0 0 250px; width: 300px; color: #555; position: absolute; }
+#social a { color: #aaa; cursor: pointer; padding: 0 2px; text-decoration: none; }
+#social a:hover { color: #e04f92 }
+
+#top option { padding-right: 10px; }
+#fu { width: 113px; }
+#blind { width: 110px; }
+#mode { width: 85px; }
+#model { width: 55px; }
+#flip { position: absolute; left: 402px; top: 7px; cursor: pointer; z-index: 10000; }
+#bookmark { position: absolute; left: 3px; top: 237px; cursor: pointer; z-index: 10000; cursor: pointer; }
+#bg { position: absolute; }
+
+select { font-family: arial; font-size: 12px; margin-top: 1px; }
+option { padding-right: 8px; }
+
+#CJ { cursor: pointer; position: absolute; top: 235px; width: 428px; text-align: center; font-size: 13px; color: #999; }
+#CJ:hover { color: #eee; }
+
+#prospect { position: absolute; left: 11px; top: 4px; color: #888; width: 300px; font-family: "Helvetica Neue"; font-size: 15px; font-weight: bold; }
+#prospect span { position: relative; top: 1px; }
+
+#custom { z-index: 1000; top: 30px; left: 296px; padding-top: 5px; BACKGROUND: #111; DISPLAY: none; Z-INDEX: 1000; POSITION: absolute; TEXT-ALIGN: center; -apple-dashboard-region: dashboard-region(control rectangle 0px 0px 0px 0px); }
+#custom .slide { BACKGROUND: url('media/barBG.png'); CURSOR: crosshair; WIDTH: 106px; margin-right: 10px; position: relative; left: -2px; }
+#custom .slide div { BACKGROUND: url('media/barCurr.png'); HEIGHT: 15px; LEFT: 0; POSITION: relative; TOP: 5px; WIDTH: 13px; margin-bottom: 10px; }
+#custom .slide:active div, #custom .slide:hover div { BACKGROUND-POSITION: 0 15px; }
+#custom .bot { padding: 5px 0 5px 0; font-size: 12px; border-top: 1px solid #222; cursor: pointer; color: #ccc; }
+#custom .bot:hover { color: #e04f92; }

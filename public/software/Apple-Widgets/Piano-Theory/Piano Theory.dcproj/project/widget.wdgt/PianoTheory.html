@@ -1,0 +1,54 @@
+
+<html>
+<head>
+    <title>BandAMP: Music Theory</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style type="text/css" title="Theory">@import "PianoTheory.css";</style>
+    <script type="text/javascript" src="Animate.js"></script>
+    <script type="text/javascript" src="/System/Library/WidgetResources/AppleClasses/AppleSlider.js" charset="utf-8"></script>
+    <script type="text/javascript" src="PianoTheory.js"></script>
+</head>
+<body>
+    <canvas id="bg" width="550" height="257"></canvas>
+    <div id="update"></div>
+    <div id="front">
+        <div id="keys"></div>
+        <div id="which"></div>
+        <div id="theory">
+            <select id="key" onmouseup="func(); inV=0;" onkeyup="func(); inV=0;" title="Keys">
+            </select>
+            <select id="octave" onmouseup="func(); inV=0;" onkeyup="func(); inV=0;" title="Octaves">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+            <select id="chord" onmouseup="mkChord(); func=function(){ mkChord(); }; inV=0;" onkeyup="mkChord(); func=function(){ mkChord(); }; inV=0;" title="Chords">
+            </select>
+            <input type="checkbox" title="Lock Chord to Keys" checked="" id="lock">
+            <select id="scale" onmouseup="mkScale(); func=function(){ mkScale(); }; inV=0;" onkeyup="mkScale(); func=function(){ mkScale(); }; inV=0;" title="Scales">
+            </select>
+            <input type="button" onclick="invert(-1)" value="-" title="Inversion -1">
+            <input type="button" onclick="invert(1)" value="+" title="Inversion +1">
+            <div style="display: none">
+                <input type="button" name="Stop" value="stop" onmousedown="MIDIPlugin.allNotesOff()">
+                <input type="button" onclick="func()" name="Play" value="play">
+                <input type="button" onclick="prog()" value="prog">
+                <input type="button" onclick="findCS(Co)" value="find">
+                <input id="find" style="width: 50px;">
+            </div>
+            <textarea id="T" style="width: 95%; height: 30px; margin: 9px 0; display: none;"></textarea>
+        </div>
+        <img src="media/cog.png" class="flip" onclick="$S('back').zIndex = 1; $S('front').zIndex = 0; showBack(event);" title="Customize">
+    </div>
+    <div id="back">
+        <input id="sustain" value="270" style="width: 35px; display: none" title="Sustain">
+        <input id="tempo" value="270" style="width: 35px; display: none" title="Tempo" onclick="setTimeout(fuTap,1)">
+        <div id="volumeTitle">Volume</div> <div id="volumeSlider"></div><div id="volumeValue"></div>
+        <div id="reverbTitle">Reverb</div> <div id="reverbSlider"></div><div id="reverbValue"></div>
+        <div onclick="widget.openURL('http://www.mudcube.com/widget/')" id="more">mudcube.com</div>
+        <img src="media/music.png" class="flip" onclick="$S('back').zIndex = 0; $S('front').zIndex = 1; hideBack(event);">
+    </div>
+</body>
+</html>
