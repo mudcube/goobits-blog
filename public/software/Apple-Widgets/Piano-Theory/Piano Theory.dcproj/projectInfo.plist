@@ -11,7 +11,7 @@
 			<key>MainCSS</key>
 			<string>main.css</string>
 			<key>MainJS</key>
-			<string>main.js</string>
+			<string>App.js</string>
 			<key>ProductDir</key>
 			<string>widget.wdgt</string>
 			<key>Steps</key>
