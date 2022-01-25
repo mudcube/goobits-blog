@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @author sbossen 
- * http://right-handed-monkey.blogspot.com
- */
-
 use Aws\Ses\SesClient;
 
 /*
@@ -29,8 +24,8 @@ use Aws\Ses\SesClient;
 
 class SESMailer {
 	const version = "1.0";
-	const AWS_KEY = "AKIATOEGPMJX7HO6732D"; // sketch.io-mailer
-	const AWS_SEC = "ak4yD5QBFlvhb42EAPCbs0i19vveIhQbnsIbqEyv";
+	const AWS_KEY = "AKIATOEGPMJXV6IWUAPD"; // miko.art-mailer
+	const AWS_SEC = "/r0tcAngZb/aWDQttWkrLEjMbTIgTvA9YxIAUHFb";
 	const AWS_REGION = "us-east-1";
 	const MAX_ATTACHMENT_NAME_LEN = 60;
 
@@ -165,5 +160,3 @@ class SESResultHelper {
 	public $error = "";
 	public $id = "";
 }
-
-?>
