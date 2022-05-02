@@ -1,14 +1,17 @@
-import {AwsClient} from 'aws4fetch'
+import {SESClient, SendEmailCommand} from "@aws-sdk/client-ses";
 
 const MY_EMAIL = 'hello@miko.art'
 const MY_NAME = 'Miko'
 
-const aws = new AwsClient({
-	accessKeyId: 'AKIATOEGPMJXV6IWUAPD',
-	secretAccessKey: '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'
-})
+const credentials = {
+	accessKeyId: 'AKIATOEGPMJXWTCUMFUR',
+	secretAccessKey: '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'
+}
 
-const SES_ENDPOINT = 'https://email.us-east-2.amazonaws.com/v2/email/outbound-emails'
+const sesClient = new SESClient({
+	region: 'us-east-1',
+	credentials: credentials
+})
 
 const corsHeaders = new Headers({
 	'Access-Control-Allow-Headers': '*',
@@ -19,45 +22,34 @@ const corsHeaders = new Headers({
 async function handleRequest(request) {
 	const {name = "", email, message = ""} = await request.json()
 
-	const messagePayload = {
-		Source: `${MY_NAME} <${MY_EMAIL}>`,
-		Destination: {
-			ToAddresses: [email],
-		},
-		ReplyToAddresses: [MY_EMAIL],
-		Message: {
-			Subject: {
-				Charset: "UTF-8",
-				Data: `Hello from ${name}`
+	try {
+		const {status} = await sesClient.send(new SendEmailCommand({
+			Source: `${MY_NAME} <${MY_EMAIL}>`,
+			FromEmailAddress: MY_EMAIL,
+			Destination: {
+				ToAddresses: [MY_EMAIL]
 			},
-			Body: {
-				Text: {
+			ReplyToAddresses: [email],
+			Message: {
+				Body: {
+					Text: {
+						Charset: "UTF-8",
+						Data: message
+					}
+				},
+				Subject: {
 					Charset: "UTF-8",
-					Data: message
+					Data: `Hello from ${name}`
 				}
 			}
-		}
-	}
+		}))
 
-	// Build signed request with aws4fetch
-	const signedRequest = await aws.sign(SES_ENDPOINT, {
-		method: 'POST',
-		body: JSON.stringify(messagePayload),
-	})
-
-	// Send the SES request
-	const sesResponse = await fetch(signedRequest)
-
-	// Return a simplified response to frontend
-	const {ok, status} = await sesResponse
-
-	if (ok) {
 		return new Response(`SES responded okay ${status}`, {
 			status: 200,
 			headers: corsHeaders
 		})
-	} else {
-		return new Response(`SES responded with error ${status}`, {
+	} catch (error) {
+		return new Response(error, {
 			status: 500,
 			headers: corsHeaders
 		})
