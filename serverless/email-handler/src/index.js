@@ -1,7 +1,6 @@
 import {SESClient, SendEmailCommand} from "@aws-sdk/client-ses";
 
 const MY_EMAIL = 'hello@miko.art'
-const MY_NAME = 'Miko'
 
 const credentials = {
 	accessKeyId: 'AKIATOEGPMJXWTCUMFUR',
@@ -24,8 +23,8 @@ async function handleRequest(request) {
 
 	try {
 		const {status} = await sesClient.send(new SendEmailCommand({
-			Source: `${MY_NAME} <${MY_EMAIL}>`,
-			FromEmailAddress: MY_EMAIL,
+			Source: `${name} <${MY_EMAIL}>`,
+			FromEmailAddress: email,
 			Destination: {
 				ToAddresses: [MY_EMAIL]
 			},
@@ -39,7 +38,7 @@ async function handleRequest(request) {
 				},
 				Subject: {
 					Charset: "UTF-8",
-					Data: `Hello from ${name}`
+					Data: `Miko.art: Contact`
 				}
 			}
 		}))
