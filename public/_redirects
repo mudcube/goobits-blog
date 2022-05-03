@@ -1,2 +1,2 @@
-/sphere/ https://colorsphere.app 301
-/piano/ https://colorpiano.app 301
+/sphere* https://colorsphere.app$1 301
+/piano* https://colorpiano.app$1 301
