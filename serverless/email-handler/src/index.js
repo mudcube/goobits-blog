@@ -2,20 +2,18 @@ import {SESClient, SendEmailCommand} from "@aws-sdk/client-ses";
 
 const MY_EMAIL = 'hello@miko.art'
 
-const credentials = {
-	accessKeyId: 'AKIATOEGPMJXWTCUMFUR',
-	secretAccessKey: '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'
-}
-
-const sesClient = new SESClient({
-	region: 'us-east-1',
-	credentials: credentials
-})
-
 const corsHeaders = new Headers({
 	'Access-Control-Allow-Headers': '*',
 	'Access-Control-Allow-Methods': 'POST, OPTIONS',
 	'Access-Control-Allow-Origin': '*'
+})
+
+const sesClient = new SESClient({
+	region: 'us-east-1',
+	credentials: {
+		accessKeyId: 'AKIATOEGPMJXWTCUMFUR',
+		secretAccessKey: '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'
+	}
 })
 
 async function handleRequest(request) {
@@ -55,30 +53,30 @@ async function handleRequest(request) {
 	}
 }
 
-async function handleOptions() {
-	return new Response(null, {
-		status: 200,
-		headers: corsHeaders
-	})
-}
-
-async function handleBadReq() {
-	return new Response('Bad Request', {
-		status: 400,
-		headers: corsHeaders
-	})
-}
-
 addEventListener('fetch', event => {
 	switch (event.request.method) {
 		case 'POST':
-			event.respondWith(handleRequest(event.request))
+			event.respondWith(
+				handleRequest(event.request)
+			)
 			break
+
 		case 'OPTIONS':
-			event.respondWith(handleOptions(event.request))
+			event.respondWith(
+				new Response(null, {
+					status: 200,
+					headers: corsHeaders
+				})
+			)
 			break
+
 		default:
-			event.respondWith(handleBadReq(event.request))
+			event.respondWith(
+				new Response('Bad Request', {
+					status: 400,
+					headers: corsHeaders
+				})
+			)
 			break
 	}
 })
