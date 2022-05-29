@@ -1,6 +1,8 @@
 body { width: 100%; height: 100%; margin: 0; FONT-FAMILY: arial, helvetica, san-serif; FONT-SIZE: 12px; background: #090909; overflow: hidden; }
 br { CLEAR: both; }
 img { border: 0; }
+a { color: #0099FF; }
+a:hover { color: #ee1155; }
 
 a.ads { color: #ffee00 }
 a.ads:hover { color: #ee1155 }
