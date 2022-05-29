@@ -117,7 +117,7 @@ a.ads:hover { color: #ee1155 }
 #canvas .MM img { position: absolute; }
 #canvas .BR { cursor: se-resize; }
 #canvas .center { margin-top: 3px; text-align: center; color: #bbb; width: 100%; }
-#canvas .center span { font-size: 10px; white-space: no-wrap; width: 0; }
+#canvas .center span { font-size: 10px; white-space: nowrap; width: 0; }
 #canvas .east { font-size: 10px; position: relative; top: -11px; color: #aaa; float: right }
 
 #ctx_box { background: url('../media/gui/op_8x8.gif'); }
@@ -290,4 +290,4 @@ canvas#fill,canvas#stroke { HEIGHT: 23px; WIDTH: 34px; CURSOR: pointer; BORDER: 
 #TEST div { display: inline; padding: 2px 6px 3px; margin-right: 2px; border: 1px solid #bbb; cursor: pointer; background: #eee; }
 #TEST div:hover { background: #fff; border: 1px solid #aaa; color: #A6197B; }
 #TEST span { display: inline; padding-right: 2px; color: #999; }
-#TEST textarea { width: 680px; height: 80px; padding: 7px; position: relative; background: #000; border: 0; display: ; overflow: hidden; color: #555; }
+#TEST textarea { width: 680px; height: 80px; padding: 7px; position: relative; background: #000; border: 0; overflow: hidden; color: #555; }
