@@ -1,7 +1,5 @@
 /* Library */
 
-cDB={};
-
 cDB['Library']={
 
 	'CNE':'The Color Naming Experiment (CNE) is an experiment by Nathan Moroney, an employee at Hewlett-Packard. These are the current results of his unconstrained color naming experiment which is taking place in 22 languages.',
