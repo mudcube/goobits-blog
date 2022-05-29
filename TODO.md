@@ -1,4 +1,4 @@
-Fix:
+FIX:
 - ColorSphere.app
 - Convert journal to static pages: https://wordpress.org/plugins/simply-static/
 - Look through /labs* for any issues...
@@ -9,8 +9,20 @@ Fix:
 - Thumbnailer
 - ZenBG
 
+301 redirects: 
+- Colorjack.com -> Miko.art via Porkbun redirect
+- Colourjack.com -> Miko.art via Porkbun redirect
+- Galactic.ink -> Miko.art via Porkbun redirect
+- GalacticMilk.com -> Miko.art via Porkbun redirect
+- Mudcu.be -> Miko.art via Porkbun redirect
+- Mudcube.com -> Miko.art via Porkbun redirect
+
 Questions:
 - Are symlinks possible?
 - Are directory listings possible?
+
+Check:
+- colorjack.com/sphere should redirect to galactic.ink/sphere/
+- test all redirects
 
 https://www.orbitmedia.com/blog/deleting-old-content/

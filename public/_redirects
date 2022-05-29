@@ -1,6 +1,7 @@
-/piano* https://colorpiano.app:splat 301
-/sphere* https://colorsphere.app:splat 301
 /bg* /labs/zen-bg/ 301
 /midi-js* /labs/midi-js/ 301
+/piano* https://colorpiano.app:splat 301
 /sketch-js* /labs/sketch-js/ 301
 /sketchpad* /labs/sketchpad/ 301
+/software/Thumbnailer* /labs/thumbnailer/ 301
+/sphere* https://colorsphere.app:splat 301
