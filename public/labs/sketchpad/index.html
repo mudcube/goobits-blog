@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" manifest="sketchpad.appcache">
+<html xmlns="http://www.w3.org/1999/xhtml" manifest="sketchpad.appcache" lang="">
 <head>
     <title>Sketchpad - Online Paint/Drawing application</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -11,33 +11,9 @@
     <link rel="chrome-webstore-item"
           href="https://chrome.google.com/webstore/detail/lkllajgbhondgjjnhmmgbjndmogapinp"/>
     <link href="inc/Sketchpad.css" rel="stylesheet" type="text/css"/>
-    <!--[if lt IE 9]>
-    <OBJECT ID="canvasFactory" CLASSID="clsid:785740C4-DD04-4B91-8AD7-44CC9FFB4984"></OBJECT>
-    <style>
-        canvas {
-            behavior: url(#canvasFactory);
-            width: 300px;
-            height: 150px;
-            display: block;
-            margin: 0;
-            border: 0;
-            background: transparent !important;
-        }
-    </style>
-    <canvas id="CanvasRenderingContext2D" style="display: none"/>
-    <script>
-        // CanvasRenderingContext2D.prototype = CanvasRenderingContext2D.getContext('2d').prototype;
-        if (0) document._createElement = document.createElement;
-        if (0) document.createElement = function (tagName) {
-            var tag = document._createElement(tagName);
-            if (tagName.toUpperCase() == 'CANVAS') tag.addBehavior("#canvasFactory");
-            return tag;
-        };
-    </script>
-    <![endif]-->
     <script type="text/javascript">
 		marqueeID = false;
-		mixin = function (o) { // dojo.mixin
+		mixin = function (o) {
 			var len = arguments.length;
 			for (var i = 1; i < len; i++)
 				for (var j in arguments[i])
@@ -47,9 +23,7 @@
 		var dtx2D = document.createElement("canvas");
 		var ctx2D;
 		try { ctx2D = dtx2D.getContext('2d'); } catch (e) {}
-		;
 		var data2pattern = function (obj, data) {
-			// if(dtx2D.parentNode === null) document.body.appendChild(dtx2D);
 			if (ctx2D == null) ctx2D = dtx2D.getContext('2d');
 
 			function createPattern(src, id) {
@@ -64,7 +38,6 @@
 			}
 		};
     </script>
-    <!-- Sketchpad -->
     <script src="inc/gui.js" type="text/javascript"></script>
     <script src="inc/Canvas2D.js" type="text/javascript"></script>
     <script src="inc/dump.js" type="text/javascript"></script>
@@ -77,7 +50,6 @@
     <script src="inc/tools-draw.js" type="text/javascript"></script>
     <script src="inc/Media.js" type="text/javascript"></script>
     <script src="inc/Sketchpad.js" type="text/javascript"></script>
-    <!-- VersionManager -->
 </head>
 <body onmousedown="if(false && preventDefault) event.preventDefault(); preventDefault = true;">
 

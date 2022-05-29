@@ -1,12 +1,16 @@
-Fix
+Fix:
 - ColorSphere.app
-- Melodic Mandalas
+- Convert journal to static pages: https://wordpress.org/plugins/simply-static/
+- Look through /labs* for any issues...
+- labs/melodic-mandalas/
 - SandPainting.app
-- Sketchpad v1.0
 - Sketchpad Mobile
+- Sketchpad v1.0
 - Thumbnailer
 - ZenBG
-- labs/
 
-- Convert journal to static pages: https://wordpress.org/plugins/simply-static/
-- 
+Questions:
+- Are symlinks possible?
+- Are directory listings possible?
+
+https://www.orbitmedia.com/blog/deleting-old-content/
