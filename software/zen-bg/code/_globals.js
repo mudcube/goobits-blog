@@ -21,7 +21,7 @@ export function createInput(props) {
 	$div.appendChild(d)
 	var d = document.createElement("input")
 	d.setAttribute("type", "range")
-	Event.add(d, 'mousedown', Event.cancel)
+	Event.add(d, 'mousedown', Event.stop)
 	for (let key in props) {
 		if (key.substr(0, 2) === "on") d[key] = props[key]
 		else d.setAttribute(key, props[key])
