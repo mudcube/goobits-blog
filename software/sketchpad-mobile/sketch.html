@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 -disable-al//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1--disable-al.dtd">
+<!--<html xmlns="http://www.w3.org/1999/xhtml" manifest="manifest.appcache">-->
+<head>
+	<script type="text/javascript">
+		if (!document.createElement("canvas").getContext) {
+			window.location = "./upgrade/";
+		}
+	</script>
+	<title>Sketch Mobile&mdash;Multi-touch drawing in HTML5.</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="description" content="Check out &ldquo;Sketch Mobile&rdquo; a multi-touch drawing application written in HTML5; http://sketch.io" />
+	<meta name="viewport" content="minimum-scale=1.0,maximum-scale=1.0,initial-scale=1.0,user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<link rel="icon" href="./media/favicon/apple-touch-icon-precomposed.png" type="image/x-icon" />
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://sketch.io/media/favicon/apple-touch-icon-144x144-precomposed.png" />
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://sketch.io/media/favicon/apple-touch-icon-114x114-precomposed.png" />
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://sketch.io/media/favicon/apple-touch-icon-72x72-precomposed.png" />
+	<link rel="apple-touch-icon-precomposed" href="http://sketch.io/media/favicon/apple-touch-icon-precomposed.png" />
+	<script src="./app.js" type="text/javascript"></script>
+
+	<link href="./css/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+
+<div id="canvasArea" class="active" style="display: block">
+	<canvas id="layer0"></canvas>
+	<canvas id="active"></canvas>
+	<canvas id="cache"></canvas>
+</div>
+
+<div id="toolPreview">
+	<div id="activeArea">
+		<div class="canvasWrapper">
+			<div id="closePreview">OK!</div>
+			<canvas id="preview"></canvas>
+		</div>
+	</div>
+	<div id="swatch">
+		<ul id="colorSwatch"></ul>
+		<ul id="gradientSwatch"></ul>
+	</div>
+</div>
+
+<div id="toolBuilder">
+	<ul id="presets">
+		<li id="p0"><div class="inner"><span class="textNode">1</span></div></li>
+		<li id="p1"><div class="inner"><span class="textNode">2</span></div></li>
+		<li id="p2"><div class="inner"><span class="textNode">3</span></div></li>
+		<li id="p3"><div class="inner"><span class="textNode">4</span></div></li>
+		<li id="p4"><div class="inner"><span class="textNode">5</span></div></li>
+	</ul>
+	<div id="tool">
+		<ul id="toolMenu">
+			<li class="menu">
+				<span class="current"><span class="textNode"><span class="ico">&</span>Magic Brush</span></span>
+				<ul>
+					<li id="vector-menu"><span class="ico">&</span>Magic Brush</li>
+					<li id="bitmap-menu" class="hidden"><span class="ico">%</span>Paint Brush</li>
+					<li id="shape-menu"><span class="ico">$</span>Shape</li>
+				</ul>
+			</li>
+		</ul>
+		<div id="toolBox">
+			<ul class="list" id="vector_list">
+				<li class="spacer"></li>
+				<li id="spirograph"><span class="textNode"><span class="ico">2</span>Spirograph</span></li>
+				<li id="hair"><span class="textNode"><span class="ico">B</span>Hair</span></li>
+				<li id="string"><span class="textNode"><span class="ico">(</span>Strings</span></li>
+				<li id="web"><span class="textNode"><span class="ico">!</span>Web</span></li>
+				<li id="shader"><span class="textNode"><span class="ico">6</span>Shader</span></li>
+				<li id="fur"><span class="textNode"><span class="ico">"</span>Fur</span></li>
+				<li id="sketchy"><span class="textNode"><span class="ico">5</span>Sketchy</span></li>
+				<li id="chrome"><span class="textNode"><span class="ico">M</span>Chrome</span></li>
+				<li id="floodfill"><span class="textNode"><span class="ico">F</span>Flood Fill</span></li>
+			</ul>
+			<ul class="list" id="bitmap_list">
+				<li class="spacer"></li>
+				<li id="pencil"><span class="textNode"><span class="ico">;</span>Pencil</span></li>
+				<li id="calligraphy"><span class="textNode"><span class="ico">N</span>Calligraphy</span></li>
+				<li id="crayon"><span class="textNode"><span class="ico">K</span>Crayon</span></li>
+				<li id="streamer"><span class="textNode"><span class="ico">)</span>Streamer</span></li>
+				<li id="automater"><span class="textNode"><span class="ico">8</span>Automator</span></li>
+				<li id="spraypaint"><span class="textNode"><span class="ico">/</span>Spraypaint</span></li>
+				<li id="brush"><span class="textNode"><span class="ico">P</span>Brush</span></li>
+				<li id="oil"><span class="textNode"><span class="ico">=</span>Oil</span></li>
+				<li id="eraser"><span class="textNode"><span class="ico">H</span>Eraser</span></li>
+			</ul>
+			<ul class="list" id="shape_list">
+				<li class="spacer"></li>
+				<li id="ellipse"><span class="textNode"><span class="ico">L</span>Circle</span></li>
+				<li id="rectangle"><span class="textNode"><span class="ico">.</span>Square</span></li>
+				<li id="polygon"><span class="textNode"><span class="ico">9</span>Polygon</span></li>
+				<li id="gear"><span class="textNode"><span class="ico">C</span>Gear</span></li>
+				<li id="star"><span class="textNode"><span class="ico">-</span>Star</span></li>
+				<li id="burst"><span class="textNode"><span class="ico">O</span>Burst</span></li>
+				<li id="radialburst"><span class="textNode"><span class="ico">7</span>Radial Burst</span></li>
+				<li id="spiral"><span class="textNode"><span class="ico">3</span>Spiral</span></li>
+				<li id="supershape"><span class="textNode"><span class="ico">'</span>Supershape</span></li>
+			</ul>
+		</div>
+	</div>
+	<div id="options">
+		<ul id="configure" class="list"></ul>
+	</div>
+</div>
+
+<div id="splash">
+	<div id="startup" class="active">
+		<div>
+			<h1 style="line-height: 0.5em; padding-bottom: 0.25em;">Sketch Mobile<span title="Menu" class="ico" style="padding-left: 0.15em; font-size: 1.42em; color: #FFF;">&gt;</span></h1>
+			<div class="icon" id="start-info-button"><span class="ico" style="background: #0fad1c">*</span><span class="title">information</span></div>
+			<div class="icon" id="start-backdrop-button"><span class="ico" style="background: #FDC22C; ">,</span><span class="title">new canvas</span></div>
+			<div class="icon" id="start-go-button"><span class="ico" style="background: #E62B32; ">&gt;</span><span class="title">draw</span></div>
+		</div>
+		<div class="footer">
+			<div style="float: left; padding: 1em; text-align: left;">
+				<a href="http://chromeexperiments.com/" style="color: #fff;"><div style="font-size: 0.6em; line-height: 1em; ">This is a </div><div style="font-size: 1em; line-height: 1.25em; ">Chrome</div><div style="font-size: 1em; line-height: 1.15em; ">Experiment</div></a>
+			</div>
+			<div style="float: right; padding: 1.5em 1.5em 1.5em 0">
+				<a href="https://twitter.com/intent/tweet?original_referer=http://sketch.io/&text=Check out &ldquo;Sketch Mobile&rdquo; a multi-touch drawing application written in HTML5; http://sketch.io" target="_blank"><span class="ico">Q</span></a>
+				<a href="http://facebook.com/sharer/sharer.php?u=http://sketch.io/" target="_blank"><span class="ico">R</span></a>
+				<a href="https://plusone.google.com/_/+1/confirm?hl=en&url=http://www.sketch.io/" target="_blank"><span class="ico">#</span></a>
+			</div>
+		</div>
+	</div>
+	<div id="textures"></div>
+	<div id="tutorial">
+		<div style="padding: 1em; line-height: 1.25em; font-size: 1em; font-family: 'Book Antiqua', 'Palatino Linotype', Palatino, serif;">
+			<h1 style="margin-top: 0.25em;">Glossary</h1>
+			<ol style="margin: 0 0 0 50px">
+				<li><a href="#info_sketchmobile">What&rsquo;s Sketch Mobile?</a>
+				<li><a href="#info_drawingarea">Drawing area</a>
+				<li><a href="#info_powernib">Power nib + terminal</a>
+				<li><a href="#info_toolbuilder">Tool builder</a>
+				<li><a href="#info_technologies">Technologies</a>
+				<li><a href="#info_humanstxt">Humans.txt</a>
+				<li><a href="#info_licensing">Licensing</a>
+			</ol>
+
+			<h1 id="info_sketchmobile">What&rsquo;s Sketch Mobile?</h1>
+			<blockquote>
+				Sketch Mobile is a drawing tool that takes advantage of the new capabilities presented in modern mobile browsers; including multi-touch, the accelerometer, and the gyroscope; providing a fun & novel environment to express yourself in colorful ways! Sketch Mobile was commissioned by Google as part of the <a href="http://mobile.chromeexperiments.com/">Mobile Chrome Experiments</a> released at <a href="https://developers.google.com/events/io/">Google I/O 2012</a>.
+			</blockquote>
+
+			<h1 id="info_drawingarea">Drawing area</h1>
+			<blockquote>
+				<p>Sketch Mobile utilizes multi-touch capabilities by allowing each each finger to become a new input device&mdash;multiple people can paint on the same device at the same time, creating collaborative works of art. There are four primary types of tools to be aware of;</p>
+				<ol>
+					<li><b>Click (1 finger)</b>&mdash;the <i>&ldquo;Floodfill&rdquo;</i> fills the screen with one click.</li>
+					<li><b>Brushes (1+ finger)</b>&mdash;with these tools, each finger represents one brush; use your whole hand to finger-paint like you did as a child, but with fun new twists. These types of brushes include; <i>Pencil, Calligraphy, Crayon, Streamer, Automater, Spraypaint, Brush, Oil, Eraser, Spirograph, Hair, Web, Shader, Fur, Sketchy,</i> and <i>Chrome</i>.</li>
+					<li><b>Shapes (2 fingers)</b>&mdash;two fingers represent one shape; rotating your fingers rotates the shape, spreading your fingers enlarges the shape, while pinching decreases the size, and dragging your fingers around the screen moves the shape. Included in Sketch Mobile you will find; <i>Circle, Square, Polygon, Gears, Star, Burst, Radial Burst, Spiral</i> and <i>Supershape</i>.</li>
+					<li><b>Brushes (2+ finger)</b>&mdash;the <i>&ldquo;Strings&rdquo;</i> tool allows you to create a non-regular polygon, where each point of the polygon is represented by one of your fingers; ten fingers creates a ten-sided non-regular polygon.</li>
+				</ol>
+			</blockquote>
+
+			<h1 id="info_powernib">Power nib + terminal</h1>
+			<blockquote>
+				<p>When you enter the drawing area, you will notice the screen is mostly blank, except for a small circular button on the top left hand side of the screen&mdash;this is the Power nib which is used as a gateway to configuring Sketch Mobile. There are two ways to use the <a href="#info_powernib">Power nib</a>;</p>
+				<ol>
+					<li>To enter the <i>Tool builder</i>, simply <b>tap on the nib once</b> (see next section).</li>
+					<li>To enter the <i>Power nib terminal</i> simply <b>tap & hold the nib</b>&mdash;once the screen turns white, you can start entering gesture-based commands with your other hand;</li>
+					<ol style="list-style-type: lower-alpha;">
+						<li>Draw a &ldquo;check&rdquo; to save your photograph.</li>
+						<ol style="list-style-type: circle;">
+							<li>Once you&rsquo;re in the save screen, tap and hold your finger on your drawing until a menu appears, and tap on &ldquo;Save&rdquo;.</li>
+						</ol>
+						<li>Draw a &ldquo;circle&rdquo; to clear the canvas.</li>
+						<li>Draw the letter &ldquo;s&rdquo; to take a shortcut to the style chooser.</li>
+						<li>While holding the button, tap the screen with different finger combinations to access tool presets that have been setup in the Tool builder, e.g. 1-finger tap = red soft paintbrush; 2-finger tap = blue star shape; 3-finger tap = large eraser, and so on. There are 5-spots that can be used for presets.</li>
+					</ol>
+				</ol>
+			</blockquote>
+
+			<h1 id="info_toolbuilder">Tool builder</h1>
+			<blockquote>
+				<p>Each tool has an array of options with multiple blending modes, colors, gradients, and tool specific options, to quickly fill the canvas. Create pleasing digital artwork&mdash;no degree in design required! There are four primary sections to the Tool builder:</p>
+				<ol>
+					<li>Presets&mdash;there are five preset buttons, labeled 1-5, that are entirely customizable, and an easy way to get back to settings that you recently created. You can switch between presets by tapping these buttons, or accessing them in the <a href="#info_powernib">Power nib terminal</a>.</li>
+					<li>Tool selector&mdash;tools are labeled with icons, such as a &ldquo;Pencil&rdquo; or &ldquo;Crayon&rdquo;, to change tools simply tap them once. Above the tool icons you will find a menu that allows you to select what type of tool you want to use, including:</li>
+					<ol style="list-style-type: circle;">
+						<li>Paint brushes&mdash;Pencil, Calligraphy, Crayon, Streamer, Automator, Spraypaint, Brush, Oil, and the Eraser.</li>
+						<li>Magic brushes&mdash;Spirograph, Hair, Strings, Web, Shader, Fur, Sketchy, Chrome, and the Flood Fill.</li>
+						<li>Shapes&mdash;Circle, Square, Polygon, Gear, Star, Burst, Radial Burst, Spiral, and the Supershape. </li>
+					</ol>
+					<li>Tool customizer&mdash;located to the right hand side of the Tool selector, this is where all the options for configuring the tools exist. You can control things such as;</li>
+					<ol style="list-style-type: circle;">
+						<li>Alpha&mdash;increase or decrease the opacity of your tool.</li>
+						<li>Composite&mdash;Erase, Paint, Light, and Disco modes.</li>
+						<li>Size&mdash;increase or decrease the radius of a shape.</li>
+						<li>Style&mdash;toggle between colors and gradients.</li>
+						<li>Color Mode&mdash;Linear, Radial or Cycling colors.</li>
+						<li>Color Noise&mdash;add randomized noise to your colors.</li>
+						<li>Rotation&mdash;control the random rotation of tool. </li>
+						<li>Scale&mdash;control the random scaling of tool.</li>
+						<li>Translate&mdash;control the random movement of tool.</li>
+					</ol>
+					<li>Preview&mdash;accessible by tapping on any colored box to the right of the Tool customizer. When you&rsquo;re in the preview area, you can test out styles and tool settings without affecting your canvas.
+				</ol>
+				<p>Once you&rsquo;ve chosen options you&rsquo;re satisfied with, click on the bright green &ldquo;check&rdquo; button to return to the <a href="#info_drawingarea">Drawing area</a>.</p>
+			</blockquote>
+
+			<h1 id="info_technologies">Technologies</h1>
+			<blockquote>
+				<ol style="list-style-type: circle;">
+					<li>Gyroscope&mdash;controls where the drips go using spraypaint tool.
+					<li>Accelerometer&mdash;shake the device to clear the drawing like an Etch-a-Sketch.
+					<li>Canvas&mdash;used to create the drawing area.
+					<li>CSS3&mdash;used to create responsive design, looking the same on mobile devices as on desktop computers.
+					<li>Icon Fonts&mdash;used for all the graphical elements within the application. 
+					<li>localStorage&mdash;used to keep configuration when user comes back.
+				</ol>
+			</blockquote>
+
+			<h1 id="info_humanstxt">Humans.txt</h1>
+			<blockquote>
+				<b>Developer</b>
+				<blockquote>
+					Michael Deal <a href="http://twitter.com/#!/mudcube">@mudcube</a><br>
+					<a href="http://mudcu.be">http://mudcu.be/</a>
+				</blockquote>
+				<b>UI Designer</b>
+				<blockquote>
+					Daniel Christopher <a href="http://twitter.com/#!/uxmonk">@uxmonk</a><br>
+					<a href="http://mudcu.be">http://uxmonk.com/</a>
+				</blockquote>
+				<b>&ldquo;Chrome&rdquo;, &ldquo;Shaded&rdquo;, &ldquo;Sketchy&rdquo;, &ldquo;Web&rdquo; and &ldquo;Fur&rdquo;</b>
+				<blockquote>
+					Ricardo Cabello <a href="http://twitter.com/#!/mrdoob">@mrdoob</a><br>
+					<a href="http://mrdoob.com">http://mrdoob.com/</a>
+				</blockquote>
+				<b>&ldquo;Spray-paint&rdquo;</b>
+				<blockquote>
+					Lukasz Karluk <a href="http://twitter.com/#!/julapy">@julapy</a><br>
+					<a href="http://julapy.com">http://julapy.com/</a>
+				</blockquote>
+				<b>&ldquo;Streamer&rdquo;</b>
+				<blockquote>
+					Dan Gries<br>
+					<a href="http://dangries.com">http://dangries.com/</a>
+				</blockquote>
+				<b>$1 Unistroke Recognizer</b>
+				<blockquote>
+					Jacob O. Wobbrock wobbrock@uw.edu<br>
+					Andrew D. Wilson awilson@microsoft.com<br>
+					Yang Li yangli@cs.washington.edu<br>
+					<a href="http://depts.washington.edu/aimgroup/proj/dollar">http://depts.washington.edu/aimgroup/proj/dollar/</a>
+				</blockquote>
+				<b>HTML5 Boilerplate</b>
+				<blockquote>
+					<a href="http://html5boilerplate.com/">http://html5boilerplate.com/</a>
+				</blockquote>
+				<b>The Noun Project</b>
+				<blockquote>
+					<a href="http://thenounproject.com">http://thenounproject.com/</a>
+				</blockquote>
+				<b>IcoMoon</b>
+				<blockquote>
+					<a href="http://keyamoon.com/icomoon">http://keyamoon.com/icomoon/</a>
+				</blockquote>
+				<b>Texturise</b>
+				<blockquote>
+					<a href="http://texturise.com">http://texturise.com/</a>
+				</blockquote>
+				<b>Web Treats</b>
+				<blockquote>
+					<a href="http://webtreats.mysitemyway.com">http://webtreats.mysitemyway.com/</a>
+				</blockquote>
+			</blockquote>
+
+			<h1 id="info_licensing">Licensing</h1>
+			<blockquote>
+				<p>Sketch Mobile comes under various licensing:</p>
+				<ol style="list-style-type: circle;">
+					<li>Sketch Mobile is available for schools and educational resources under the Creative Commons BY-NC 3.0 license. For more information, and a link to the code repo, contact me <a href="http://twitter.com/#!/mudcube">@mudcube</a>.</li>
+					<li>Mr. Doob&rsquo;s ever-hypnotizing <a href="https://github.com/paulirish/harmony">harmony tools</a>, including; <i>Web, Shader, Fur, Sketchy,</i> and <i>Chrome</i>, are available under the MIT License.</li>
+					<li><a href="#">Event.js</a>, which controls the multi-touch events in Sketch Mobile, including; <i>Drag, Shake, Pinch, Rotate, Swipe, Tap, Taphold, Dbltap, Dblclick,</i> and <i>Click</i>, is available under the MIT License. </li>
+					<li><a href="http://depts.washington.edu/aimgroup/proj/dollar/">$1 Unistroke Recognizer</a>, used for recognizing gestures in the Power nib terminal, is available under the New BSD License. I&rsquo;ve made some slight modifications, which allow gestures to be more readily recognized that can be found on <a href="#">github</a>.</li>
+				</ol>
+			</blockquote>
+			<div style="height: 20em"></div>
+		</div>
+	</div>
+</div>
+
+<div id="save-menu">
+	<div>
+		<div id="upload-progress">
+			<div class="button" onclick="Sketch.saveImage('sync')">Sync</div>
+			<div class="button" onclick="Sketch.saveImage('new')">Save as new...</div>
+			<br>
+			<div class="progress"><div id="upload-bar" style="width: 0;"></div></div><span id="upload-bar-percent">0%</span>
+		</div>
+		<div id="upload-view" style="display: none">
+			<div class="header">View your image:</div>
+			<blockquote><a href="{$oi}" id="upload-link" target="_blank">{$oi}</a></blockquote>
+		</div>
+		<div id="upload-share">
+			<div class="hr"></div>
+			<div class="header">Share your image:</div>
+			<blockquote class="footer">
+				<a href="https://twitter.com/intent/tweet?original_referer=http://sketch.io/&text=Check out my drawing made with Sketch Mobile; {$oi}" target="_blank"><span class="ico">Q</span><br><span class="title">Twitter</span></a>
+				<a href="http://facebook.com/sharer/sharer.php?u={$oi}" target="_blank"><span class="ico">R</span><br><span class="title">Facebook</span></a>
+				<a href="https://plusone.google.com/_/+1/confirm?hl=en&url={$oi}" target="_blank"><span class="ico">#</span><br><span class="title">Google</span></a>
+			</blockquote>
+		</div>
+	</div>
+</div>
+
+<div id="controls">
+	<span id="start-go" title="Root" class="ico active"><span>&gt;</span></span>
+	<span id="start-info" title="Information" class="ico"><span>*</span></span>
+	<span id="start-backdrop" title="New Canvas" class="ico"><span>,</span></span>
+	<span id="start-save" title="Save Image" class="ico" style="font-size: 1.5em"><span>S</span></span>
+	<span id="start-check" title="Confirm" class="ico" style="display: none; text-shadow: 1px 1px 2px #000;"><span style="font-family: sans-serif; font-size: 0.5em; font-weight: bold"><font style="background: rgba(0,0,0,0.5); border: 2px solid #000; border-radius: 2em; padding: 0.5em 0.25em">ok!</font></span></span>
+</div>
+<script>
+	(function(i, s, o, g, r, a, m) {
+		i["GoogleAnalyticsObject"] = r;
+		i[r] = i[r] || function() {
+			(i[r].q = i[r].q || []).push(arguments)
+		}, i[r].l = 1 * new Date();
+		a = s.createElement(o),
+			m = s.getElementsByTagName(o)[0];
+		a.async = 1;
+		a.src = g;
+		m.parentNode.insertBefore(a, m)
+	})(window, document, "script", "//www.google-analytics.com/analytics.js", "ga");
+	ga("create", "UA-400768-15", "auto");
+	ga("send", "pageview");
+</script>
+</body>
+</html>
