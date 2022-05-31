@@ -169,7 +169,6 @@ root.Loader = function (conf) {
 		}
 	};
 	this.stop = function () {
-		console.error(1)
 		setTimeout(function() {
 			window.clearInterval(that.interval);
 			delete that.interval;

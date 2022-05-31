@@ -7,7 +7,7 @@ function removeChildNodes(o) {
 }
 
 function createHeader(title) {
-	var div = document.createElement("div")
+	const div = document.createElement("div")
 	div.className = "header"
 	div.textContent = title
 	cnt.appendChild(div)
@@ -15,16 +15,16 @@ function createHeader(title) {
 }
 
 function createInput(props) {
-	var div = document.createElement("div")
-	div.style.cssText = "padding-top: 5px;"
+	const $div = document.createElement("div")
+	$div.style.cssText = "padding-top: 5px;"
 	var d = document.createElement("span")
 	d.textContent = props.title || props.id
 	d.className = "formSpan"
-	div.appendChild(d)
+	$div.appendChild(d)
 	var d = document.createElement("input")
 	d.setAttribute("type", "range")
-	d.onmousedown = function (e) { e.stopPropagation(); }
-	for (var key in props) {
+	Event.add(d, 'mousedown', Event.cancel)
+	for (let key in props) {
 		if (key.substr(0, 2) === "on") d[key] = props[key]
 		else d.setAttribute(key, props[key])
 	}
@@ -32,8 +32,8 @@ function createInput(props) {
 		d.onkeyup = d.onchange
 		d.onmouseup = d.onchange
 	}
-	div.appendChild(d)
-	return div
+	$div.appendChild(d)
+	return $div
 }
 
 BG.onload = function () {
@@ -49,7 +49,7 @@ BG.onload = function () {
 		dropAreaStyle: "position: absolute; background: rgba(0, 200, 0, 1);",
 		dropAreaMessage: "Drop Photo Here",
 		onChange: function (self, files) {
-			for (var key in files)
+			for (let key in files)
 			var file = files[key]
 			BG.createSeamlessTexture(file.src, function (canvas) {
 				createTexture(canvas.toDataURL(), function () {
@@ -104,18 +104,18 @@ BG.onload = function () {
 			BG.toggleRemoteFrame("up")
 		},
 		callback: function (color, state) {
-			var gd = BG.gradient
-			var colorStop = gd.stops
+			const gd = BG.gradient
+			const colorStop = gd.stops
 			///
 			//			colorStop[gd.active].stop = 1 - color.A / 255
 			///
 			BG.toggleRemoteFrame(state)
-			var type = gd["active"]
-			var active = gd.stops[type]
+			const type = gd["active"]
+			const active = gd.stops[type]
 			active.R = color.R
 			active.G = color.G
 			active.B = color.B
-			var d = document.getElementById("CP" + type)
+			const d = document.getElementById("CP" + type)
 			if (d) d.style.background = Color.Space.RGBA_W3(gd.stops[type])
 			BG.render()
 		}
@@ -140,12 +140,12 @@ BG.onload = function () {
 	///
 
 	if (window.location.hash) {
-		var hash = window.location.hash.substr(1).split("%22").join('"')
-		var ret = JSON.parse(hash)
+		const hash = window.location.hash.substr(1).split("%22").join('"')
+		const ret = JSON.parse(hash)
 		if (ret.config && ret.width && ret.height && ret.gradient) {
 			config = ret.config
 			BG.gradient.stops = []
-			var gradient = ret.gradient
+			const gradient = ret.gradient
 			for (var key in gradient) {
 				if (BG.pickerColor === "008BE1") BG.pickerColor = gradient[key]
 				BG.gradient.stops.push(new BG.colorStop({
@@ -157,7 +157,7 @@ BG.onload = function () {
 	}
 	BG.createGeneratorUI()
 	///
-	var sidebar = document.getElementById("sidebar")
+	const sidebar = document.getElementById("sidebar")
 	eventjs.proxy.drag({
 		position: "move",
 		target: sidebar,
@@ -169,14 +169,14 @@ BG.onload = function () {
 		}
 	})
 	///
-	var element = document.getElementById("textures")
-	eventjs.add(element, "click", function (event) {
+	const element = document.querySelector("#textures")
+	Event.add(element, 'mousedown', Event.cancel)
+	Event.add(element, "click", function () {
 		if (element.style.height) {
 			element.style.width = ""
 			element.style.height = ""
 			element.scrollTop = 0
 		} else {
-			//			element.style.width = "496px"
 			element.style.height = "432px"
 		}
 	})
@@ -184,9 +184,9 @@ BG.onload = function () {
 	dcanvas = document.createElement("canvas")
 	dctx = dcanvas.getContext("2d")
 	///
-	var twidth = 244
-	var theight = 46
-	var thumbnailer = new widgets.Thumbnailer()
+	const twidth = 244
+	const theight = 46
+	const thumbnailer = new widgets.Thumbnailer()
 	///
 	tcanvas = document.createElement("canvas")
 	tctx = tcanvas.getContext("2d")
@@ -268,7 +268,7 @@ BG.onresize = function () {
 	BG.width = canvas.width = window.innerWidth
 	BG.height = canvas.height = window.innerHeight
 	// resize iframe
-	var iframe = document.getElementById("iframe")
+	const iframe = document.getElementById("iframe")
 	if (iframe) iframe.style.width = (window.innerWidth) + "px"
 	//
 	dcanvas.width = ctx.canvas.width

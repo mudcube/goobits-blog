@@ -4,9 +4,9 @@ const createTexture = (function () {
 	let $image = new Image()
 
 	return function (src, callback) {
-		BG.loader.message("loading...");
+		BG.loader.message("loading...")
 
-		$image = new Image();
+		$image = new Image()
 		$image.onerror = console.error
 		$image.onload = function () {
 			// lum in sRGB
@@ -14,10 +14,10 @@ const createTexture = (function () {
 			var width = $image.width
 			var height = $image.height
 			// resize canvas
-			canvas.width = width;
-			canvas.height = height;
+			canvas.width = width
+			canvas.height = height
 			// draw images
-			ctx.drawImage($image, 0, 0, width, height);
+			ctx.drawImage($image, 0, 0, width, height)
 			// get imageData
 			const imageData = ctx.getImageData(0, 0, width, height)
 			const src = imageData.data
@@ -36,40 +36,40 @@ const createTexture = (function () {
 				// Apply effect to pixels (in this case Subtract)
 				if (light) {
 					var er = Math.min(255, r + R); // delete light colors
-					var eg = Math.min(255, g + G);
-					var eb = Math.min(255, b + B);
+					var eg = Math.min(255, g + G)
+					var eb = Math.min(255, b + B)
 				} else {
 					var er = Math.max(0, R < r ? R : r); // delete dark colors
-					var eg = Math.max(0, G < g ? G : g);
-					var eb = Math.max(0, B < b ? B : b);
+					var eg = Math.max(0, G < g ? G : g)
+					var eb = Math.max(0, B < b ? B : b)
 				}
 				// Remove color that would have otherwise been changed
-				src[n] = 0;
-				src[n + 1] = 0;
-				src[n + 2] = 0;
+				src[n] = 0
+				src[n + 1] = 0
+				src[n + 2] = 0
 				// Calculate amount of modification
 				const mr = er - r
 				const mg = eg - g
 				const mb = eb - b
 				const ma = Math.abs(mr) * lum.r + Math.abs(mg) * lum.g + Math.abs(mb) * lum.b
 				// Combined alpha of changed pixels (erase)
-				src[n + 3] = a - ma;
+				src[n + 3] = a - ma
 			}
-			ctx.putImageData(imageData, 0, 0);
+			ctx.putImageData(imageData, 0, 0)
 
-			canvas.pattern = ctx.createPattern(canvas, "repeat");
-			canvas.style.cssText = "z-index: 1000; position: absolute; right: 0;";
+			canvas.pattern = ctx.createPattern(canvas, "repeat")
+			canvas.style.cssText = "z-index: 1000; position: absolute; right: 0;"
 
-			// BG.loader.stop();
+			// BG.loader.stop()
 
 			if (callback) {
-				callback(canvas);
+				callback(canvas)
 			}
-		};
+		}
 
-		$image.src = src;
-		return canvas;
-	};
+		$image.src = src
+		return canvas
+	}
 })()
 
 const textures = [
