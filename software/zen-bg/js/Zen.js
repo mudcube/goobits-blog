@@ -1,4 +1,4 @@
-if (typeof(BG) === "undefined") var BG = {};
+if (typeof (BG) === "undefined") var BG = {};
 
 function removeChildNodes(o) {
 	while (o.hasChildNodes()) {
@@ -23,9 +23,9 @@ function createInput(props) {
 	div.appendChild(d);
 	var d = document.createElement("input");
 	d.setAttribute("type", "range");
-	d.onmousedown = function(e) { e.stopPropagation(); };
+	d.onmousedown = function (e) { e.stopPropagation(); };
 	for (var key in props) {
-		if (key.substr(0,2) === "on") d[key] = props[key];
+		if (key.substr(0, 2) === "on") d[key] = props[key];
 		else d.setAttribute(key, props[key]);
 	}
 	if (props.type === "number" && d.onchange) {
@@ -36,11 +36,11 @@ function createInput(props) {
 	return div;
 };
 
-BG.onload = function() {
+BG.onload = function () {
 	BG.loader = new widgets.Loader("starting...");
 	/// load blend pixel shaders
 	eval(Color.Blend.createKernals());
-	/// 
+	///
 	BG.uploader = new widgets.Uploader({
 		confirm: "text", // json, boolean, text
 		action: "./upload.php",
@@ -49,10 +49,10 @@ BG.onload = function() {
 		dropAreaStyle: "position: absolute; background: rgba(0, 200, 0, 1);",
 		dropAreaMessage: "Drop Photo Here",
 		onChange: function (self, files) {
-			for (var key in files);
+			for (var key in files) ;
 			var file = files[key];
-			BG.createSeamlessTexture(file.src, function(canvas) {
-				createTexture(canvas.toDataURL(), function() {
+			BG.createSeamlessTexture(file.src, function (canvas) {
+				createTexture(canvas.toDataURL(), function () {
 					tctx.clearRect(0, 0, tcanvas.width, tcanvas.height);
 					tctx.drawImage(BG.texture, 0, 0);
 					BG.render()
@@ -97,17 +97,17 @@ BG.onload = function() {
 		style: "top: 220px; right: 270px", // sets style to picker element
 		color: "#" + BG.pickerColor,
 		display: true,
-		onMouseDown: function(self) {
+		onMouseDown: function (self) {
 			BG.toggleRemoteFrame("down");
 		},
-		onMouseUp: function(self) {
+		onMouseUp: function (self) {
 			BG.toggleRemoteFrame("up");
 		},
-		callback: function(color, state) {
+		callback: function (color, state) {
 			var gd = BG.gradient;
 			var colorStop = gd.stops;
 			///
-//			colorStop[gd.active].stop = 1 - color.A / 255;
+			//			colorStop[gd.active].stop = 1 - color.A / 255;
 			///
 			BG.toggleRemoteFrame(state);
 			var type = gd["active"];
@@ -121,18 +121,18 @@ BG.onload = function() {
 		}
 	});
 
-	eventjs.add(document.querySelector("#ColorPicker"), "mousedown", function(event) {
+	eventjs.add(document.querySelector("#ColorPicker"), "mousedown", function (event) {
 		proxy = widget.windows.drag(this, event);
 	});
 
 	BG.picker.element.style.top = 20 + "px";
 	BG.picker.element.style.left = 1000 + "px";
-	///	
+	///
 	BG.gradient = {
 		active: 0,
 		stops: [
-			new BG.colorStop({ hex: 0x229CFF, stop: 0 }),
-			new BG.colorStop({ hex: 0x00AA77, stop: 1 })
+			new BG.colorStop({hex: 0x229CFF, stop: 0}),
+			new BG.colorStop({hex: 0x00AA77, stop: 1})
 		]
 	};
 	BG.width = canvas.width = window.innerWidth;
@@ -148,9 +148,9 @@ BG.onload = function() {
 			var gradient = ret.gradient;
 			for (var key in gradient) {
 				if (BG.pickerColor === "008BE1") BG.pickerColor = gradient[key];
-				BG.gradient.stops.push(new BG.colorStop({ 
+				BG.gradient.stops.push(new BG.colorStop({
 					hex: "0x" + gradient[key].substr(1),
-					stop: key 
+					stop: key
 				}));
 			}
 		}
@@ -170,13 +170,13 @@ BG.onload = function() {
 	});
 	///
 	var element = document.getElementById("textures");
-	eventjs.add(element, "click", function(event) {
+	eventjs.add(element, "click", function (event) {
 		if (element.style.height) {
 			element.style.width = "";
 			element.style.height = "";
 			element.scrollTop = 0;
 		} else {
-//			element.style.width = "496px";
+			//			element.style.width = "496px";
 			element.style.height = "432px";
 		}
 	});
@@ -201,16 +201,16 @@ BG.onload = function() {
 			maxWidth: twidth,
 			maxHeight: theight,
 			crop: "None", // Fit, Edge, None
-			callback: function(canvas) {
-				eventjs.add(canvas, "click", function(event, self) {
+			callback: function (canvas) {
+				eventjs.add(canvas, "click", function (event, self) {
 					if (!element.style.height) return;
-					BG.texture.src = self.target.src.replace("_thumb","");
-					texture = createTexture(BG.texture.src, function() {
+					BG.texture.src = self.target.src.replace("_thumb", "");
+					texture = createTexture(BG.texture.src, function () {
 						tctx.clearRect(0, 0, tcanvas.width, tcanvas.height);
 						tctx.drawImage(BG.texture, 0, 0);
 						BG.render()
 					});
-					BG.texture.onload = function() {
+					BG.texture.onload = function () {
 						noise.width = BG.texture.width;
 						noise.height = BG.texture.height;
 						BG.render();
@@ -221,13 +221,14 @@ BG.onload = function() {
 	}
 	///
 	BG.generateNoise(true);
+
 	///
 	function loadTexture(src) {
-		BG.texture = createTexture(src, function() {
+		BG.texture = createTexture(src, function () {
 			tctx.clearRect(0, 0, tcanvas.width, tcanvas.height);
 			tctx.drawImage(BG.texture, 0, 0);
 			// remote access
-			BG.createRemoteFrame();	
+			BG.createRemoteFrame();
 			// create default noise
 			window.onresize();
 			BG.render();
@@ -243,15 +244,15 @@ BG.onload = function() {
 	///
 	BG.fileSaver = new widgets.FileSaver({
 		jsDir: "./inc/",
-		callback: function(self) {
+		callback: function (self) {
 			self.button({
-				parent: document.querySelector("#sidebar"), 
-				id: "downloadWallpaper", 
+				parent: document.querySelector("#sidebar"),
+				id: "downloadWallpaper",
 				title: "Download Wallpaper",
-				fileName: "ZenBG", 
-				fileType: "png", 
-				format: "base64", 
-				getData: function() {
+				fileName: "ZenBG",
+				fileType: "png",
+				format: "base64",
+				getData: function () {
 					return canvas;
 				}
 			});
@@ -259,7 +260,7 @@ BG.onload = function() {
 	});
 };
 
-BG.onresize = function() {
+BG.onresize = function () {
 	BG.width = canvas.width = window.innerWidth;
 	BG.height = canvas.height = window.innerHeight;
 	// resize iframe
@@ -272,5 +273,5 @@ BG.onresize = function() {
 	BG.render();
 };
 
-eventjs.add("body", "ready", BG.onload);
-eventjs.add(window, "resize", BG.onresize);
+window.addEventListener('DOMContentLoaded', BG.onload)
+window.addEventListener('resize', BG.onresize)
