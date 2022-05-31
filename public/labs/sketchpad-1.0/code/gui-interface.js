@@ -347,7 +347,7 @@ gui_options = {
 				}
 				z = '<div id="text" style="padding-bottom: 13px">' +
 					' <span style="font-size: 11px; -moz-user-select: none; -khtml-user-select: none; user-select: none; ">MESSAGE</span><br>' +
-					' <input type="text" onmousedown="preventDefault = false;" onkeydown="vars.textMessage=this.value;" onkeyup="vars.textMessage=this.value;" style="width: 90%; font-size: 16px" value="'+vars.textMessage+'">' +
+					' <input type="text" onkeydown="vars.textMessage=this.value;" onkeyup="vars.textMessage=this.value;" style="width: 90%; font-size: 16px" value="'+vars.textMessage+'">' +
 					'</div>' + z;
 				break;
 		} 
