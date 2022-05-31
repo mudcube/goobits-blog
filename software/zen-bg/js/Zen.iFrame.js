@@ -40,6 +40,8 @@ window.BG || (window.BG = {});
 				return false
 			})
 		}
+
+		BG.loader.stop()
 	}
 
 	BG.remoteFrame = undefined; // webpage in iframe
@@ -55,9 +57,7 @@ window.BG || (window.BG = {});
 	}
 
 	BG.createRemoteFrame = async function () {
-		if (!window.location.search) {
-			return
-		}
+		BG.loader.message('Loading Website...')
 
 		const $a = document.createElement('a')
 		const $main = document.querySelector('#main')

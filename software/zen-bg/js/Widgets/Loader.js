@@ -1,4 +1,4 @@
-/* 
+/*
 	----------------------------------------------------
 	Loader.js : 0.3 : 2012/04/12 : http://mudcu.be
 	----------------------------------------------------
@@ -14,10 +14,10 @@
 		lineHeight: 10,
 		background: "rgba(0,0,0,0.5)"
 	});
-	loader.stop();	
+	loader.stop();
 	----------------------------------------------------
 	loader.message("loading: New loading message...", function() {
-		// call function once loader has started	
+		// call function once loader has started
 	});
 */
 
@@ -26,7 +26,7 @@ if (typeof(widgets) === "undefined") widgets = {};
 (function(root) {
 
 var PI = Math.PI;
-var defaultConfig = { 
+var defaultConfig = {
 	id: "loader",
 	bars: 12,
 	radius: 0,
@@ -169,6 +169,7 @@ root.Loader = function (conf) {
 		}
 	};
 	this.stop = function () {
+		console.error(1)
 		setTimeout(function() {
 			window.clearInterval(that.interval);
 			delete that.interval;

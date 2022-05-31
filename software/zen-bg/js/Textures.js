@@ -60,9 +60,11 @@ const createTexture = (function () {
 			canvas.pattern = ctx.createPattern(canvas, "repeat");
 			canvas.style.cssText = "z-index: 1000; position: absolute; right: 0;";
 
-			if (callback) callback(canvas);
+			// BG.loader.stop();
 
-			BG.loader.stop();
+			if (callback) {
+				callback(canvas);
+			}
 		};
 
 		$image.src = src;
