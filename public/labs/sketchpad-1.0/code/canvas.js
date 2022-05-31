@@ -231,7 +231,7 @@ let vars = {}
 		const type = vars.type
 		if (type === 'brush' || type === 'eraser' || type === 'pencil') {
 			const c = $2D('ctx_brush'),
-				D = vars[`diameter_${vars.type}`]  || 10,
+				D = vars[`diameter_${vars.type}`] || 10,
 				D2 = D * 2
 			$('ctx_brush').width = D2;
 			$('ctx_brush').height = D2;

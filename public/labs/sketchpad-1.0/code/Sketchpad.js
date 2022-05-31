@@ -27,7 +27,7 @@ canvas = {
 	'history_set': function (v, s) {
 		if ($('history_0')) {
 			var o = gui.Y,
-			r = canvas.history_r;
+				r = canvas.history_r;
 			if (isNaN(v)) { // SAVE
 				var z = r.z;
 				r.r[r.n + 1] = (r.n % canvas.history_n) + 1;
@@ -40,12 +40,12 @@ canvas = {
 					}
 				}
 				var a = 'history_' + r.r[r.n],
-				b = 'ctx_box';
+					b = 'ctx_box';
 				$(a).width = canvas.W;
 				$(a).height = canvas.H;
 			} else { // UNDO + REDO
 				var a = 'ctx_box',
-				b = 'history_' + r.r[r.n];
+					b = 'history_' + r.r[r.n];
 				canvas.W = r.data[r.n][0];
 				canvas.H = r.data[r.n][1];
 				$('ctx_box').width = canvas.W;
@@ -73,7 +73,7 @@ canvas = {
 		gui_swatch.id = 'CO';
 		$('ctx_box').width = canvas.W = w;
 		$('ctx_box').height = canvas.H = h;
-		crop.apply({ X: 0, Y: 0 }, { X: w, Y: h });
+		crop.apply({X: 0, Y: 0}, {X: w, Y: h});
 		if (u) {
 			jelly.src = u;
 			jelly.onload = function () {

@@ -1,5 +1,5 @@
 /*
-	GUI Interface / 0.1 / 
+	GUI Interface / 0.1 /
 	-------------------------
 	gui_tools
 	gui_palette
@@ -16,7 +16,7 @@ gui_tools = {
 	imagePos: {}, // y-pos of backgroundPosition (all tools are in media/GUI/Tools.png
 	imageMap: function () { // create image mapping
 		var elements = $T('div', $C('tools', 'tools')[0]),
-			icons = [ 
+			icons = [
 				'Brush',
 				'Calligraphy',
 				'Crop',
@@ -49,7 +49,7 @@ gui_tools = {
 		}
 		for (var image in elements) {
 			image = elements[image];
-			if (typeof(image) == 'object') {
+			if (typeof (image) == 'object') {
 				var o = $T('img', image);
 				if (o[0]) {
 					o = (o[1] && o[1].className != 'plus') ? o[1] : o[0];
@@ -72,7 +72,7 @@ gui_tools = {
 	},
 	imageSize: function (v, i, end) { // image animation (switching tools)
 		var o = $C(v, 'tools')[0],
-		d = o.style;
+			d = o.style;
 		d.width = (15 + i) + 'px';
 		d.height = (15 + i) + 'px';
 		d.top = (-(i / 2)) + 'px';
@@ -117,21 +117,21 @@ gui_tools = {
 			}
 			if (prev) {
 				var timer = 0,
-				img1 = new Image();
+					img1 = new Image();
 				img1.src = 'media/gui/tools/' + prev + '.png';
 				for (var i = 25; i >= 0; i--) {
 					zoom(prev, 0);
 				}
 			}
 			var timer = 0,
-			img2 = new Image();
+				img2 = new Image();
 			img2.src = 'media/gui/tools/' + v + '_2.png';
 			for (var i = 0; i <= 25; i++) {
 				zoom(v, 25);
 			}
 			gui_tools.prev = v;
 			gui_options.forge(vars.type); // build "OPTIONS" window
-			vars.updateTool(); // 
+			vars.updateTool(); //
 			vars.cache(1);
 		}
 	}
@@ -166,7 +166,7 @@ gui_options = {
 				size: 58
 			},
 			'text': {
-				build: ['fontSize', 'stroke_text'],//'kerning', 'leading', 
+				build: ['fontSize', 'stroke_text'],//'kerning', 'leading',
 				vars: {
 					'movement_text': 'active',
 					'fontSize': 90,
@@ -234,7 +234,7 @@ gui_options = {
 				glyph: 1
 			},
 			'spirograph': {
-				build: ['inner_radius_spirograph', 'outer_radius_spirograph', 'diameter_spirograph','speed_spirograph','resolution_spirograph'],
+				build: ['inner_radius_spirograph', 'outer_radius_spirograph', 'diameter_spirograph', 'speed_spirograph', 'resolution_spirograph'],
 				vars: {
 					'inner_radius_spirograph': 29,
 					'outer_radius_spirograph': 79,
@@ -288,7 +288,8 @@ gui_options = {
 	forge: function (v) { // build "OPTIONS" window
 		if (!gui_options.modules || v == 'shape') {
 			gui_options.modulesObject();
-		};
+		}
+		;
 		var r = gui_options.modules[v],
 			z = '';
 		for (var i in r.vars) { // BUILD CONTENT
@@ -307,7 +308,8 @@ gui_options = {
 			gui_options.resize(r.size[d] ? r.size[d] : r.size['']);
 		} else {
 			gui_options.resize(r.size);
-		};
+		}
+		;
 		for (var i in r.build) {
 			i = r.build[i];
 			var o = i.indexOf('_') != -1 ? i.substr(0, i.indexOf('_')) : i,
@@ -325,34 +327,34 @@ gui_options = {
 				z += fu;
 			}
 		}
-		if(v == 'fill' || v =='brush' || v == 'pencil' || v == 'calligraphy' || v == 'stamp') { // these tools use only the "fill" property
-			gui_palette.click('fill')		
-		} else if(v == 'spirograph') { // these ones use only the "stroke" property
-			gui_palette.click('stroke')		
-		} 
-		switch(v) { // extra stuff
+		if (v == 'fill' || v == 'brush' || v == 'pencil' || v == 'calligraphy' || v == 'stamp') { // these tools use only the "fill" property
+			gui_palette.click('fill')
+		} else if (v == 'spirograph') { // these ones use only the "stroke" property
+			gui_palette.click('stroke')
+		}
+		switch (v) { // extra stuff
 			case 'picker':
-				z = '<img src="media/gui/loupe.png" onmousedown="return(noMove())" class="loupe" alt="...">'+
-					'<canvas id="picker" height="106" width="149" style="height: 106px; width: 149px"></canvas>'+
-					'<div class="picker"><div>R<br>G<br>B<br>A</div><div id="picker_hex">0<br>0<br>0<br>0</div></div>'+
+				z = '<img src="media/gui/loupe.png" onmousedown="return(noMove())" class="loupe" alt="...">' +
+					'<canvas id="picker" height="106" width="149" style="height: 106px; width: 149px"></canvas>' +
+					'<div class="picker"><div>R<br>G<br>B<br>A</div><div id="picker_hex">0<br>0<br>0<br>0</div></div>' +
 					'<canvas id="picker1x1" height="1" width="1"></canvas>';
 				break;
 			case 'stamp':
-				z = '<div id="stamp"></div>' + gui.Y.kontrol('stamp') + 
+				z = '<div id="stamp"></div>' + gui.Y.kontrol('stamp') +
 					"<span style=\"position: relative; top: -6px; border: 0\" id=\"brush_author\"></span>" + z;
 				break;
-			case 'text': 
-				if(!vars.textMessage) {
+			case 'text':
+				if (!vars.textMessage) {
 					vars.textMessage = "hello!";
 				}
 				z = '<div id="text" style="padding-bottom: 13px">' +
 					' <span style="font-size: 11px; -moz-user-select: none; -khtml-user-select: none; user-select: none; ">MESSAGE</span><br>' +
-					' <input type="text" onkeydown="vars.textMessage=this.value;" onkeyup="vars.textMessage=this.value;" style="width: 90%; font-size: 16px" value="'+vars.textMessage+'">' +
+					' <input type="text" onkeydown="vars.textMessage=this.value;" onkeyup="vars.textMessage=this.value;" style="width: 90%; font-size: 16px" value="' + vars.textMessage + '">' +
 					'</div>' + z;
 				break;
-		} 
+		}
 		var d = $('options');
-		$C('TML', d)[0].innerHTML = '<span style="-moz-user-select: none; -khtml-user-select: none; user-select: none; ">'+(r.head ? gui.menu.build(r.head, cF[r.head].val) : v)+'</div>';
+		$C('TML', d)[0].innerHTML = '<span style="-moz-user-select: none; -khtml-user-select: none; user-select: none; ">' + (r.head ? gui.menu.build(r.head, cF[r.head].val) : v) + '</div>';
 		$C('MM', d)[0].innerHTML = '<div class="z" style="display: none; margin-top:1px;">' + z + '</div>';
 		if (v == 'stamp') {
 			stamp.reset();
@@ -388,7 +390,7 @@ gui_options = {
 gui_palette = {
 
 	click: function (v) {
-		if(vars.id == v) {
+		if (vars.id == v) {
 			return;
 		}
 		gui_palette.zindex(v);
@@ -399,15 +401,17 @@ gui_palette = {
 			'fill': 'stroke',
 			'stroke': 'fill'
 		};
+
 		function fu(v, c, i) {
 			var o = $(v).parentNode.style;
 			o.zIndex = i;
 			o.cursor = c;
 			$S(v).cursor = c;
 		}
+
 		fu(v, 'default', 2);
 		fu(r[v], 'pointer', 1);
-		$('swap').innerHTML = v.substr(0,1).toUpperCase();
+		$('swap').innerHTML = v.substr(0, 1).toUpperCase();
 	},
 	current: function () {
 		var q = gui_swatch.L2S,
@@ -425,7 +429,7 @@ gui_palette = {
 		var z = (vars.id == 'fill'),
 			a = z ? 'stroke' : 'fill',
 			b = z ? 'fill' : 'stroke',
-		z = '';
+			z = '';
 		if (vars.fill == 'pattern' || vars.stroke == 'pattern') {
 			gui_pattern.o[a] = vars[b + 'PT'];
 			gui_pattern.o[b] = vars[a + 'PT'];
@@ -462,9 +466,9 @@ gui_palette = {
 		stamp.preview(stamp.fileNumber, m);
 		var id = b || vars.id,
 			d = $(id),
-		c = d.getContext('2d');
+			c = d.getContext('2d');
 		c.clearRect(0, 0, d.width = 34, d.height = 23);
-		style(c, "fillStyle", id, { X: 0, Y: 0 }, { X: 34, Y: 23 });
+		style(c, "fillStyle", id, {X: 0, Y: 0}, {X: 34, Y: 23});
 		c.fillRect(0, 0, 34, 23);
 	}
 };
@@ -476,16 +480,16 @@ gui_color = {
 	'core': function (o, e, fu) {
 		if (gui_swatch.id == 'PT') gui_swatch.cur('CO');
 		core.fu(o, e, {
-			fu: core.X,
-			oX: -13.5,
-			X1: 0,
-			X2: 121,
-			oY: 0
-		},
-		fu);
+				fu: core.X,
+				oX: -13.5,
+				X1: 0,
+				X2: 121,
+				oY: 0
+			},
+			fu);
 	},
 	'cur': function (n, v, i, m) {
-		var b = gui_color[v+"_"][i],
+		var b = gui_color[v + "_"][i],
 			n = Math.max(0, n) / 121;
 		gui_color[v][i[0]] = (i == 'Alpha') ? n : Math.round((1 - n) * b);
 		gui_color.run(i);
@@ -494,15 +498,15 @@ gui_color = {
 	},
 	'pos': function (r, v, i) {
 		var s = (i == 'Alpha'),
-		n = r[i[0]];
+			n = r[i[0]];
 		n = s ? (1 - n) * 100 : n;
-		$S(i + 'Cur').left = parseInt((121 - (n / gui_color[v+"_"][i]) * 121) + 10) + 'px';
+		$S(i + 'Cur').left = parseInt((121 - (n / gui_color[v + "_"][i]) * 121) + 10) + 'px';
 		$(i + 'Me').innerHTML = Math.round(s ? 100 - n : n);
 	},
 	// Create
 	'mk': function () {
 		var z = '',
-		o = $C('MM', 'solid')[0];
+			o = $C('MM', 'solid')[0];
 		var R = {
 			'Hue': 'HSV',
 			'Saturation': 'HSV',
@@ -514,10 +518,10 @@ gui_color = {
 		};
 		for (var i in R) {
 			var v = 'gui_color.core(\'' + i + 'Cur\',event,function(a,b,m) { gui_color.cur(b.X,\'' + R[i] + '\',\'' + i + '\',m); })';
-			z += '<div title="' + i.substr(0,1).toUpperCase() + i.substr(1) + '">' + ' <div class="west" id="' + i + 'T">' + i.substr(0,1).toUpperCase() + '</div>' + 
-				 ' <span class="east" id="' + i + 'Me"></span>' + ' <div onmousedown="' + v + '; return false;" id="' + i + 'Cur" class="cur"></div>' + 
-				 ' <canvas id="' + i + '" onmousedown="' + v + '" height="18" width="120"></canvas><br>' + 
-				 '</div>';
+			z += '<div title="' + i.substr(0, 1).toUpperCase() + i.substr(1) + '">' + ' <div class="west" id="' + i + 'T">' + i.substr(0, 1).toUpperCase() + '</div>' +
+				' <span class="east" id="' + i + 'Me"></span>' + ' <div onmousedown="' + v + '; return false;" id="' + i + 'Cur" class="cur"></div>' +
+				' <canvas id="' + i + '" onmousedown="' + v + '" height="18" width="120"></canvas><br>' +
+				'</div>';
 		}
 		o.innerHTML = '<div class="z">' + z + '</div>';
 	},
@@ -528,50 +532,50 @@ gui_color = {
 		}
 		if (r) {
 			var r = gui_color.RGB = {
-				R: r[0],
-				G: r[1],
-				B: r[2],
-				A: r[3]
-			},
-			h = gui_color.HSV = Color.RGB_HSV(gui_color.RGB);
+					R: r[0],
+					G: r[1],
+					B: r[2],
+					A: r[3]
+				},
+				h = gui_color.HSV = Color.RGB_HSV(gui_color.RGB);
 		} else {
 			var r = gui_color.RGB,
 				h = gui_color.HSV;
 		}
 		if (gui_color.HSV_[m]) {
 			var t = Color.HSV_RGB(h);
-				t.A = r.A;
-				r = gui_color.RGB = t;
+			t.A = r.A;
+			r = gui_color.RGB = t;
 		} else if (gui_color.RGB_[m]) {
 			h = gui_color.HSV = Color.RGB_HSV(r);
 		}
 		var R = {
 			'Hue': [
-				[0, { H: 0, S: h.S, V: h.V }],
-				[0.15, { H: 300, S: h.S, V: h.V}],
-				[0.30, { H: 240, S: h.S, V: h.V}],
-				[0.50, { H: 180, S: h.S, V: h.V}],
-				[0.65, { H: 120, S: h.S, V: h.V}],
-				[0.85, { H: 60, S: h.S, V: h.V}],
-				[1, { H: 0, S: h.S, V: h.V}]],
+				[0, {H: 0, S: h.S, V: h.V}],
+				[0.15, {H: 300, S: h.S, V: h.V}],
+				[0.30, {H: 240, S: h.S, V: h.V}],
+				[0.50, {H: 180, S: h.S, V: h.V}],
+				[0.65, {H: 120, S: h.S, V: h.V}],
+				[0.85, {H: 60, S: h.S, V: h.V}],
+				[1, {H: 0, S: h.S, V: h.V}]],
 			'Saturation': [
-				[0, { H: h.H, S: 100, V: h.V}],
-				[1, { H: h.H, S: 0, V: h.V}]],
+				[0, {H: h.H, S: 100, V: h.V}],
+				[1, {H: h.H, S: 0, V: h.V}]],
 			'Value': [
-				[0, { H: h.H, S: h.S, V: 100}],
-				[1, { H: h.H, S: h.S, V: 0}]],
+				[0, {H: h.H, S: h.S, V: 100}],
+				[1, {H: h.H, S: h.S, V: 0}]],
 			'Red': [
-				[0, { R: 255, G: r.G, B: r.B, A: r.A }],
-				[1, { R: 0, G: r.G, B: r.B, A: r.A }]],
+				[0, {R: 255, G: r.G, B: r.B, A: r.A}],
+				[1, {R: 0, G: r.G, B: r.B, A: r.A}]],
 			'Green': [
-				[0, { R: r.R, G: 255, B: r.B, A: r.A }],
-				[1, { R: r.R, G: 0, B: r.B, A: r.A }]],
+				[0, {R: r.R, G: 255, B: r.B, A: r.A}],
+				[1, {R: r.R, G: 0, B: r.B, A: r.A}]],
 			'Blue': [
-				[0, { R: r.R, G: r.G, B: 255, A: r.A }],
-				[1, { R: r.R, G: r.G, B: 0, A: r.A }]],
+				[0, {R: r.R, G: r.G, B: 255, A: r.A}],
+				[1, {R: r.R, G: r.G, B: 0, A: r.A}]],
 			'Alpha': [
-				[0, { R: r.R, G: r.G, B: r.B, A: 0 }],
-				[1, { R: r.R, G: r.G, B: r.B, A: 1 }]]
+				[0, {R: r.R, G: r.G, B: r.B, A: 0}],
+				[1, {R: r.R, G: r.G, B: r.B, A: 1}]]
 		};
 		for (var i in R) {
 			var c = $2D(i),
@@ -588,7 +592,7 @@ gui_color = {
 				rgb = rgb.R + ',' + rgb.G + ',' + rgb.B + ',' + rgb.A;
 				g.addColorStop(j[0], 'rgba(' + rgb + ')');
 			}
-			c.rect(0,0,120,18);
+			c.rect(0, 0, 120, 18);
 			co.style.fill(c, g);
 			if (gui_color.HSV_[i]) {
 				gui_color.pos(h, 'HSV', i);
@@ -599,21 +603,21 @@ gui_color = {
 		var r = gui_color.mode(r);
 		$('HEX').innerHTML = Color.HEX_STRING(r.R << 16 | r.G << 8 | r.B);
 		if (vars[vars.id] == 'solid') {
-			vars[vars.id + 'CO'] = [ r.R, r.G, r.B, r.A ];
+			vars[vars.id + 'CO'] = [r.R, r.G, r.B, r.A];
 			vars.opacity_fill = r.A * 100;
-			if($('opacity_fillCur') && vars.id == "fill") {
+			if ($('opacity_fillCur') && vars.id == "fill") {
 				$('opacity_fillCur').style.left = parseInt(r.A * 110) + 'px';
-				$('opacity_fillCurV').innerHTML = parseInt(r.A * 100);			
+				$('opacity_fillCurV').innerHTML = parseInt(r.A * 100);
 			}
 		} else if (vars[vars.id] == 'gradient') {
 			var b = gui_gradient.o.id.substr(2);
-			vars[vars.id + 'GD'][b][1] = [ r.R, r.G, r.B, r.A ];
+			vars[vars.id + 'GD'][b][1] = [r.R, r.G, r.B, r.A];
 			gui_gradient.run(b, 'move');
 		}
 	},
 	// Data
 	'mode': function (r, s) {
-		return (s ? r : { R: r.R, G: r.G, B: r.B, A: r.A });
+		return (s ? r : {R: r.R, G: r.G, B: r.B, A: r.A});
 	},
 	'RGB_': {
 		'Red': 255,
@@ -645,7 +649,7 @@ gui_gradient = {
 	// Mouse
 	'slide_x': function (a, b, m) {
 		var g = vars[vars.id + 'GD'],
-		r = g[gui_gradient.o.id.substr(2)];
+			r = g[gui_gradient.o.id.substr(2)];
 		if (N.between(b.Y, 0, 40)) {
 			if (gui_gradient.del) {
 				gui_gradient.o.style.display = 'block';
@@ -666,13 +670,13 @@ gui_gradient = {
 	},
 	'slide_y': function (a, b, m) {
 		var g = vars[vars.id + 'GD'],
-		op = Math.round((1 - (b.Y + 5) / 91) * 1000) / 1000;
+			op = Math.round((1 - (b.Y + 5) / 91) * 1000) / 1000;
 		$S('gOpacity').top = b.Y + 'px';
 		$('gPos').innerHTML = Math.round(op * 100) + '<span class="small">%</span>';
 		vars.opacity_fill = op * 100;
-		if($('opacity_fillCur') && vars.id == "fill") {
+		if ($('opacity_fillCur') && vars.id == "fill") {
 			$('opacity_fillCur').style.left = parseInt(op * 110) + 'px';
-			$('opacity_fillCurV').innerHTML = parseInt(op * 100);			
+			$('opacity_fillCurV').innerHTML = parseInt(op * 100);
 		}
 		for (var i in g) {
 			g[i][1][3] = op;
@@ -685,9 +689,9 @@ gui_gradient = {
 		a.X += x.oX;
 		a.Y += x.oY;
 		var o = $S('gAngle'),
-		W = 132,
-		W2 = W / 2,
-		R = Math.atan2(a.X - W2 - 3, W - a.Y - W2 - 6);
+			W = 132,
+			W2 = W / 2,
+			R = Math.atan2(a.X - W2 - 3, W - a.Y - W2 - 6);
 		gui_gradient.rotate = R;
 		o.left = (Math.abs((Math.sin(R) * W2) + W2) + 30) + 'px';
 		o.top = (Math.abs((Math.cos(R) * W2) - W2) + 40) + 'px';
@@ -703,17 +707,17 @@ gui_gradient = {
 	'add': function (e) {
 		if (stop) {
 			var g = vars[vars.id + 'GD'],
-			n = g.length;
+				n = g.length;
 			g[n] = [0, deObject(vars[vars.id + 'GD'][gui_gradient.o.id.substr(2)][1])];
 			gui_gradient.mk_x('gd' + n);
 			core.fu('gd' + n, e, {
-				fu: core.X,
-				oX: 0,
-				oY: 15,
-				X1: 0,
-				X2: 169
-			},
-			gui_gradient.slide_x);
+					fu: core.X,
+					oX: 0,
+					oY: 15,
+					X1: 0,
+					X2: 169
+				},
+				gui_gradient.slide_x);
 		}
 	},
 	'remove': function (o) {
@@ -730,7 +734,7 @@ gui_gradient = {
 	},
 	'mk_x': function (o) {
 		var g = vars[vars.id + 'GD'],
-		z = '';
+			z = '';
 		for (var i in g) z += '<div onmousedown="gui_gradient.cur(this); gui_gradient.cs(); core.fu(\'gd' + i + '\',event,{fu:core.X, oX:0, oY:15, X1:0, X2:169}, gui_gradient.slide_x)" id="gd' + i + '" style="left: ' + ((g[i][0] * 169) - 5) + 'px"><canvas height="7" width="7"></canvas></div>';
 		$C('slide_x', 'gradient')[0].innerHTML = z;
 		gui_gradient.cur($(o ? o : 'gd' + i));
@@ -739,12 +743,14 @@ gui_gradient = {
 	// Visualizer
 	'run': function (v, m) {
 		var g = vars[vars.id + 'GD'];
+
 		function z(i) {
 			var c = $T('canvas', 'gd' + i)[0].getContext('2d');
 			c.clearRect(0, 0, 7, 7);
-			c.rect(0,0,7,7);
+			c.rect(0, 0, 7, 7);
 			co.style.fill(c, 'rgba(' + g[i][1].join(',') + ')');
 		}
+
 		if (isNaN(v)) {
 			for (var i in g) {
 				z(i);
@@ -756,16 +762,16 @@ gui_gradient = {
 	},
 	'fill': function (m) {
 		var c = $2D('cGD1'),
-		g = vars[vars.id + 'GD'];
+			g = vars[vars.id + 'GD'];
 		co.gradient({
-			'X': 0,
-			'Y': 0
-		},
-		{
-			'X': 169,
-			'Y': 169
-		},
-		c, g, 'fill');
+				'X': 0,
+				'Y': 0
+			},
+			{
+				'X': 169,
+				'Y': 169
+			},
+			c, g, 'fill');
 		c.clearRect(0, 0, 169, 169);
 		c.fillRect(0, 0, 169, 169);
 		if (m == 'up') gui_palette.create();
@@ -787,9 +793,9 @@ var gui_pattern = {
 		var op = (gui_pattern.op[vars.id] = Math.round((1 - (b.Y + 5) / 91) * 1000) / 1000);
 		$('pPos').innerHTML = Math.round(op * 100) + '<span class="small">%</span>';
 		vars.opacity_fill = op * 100;
-		if($('opacity_fillCur') && vars.id == "fill") {
+		if ($('opacity_fillCur') && vars.id == "fill") {
 			$('opacity_fillCur').style.left = parseInt(op * 110) + 'px';
-			$('opacity_fillCurV').innerHTML = parseInt(op * 100);			
+			$('opacity_fillCurV').innerHTML = parseInt(op * 100);
 		}
 		$S('pOpacity').top = b.Y + 'px';
 		infc.info(m, 'cPT2', 'pPos');
@@ -800,9 +806,9 @@ var gui_pattern = {
 	// Create
 	'mk': function (s) {
 		var j = 0,
-		r = vars[vars.id + 'GD'],
-		o = $C('MM', 'pattern')[0],
-		z = '';
+			r = vars[vars.id + 'GD'],
+			o = $C('MM', 'pattern')[0],
+			z = '';
 		o.innerHTML = '<div class="z" onmousedown="gui_swatch.toType(\'PT\')">' + ' <div onmousedown="core.fu(\'cPT1\',event, {fu:core.Y, oX:0, oY:-41, Y1:-5, Y2:86}, gui_pattern.slide_y); return false;" class="blue_slide"><div id="pOpacity" class="blue_dot" title="Opacity"></div></div>' + ' <div id="pPos"></div>' + ' <canvas id="cPT"></canvas>' + ' <canvas id="cPT1" height="169" width="169"></canvas>' + ' <canvas id="cPT2" height="169" width="169"></canvas>' + '</div>';
 		gui_pattern.o[vars.id] = vars[vars.id + 'PT'];
 		gui_pattern.fill();
@@ -816,18 +822,18 @@ var gui_pattern = {
 	},
 	// Visualizer
 	'cache': function (type) { // cache image w/ createPattern()
-		var pattern = vars[type+'PT'];
+		var pattern = vars[type + 'PT'];
 		dtx2D.width = pattern.width;
 		dtx2D.height = pattern.height;
 		ctx2D.save();
 		ctx2D.globalAlpha = isNaN(pattern.opacity) ? 1 : pattern.opacity;
 		ctx2D.drawImage(pattern, 0, 0);
 		ctx2D.restore();
-		vars[type+'PT~'] = ctx2D.createPattern(dtx2D, "repeat");
+		vars[type + 'PT~'] = ctx2D.createPattern(dtx2D, "repeat");
 	},
 	'create': function (opacity, m) {
 		var image = vars[vars.id + 'PT'],
-			b = { X: image.width, Y: image.height };
+			b = {X: image.width, Y: image.height};
 		if (!opacity) {
 			opacity = gui_pattern.op[vars.id];
 		}
@@ -841,20 +847,20 @@ var gui_pattern = {
 	'fill': function (op, b, m, i) {
 		if (!op) op = gui_pattern.op[vars.id];
 		var a = {
-			'X': 0,
-			'Y': 0
-		},
-		b = b ? b : {
-			'X': 169,
-			'Y': 169
-		},
-		c = $2D(i ? i : 'cPT1');
+				'X': 0,
+				'Y': 0
+			},
+			b = b ? b : {
+				'X': 169,
+				'Y': 169
+			},
+			c = $2D(i ? i : 'cPT1');
 		co.del(c);
 		c.globalCompositeOperation = 'source-over';
-		c.rect(a.X,a.Y,b.X,b.Y);
+		c.rect(a.X, a.Y, b.X, b.Y);
 		co.style.fill(c, c.createPattern(vars[vars.id + 'PT'], 'repeat'));
 		c.globalCompositeOperation = 'destination-in';
-		c.rect(a.X,a.Y,b.X,b.Y);
+		c.rect(a.X, a.Y, b.X, b.Y);
 		c.fillStyle = 'rgba(255,255,255,' + op + ')';
 		c.fill();
 		if (m == 'up') gui_palette.create();
@@ -892,10 +898,12 @@ gui_swatch = {
 	'cur': function (type, s) {
 		gui.Y.id = type = type || "CO";
 		vars[vars.id] = gui_swatch.r[type][0];
+
 		function z(a, b, c) {
 			$C(a, 'swatch')[0].style[b] = c;
 		}
-		if(gui_swatch.id) {
+
+		if (gui_swatch.id) {
 			z(gui_swatch.id, 'display', 'none');
 			z(gui_swatch.id + 'menu', 'cursor', 'pointer');
 		}
@@ -920,8 +928,8 @@ gui_swatch = {
 	},
 	'pos': function (n) {
 		var o = gui.Y,
-		a = Math.ceil(n / 7) * 7,
-		b = (a - 7) - (o.cur[gui_swatch.id] - 1);
+			a = Math.ceil(n / 7) * 7,
+			b = (a - 7) - (o.cur[gui_swatch.id] - 1);
 		if (b > 21 || b < 0) o.cur[gui_swatch.id] = (a - (b < 0 ? 7 : 28));
 		o.prev[gui_swatch.id] = 0;
 		o.cord(0);
@@ -929,7 +937,7 @@ gui_swatch = {
 	},
 	'add': function () {
 		var r = vars[gui_swatch.id],
-		n = gui_swatch.n[vars.id + gui_swatch.id];
+			n = gui_swatch.n[vars.id + gui_swatch.id];
 		var fu = {
 			'CO': function (r) {
 				r = deObject(vars[vars.id + gui_swatch.id]);
@@ -953,7 +961,7 @@ gui_swatch = {
 	'remove': function () {
 		if (vars[gui_swatch.id].length > 1) {
 			var r = vars[gui_swatch.id],
-			n = gui_swatch.n[vars.id + gui_swatch.id];
+				n = gui_swatch.n[vars.id + gui_swatch.id];
 			r.splice(n - 1, 1);
 			vars[vars.id + gui_swatch.id] = r[(n = Math.min(n, r.length)) - 1];
 			gui_swatch.pos(n);
@@ -962,11 +970,11 @@ gui_swatch = {
 		}
 	},
 	// Create
-	author: function(id) {
+	author: function (id) {
 		var id = id || gui_swatch.id,
-			res = Resources[id][vars[id+'*']] || "";
-		if(res) { // resource
-			return '<i>by:&nbsp; <a href="'+res.url+'" target="_blank">'+res.name+'</a></i>';
+			res = Resources[id][vars[id + '*']] || "";
+		if (res) { // resource
+			return '<i>by:&nbsp; <a href="' + res.url + '" target="_blank">' + res.name + '</a></i>';
 		} else {
 			return '';
 		}
@@ -980,18 +988,20 @@ gui_swatch = {
 			for (var j in Q[i]) gui_swatch.set[i][k++] = j;
 		}
 		for (var i in gui_swatch.r) {
-			var res = '<div id="author_'+i+'" class="author">'+gui_swatch.author(i)+'</div>';
-			z += '<div class="menu ' + i + 'menu" onmousedown="gui_swatch.cur(\'' + i + '\'); vars.cache(1);">' + ' <div>' + gui_swatch.r[i][0].toUpperCase() + 'S</div>' + 
-				 ' <span class="east">' + 
-				 ' <div style="padding: 2px 0 0; font-size: 12px" id="'+i+'_author"></div>' +
-//				 '  <img src="media/gui/sw_remove.png" onmousedown="if(this.parentNode.parentNode.style.cursor==\'default\') gui_swatch.remove(); return false;" alt="..." class="remove">' + 
-//				 '  <img src="media/gui/sw_add.png" onmousedown="if(this.parentNode.parentNode.style.cursor==\'default\') gui_swatch.add(); return false;" alt="...">' + 
-				 ' </span>' + 
-				 '</div>' + 
-				 '<div class="' + i + '" style="display: none">' + 
-				 ' <div style="position: absolute; left: 19px; top: ' + (42 + gui_swatch.r[i][2]) + 'px;">' + gui.menu.build(i + '*', gui_swatch.set[i]) + '</div>' + 
-				 ' <div id="' + i + '" class="squares"></div>' + gui.Y.kontrol(i, gui_swatch.r[i][2] + 49) + '<br>' +res+ 
-				 '</div>';
+			var res = '<div id="author_' + i + '" class="author">' + gui_swatch.author(i) + '</div>';
+			z += '<div class="menu ' + i + 'menu" onmousedown="gui_swatch.cur(\'' + i + '\'); vars.cache(1);">' + ' <div>' + gui_swatch.r[i][0].toUpperCase() + 'S</div>' +
+				' <span class="east">' +
+				' <div style="padding: 2px 0 0; font-size: 12px" id="' + i + '_author"></div>' +
+				//				 '  <img src="media/gui/sw_remove.png"
+				// onmousedown="if(this.parentNode.parentNode.style.cursor==\'default\') gui_swatch.remove(); return false;" alt="..."
+				// class="remove">' +  '  <img src="media/gui/sw_add.png"
+				// onmousedown="if(this.parentNode.parentNode.style.cursor==\'default\') gui_swatch.add(); return false;" alt="...">' +
+				' </span>' +
+				'</div>' +
+				'<div class="' + i + '" style="display: none">' +
+				' <div style="position: absolute; left: 19px; top: ' + (42 + gui_swatch.r[i][2]) + 'px;">' + gui.menu.build(i + '*', gui_swatch.set[i]) + '</div>' +
+				' <div id="' + i + '" class="squares"></div>' + gui.Y.kontrol(i, gui_swatch.r[i][2] + 49) + '<br>' + res +
+				'</div>';
 		}
 		$C('MM', 'swatch')[0].innerHTML = '<div class="z">' + z + '</div>';
 		gui_swatch.cur(gui_swatch.id = gui_swatch.L2S[vars[vars.id]]);
@@ -1023,20 +1033,21 @@ gui_swatch = {
 			},
 			'GD': function (r, c) {
 				co.gradient({
-					'X': 3,
-					'Y': 3
-				},
-				{
-					'X': 13,
-					'Y': 13
-				},
-				c, r[i - 1], 'fill', 1);
+						'X': 3,
+						'Y': 3
+					},
+					{
+						'X': 13,
+						'Y': 13
+					},
+					c, r[i - 1], 'fill', 1);
 			},
 			'PT': function (r, c) {
 				c.fillStyle = c.createPattern(r[i - 1], 'repeat');
 				c.fill();
 			}
 		};
+
 		function z(i) {
 			var d = $(vars.id + gui_swatch.id + i);
 			if (d) {
@@ -1044,13 +1055,13 @@ gui_swatch = {
 				c.clearRect(0, 0, 16, 16);
 				if (gui_swatch.n[vars.id + gui_swatch.id] == i && !s) {
 					var a = {
-						'X': 3,
-						'Y': 3
-					},
-					b = {
-						'X': 13,
-						'Y': 13
-					};
+							'X': 3,
+							'Y': 3
+						},
+						b = {
+							'X': 13,
+							'Y': 13
+						};
 					c.beginPath();
 					co.circle(a, b, c);
 					c.strokeStyle = 'rgba(255,255,255,1)';
@@ -1059,11 +1070,12 @@ gui_swatch = {
 					fu[gui_swatch.id](r, c);
 					c.beginPath();
 				} else {
-					c.rect(0, 0, 16,16);
+					c.rect(0, 0, 16, 16);
 					fu[gui_swatch.id](r, c);
 				}
 			}
 		}
+
 		if (isNaN(i)) for (var i = gui.Y.cur[gui_swatch.id], ii = 1; i <= r.length && ii <= 28; i++, ii++) z(i);
 		else z(i);
 	},
@@ -1074,7 +1086,7 @@ gui_swatch = {
 		}
 	},
 	// Data
-	'L2S': { 
+	'L2S': {
 		'solid': 'CO',
 		'gradient': 'GD',
 		'pattern': 'PT'
@@ -1112,21 +1124,21 @@ infc = {
 	'info': function (m, o, i) {
 		if (m == 'down' || m == 'up') {
 			var c = $2D(o),
-			r = {
-				'down': ['source-over', 0.4, 0.2, 0],
-				'up': ['destination-out', 1, 1, 1]
-			} [m];
+				r = {
+					'down': ['source-over', 0.4, 0.2, 0],
+					'up': ['destination-out', 1, 1, 1]
+				} [m];
 			c.beginPath();
 			c.globalCompositeOperation = r[0];
 			co.circle({
-				'X': 35 + r[3],
-				'Y': 20 + r[3]
-			},
-			{
-				'X': -15 - r[3],
-				'Y': -30 - r[3]
-			},
-			c);
+					'X': 35 + r[3],
+					'Y': 20 + r[3]
+				},
+				{
+					'X': -15 - r[3],
+					'Y': -30 - r[3]
+				},
+				c);
 			c.lineWidth = 1;
 			co.style.fill(c, 'rgba(0,0,0,' + r[1] + ')');
 			co.style.stroke(c, 'rgba(0,0,0,' + r[2] + ')');
@@ -1135,20 +1147,22 @@ infc = {
 	},
 	'info_draw': function (v, s) {
 		var c = $2D(v),
-		a = {
-			'X': 37,
-			'Y': 37
-		},
-		b = {
-			'X': 131,
-			'Y': 131
-		}
+			a = {
+				'X': 37,
+				'Y': 37
+			},
+			b = {
+				'X': 131,
+				'Y': 131
+			}
+
 		function ellip(a, b, r, w) {
 			c.beginPath();
 			c.lineWidth = w;
 			co.circle(a, b, c);
 			co.style.stroke(c, 'rgba(' + r + ')');
 		}
+
 		function line(a, b, r, w) {
 			c.beginPath();
 			c.lineWidth = w;
@@ -1156,139 +1170,140 @@ infc = {
 			c.lineTo(b.X, b.Y);
 			co.style.stroke(c, 'rgba(' + r + ')');
 		}
+
 		if (!s) { // DRAW ROTATE
 			ellip(a, b, [0, 0, 0, 1], 8);
 			c.globalCompositeOperation = 'source-out';
 			ellip({
-				'X': a.X + 3,
-				'Y': a.Y + 3
-			},
-			{
-				'X': b.X + 3,
-				'Y': b.Y + 3
-			},
-			[0, 0, 0, 0.3], 2);
+					'X': a.X + 3,
+					'Y': a.Y + 3
+				},
+				{
+					'X': b.X + 3,
+					'Y': b.Y + 3
+				},
+				[0, 0, 0, 0.3], 2);
 			c.globalCompositeOperation = 'source-over';
 			ellip(a, b, [128, 128, 128, 0.4], 8);
 			ellip({
-				'X': a.X,
-				'Y': a.Y + 1
-			},
-			{
-				'X': b.X,
-				'Y': b.Y + 1
-			},
-			[255, 255, 255, 0.2], 1);
+					'X': a.X,
+					'Y': a.Y + 1
+				},
+				{
+					'X': b.X,
+					'Y': b.Y + 1
+				},
+				[255, 255, 255, 0.2], 1);
 			ellip(a, b, [33, 33, 33, 1], 1);
 			line({
-				X: 84,
-				Y: 14
-			},
-			{
-				X: 84,
-				Y: 7
-			},
-			[0, 0, 0, 0.4], 2);
+					X: 84,
+					Y: 14
+				},
+				{
+					X: 84,
+					Y: 7
+				},
+				[0, 0, 0, 0.4], 2);
 			line({
-				X: 85,
-				Y: 14
-			},
-			{
-				X: 85,
-				Y: 7
-			},
-			[255, 255, 255, 0.4], 1); // N
+					X: 85,
+					Y: 14
+				},
+				{
+					X: 85,
+					Y: 7
+				},
+				[255, 255, 255, 0.4], 1); // N
 			line({
-				X: 85,
-				Y: 154
-			},
-			{
-				X: 85,
-				Y: 161
-			},
-			[0, 0, 0, 0.4], 2);
+					X: 85,
+					Y: 154
+				},
+				{
+					X: 85,
+					Y: 161
+				},
+				[0, 0, 0, 0.4], 2);
 			line({
-				X: 85,
-				Y: 154
-			},
-			{
-				X: 84,
-				Y: 161
-			},
-			[255, 255, 255, 0.4], 1); // S
+					X: 85,
+					Y: 154
+				},
+				{
+					X: 84,
+					Y: 161
+				},
+				[255, 255, 255, 0.4], 1); // S
 			line({
-				X: 154,
-				Y: 85
-			},
-			{
-				X: 161,
-				Y: 85
-			},
-			[0, 0, 0, 0.4], 2);
+					X: 154,
+					Y: 85
+				},
+				{
+					X: 161,
+					Y: 85
+				},
+				[0, 0, 0, 0.4], 2);
 			line({
-				X: 154,
-				Y: 86
-			},
-			{
-				X: 161,
-				Y: 86
-			},
-			[255, 255, 255, 0.4], 1); // E
+					X: 154,
+					Y: 86
+				},
+				{
+					X: 161,
+					Y: 86
+				},
+				[255, 255, 255, 0.4], 1); // E
 			line({
-				X: 14,
-				Y: 86
-			},
-			{
-				X: 7,
-				Y: 86
-			},
-			[0, 0, 0, 0.4], 2);
+					X: 14,
+					Y: 86
+				},
+				{
+					X: 7,
+					Y: 86
+				},
+				[0, 0, 0, 0.4], 2);
 			line({
-				X: 14,
-				Y: 85
-			},
-			{
-				X: 7,
-				Y: 85
-			},
-			[255, 255, 255, 0.4], 1); // W
+					X: 14,
+					Y: 85
+				},
+				{
+					X: 7,
+					Y: 85
+				},
+				[255, 255, 255, 0.4], 1); // W
 		}
 		line({
-			X: 87,
-			Y: 35
-		},
-		{
-			X: 87,
-			Y: 135
-		},
-		[0, 0, 0, 0.7], 1);
+				X: 87,
+				Y: 35
+			},
+			{
+				X: 87,
+				Y: 135
+			},
+			[0, 0, 0, 0.7], 1);
 		line({
-			X: 84,
-			Y: 35
-		},
-		{
-			X: 84,
-			Y: 135
-		},
-		[128, 128, 128, 0.4], 8);
+				X: 84,
+				Y: 35
+			},
+			{
+				X: 84,
+				Y: 135
+			},
+			[128, 128, 128, 0.4], 8);
 		line({
-			X: 84,
-			Y: 35
-		},
-		{
-			X: 84,
-			Y: 135
-		},
-		[0, 0, 0, 1], 1);
+				X: 84,
+				Y: 35
+			},
+			{
+				X: 84,
+				Y: 135
+			},
+			[0, 0, 0, 1], 1);
 		line({
-			X: 85,
-			Y: 35
-		},
-		{
-			X: 85,
-			Y: 135
-		},
-		[255, 255, 255, 0.2], 1);
+				X: 85,
+				Y: 35
+			},
+			{
+				X: 85,
+				Y: 135
+			},
+			[255, 255, 255, 0.2], 1);
 		c.closePath();
 	},
 	// GLOBAL OPACITY
@@ -1298,7 +1313,7 @@ infc = {
 		if ($(o + 'CurV')) {
 			$(o + 'CurV').innerHTML = Math.round(op);
 		}
-		switch(vars["fill"]) {
+		switch (vars["fill"]) {
 			case 'pattern':
 				gui_pattern.create(op / 100);
 				$S('pOpacity').top = ((1 - (op / 100)) * 91 - 5) + 'px'

@@ -908,8 +908,7 @@ win = {
 		};
 		if (r = cookieGrab('windows')) {
 			win.mk(r);
-		}
-		else win.mk(win.cp());
+		} else win.mk(win.cp());
 	},
 	'mk': function (r) {
 		var n = win.getCenter(),

@@ -19,9 +19,9 @@
 			return (key.code(event));
 		},
 		'active': function () {
-			if (vars.type == 'marquee') {
+			if (vars.type === 'marquee') {
 				marquee.core(oXY, cXY, 'move');
-			} else if (vars.type == 'shape') {
+			} else if (vars.type === 'shape') {
 				draw.shape(oXY, cXY, 'move');
 			}
 		},
