@@ -12,12 +12,11 @@
 	};
 
 	key = {
-		'k': function (e) {
-			if (typeof (e) == 'undefined') var e = event;
-			if (typeof (e.shiftKey) == 'undefined') e.shiftKey = 0;
-			E.sh = E.sh_var = e.shiftKey ? 1 : 0;
-			E.ctrl = e.ctrlKey ? 1 : 0;
-			return (key.code(e));
+		'k': function (event) {
+			if (typeof (event.shiftKey) == 'undefined') event.shiftKey = 0;
+			E.sh = E.sh_var = event.shiftKey ? 1 : 0;
+			E.ctrl = event.metaKey ? 1 : 0;
+			return (key.code(event));
 		},
 		'active': function () {
 			if (vars.type == 'marquee') {
@@ -100,7 +99,7 @@
 		var k = key.k(event),
 			r = {};
 
-		console.log(event.ctrlKey, E.sh)
+		console.log(event.metaKey, E.sh)
 		if (vars.type == 'marquee' && E.ctrl && k == 65) { // SELECT ALL
 			marquee.core({
 					'X': 1,
@@ -111,9 +110,9 @@
 					'Y': canvas.H - 1
 				},
 				'up');
-		} else if (event.ctrlKey && E.sh && k == 90 && (r = canvas.history_r) && r.r[r.n + 1] <= canvas.history_n && (r.n + 1) <= r.z) { // REDO
+		} else if (event.metaKey && E.sh && k == 90 && (r = canvas.history_r) && r.r[r.n + 1] <= canvas.history_n && (r.n + 1) <= r.z) { // REDO
 			canvas.history_set(r.n++);
-		} else if (event.ctrlKey && !E.sh && k == 90 && (r = canvas.history_r) && r.r[r.n - 1] >= 0 && (r.n - 1) >= r.a) { // UNDO
+		} else if (event.metaKey && !E.sh && k == 90 && (r = canvas.history_r) && r.r[r.n - 1] >= 0 && (r.n - 1) >= r.a) { // UNDO
 			canvas.history_set(r.n--);
 		} else if (mXY != 'up' && cXY && cXY.X) { // TOGGLE CONSTRAIN
 			key.active();
