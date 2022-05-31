@@ -1,4 +1,4 @@
-if (typeof (BG) === "undefined") var BG = {}
+window.BG || (window.BG = {})
 
 const canvas = document.createElement("canvas")
 const ctx = canvas.getContext('2d')
@@ -439,14 +439,24 @@ BG.createGeneratorUI = function () {
 }
 
 BG.onFormSubmit = function () {
-	const ret = JSON.stringify({ // keep track of gradient
+	const hash = JSON.stringify({
 		width: BG.width,
 		height: BG.height,
 		config: config,
 		gradient: BG.getColorStops()
 	})
 
-	history.replaceState(null, null, `#${ret}`)
+	if (document.getElementById('url')) {
+		var query = `?${document.getElementById('url').value}`
+	} else {
+		var query = ""
+	}
+
+	history.replaceState(null, null, `${query}#${hash}`)
+
+	if (query) {
+		BG.createRemoteFrame()
+	}
 }
 
 BG.saveStream = function (data) {
