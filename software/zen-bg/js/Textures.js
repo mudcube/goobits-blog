@@ -1,47 +1,38 @@
-var createTexture = (function() {
-	var canvas = document.createElement("canvas");
-	var ctx = canvas.getContext('2d');
-	var image = new Image();
-	///
-	return function(src, callback) {
+const createTexture = (function () {
+	const canvas = document.createElement("canvas")
+	const ctx = canvas.getContext('2d')
+	let $image = new Image()
+
+	return function (src, callback) {
 		BG.loader.message("loading...");
-/*		if (src.substr(0, 5) === "data:") {
-			image.onload = function() {
-				ctx.drawImage(image, 0, 0);
-				canvas.pattern = ctx.createPattern(image, "repeat");
-				if (callback) callback(canvas);
-			};
-			image.src = src;			
-			return canvas;
-		}*/
-		image = new Image();
-		image.onload = function() {
-			var width = image.width = this.width;
-			var height = image.height = this.height;
+
+		$image = new Image();
+		$image.onerror = console.error
+		$image.onload = function () {
 			// lum in sRGB
-			var lum = { r: 0.33, g: 0.33, b: 0.33 };
-			var width = image.width
-			var height = image.height
+			const lum = {r: 0.33, g: 0.33, b: 0.33}
+			var width = $image.width
+			var height = $image.height
 			// resize canvas
 			canvas.width = width;
 			canvas.height = height;
 			// draw images
-			ctx.drawImage(image, 0, 0, width, height);
+			ctx.drawImage($image, 0, 0, width, height);
 			// get imageData
-			var imageData = ctx.getImageData(0, 0, width, height);
-			var src = imageData.data;
-			var length = src.length;
-			var light = 0;
-			for (var n = 0; n < length; n += 4) {
+			const imageData = ctx.getImageData(0, 0, width, height)
+			const src = imageData.data
+			const length = src.length
+			const light = 0
+			for (let n = 0; n < length; n += 4) {
 				// Source #
-				var r = src[n];
-				var g = src[n + 1];
-				var b = src[n + 2];
-				var a = src[n + 3];
+				const r = src[n]
+				const g = src[n + 1]
+				const b = src[n + 2]
+				const a = src[n + 3]
 				// Source #2
-				var R = light;
-				var G = light;
-				var B = light;
+				const R = light
+				const G = light
+				const B = light
 				// Apply effect to pixels (in this case Subtract)
 				if (light) {
 					var er = Math.min(255, r + R); // delete light colors
@@ -57,30 +48,29 @@ var createTexture = (function() {
 				src[n + 1] = 0;
 				src[n + 2] = 0;
 				// Calculate amount of modification
-				var mr = er - r;
-				var mg = eg - g;
-				var mb = eb - b;
-				var ma = Math.abs(mr) * lum.r + Math.abs(mg) * lum.g + Math.abs(mb) * lum.b;
+				const mr = er - r
+				const mg = eg - g
+				const mb = eb - b
+				const ma = Math.abs(mr) * lum.r + Math.abs(mg) * lum.g + Math.abs(mb) * lum.b
 				// Combined alpha of changed pixels (erase)
 				src[n + 3] = a - ma;
 			}
 			ctx.putImageData(imageData, 0, 0);
-///			if (image.height !== 512) window.location = canvas.toDataURL();
+
 			canvas.pattern = ctx.createPattern(canvas, "repeat");
-			///
 			canvas.style.cssText = "z-index: 1000; position: absolute; right: 0;";
-//			document.body.appendChild(canvas);
-			///
+
 			if (callback) callback(canvas);
-			///
+
 			BG.loader.stop();
 		};
-		image.src = src;
+
+		$image.src = src;
 		return canvas;
 	};
-})();
+})()
 
-var textures = [
+const textures = [
 	"textures/texturise/wood_001.jpeg",
 	"textures/texturise/wood_002.jpeg",
 	"textures/texturise/wood_003.jpeg",
@@ -177,4 +167,4 @@ var textures = [
 	"textures/texturise/concrete_011.jpeg",
 	"textures/texturise/concrete_013.jpeg",
 	"textures/texturise/concrete_014.jpeg"
-];
+]
