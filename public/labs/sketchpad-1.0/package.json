@@ -1,0 +1,36 @@
+{
+	"name": "sketchpad-1.0",
+	"description": "Sketchpad is an online drawing application",
+	"version": "1.0.0",
+	"pwaManifest": {
+		"name": "Sketchpad 1.0",
+		"shortName": "Sketchpad",
+		"startURL": "./",
+		"theme": "#add8e6",
+		"generateIconOptions": {
+			"baseIcon": "./static/media/gui/favicon.png",
+			"sizes": [
+				44,
+				96,
+				144,
+				256,
+				512
+			],
+			"genFavicons": true
+		}
+	},
+	"scripts": {
+		"build": "parcel build index.html --no-source-maps",
+		"build-and-serve": "yarn build; http-server ./dist -p 1234",
+		"dev": "parcel index.html"
+	},
+	"dependencies": {
+		"parcel": "^2.6.0",
+		"parcel-config-pwa-manifest": "^0.1.2",
+		"parcel-reporter-static-files-copy": "^1.3.4"
+	},
+	"devDependencies": {
+		"@parcel/packager-raw-url": "2.6.0",
+		"@parcel/packager-xml": "2.6.0"
+	}
+}
