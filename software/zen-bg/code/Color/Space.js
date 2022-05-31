@@ -1,4 +1,4 @@
-/* 
+/*
 	----------------------------------------------------
 	Color Space : 1.2.1 : 2013/10/13 : MIT License
 	----------------------------------------------------
@@ -18,8 +18,8 @@
 	----------------------------------------------------
 */
 
-if (typeof(Color) === "undefined") var Color = {};
-if (typeof(ColorSpace) === "undefined") var ColorSpace = {};
+window.Color || (window.Color = {});
+window.ColorSpace || (window.ColorSpace = {});
 if (typeof(Color.Space) === "undefined") Color.Space = {};
 
 (function () { "use strict";
@@ -65,7 +65,7 @@ var root = Color.Space = function(color, route) {
 		if (useEval) {
 			f = "Color.Space."+key+"("+f+")";
 		}
-	}	
+	}
 	if (useEval) {
 		functions[route] = eval("(function(color) { return "+f+" })");
 	}
@@ -74,7 +74,7 @@ var root = Color.Space = function(color, route) {
 
 var spaceX = ColorSpace = Color.SpaceX = function(color, type) {
 	var that = this;
-	/*	
+	/*
 		----------------------------------------------------
 		Color Space Conversion Routes
 		------------------------------
@@ -114,7 +114,7 @@ var spaceX = ColorSpace = Color.SpaceX = function(color, type) {
     		that.g = data.G;
     		that.b = data.B;
     		that.a = data.A;
-    	}, 
+    	},
     	"rgba": function(that, color) {
     		var data = root.W3_RGBA(color);
     		that.r = data.R;
@@ -122,14 +122,14 @@ var spaceX = ColorSpace = Color.SpaceX = function(color, type) {
     		that.b = data.B;
     		that.a = data.A;
     		that.type = "rgba";
-    	}, 
+    	},
     	"rgb": function(that, color) {
     		var data = root.W3_RGB(color);
     		that.r = data.R;
     		that.g = data.G;
     		that.b = data.B;
     		that.type = "rgb";
-    	}, 
+    	},
     	"hsla": function(that, color) {
     		var data = root.W3_HSLA(color);
     		that.h = data.H;
@@ -137,7 +137,7 @@ var spaceX = ColorSpace = Color.SpaceX = function(color, type) {
     		that.l = data.L;
     		that.a = data.A;
     		that.type = "hsla";
-    	}, 
+    	},
     	"hsl": function(that, color) {
     		var data = root.W3_HSL(color);
     		that.h = data.H;
@@ -252,13 +252,13 @@ root.isW3Contrast = function (rgb1, rgb2) {
 
 // W3C - RGB + RGBA
 
-root.RGB_W3 = function(o) { 
-	return "rgb(" + (o.R >> 0) + "," + (o.G >> 0) + "," + (o.B >> 0) + ")"; 
+root.RGB_W3 = function(o) {
+	return "rgb(" + (o.R >> 0) + "," + (o.G >> 0) + "," + (o.B >> 0) + ")";
 };
 
-root.RGBA_W3 = function(o) { 
+root.RGBA_W3 = function(o) {
 	var alpha = typeof(o.A) === "number" ? o.A / 255 : 1;
-	return "rgba(" + (o.R >> 0) + "," + (o.G >> 0) + "," + (o.B >> 0) + "," + alpha + ")"; 
+	return "rgba(" + (o.R >> 0) + "," + (o.G >> 0) + "," + (o.B >> 0) + "," + alpha + ")";
 };
 
 root.W3_RGB = function(o) {
@@ -283,12 +283,12 @@ root.W3_RGBA = function(o) {
 // W3C - HSL + HSLA
 
 root.HSL_W3 = function(o) {
-	return "hsl(" + ((o.H + 0.5) >> 0) + "," + ((o.S + 0.5) >> 0) + "%," + ((o.L + 0.5) >> 0) + "%)"; 
+	return "hsl(" + ((o.H + 0.5) >> 0) + "," + ((o.S + 0.5) >> 0) + "%," + ((o.L + 0.5) >> 0) + "%)";
 };
 
 root.HSLA_W3 = function(o) {
 	var alpha = typeof(o.A) === "number" ? o.A / 255 : 1;
-	return "hsla(" + ((o.H + 0.5) >> 0) + "," + ((o.S + 0.5) >> 0) + "%," + ((o.L + 0.5) >> 0) + "%," + alpha + ")"; 
+	return "hsla(" + ((o.H + 0.5) >> 0) + "," + ((o.S + 0.5) >> 0) + "%," + ((o.L + 0.5) >> 0) + "%," + alpha + ")";
 };
 
 root.W3_HSL = function(o) {
@@ -316,7 +316,7 @@ root.W3_HSLA = function(o) {
 
 // W3 HEX = "FFFFFF" | "FFFFFFFF"
 
-root.W3_HEX = 
+root.W3_HEX =
 root.W3_HEX24 = function (o) {
 	if (o.substr(0, 1) === "#") o = o.substr(1);
 	if (o.length === 3) o = o[0] + o[0] + o[1] + o[1] + o[2] + o[2];
@@ -449,7 +449,7 @@ root.RGB_HSV = function (o) { //- RGB from 0 to 255
 		min = Math.min(_R, _G, _B),
 		max = Math.max(_R, _G, _B),
 		D = max - min,
-		H, 
+		H,
 		S,
 		V = max;
 	if (D === 0) { // No chroma
@@ -563,7 +563,7 @@ root.HSL_RGB = function (o) {
 // HSV (1978) = H: Hue / S: Saturation / V: Value
 // en.wikipedia.org/wiki/HSL_and_HSV
 
-root.HSVA_RGBA = 
+root.HSVA_RGBA =
 root.HSV_RGB = function (o) {
 	var H = o.H / 360;
 	var S = o.S / 100;

@@ -26,9 +26,9 @@
 	});
 */
 
-if (typeof (widgets) === "undefined") var widgets = {};
+window.widgets || (window.widgets = {})
 
-(function () {
+;(function () {
 
 	var dataFormat = {
 		"text/css": "string",

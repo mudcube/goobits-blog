@@ -1,40 +1,6 @@
-if (typeof (BG) === "undefined") var BG = {}
+import {createTexture} from './Textures.js'
 
-function removeChildNodes(o) {
-	while (o.hasChildNodes()) {
-		o.removeChild(o.firstChild)
-	}
-}
-
-function createHeader(title) {
-	const div = document.createElement("div")
-	div.className = "header"
-	div.textContent = title
-	cnt.appendChild(div)
-	return div
-}
-
-function createInput(props) {
-	const $div = document.createElement("div")
-	$div.style.cssText = "padding-top: 5px;"
-	var d = document.createElement("span")
-	d.textContent = props.title || props.id
-	d.className = "formSpan"
-	$div.appendChild(d)
-	var d = document.createElement("input")
-	d.setAttribute("type", "range")
-	Event.add(d, 'mousedown', Event.cancel)
-	for (let key in props) {
-		if (key.substr(0, 2) === "on") d[key] = props[key]
-		else d.setAttribute(key, props[key])
-	}
-	if (props.type === "number" && d.onchange) {
-		d.onkeyup = d.onchange
-		d.onmouseup = d.onchange
-	}
-	$div.appendChild(d)
-	return $div
-}
+window.BG || (window.BG = {});
 
 BG.onload = function () {
 	BG.loader = new widgets.Loader("starting...")
@@ -68,7 +34,6 @@ BG.onload = function () {
 	BG.pickerColor = "22FF74"
 
 	BG.picker = new Color.Picker({
-		display: false,
 		feature: {
 			closeButton: true,
 			hexInput: true
@@ -105,10 +70,6 @@ BG.onload = function () {
 		},
 		callback: function (color, state) {
 			const gd = BG.gradient
-			const colorStop = gd.stops
-			///
-			//			colorStop[gd.active].stop = 1 - color.A / 255
-			///
 			BG.toggleRemoteFrame(state)
 			const type = gd["active"]
 			const active = gd.stops[type]
@@ -122,7 +83,7 @@ BG.onload = function () {
 	})
 
 	eventjs.add(document.querySelector("#ColorPicker"), "mousedown", function (event) {
-		proxy = widget.windows.drag(this, event)
+		widget.windows.drag(this, event)
 	})
 
 	BG.picker.element.style.top = 20 + "px"

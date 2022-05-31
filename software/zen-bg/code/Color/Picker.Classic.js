@@ -1,4 +1,4 @@
-/* 
+/*
 	----------------------------------------------------
 	Color Picker : 1.1.6 : 2013/04/15
 	----------------------------------------------------
@@ -24,7 +24,7 @@
 	@ColorPicker #Event.js #Color/Space.js
 */
 
-if (typeof(Color) === "undefined") var Color = {};
+window.Color || (window.Color = {});
 
 (function() { "use strict";
 
@@ -86,7 +86,7 @@ Color.Picker = function (conf) {
 	}
 
 	/// Useful for toggling focus when picker is over an iframe.
-	this.onMouseDown = conf.onMouseDown || conf.onmousedown; 
+	this.onMouseDown = conf.onMouseDown || conf.onmousedown;
 	this.onMouseUp = conf.onMouseUp || conf.onmousedown;
 
 	/// Creating our color picker.
@@ -158,7 +158,7 @@ Color.Picker = function (conf) {
 				var bbox = Event.proxy.getBoundingBox(that.eyeDropper.target);
 				coord.x += bbox.scrollLeft - bbox.x1;
 				coord.y += bbox.scrollTop - bbox.y1;
-				///			
+				///
 				var ctx = that.eyeDropper.canvas.getContext("2d");
 				var data = ctx.getImageData(coord.x, coord.y, 1, 1);
 				if (data.data[3] === 0) return;
@@ -172,7 +172,7 @@ Color.Picker = function (conf) {
 				that.eyeDropper.target.title = mouseLayerTitle;
 				Event.remove(document.body, "mouseup", mouseLayerExit);
 				Event.remove(that.eyeDropper.target, "mousemove", mouseLayerUpdate);
-				setTimeout(function() { 
+				setTimeout(function() {
 					that.state = "colorPicker";
 				}, 50);
 			};
@@ -259,7 +259,7 @@ Color.Picker = function (conf) {
 		if (self.target.className === "hexInput") {
 			if (isPointerDown) Event.stop(event);
 			plugin.style.cursor = "text";
-			return; // allow selection of HEX		
+			return; // allow selection of HEX
 		} else if (x !== x0 || y !== y0) { // move colorpicker
 			if (that.feature.drag) {
 				plugin.style.cursor = "move";
@@ -286,9 +286,9 @@ Color.Picker = function (conf) {
 							plugin.style.zIndex = window.zIndexGlobal ++;
 						} else if (self.state === "up") {
 							if (conf.recordWindow) {
-								conf.recordWindow({ 
-									id: that.recordId || plugin.id, 
-									left: self.x / x2, 
+								conf.recordWindow({
+									id: that.recordId || plugin.id,
+									left: self.x / x2,
 									top: self.y / y2,
 									display: "block"
 								});
@@ -357,7 +357,7 @@ Color.Picker = function (conf) {
 	});
 
 	/// helper functions
-	
+
 	this.update = function(color, alpha) { // accepts HEX, RGB, and HSV
 		if (color) that.color = getHSVA(color);
 		if (typeof(alpha) === "number") that.color.A = alpha;
@@ -375,7 +375,7 @@ Color.Picker = function (conf) {
 		///
 		that.drawSample("update", true);
 	};
-	
+
 	this.drawSample = function (state, update) {
 		// clearing canvas
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -428,7 +428,7 @@ Color.Picker = function (conf) {
 			that.callback(rgba, state, w3);
 		}
 	};
-	
+
 	this.toString = function(color) {
 		color = color || that.color;
 		if (isFinite(color.H)) {
@@ -476,7 +476,7 @@ Color.Picker = function (conf) {
 		ctx.strokeRect(offset+0.5, offset+0.5, width-1, height-1);
 		ctx.restore();
 	};
-	
+
 	var grayscale = function(color, type) {
 		if (that.conf[type].enable === true) {
 			return color;
@@ -513,7 +513,7 @@ Color.Picker = function (conf) {
 		ctx.strokeRect(left + 0.5, that.offset + 0.5, that.conf.hue.width - 1, that.conf.hue.height - 1);
 		ctx.restore();
 	};
-	
+
 	this.drawAlpha = function () {
 		// drawing hue selector
 		var left = that.conf.satval.width + that.margin * 2 + that.conf.hue.width + that.offset;
@@ -532,7 +532,7 @@ Color.Picker = function (conf) {
 		ctx.strokeStyle = this.strokeColor;
 		ctx.strokeRect(left + 0.5, that.offset + 0.5, that.conf.alpha.width - 1, that.conf.satval.height - 1);
 	};
-	
+
 	this.toggle = function (value) {
 		if (value || (" " + plugin.className + " ").indexOf(" opened ") === -1) {
 			this.open();
@@ -540,7 +540,7 @@ Color.Picker = function (conf) {
 			this.close();
 		}
 	};
-	
+
 	this.open = function () {
 		var id = that.recordId || plugin.id;
 		var element = document.getElementById(id);
@@ -560,7 +560,7 @@ Color.Picker = function (conf) {
 		element.style.zIndex = window.zIndexGlobal ++;
 		window.clearTimeout(element.interval);
 	};
-	
+
 	this.close = function () {
 		var id = that.recordId || plugin.id;
 		var element = document.getElementById(id);
@@ -682,7 +682,7 @@ var interlace = function (size, color1, color2) {
 	return pattern;
 };
 
-/// 
+///
 var clamp = function(n, min, max) {
 	return (n < min) ? min : ((n > max) ? max : n);
 };

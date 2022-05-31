@@ -1,26 +1,10 @@
+import {createHeader, createInput} from './_globals.js'
+
 window.BG || (window.BG = {})
-
-const canvas = document.createElement("canvas")
-const ctx = canvas.getContext('2d')
-
-let config = {
-	textureEnabled: true,
-	alpha: 0.75,
-	scale: 1,
-	seed: 11899,
-	grayscale: true,
-	rotate: Math.PI / 2
-}
-
-const noise = document.createElement("canvas")
-const ctx_noise = noise.getContext('2d')
-noise.width = 128
-noise.height = 128
 
 BG.generateNoise = function (grayscale) {
 	if (!this.random) this.random = new sketch.util.Random(config.seed)
 	const random = this.random
-	const time = (new Date()).getTime()
 	const imgData = ctx_noise.getImageData(0, 0, noise.width, noise.height)
 	const data = imgData.data
 	const xmax = imgData.width
@@ -452,7 +436,7 @@ BG.onFormSubmit = function () {
 		var query = ""
 	}
 
-	history.replaceState(null, null, `${query}#${hash}`)
+	history.pushState(null, null, `${query}#${hash}`)
 
 	if (query) {
 		BG.createRemoteFrame()
@@ -466,11 +450,11 @@ BG.saveStream = function (data) {
 BG.createSeamlessTexture = function (src, callback) {
 	const image = new Image()
 	image.onload = function () {
-		const canvas = document.createElement("canvas")
-		const ctx = canvas.getContext("2d")
-		canvas.width = image.width * 2
-		canvas.height = image.height * 2
-		///
+		const $canvas = document.createElement("canvas")
+		const ctx = $canvas.getContext("2d")
+		$canvas.width = image.width * 2
+		$canvas.height = image.height * 2
+
 		ctx.drawImage(image, 0, 0)
 		// flip horizontally
 		ctx.save()
@@ -490,7 +474,7 @@ BG.createSeamlessTexture = function (src, callback) {
 		ctx.drawImage(image, 0, 0); // flip vertically
 		ctx.restore()
 		///
-		callback(canvas)
+		callback($canvas)
 	}
 	image.src = src
 }

@@ -25,7 +25,7 @@
 */
 
 if (typeof(zIndexGlobal) === "undefined") var zIndexGlobal = 100;
-if (typeof(widget) === "undefined") var widget = {};
+if (typeof(widget) === "undefined") window.widget = {};
 
 widget = (function (root) { "use strict";
 
@@ -39,10 +39,10 @@ windows.add = function (conf, left, top, display) {
 	var callback = typeof(left) === "function" ? left : null;
 	if (typeof(conf) === "string") {
 		conf = {
-			id: conf, 
+			id: conf,
 			left: left,
-			top: top, 
-			display: display 
+			top: top,
+			display: display
 		};
 	} else if (conf.id) {
 		if (conf.format === "px") {
@@ -85,7 +85,7 @@ windows.add = function (conf, left, top, display) {
 		///
 		if (conf.display === "NONE") json.display = "none";
 		if (conf.display === "BLOCK") json.display = "block";
-		///		
+		///
 		mergeObject(json, conf);
 	});
 };
@@ -98,8 +98,8 @@ windows.setCurrentTab = function(id, className) {
 		target: document.querySelector("#"+id+" " + className)
 	});
 	widget.windows.record({
-		id: id, 
-		className: className 
+		id: id,
+		className: className
 	});
 };
 
@@ -156,7 +156,7 @@ windows.restore = function () {
 			o.x = 0.5 * width - metrics.width / 2;
 			o.y = 0.5 * height - metrics.height / 2 + 20;
 		}
-		
+
 		/// position of target element
 		var targetTop = (isFinite(o.y) ? o.y : o.top * height) + clampTop;
 		var targetLeft = (isFinite(o.x) ? o.x : o.left * width) + clampLeft;
@@ -166,7 +166,7 @@ windows.restore = function () {
 		/// deviance to compensate for out of element bounds
 		var offsetTop = Math.min(targetTop, height);
 		var offsetLeft = Math.min(targetLeft, width);
-		
+
 		/// calculate offsets from edges
 		offset.BOTTOM = (targetTop + metrics.height) - height;
 		offset.TOP = offsetTop - targetTop;
@@ -176,13 +176,13 @@ windows.restore = function () {
 		/// find maximum deviance
 		offset[vAlign] = Math.max(offset[vAlign] || 0, offset[vAlign.toUpperCase()]);
 		offset[hAlign] = Math.max(offset[hAlign] || 0, offset[hAlign.toUpperCase()]);
-		
+
 		///
 		targetTop -= Math.max(0, offset.BOTTOM);
 //		targetLeft -= Math.max(0, offset.RIGHT);
 		///
-		position.push({ 
-			top: Math.max(CLAMP.y, targetTop), 
+		position.push({
+			top: Math.max(CLAMP.y, targetTop),
 			left: Math.max(CLAMP.x, targetLeft)
 		});
 	}
@@ -441,7 +441,7 @@ windows.drag = function (that, event) {
 				///
 				windows.record({
 					id: that.id,
-					x: left - borderLeft, 
+					x: left - borderLeft,
 					y: top - borderTop,
 					left: left / window.innerWidth,
 					top: top / window.innerHeight,
@@ -466,7 +466,7 @@ windows.lazyloader = function(selector) {
 	var area = document.querySelectorAll(selector);
 	for (var n = 0; n < area.length; n ++) {
 		var d = area[n];
-		d.src = d.getAttribute("data-src");				
+		d.src = d.getAttribute("data-src");
 		d.className = (" " + d.className + " ").replace(" lazy ", " ").trim();
 	}
 };

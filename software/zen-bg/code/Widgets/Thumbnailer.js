@@ -14,7 +14,7 @@
 			console.log(this.src);
 		}
 	});
-	// Generate thumbnail. 
+	// Generate thumbnail.
 	var canvas = thumbnailer.generate({
 		src: "https://www.google.com/images/srpr/logo3w.png", // or could be a <canvas> element
 		title: "Google",
@@ -28,7 +28,7 @@
 	});
 */
 
-if (typeof(widgets) === "undefined") var widgets = {};
+window.widgets || (window.widgets = {})
 
 widgets.Thumbnailer = (function(root) {
 
@@ -102,9 +102,9 @@ root = function(conf) {
 			if (crop !== "None") {
 				var isWide = maxWidth / maxHeight < image.width / image.height;
 				var toEdge = crop === "Fit";
-				if (toEdge && isWide || !toEdge && !isWide) { 
+				if (toEdge && isWide || !toEdge && !isWide) {
 					ratio = maxHeight / image.height;
-				} else { 
+				} else {
 					ratio = maxWidth / image.width;
 				}
 			}
@@ -159,7 +159,7 @@ root = function(conf) {
 			thumb.generate({
 				src: key,
 				canvas: this.images[key].canvas
-			});	
+			});
 		}
 	};
 	//

@@ -20,7 +20,7 @@
 
 */
 
-if (typeof(Color) === "undefined") Color = {};
+window.Color || (window.Color = {});
 if (typeof(Color.Blend) === "undefined") Color.Blend = {};
 
 (function (root) {
@@ -44,9 +44,9 @@ root.isAlphaRequired = (function (data) { // Return object of booleans.
 	}
 	return o;
 })([ // These modes require 32-bit colors.
-	'Darker', 'Lighter', 'SourceIn', 'SourceOver', 'DestinationOut', 
-	'Luminosity', 'Tint', 'DarkerColor', 'LighterColor', 'Hue', 
-	'Saturation', 'Color', 'Red', 'Green', 'Blue', 'Cyan', 'Magenta', 
+	'Darker', 'Lighter', 'SourceIn', 'SourceOver', 'DestinationOut',
+	'Luminosity', 'Tint', 'DarkerColor', 'LighterColor', 'Hue',
+	'Saturation', 'Color', 'Red', 'Green', 'Blue', 'Cyan', 'Magenta',
 	'Yellow', 'Dissolve'
 ]);
 
@@ -249,7 +249,7 @@ root.Darker = function (src, dst) { // aka. CompositePlusDarker
 	return (a0 << 24 | r0 << 16 | g0 << 8 | b0) >>> 0;
 };
 
-root.Lighten = function (A, B) { //+ 
+root.Lighten = function (A, B) { //+
 	return (A > B) ? A : B;
 };
 
@@ -311,13 +311,13 @@ root.SoftLight = function (A, B) { //-
 	/*
 	// soft_light (libpsd)
 	#define PSD_BLEND_SOFTLIGHT(b, f, a)
-	do {											
-	psd_int c1, c2;												
-	c1 = b * f >> 8;									
-	c2 = 255 - ((255 - b) * (255 - f) >> 8);				
-	f = ((255 - b) * c1 >> 8) + (b * c2 >> 8);	
+	do {
+	psd_int c1, c2;
+	c1 = b * f >> 8;
+	c2 = 255 - ((255 - b) * (255 - f) >> 8);
+	f = ((255 - b) * c1 >> 8) + (b * c2 >> 8);
 	b = PSD_BLEND_CHANNEL(b, f, a);
-	} while(0)	
+	} while(0)
 	*/
 	return Math.pow(A / 255, 1 / (B / 170.0 + 0.5)) * 255; // gamma
 	function D(x) {
@@ -456,11 +456,11 @@ root.Blue = function (src, dst) { //-
 		ret[NUM_to_RGB[b0]] = B;
 		return ret;
 	};
-	
+
 	var Lum = function (r, g, b) {
 		return 0.3 * r + 0.59 * g + 0.11 * b;
 	};
-	
+
 	var SetLum = function (r, g, b, l) {
 		if (typeof r === "object") {
 			l = g;
@@ -487,27 +487,27 @@ root.Blue = function (src, dst) { //-
 		}
 		return r << 16 | g << 8 | b;
 	};
-	
+
 	root.Hue = function (src, dst) { //+
 		var sat = Math.max(src.R, src.G, src.B) - Math.min(src.R, src.G, src.B);
 		var a0 = Math.min(src.A + dst.A, 0xFF);
 		var color = SetLum(SetSat(dst.R, dst.G, dst.B, sat), Lum(src.R, src.G, src.B));
 		return (a0 << 24 | color) >>> 0;
 	};
-	
+
 	root.Saturation = function (src, dst) { //+
 		var sat = Math.max(dst.R, dst.G, dst.B) - Math.min(dst.R, dst.G, dst.B);
 		var a0 = Math.min(src.A + dst.A, 0xFF);
 		var color = SetLum(SetSat(src.R, src.G, src.B, sat), Lum(src.R, src.G, src.B));
 		return (a0 << 24 | color) >>> 0;
 	};
-	
+
 	root.Color = function (src, dst) { //+
 		var a0 = Math.min(src.A + dst.A, 0xFF);
 		var color = SetLum(dst.R, dst.G, dst.B, Lum(src.R, src.G, src.B));
 		return (a0 << 24 | color) >>> 0;
 	};
-	
+
 	root.Luminosity = function (src, dst) { //+
 		var a0 = Math.min(src.A + dst.A, 0xFF);
 		var color = SetLum(src.R, src.G, src.B, Lum(dst.R, dst.G, dst.B));
@@ -673,7 +673,7 @@ root.createKernals = function () {
 			"		var sR = data1[n], sG = data1[n+1], sB = data1[n+2], sA = data1[n+3];"+
 			"		var dR = data2[n], dG = data2[n+1], dB = data2[n+2], dA = data2[n+3];"+
 			"		if (sA > 0) {"+
-			rbit + 
+			rbit +
 			gbit +
 			bbit +
 			"			data2[n + 3] = sA;"+

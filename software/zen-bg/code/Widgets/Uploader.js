@@ -6,7 +6,7 @@
 	----------------------------------------------------
 	FileReader, Blobs, XHR2, DnD, JSON.
 	----------------------------------------------------
-	var uploader = new widgets.Uploader({ 
+	var uploader = new widgets.Uploader({
 		action: "./Uploader.php?upload=true", // Page to POST to.
 		mode: "upload", // "read" or "upload"
 		maxFiles: Infinity,
@@ -32,7 +32,7 @@
 	uploader.createDropArea(iframe);
 */
 
-if (typeof(widgets) === "undefined") var widgets = {};
+window.widgets || (window.widgets = {})
 
 widgets.Uploader = function(conf) {
 	var that = this;
@@ -69,7 +69,7 @@ widgets.Uploader = function(conf) {
 		formats = (conf.formats || "jpg,jpeg,gif,png").split(",");
 		while(formats.length) this.formats[formats.shift().toLowerCase()] = true;
 	}
-	
+
 	this.createFileInput = function() {
 		if (that.fileInput) { // raw input area.
 			var fileInput = that.fileInput;
@@ -145,7 +145,7 @@ widgets.Uploader = function(conf) {
 			event.preventDefault();
 			event.stopPropagation();
 			return false;
-		}; 
+		};
 		dropArea.ondrop = function(event) {
 			event.preventDefault();
 			event.stopPropagation();
@@ -189,7 +189,7 @@ widgets.Uploader = function(conf) {
 			})();
 		}
 	};
-	
+
 	var hash = { length: 0 };
 	var handleFiles = function(files) {
 		var idx = 0;
@@ -286,7 +286,7 @@ widgets.Uploader = function(conf) {
 			var extension = name.substr(name.lastIndexOf(".") + 1).toLowerCase();
 
 			// Not acceptable format.
-			if (!that.formats[extension]) return getNextFile(); 
+			if (!that.formats[extension]) return getNextFile();
 
 			// Check whether file is empty.
 			var size = file.fileSize || file.size;
@@ -311,9 +311,9 @@ widgets.Uploader = function(conf) {
 		///
 		getNextFile();
 	};
-	
+
 	//////
-	
+
 	this.errors = {
 		"UPLOAD_ERR_INI_SIZE": "The uploaded file exceeds the upload_max_filesize directive",
 		"UPLOAD_ERR_FORM_SIZE": "The uploaded file exceeds the MAX_FILE_SIZE directive",
@@ -358,7 +358,7 @@ widgets.Uploader = function(conf) {
 			default: // single file.
 				callback(files);
 				break;
-		}	
+		}
 	};
 
 	var uploadFormData = function(self, callback) {
@@ -411,7 +411,7 @@ widgets.Uploader = function(conf) {
 				try {
 					response = JSON.parse(response);
 				} catch(e) {
-					console.log(event.target.responseText);			
+					console.log(event.target.responseText);
 				}
 			}
 			if (that.errors[response]) {
@@ -430,7 +430,7 @@ widgets.Uploader = function(conf) {
 		xhttp.open("POST", that.action);
 		xhttp.send(data);
 	};
-	
+
 	var uploadFrame = function(self, callback) {
 		// Fallback
 		var form = document.createElement("form");
@@ -469,7 +469,7 @@ widgets.Uploader = function(conf) {
 					try {
 						response = JSON.parse(response);
 					} catch(e) {
-						console.log(response);			
+						console.log(response);
 					}
 				}
 				if (that.errors[response]) {
@@ -538,5 +538,5 @@ widgets.Uploader = function(conf) {
 	if (this.dropAreaContainer) this.createDropArea();
 	if (this.fakeInput || this.fileInput) this.createFileInput();
 	///
-	return this;	
+	return this;
 };

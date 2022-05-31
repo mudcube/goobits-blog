@@ -1,4 +1,4 @@
-const createTexture = (function () {
+export const createTexture = (function () {
 	const canvas = document.createElement("canvas")
 	const ctx = canvas.getContext('2d')
 	let $image = new Image()
@@ -72,7 +72,7 @@ const createTexture = (function () {
 	}
 })()
 
-const textures = [
+window.textures = [
 	"textures/texturise/wood_001.jpeg",
 	"textures/texturise/wood_002.jpeg",
 	"textures/texturise/wood_003.jpeg",

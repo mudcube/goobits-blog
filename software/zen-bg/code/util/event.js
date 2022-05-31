@@ -15,12 +15,12 @@
 	* Event batching - i.e. for every x fingers down a new gesture is created.
 	----------------------------------------------------
 	http://www.w3.org/TR/2011/WD-touch-events-20110505/
-	----------------------------------------------------	
+	----------------------------------------------------
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 
-(function(root) { "use strict";
+;(function(root) { "use strict";
 
 // Add custom *EventListener commands to HTMLElements (set false to prevent funkiness).
 root.modifyEventListener = false;
@@ -38,7 +38,7 @@ root.remove = function(target, type, listener, configure) {
 };
 
 root.returnFalse = function(event) {
-	return false;	
+	return false;
 };
 
 root.stop = function(event) {
@@ -188,11 +188,11 @@ var eventManager = function(target, type, listener, configure, trigger, fromOver
 	/// Handle multiple targets.
 	var event;
 	var events = {};
-	if (target.length > 0 && target !== window) { 
+	if (target.length > 0 && target !== window) {
 		for (var n0 = 0, length0 = target.length; n0 < length0; n0 ++) {
 			event = eventManager(target[n0], type, listener, clone(configure), trigger);
 			if (event) events[n0] = event;
-		}	
+		}
 		return createBatchCommands(events);
 	}
 
@@ -205,7 +205,7 @@ var eventManager = function(target, type, listener, configure, trigger, fromOver
 			type = type.split(",");
 		}
 	}
-	
+
 	/// Attach or remove multiple events associated with a target.
 	if (typeof(type) !== "string") { // Has multiple events.
 		if (typeof(type.length) === "number") { // Handle multiple listeners glued together.
@@ -256,12 +256,12 @@ var eventManager = function(target, type, listener, configure, trigger, fromOver
 				};
 			}
 			// Create listener proxy.
-			configure.gesture = type; 
+			configure.gesture = type;
 			configure.target = target;
 			configure.listener = listener;
 			configure.fromOverwrite = fromOverwrite;
 			// Record wrapper.
-			wrappers[id] = root.proxy[type](configure); 
+			wrappers[id] = root.proxy[type](configure);
 		}
 		return wrappers[id];
 	} else { // Fire native event.
@@ -271,13 +271,13 @@ var eventManager = function(target, type, listener, configure, trigger, fromOver
 			eventId = type + "." + id;
 			if (trigger === "remove") { // Remove event listener.
 				if (!wrappers[eventId]) continue; // Already removed.
-				target[remove](type, listener, useCapture); 
+				target[remove](type, listener, useCapture);
 				delete wrappers[eventId];
 			} else if (trigger === "add") { // Attach event listener.
 				if (wrappers[eventId]) return wrappers[eventId]; // Already attached.
-				target[add](type, listener, useCapture); 
+				target[add](type, listener, useCapture);
 				// Record wrapper.
-				wrappers[eventId] = { 
+				wrappers[eventId] = {
 					id: eventId,
 					type: type,
 					target: target,
@@ -326,8 +326,8 @@ var pointerDefs = {
 
 var pointerDetect = {
 	// MSPointer
-	"MSPointerDown": 0, 
-	"MSPointerMove": 1, 
+	"MSPointerDown": 0,
+	"MSPointerMove": 1,
 	"MSPointerUp": 2,
 	// Touch
 	"touchstart": 0,
@@ -484,7 +484,7 @@ return root;
 	----------------------------------------------------
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 if (typeof(eventjs.proxy) === "undefined") eventjs.proxy = {};
 
 eventjs.proxy = (function(root) { "use strict";
@@ -500,7 +500,7 @@ root.pointerSetup = function(conf, self) {
 	conf.minFingers = conf.minFingers || conf.fingers || 1; // Minimum required fingers.
 	conf.maxFingers = conf.maxFingers || conf.fingers || Infinity; // Maximum allowed fingers.
 	conf.position = conf.position || "relative"; // Determines what coordinate system points are returned.
-	delete conf.fingers; //- 
+	delete conf.fingers; //-
 	/// Convenience data.
 	self = self || {};
 	self.enabled = true;
@@ -584,7 +584,7 @@ root.pointerStart = function(event, self, conf) {
 		eventjs.isMSPointer = true;
 	}
 	///
-	var addTouchStart = function(touch, sid) {	
+	var addTouchStart = function(touch, sid) {
 		var bbox = conf.bbox;
 		var pt = track[sid] = {};
 		///
@@ -699,7 +699,7 @@ root.pointerEnd = function(event, self, conf, onPointerUp) {
 				changedTouches: [{
 					pageX: track.pageX,
 					pageY: track.pageY,
-					identifier: sid === "Infinity" ? Infinity : sid 
+					identifier: sid === "Infinity" ? Infinity : sid
 				}]
 			}, "up");
 		}
@@ -720,7 +720,7 @@ root.pointerEnd = function(event, self, conf, onPointerUp) {
 					changedTouches: [{
 						pageX: track.pageX,
 						pageY: track.pageY,
-						identifier: sid === "Infinity" ? Infinity : sid 
+						identifier: sid === "Infinity" ? Infinity : sid
 					}]
 				}, "up");
 			}
@@ -822,7 +822,7 @@ root.getCoord = function(event) {
 };
 
 /*
-	Get target scale and position in space.	
+	Get target scale and position in space.
 */
 
 var getPropertyAsFloat = function(o, type) {
@@ -830,7 +830,7 @@ var getPropertyAsFloat = function(o, type) {
 	return isFinite(n) ? n : 0;
 };
 
-root.getBoundingBox = function(o) { 
+root.getBoundingBox = function(o) {
 	if (o === window || o === document) o = document.body;
 	///
 	var bbox = {};
@@ -867,7 +867,7 @@ root.getBoundingBox = function(o) {
 	///
 	bbox.x2 = bbox.x1 + bbox.width;
 	bbox.y2 = bbox.y1 + bbox.height;
-	
+
 	/// Get the scroll of container element.
 	var position = style.getPropertyValue("position");
 	var tmp = position === "fixed" ? o : o.parentNode;
@@ -946,7 +946,7 @@ return root;
 	   src: http://stackoverflow.com/questions/10868104/can-you-have-a-javascript-hook-trigger-after-a-dom-elements-style-object-change
 	----------------------------------------------------
 */
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 
 eventjs.MutationObserver = (function() {
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
@@ -996,7 +996,7 @@ eventjs.MutationObserver = (function() {
 	eventjs.add(window, "click", function(event, self) {});
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 if (typeof(eventjs.proxy) === "undefined") eventjs.proxy = {};
 
 eventjs.proxy = (function(root) { "use strict";
@@ -1057,7 +1057,7 @@ return root;
 	Touch an target twice for <= 700ms, with less than 25 pixel drift.
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 if (typeof(eventjs.proxy) === "undefined") eventjs.proxy = {};
 
 eventjs.proxy = (function(root) { "use strict";
@@ -1068,7 +1068,7 @@ root.dblclick = function(conf) {
 	conf.maxFingers = conf.maxFingers || conf.fingers || 1;
 	// Setting up local variables.
 	var delay = 700; // in milliseconds
-	var time0, time1, timeout; 
+	var time0, time1, timeout;
 	var pointer0, pointer1;
 	// Tracking the events.
 	conf.onPointerDown = function (event) {
@@ -1153,7 +1153,7 @@ return root;
 	});
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 if (typeof(eventjs.proxy) === "undefined") eventjs.proxy = {};
 
 eventjs.proxy = (function(root) { "use strict";
@@ -1254,17 +1254,17 @@ return root;
 	----------------------------------------------------
 	eventjs.add(window, "gesture", function(event, self) {
 		console.log(
-			self.x, // centroid 
+			self.x, // centroid
 			self.y,
 			self.rotation,
-			self.scale, 
-			self.fingers, 
+			self.scale,
+			self.fingers,
 			self.state
 		);
 	});
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 if (typeof(eventjs.proxy) === "undefined") eventjs.proxy = {};
 
 eventjs.proxy = (function(root) { "use strict";
@@ -1321,7 +1321,7 @@ root.gesture = function(conf) {
 			var sid = touch.identifier || Infinity;
 			var pt = points[sid];
 			// Check whether "pt" is used by another gesture.
-			if (!pt) continue; 
+			if (!pt) continue;
 			// Find the actual coordinates.
 			pt.move.x = (touch.pageX - bbox.x1);
 			pt.move.y = (touch.pageY - bbox.y1);
@@ -1414,13 +1414,13 @@ return root;
 	});
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 if (typeof(eventjs.proxy) === "undefined") eventjs.proxy = {};
 
 eventjs.proxy = (function(root) { "use strict";
 
-root.pointerdown = 
-root.pointermove = 
+root.pointerdown =
+root.pointermove =
 root.pointerup = function(conf) {
 	conf.gesture = conf.gesture || "pointer";
 	if (conf.target.isPointerEmitter) return;
@@ -1471,7 +1471,7 @@ return root;
 	});
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 if (typeof(eventjs.proxy) === "undefined") eventjs.proxy = {};
 
 eventjs.proxy = (function(root) { "use strict";
@@ -1506,7 +1506,7 @@ root.shake = function(conf) {
 		var o = e.accelerationIncludingGravity;
 		gravity.x = alpha * gravity.x + (1 - alpha) * o.x;
 		gravity.y = alpha * gravity.y + (1 - alpha) * o.y;
-		gravity.z = alpha * gravity.z + (1 - alpha) * o.z; 
+		gravity.z = alpha * gravity.z + (1 - alpha) * o.z;
 		self.accelerationIncludingGravity = gravity;
 		self.acceleration.x = o.x - gravity.x;
 		self.acceleration.y = o.y - gravity.y;
@@ -1515,7 +1515,7 @@ root.shake = function(conf) {
 		if (conf.gesture === "devicemotion") {
 			conf.listener(e, self);
 			return;
-		} 
+		}
 		var data = "xyz";
 		var now = (new Date()).getTime();
 		for (var n = 0, length = data.length; n < length; n ++) {
@@ -1573,7 +1573,7 @@ return root;
 	});
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 if (typeof(eventjs.proxy) === "undefined") eventjs.proxy = {};
 
 eventjs.proxy = (function(root) { "use strict";
@@ -1599,7 +1599,7 @@ root.swipe = function(conf) {
 			var sid = touch.identifier || Infinity;
 			var o = conf.tracker[sid];
 			// Identifier defined outside of listener.
-			if (!o) continue; 
+			if (!o) continue;
 			o.move.x = touch.pageX;
 			o.move.y = touch.pageY;
 			o.moveTime = (new Date()).getTime();
@@ -1691,7 +1691,7 @@ return root;
 	multi-finger longpress // touch an target for >= 500ms
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 if (typeof(eventjs.proxy) === "undefined") eventjs.proxy = {};
 
 eventjs.proxy = (function(root) { "use strict";
@@ -1814,7 +1814,7 @@ return root;
 	});
 */
 
-if (typeof(eventjs) === "undefined") var eventjs = {};
+window.eventjs || (window.eventjs = {})
 if (typeof(eventjs.proxy) === "undefined") eventjs.proxy = {};
 
 eventjs.proxy = (function(root) { "use strict";
