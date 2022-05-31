@@ -1,7 +1,6 @@
 /* MARQUEE */
 
 marquee = {
-
 	// Keypress
 	'move': function (x) {
 		var r = marquee.shapes;
@@ -100,7 +99,7 @@ marquee = {
 				}
 			}
 			marquee.dash(ants[ants_n], c, 1);
-		} else if(m == "down" && E.sh_var && marquee.shapes.length) {
+		} else if (m == "down" && E.sh_var && marquee.shapes.length) {
 			marquee.dash(ants[ants_n]);
 		} else {
 			marquee.reset();
@@ -211,7 +210,7 @@ marquee = {
 			marquee.on = 1;
 			marquee.ghost = 1;
 		}
-	//	marqueeID = setInterval(function() { marquee.dash(); }, 300);  
+		//	marqueeID = setInterval(function() { marquee.dash(); }, 300);
 	},
 	'reset': function (v, s) {
 		v = v ? v : '';
@@ -238,8 +237,8 @@ marquee = {
 
 /* PICKER */
 
-picker={
-	'core':function (a, b, m) {
+picker = {
+	core(a, b, state) {
 		var c = $2D('picker'),
 			w = 129,
 			h = 96,
@@ -249,7 +248,7 @@ picker={
 		ctx.clearRect(0, 0, 1, 1);
 		ctx.putImageData(data, 0, 0);
 		r[3] = parseInt(r[3] / 255 * 100);
-		$('picker_hex').innerHTML = r[0] + '<br>' + r[1] + '<br>' + r[2] + '<br>' + r[3];
+		$('picker_hex').innerHTML = `${r[0]}<br>${r[1]}<br>${r[2]}<br>${r[3]}`;
 		c.clearRect(0, 0, w + 20, h);
 		c.globalCompositeOperation = 'source-over';
 		var x = a.X - 7,
@@ -260,16 +259,17 @@ picker={
 		c.drawImage($('ctx_box'), Math.max(0, x), Math.max(0, y), w / 10, h / 10, 20 + xx, yy, w, h);
 		c.globalCompositeOperation = 'destination-in';
 		co.circle({
-			'X': 45,
-			'Y': -7
-		},
-		{
-			'X': w,
-			'Y': w - 58
-		},
-		c);
+				'X': 45,
+				'Y': -7
+			},
+			{
+				'X': w,
+				'Y': w - 58
+			},
+			c);
 		c.fill();
-		if (m == 'down') {
+
+		if (state === 'down') {
 			r[3] = r[3] / 100;
 			gui_color.run('set', r);
 			gui_palette.update();
@@ -281,91 +281,92 @@ picker={
 /* MOUSE */
 
 mouse = {
-    'cursor': function (e, o) {
-        var r = mouse.area;
-        if (r) {
-            var a = XY(e);
-            var d = win_size.LT();
-            a.X -= abPos(o).X + d.L;
-            a.Y -= abPos(o).Y + d.T;
-            var getID = function () {
-                var v = mouse.id.split('.'),
-                n = parseInt(v[0]);
-                return ({
-                    'n': n,
-                    'id': v[1],
-                    'num': !isNaN(n)
-                });
-            }
-            function z(v1, v2) {
-                $S('cBound').cursor = v1;
-                $('cZoom').innerHTML = mouse.id = v2;
-                var d = $2D('ctx_active'),
-                q = getID();
-                co.del(d);
-                if (q.id && q.id != 'A') {
-                    var v = path.r[q.n + 1],
-                    o = path.O2R,
-                    n = o[v[0]][q.id];
-                    if (n) {
-                        d.beginPath();
-                        d.drawImage(path[q.id == 'P' ? 'point_select' : 'node_select'], 0, 0, 7, 7, Math.round(v[n] - 4), Math.round(v[n + 1] - 4), 7, 7);
-                        d.closePath();
-                    }
-                }
-            };
-            var o = $2D('ctx_mouse').getImageData(a.X,a.Y,1,1).data,
-            	hex = (o[0] << 24 | o[1] << 16 | o[2] << 8 | o[3]) >>> 0,
+	'cursor': function (e, o) {
+		var r = mouse.area;
+		if (r) {
+			var a = XY(e);
+			var d = win_size.LT();
+			a.X -= abPos(o).X + d.L;
+			a.Y -= abPos(o).Y + d.T;
+			var getID = function () {
+				var v = mouse.id.split('.'),
+					n = parseInt(v[0]);
+				return ({
+					'n': n,
+					'id': v[1],
+					'num': !isNaN(n)
+				});
+			}
+
+			function z(v1, v2) {
+				$S('cBound').cursor = v1;
+				$('cZoom').innerHTML = mouse.id = v2;
+				var d = $2D('ctx_active'),
+					q = getID();
+				co.del(d);
+				if (q.id && q.id != 'A') {
+					var v = path.r[q.n + 1],
+						o = path.O2R,
+						n = o[v[0]][q.id];
+					if (n) {
+						d.beginPath();
+						d.drawImage(path[q.id == 'P' ? 'point_select' : 'node_select'], 0, 0, 7, 7, Math.round(v[n] - 4), Math.round(v[n + 1] - 4), 7, 7);
+						d.closePath();
+					}
+				}
+			};
+			var o = $2D('ctx_mouse').getImageData(a.X, a.Y, 1, 1).data,
+				hex = (o[0] << 24 | o[1] << 16 | o[2] << 8 | o[3]) >>> 0,
 				i = '';
-            if (hex != '00000000' && mouse.fu()) {
-                if ((i = r[hex]) && mouse.id != i.id) {
-                    z(i.cursor, i.id);
-                }
-            } else if (mouse.id) {
-                z('crosshair', '');
-            }
-        }
-    },
-    'draw': function (r) {
-        var c = $2D('ctx_mouse'),
-        fu = N.rand;
-        co.del(c);
-        mouse.area = {};
-        for (var i in r) {
-            var o = [fu(255), fu(255), fu(255), 255],
-            k = r[i];
-            c.beginPath();
-            if (!k[2]) {
-                co.rectangle(k[0], k[1], c);
-            } else if (k[2] == 'ellipses') {
-                co.ellipses(k[0], k[1], c);
-            } else if (k[2] == 'star') {
-                co.star(k[0], k[1], c);
-            } else if (k[2] == 'burst') {
-                co.burst(k[0], k[1], c);
-            } else if (k[2] == 'gear') {
-                co.gear(k[0], k[1], c);
-            } else if (k[2] == 'path') {
-                path.draw(c);
-            }
-            c.lineWidth = 2.5;
-            c.strokeStyle = 'rgba(' + o + ')';
-            c.stroke();
-            c.fillStyle = 'rgba(' + o + ')';
-            c.fill();
-            mouse.area[(o[0] << 24 | o[1] << 16 | o[2] << 8 | o[3]) >>> 0] = {
-                'id': i,
-                'cursor': k[3] ? r[i][3] : i
-            };
-        }
-    },
-    'moveCheck': function (a, b) {
-        var t = getTime() - core.time;
-        return (Math.abs(a.X - b.X) <= 5 || Math.abs(a.Y - b.Y) <= 5 || (mouse.area && !mouse.id && t <= 125));
-    },
-    'reset': function () {
-        mouse.down = 0;
-        mouse.moved = 0;
-    }
+			if (hex != '00000000' && mouse.fu()) {
+				if ((i = r[hex]) && mouse.id != i.id) {
+					z(i.cursor, i.id);
+				}
+			} else if (mouse.id) {
+				z('crosshair', '');
+			}
+		}
+	},
+	'draw': function (r) {
+		var c = $2D('ctx_mouse'),
+			fu = N.rand;
+		co.del(c);
+		mouse.area = {};
+		for (var i in r) {
+			var o = [fu(255), fu(255), fu(255), 255],
+				k = r[i];
+			c.beginPath();
+			if (!k[2]) {
+				co.rectangle(k[0], k[1], c);
+			} else if (k[2] == 'ellipses') {
+				co.ellipses(k[0], k[1], c);
+			} else if (k[2] == 'star') {
+				co.star(k[0], k[1], c);
+			} else if (k[2] == 'burst') {
+				co.burst(k[0], k[1], c);
+			} else if (k[2] == 'gear') {
+				co.gear(k[0], k[1], c);
+			} else if (k[2] == 'path') {
+				path.draw(c);
+			}
+			c.lineWidth = 2.5;
+			c.strokeStyle = 'rgba(' + o + ')';
+			c.stroke();
+			c.fillStyle = 'rgba(' + o + ')';
+			c.fill();
+			mouse.area[(o[0] << 24 | o[1] << 16 | o[2] << 8 | o[3]) >>> 0] = {
+				'id': i,
+				'cursor': k[3] ? r[i][3] : i
+			};
+		}
+	},
+	'moveCheck': function (a, b) {
+		var t = getTime() - core.time;
+		return (Math.abs(a.X - b.X) <= 5 || Math.abs(a.Y - b.Y) <= 5 || (mouse.area && !mouse.id && t <= 125));
+	},
+	'reset': function () {
+		mouse.down = 0;
+		mouse.moved = 0;
+	}
 };
 

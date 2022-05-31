@@ -8,10 +8,9 @@
     <link rel="chrome-webstore-item"
           href="https://chrome.google.com/webstore/detail/lkllajgbhondgjjnhmmgbjndmogapinp"/>
     <link href="./code/Sketchpad.css" rel="stylesheet" type="text/css"/>
-    <script src="./code/Data2Pattern.js" type="text/javascript"></script>
+	<script src="./code/Data2Pattern.js" type="text/javascript"></script>
     <script src="./code/gui.js" type="text/javascript"></script>
     <script src="./code/Canvas2D.js" type="text/javascript"></script>
-    <script src="./code/dump.js" type="text/javascript"></script>
     <script src="./code/global.js" type="text/javascript"></script>
     <script src="./code/canvas.js" type="text/javascript"></script>
     <script src="./code/gui-interface.js" type="text/javascript"></script>
@@ -21,7 +20,7 @@
     <script src="./code/tools-draw.js" type="text/javascript"></script>
     <script src="./code/Media.js" type="text/javascript"></script>
     <script src="./code/Sketchpad.js" type="text/javascript"></script>
-    <script src="./code/App.js" type="text/javascript"></script>
+    <script src="./code/App.js" type="module"></script>
 </head>
 <body>
     <div id="top">
@@ -39,7 +38,7 @@
                 <div id="ihistory" onmousedown="win.tab(this,'history',vars[vars.id])">history</div>
                 <div id="ioptions" onmousedown="win.tab(this,'options',vars[vars.id])">options</div>
                 <div onmousedown="canvas.open();" class="cur open" style="display:none"><span></span></div>
-                <a href="#" onclick="window.saveDrawing(); return false;" target="_blank">
+                <a href="javascript:" onclick="window.saveDrawing(); return false;">
                     <div class="cur save"><span></span></div>
                 </a>
                 <div style="background: none; border-left: none; border: none; border-left:1px solid #3e3e3e; height: 22px; padding: 0; cursor: default"></div>

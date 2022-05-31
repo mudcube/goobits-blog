@@ -268,7 +268,7 @@ a.ads:hover {
 	BACKGROUND: url('../static/media/gui/range_bar.png') 3px 4px no-repeat;
 	CURSOR: crosshair;
 	HEIGHT: 16px;
-	width: 130px;
+	width: 120px;
 	opacity: 0.8;
 	margin-bottom: 8px;
 	float: left;
@@ -1210,7 +1210,6 @@ a.ads:hover {
 }
 
 #tools .fill {
-	border: 1px solid #000;
 	position: relative;
 	z-index: 1;
 }

@@ -1,3 +1,5 @@
+import '../inc/saveAs.js'
+
 const init = {
 	'canvas': function (w, h, u) {
 		gui_swatch.id = 'CO'
@@ -84,23 +86,26 @@ const init = {
 				'marquee': 1
 			} [vars.type]) return false
 		}
+
 		o.ondblclick = function (e) {
 			if (vars.type === 'text') {
 				noMove()
 				//                co.core(e, text.core)
 			}
 		}
-		o.onmousemove = function (e) {
+
+		o.onmousemove = function (event) {
 			if (stop) {
 				if ({
 					'marquee': 1,
 					'text': 1,
 					'crop': 1
 				} [vars.type]) {
-					mouse.cursor(e, this)
+					mouse.cursor(event, this)
 				}
+
 				if (vars.type === 'picker') {
-					const a = XY(e)
+					const a = XY(event)
 					a.X -= abPos(this).X
 					a.Y -= abPos(this).Y
 					a.X = Math.max(0, Math.min(canvas.W - 1, a.X))
@@ -109,41 +114,45 @@ const init = {
 				}
 			}
 		}
-		o.onmousedown = function (e) {
+
+		o.onmousedown = function (event) {
+			event.preventDefault()
+			event.stopPropagation()
+
 			if (vars.type === 'crop') {
-				co.core(e, crop.core)
+				co.core(event, crop.core)
 			} else if (vars.type === 'fill') {
-				co.core(e, draw.fill)
+				co.core(event, draw.fill)
 			} else if (vars.type === 'marquee') {
-				co.core(e, marquee.core)
+				co.core(event, marquee.core)
 			} else if (vars.type === 'picker') {
-				const a = XY(e)
+				const a = XY(event)
 				a.X -= abPos(this).X
 				a.Y -= abPos(this).Y
 				a.X = Math.max(0, Math.min(canvas.W - 1, a.X))
 				a.Y = Math.max(0, Math.min(canvas.H - 1, a.Y))
-				picker.core(a, a, 'down', e)
+				picker.core(a, a, 'down', event)
 			} else if (vars.type === 'shape') {
-				co.core(e, draw.shape)
+				co.core(event, draw.shape)
 			} else if (vars.type === 'text') {
-				co.core(e, draw.text)
+				co.core(event, draw.text)
 			} else if ({
 				'calligraphy': 1,
 				'stamp': 1
 			} [vars.type]) {
 				if (stamp.loaded) {
-					co.core(e, draw[vars.type])
+					co.core(event, draw[vars.type])
 				} else {
 					noMove()
 				}
 			} else if (vars.type === 'spirograph') {
-				co.core(e, draw.spirograph)
+				co.core(event, draw.spirograph)
 			} else if ({
 				'brush': 1,
 				'pencil': 1,
 				'eraser': 1
 			} [vars.type]) {
-				co.core(e, draw[vars.type])
+				co.core(event, draw[vars.type])
 			} else {
 				return noMove()
 			}
@@ -224,10 +233,10 @@ const init = {
 			if (vars['PT*'] === 'Squidfingers')
 				random = Math.random() > .5 ? '82' : '105'
 			else random = rand(n)
-			src = gui_pattern.dir + vars['PT*'] + '/' + (gui_swatch.n[v + 'PT'] = random) + '-live.jpg'
+			src = `${gui_pattern.dir + vars['PT*']}/${gui_swatch.n[v + 'PT'] = random}-live.jpg`
 			gui_pattern.o[v].src = src
 			vars[v + 'PT'].src = src
-			gui_swatch.n[v + 'PT'] = n - gui_swatch.n[v + 'PT']
+			gui_swatch.n[`${v}PT`] = n - gui_swatch.n[`${v}PT`]
 		}
 
 		function CO(v) {
@@ -247,7 +256,6 @@ const init = {
 		CO('GD')
 		PT('fill')
 		PT('stroke')
-		// setTimeout( init.content, 1000)
 
 		gui_pattern.o.fill.onload = function () {
 			if (gui_pattern.o.stroke.loaded) init.content()
@@ -267,7 +275,7 @@ window.onresize = win.feed
 window.currentBlob = null
 window.currentPort = null
 window.saveDrawing = function () {
-	$('ctx_box').toBlob().then(blob => {
+	$('ctx_box').toBlob(blob => {
 		saveAs(blob, 'drawing.png')
 	})
 }

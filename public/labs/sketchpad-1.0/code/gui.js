@@ -3,7 +3,7 @@ gui = {
 	// Options
 	'options': function () {
 		var r = [],
-		fu = N.format;
+			fu = N.format;
 		cF = {
 			'inner_radius_spirograph': {
 				type: 'X',
@@ -141,6 +141,7 @@ gui = {
 				val: ["movement_" + r[i], "anchored", "freedraw", "active"]
 			};
 		}
+
 		function z(r, v) {
 			for (var i in r) {
 				cF[v + "_" + r[i]] = {
@@ -155,7 +156,7 @@ gui = {
 		z(["brush", "calligraphy", "eraser", "stamp"], "flow");
 		z(["brush", "eraser"], "hardness");
 		var j = 0,
-		r = [];
+			r = [];
 		for (var i in stamp.r) {
 			r[j++] = i;
 		}
@@ -197,6 +198,7 @@ gui = {
 				o.innerHTML = c;
 				o.className = d;
 			}
+
 			if (o.className == 'cur') z('block', 'none', 'false', '');
 			else z('none', 'block', 'true', 'cur');
 			crop.click();
@@ -214,7 +216,7 @@ gui = {
 				return;
 			}
 			var i = o.innerHTML,
-			cur = vars[v];
+				cur = vars[v];
 			$C("cur", o.parentNode)[0].className = "";
 			o.className = "cur";
 			vars[v] = i;
@@ -236,9 +238,9 @@ gui = {
 	'menu': {
 		'build': function (c, r) {
 			var z = '',
-			length = 0,
-			o = gui.menu;
-			if (typeof(r) == 'object' && !r.length) for (var i in r) {
+				length = 0,
+				o = gui.menu;
+			if (typeof (r) == 'object' && !r.length) for (var i in r) {
 				length++;
 			} else length = r.length;
 			for (var i in r) {
@@ -310,7 +312,7 @@ gui = {
 				o.sw(1);
 				o.kontrol_update(v1);
 				vars.cache(1);
-				$('author_'+gui_swatch.id).innerHTML = gui_swatch.author();
+				$('author_' + gui_swatch.id).innerHTML = gui_swatch.author();
 			},
 			'CO*': function (c, o) {
 				gui.menu.fu.sw(c, o, 'CO', 'solid');
@@ -322,7 +324,7 @@ gui = {
 				gui.menu.fu.z(c, o);
 				vars.PT = Q.PT[o.innerHTML];
 				var i = vars.id + 'PT',
-				n = vars.PT.length - (gui_swatch.n[i] = Math.min(gui_swatch.n[i], vars.PT.length));
+					n = vars.PT.length - (gui_swatch.n[i] = Math.min(gui_swatch.n[i], vars.PT.length));
 				vars.PT[n + 1] = new Image();
 				vars.PT[n + 1].src = gui_pattern.dir + vars['PT*'] + '/' + n + '-live.jpg';
 				vars[vars.id + 'PT'] = vars.PT[n + 1];
@@ -335,7 +337,7 @@ gui = {
 					o.kontrol_update('PT');
 					vars.cache(1);
 				}
-				$('author_'+gui_swatch.id).innerHTML = gui_swatch.author();
+				$('author_' + gui_swatch.id).innerHTML = gui_swatch.author();
 			},
 			'shape': function (c, o) {
 				gui.menu.fu.z(c, o);
@@ -350,7 +352,7 @@ gui = {
 			gui.menu.cur[v] = o;
 			vars[v] = o;
 			var a = o,
-			b = a.substr(0, a.indexOf('(') != -1 ? a.indexOf('(') - 1 : a.length);
+				b = a.substr(0, a.indexOf('(') != -1 ? a.indexOf('(') - 1 : a.length);
 			gui.menu.key[v] = b;
 		},
 		// Data
@@ -359,7 +361,7 @@ gui = {
 		'prev': {},
 		'toggle': function (n) {
 			var p = n.parentNode.parentNode,
-			o = gui.menu;
+				o = gui.menu;
 			if (p.opened != true) {
 				if (o.parent.opened == true) o.close();
 				stop = 0;
@@ -382,9 +384,9 @@ gui = {
 				p.style.overflow = 'visible';
 				n.parentNode.className += 'opened';
 				window.setTimeout(function () {
-					p.opened = true;
-				},
-				100);
+						p.opened = true;
+					},
+					100);
 				window.onmousedown = o.close;
 			} else o.doSelect(n, p);
 		},
@@ -417,7 +419,7 @@ gui = {
 			if (p.opened) p.okClose = true;
 		}
 	},
-	
+
 	//* Y-Scroll
 	'Y': {
 		'id': 'stamp',
@@ -490,11 +492,11 @@ gui = {
 				'row': 4
 			}
 		},
-		
+
 		// WHEEL
 		'wheel': function (event) {
 			var o = gui.Y,
-			r = o.r[o.id];
+				r = o.r[o.id];
 			if (event.wheelDelta) {
 				var v = event.wheelDelta / 120;
 				if (window.opera) {
@@ -506,36 +508,36 @@ gui = {
 				// MOZ
 			}
 			var n = Math.max(2.5, (r.n() / (r.col * r.row)) / r.row * 4),
-			v = (v <= 0) ? Math.floor(v + 0.2) : Math.ceil(v + 0.5); //- JUNK
+				v = (v <= 0) ? Math.floor(v + 0.2) : Math.ceil(v + 0.5); //- JUNK
 			o.cord(v * n);
 			eval(o.fu[o.id] + "()");
 		},
 		'cord': function (v) {
 			var o = gui.Y,
-			r = o.r[o.id];
+				r = o.r[o.id];
 			var Y2 = r.Y - o.height(o.id),
-			n = r.n() - r.display,
-			cur = o.cur[o.id];
+				n = r.n() - r.display,
+				cur = o.cur[o.id];
 			if (o.id == 'hi') cur -= canvas.history_r.a + 1;
 			v = Math.round(Math.max(0, Math.min(n, cur - v)));
 			$S(o.id + 'Slide').top = Math.round(1 / n * Y2 * v) + 'px';
 			if (o.id == 'hi') v += canvas.history_r.a + 1;
 			o.cur[o.id] = v;
 		},
-		
+
 		// SLIDE
 		'kontrol': function (i, n) {
 			var o = gui.Y,
-			r = o.r[i],
-			H = o.height(i);
+				r = o.r[i],
+				H = o.height(i);
 			return ('<div id="' + i + 'Kontrol" onmousedown="gui.Y.slide_fu(event,\'' + i + '\')" class="slideY" style="top: ' + (!isNaN(n) ? n : 35) + 'px; height: ' + r.Y + 'px; display:' + (r.n() <= r.display ? 'none' : 'block') + '">' + ' <span class="rT"></span><span class="rB" style="top:' + r.Y + 'px;"></span>' + ' <div id="' + i + 'Slide" class="slider" style="position: relative; height:' + o.height(i) + 'px; top:' + o.top(o, r) + 'px;">' + '  <div class="rT"></div><div class="rB" style="top:' + H + 'px"></div>' + ' </div>' + '</div>');
 		},
 		'kontrol_update': function (v, s) {
 			var o = gui.Y,
-			r = o.r[v],
-			i = $(v + 'Slide');
+				r = o.r[v],
+				i = $(v + 'Slide');
 			var H = o.height(v),
-			b = i.style;
+				b = i.style;
 			$S(v + 'Kontrol').display = 'none';
 			b.height = H + 'px';
 			i.childNodes[2].style.top = H + 'px';
@@ -544,8 +546,8 @@ gui = {
 		},
 		'slide': function (a, b, m) {
 			var o = gui.Y,
-			r = o.r[o.id],
-			n = r.n() - r.display;
+				r = o.r[o.id],
+				n = r.n() - r.display;
 			$S(o.id + 'Slide').top = b.Y + 'px';
 			var a = Math.round(Math.max(0, Math.min(n, (b.Y / (r.Y - o.height(o.id))) * n)));
 			if (o.id == 'hi') a += canvas.history_r.a + 1;
@@ -554,16 +556,16 @@ gui = {
 		},
 		'slide_fu': function (e, i) {
 			var o = gui.Y,
-			H = o.height(i);
+				H = o.height(i);
 			o.id = i;
 			core.fu(i + 'Slide', e, {
-				fu: core.Y,
-				oX: 0,
-				oY: -(H / 2),
-				Y1: 0,
-				Y2: o.r[i].Y - H
-			},
-			o.slide);
+					fu: core.Y,
+					oX: 0,
+					oY: -(H / 2),
+					Y1: 0,
+					Y2: o.r[i].Y - H
+				},
+				o.slide);
 		},
 		'height': function (i) {
 			var o = gui.Y.r[i];
@@ -571,16 +573,16 @@ gui = {
 		},
 		'top': function (o, r) {
 			var cur = o.cur[o.id],
-			n = r.row,
-			H = o.height(o.id);
+				n = r.row,
+				H = o.height(o.id);
 			if (o.id == 'hi') cur -= canvas.history_r.a - 6;
 			return (cur <= 1 ? 0 : Math.round((cur / ((r.n() - r.display) + n)) * (r.Y - H)));
 		},
 		// ACTIVE SCROLL
 		'active': function (o, n, n1, n2, fu, s) {
 			var z = '',
-			v = '',
-			r = gui.Y;
+				v = '',
+				r = gui.Y;
 			if (s) r.prev[r.id] = null;
 			while (Math.round(r.cur[r.id] - 1) % n != 0) {
 				r.cur[r.id]++;
@@ -600,7 +602,8 @@ gui = {
 		},
 		'sw': function (s) {
 			var r = gui.Y,
-			c = r.cur;
+				c = r.cur;
+
 			function fu(i, r) {
 				if (i <= r.length) {
 					if (gui_swatch.id == 'PT') {
@@ -611,14 +614,15 @@ gui = {
 					return ('<canvas id="' + vars.id + gui_swatch.id + i + '" height="16" width="16"' + (r.n == i ? 'class="cur"' : '') + ' onmousedown="gui_swatch.click(this)" title="' + String(vars.PT.length - i) + '"></canvas>');
 				}
 			}
+
 			if (r.active($(gui_swatch.id), 7, c[gui_swatch.id], c[gui_swatch.id] + 27, {
-				'each': fu,
-				'vars': {
-					'length': vars[gui_swatch.id].length,
-					'n': gui_swatch.n[vars.id + gui_swatch.id]
-				}
-			},
-			s)) {
+					'each': fu,
+					'vars': {
+						'length': vars[gui_swatch.id].length,
+						'n': gui_swatch.n[vars.id + gui_swatch.id]
+					}
+				},
+				s)) {
 				if (gui_swatch.id == 'PT') {
 					for (var i = c[gui_swatch.id]; i <= c[gui_swatch.id] + 27; i++) if (i <= vars[gui_swatch.id].length && vars.PT[i - 1]) vars.PT[i - 1].onload = function () {
 						gui_swatch.update(this.id);
@@ -628,7 +632,8 @@ gui = {
 		},
 		'stamp': function (s) {
 			var r = gui.Y,
-			c = r.cur;
+				c = r.cur;
+
 			function fu(i, r) {
 				if (i <= r.length) {
 					stamp.src[i] = new Image();
@@ -637,24 +642,25 @@ gui = {
 					return ('<canvas width="34" height="34" onmousedown="if(this.id.substr(5)!=stamp.fileNumber) { stamp.current(this); co.glyph(stamp.uri(\'live\'),this.id); }" id="stamp' + i + '"' + (stamp.fileNumber == i ? ' class="cur"' : '') + '></canvas>');
 				}
 			}
-			if($('brush_author')) {
+
+			if ($('brush_author')) {
 				var stampSet = Resources.Brushes[vars.stamp];
-				if(!stampSet) {
-					$('brush_author').innerHTML = '';				
+				if (!stampSet) {
+					$('brush_author').innerHTML = '';
 				} else {
-					$('brush_author').innerHTML = '<i style="-moz-user-select: none; -khtml-user-select: none; user-select: none; ">by:&nbsp; <a href="'+stampSet.url+'" target="_blank">'+stampSet.name+'</a></i><div style="background: #555; height: 1px; margin: 6px 0 2px; "></div>';
+					$('brush_author').innerHTML = '<i style="-moz-user-select: none; -khtml-user-select: none; user-select: none; ">by:&nbsp; <a href="' + stampSet.url + '" target="_blank">' + stampSet.name + '</a></i><div style="background: #555; height: 1px; margin: 6px 0 2px; "></div>';
 				}
 			}
 			if (r.active($('stamp'), 4, c[r.id], c[r.id] + 11, {
-				'change': function () {
-					stamp.src = [];
+					'change': function () {
+						stamp.src = [];
+					},
+					'each': fu,
+					'vars': {
+						'length': stamp.r[vars.stamp]
+					}
 				},
-				'each': fu,
-				'vars': {
-					'length': stamp.r[vars.stamp]
-				}
-			},
-			s)) {
+				s)) {
 				for (var i in stamp.src) stamp.src[i].onload = function () {
 					stamp.preview(this.id);
 				};
@@ -662,8 +668,9 @@ gui = {
 		},
 		'hi': function (s) {
 			var r = gui.Y,
-			c = r.cur;
+				c = r.cur;
 			r.id = 'hi';
+
 			function fu(i) {
 				var r = canvas.history_r;
 				i--;
@@ -682,12 +689,13 @@ gui = {
 					}
 				}
 			}
+
 			r.active($C('z', 'history')[0], 1, c[r.id], c[r.id] + 7, {
 				'each': fu
 			}, s);
 		}
 	},
-	
+
 	//* X-Slide
 	'X': {
 		'html': function (o, r, n, m) {
@@ -701,8 +709,8 @@ gui = {
 		},
 		'build': function (v, o, r) {
 			var a = '',
-			b = '',
-			n = 0;
+				b = '',
+				n = 0;
 			if (!isNaN(r[0])) {
 				r = {
 					'': r
@@ -720,43 +728,45 @@ gui = {
 		},
 		'xRun': function (o, e) {
 			core.fu(o + 'Cur', e, {
-				fu: core.X,
-				oX: -6,
-				X1: 0,
-				X2: 110,
-				oY: 0
-			},
-			function (a, b, m) {
-				var i = cF[o];
-				if (i.fu) {
-					i.fu(o, i.val, b.X, m);
-				} else {
-					gui.X.html(o, i.val, b.X / 110, m);
-				}
-				gui.X.left(o, b.X);
-				if (m == 'up') vars.cache(1);
-			});
+					fu: core.X,
+					oX: -6,
+					X1: 0,
+					X2: 110,
+					oY: 0
+				},
+				function (a, b, m) {
+					var i = cF[o];
+					if (i.fu) {
+						i.fu(o, i.val, b.X, m);
+					} else {
+						gui.X.html(o, i.val, b.X / 110, m);
+					}
+					gui.X.left(o, b.X);
+					if (m == 'up') vars.cache(1);
+				});
 		},
 		'xxSwitch': function (o, e, v) {
 			var n = (XY(e, 'X') - abPos(v).X - 7);
 			gui.X.xxID = o;
+
 			function z(v1, v2) {
 				$S(o + v1 + 'Cur').zIndex = 1;
 				$S(o + v2 + 'Cur').zIndex = 0;
 				core.fu(o + v1 + 'Cur', e, {
-					fu: core.X,
-					oX: v1 == '_min' ? 0 : -7,
-					X1: 0,
-					X2: 115,
-					oY: 0
-				},
-				function (a, b, m) {
-					gui.X.xxRun(a, b, m, v1);
-					if (m == 'up') vars.cache(1);
-				});
+						fu: core.X,
+						oX: v1 == '_min' ? 0 : -7,
+						X1: 0,
+						X2: 115,
+						oY: 0
+					},
+					function (a, b, m) {
+						gui.X.xxRun(a, b, m, v1);
+						if (m == 'up') vars.cache(1);
+					});
 			}
+
 			var a = zero($S(o + '_maxCur').left),
-			b = zero($S(o + '_minCur').left);
+				b = zero($S(o + '_minCur').left);
 			if (Math.abs(n - a) < Math.abs(n - b) || (Math.abs(n - a) == Math.abs(n - b) && n <= a)) z('_max', '_min');
 			else z('_min', '_max');
 		},
@@ -768,12 +778,14 @@ gui = {
 		},
 		'xxRun': function (a, b, m, i) {
 			var o = gui.X,
-			v = o.xxID;
+				v = o.xxID;
+
 			function z(i, b) {
 				o.html(v + i, cF[v].val[i], b / 115, m);
 				o.left(v + i, b);
 				o.range(v, i, b);
 			}
+
 			if (i == '_max' && zero($S(v + '_minCur').left) < (b.X + 1)) z('_min', Math.min(115, b.X + 1));
 			else if (i == '_min' && zero($S(v + '_maxCur').left) > (b.X - 1)) z('_max', Math.max(0, b.X - 1));
 			z(i, b.X);
@@ -822,9 +834,9 @@ win = {
 	'tog': function (v, s, r) {
 		if ($(v)) {
 			var o = $(v),
-			d = $S(v),
-			n = win.getCenter();
-			if (typeof(s) != 'object') {
+				d = $S(v),
+				n = win.getCenter();
+			if (typeof (s) != 'object') {
 				s = {
 					display: s,
 					effect: false
@@ -881,11 +893,11 @@ win = {
 			win.cp(1);
 		}
 	},
-	
+
 	// Create
 	'feed': function () {
 		win.r = {
-			'canvas': ['block', -10, 19, ],
+			'canvas': ['block', -10, 19,],
 			'solid': ['block', 588, 49, 256],
 			'gradient': ['none', 338, 382, 230],
 			'pattern': ['none', 338, 152, 219],
@@ -894,22 +906,24 @@ win = {
 			'options': ['block', -103, 296, 200],
 			'history': ['none', 138, 416, 187]
 		};
-		if (r = cookieGrab('windows')) win.mk(r);
+		if (r = cookieGrab('windows')) {
+			win.mk(r);
+		}
 		else win.mk(win.cp());
 	},
 	'mk': function (r) {
 		var n = win.getCenter(),
-		r = r.split(':');
+			r = r.split(':');
 		for (var i in r) {
 			var v = r[i].split(','),
-			o = '';
-			if(!v[0]) continue; //- there's a missing name being passed somewhere...
+				o = '';
+			if (!v[0]) continue; //- there's a missing name being passed somewhere...
 			win.r[v[0]] = [v[1], parseInt(v[2]), v[3], v[4]];
 			win.tog(v[0], v[1], [n + parseInt(v[2]), v[3], v[4]]);
 			if (o = $('i' + v[0])) {
 				o.opened = (v[1] == 'none') ? false : true;
 				o.className = (v[1] == 'none') ? 'cur' : '';
-			} //			TEST("'"+v[0]+"':['"+v[1]+"',"+v[2]+","+v[3]+","+v[4]+"],",1);
+			}
 		}
 	},
 	'cp': function (o, r) {
@@ -927,11 +941,11 @@ win = {
 			return (z);
 		}
 	},
-	
+
 	// Visualizer
 	'apply': function (o, r) {
 		var d = o.style,
-		n = win.getCenter();
+			n = win.getCenter();
 		for (i in r) {
 			if (i == 'opacity') {
 				var b = r[i] / 100;
@@ -958,43 +972,45 @@ win = {
 		win.overflow(o, 'hidden');
 		o.style.cursor = 'pointer';
 		o.interval = window.setInterval(function () {
-			var done = true,
-			A = [],
-			Z = [];
-			for (i in r) {
-				A[i] = Math.round((r[i] - o[i]) * n);
-			}
-			for (i in A) {
-				Z[i] = o[i] + A[i];
-				if (A[i] == 0 || (A[i] > 0 && Z[i] > r[i]) || (A[i] < 0 && Z[i] < r[i])) {
-					Z[i] = r[i];
-				} else {
-					done = false;
+				var done = true,
+					A = [],
+					Z = [];
+				for (i in r) {
+					A[i] = Math.round((r[i] - o[i]) * n);
 				}
-			}
-			win.apply(o, Z);
-			if (done) {
-				window.clearInterval(o.interval);
-				o.interval = null;
-				stop = 1;
-				o.style.cursor = 'move';
-				win.overflow(o, 'visible');
-			}
-		},
-		35);
+				for (i in A) {
+					Z[i] = o[i] + A[i];
+					if (A[i] == 0 || (A[i] > 0 && Z[i] > r[i]) || (A[i] < 0 && Z[i] < r[i])) {
+						Z[i] = r[i];
+					} else {
+						done = false;
+					}
+				}
+				win.apply(o, Z);
+				if (done) {
+					window.clearInterval(o.interval);
+					o.interval = null;
+					stop = 1;
+					o.style.cursor = 'move';
+					win.overflow(o, 'visible');
+				}
+			},
+			35);
 	},
 	'overflow': function (o, v) {
 		o.style.overflow = v;
+
 		function fu(d) {
 			d.style.overflow = v;
 		}
+
 		fu($C('z', o)[0]);
 		var d = $C('TML', o)[0];
 		if (d) fu(d);
 		var d = $C('TRx', o)[0];
 		if (d) fu(d);
 	},
-	
+
 	// Data
 	'zindex': 3,
 	'getCenter': function () {
@@ -1010,7 +1026,7 @@ win_size = {
 	'core': function (e) {
 		function fu(o, m, a) {
 			var Y = Math.max(100, (a.Y - r.Y) + r.H),
-			X = Math.max(212, (a.X - r.X) + r.W);
+				X = Math.max(212, (a.X - r.X) + r.W);
 			var o = {
 				W: X - 32,
 				H: Y - 40
@@ -1020,6 +1036,7 @@ win_size = {
 				vars.cache(1);
 			}
 		}
+
 		var r = win_size.construct({
 			'X': $('canvas').offsetLeft,
 			'Y': $('canvas').offsetTop,
@@ -1040,24 +1057,24 @@ win_size = {
 	'max': function () {
 		var o = win_size;
 		o.fu({
-			cT: 19,
-			cL: -8,
-			W: XYwin('X') - 16,
-			H: XYwin('Y') - 56
-		},
-		o.construct({}));
+				cT: 19,
+				cL: -8,
+				W: XYwin('X') - 16,
+				H: XYwin('Y') - 56
+			},
+			o.construct({}));
 	},
 	'min': function () {
 		var o = win_size;
 		o.fu({
-			cT: 19,
-			cL: (document.body.scrollWidth - (canvas.W + 30)) / 2,
-			W: canvas.W,
-			H: canvas.H
-		},
-		o.construct({}));
+				cT: 19,
+				cL: (document.body.scrollWidth - (canvas.W + 30)) / 2,
+				W: canvas.W,
+				H: canvas.H
+			},
+			o.construct({}));
 	},
-	
+
 	// Create
 	'fu': function (o, c) {
 		var d = $S('canvas');
@@ -1079,12 +1096,13 @@ win_size = {
 		c['MM'].width = o.W + 'px';
 		c['BM'].width = o.W + 'px';
 		var o = win_size.LT(),
-		r = ['ctx_box', 'ctx_temp', 'ctx_marquee', 'ctx_active', 'ctx_mouse'];
+			r = ['ctx_box', 'ctx_temp', 'ctx_marquee', 'ctx_active', 'ctx_mouse'];
 		for (var i in r) {
 			var d = $S(r[i]);
 			d.left = o.L + 'px';
 			d.top = o.T + 'px';
-		};
+		}
+		;
 	},
 	'LT': function () {
 		return ({
@@ -1094,7 +1112,7 @@ win_size = {
 	},
 	'construct': function (o) {
 		var d = $('canvas'),
-		r = ['ML', 'MM', 'MR', 'TM', 'BM'];
+			r = ['ML', 'MM', 'MR', 'TM', 'BM'];
 		for (var i in r) {
 			i = r[i];
 			o[i] = $C(i, d)[0].style;
