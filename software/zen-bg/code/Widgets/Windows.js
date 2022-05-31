@@ -25,7 +25,7 @@
 */
 
 if (typeof(zIndexGlobal) === "undefined") var zIndexGlobal = 100;
-if (typeof(widget) === "undefined") window.widget = {};
+window.widget || (window.widget = {})
 
 widget = (function (root) { "use strict";
 

@@ -4,8 +4,8 @@
 	Inspired by; http://html5-demos.appspot.com/static/fullscreen.html
 	-------------------------------------
 	widgets.FullScreen.enter();
-	widgets.FullScreen.exit(); 
-	
+	widgets.FullScreen.exit();
+
 	function toggleFullScreen() {
 		var root = widgets.FullScreen;
 		if (!root.enter) return; // fullscreen not supported
@@ -18,11 +18,11 @@
 
 */
 
-if (typeof(widgets) === "undefined") widgets = {};
+window.widgets || (window.widgets = {})
 
-(function(root) {
+;(function(root) {
 	if (document.cancelFullScreen) {
-		var onChange = "onfullscreenchange";		
+		var onChange = "onfullscreenchange";
 	} else if (document.webkitCancelFullScreen) {
 		var onChange = "onwebkitfullscreenchange";
 		document.cancelFullScreen = document.webkitCancelFullScreen;
@@ -33,7 +33,7 @@ if (typeof(widgets) === "undefined") widgets = {};
 		return;
 	}
 	//- how to detect whether we're in fullscreen?
-	root.state = "exited"; 
+	root.state = "exited";
 	// external functions
 	root.addKeyboardEvents = function() {
 		Event.add(window, 'keydown', function (event) {

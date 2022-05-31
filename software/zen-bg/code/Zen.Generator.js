@@ -47,7 +47,7 @@ BG.generateCSSGradient = function () {
 		hex = Color.Space(colorStop, "RGB>HEX>W3")
 		moz += `#${hex} ${stop * 100 >> 0}%, `
 		webkit += `color-stop(${stop}, #${hex}), `
-		last = `#${hex}`
+		window.last = `#${hex}`
 	}
 	// via http://www.webdesignerwall.com/tutorials/cross-browser-css-gradient/
 	return "background-image: -webkit-gradient(linear, left top, left bottom, " + webkit.substr(0, webkit.length - 2) + ");\n" +
@@ -268,7 +268,7 @@ background-repeat: ${repeat};`
 BG.createGeneratorUI = function () {
 
 	const content = document.getElementById("sidebar")
-	cnt = document.createElement("div")
+	window.cnt = document.createElement("div")
 	content.appendChild(cnt)
 	///
 	const span = document.createElement("span")
@@ -338,11 +338,11 @@ BG.createGeneratorUI = function () {
 
 	// GRADIENT UI
 
-	stopHeader = document.createElement("span")
+	window.stopHeader = document.createElement("span")
 	stopHeader.style.cssText = "float: right; position: relative; top: -8px"
 	createHeader("Gradient").appendChild(stopHeader)
 
-	stopContainer = document.createElement("div")
+	window.stopContainer = document.createElement("div")
 	stopContainer.style.cssText = "clear: both; padding: 0 7px"
 	cnt.appendChild(stopContainer)
 	BG.createColorStops()

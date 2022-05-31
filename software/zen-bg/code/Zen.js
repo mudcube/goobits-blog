@@ -142,15 +142,15 @@ BG.onload = function () {
 		}
 	})
 	///
-	dcanvas = document.createElement("canvas")
-	dctx = dcanvas.getContext("2d")
+	window.dcanvas = document.createElement("canvas")
+	window.dctx = dcanvas.getContext("2d")
 	///
 	const twidth = 244
 	const theight = 46
 	const thumbnailer = new widgets.Thumbnailer()
 	///
-	tcanvas = document.createElement("canvas")
-	tctx = tcanvas.getContext("2d")
+	window.tcanvas = document.createElement("canvas")
+	window.tctx = tcanvas.getContext("2d")
 	tcanvas.width = twidth
 	tcanvas.height = theight
 	element.appendChild(tcanvas)
@@ -166,7 +166,7 @@ BG.onload = function () {
 				eventjs.add(canvas, "click", function (event, self) {
 					if (!element.style.height) return
 					BG.texture.src = self.target.src.replace("_thumb", "")
-					texture = createTexture(BG.texture.src, function () {
+					window.texture = createTexture(BG.texture.src, function () {
 						tctx.clearRect(0, 0, tcanvas.width, tcanvas.height)
 						tctx.drawImage(BG.texture, 0, 0)
 						BG.render()
