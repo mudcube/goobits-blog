@@ -884,15 +884,20 @@ gui_swatch = {
 	// Mouse
 	'click': function (o) {
 		var n = parseInt(o.id.replace(/[a-zA-Z]*/, ''));
-		if (gui_swatch.n[vars.id + gui_swatch.id] != n) {
-			if (gui_swatch.id == 'PT') {
-				vars[vars.id + gui_swatch.id] = new Image();
-				vars[vars.id + gui_swatch.id].src = vars[gui_swatch.id][n - 1].src;
+		if (gui_swatch.n[vars.id + gui_swatch.id] !== n) {
+			if (gui_swatch.id === 'PT') {
+				const image = new Image();
+				image.src = vars[gui_swatch.id][n - 1].src;
+				image.onload = function () {
+					vars[vars.id + gui_swatch.id] = image
+					gui_swatch.cur_switch(n);
+					co.glyph();
+				}
 			} else {
 				vars[vars.id + gui_swatch.id] = deObject(vars[gui_swatch.id][n - 1]);
+				gui_swatch.cur_switch(n);
+				co.glyph();
 			}
-			gui_swatch.cur_switch(n);
-			co.glyph();
 		}
 	},
 	'cur': function (type, s) {

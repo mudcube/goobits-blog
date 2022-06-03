@@ -679,9 +679,9 @@ const init = {
     },
     "images": function() {
         const dir = "media/gui/";
-        op_8x8 = new Image();
+        window.op_8x8 = new Image();
         op_8x8.src = dir + "op_8x8.gif";
-        path = {
+        window.path = {
             point: new Image(),
             node_select: new Image()
         };
@@ -697,7 +697,7 @@ const init = {
             let random;
             if (vars["PT*"] === "Squidfingers") random = Math.random() > .5 ? "82" : "105";
             else random = rand(n);
-            src = `${gui_pattern.dir + vars["PT*"]}/${gui_swatch.n[v + "PT"] = random}-live.jpg`;
+            window.src = `${gui_pattern.dir + vars["PT*"]}/${gui_swatch.n[v + "PT"] = random}-live.jpg`;
             gui_pattern.o[v].src = src;
             vars[v + "PT"].src = src;
             gui_swatch.n[`${v}PT`] = n - gui_swatch.n[`${v}PT`];
@@ -748,7 +748,7 @@ window.addEventListener("DOMContentLoaded", ()=>{
     ]);
 });
 ///------  PARTS OF LIBRARIES
-Color = {};
+window.Color = {};
 Color.HEX_STRING = function(o) {
     let z = o.toString(16), n = z.length;
     while(n < 6){
@@ -790,10 +790,10 @@ Color.HSV_RGB = function(o) {
     else {
         if (H >= 1) H = 0;
         H = 6 * H;
-        D = H - Math.floor(H);
-        A = Math.round(255 * V * (1 - S));
+        const D = H - Math.floor(H);
+        const A = Math.round(255 * V * (1 - S));
         B = Math.round(255 * V * (1 - S * D));
-        C = Math.round(255 * V * (1 - S * (1 - D)));
+        const C = Math.round(255 * V * (1 - S * (1 - D)));
         V = Math.round(255 * V);
         switch(Math.floor(H)){
             case 0:
