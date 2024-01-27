@@ -1,3 +1,4 @@
+import * as child_process from 'child_process'
 import commonjs from '@rollup/plugin-commonjs'
 import livereload from 'rollup-plugin-livereload'
 import preprocess from 'svelte-preprocess'
@@ -7,17 +8,29 @@ import {terser} from 'rollup-plugin-terser'
 
 const production = !process.env.ROLLUP_WATCH
 
+/**
+ *
+ * @returns {{writeBundle(): void}}
+ */
 function serve() {
 	let server
 
+	/**
+	 *
+	 */
 	function toExit() {
-		if (server) server.kill(0)
+		if (server) {
+			server.kill(0)
+		}
 	}
 
 	return {
 		writeBundle() {
-			if (server) return
-			server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
+			if (server) {
+				return
+			}
+
+			server = child_process.spawn('npm', ['run', 'start', '--', '--dev'], {
 				stdio: ['ignore', 'inherit', 'inherit'],
 				shell: true
 			})

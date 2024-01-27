@@ -16,6 +16,11 @@ const sesClient = new SESClient({
 	}
 })
 
+/**
+ *
+ * @param request
+ * @returns {Promise<Response>}
+ */
 async function handleRequest(request) {
 	const {name = "", email, message = ""} = await request.json()
 
