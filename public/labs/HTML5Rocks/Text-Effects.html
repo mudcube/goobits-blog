@@ -31,9 +31,9 @@ function changeDemo(hash) {
 	ctx.strokeStyle = "#000";
 	ctx.fillStyle = "#000";
 	ctx.lineWidth = 1;
-	ctx.globalCompositeOperation = "source-over"; 
+	ctx.globalCompositeOperation = "source-over";
 	ctx.globalAlpha = 1;
-	if (document.getElementById("spaceage")) 
+	if (document.getElementById("spaceage"))
 		document.getElementById("spaceage").style.display = "none";
 	if (hash == "spaceage") {
 		document.getElementById("spaceageselect").selected = true;
@@ -65,7 +65,7 @@ function changeDemo(hash) {
 		ctx.canvas.height = 700;
 		ctx.canvas.width = 700;
 		neonLightEffect();
-	} else if (hash == "innershadow+pattern+gradient") {	
+	} else if (hash == "innershadow+pattern+gradient") {
 		document.getElementById("innershadowpatterngradient").selected = true;
 		document.body.style.background = "url('"+op_8x8.data+"') fixed";
 		ctx.canvas.height = 400;
@@ -110,7 +110,7 @@ image.style.cssText = "display: inline";
 
 getMetrics = function(text, font) {
 	var metrics = document.getElementById("metrics");
-	if (metrics) {	
+	if (metrics) {
 		metrics.style.cssText = "display: block";
 		var parent = metrics.firstChild;
 		parent.firstChild.textContent = text;
@@ -124,7 +124,7 @@ getMetrics = function(text, font) {
 		metrics.appendChild(parent);
 		document.body.insertBefore(metrics, document.body.firstChild);
 	}
-	
+
 	// direction of the text
 	var direction = window.getComputedStyle(document.body, "")["direction"];
 
@@ -141,12 +141,12 @@ getMetrics = function(text, font) {
 	// capturing the "middle" baseline
 	parent.style.cssText = "font: " + font + "; white-space: nowrap; line-height: 0; display: block;";
 	var middle = image.offsetTop + 1;
-	
+
 	// capturing "1em"
 	parent.style.cssText = "font: " + font + "; white-space: nowrap; height: 1em; display: block;";
 	parent.firstChild.textContent = "";
 	var em = parent.offsetHeight;
-	
+
 	// cleanup
 	metrics.style.display = "none";
 
@@ -179,15 +179,14 @@ a:hover { color: #ff0000 }
 <div id="controls" onmousedown="event.stopPropagation();">
 <div><span class="effects">CANVAS:</span><select style="position: relative; top: -3px; float: right; font-size: 20px" onchange="changeDemo(this.options[this.selectedIndex].innerHTML.substr(4))"><option id="shadow">(1) shadow</option><option id="patterngradientreflect">(2) pattern+gradient+reflect</option><option id="neonrainbowjitter">(3) neon+rainbow+jitter</option><option id="innershadowpatterngradient">(4) innershadow+pattern+gradient</option><option id="spaceageselect">(5) spaceage</option></select><br></div>
 </div>
-<script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-400768-7']);
-  _gaq.push(['_trackPageview']);
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-400768-7"></script>
+<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'UA-400768-7');
 </script>
 </body>
 </html>
