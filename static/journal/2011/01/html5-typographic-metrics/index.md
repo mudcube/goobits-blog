@@ -180,11 +180,7 @@ By default `<canvas>` text is aligned to the “alphabetic” baseline. When dra
 baseline, and a y-position of 0, only the descenders can be seen:
 
 ```js
-ctx.fillText(“Hello
-world
-!”,
-0, 0
-)
+ctx.fillText("Hello world!", 0, 0);
 ;
 
 ```
@@ -194,14 +190,8 @@ wonderfully, however, not all browsers support the “top” baseline. If baseli
 world!” should become visible in the following example:
 
 ```js
-ctx.textBaseline = “top”;
-ctx.fillText(“Hello
-world
-!”,
-0, 0
-)
-;
-
+ctx.textBaseline = "top";
+ctx.fillText("Hello world!", 0, 0);
 ```
 
 Opera, Safari and Chrome work identically with “top”, “bottom”, “middle”, and “alphabetic”… however, Firefox seems to

@@ -9,7 +9,7 @@ tags:
   - "unicode"
 ---
 
-The **[Unicode Profiling Project](http://mudcu.be/labs/ucpp/)** was designed to gather statistics on unicode support across systems.  The software checks each symbol in your systems Unicode catalog (65,535 glyphs) to see which are visible on your computer using `<canvas>` and Javascript.
+The **[Unicode Profiling Project](/labs/ucpp/)** was designed to gather statistics on unicode support across systems.  The software checks each symbol in your systems Unicode catalog (65,535 glyphs) to see which are visible on your computer using `<canvas>` and Javascript.
 
 The data generated from your computer will help profile the state of unicode support on the web. Your computers unicode support, remote address, user agent and processing time will be submitted to the server upon completion of the test — a statistic analysis of the data will be published — no specific information about your computer will be published.
 
@@ -17,25 +17,25 @@ The code behind this project is an extension of [isFontSupported](/journal/20
 
 **Running the test:**
 
-Once the [test](http://mudcu.be/labs/ucpp/) is initiated you’ll be able to watch the glyphs as they’re scanned with their related unicode block name.  It typically takes over a minute to scan an entire collection of unicode characters.  This is what the acid test looks like while being processed:
+Once the [test](/labs/ucpp/) is initiated you’ll be able to watch the glyphs as they’re scanned with their related unicode block name.  It typically takes over a minute to scan an entire collection of unicode characters.  This is what the acid test looks like while being processed:
 
-[![](images/Screen-shot-2010-11-10-at-7.39.11-PM.png "Screen shot 2010-11-10 at 7.39.11 PM")](http://mudcu.be/journal/wp-content/uploads/2010/11/Screen-shot-2010-11-10-at-7.39.11-PM.png)
+[![](images/Screen-shot-2010-11-10-at-7.39.11-PM.png "Screen shot 2010-11-10 at 7.39.11 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.39.11-PM.png)
 
 **Reading your profile:**
 
 Once the processing has completed you will be presented with a string of binary representing what characters are visible, and which ones are unavailable or invisible (65,535 numbers). Here are the results from my Chromium browser running on OSX 10.6.4:
 
-[![](images/Screen-shot-2010-11-10-at-7.43.37-PM.png "Screen shot 2010-11-10 at 7.43.37 PM")](http://mudcu.be/journal/wp-content/uploads/2010/11/Screen-shot-2010-11-10-at-7.43.37-PM.png)
+[![](images/Screen-shot-2010-11-10-at-7.43.37-PM.png "Screen shot 2010-11-10 at 7.43.37 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.43.37-PM.png)
 
 **Unicode characters:**
 
 Now the fun part, click on “Show Available” — this may take a few seconds as you’re referencing tens of thousands of unicode characters at once:
 
-[![](images/Screen-shot-2010-11-10-at-7.34.10-PM.png "Screen shot 2010-11-10 at 7.34.10 PM")](http://mudcu.be/journal/wp-content/uploads/2010/11/Screen-shot-2010-11-10-at-7.34.10-PM.png)
+[![](images/Screen-shot-2010-11-10-at-7.34.10-PM.png "Screen shot 2010-11-10 at 7.34.10 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.34.10-PM.png)
 
 [Unicode #65018](http://www.fileformat.info/info/unicode/char/fdfa/index.htm)
 
-[![](images/Screen-shot-2010-11-10-at-11.55.10-PM.png "Screen shot 2010-11-10 at 11.55.10 PM")](http://mudcu.be/journal/wp-content/uploads/2010/11/Screen-shot-2010-11-10-at-11.55.10-PM.png)
+[![](images/Screen-shot-2010-11-10-at-11.55.10-PM.png "Screen shot 2010-11-10 at 11.55.10 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-11.55.10-PM.png)
 
 [Brail Patterns \[0x2800-28FF\]](http://www.fileformat.info/info/unicode/block/braille_patterns/utf8test.htm)
 

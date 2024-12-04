@@ -26,4 +26,4 @@ tags:
 
 … and many other [fun](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#shadow) [effects](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#innershadow+pattern+gradient).  The following ones are using a CSS->Canvas converter; the CSS used in the converter was sourced from [Line25](http://line25.com/articles/using-css-text-shadow-to-create-cool-text-effects), and [Stereoscopic](http://lab.simurai.com/css/css3d/), and [Shadow 3D](http://pgwebdesign.net/blog/3d-css-shadow-text-tutorial);
 
-[![](images/Screen-shot-2011-05-15-at-11.06.57-PM.png "Screen shot 2011-05-15 at 11.06.57 PM")](http://mudcu.be/journal/wp-content/uploads/2011/03/Screen-shot-2011-05-15-at-11.06.57-PM.png)
+[![](images/Screen-shot-2011-05-15-at-11.06.57-PM.png "Screen shot 2011-05-15 at 11.06.57 PM")](/journal/2011/03/html5-typographic-effects/images/Screen-shot-2011-05-15-at-11.06.57-PM.png)

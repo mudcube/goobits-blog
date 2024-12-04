@@ -8,7 +8,7 @@ tags:
   - "optimization"
 ---
 
-[![](images/1320621615_emerald-theme-manager1.png "1320621615_emerald-theme-manager")](http://mudcu.be/journal/wp-content/uploads/2011/11/1320621615_emerald-theme-manager1.png)One of my favorite posts in the last few years was [Bitwise Gems in AS3](http://lab.polygonal.de/2007/05/10/bitwise-gems-fast-integer-math/) by _Polygonal Labs_, an article inspired by [Bitwise Operations in C](http://www.gamedev.net/reference/articles/article1563.asp) on _Gamedev_. This article is a summery of what I’ve learned, applied to Javascript, plus a few other tricks.
+[![](images/1320621615_emerald-theme-manager1.png "1320621615_emerald-theme-manager")](/journal/2011/11/bitwise-gems-and-other-optimizations/images/1320621615_emerald-theme-manager1.png)One of my favorite posts in the last few years was [Bitwise Gems in AS3](http://lab.polygonal.de/2007/05/10/bitwise-gems-fast-integer-math/) by _Polygonal Labs_, an article inspired by [Bitwise Operations in C](http://www.gamedev.net/reference/articles/article1563.asp) on _Gamedev_. This article is a summery of what I’ve learned, applied to Javascript, plus a few other tricks.
 
 **What’s the wisdom in using bit_wise_?**
 

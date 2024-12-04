@@ -30,7 +30,6 @@ The benefits of dynamic music generation is substantial — saving bandwidth, op
     
     ```js
     <applet archive="MIDIPlugin.jar" code="MIDIPlugin.class" height="1" id="MIDIPlugin" name="MIDIPlugin" width="1"><applet>
-    
     ```
     
 2. Test to see whether the browser supports the MIDIPlugin (has Soundbank installed and supports Java) with the following function in window.onload:
@@ -89,7 +88,7 @@ Released as [CC0](http://creativecommons.org/publicdomain/zero/1.0/) — this me
 
 **Git me**
 
-Easily forkable on [GITHub](http://github.com/mudx/MIDIPlugin) or download the precompiled [.jar applet](http://mudcu.be/labs/Piano/MIDIPlugin-0.2.jar).
+Easily forkable on [GITHub](http://github.com/mudx/MIDIPlugin) or download the precompiled [.jar applet](/labs/Piano/MIDIPlugin-0.2.jar).
 
 **Supported OS/Browsers**
 
