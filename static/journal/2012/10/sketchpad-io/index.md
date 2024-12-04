@@ -8,7 +8,7 @@ tags:
   - "sketchpad"
 ---
 
-**UPDATE: [Read about Sketchpad 3.0](http://mudcu.be/journal/2013/07/sketchpad-3-0/)**
+**UPDATE: [Read about Sketchpad 3.0](/journal/2013/07/sketchpad-3-0/)**
 
 Introducing a new way to create graphics online. [Sketchpad 2.0](http://sketchpad.io/sketch/?src=mudcube/1) is a non-destructive vector & image editor, built in HTML5, that you can start using right now, for free! I/O is for input and output, that means, any drawing you make can be shared, forked, and edited.
 

@@ -10,7 +10,7 @@ tags:
   - "webaudio"
 ---
 
-[Color Piano Theory](https://chrome.google.com/webstore/detail/ihmigmmflfcbhdpdgbkkeojchjhhphnh) is now available on the Chrome Webstore. There haven’t been any major UI overhauls since [last reported](http://mudcu.be/journal/2011/01/color-piano-theory/), but there has been a lot of work going on the back-end! Most importantly moving from the Java interface to native HTML5 <audio> tag (as Java isn’t supported in the Chrome Webstore). Although this sounds like a simple task, there’s a lot of steps involved; hopefully this will save someone else a bit of trouble!
+[Color Piano Theory](https://chrome.google.com/webstore/detail/ihmigmmflfcbhdpdgbkkeojchjhhphnh) is now available on the Chrome Webstore. There haven’t been any major UI overhauls since [last reported](/journal/2011/01/color-piano-theory/), but there has been a lot of work going on the back-end! Most importantly moving from the Java interface to native HTML5 <audio> tag (as Java isn’t supported in the Chrome Webstore). Although this sounds like a simple task, there’s a lot of steps involved; hopefully this will save someone else a bit of trouble!
 
 **Generating your own soundfont files;**
 

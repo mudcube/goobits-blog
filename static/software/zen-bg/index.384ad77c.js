@@ -5474,7 +5474,7 @@ if (typeof Color.Space === "undefined") Color.Space = {};
 },{}],"cFbML":[function(require,module,exports) {
 /*
 	----------------------------------------------------
-	Loader.js : 0.3 : 2012/04/12 : http://mudcu.be
+	Loader.js : 0.3 : 2012/04/12 : https://miko.art
 	----------------------------------------------------
 	Copyright 2010-2012 Michael Deal. All rights reserved.
 	----------------------------------------------------
@@ -6419,7 +6419,7 @@ widget = function(root) {
 },{}],"b9HL0":[function(require,module,exports) {
 /*
 	----------------------------------------------------
-	Uploader.js : 0.5 : 2012/07/02 : http://mudcu.be
+	Uploader.js : 0.5 : 2012/07/02 : https://miko.art
 	----------------------------------------------------
 	Copyright 2010-2012 Michael Deal. All rights reserved.
 	----------------------------------------------------

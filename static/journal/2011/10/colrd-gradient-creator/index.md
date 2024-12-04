@@ -41,7 +41,7 @@ Traditionally gradient editors allow users to place a point in space that radiat
 **Future developments;**
 
 - GGR, SVG, and CSS3 exporting (soon, as in this week).
-- Desktop wallpaper generator; textures, gradients, and user defined sizing (see [previous article](http://mudcu.be/journal/2011/10/background-generator/)), along with the Gradient Noise generator.
+- Desktop wallpaper generator; textures, gradients, and user defined sizing (see [previous article](/journal/2011/10/background-generator/)), along with the Gradient Noise generator.
 - Time-machine (undo and redo).
 - The user could split the midpoint, creating a shadow of itself in the opposite direction, this way the user could control the color blur on one edge (as it is now), or both edges simultaneously.  The shadow could be fixed to the inverse of the controller (SHIFT-KEY) to create even blurs, or controlled on it’s own independently.
 

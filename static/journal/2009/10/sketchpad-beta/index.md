@@ -1,7 +1,7 @@
 ---
 title: "Sketchpad 1.0"
 date: "2009-10-27"
-coverImage: "https://web.archive.org/web/20121019065304im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-06-17-at-11.20.png&w=750&h="
+coverImage: "/journal/2009/10/sketchpad-beta/images/13.png"
 categories: 
   - "apps"
 tags: 
@@ -9,7 +9,7 @@ tags:
   - "sketchpad"
 ---
 
-UPDATE: [Read about Sketchpad 3.0](http://mudcu.be/journal/2013/07/sketchpad-3-0/)
+UPDATE: [Read about Sketchpad 3.0](/journal/2013/07/sketchpad-3-0/)
 
 [Sketchpad](http://mugtug.com/sketchpad/) is a free application utilizing [`<canvas>`](http://en.wikipedia.org/wiki/Canvas_%28HTML_element%29) to allow anyone with a web-connection and a recent copy of Safari, Firefox, Opera, or Chrome the ability to create beautiful drawings.
 
@@ -19,17 +19,16 @@ Feel free to add your Sketchpad drawings to our [Flickr group](http://www.flickr
 
 Here are a few drawing made with [Sketchpad](http://mugtug.com/sketchpad/):
 
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/1.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/2.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/3.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/4.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/5.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/6.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/7.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/8.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/9.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/10.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/11.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/12.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/13.png)
-![](http://mudcu.be/journal/wp-content/uploads/2009/10/14.png)
+![](/journal/2009/10/sketchpad-beta/images/1.png)
+![](/journal/2009/10/sketchpad-beta/images/2.png)
+![](/journal/2009/10/sketchpad-beta/images/3.png)
+![](/journal/2009/10/sketchpad-beta/images/4.png)
+![](/journal/2009/10/sketchpad-beta/images/5.png)
+![](/journal/2009/10/sketchpad-beta/images/6.png)
+![](/journal/2009/10/sketchpad-beta/images/7.png)
+![](/journal/2009/10/sketchpad-beta/images/8.png)
+![](/journal/2009/10/sketchpad-beta/images/9.png)
+![](/journal/2009/10/sketchpad-beta/images/10.png)
+![](/journal/2009/10/sketchpad-beta/images/11.png)
+![](/journal/2009/10/sketchpad-beta/images/12.png)
+![](/journal/2009/10/sketchpad-beta/images/14.png)

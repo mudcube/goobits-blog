@@ -13,7 +13,7 @@ The **[Unicode Profiling Project](http://mudcu.be/labs/ucpp/)** was designed to
 
 The data generated from your computer will help profile the state of unicode support on the web. Your computers unicode support, remote address, user agent and processing time will be submitted to the server upon completion of the test — a statistic analysis of the data will be published — no specific information about your computer will be published.
 
-The code behind this project is an extension of [isFontSupported](http://mudcu.be/journal/2010/10/font-detection-in-html5/) (font detection in `<canvas>`). As with isFontSupported, the code behind Unicode Profiling Project is released under CC0, free to use this code in creative ways in your own projects 😊
+The code behind this project is an extension of [isFontSupported](/journal/2010/10/font-detection-in-html5/) (font detection in `<canvas>`). As with isFontSupported, the code behind Unicode Profiling Project is released under CC0, free to use this code in creative ways in your own projects 😊
 
 **Running the test:**
 

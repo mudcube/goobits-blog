@@ -64,7 +64,7 @@ _Getting your feet wet with Color Piano (features);_
     - Tie into localStorage to save settings.
     - Preview notes before they happen.
 - 1.2.0–12/6/11
-    - Using [base64 soundfonts](http://mudcu.be/journal/2011/11/base64-soundfonts/).
+    - Using [base64 soundfonts](/journal/2011/11/base64-soundfonts/).
     - Now displays all 88-keys of a standard piano.
     - Watch notes falling towards the keys before the note plays!
 - 1.1.0–11/27/11
@@ -73,5 +73,5 @@ _Getting your feet wet with Color Piano (features);_
 - 1.0beta
     - MIDI-reading support via [Matt West](http://matt.west.co.tt/)‘s very kindly provided [jasmid](https://github.com/gasman/jasmid) project.
     - Royalty free classical piano pieces from [Disklavier World](http://www.kuhmann.com/Yamaha.htm).
-    - [http://mudcu.be/journal/2011/01/color-piano-theory/](http://mudcu.be/journal/2011/01/color-piano-theory/)
-    - [http://mudcu.be/journal/2007/03/piano-theory-widget/](http://mudcu.be/journal/2007/03/piano-theory-widget/)
+    - [/journal/2011/01/color-piano-theory/](/journal/2011/01/color-piano-theory/)
+    - [/journal/2007/03/piano-theory-widget/](/journal/2007/03/piano-theory-widget/)

@@ -9,7 +9,7 @@ tags:
 coverImage: "Untitled.png"
 ---
 
-The [standard chart](https://developer.mozilla.org/samples/canvas-tutorial/6_1_canvas_composite.html) (a great resource provided by Mozilla) describing the effects of the globalCompositeOperation is incomplete, as it leaves us to extrapolate how 99% of the color-spectrum, and multiple levels of opacity, will affect the composite operation. The [following chart](http://mudcu.be/labs/HTML5Rocks/globalCompositeOperation.html) allows you to see what the globalCompositeOperation’s is doing on a pixel-to-pixel basis.
+The [standard chart](https://developer.mozilla.org/samples/canvas-tutorial/6_1_canvas_composite.html) (a great resource provided by Mozilla) describing the effects of the globalCompositeOperation is incomplete, as it leaves us to extrapolate how 99% of the color-spectrum, and multiple levels of opacity, will affect the composite operation. The [following chart](/labs/HTML5Rocks/globalCompositeOperation.html) allows you to see what the globalCompositeOperation’s is doing on a pixel-to-pixel basis.
 
 The source-image contains strictly 0% and 100% opaque pixels. This image depicts the traditional [RGB additive color model](http://www.colorjack.com/knowledge/color_models.html), and was created with three overlapping ellipses using the “lighter” globalCompositeOperation;
 

@@ -11,7 +11,7 @@ tags:
   - "webaudio"
 ---
 
-**UPDATE:** There is a more recent post on [Color Piano](http://mudcu.be/journal/2011/12/color-piano/).
+**UPDATE:** There is a more recent post on [Color Piano](/journal/2011/12/color-piano/).
 
 [Color Piano Theory](/piano/) (CPT) was inspired by an interest in building an _educational application_ that utilizes colors in _teaching piano theory_.  CPT ties together chords, scales, inversions, octaves, and key signatures.  CPT is a visual interface for learning the keyboard.
 
@@ -49,7 +49,7 @@ Being a big HTML5 fan, I decided to program the application in Javascript—the 
 
 [![](images/Screen-shot-2011-01-26-at-1.51.10-PM.png "Screen shot 2011-01-26 at 1.51.10 PM")](http://mudcu.be/journal/wp-content/uploads/2011/01/Screen-shot-2011-01-26-at-1.51.10-PM.png)After banging my head trying to get MIDI playing with native Javascript commands, I found one solution that would allow me to access MIDI across browsers: Javascript->Java communication.  The next step was creating the project [MIDIPlugin](https://github.com/mudx/MIDIPlugin), a **CC0 framework exposing the Java MIDI interface**.  Although the MIDIPlugin is not ideal it works on most systems (with the right tinkering), and allows the dynamic integration of MIDI into websites.
 
-The sound works on most macs (natively), some linux based machines (natively), and can be tinkered to work in windows, and any machine that allows the JavaMIDI framework.  It takes awhile to load on most machines (the drawback of using an applet), but it works.  Read more on [how to tie the MIDIPLugin into your application](http://mudcu.be/journal/2010/08/dynamic-midi-generation-in-the-browser/).
+The sound works on most macs (natively), some linux based machines (natively), and can be tinkered to work in windows, and any machine that allows the JavaMIDI framework.  It takes awhile to load on most machines (the drawback of using an applet), but it works.  Read more on [how to tie the MIDIPLugin into your application](/journal/2010/08/dynamic-midi-generation-in-the-browser/).
 
 **Presenting a synesthetic educational experiment**
 
