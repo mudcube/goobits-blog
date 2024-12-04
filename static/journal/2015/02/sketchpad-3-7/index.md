@@ -28,4 +28,4 @@ Here’s a list of new features:
 - Improved speed of undoing multiple actions.
 - Text-box resizing without scaling by holding ShiftKey.
 
-Play around with the latest version to see for yourself ?
+Play around with the latest version to see for yourself 😊✨

@@ -17,7 +17,7 @@ To enable editing, hover over the right side of the app—this will display thes
 
 Play around, share the results, and let us know what you think!
 
-Available as a [Chrome Extension](https://chrome.google.com/webstore/detail/filterstack/inlmgknpbjingijmnphnnjakekmncnai?hl=en&gl=US) or [Web app](https://sketch.io/webcam-fx/) ?
+Available as a [Chrome Extension](https://chrome.google.com/webstore/detail/filterstack/inlmgknpbjingijmnphnnjakekmncnai?hl=en&gl=US) or [Web app](https://sketch.io/webcam-fx/).
 
 [![](images/3a611e84-6702-4fae-b255-c748188d7939-600x600.jpg)](https://galactic.ink/journal/wp-content/uploads/2013/07/3a611e84-6702-4fae-b255-c748188d7939.jpg)
 

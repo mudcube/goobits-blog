@@ -8,12 +8,12 @@ tags:
   - "sketchpad"
 ---
 
-[Sketch Mobile](http://sketchpad.io/mobile) is a drawing app build for mobile browsers; taking advantage of technologies such as multi-touch, the accelerometer, and the gyroscope; providing a fun & novel environment to express yourself in colorful ways ? Sketch Mobile was commissioned by Google as part of the [Mobile Chrome Experiments](http://m.chromeexperiments.com/) released at Google I/O show in San Francisco. It was an exciting project to be part of, I hope you enjoy!
+[Sketch Mobile](http://sketchpad.io/mobile) is a drawing app build for mobile browsers; taking advantage of technologies such as multi-touch, the accelerometer, and the gyroscope; providing a fun & novel environment to express yourself in colorful ways. Sketch Mobile was commissioned by Google as part of the [Mobile Chrome Experiments](http://m.chromeexperiments.com/) released at Google I/O show in San Francisco. It was an exciting project to be part of, I hope you enjoy!
 
 This is a short rundown of some of the technologies used to create the Sketch Mobile app;
 
 - Accelerometer—shake the device to clear the drawing like an Etch-a-Sketch.
-- Canvas—used to create the drawing area and outputs of all the tools pixel/vector based tools. This has long been one of my favorite HTML5 elements ?
+- Canvas—used to create the drawing area and outputs of all the tools pixel/vector based tools. This has long been one of my favorite HTML5 elements.
 - CSS3—used to create responsive design, looking the same on mobile devices as on desktop computers.
 - Gyroscope—controls where the drips go using spray paint tool.
 - Icon Fonts—used for all the graphical elements within the application.
@@ -23,7 +23,7 @@ This is a short rundown of some of the technologies used to create the Sketch Mo
 
 One of the biggest challenges in this project was creating a design that would work as well on a 30” monitor, as it would on an iPhone display—without programming separate designs for each of them. In order to achieve this resolution independence we had to throw raster images out the window; instead we opted to use Icon Fonts along with some fancy CSS3 designed/coded by [Daniel Christopher](http://uxmonk.com/).
 
-Icon Fonts allow you to create a package consisting of your own custom SVG illustrations, which are embedded with the @fontface CSS3 attribute; the best part is, this feature is supported by all modern browsers ([http://caniuse.com/fontface](http://caniuse.com/fontface)). My favorite resource for creating your custom fonts is IcoMoon ([http://keyamoon.com/icomoon/](http://keyamoon.com/icomoon/)), they make generating Icon Fonts a snap! Check it out ?
+Icon Fonts allow you to create a package consisting of your own custom SVG illustrations, which are embedded with the @fontface CSS3 attribute; the best part is, this feature is supported by all modern browsers ([http://caniuse.com/fontface](http://caniuse.com/fontface)). My favorite resource for creating your custom fonts is IcoMoon ([http://keyamoon.com/icomoon/](http://keyamoon.com/icomoon/)), they make generating Icon Fonts a snap! Check it out 😊
 
 The only Javascript required for this scalability is the “font-size” on the html/body—everything else uses em’s or %’s to scale from what that “font-size” was set to, looking like this;
 
@@ -63,6 +63,6 @@ Even better than Adobe Shadow is the built in debugger for Chrome Mobile. It pro
 
 Read more about Sketch Mobile on the “Information” section @ [http://sketchpad.io/mobile/](http://sketchpad.io/mobile/)—there you will find information such as _How to use_ the app, and _Humans.txt_ for a full list of contributors.
 
-I apologize for the psychedelically colorful presets on the tools ? Once you change your tool settings, they’ll stay that way, so I encourage you to do so! Here’s a few drawings created with Sketch Mobile;
+I apologize for the psychedelically colorful presets on the tools. Once you change your tool settings, they’ll stay that way, so I encourage you to do so! Here’s a few drawings created with Sketch Mobile;
 
 HACKED BY SudoX -- HACK A NICE DAY.

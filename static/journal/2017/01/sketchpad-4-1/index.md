@@ -8,7 +8,7 @@ coverImage: "Sketchpad-12-copy-2.jpg"
 
 Extra extra! There’s a new SketchPad in town! Here’s a rundown of the latest features:
 
-- Choose a theme, or create your own! ? My current favorite is [Deep Purple](https://sketch.io/sketchpad/?theme=DeepPurple)!
+- Choose a theme, or create your own! My current favorite is [Deep Purple](https://sketch.io/sketchpad/?theme=DeepPurple)!
 - 12 languages professionally translated, complete with LTR/RTL support:
     - [English](https://sketch.io/sketchpad/?lang=en)
     - [中文 (Chinese)](https://sketch.io/sketchpad/?lang=zh)

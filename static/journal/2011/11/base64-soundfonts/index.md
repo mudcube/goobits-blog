@@ -49,7 +49,7 @@ if ($_REQUEST['midi']) {
 - **Getting out of MIDI format;** At this point, we have a bunch of MIDI files. We need to eventually get these MIDI’s -> OGG format, by mapping it to a high-quality SoundFont;
     - _Older versions_ of iTunes allows you to batch convert from _MIDI’s_ -> _MP4’s_. That was very nice feature that seems to have disappeared…
     - Online app, such as [SolMire](http://solmire.com/), allow you to convert from _MIDI’s_ -> _MP3’s_ and other formats, one at a time. I especially like that SolMire allows you to choose the desired SoundFont to use on the .MIDI.
-    - [MIDI2MP3](http://www.audiosoftstore.com/downloads.html) is a command line application available for Window and Mac OSX that enables you to use specific SoundFonts in your encodings, and allows you to use the command line… and therefore the ability for batch _MIDI_ -> _WAV_ conversion! [FluidSynth Soundfont GM](http://packages.debian.org/squeeze/fluid-soundfont-gm) is a good .SF2 file to get you started ?
+    - [MIDI2MP3](http://www.audiosoftstore.com/downloads.html) is a command line application available for Window and Mac OSX that enables you to use specific SoundFonts in your encodings, and allows you to use the command line… and therefore the ability for batch _MIDI_ -> _WAV_ conversion! [FluidSynth Soundfont GM](http://packages.debian.org/squeeze/fluid-soundfont-gm) is a good .SF2 file to get you started.
 - **Getting into the OGG format;**
     - [Switch](http://www.nch.com.au/switch/index.html) (for Mac) allows you to convert from _WAV’s, MP4’s, and MP3’s_ -> _OGG’s_.
     - [oggenc](http://www.rarewares.org/ogg-oggenc.php) from Vorbis, allows you do batch conversion of _WAV’s_ -> _OGG’s_ using a bash script. The calls are like this:

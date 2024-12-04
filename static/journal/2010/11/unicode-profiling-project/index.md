@@ -9,11 +9,11 @@ tags:
   - "unicode"
 ---
 
-The **[Unicode Profiling Project](http://mudcu.be/labs/ucpp/)** was designed to gather statistics on unicode support across systems.  The software checks each symbol in your systems Unicode catalog (65,535 glyphs) to see which are visible on your computer using <canvas> and Javascript.
+The **[Unicode Profiling Project](http://mudcu.be/labs/ucpp/)** was designed to gather statistics on unicode support across systems.  The software checks each symbol in your systems Unicode catalog (65,535 glyphs) to see which are visible on your computer using &lt;canvas&gt; and Javascript.
 
 The data generated from your computer will help profile the state of unicode support on the web. Your computers unicode support, remote address, user agent and processing time will be submitted to the server upon completion of the test — a statistic analysis of the data will be published — no specific information about your computer will be published.
 
-The code behind this project is an extension of [isFontSupported](http://mudcu.be/journal/2010/10/font-detection-in-html5/) (font detection in <canvas>). As with isFontSupported, the code behind Unicode Profiling Project is released under CC0, free to use this code in creative ways in your own projects ?
+The code behind this project is an extension of [isFontSupported](http://mudcu.be/journal/2010/10/font-detection-in-html5/) (font detection in &lt;canvas&gt;). As with isFontSupported, the code behind Unicode Profiling Project is released under CC0, free to use this code in creative ways in your own projects 😊
 
 **Running the test:**
 
@@ -51,7 +51,7 @@ The project fully supports Chrome, Firefox, Safari, and Opera.  Some false posi
 - **Firefox 3.6** 49,428 visible glyphs _NOTE:  Each undefined symbol has a unique hash unless text size is <=11_
 - **Google Chrome 7.0** 49,493 visible glyphs
 - **Chromium 8.0** 49,492 visible glyphs
-- **Opera 10.6** 47,672 visible glyphs _NOTE:  Supports different fonts in <canvas> than regular DOM_
+- **Opera 10.6** 47,672 visible glyphs _NOTE:  Supports different fonts in &lt;canvas&gt; than regular DOM_
 
 **Results on my Windows:**
 

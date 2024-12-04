@@ -9,7 +9,7 @@ tags:
   - "html5"
 ---
 
-Color Sphere was one of my 1st HTML5 projects, way back in 2007. Well, the years passed, browsers sped up, my hair grew longer, and nothing changed on Color Sphere… but the time has come! The latest rendition is bigger (easier to see), more accurate (pixel perfect), and looks really cool when you switch it to Websafe mode and move the Saturation slider around ?
+Color Sphere was one of my 1st HTML5 projects, way back in 2007. Well, the years passed, browsers sped up, my hair grew longer, and nothing changed on Color Sphere… but the time has come! The latest rendition is bigger (easier to see), more accurate (pixel perfect), and looks really cool when you switch it to Websafe mode and move the Saturation slider around.
 
 The colors in Color Sphere are mapped to HSL. The luminance is the radius from the center, the hue is the angle, and the saturation controls the z-index; that is to say, the zoom into the HSL color space. Technically, it’s more of a color cylinder.
 

@@ -27,7 +27,7 @@ The following highlight some of the options to get around Cross Domain issues wi
 
 3. Flash (crossdomain.xml)
 
-- The website must have a crossdomain.xml in their root directory, and the browser must have Flash installed. When that is all in place, you can use the ExternalInterface to copy the base64 from Flash into a Image tags src, and subsequently onto <canvas>.
+- The website must have a crossdomain.xml in their root directory, and the browser must have Flash installed. When that is all in place, you can use the ExternalInterface to copy the base64 from Flash into a Image tags src, and subsequently onto &lt;canvas&gt;.
 
 5. UniversalXPConnect (Firefox)
 

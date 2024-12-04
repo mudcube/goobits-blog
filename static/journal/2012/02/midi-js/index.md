@@ -19,6 +19,4 @@ The Jack the Tunafish artwork was graciously provided by Boni Deal; [http://bo
 
 View a live demo of the github project; [http://mudcu.be/midi-js/](http://mudcu.be/midi-js/)
 
-Please report issues and bugs on Github or here, many thanks ?
-
-HACKED BY SudoX -- HACK A NICE DAY.
+Please report issues and bugs on Github or here, many thanks!

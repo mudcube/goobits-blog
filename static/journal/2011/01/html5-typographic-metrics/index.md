@@ -9,13 +9,13 @@ tags:
   - "typography"
 ---
 
-Typography support between browsers has a history of being spotty.  One of the major hurdles in creating the (yet-to-be-released) next-incarnation of Sketchpad was typographic support; between browsers and even within the <canvas> specs.  One pitfall of the <canvas> tag is the lack of text-metrics support (past calculating the width via ctx.measureText).  This prevents us from emulating how text works in DOM for other elements such as <div> or even <textarea>—fortunately, these metrics can be measured through simple css-hacks.The solutions to the following are provided:
+Typography support between browsers has a history of being spotty.  One of the major hurdles in creating the (yet-to-be-released) next-incarnation of Sketchpad was typographic support; between browsers and even within the &lt;canvas&gt; specs.  One pitfall of the &lt;canvas&gt; tag is the lack of text-metrics support (past calculating the width via ctx.measureText).  This prevents us from emulating how text works in DOM for other elements such as <div> or even <textarea>—fortunately, these metrics can be measured through simple css-hacks.The solutions to the following are provided:
 
 - ctx.textBaseline=”alphabetic”; // alphabetic, top, bottom, middle
 - ctx. textAlign=”left”; // left, right, middle, start, end
 - measureText(‘hello’).width // px width of typeface
 
-The solution for finding these metrics is compatible with browsers as far back as 2004 (such as Firefox 1.0), before <canvas> was introduced.  Out of 64 browsers tested on BrowserShots and the 30 tested on CrossBrowserShots, four browsers failed to generate proper metrics for Arial with these CSS solutions.  There was an error margin of +/- 2px, which may accounted for in the differences between anti-aliasing in <canvas> vs. rendering in <div>/<span>/<ect>.
+The solution for finding these metrics is compatible with browsers as far back as 2004 (such as Firefox 1.0), before &lt;canvas&gt; was introduced.  Out of 64 browsers tested on BrowserShots and the 30 tested on CrossBrowserShots, four browsers failed to generate proper metrics for Arial with these CSS solutions.  There was an error margin of +/- 2px, which may accounted for in the differences between anti-aliasing in &lt;canvas&gt; vs. rendering in <div>/<span>/<ect>.
 
 ## Table of contents
 
@@ -23,7 +23,7 @@ The solution for finding these metrics is compatible with browsers as far back a
     - [Calculating the bounding-box of unicode](#bboxUnicode)
 - **[ctx.textBaseline](#baseline)**
     - [Mimicking the way text is supported in other DOM elements](#baselineMimic)
-    - [Finding “Ascent”, “Descent” and “x-height” in <canvas>](#baselineCanvas)
+    - [Finding “Ascent”, “Descent” and “x-height” in &lt;canvas&gt;](#baselineCanvas)
     - [Finding “Ascent”, “Descent” and “x-height” in CSS](#baselineCSS)
     - [Compensating for “overhanging” and “clipping”](#clipping)
     - [Native support between browsers](#baselineNative)
@@ -41,7 +41,7 @@ The solution for finding these metrics is compatible with browsers as far back a
 
 **Calculating the bounding-box of unicode**
 
-I’ve used a simple brute-force formula to calculate the bounding-box of unicode characters for the following text experiments called “getTextMetrics”.  Once you know the text metrics, you can do most anything ?
+I’ve used a simple brute-force formula to calculate the bounding-box of unicode characters for the following text experiments called “getTextMetrics”.  Once you know the text metrics, you can do most anything.
 
 It’s been very useful to me for many purposes:  Unicode Profiling Project, Font-Family Profiling Project, calculating the “Ascent, Descent, and x-height”, and finding the bounding-box of unicode glyphs to create stamps, amongst other things.
 
@@ -160,7 +160,7 @@ getFontMetrics = function(props) {
 
 **Mimicking the way text is supported in other DOM elements**
 
-By default <canvas> text is aligned to the “alphabetic” baseline.  When drawing to a canvas, using the default baseline, and a y-position of 0, only the descenders can be seen:
+By default &lt;canvas&gt; text is aligned to the “alphabetic” baseline.  When drawing to a canvas, using the default baseline, and a y-position of 0, only the descenders can be seen:
 
 ```
 ctx.fillText(“Hello world!”, 0, 0);
@@ -179,13 +179,13 @@ Opera, Safari and Chrome work identically with “top”, “bottom”, “middl
 
 This illustrates our problem… lets find a solution!
 
-**<canvas> -> “Ascent”, “Descent” and “x-height”**
+**&lt;canvas&gt; -> “Ascent”, “Descent” and “x-height”**
 
-According the Apache FOP, the “top” baseline is equal to the “ascent”, the “bottom” basline is equal to the “descent”, and the “middle” baseline is half of the “x-height”.  Given this information, it’s possible to measure these values in <canvas> when ctx.getImageData() and ctx.textBaseline are supported.
+According the Apache FOP, the “top” baseline is equal to the “ascent”, the “bottom” basline is equal to the “descent”, and the “middle” baseline is half of the “x-height”.  Given this information, it’s possible to measure these values in &lt;canvas&gt; when ctx.getImageData() and ctx.textBaseline are supported.
 
 To measure these baselines, the following code was used:
 
-_See [<canvas> baseline demo](http://mudcu.be/labs/Typography/googleFontsAPI.html) in action._
+_See [&lt;canvas&gt; baseline demo](http://mudcu.be/labs/Typography/googleFontsAPI.html) in action._
 
 ```
 // finding portion that protrudes past bottom of alphabetic baseline
@@ -225,13 +225,13 @@ var MiddleBaseline = getFontMetrics({
 
 ```
 
-Unfortunately, the only reliable baseline identically supported between all browsers in <canvas> is “alphabetic”, and there is no way to measure the “ascent” and “descent” when the only working baseline is “alphabetic”.  The reason is the invisible “buffer-spacing” above and below the descenders changes the expected output, and there is no way to measure “invisible” space.
+Unfortunately, the only reliable baseline identically supported between all browsers in &lt;canvas&gt; is “alphabetic”, and there is no way to measure the “ascent” and “descent” when the only working baseline is “alphabetic”.  The reason is the invisible “buffer-spacing” above and below the descenders changes the expected output, and there is no way to measure “invisible” space.
 
 _To recap:_ at this point, we still don’t have the ability to measure the “ascent”, “descent” and “x-height” when textBaseline isn’t supporting “top” or “bottom”… but, we do now know what values we’re searching for.  Next, let’s look into getting the values from CSS.
 
 **CSS -> “Ascent”, “Descent” and “x-height”**
 
-After searching for a solution for hours in <canvas> under the crazy pursuit of measuring something invisible, I came home and found a simple solution in CSS. By using an <img> (or any inline-block element) and the vertical-align property inside of a container element (such as a <div>), the values <canvas> provides for ctx.textBaseline can be matched with an error margin of +/- 2px—many fonts are matched exactly.  Likely, these discrepancies are due to anti-aliasing in <canvas> vs. DOM.
+After searching for a solution for hours in &lt;canvas&gt; under the crazy pursuit of measuring something invisible, I came home and found a simple solution in CSS. By using an <img> (or any inline-block element) and the vertical-align property inside of a container element (such as a <div>), the values &lt;canvas&gt; provides for ctx.textBaseline can be matched with an error margin of +/- 2px—many fonts are matched exactly.  Likely, these discrepancies are due to anti-aliasing in &lt;canvas&gt; vs. DOM.
 
 1. The “top” baseline is equal to the image.offsetTop since an <img> element is automatically aligned to the baseline of a font.
 2. The “bottom” baseline can be found by subtracting the height of the text (see the measureText section) from the “top” baseline.
@@ -276,10 +276,10 @@ Some font-faces protrude past the outside of their em-box, clipping their x or y
 
 To fix the clipping on the top portion of the text:
 
-1. Measure the entire height of the font in <canvas> using a lot of padding to make sure the entire text-string is visible.
-2. Resize the <canvas> to the height of the em-box, and align the baseline of your text to “top”.  Measure the entire height again.
+1. Measure the entire height of the font in &lt;canvas&gt; using a lot of padding to make sure the entire text-string is visible.
+2. Resize the &lt;canvas&gt; to the height of the em-box, and align the baseline of your text to “top”.  Measure the entire height again.
 3. Subject the first value from the second, this difference is the amount the text protrudes past the top of the em-box.
-4. Using this value, the top portion of the font-face that was clipped can become visible.  This can be applied to <div>’s using padding-top, or to <canvas>’s by adjusting the y-offset of a text drawing command such as ctx.fillText() and adding the same value to the height of the <canvas> (assuming we want a perfect bounding-box).
+4. Using this value, the top portion of the font-face that was clipped can become visible.  This can be applied to <div>’s using padding-top, or to &lt;canvas&gt;’s by adjusting the y-offset of a text drawing command such as ctx.fillText() and adding the same value to the height of the &lt;canvas&gt; (assuming we want a perfect bounding-box).
 
 Here’s an example of finding the clipping on left and top:
 
@@ -308,7 +308,7 @@ if (topClipping < 0) { // is padding, not clipping
 
 **Native support between browsers**
 
-On a side-note, it looks like at this time no browser supports the HTML5 standards “ideographic” or “hanging”.  Opera/Safari/Chrome default to “top” and “bottom” respectively, whereas Firefox defaults to “alphabetic” in when these options are chosen.  It looks impossible to fix “ideographic” and “hanging” without these values being provided via an external means (i.e. Python)—please prove me wrong ?
+On a side-note, it looks like at this time no browser supports the HTML5 standards “ideographic” or “hanging”.  Opera/Safari/Chrome default to “top” and “bottom” respectively, whereas Firefox defaults to “alphabetic” in when these options are chosen.  It looks impossible to fix “ideographic” and “hanging” without these values being provided via an external means (i.e. Python)—please prove me wrong.
 
 ## **ctx.textAlign**
 
@@ -376,7 +376,7 @@ Measurements provided this CSS solution produces identical results as ctx.measur
 
 Opera, Safari, Chrome and Firefox work nearly identically across systems within a difference of +/- 1px. Older browsers such as Firefox 2.x, and Opera 9.x require a fallback in order for ctx.measureText() to work at all.
 
-## **Line-breaks in <canvas>**
+## **Line-breaks in &lt;canvas&gt;**
 
 **Finding the “em-height”**
 
@@ -388,7 +388,7 @@ Create a <span> element with the text you want to measure, with the font-propert
 
 Calculating word-wrapping entails looping through the text.split(“ “) into singular words, and measuring each word individually until the edge of the bounding-box is hit, at which point a break is inserted, and the process continues.   This works great for words that don’t extend past the bounding-box on their own.
 
-When the word is so large it extends past the bounding box, we need to add in “letter-wrapping”.  This is similar to hyphenation, but without the hyphen ? Calculating letter-wrapping entails looping through the text.length of the long word in question, until the edge of the bounding-box is hit, at which point a line-break is added.
+When the word is so large it extends past the bounding box, we need to add in “letter-wrapping”.  This is similar to hyphenation, but without the hyphen. Calculating letter-wrapping entails looping through the text.length of the long word in question, until the edge of the bounding-box is hit, at which point a line-break is added.
 
 _See [lineBreaks demo](http://mudcu.be/labs/Typography/metrics.html#lineBreak) in action._
 
@@ -444,5 +444,5 @@ function getLines(text, maxWidth) {
 
 Using the above methods, we can get text working when ctx.measureText, ctx.textAlign or ctx.textBaseline is malfunctioning.  In a future installment we’ll look into _embedded fonts_, including adding support of ctx.fillText and ctx.strokeText by parsing SVG fonts and drawing them using the vector primitives ctx.moveTo, ctx.lineTo, ctx.quadradicCurveTo and ctx.bezierCurveTo.
 
-_View [CSS text-metrics in <canvas>](http://mudcu.be/labs/Typography/metrics.html)._  
+_View [CSS text-metrics in &lt;canvas&gt;](http://mudcu.be/labs/Typography/metrics.html)._  
 _View [CSS text-measurements](http://mudcu.be/labs/Typography/cssTextMetrics.html)._

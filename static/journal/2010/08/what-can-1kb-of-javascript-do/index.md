@@ -34,7 +34,7 @@ window.onload=function(){Q=Math.random;C=Math.cos;S=Math.sin;H=0;w=window;d=docu
 
 ## [Spectrum DJ](http://mudcu.be/labs/JS1k/SpectrumDJ.html)
 
-Dynamically generated sphere controlled by mouse movements. I would love to see this made into a Audio Visualizer, there are a lot of cool effects that can be done very quickly with ColorMatrix’s. Here’s the same sphere in [Darkroom](http://mugtug.com/darkroom/) – allowing you to edit other attributes of the spectrum \[Tint, Temperature, Exposure, Contrast, ect\]. For instance, Exposure could be mapped to the bass beats. It might be cool ?
+Dynamically generated sphere controlled by mouse movements. I would love to see this made into a Audio Visualizer, there are a lot of cool effects that can be done very quickly with ColorMatrix’s. Here’s the same sphere in [Darkroom](http://mugtug.com/darkroom/) – allowing you to edit other attributes of the spectrum \[Tint, Temperature, Exposure, Contrast, ect\]. For instance, Exposure could be mapped to the bass beats. It might be cool.
 
 [![](images/SpectrumDJ.jpeg "SpectrumDJ")](http://mudcu.be/journal/wp-content/uploads/2010/08/SpectrumDJ.jpeg)The code for the Spectrum DJ, 928 bytes:
 

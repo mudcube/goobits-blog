@@ -14,4 +14,4 @@ BG allows you to create **fancy Web 3.0 backgrounds** without getting dirty with
 
 BG outputs valid **CSS3** code, and also supports older browsers **back to CSS1**.  Supporting CSS1 is accomplished through the fallback of using of an embedded JPEG. Designers targeting newer browsers will also be happy; BG supports **\-moz-linear-gradient** (for Firefox), **\-o-linear-gradient** (for Opera) and **\-webkit-gradient** (for Safari/Chrome) with multiple color-stops. Additionally, BG outputs **DXImageTransform** (Internet Explorer) code, as long as there are no more than two color-stops; IE can support multiple color-stops by using the fallback method (JPEG). Supporting browsers across the spectrum: **IE, Firefox, Safari, Chrome, and Opera**.
 
-Please enjoy, and if you find it useful, post the website you designed here! ?
+Please enjoy, and if you find it useful, post the website you designed here!

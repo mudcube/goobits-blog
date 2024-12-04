@@ -83,7 +83,7 @@ The benefits of dynamic music generation is substantial — saving bandwidth, op
     ```
     
 
-**Licensed to use in your projects ?**
+**Licensed to use in your projects**
 
 Released as [CC0](http://creativecommons.org/publicdomain/zero/1.0/) — this means you can use the MIDIPlugin in your project, and modify it to your hearts content without giving recognition, be that commercial or non-commercial.
 

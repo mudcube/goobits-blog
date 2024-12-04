@@ -25,5 +25,3 @@ The app also needed to run in Java (on Google’s AppEngine) so the server could
 From there, the bracelets are sent to Shapeways where they are printed with high-quality nylon plastic on 3D printers from EOS, a German printer manufacturer who provided P760 SLS 3D printers to support the initiative.
 
 The Bracelet challenge has a limited print run, so get them while you can! After that there will still be a lot of other fun challenges on the Made with Code website.
-
-Here’s a video from Shapeways:
