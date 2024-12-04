@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import adapter from '@sveltejs/adapter-node'
+import adapter from '@sveltejs/adapter-static'
 import { mdsvex } from 'mdsvex'
 
 const {

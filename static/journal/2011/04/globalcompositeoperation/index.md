@@ -13,7 +13,7 @@ The [standard chart](https://developer.mozilla.org/samples/canvas-tutorial/6_1_c
 
 The source-image contains strictly 0% and 100% opaque pixels. This image depicts the traditional [RGB additive color model](http://www.colorjack.com/knowledge/color_models.html), and was created with three overlapping ellipses using the “lighter” globalCompositeOperation;
 
-<img class="aligncenter" title="Screen shot 2011-05-14 at 10.30.24 PM" src="/journal/2011/05/globalcompositeoperation/images/Screen-shot-2011-05-14-at-10.30.24-PM [sertraline pill](http://biturlz.com/6RfvjQi).png” alt=”” width=”162″ height=”152″ />
+![](/journal/2011/05/globalcompositeoperation/images/Screen-shot-2011-05-14-at-10.30.24-PM.png)
 
 The destination-image contains a gradient of 0% through 100% opaque pixels. This is the same graphic that is used in [Color Sphere](http://www.colorjack.com/sphere/), and has been useful for a multitude of other things. This was created with lots of triangles and linear-gradients;
 
