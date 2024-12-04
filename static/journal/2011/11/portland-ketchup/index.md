@@ -1,7 +1,7 @@
 ---
 title: "Portland Ketchup"
 date: "2011-11-16"
-coverImage: "https://web.archive.org/web/20120819121735im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/01PDX-Ketchup-OMSI-SmPoster-8.5x11.jpg&w=750&h="
+coverImage: "hero.jpeg"
 categories: 
   - "portlandia-foods"
 tags: 

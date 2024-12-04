@@ -1,7 +1,7 @@
 ---
 title: "Print-ready graphics in Canvas"
 date: "2011-11-09"
-coverImage: "https://web.archive.org/web/20120819121750im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/2011-11-09_13-43-42_698.jpeg&w=750&h="
+coverImage: "hero.jpeg"
 categories: 
   - "diy"
 tags: 

@@ -1,7 +1,7 @@
 ---
 title: "Color Sphere"
 date: "2011-11-15"
-coverImage: "https://web.archive.org/web/20120819121729im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/Screen-Shot-2011-11-15-at-12.31.29-AM.png&w=750&h="
+coverImage: "hero.png"
 categories: 
   - "apps"
 tags: 

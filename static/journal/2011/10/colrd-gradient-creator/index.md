@@ -1,7 +1,7 @@
 ---
 title: "ColRD: Gradient Creator"
 date: "2011-10-22"
-coverImage: "https://web.archive.org/web/20120819121719im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/Screen-Shot-2011-10-22-at-3.532.png&w=750&h="
+coverImage: "hero.png"
 categories: 
   - "apps"
   - "colrd"

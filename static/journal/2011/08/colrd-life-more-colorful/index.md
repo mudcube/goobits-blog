@@ -1,7 +1,7 @@
 ---
 title: "ColRD: website"
 date: "2011-08-17"
-coverImage: "https://web.archive.org/web/20120819121704im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/Screen-Shot-2011-08-14-at-9.04.png&w=750&h="
+coverImage: "hero.png"
 categories: 
   - "colrd"
 tags: 

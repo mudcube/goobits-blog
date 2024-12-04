@@ -1,7 +1,7 @@
 ---
 title: "Color Piano 2.0"
 date: "2011-12-28"
-coverImage: "https://web.archive.org/web/20120807112752im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/12/piano1.png&w=750&h="
+coverImage: "hero.png"
 categories: 
   - "apps"
 tags: 

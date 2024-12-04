@@ -1,7 +1,7 @@
 ---
 title: "Music Box"
 date: "2011-08-08"
-coverImage: "https://web.archive.org/web/20120817145614im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/Screen-Shot-2011-08-08-at-3.42.png&w=750&h="
+coverImage: "hero.png"
 categories: 
   - "apps"
 tags: 

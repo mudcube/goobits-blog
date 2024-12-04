@@ -1,7 +1,7 @@
 ---
 title: "Background Generator"
 date: "2011-10-08"
-coverImage: "https://web.archive.org/web/20120819121709im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/5760613655_edb3d949e3_z.jpeg&w=750&h="
+coverImage: "hero.jpeg"
 categories: 
   - "apps"
 tags: 
