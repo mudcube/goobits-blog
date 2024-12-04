@@ -16,7 +16,7 @@ The MIDIPlugin requires that [Java](http://www.java.com/en/download/manual.jsp) 
 
 [![](images/Screen-shot-2010-08-24-at-11.52.22-PM.png "Screen shot 2010-08-24 at 11.52.22 PM")](http://mudcu.be/labs/Piano/)
 
-[Piano Theory](http://mudcu.be/labs/Piano/) was built utilizing the MIDIPlugin.  Although the MIDIPlugin works in Internet Explorer my piano webapp does not (at this time) — apologies to IE users.
+[Piano Theory](/piano/) was built utilizing the MIDIPlugin.  Although the MIDIPlugin works in Internet Explorer my piano webapp does not (at this time) — apologies to IE users.
 
 **My pitch for MIDI support becoming a W3C standard**
 
@@ -28,14 +28,14 @@ The benefits of dynamic music generation is substantial — saving bandwidth, op
 
 1. Include the MIDIPlugin in your projects to create a dynamic audio experience:
     
-    ```
+    ```js
     <applet archive="MIDIPlugin.jar" code="MIDIPlugin.class" height="1" id="MIDIPlugin" name="MIDIPlugin" width="1"><applet>
     
     ```
     
 2. Test to see whether the browser supports the MIDIPlugin (has Soundbank installed and supports Java) with the following function in window.onload:
     
-    ```
+    ```js
     MIDIPlugin = document.MIDIPlugin;
     setTimeout(function () { // run on next event loop (once MIDIPlugin is loaded)
         try { // activate MIDIPlugin
@@ -48,7 +48,7 @@ The benefits of dynamic music generation is substantial — saving bandwidth, op
     
 3. When MIDIPlugin is false the user is either missing the [MIDI Soundbank](http://java.sun.com/products/java-media/sound/soundbanks.html) or [Java](http://www.java.com/en/download/manual.jsp) — prompt the user to install the appropriate software.  If the MIDIPlugin isn’t set to false… well then, the fun starts ;)Functions available to you within the MIDIPlugin object:
     
-    ```
+    ```js
     MIDIPlugin {
         setChannel(int)
         setMono(boolean)
@@ -76,7 +76,7 @@ The benefits of dynamic music generation is substantial — saving bandwidth, op
     
 4. Remember to unload the plugin onbeforeunload, or your will have a loose connection hanging, which over time (multiple reloads) will result in the MIDI sound not working until you restart your browser:
     
-    ```
+    ```js
     window.onbeforeunload = function() {
         MIDIPlugin.closePlugin();
     };

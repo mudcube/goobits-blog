@@ -7,7 +7,7 @@
 
 ## Demos
 
-* [Color Piano](http://mudcu.be/piano) by Michael Deal @mudcube
+* [Color Piano](/piano/) by Michael Deal @mudcube
 * [3D Piano Player w/ Three.js](http://www.rgba.org/r3d/3d-piano-player/) by Borja Morales @reality3d
 * [Simon Says](http://labs.uxmonk.com/simon-says/) by Daniel Christopher @uxmonk
 * [Brite Lite](http://labs.uxmonk.com/brite-lite/) by Daniel Christopher @uxmonk

@@ -1,6 +1,7 @@
 ---
 title: "Sketch Mobile"
 date: "2012-07-18"
+coverImage: "https://web.archive.org/web/20150922202948im_/https://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-06-17-at-11.20.png&w=750&h="
 categories: 
   - "apps"
 tags: 
@@ -27,7 +28,7 @@ Icon Fonts allow you to create a package consisting of your own custom SVG illus
 
 The only Javascript required for this scalability is the “font-size” on the html/body—everything else uses em’s or %’s to scale from what that “font-size” was set to, looking like this;
 
-```
+```js
 var width = window.innerWidth / 1280;
 var height = window.innerHeight / 800;
 var ratio = Math.min(width, height) * 100 &gt;&gt; 0;
@@ -63,6 +64,30 @@ Even better than Adobe Shadow is the built in debugger for Chrome Mobile. It pro
 
 Read more about Sketch Mobile on the “Information” section @ [http://sketchpad.io/mobile/](http://sketchpad.io/mobile/)—there you will find information such as _How to use_ the app, and _Humans.txt_ for a full list of contributors.
 
-I apologize for the psychedelically colorful presets on the tools. Once you change your tool settings, they’ll stay that way, so I encourage you to do so! Here’s a few drawings created with Sketch Mobile;
+I apologize for the psychedelically colorful presets on the tools. Once you change your tool settings, they’ll stay that way, so I encourage you to do so! Here’s a few drawings created with Sketch Mobile:
 
-HACKED BY SudoX -- HACK A NICE DAY.
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-05-17-at-4.29.13-PM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-06-04-at-3.25.53-AM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-05-17-at-4.53.13-PM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-05-17-at-5.06.29-PM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-05-17-at-5.26.39-PM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-05-17-at-2.34.33-AM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-05-17-at-3.17.50-PM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-06-04-at-2.17.21-PM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-05-17-at-4.36.18-PM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-05-17-at-6.37.01-PM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/Screen-Shot-2012-05-27-at-9.46.21-PM.png)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13432591069084510.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13432613359586200.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13433262381333950.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13435083998159670.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13435292578417000.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13435619253607140.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13435623515008100.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13435636212863370.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13435796942320180.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13435803821856980.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13436762137798270.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13436786012744350.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13437098427555180.jpeg)
+![](http://mudcu.be/journal/wp-content/uploads/2012/07/13437487008577810.jpeg)

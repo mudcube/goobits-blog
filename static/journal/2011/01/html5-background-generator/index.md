@@ -8,7 +8,7 @@ tags:
   - "html5"
 ---
 
-**[Background Generator](http://mudcu.be/bg/)** (BG) provides the ability to edit the background of any website in real-time! To give you an idea, the backgrounds of the Journal, Photos, Projects, and Labs sections of Mudcu.be were created using BG.
+**[Background Generator](/bg/)** (BG) provides the ability to edit the background of any website in real-time! To give you an idea, the backgrounds of the Journal, Photos, Projects, and Labs sections of Mudcu.be were created using BG.
 
 BG allows you to create **fancy Web 3.0 backgrounds** without getting dirty with Photoshop, GIMP, ect. The project includes a collection of **textures** (wood, rust, paper, concrete and so-on) which are combined with custom **linear-gradients** and **colors** to create a **wide assortment of themes**.
 

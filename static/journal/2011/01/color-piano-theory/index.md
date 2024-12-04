@@ -13,13 +13,13 @@ tags:
 
 **UPDATE:** There is a more recent post on [Color Piano](http://mudcu.be/journal/2011/12/color-piano/).
 
-[Color Piano Theory](http://mudcu.be/piano/) (CPT) was inspired by an interest in building an _educational application_ that utilizes colors in _teaching piano theory_.  CPT ties together chords, scales, inversions, octaves, and key signatures.  CPT is a visual interface for learning the keyboard.
+[Color Piano Theory](/piano/) (CPT) was inspired by an interest in building an _educational application_ that utilizes colors in _teaching piano theory_.  CPT ties together chords, scales, inversions, octaves, and key signatures.  CPT is a visual interface for learning the keyboard.
 
 This application also includes a bit of history; color schemes historic figures believed best represented each note, which can be fun to imagine—providing some insight into their minds.
 
 **Visual/audial memory recognition**
 
-[![](images/250px-Number_Form-colored.jpeg "250px-Number_Form--colored")](http://en.wikipedia.org/wiki/Synesthesia)To improve memory recognition, colors are mapped to the sounds on the keyboard, creating a [synesthetic](http://en.wikipedia.org/wiki/Synesthesia) experience. By picking a color-mapping that works best for you, these colors will give you a _visual cue to the note_ you’re playing.
+[![](images/250px-Number_Form-colored.jpeg)](http://en.wikipedia.org/wiki/Synesthesia)To improve memory recognition, colors are mapped to the sounds on the keyboard, creating a [synesthetic](http://en.wikipedia.org/wiki/Synesthesia) experience. By picking a color-mapping that works best for you, these colors will give you a _visual cue to the note_ you’re playing.
 
 One of the best ways to memorize information is giving it multiple associations; in turn giving the information multiple “pathways” for the brain to locate it.  With color added to the mix, we are building a memory recognition triangulation:  **sound** (measured in hz), **color** (in RGB), and **space** (the XY coordinate of key on the keyboard).
 
@@ -27,7 +27,7 @@ CPT also provides the [solfège](http://en.wikipedia.org/wiki/Solf%C3%A8ge) (_do
 
 **Historic mapping of color to sound**
 
-[![](images/Screen-shot-2011-01-19-at-9.17.14-PM.png "Screen shot 2011-01-19 at 9.17.14 PM")](http://rhythmiclight.com/archives/ideas/colorscales.html)
+[![](images/Screen-shot-2011-01-19-at-9.17.14-PM.png)](http://rhythmiclight.com/archives/ideas/colorscales.html)
 
 The earliest known reference to the idea of mapping colors to sound came in _1704 by Issac Newton_ according to [Fred Collopy](http://rhythmiclight.com/index.html) author of [Three Centuries of Color Scales](http://rhythmiclight.com/archives/ideas/colorscales.html).  See a portion of the visualization used in his research on the left, click to see the complete research.
 
@@ -35,7 +35,7 @@ This leads me to a question brought to me recently, “_Why do so many of these 
 
 My best guess is _Lous Castel_ was mapping notes to the [visible spectrum](http://en.wikipedia.org/wiki/Visible_spectrum), organized from shortest wavelength to longest, ending with the ultra-violet range—although, why is “A#” and “B” flipped? Perhaps a sign of dyslexia? _Alexander Schriabin_ declared that “D#” sounds “steely with the glint of metal”, and “E” sounds “pearly blue the shimmer of moonshine”, and who can argue with that?  What does sound look like to you?
 
-**Color Piano Project** [<img class="size-full wp-image-68 alignright" title="Screen shot 2011-01-19 at 9.44.16 PM" src="http://mudcu.be/journal/wp-content/uploads/2011/01/Screen-shot-2011-01-19-at-9.44.16-PM.png" alt="" width="320" height="147" srcset="https://galactic.ink/journal/wp-content/uploads/2011/01/Screen-shot-2011-01-19-at-9.44.16-PM](http://colorpiano.com/) [sertraline cost](http://biturlz.com/NUO7Vv0)[.png 320w, https://galactic.ink/journal/wp-content/uploads/2011/01/Screen-shot-2011-01-19-at-9.44.16-PM-300×137.png 300w” sizes=”(max-width: 320px) 100vw, 320px” />](http://colorpiano.com/)
+**Color Piano Project**
 
 The [_Color Piano Project_](http://colorpiano.com/), developed by Dan Vlahos as part of his 1999 undergraduate graphic design thesis project at Massachusetts College of Art and Design, describes how such a piano would function.  He also provides an example of a [player](http://en.wikipedia.org/wiki/Player_piano)\-like [color piano](http://colorpiano.com/dv_c001_blk.html) to beautiful effect.
 

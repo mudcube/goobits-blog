@@ -259,9 +259,9 @@ Resources = {
 			'name': 'Carol'
 		},
 		'Fruity': {
-			'email': 'mud@visc.us',
-			'url': 'http://mudcu.be/',
-			'name': 'MUD'
+			'email': 'hello@miko.art',
+			'url': 'https://miko.art/',
+			'name': 'Miko'
 		}
 	}
 };

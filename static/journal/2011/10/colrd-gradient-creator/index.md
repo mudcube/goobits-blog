@@ -1,6 +1,7 @@
 ---
 title: "ColRD: Gradient Creator"
 date: "2011-10-22"
+coverImage: "https://web.archive.org/web/20120819121719im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/Screen-Shot-2011-10-22-at-3.532.png&w=750&h="
 categories: 
   - "apps"
   - "colrd"
@@ -25,7 +26,7 @@ Tonight, on [ColRD](http://colrd.com/), we released the latest rendition of [Pa
 
 Gradient editors haven’t changed much historically, the same dynamic is used throughout GIMP, Illustrator, Inkscape and Photoshop. For me, these interfaces are clunky, leading to repetitive stress of the wrists and fingers, which prompted me to think, “There must be a better way!”.  One of the most click-saving changes was combining the Color Picker and Gradient Creator as one unit—there are no popup windows or “Ok” buttons.
 
-Traditionally gradient editors allow users to place a point in space that radiates it’s color in both directions evenly. This is the way that computers think about gradients; color points in space, blended (in the case of &lt;canvas&gt;) linearly.
+Traditionally gradient editors allow users to place a point in space that radiates it’s color in both directions evenly. This is the way that computers think about gradients; color points in space, blended (in the case of `<canvas>`) linearly.
 
 **Description of the Gradient Creator;**
 

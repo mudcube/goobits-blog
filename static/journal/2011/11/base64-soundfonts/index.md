@@ -16,26 +16,24 @@ tags:
 
 - [JSMIDI](https://github.com/sergi/jsmidi) will allow you to generate MIDI files with the MidiWriter package;
 
-```
+```js
 	var key = 0x45; // the note A4
 	var noteEvents = [];
 	Array.prototype.push.apply(noteEvents, MidiEvent.createNote(key));
 	var track = new MidiTrack({ events: noteEvents});
 	var song  = MidiWriter({ tracks: [track] });
 	console.log(song.b64);
-
 ```
 
-- **Saving the MIDI files to disk;** [File Writer API](http://www.w3.org/TR/file-writer-api/) allows you to save those generated MIDI files to your hard-disk, or, alternatively (and a bit more simple in terms of programming), you could POST the base64 from an embedded <iframe> to .PHP, and write to the file-system;
+- **Saving the MIDI files to disk;** [File Writer API](http://www.w3.org/TR/file-writer-api/) allows you to save those generated MIDI files to your hard-disk, or, alternatively (and a bit more simple in terms of programming), you could POST the base64 from an embedded `<iframe>` to .PHP, and write to the file-system;
 
-```
+```js
 	var iframe = document.createElement("iframe");
 	iframe.src = "index.php?midi=" + (song.b64) + "&key=" + key;
 	document.body.appendChild(iframe);
-
 ```
 
-```
+```js
 if ($_REQUEST['midi']) {
 	$myFile = "./midi/".$_REQUEST['key'].".mid";
 	$fh = fopen($myFile, "w") or die("can't open file");
@@ -43,7 +41,6 @@ if ($_REQUEST['midi']) {
 	fclose($fh);
 	return;
 }
-
 ```
 
 - **Getting out of MIDI format;** At this point, we have a bunch of MIDI files. We need to eventually get these MIDI’s -> OGG format, by mapping it to a high-quality SoundFont;
@@ -59,7 +56,7 @@ if ($_REQUEST['midi']) {
 
 The following code will allow you to take those MIDI files we created with the JSMIDI package (step #1) and convert them from WAV to OGG to JS to JGZ in seconds! Presenting a solution for the batch conversions of multiple MIDI’s into base64 soundfonts;
 
-```
+```bash
 #!/bin/bash
 
 # gzip     - http://www.gzip.org/
@@ -81,7 +78,6 @@ find ./directory -name '*.mid' -print0 | while read -d $'\0' file
 		# gzipped version
 		gzip $file.js -c > $file.jgz
 	done
-
 ```
 
 Now you’re ready to create your own custom Soundfont =)

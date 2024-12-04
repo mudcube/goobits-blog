@@ -17,7 +17,7 @@ The source-image contains strictly 0% and 100% opaque pixels. This image depicts
 
 The destination-image contains a gradient of 0% through 100% opaque pixels. This is the same graphic that is used in [Color Sphere](http://www.colorjack.com/sphere/), and has been useful for a multitude of other things. This was created with lots of triangles and linear-gradients;
 
-![](images/Screen-shot-2011-05-14-at-10.29.37-PM.png "Screen shot 2011-05-14 at 10.29.37 PM")
+![](images/Screen-shot-2011-05-14-at-10.29.37-PM.png)
 
 **NOTES:**
 

@@ -1,6 +1,7 @@
 ---
 title: "ColRD: Image DNA"
 date: "2011-11-22"
+coverImage: "https://web.archive.org/web/20120702202140im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/2.png&w=750&h="
 categories: 
   - "apps"
   - "colrd"

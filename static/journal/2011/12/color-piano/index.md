@@ -1,6 +1,7 @@
 ---
 title: "Color Piano 2.0"
 date: "2011-12-28"
+coverImage: "https://web.archive.org/web/20120807112752im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/12/piano1.png&w=750&h="
 categories: 
   - "apps"
 tags: 
@@ -14,7 +15,7 @@ Learn how to play piano songs by watching notes fall towards the keyboard as co
 Color Piano is free to use, please share!
 
 - To download a copy visit the [Chrome Webstore](https://chrome.google.com/webstore/detail/ihmigmmflfcbhdpdgbkkeojchjhhphnh)
-- View on the web @ [http://mudcu.be/piano/](http://mudcu.be/piano/)
+- View on the web @ [/piano/](/piano/)
 
 _Getting your feet wet with Color Piano (features);_
 

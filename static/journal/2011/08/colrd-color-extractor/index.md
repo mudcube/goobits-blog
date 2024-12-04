@@ -1,6 +1,7 @@
 ---
 title: "ColRD: Color Extractor"
 date: "2011-08-01"
+coverImage: "https://web.archive.org/web/20120819121659im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/Screen-Shot-2011-07-31-at-11.57.png&w=750&h="
 categories: 
   - "apps"
   - "colrd"

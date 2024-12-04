@@ -1,6 +1,7 @@
 ---
 title: "MIDI.js"
 date: "2012-02-16"
+coverImage: "https://web.archive.org/web/20120904011401im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2012/01/Screen-Shot-2012-01-08-at-3.33.55-PM.png&w=750&h="
 categories: 
   - "open-source"
 tags: 
@@ -17,6 +18,6 @@ tags:
 
 The Jack the Tunafish artwork was graciously provided by Boni Deal; [http://bonideal.com/](http://bonideal.com/)
 
-View a live demo of the github project; [http://mudcu.be/midi-js/](http://mudcu.be/midi-js/)
+View a live demo of the github project; [/midi-js/](/midi-js/)
 
 Please report issues and bugs on Github or here, many thanks!

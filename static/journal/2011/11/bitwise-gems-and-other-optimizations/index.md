@@ -12,7 +12,7 @@ tags:
 
 **What’s the wisdom in using bit_wise_?**
 
-Bitwise operations can be moderately faster than conventional methods. When processing a lot of data, even a 5% increase in speed can become noticeable. A good example of where you would want to use bitwise operations is in the pixel-manipulation of a _&lt;canvas&gt; element_, especially when dealing with larger dimensions. When you add up all speed improvements here, and then multiply that by each user that uses your application around the world, we could be talking about _years of time saved!_ (in the collective sense).
+Bitwise operations can be moderately faster than conventional methods. When processing a lot of data, even a 5% increase in speed can become noticeable. A good example of where you would want to use bitwise operations is in the pixel-manipulation of a _`<canvas>` element_, especially when dealing with larger dimensions. When you add up all speed improvements here, and then multiply that by each user that uses your application around the world, we could be talking about _years of time saved!_ (in the collective sense).
 
 Standard operation on the (left) === (right) is bitwise or an alternative method such as replacing Math.max(a, b) with (a > b ? a : b). All speed results are measured in Javascript using _Google Chrome 15_. Without further ado;
 

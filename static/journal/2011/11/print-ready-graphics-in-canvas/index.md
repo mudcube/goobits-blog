@@ -1,6 +1,7 @@
 ---
 title: "Print-ready graphics in Canvas"
 date: "2011-11-09"
+coverImage: "https://web.archive.org/web/20120819121750im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/2011-11-09_13-43-42_698.jpeg&w=750&h="
 categories: 
   - "diy"
 tags: 
@@ -8,9 +9,9 @@ tags:
   - "html5"
 ---
 
-Last month, I posted about the possibility of creating high-resolution and print-ready graphics in &lt;canvas&gt;. Since then, it’s been in the back of my mind, but happened to be at Kinko’s today, and decided to take this experiment to the next level…
+Last month, I posted about the possibility of creating high-resolution and print-ready graphics in `<canvas>`. Since then, it’s been in the back of my mind, but happened to be at Kinko’s today, and decided to take this experiment to the next level…
 
-The following flash-cards were designed in Illustrator \[by [Altered Focus](http://alteredfoc.us/)\], exported into SVG, then parsed into &lt;canvas&gt;… and finally, that one template card (in the picture below it’s the “C” major card on the left) was used to create a large variety of combinations—based on a set of music-theory instructions. Such as;
+The following flash-cards were designed in Illustrator \[by [Altered Focus](http://alteredfoc.us/)\], exported into SVG, then parsed into `<canvas>`… and finally, that one template card (in the picture below it’s the “C” major card on the left) was used to create a large variety of combinations—based on a set of music-theory instructions. Such as;
 
 ```js
 Chord = { // definition for an A chord
@@ -29,8 +30,8 @@ There are a few bugs in my music-theory code (please excuse the improper fingeri
 
 Next step; find a good printer, and then get these cards into the local-guitar shops around Portland.
 
-Oh, and, was thinking… Jacob Seidelin’s [Canvas2Image](http://www.nihilogic.dk/labs/canvas2image/) could be modified to specify the resolution the toDataURL export from &lt;canvas&gt;, exporting into 300DPI, instead of a scaled up 72DPI.
+Oh, and, was thinking… Jacob Seidelin’s [Canvas2Image](http://www.nihilogic.dk/labs/canvas2image/) could be modified to specify the resolution the toDataURL export from `<canvas>`, exporting into 300DPI, instead of a scaled up 72DPI.
 
-**Alternative route to convert from Illustrator to &lt;canvas&gt;**
+**Alternative route to convert from Illustrator to `<canvas>`**
 
-Although it’s not as versatile as a full-blown SVG-parser (as it’s a bit harder to modify the contents) you can get from Illustrator to &lt;canvas&gt; in a much quicker/easier way; [AI-Canvas](http://visitmix.com/work/ai2canvas/) allows you to export from Adobe Illustrator directly into &lt;canvas&gt; paths, and even animations.
+Although it’s not as versatile as a full-blown SVG-parser (as it’s a bit harder to modify the contents) you can get from Illustrator to `<canvas>` in a much quicker/easier way; [AI-Canvas](http://visitmix.com/work/ai2canvas/) allows you to export from Adobe Illustrator directly into `<canvas>` paths, and even animations.

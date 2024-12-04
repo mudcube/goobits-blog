@@ -1,6 +1,7 @@
 ---
 title: "Color Accessibility in the Browser"
 date: "2011-10-20"
+coverImage: "https://web.archive.org/web/20120819121714im_/http://mudcu.be/journal/wp-content/themes/grido/themify/img.php?src=http://mudcu.be/journal/wp-content/uploads/2011/11/Screen-Shot-2011-10-21-at-3.07.png&w=750&h="
 categories: 
   - "apps"
 tags: 
@@ -27,7 +28,7 @@ The following highlight some of the options to get around Cross Domain issues wi
 
 3. Flash (crossdomain.xml)
 
-- The website must have a crossdomain.xml in their root directory, and the browser must have Flash installed. When that is all in place, you can use the ExternalInterface to copy the base64 from Flash into a Image tags src, and subsequently onto &lt;canvas&gt;.
+- The website must have a crossdomain.xml in their root directory, and the browser must have Flash installed. When that is all in place, you can use the ExternalInterface to copy the base64 from Flash into a Image tags src, and subsequently onto `<canvas>`.
 
 5. UniversalXPConnect (Firefox)
 

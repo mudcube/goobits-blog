@@ -255,7 +255,7 @@ Resource = {
         },
         "Fruity": {
             "email": "mud@visc.us",
-            "url": "http://mudcu.be/",
+            "url": "/",
             "name": "MUD"
         }
     }
