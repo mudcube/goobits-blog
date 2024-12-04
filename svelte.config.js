@@ -27,7 +27,8 @@ export default {
 			'@routes': './src/routes',
 			'@src': './src',
 			'@static': './static'
-		}
+		},
+		trailingSlash: 'never'
 	},
 	extensions: [ '.svelte', '.md' ],
 	preprocess: [
