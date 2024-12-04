@@ -26,27 +26,9 @@ browsers failed to generate proper metrics for Arial with these CSS solutions. T
 which may accounted for in the differences between anti-aliasing in `<canvas>` vs. rendering in `<div>`/`<span>`/
 `<ect>`.
 
-## Table of contents
+## TOC:2
 
-- **[Bounding-box](#bbox)**
-    - [Calculating the bounding-box of unicode](#bboxUnicode)
-- **[ctx.textBaseline](#baseline)**
-    - [Mimicking the way text is supported in other DOM elements](#baselineMimic)
-    - [Finding “Ascent”, “Descent” and “x-height” in `<canvas>`](#baselineCanvas)
-    - [Finding “Ascent”, “Descent” and “x-height” in CSS](#baselineCSS)
-    - [Compensating for “overhanging” and “clipping”](#clipping)
-    - [Native support between browsers](#baselineNative)
-- **[ctx.textAlign](#align)**
-    - [Fixing older browsers](#alignFix)
-    - [Native support between browsers](#alignNative)
-- **[ctx.measureText](#measure)**
-    - [Fixing older browsers](#measureFix)
-    - [Native support between browsers](#measureNative)
-- **[Line-breaks](#breaks)**
-    - [Finding the “em-height”](#breaksEm)
-    - [Calculating line & letter breaks](#lineBreaks)
-
-## **Bounding boxes**
+## Bounding boxes
 
 **Calculating the bounding-box of unicode**
 
@@ -172,7 +154,7 @@ _See [getBitmapBounds demo](/labs/Typography/getBitmapBounds.html) in action._
 
 ```
 
-## **ctx.textBaseline**
+## ctx.textBaseline
 
 **Mimicking the way text is supported in other DOM elements**
 
@@ -275,7 +257,7 @@ an error margin of +/- 2px—many fonts are matched exactly. Likely, these discr
    a height of 0. In order to get the proper values the whole experiment must be offset vertically (so the text isn’t
    hidden off-screen).
 
-_See [CSS text-metrics demo](/labs/Typography/cssTextMetrics.html) in action._  
+_See [CSS text-metrics demo](/labs/Typography/CSSTextMetrics.html) in action._  
 _See [text baseline demo](/labs/Typography/metrics.html#textBaseline) in action._
 
 ```js
@@ -356,7 +338,7 @@ Opera/Safari/Chrome default to “top” and “bottom” respectively, whereas 
 options are chosen. It looks impossible to fix “ideographic” and “hanging” without these values being provided via an
 external means (i.e. Python)—please prove me wrong.
 
-## **ctx.textAlign**
+## ctx.textAlign
 
 **Fixing older browsers**
 
@@ -403,7 +385,7 @@ Opera, Safari, Chrome and Firefox work identically with “left”, “start”,
 branches. Older browsers such as Firefox 2.x, and Opera 9.x require a fallback in order for ctx.textAlign to work
 properly, such as this CSS solution.
 
-## **ctx.measureText**
+## ctx.measureText
 
 **Fixing older browsers**
 
@@ -438,7 +420,7 @@ example of a font-face that produces this deviance.
 Opera, Safari, Chrome and Firefox work nearly identically across systems within a difference of +/- 1px. Older browsers
 such as Firefox 2.x, and Opera 9.x require a fallback in order for ctx.measureText() to work at all.
 
-## **Line-breaks in `<canvas>`**
+## Line-breaks in `<canvas>`
 
 **Finding the “em-height”**
 
@@ -513,7 +495,7 @@ function getLines(text, maxWidth) {
 };
 ```
 
-## **Conclusion**
+## Conclusion
 
 Using the above methods, we can get text working when ctx.measureText, ctx.textAlign or ctx.textBaseline is
 malfunctioning. In a future installment we’ll look into _embedded fonts_, including adding support of ctx.fillText and
@@ -521,4 +503,4 @@ ctx.strokeText by parsing SVG fonts and drawing them using the vector primitives
 ctx.quadradicCurveTo and ctx.bezierCurveTo.
 
 _View [CSS text-metrics in `<canvas>`](/labs/Typography/metrics.html)._  
-_View [CSS text-measurements](/labs/Typography/cssTextMetrics.html)._
+_View [CSS text-measurements](/labs/Typography/CSSTextMetrics.html)._

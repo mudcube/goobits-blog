@@ -18,6 +18,6 @@ MIDIBridge allows Javascript to connect to Java’s internal MIDI synthesizer. T
 
 [Matt West](http://matt.west.co.tt)’s MIDI file reader [jasmid](https://github.com/gasman/jasmid) was extremely useful to parse the MIDI files from the server on the client-side using Javascript.  I’ve tweaked the script slightly to allow for pausing, and resuming of songs.  The collection of royalty free classical piano pieces comes from [Disklavier World](http://www.kuhmann.com/Yamaha.htm).  Thank you to all, amazing contributions!
 
-Here’s the [WebGL Music Box](/labs/Music-Box/) that reads a selection of classical music such as Tchaikovsky’s Waltz of the Flowers from the Nutcracker. And then there is the [interactive](/labs/Music-Box/#interactive) version that you can control the notes with your mouse.
+Here’s the [WebGL Music Box](/labs/Music-Box/) that reads a selection of classical music such as Tchaikovsky’s Waltz of the Flowers from the Nutcracker. And then there is the [interactive](/labs/Music-Box/) version that you can control the notes with your mouse.
 
 This demo has been tested on Mac in Google Chrome, Safari, and Firefox.
