@@ -2,7 +2,7 @@
 title: "Orange Honey; Epilogue"
 date: "2011-07-16"
 coverImage: "hero.png"
-categories: 
+categories:
   - "code-art"
 tags: 
   - "canvas"
