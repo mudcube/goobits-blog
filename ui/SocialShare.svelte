@@ -17,8 +17,9 @@
 	import './SocialShare.scss'
 	import { createMessageGetter } from '@goobits/blog/utils'
 	import { defaultMessages } from '@goobits/blog/config'
+	import { createLogger } from '@goobits/blog/utils/logger.js'
 
-	// const logger = new Logger('SocialShare')
+	const logger = createLogger('SocialShare')
 
 	/**
 	 * @typedef {Object} Props
@@ -53,7 +54,7 @@
 					copySuccess = false
 				}, 2000)
 			} catch (err) {
-				console.error('Failed to copy URL: ', err)
+				logger.error('Failed to copy URL:', err)
 			}
 		}
 	}

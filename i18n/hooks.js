@@ -41,7 +41,10 @@ export async function handleBlogI18n(event, handler) {
 			try {
 				await handler(event)
 			} catch (error) {
-				console.error('Error in blog i18n handler:', error.message)
+				// Import logger inline to avoid circular dependencies
+				const { createLogger } = await import('../utils/logger.js')
+				const logger = createLogger('BlogI18n')
+				logger.error('Error in blog i18n handler:', error.message)
 				// Don't rethrow to avoid breaking the request flow
 			}
 		}

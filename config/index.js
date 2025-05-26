@@ -5,7 +5,10 @@
  */
 
 import { defaultBlogConfig, getDefaultBlogPostFiles } from './defaults.js'
+import { createLogger } from '../utils/logger.js'
 export { defaultMessages } from './defaultMessages.js'
+
+const logger = createLogger('Config')
 
 // Store for the current configuration
 let currentConfig = null
@@ -63,7 +66,7 @@ export function initBlogConfig(userConfig = {}, options = {}) {
  */
 export function getBlogConfig() {
 	if (!currentConfig) {
-		console.warn('@goobits/blog: Config not initialized, using defaults. Call initBlogConfig() at app startup.')
+		logger.warn('Config not initialized, using defaults. Call initBlogConfig() at app startup.')
 		currentConfig = { ...defaultBlogConfig }
 	}
 	return currentConfig
@@ -103,7 +106,7 @@ export const blogConfig = new Proxy({}, {
 		return config[prop]
 	},
 	set(target, prop, value) {
-		console.warn('@goobits/blog: Direct config modification is not recommended. Use initBlogConfig() instead.')
+		logger.warn('Direct config modification is not recommended. Use initBlogConfig() instead.')
 		const config = getBlogConfig()
 		config[prop] = value
 		return true

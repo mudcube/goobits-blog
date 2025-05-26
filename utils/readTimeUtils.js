@@ -1,7 +1,11 @@
 import { blogConfig } from '../config.js'
+import { createLogger } from './logger.js'
+
+const logger = createLogger('ReadTimeUtils')
+
 // Create simple implementations of these utility functions
 function handleError(moduleName, error) {
-	console.error(`[${ moduleName }] Error:`, error)
+	logger.error(`Error:`, error)
 	return error
 }
 

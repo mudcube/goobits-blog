@@ -4,6 +4,7 @@
 	import TagCategoryList from './TagCategoryList.svelte'
 	import { blogConfig, defaultMessages } from '@goobits/blog/config'
 	import { Calendar, Clock, Share2, ChevronLeft } from '@lucide/svelte'
+	import { createLogger } from '@goobits/blog/utils/logger.js'
 	import { onMount } from 'svelte'
 	import {
 		formatDate as utilFormatDate,
@@ -14,6 +15,8 @@
 		getSimilarPosts,
 		createMessageGetter
 	} from '@goobits/blog/utils'
+
+	const logger = createLogger('BlogPostPage')
 
 	let { data, messages = {}, locale = 'en' } = $props()
 	
@@ -28,7 +31,7 @@
 		try {
 			return data?.post?.metadata?.fm?.readTime || 5
 		} catch (error) {
-			console.error('Error accessing readTime:', error)
+			logger.error('Error accessing readTime:', error)
 			return 5
 		}
 	}
@@ -43,7 +46,7 @@
 			return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' })
 				.format(new Date(data?.post?.date || Date.now()))
 		} catch (error) {
-			console.error('Error formatting date with Intl:', error)
+			logger.error('Error formatting date with Intl:', error)
 			return utilFormatDate(data?.post?.date || new Date())
 		}
 	}
@@ -66,7 +69,7 @@
 		try {
 			return data?.post?.metadata?.fm?.category || ''
 		} catch (error) {
-			console.error('Error accessing category:', error)
+			logger.error('Error accessing category:', error)
 			return ''
 		}
 	}
@@ -109,7 +112,7 @@
 					copySuccess = false
 				}, 2000)
 			} catch (err) {
-				console.error('Failed to copy URL: ', err)
+				logger.error('Failed to copy URL:', err)
 			}
 		}
 	}
@@ -140,11 +143,11 @@
 						postContentComponent = module.default
 						contentLoaded = true
 					} else {
-						console.error('Module imported but no default export found for path:', contentPath)
+						logger.error('Module imported but no default export found for path:', contentPath)
 						loadingError = getMessage('loadingError', 'Error loading content')
 					}
 				} catch (error) {
-					console.error('Error importing post content from path:', contentPath, error)
+					logger.error('Error importing post content from path:', contentPath, error)
 					loadingError = getMessage('loadingError', 'Error loading content')
 				} finally {
 					isImporting = false
@@ -268,16 +271,13 @@
 
 			<div class="goo__article-content">
 				{#if isImporting}
-					{@const _ = console.debug('Content loading client-side')}
 					<div class="goo__loading-content">
 						<div class="goo__loading-spinner"></div>
 						<h2>{getMessage('loading', 'Loading...')}</h2>
 					</div>
 				{:else if loadingError}
-					{@const _ = console.debug('Content loading error:', loadingError)}
 					<p class="goo__error-message">{loadingError}</p>
 				{:else if postContentComponent}
-					{@const _ = console.debug('Rendering content component')}
 					{@const SvelteComponent = postContentComponent}
 					<article class="goo__content">
 						<SvelteComponent />

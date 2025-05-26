@@ -4,8 +4,11 @@
 	import Sidebar from './Sidebar.svelte'
 	import { blogConfig, defaultMessages } from '@goobits/blog/config'
 	import { createMessageGetter } from '@goobits/blog/utils'
+	import { createLogger } from '@goobits/blog/utils/logger.js'
 	import { onMount } from 'svelte'
 	import { slugify } from '@goobits/blog/utils'
+
+	const logger = createLogger('BlogListPage')
 
 	let { data, messages = {}, locale = 'en' } = $props()
 	
@@ -71,7 +74,7 @@
 				hasMorePosts = false
 			}
 		} catch (error) {
-			console.error('Error loading more posts:', error)
+			logger.error('Error loading more posts:', error)
 			hasMorePosts = false
 		} finally {
 			isLoading = false
@@ -113,7 +116,7 @@
 			if (loadingElement) {
 				observer.observe(loadingElement)
 			} else {
-				console.warn('Loading element not available to observe for infinite scroll.')
+				logger.warn('Loading element not available to observe for infinite scroll.')
 			}
 		}
 
