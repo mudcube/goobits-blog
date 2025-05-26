@@ -1,0 +1,1075 @@
+/**
+ * Shared styles for blog components and layouts
+ *
+ * NOTE: This file maintains both the original class names and the BEM-style class names
+ * to ensure backward compatibility during migration. All new components should use the goo__ namespace.
+ */
+
+// Theme color variables - these should be customizable
+:root {
+  // Primary blog color theme (defaults to amber colors)
+  --goo-color-50: var(--color-primary-lightest, #fffbeb);
+  --goo-color-100: var(--color-primary-lighter, #fef3c7);
+  --goo-color-200: var(--color-primary-light, #fde68a);
+  --goo-color-300: var(--color-primary-medium, #fcd34d);
+  --goo-color-500: var(--color-primary, #f59e0b);
+  --goo-color-600: var(--color-primary-dark, #d97706);
+  --goo-color-700: var(--color-primary-darker, #b45309);
+  --goo-color-800: var(--color-primary-darkest, #92400e);
+
+  // Legacy variable mapping for backward compatibility
+  --blog-color-50: var(--goo-color-50);
+  --blog-color-100: var(--goo-color-100);
+  --blog-color-200: var(--goo-color-200);
+  --blog-color-300: var(--goo-color-300);
+  --blog-color-500: var(--goo-color-500);
+  --blog-color-600: var(--goo-color-600);
+  --blog-color-700: var(--goo-color-700);
+  --blog-color-800: var(--goo-color-800);
+
+  --amber-50: var(--goo-color-50);
+  --amber-100: var(--goo-color-100);
+  --amber-200: var(--goo-color-200);
+  --amber-300: var(--goo-color-300);
+  --amber-500: var(--goo-color-500);
+  --amber-600: var(--goo-color-600);
+  --amber-700: var(--goo-color-700);
+  --amber-800: var(--goo-color-800);
+}
+
+// Post meta styling - ensure consistent margin
+.post-meta, .blog-card__meta, .goo__card-meta {
+  margin-bottom: 0 !important;
+}
+
+// Layout variables
+$blog-content-max-width: 900px;
+$main-content-width: 66.666667%;
+$sidebar-width: 33.333333%;
+
+// Container and layout styles
+.goo__container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  color: var(--gray-800);
+}
+
+.goo__layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem; /* Increased gap between main content and sidebar */
+}
+
+// Responsive behaviors
+@media (min-width: 768px) {
+  .goo__layout {
+    flex-direction: row;
+  }
+
+  .goo__main {
+    width: $main-content-width;
+  }
+
+  .goo__sidebar {
+    width: $sidebar-width !important; /* Added !important to ensure it overrides component styles */
+  }
+}
+
+@media (max-width: 767px) {
+  .goo__main, .goo__sidebar {
+    width: 100%;
+  }
+
+  // Set column order for mobile
+  .goo__main {
+    order: 1;
+  }
+
+  .goo__sidebar {
+    order: 2;
+  }
+}
+
+// Note: Breadcrumbs styling removed to prevent conflicts with the component's own styling
+
+// Header styling
+.goo__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0;
+
+  .goo__header-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--amber-500);
+  }
+
+  h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--amber-800);
+
+    @media (min-width: 768px) {
+      font-size: 2.25rem;
+    }
+  }
+}
+
+// Description text
+.goo__description {
+  color: var(--gray-600);
+  margin-bottom: 2rem;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+.goo__category-description {
+  color: var(--gray-600);
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+// Blog post content container
+.goo__post-content {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Remove width restriction for desktop to match blog page full width */
+@media (min-width: 768px) {
+  .goo__post-content {
+    width: 100%;
+  }
+}
+
+// Article content styling (replacing prose classes)
+.goo__article-content {
+  width: 100%;
+  max-width: none;
+  margin-bottom: 3rem; // Equivalent to mb-12
+  color: var(--gray-700);
+  font-size: 1.125rem; // Equivalent to prose-lg
+  line-height: 1.75;
+
+  // Article content elements
+  p {
+    margin-bottom: 1.5rem;
+    line-height: 1.75;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--gray-900);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  a {
+    color: var(--amber-700);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: var(--amber-800);
+    }
+  }
+
+  ul, ol {
+    margin-bottom: 1.5rem;
+    margin-left: 1.5rem;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--amber-300);
+    padding-left: 1rem;
+    font-style: italic;
+    color: var(--gray-600);
+    margin: 1.5rem 0;
+  }
+
+  pre {
+    background-color: var(--gray-100);
+    border-radius: 0.375rem;
+    padding: 1.25rem;
+    overflow-x: auto;
+  }
+
+  code {
+    background-color: var(--gray-100);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+  }
+}
+
+// Author avatar styling - using BEM naming
+.goo__author-avatar {
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
+  overflow: hidden;
+  border-radius: 9999px;
+  border: 1px solid var(--amber-200);
+  position: relative;
+
+  img {
+    width: 50px;
+    height: 50px;
+    max-width: none;
+    border-radius: 9999px;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+
+// Legacy class for backwards compatibility
+.author-avatar-wrapper {
+  @extend .goo__author-avatar;
+}
+
+// Empty state styling
+.goo__empty-state {
+  background-color: var(--amber-50);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .goo__empty-state-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .goo__empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+  }
+
+  .goo__empty-state-text {
+    color: var(--gray-600);
+    margin-bottom: 1.5rem;
+  }
+
+  .goo__empty-state-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--amber-600);
+    color: white;
+    font-weight: 500;
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: var(--amber-700);
+    }
+
+    .goo__empty-state-link-icon {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+}
+
+// Pagination styling
+.goo__pagination {
+  margin-top: 3rem;
+  display: flex;
+  justify-content: center;
+
+  .goo__pagination-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .goo__loading-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: white;
+    border: 1px solid var(--amber-200);
+    color: var(--amber-600);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+  }
+
+  .goo__spinner {
+    animation: spin 1s linear infinite;
+    height: 1.25rem;
+    width: 1.25rem;
+    color: var(--amber-600);
+
+    &-circle {
+      opacity: 0.25;
+    }
+
+    &-path {
+      opacity: 0.75;
+    }
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .goo__pagination-link {
+    background-color: white;
+    border: 1px solid var(--amber-200);
+    color: var(--amber-600);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: var(--amber-50);
+    }
+  }
+
+  .goo__pagination-link--active {
+    background-color: var(--amber-600);
+    color: white;
+    border: 1px solid var(--amber-600);
+
+    &:hover {
+      background-color: var(--amber-700);
+    }
+  }
+
+  .goo__pagination-link--prev,
+  .goo__pagination-link--next {
+    font-weight: 500;
+  }
+
+  .goo__end-message {
+    background-color: white;
+    border: 1px solid var(--amber-200);
+    color: var(--amber-600);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+  }
+}
+
+// Posts info
+.goo__posts-info {
+  text-align: center;
+  color: var(--gray-500);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
+
+// Utility classes used in blog posts (Tailwind-like)
+// Margins
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mb-12 { margin-bottom: 3rem; }
+.mb-16 { margin-bottom: 4rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+
+// Paddings
+.px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.p-4 { padding: 1rem; }
+
+// Width/height
+.w-4 { width: 1rem; }
+.h-4 { height: 1rem; }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.h-64 { height: 16rem; }
+
+// Flexbox
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: 0.5rem; }
+.gap-4 { gap: 1rem; }
+
+// Text
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+.text-3xl { font-size: 1.875rem; }
+.font-bold { font-weight: 700; }
+.text-gray-500 { color: var(--gray-500); }
+.text-gray-600 { color: var(--gray-600); }
+.text-gray-700 { color: var(--gray-700); }
+.text-gray-900 { color: var(--gray-900); }
+.text-white { color: white; }
+
+// Other
+.rounded-full { border-radius: 9999px; }
+.rounded-xl { border-radius: 0.75rem; }
+.bg-amber-500 { background-color: var(--amber-500); }
+.hover\:bg-amber-600:hover { background-color: var(--amber-600); }
+.transition { transition: all 0.3s ease; }
+.inline-block { display: inline-block; }
+.overflow-hidden { overflow: hidden; }
+.leading-tight { line-height: 1.25; }
+
+// Media queries
+@media (min-width: 768px) {
+  .md\:text-4xl { font-size: 2.25rem; }
+  .md\:h-96 { height: 24rem; }
+}
+
+@media (min-width: 1024px) {
+  .lg\:text-5xl { font-size: 3rem; }
+}
+
+// Duplicate definition removed since it's already defined above
+
+// Social sharing container
+.goo__social-share-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background-color: var(--amber-50);
+  border-radius: 0.75rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  flex-direction: row;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+.goo__social-share-text {
+  color: var(--gray-700);
+  flex: 1;
+}
+
+.goo__social-share-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  font-size: 1.125rem;
+}
+
+.goo__social-share-subtitle {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+}
+
+.goo__social-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+
+  @media (max-width: 480px) {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+.goo__share-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 9999px;
+  background-color: var(--amber-500);
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--amber-600);
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-width: 110px;
+  text-align: center;
+
+  &:hover {
+    background-color: var(--amber-600);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &.success {
+    background-color: var(--green-500);
+    border-color: var(--green-600);
+
+    &:hover {
+      background-color: var(--green-600);
+    }
+  }
+
+  // Lucide component styling
+  :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+  }
+
+  span {
+    white-space: nowrap;
+
+    @media (max-width: 640px) {
+      display: block;
+    }
+  }
+}
+
+// Share button in metadata
+.goo__share-metadata-btn {
+  appearance: none;
+  transition: all 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+  font: inherit;
+
+  &:hover {
+    color: var(--amber-600);
+  }
+}
+
+// Post meta item styles
+.goo__post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0;
+  color: var(--gray-500);
+  font-size: 0.875rem;
+}
+
+.goo__post-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.goo__post-meta-icon {
+  width: 1rem;
+  height: 1rem;
+  stroke: currentColor;
+}
+
+.goo__post-meta-share {
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+  font: inherit;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--amber-600);
+  }
+}
+
+// Post tags section
+.goo__post-tags {
+  margin-bottom: 3rem;
+}
+
+.goo__post-tags-heading {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  margin-bottom: 0.75rem;
+}
+
+// Post title and proper heading styles
+.goo__post-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 1rem 0;
+  line-height: 1.25;
+}
+
+@media (min-width: 768px) {
+  .goo__post-title {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .goo__post-title {
+    font-size: 3rem;
+  }
+}
+
+// Blog category image with proper margin
+.goo__category-image {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+// Featured image container styles
+.goo__featured-image {
+  width: 100%;
+  height: 16rem;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem 0;
+
+  img {
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  &--placeholder {
+    width: 100%;
+    height: 16rem;
+    margin-top: 1rem;
+    background-image: linear-gradient(to right, var(--amber-100), var(--amber-200));
+    border-radius: 0.75rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .goo__featured-image,
+  .goo__featured-image--placeholder {
+    height: 24rem;
+  }
+}
+
+// Featured image emoji style
+.goo__featured-emoji {
+  font-size: 3rem;
+}
+
+@media (min-width: 768px) {
+  .goo__featured-emoji {
+    font-size: 5rem;
+  }
+}
+
+// Author section
+.goo__author-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-top: 1px solid var(--amber-100);
+  border-bottom: 1px solid var(--amber-100);
+}
+
+.goo__author-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-900);
+}
+
+.goo__author-role {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+// Related posts section
+.goo__related-posts {
+  border-top: 1px solid var(--amber-100);
+  padding-top: 3rem;
+  margin-bottom: 4rem;
+}
+
+.goo__related-posts-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 2rem;
+}
+
+.goo__related-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.goo__related-post {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.goo__related-post:hover {
+  background-color: var(--amber-50);
+}
+
+@media (min-width: 768px) {
+  .goo__related-post {
+    flex-direction: row;
+  }
+}
+
+.goo__related-post-image-container {
+  width: 100%;
+  height: 10rem;
+  background-color: var(--amber-100);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+  flex-shrink: 0;
+}
+
+.goo__related-post:hover .goo__related-post-image-container {
+  opacity: 0.9;
+}
+
+@media (min-width: 768px) {
+  .goo__related-post-image-container {
+    width: 25%;
+  }
+}
+
+.goo__related-post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.goo__related-post-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goo__related-post-emoji {
+  font-size: 2.5rem;
+}
+
+.goo__related-post-content {
+  flex: 1;
+}
+
+.goo__related-post-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.goo__related-post:hover .goo__related-post-title {
+  color: var(--amber-700);
+}
+
+.goo__related-post-excerpt {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin-bottom: 0.75rem;
+}
+
+.goo__related-post-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--gray-500);
+  font-size: 0.75rem;
+}
+
+// Back to blog link
+.goo__back-link-container {
+  text-align: center;
+}
+
+.goo__back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--amber-600);
+  color: white;
+  font-weight: 500;
+  border-radius: 9999px;
+  transition: background-color 0.3s ease;
+}
+
+.goo__back-link:hover {
+  background-color: var(--amber-700);
+}
+
+.goo__back-link-icon {
+  width: 1rem;
+  height: 1rem;
+  stroke: currentColor;
+}
+
+// Error message styling
+.goo__error-message {
+  color: #DC2626; // red-600 equivalent
+  font-weight: 500;
+}
+
+// Note: Direct component styles are also defined in the respective component files
+// This acts as a fallback for global styling
+
+// Specific scoped selectors for known category elements
+:global(.blog-card__category.s-1fha09V63BUh),
+:global(.blog__primary-category.s-xrw6CAgb2VxL),
+:global(.goo__card-category.s-1fha09V63BUh),
+:global(.goo__primary-category.s-xrw6CAgb2VxL) {
+  background-color: var(--blog-category-active-bg) !important;
+  color: var(--blog-category-active-color) !important;
+  border: 1px solid var(--blog-category-active-border) !important;
+  font-weight: 500;
+}
+
+:global(.blog-card__category.s-1fha09V63BUh a),
+:global(.blog__primary-category.s-xrw6CAgb2VxL a),
+:global(.goo__card-category.s-1fha09V63BUh a),
+:global(.goo__primary-category.s-xrw6CAgb2VxL a) {
+  color: white !important;
+}
+
+// Shared tag/category styles
+:root {
+  // Base colors for tags
+  --goo-tag-bg: var(--gray-100, #f3f4f6);
+  --goo-tag-color: var(--gray-700, #4b5563);
+  --goo-tag-border: var(--gray-200, #e5e7eb);
+
+  // Hover colors for tags
+  --goo-tag-hover-bg: var(--goo-color-100, #fef3c7);
+  --goo-tag-hover-color: var(--goo-color-800, #92400e);
+  --goo-tag-hover-border: var(--goo-color-200, #fde68a);
+
+  // Active colors for tags
+  --goo-tag-active-bg: var(--goo-color-500, #f59e0b);
+  --goo-tag-active-color: white;
+  --goo-tag-active-border: var(--goo-color-600, #d97706);
+
+  // Base colors for categories
+  --goo-category-bg: rgba(16, 185, 129, 0.1);
+  --goo-category-color: rgb(6, 95, 70);
+  --goo-category-border: rgba(16, 185, 129, 0.2);
+
+  // Hover colors for categories
+  --goo-category-hover-bg: rgba(16, 185, 129, 0.2);
+  --goo-category-hover-color: rgb(6, 95, 70);
+  --goo-category-hover-border: rgba(16, 185, 129, 0.3);
+
+  // Active colors for categories
+  --goo-category-active-bg: var(--emerald-500, #10b981);
+  --goo-category-active-color: white;
+  --goo-category-active-border: var(--emerald-600, #059669);
+
+  // Shared properties
+  --goo-taxonomy-border-radius: 9999px;
+  --goo-taxonomy-transition: all 0.2s ease;
+  --goo-taxonomy-padding: 0.25rem 0.75rem;
+  --goo-taxonomy-font-size: 0.75rem;
+
+  // Legacy mappings for backward compatibility
+  --blog-tag-bg: var(--goo-tag-bg);
+  --blog-tag-color: var(--goo-tag-color);
+  --blog-tag-border: var(--goo-tag-border);
+  --blog-tag-hover-bg: var(--goo-tag-hover-bg);
+  --blog-tag-hover-color: var(--goo-tag-hover-color);
+  --blog-tag-hover-border: var(--goo-tag-hover-border);
+  --blog-tag-active-bg: var(--goo-tag-active-bg);
+  --blog-tag-active-color: var(--goo-tag-active-color);
+  --blog-tag-active-border: var(--goo-tag-active-border);
+  --blog-category-bg: var(--goo-category-bg);
+  --blog-category-color: var(--goo-category-color);
+  --blog-category-border: var(--goo-category-border);
+  --blog-category-hover-bg: var(--goo-category-hover-bg);
+  --blog-category-hover-color: var(--goo-category-hover-color);
+  --blog-category-hover-border: var(--goo-category-hover-border);
+  --blog-category-active-bg: var(--goo-category-active-bg);
+  --blog-category-active-color: var(--goo-category-active-color);
+  --blog-category-active-border: var(--goo-category-active-border);
+  --blog-taxonomy-border-radius: var(--goo-taxonomy-border-radius);
+  --blog-taxonomy-transition: var(--goo-taxonomy-transition);
+  --blog-taxonomy-padding: var(--goo-taxonomy-padding);
+  --blog-taxonomy-font-size: var(--goo-taxonomy-font-size);
+}
+
+// Base styles for tags and categories
+.goo__tags-item, .goo__card-tag, .goo__post-tag {
+  display: inline-block;
+  font-size: var(--goo-taxonomy-font-size);
+  padding: var(--goo-taxonomy-padding);
+  border-radius: var(--goo-taxonomy-border-radius);
+  transition: var(--goo-taxonomy-transition);
+  text-decoration: none;
+  background-color: var(--goo-tag-bg);
+  color: var(--goo-tag-color);
+  border: 1px solid var(--goo-tag-border);
+
+  &:hover {
+    background-color: var(--goo-tag-hover-bg);
+    color: var(--goo-tag-hover-color);
+    border-color: var(--goo-tag-hover-border);
+  }
+}
+
+.goo__categories-item, .goo__related-category {
+  display: inline-block;
+  font-size: var(--blog-taxonomy-font-size);
+  padding: var(--blog-taxonomy-padding);
+  border-radius: var(--blog-taxonomy-border-radius);
+  transition: var(--blog-taxonomy-transition);
+  text-decoration: none;
+  background-color: var(--blog-category-bg);
+  color: var(--blog-category-color);
+  border: 1px solid var(--blog-category-border);
+
+  &:hover {
+    background-color: var(--blog-category-hover-bg);
+    color: var(--blog-category-hover-color);
+    border-color: var(--blog-category-hover-border);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+// Special styling for the main categories that should always have a solid background
+.goo__card-category, .goo__primary-category,
+:global([class*='s-'] .goo__card-category),
+:global([class*='s-'] .goo__primary-category) {
+  // Inherit basic properties from normal categories
+  background-color: var(--blog-category-active-bg) !important;
+  color: var(--blog-category-active-color) !important;
+  border: 1px solid var(--blog-category-active-border) !important;
+  font-weight: 500;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  a {
+    color: white !important; /* Ensure links are always white for readability on solid background */
+  }
+}
+
+// Category image styling
+.goo__category-image {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1.5rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.goo__category-image-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: cover;
+}
+
+// Active states for tags and categories
+.goo__tags-item--state-active {
+  background-color: var(--blog-tag-active-bg) !important;
+  color: var(--blog-tag-active-color) !important;
+  border: 1px solid var(--blog-tag-active-border) !important;
+  font-weight: 500;
+}
+
+.goo__tags--variant-default .goo__tags-item--state-active {
+  background-color: var(--color-primary, #f59e0b) !important;
+  color: white !important;
+  border-color: var(--color-primary, #f59e0b) !important;
+}
+
+.goo__tags-item--state-active:hover {
+  background-color: var(--color-primary-dark, #d97706) !important;
+  color: white !important;
+  border-color: var(--color-primary-dark, #d97706) !important;
+  opacity: 0.9;
+}
+
+.goo__categories-item--state-active {
+  background-color: var(--blog-category-active-bg) !important;
+  color: var(--blog-category-active-color) !important;
+  border: 1px solid var(--blog-category-active-border) !important;
+  font-weight: 500;
+}
+
+.goo__categories--variant-default .goo__categories-item--active {
+  background-color: var(--color-secondary, #10b981) !important;
+  color: white !important;
+  border-color: var(--color-secondary, #10b981) !important;
+}
+
+.goo__categories-item--active:hover {
+  background-color: var(--color-secondary-dark, #059669) !important;
+  color: white !important;
+  border-color: var(--color-secondary-dark, #059669) !important;
+  opacity: 0.9;
+}

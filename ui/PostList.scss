@@ -1,0 +1,121 @@
+.goo {
+	&__post-list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-large, 2rem);
+
+		&-grid {
+			display: grid;
+			gap: var(--spacing-medium, 1rem);
+			grid-template-columns: 1fr;
+
+			&--cols-1 {
+				grid-template-columns: 1fr;
+			}
+
+			&--cols-2 {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			&--cols-3 {
+				grid-template-columns: repeat(3, 1fr);
+			}
+
+			&--cols-4 {
+				grid-template-columns: repeat(4, 1fr);
+			}
+		}
+
+		&-list {
+			display: flex;
+			flex-direction: column;
+			gap: var(--spacing-medium, 1.5rem);
+		}
+
+		&-featured-layout {
+			display: grid;
+			gap: var(--spacing-medium, 1.5rem);
+			grid-template-columns: 1fr;
+
+			@media (min-width: 768px) {
+				grid-template-columns: 2fr 1fr;
+			}
+		}
+
+		&-secondary-posts {
+			display: flex;
+			flex-direction: column;
+			gap: var(--spacing-small, 0.5rem);
+		}
+
+		&-pagination {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-top: var(--spacing-large, 2rem);
+			gap: var(--spacing-small, 0.5rem);
+
+			&-numbers {
+				display: flex;
+				gap: var(--spacing-small, 0.5rem);
+			}
+
+			button {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 2.5rem;
+				height: 2.5rem;
+				padding: 0 0.5rem;
+				border: 1px solid var(--color-border, #e5e7eb);
+				border-radius: var(--border-radius-small, 0.25rem);
+				background: var(--color-background, #ffffff);
+				color: var(--color-text, #374151);
+				font-size: 0.875rem;
+				cursor: pointer;
+				transition: all 0.2s ease;
+
+				&:hover:not(:disabled) {
+					background: var(--color-primary, #f59e0b);
+					color: var(--white, white);
+					border-color: var(--color-primary, #f59e0b);
+				}
+
+				&:disabled {
+					opacity: 0.5;
+					cursor: not-allowed;
+				}
+			}
+
+			.goo__post-list-pagination-prev,
+			.goo__post-list-pagination-next,
+			.goo__post-list-pagination-number {
+				border: 1px solid var(--color-border, #e5e7eb);
+			}
+
+			&-number--state-current {
+				background: var(--color-primary, #f59e0b);
+				color: var(--white, white);
+				border-color: var(--color-primary, #f59e0b);
+			}
+
+			&-ellipsis {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 2.5rem;
+				height: 2.5rem;
+			}
+		}
+
+		&-empty-state {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			padding: var(--spacing-large, 2rem);
+			background: var(--color-background-light, #f9fafb);
+			border-radius: var(--border-radius-medium, 0.5rem);
+			border: 1px solid var(--color-border, #e5e7eb);
+		}
+	}
+}

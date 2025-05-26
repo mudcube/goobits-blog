@@ -1,0 +1,66 @@
+{
+  "name": "@goobits/blog",
+  "version": "1.0.1",
+  "description": "Reusable blog components for Svelte 5 projects",
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./ui": "./ui/index.js",
+    "./utils": "./utils/index.js",
+    "./config": "./config/index.js",
+    "./config/defaults": "./config/defaults.js",
+    "./handlers": "./handlers/index.js",
+    "./i18n": "./i18n/hooks.js"
+  },
+  "sideEffects": [
+    "**/*.scss"
+  ],
+  "scripts": {
+    "test": "echo 'No tests configured'"
+  },
+  "files": [
+    "index.js",
+    "ui",
+    "utils",
+    "config",
+    "handlers",
+    "i18n",
+    "styles",
+    "templates",
+    "config.js",
+    "LICENSE.md",
+    "README.md",
+    "SETUP.md"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "peerDependencies": {
+    "@sveltejs/kit": "^2.0.0",
+    "svelte": "^5.0.0"
+  },
+  "keywords": [
+    "svelte",
+    "sveltekit",
+    "blog",
+    "markdown",
+    "cms",
+    "i18n",
+    "internationalization"
+  ],
+  "author": "GooBits",
+  "homepage": "https://github.com/goobits/blog#readme",
+  "bugs": {
+    "url": "https://github.com/goobits/blog/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goobits/blog.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
