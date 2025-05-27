@@ -5,7 +5,7 @@ const logger = createLogger('ReadTimeUtils')
 
 // Create simple implementations of these utility functions
 function handleError(moduleName, error) {
-	logger.error(`Error:`, error)
+	logger.error('Error:', error)
 	return error
 }
 
