@@ -78,24 +78,25 @@ export function createBlogSlugHandler(options = {}) {
 			const { slug } = params
 			const lang = getLanguage(locals)
 
-			// Router logic
-			const routeParts = slug ? slug.split('/') : []
+			// Router logic - normalize slug by removing trailing slashes
+			const normalizedSlug = slug ? slug.replace(/\/$/, '') : ''
+			const routeParts = normalizedSlug ? normalizedSlug.split('/') : []
 
-			if (!slug || slug === '') {
+			if (!normalizedSlug || normalizedSlug === '') {
 				return await loadBlogIndex(lang, config)
 			}
 
-			if (slug.startsWith('category/')) {
-				const categorySlug = slug.replace('category/', '').replace(/\/$/, '')
+			if (normalizedSlug.startsWith('category/')) {
+				const categorySlug = normalizedSlug.replace('category/', '')
 				return await loadCategory(categorySlug, lang, config)
 			}
 
-			if (slug.startsWith('tag/')) {
-				const tagSlug = slug.replace('tag/', '').replace(/\/$/, '')
+			if (normalizedSlug.startsWith('tag/')) {
+				const tagSlug = normalizedSlug.replace('tag/', '')
 				return await loadTag(tagSlug, lang, config)
 			}
 
-			if (slug.match(/^\d{4}\/\d{2}\/.+/)) {
+			if (normalizedSlug.match(/^\d{4}\/\d{2}\/.+/)) {
 				const [ year, month, postSlug ] = routeParts
 				return await loadPost(year, month, postSlug, lang, config)
 			}
