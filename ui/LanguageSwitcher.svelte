@@ -16,7 +16,7 @@
 	 * @component
 	 */
 	import './LanguageSwitcher.scss'
-	import { ClassNames, bemClasses } from '@goobits/blog/utils'
+	import { ClassNames, bemClasses } from '@goobits/blog/utils/index.js'
 
 	/**
 	 * @typedef {Object} LanguageSwitcherProps

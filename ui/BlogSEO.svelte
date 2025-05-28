@@ -1,6 +1,6 @@
 <script>
-	import { createMessageGetter } from '@goobits/blog/utils'
-	import { blogConfig, defaultMessages } from '@goobits/blog/config'
+	import { createMessageGetter } from '@goobits/blog/utils/index.js'
+	import { blogConfig, defaultMessages } from '@goobits/blog/config/index.js'
 
 	let { data, messages = {} } = $props()
 

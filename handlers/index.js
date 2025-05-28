@@ -5,7 +5,7 @@
  * to quickly set up a blog on any website.
  */
 
-import { getAllPosts, generateRssFeed } from '../utils/blogUtils.js'
+import { getAllPosts, generateRssFeed } from '../utils/index.js'
 import {
 	loadBlogIndex,
 	loadCategory,
