@@ -82,6 +82,13 @@ export function createBlogSlugHandler(options = {}) {
 			const normalizedSlug = slug ? slug.replace(/\/$/, '') : ''
 			const routeParts = normalizedSlug ? normalizedSlug.split('/') : []
 
+			// Skip static asset requests (CSS, SCSS, JS, images, etc.)
+			if (normalizedSlug.match(/\.(css|scss|js|ts|jsx|tsx|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i)) {
+				const error = new Error('Not a blog route')
+				error.status = 404
+				throw error
+			}
+
 			if (!normalizedSlug || normalizedSlug === '') {
 				return await loadBlogIndex(lang, config)
 			}
