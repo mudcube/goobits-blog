@@ -87,8 +87,13 @@ export const defaultBlogConfig = {
 			tall: { width: 3, height: 4 }
 		},
 		remote: {
-			domains: [ 'images.unsplash.com', 'res.cloudinary.com' ],
-			prefixes: [ 'https://cdn.', 'https://images.' ]
+			domains: [
+				'images.unsplash.com',
+				'res.cloudinary.com',
+				's3.amazonaws.com',
+				's3.eu-west-1.amazonaws.com'
+			],
+			prefixes: [ 'https://cdn.', 'https://images.', 'https://medusa-public-images.' ]
 		},
 		defaults: {
 			coverImage: '/images/default-cover.jpg',
