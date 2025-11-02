@@ -41,20 +41,20 @@
 	h1 {
 		font-size: 2rem;
 		font-weight: 700;
-		color: var(--gray-900);
+		color: var(--color-text-primary);
 		margin: 0;
 	}
 }
 
 .goo__description {
-	color: var(--gray-600);
+	color: var(--color-text-muted);
 	margin-bottom: 2rem;
 	line-height: 1.6;
 }
 
 .goo__posts-info {
 	text-align: center;
-	color: var(--gray-600);
+	color: var(--color-text-muted);
 	margin-top: 2rem;
 	font-size: 0.875rem;
 }
@@ -75,7 +75,7 @@
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	color: var(--gray-600);
+	color: var(--color-text-muted);
 }
 
 .goo__spinner {
@@ -85,7 +85,7 @@
 }
 
 .goo__spinner-circle {
-	stroke: var(--gray-300);
+	stroke: var(--color-border);
 }
 
 .goo__spinner-path {
@@ -99,6 +99,6 @@
 }
 
 .goo__end-message {
-	color: var(--gray-500);
+	color: var(--color-text-muted);
 	font-style: italic;
 }

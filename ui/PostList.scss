@@ -67,18 +67,18 @@
 				min-width: 2.5rem;
 				height: 2.5rem;
 				padding: 0 0.5rem;
-				border: 1px solid var(--color-border, #e5e7eb);
+				border: 1px solid var(--color-border);
 				border-radius: var(--border-radius-small, 0.25rem);
-				background: var(--color-background, #ffffff);
-				color: var(--color-text, #374151);
+				background: var(--color-background);
+				color: var(--color-text-primary);
 				font-size: 0.875rem;
 				cursor: pointer;
 				transition: all 0.2s ease;
 
 				&:hover:not(:disabled) {
-					background: var(--color-primary, #f59e0b);
+					background: var(--color-primary);
 					color: var(--white, white);
-					border-color: var(--color-primary, #f59e0b);
+					border-color: var(--color-primary);
 				}
 
 				&:disabled {
@@ -90,13 +90,13 @@
 			.goo__post-list-pagination-prev,
 			.goo__post-list-pagination-next,
 			.goo__post-list-pagination-number {
-				border: 1px solid var(--color-border, #e5e7eb);
+				border: 1px solid var(--color-border);
 			}
 
 			&-number--state-current {
-				background: var(--color-primary, #f59e0b);
+				background: var(--color-primary);
 				color: var(--white, white);
-				border-color: var(--color-primary, #f59e0b);
+				border-color: var(--color-primary);
 			}
 
 			&-ellipsis {
@@ -113,9 +113,9 @@
 			justify-content: center;
 			align-items: center;
 			padding: var(--spacing-large, 2rem);
-			background: var(--color-background-light, #f9fafb);
+			background: var(--color-background-light);
 			border-radius: var(--border-radius-medium, 0.5rem);
-			border: 1px solid var(--color-border, #e5e7eb);
+			border: 1px solid var(--color-border);
 		}
 	}
 }

@@ -81,19 +81,19 @@
 		font-size: $font-size-small;
 
 		&__link {
-			color: $gray-500;
+			color: var(--color-text-muted);
 
 			&:hover {
-				color: $amber-700;
+				color: var(--amber-700);
 			}
 		}
 
 		&__separator {
-			color: #9ca3af; // Using hex since gray-400 not in variables
+			color: var(--color-text-muted);
 		}
 
 		&__current {
-			color: $amber-700;
+			color: var(--amber-700);
 			font-weight: $font-weight-medium;
 			overflow: hidden;
 			text-overflow: ellipsis;

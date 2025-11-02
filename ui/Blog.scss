@@ -3,39 +3,11 @@
  *
  * NOTE: This file maintains both the original class names and the BEM-style class names
  * to ensure backward compatibility during migration. All new components should use the goo__ namespace.
+ *
+ * IMPORTANT: CSS custom properties are inherited from the parent application's
+ * design-tokens.css. Do not define :root level variables here as they will
+ * override the theme system and break light/dark mode support.
  */
-
-// Theme color variables - these should be customizable
-:root {
-  // Primary blog color theme (defaults to amber colors)
-  --goo-color-50: var(--color-primary-lightest, #fffbeb);
-  --goo-color-100: var(--color-primary-lighter, #fef3c7);
-  --goo-color-200: var(--color-primary-light, #fde68a);
-  --goo-color-300: var(--color-primary-medium, #fcd34d);
-  --goo-color-500: var(--color-primary, #f59e0b);
-  --goo-color-600: var(--color-primary-dark, #d97706);
-  --goo-color-700: var(--color-primary-darker, #b45309);
-  --goo-color-800: var(--color-primary-darkest, #92400e);
-
-  // Legacy variable mapping for backward compatibility
-  --blog-color-50: var(--goo-color-50);
-  --blog-color-100: var(--goo-color-100);
-  --blog-color-200: var(--goo-color-200);
-  --blog-color-300: var(--goo-color-300);
-  --blog-color-500: var(--goo-color-500);
-  --blog-color-600: var(--goo-color-600);
-  --blog-color-700: var(--goo-color-700);
-  --blog-color-800: var(--goo-color-800);
-
-  --amber-50: var(--goo-color-50);
-  --amber-100: var(--goo-color-100);
-  --amber-200: var(--goo-color-200);
-  --amber-300: var(--goo-color-300);
-  --amber-500: var(--goo-color-500);
-  --amber-600: var(--goo-color-600);
-  --amber-700: var(--goo-color-700);
-  --amber-800: var(--goo-color-800);
-}
 
 // Post meta styling - ensure consistent margin
 .post-meta, .blog-card__meta, .goo__card-meta {
@@ -53,7 +25,7 @@ $sidebar-width: 33.333333%;
   max-width: 1440px;
   margin: 0 auto;
   padding: 3rem 1rem;
-  color: var(--gray-800);
+  color: var(--color-text-secondary);
 }
 
 .goo__layout {
@@ -110,7 +82,7 @@ $sidebar-width: 33.333333%;
   h1 {
     font-size: 1.875rem;
     font-weight: 700;
-    color: var(--amber-800);
+    color: var(--color-text-primary);
 
     @media (min-width: 768px) {
       font-size: 2.25rem;
@@ -120,14 +92,14 @@ $sidebar-width: 33.333333%;
 
 // Description text
 .goo__description {
-  color: var(--gray-600);
+  color: var(--color-text-muted);
   margin-bottom: 2rem;
   font-size: 1.125rem;
   line-height: 1.5;
 }
 
 .goo__category-description {
-  color: var(--gray-600);
+  color: var(--color-text-muted);
   margin-top: 0;
   margin-bottom: 0;
   font-size: 1.125rem;
@@ -153,7 +125,7 @@ $sidebar-width: 33.333333%;
   width: 100%;
   max-width: none;
   margin-bottom: 3rem; // Equivalent to mb-12
-  color: var(--gray-700);
+  color: var(--color-text-secondary);
   font-size: 1.125rem; // Equivalent to prose-lg
   line-height: 1.75;
 
@@ -164,7 +136,7 @@ $sidebar-width: 33.333333%;
   }
 
   h1, h2, h3, h4 {
-    color: var(--gray-900);
+    color: var(--color-text-primary);
     font-weight: 600;
     line-height: 1.3;
   }
@@ -204,19 +176,19 @@ $sidebar-width: 33.333333%;
     border-left: 4px solid var(--amber-300);
     padding-left: 1rem;
     font-style: italic;
-    color: var(--gray-600);
+    color: var(--color-text-muted);
     margin: 1.5rem 0;
   }
 
   pre {
-    background-color: var(--gray-100);
+    background-color: var(--color-background-alt);
     border-radius: 0.375rem;
     padding: 1.25rem;
     overflow-x: auto;
   }
 
   code {
-    background-color: var(--gray-100);
+    background-color: var(--color-background-alt);
     padding: 0.125rem 0.25rem;
     border-radius: 0.25rem;
     font-size: 0.875em;
@@ -267,12 +239,12 @@ $sidebar-width: 33.333333%;
   .goo__empty-state-title {
     font-size: 1.5rem;
     font-weight: 500;
-    color: var(--gray-800);
+    color: var(--color-text-secondary);
     margin-bottom: 0.5rem;
   }
 
   .goo__empty-state-text {
-    color: var(--gray-600);
+    color: var(--color-text-muted);
     margin-bottom: 1.5rem;
   }
 
@@ -386,7 +358,7 @@ $sidebar-width: 33.333333%;
 // Posts info
 .goo__posts-info {
   text-align: center;
-  color: var(--gray-500);
+  color: var(--color-text-muted);
   font-size: 0.875rem;
   margin-bottom: 1rem;
   margin-top: 2rem;
@@ -441,10 +413,10 @@ $sidebar-width: 33.333333%;
 .text-2xl { font-size: 1.5rem; }
 .text-3xl { font-size: 1.875rem; }
 .font-bold { font-weight: 700; }
-.text-gray-500 { color: var(--gray-500); }
-.text-gray-600 { color: var(--gray-600); }
-.text-gray-700 { color: var(--gray-700); }
-.text-gray-900 { color: var(--gray-900); }
+.text-gray-500 { color: var(--color-text-muted); }
+.text-gray-600 { color: var(--color-text-secondary); }
+.text-gray-700 { color: var(--color-text-tertiary); }
+.text-gray-900 { color: var(--color-text-primary); }
 .text-white { color: white; }
 
 // Other
@@ -489,7 +461,7 @@ $sidebar-width: 33.333333%;
 }
 
 .goo__social-share-text {
-  color: var(--gray-700);
+  color: var(--color-text-secondary);
   flex: 1;
 }
 
@@ -501,7 +473,7 @@ $sidebar-width: 33.333333%;
 
 .goo__social-share-subtitle {
   font-size: 0.875rem;
-  color: var(--gray-500);
+  color: var(--color-text-muted);
 }
 
 .goo__social-buttons {
@@ -591,7 +563,7 @@ $sidebar-width: 33.333333%;
   align-items: center;
   gap: 1rem;
   margin-bottom: 0;
-  color: var(--gray-500);
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 
@@ -629,7 +601,7 @@ $sidebar-width: 33.333333%;
 
 .goo__post-tags-heading {
   font-size: 0.875rem;
-  color: var(--gray-500);
+  color: var(--color-text-muted);
   margin-bottom: 0.75rem;
 }
 
@@ -637,7 +609,7 @@ $sidebar-width: 33.333333%;
 .goo__post-title {
   font-size: 1.875rem;
   font-weight: 700;
-  color: var(--gray-900);
+  color: var(--color-text-primary);
   margin: 1rem 0;
   line-height: 1.25;
 }
@@ -722,12 +694,12 @@ $sidebar-width: 33.333333%;
 .goo__author-name {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--gray-900);
+  color: var(--color-text-primary);
 }
 
 .goo__author-role {
   font-size: 0.75rem;
-  color: var(--gray-500);
+  color: var(--color-text-muted);
 }
 
 // Related posts section
@@ -740,7 +712,7 @@ $sidebar-width: 33.333333%;
 .goo__related-posts-heading {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--gray-900);
+  color: var(--color-text-primary);
   margin-bottom: 2rem;
 }
 
@@ -825,7 +797,7 @@ $sidebar-width: 33.333333%;
 
 .goo__related-post-excerpt {
   font-size: 0.875rem;
-  color: var(--gray-600);
+  color: var(--color-text-muted);
   margin-bottom: 0.75rem;
 }
 
@@ -833,7 +805,7 @@ $sidebar-width: 33.333333%;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--gray-500);
+  color: var(--color-text-muted);
   font-size: 0.75rem;
 }
 
@@ -866,7 +838,7 @@ $sidebar-width: 33.333333%;
 
 // Error message styling
 .goo__error-message {
-  color: #DC2626; // red-600 equivalent
+  color: var(--red-600);
   font-weight: 500;
 }
 
@@ -891,68 +863,21 @@ $sidebar-width: 33.333333%;
   color: white !important;
 }
 
-// Shared tag/category styles
-:root {
-  // Base colors for tags
-  --goo-tag-bg: var(--gray-100, #f3f4f6);
-  --goo-tag-color: var(--gray-700, #4b5563);
-  --goo-tag-border: var(--gray-200, #e5e7eb);
-
-  // Hover colors for tags
-  --goo-tag-hover-bg: var(--goo-color-100, #fef3c7);
-  --goo-tag-hover-color: var(--goo-color-800, #92400e);
-  --goo-tag-hover-border: var(--goo-color-200, #fde68a);
-
-  // Active colors for tags
-  --goo-tag-active-bg: var(--goo-color-500, #f59e0b);
-  --goo-tag-active-color: white;
-  --goo-tag-active-border: var(--goo-color-600, #d97706);
-
-  // Base colors for categories
-  --goo-category-bg: rgba(16, 185, 129, 0.1);
-  --goo-category-color: rgb(6, 95, 70);
-  --goo-category-border: rgba(16, 185, 129, 0.2);
-
-  // Hover colors for categories
-  --goo-category-hover-bg: rgba(16, 185, 129, 0.2);
-  --goo-category-hover-color: rgb(6, 95, 70);
-  --goo-category-hover-border: rgba(16, 185, 129, 0.3);
-
-  // Active colors for categories
-  --goo-category-active-bg: var(--emerald-500, #10b981);
-  --goo-category-active-color: white;
-  --goo-category-active-border: var(--emerald-600, #059669);
-
-  // Shared properties
-  --goo-taxonomy-border-radius: 9999px;
-  --goo-taxonomy-transition: all 0.2s ease;
-  --goo-taxonomy-padding: 0.25rem 0.75rem;
-  --goo-taxonomy-font-size: 0.75rem;
-
-  // Legacy mappings for backward compatibility
-  --blog-tag-bg: var(--goo-tag-bg);
-  --blog-tag-color: var(--goo-tag-color);
-  --blog-tag-border: var(--goo-tag-border);
-  --blog-tag-hover-bg: var(--goo-tag-hover-bg);
-  --blog-tag-hover-color: var(--goo-tag-hover-color);
-  --blog-tag-hover-border: var(--goo-tag-hover-border);
-  --blog-tag-active-bg: var(--goo-tag-active-bg);
-  --blog-tag-active-color: var(--goo-tag-active-color);
-  --blog-tag-active-border: var(--goo-tag-active-border);
-  --blog-category-bg: var(--goo-category-bg);
-  --blog-category-color: var(--goo-category-color);
-  --blog-category-border: var(--goo-category-border);
-  --blog-category-hover-bg: var(--goo-category-hover-bg);
-  --blog-category-hover-color: var(--goo-category-hover-color);
-  --blog-category-hover-border: var(--goo-category-hover-border);
-  --blog-category-active-bg: var(--goo-category-active-bg);
-  --blog-category-active-color: var(--goo-category-active-color);
-  --blog-category-active-border: var(--goo-category-active-border);
-  --blog-taxonomy-border-radius: var(--goo-taxonomy-border-radius);
-  --blog-taxonomy-transition: var(--goo-taxonomy-transition);
-  --blog-taxonomy-padding: var(--goo-taxonomy-padding);
-  --blog-taxonomy-font-size: var(--goo-taxonomy-font-size);
-}
+/* ========================================
+ * NOTE: Tag/category color variables removed
+ * ======================================== *
+ *
+ * Blog components now use CSS custom properties directly from the parent
+ * app's design-tokens.css. This ensures proper theme inheritance for
+ * light/dark modes.
+ *
+ * Components should use:
+ * - var(--gray-100), var(--gray-700), etc. for base colors
+ * - var(--amber-100), var(--amber-600), etc. for primary colors
+ * - var(--green-100), var(--green-600), etc. for category colors
+ *
+ * These will automatically adapt to light/dark themes via the parent app.
+ * ======================================== */
 
 // Base styles for tags and categories
 .goo__tags-item, .goo__card-tag, .goo__post-tag {
@@ -1042,15 +967,15 @@ $sidebar-width: 33.333333%;
 }
 
 .goo__tags--variant-default .goo__tags-item--state-active {
-  background-color: var(--color-primary, #f59e0b) !important;
+  background-color: var(--color-primary) !important;
   color: white !important;
-  border-color: var(--color-primary, #f59e0b) !important;
+  border-color: var(--color-primary) !important;
 }
 
 .goo__tags-item--state-active:hover {
-  background-color: var(--color-primary-dark, #d97706) !important;
+  background-color: var(--color-primary-dark) !important;
   color: white !important;
-  border-color: var(--color-primary-dark, #d97706) !important;
+  border-color: var(--color-primary-dark) !important;
   opacity: 0.9;
 }
 
@@ -1062,14 +987,14 @@ $sidebar-width: 33.333333%;
 }
 
 .goo__categories--variant-default .goo__categories-item--active {
-  background-color: var(--color-secondary, #10b981) !important;
+  background-color: var(--color-secondary) !important;
   color: white !important;
-  border-color: var(--color-secondary, #10b981) !important;
+  border-color: var(--color-secondary) !important;
 }
 
 .goo__categories-item--active:hover {
-  background-color: var(--color-secondary-dark, #059669) !important;
+  background-color: var(--color-secondary-dark) !important;
   color: white !important;
-  border-color: var(--color-secondary-dark, #059669) !important;
+  border-color: var(--color-secondary-dark) !important;
   opacity: 0.9;
 }

@@ -5,9 +5,9 @@
 		gap: var(--spacing-medium, 1rem);
 		margin: var(--spacing-xlarge, 2.5rem) 0;
 		padding: var(--spacing-large, 1.5rem);
-		background-color: var(--color-background-light, #ffffff);
+		background-color: var(--color-background-light);
 		border-radius: var(--border-radius-medium, 8px);
-		border: 1px solid var(--color-border, #e5e7eb);
+		border: 1px solid var(--color-border);
 
 		@media (min-width: 640px) {
 			flex-direction: row;
@@ -25,13 +25,13 @@
 	&__social-share-title {
 		font-weight: var(--font-weight-semibold, 600);
 		font-size: var(--font-size-medium, 1.125rem);
-		color: var(--color-text-primary, #1f2937);
+		color: var(--color-text-primary);
 		margin: 0;
 	}
 
 	&__social-share-subtitle {
 		font-size: var(--font-size-small, 0.875rem);
-		color: var(--color-text-secondary, #6b7280);
+		color: var(--color-text-secondary);
 		margin: 0;
 	}
 
@@ -46,23 +46,23 @@
 		align-items: center;
 		gap: var(--spacing-small, 0.5rem);
 		padding: var(--spacing-small, 0.5rem) var(--spacing-medium, 1rem);
-		background-color: var(--white, #ffffff);
-		border: 1px solid var(--color-border, #e5e7eb);
+		background-color: var(--white);
+		border: 1px solid var(--color-border);
 		border-radius: var(--border-radius-full, 9999px);
-		color: var(--color-text-primary, #1f2937);
+		color: var(--color-text-primary);
 		font-size: var(--font-size-small, 0.875rem);
 		cursor: pointer;
 		text-decoration: none;
 		transition: var(--transition-base, all 0.3s ease);
 
 		&:hover {
-			background-color: var(--color-background-alt, #f3f4f6);
+			background-color: var(--color-background-alt);
 		}
 
 		&--state-success {
-			background-color: var(--color-success, #22c55e);
-			color: var(--color-text-light, #ffffff);
-			border-color: var(--color-success, #16a34a);
+			background-color: var(--color-success);
+			color: var(--color-text-light);
+			border-color: var(--color-success);
 		}
 
 		svg {
