@@ -92,12 +92,6 @@
 	fill: var(--amber-500);
 }
 
-@keyframes spin {
-	to {
-		transform: rotate(360deg);
-	}
-}
-
 .goo__end-message {
 	color: var(--color-text-muted);
 	font-style: italic;
