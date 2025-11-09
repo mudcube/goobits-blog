@@ -93,7 +93,7 @@ export const defaultBlogConfig = {
 				's3.amazonaws.com',
 				's3.eu-west-1.amazonaws.com'
 			],
-			prefixes: [ 'https://cdn.', 'https://images.', 'https://medusa-public-images.' ]
+			prefixes: [ 'https://cdn.', 'https://images.', 'https://medusa-public-images.', 'http://localhost', '/products/' ]
 		},
 		defaults: {
 			coverImage: '/images/default-cover.jpg',
