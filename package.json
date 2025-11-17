@@ -1,13 +1,17 @@
 {
   "name": "@goobits/blog",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Reusable blog components for Svelte 5 projects",
   "main": "index.js",
+  "svelte": "./index.js",
   "publishConfig": {
     "access": "public"
   },
   "exports": {
-    ".": "./index.js",
+    ".": {
+      "svelte": "./index.js",
+      "default": "./index.js"
+    },
     "./ui": "./ui/index.js",
     "./utils": "./utils/index.js",
     "./config": "./config/index.js",
