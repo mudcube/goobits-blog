@@ -1,6 +1,6 @@
 {
   "name": "@goobits/blog",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Reusable blog components for Svelte 5 projects",
   "main": "index.js",
   "svelte": "./index.js",
