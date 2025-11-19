@@ -66,12 +66,9 @@
     "config",
     "handlers",
     "i18n",
-    "styles",
-    "templates",
     "config.js",
-    "LICENSE.md",
-    "README.md",
-    "SETUP.md"
+    "LICENSE",
+    "README.md"
   ],
   "license": "MIT",
   "type": "module",
