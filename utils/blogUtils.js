@@ -1,8 +1,8 @@
 import { blogConfig, getBlogVersion, getBlogPostFiles } from '../config/index.js'
 import { getPostReadTime } from './readTimeUtils.js'
+import { createLogger } from './logger.js'
 
-// Simple console logger for the package
-const logger = console
+const logger = createLogger('BlogUtils')
 
 // In-memory cache for blog posts to avoid re-reading files on every request
 const postsCache = new Map()
@@ -10,18 +10,34 @@ const CACHE_TTL = 1000 * 60 * 5 // 5 minutes cache
 
 // URL localizer function that can be set by the consuming app
 let _localizeUrl = (url) => url
+
+/**
+ * Sets a custom URL localizer function for i18n support
+ * @param {Function} localizer - Function that transforms URLs for localization
+ * @returns {void}
+ */
 export function setUrlLocalizer(localizer) {
 	_localizeUrl = localizer
 }
 
 /**
  * Clear the blog posts cache (useful for development)
+ * @returns {void}
  */
 export function clearBlogCache() {
 	postsCache.clear()
 	if (blogConfig.debug) {
-		logger.log('[BlogUtils] Blog cache cleared')
+		logger.log('Blog cache cleared')
 	}
+}
+
+/**
+ * Validates that posts is a non-empty array
+ * @param {*} posts - Value to validate
+ * @returns {boolean} True if posts is a valid non-empty array
+ */
+function isValidPostArray(posts) {
+	return Array.isArray(posts) && posts.length > 0
 }
 
 // Log version info on import when debugging is enabled
@@ -406,11 +422,10 @@ export function localizeUrl(url) {
 /**
  * Generate URL for a blog post
  * @param {ProcessedPost} post - The post to generate URL for
- * @param {boolean} [withLanguage=true] - Whether to add language prefix
- * @param {string} [languageCode] - Specific language code to use (overrides current language)
+ * @param {boolean} [withLanguage=false] - Whether to add language prefix
  * @returns {string} Relative URL to the post
  */
-export function getPostUrl(post, withLanguage = false, _languageCode) {
+export function getPostUrl(post, withLanguage = false) {
 	if (!post?.urlPath) return withLanguage ? _localizeUrl(blogConfig.uri) : blogConfig.uri
 	const url = `${ blogConfig.uri }${ post.urlPath }`
 	return withLanguage ? _localizeUrl(url) : url
@@ -563,7 +578,7 @@ export function getAuthorAvatarUrl(post, fallbackImage = blogConfig.images.defau
  * @returns {string[]} Array of category names sorted by frequency (most used first)
  */
 export function getAllCategories(posts, limit = blogConfig.posts.popularCategoriesCount) {
-	if (!posts || !Array.isArray(posts) || posts.length === 0) {
+	if (!isValidPostArray(posts)) {
 		return []
 	}
 
@@ -597,7 +612,7 @@ export function getAllCategories(posts, limit = blogConfig.posts.popularCategori
  * @returns {string[]} Array of tag names sorted by frequency (most used first)
  */
 export function getAllTags(posts, limit = blogConfig.posts.popularTagsCount) {
-	if (!posts || !Array.isArray(posts) || posts.length === 0) {
+	if (!isValidPostArray(posts)) {
 		return []
 	}
 
@@ -680,14 +695,6 @@ export function getSimilarPosts(
 		.slice(0, count)
 		.map(item => item.post)
 }
-
-/**
- * Estimates the reading time from markdown frontmatter and file size
- * This is a fallback when we can't get the full content
- * @param {Object} metadata - The frontmatter metadata
- * @param {number} fileSize - The size of the file in bytes (if available)
- * @returns {number} Estimated reading time in minutes
- */
 
 /**
  * Gets raw markdown content from a blog post file path

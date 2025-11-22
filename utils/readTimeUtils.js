@@ -3,12 +3,25 @@ import { createLogger } from './logger.js'
 
 const logger = createLogger('ReadTimeUtils')
 
-// Create simple implementations of these utility functions
+/**
+ * Logs an error and returns it for consistent error handling
+ * @param {string} moduleName - Name of the module for error context
+ * @param {Error} error - The error to handle
+ * @returns {Error} The original error
+ */
 function handleError(moduleName, error) {
 	logger.error('Error:', error)
 	return error
 }
 
+/**
+ * Validates that a value is of the expected type
+ * @param {*} value - The value to validate
+ * @param {string} type - Expected type ('string', 'number', 'object', 'array')
+ * @param {string} name - Parameter name for error messages
+ * @param {boolean} [isOptional=true] - Whether the value can be null/undefined
+ * @throws {Error} If validation fails
+ */
 function validateType(value, type, name, isOptional = true) {
 	if (value === undefined || value === null) {
 		if (!isOptional) {
@@ -25,6 +38,17 @@ function validateType(value, type, name, isOptional = true) {
 	} else if (actualType !== type) {
 		throw new Error(`${ name } must be a ${ type }, got ${ actualType }`)
 	}
+}
+
+/**
+ * Gets the default read time from options, blogConfig, or defaults (in priority order)
+ * @param {Object} [options] - Options that may contain defaultTime
+ * @returns {number} The default read time in minutes
+ */
+function getDefaultTime(options = {}) {
+	return options.defaultTime ??
+		blogConfig?.posts?.readTime?.defaultTime ??
+		DEFAULT_READ_TIME_CONFIG.defaultTime
 }
 
 // Module name for error context
@@ -59,10 +83,7 @@ export const DEFAULT_READ_TIME_CONFIG = {
 export function calculateReadTime(content, options = {}) {
 	// Return default time for non-string content
 	if (!content || typeof content !== 'string') {
-		// Use options defaultTime, or fall back to blogConfig if available, or use our own defaults
-		return options.defaultTime ||
-           (blogConfig?.posts?.readTime?.defaultTime) ||
-           DEFAULT_READ_TIME_CONFIG.defaultTime
+		return getDefaultTime(options)
 	}
 
 	try {
@@ -117,9 +138,8 @@ export function calculateReadTime(content, options = {}) {
 
 		return readTime
 	} catch (error) {
-		// Use consistent error handling
 		handleError(MODULE_NAME, error)
-		return options.defaultTime || DEFAULT_READ_TIME_CONFIG.defaultTime
+		return getDefaultTime(options)
 	}
 }
 
@@ -139,10 +159,7 @@ export function getPostReadTime(post, options = {}) {
 	try {
 		// If post is null or undefined, return default
 		if (post === null || post === undefined) {
-			const defaultTime = options.defaultTime ||
-                        (blogConfig?.posts?.readTime?.defaultTime) ||
-                        DEFAULT_READ_TIME_CONFIG.defaultTime
-			return defaultTime
+			return getDefaultTime(options)
 		}
 
 		// Validate post is an object if provided
@@ -173,16 +190,10 @@ export function getPostReadTime(post, options = {}) {
 		}
 
 		// Fallback to default time
-		const defaultTime = options.defaultTime ||
-                     (blogConfig?.posts?.readTime?.defaultTime) ||
-                     DEFAULT_READ_TIME_CONFIG.defaultTime
-		return defaultTime
+		return getDefaultTime(options)
 	} catch (error) {
-		// Use consistent error handling
 		handleError(MODULE_NAME, error)
-		return options.defaultTime ||
-			(blogConfig?.posts?.readTime?.defaultTime) ||
-			DEFAULT_READ_TIME_CONFIG.defaultTime
+		return getDefaultTime(options)
 	}
 }
 

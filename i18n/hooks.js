@@ -96,14 +96,10 @@ export async function loadWithBlogI18n(event, originalLoad) {
 
 /**
  * Layout server load hook for adding i18n data to layouts
- * @param {Object} event - SvelteKit layout server load event
- * @param {Function} [originalLoad] - The original load function if any
- * @returns {Promise<Object>} The load function result with i18n data
+ * Alias for loadWithBlogI18n, typically used in +layout.server.js
+ * @type {typeof loadWithBlogI18n}
  */
-export async function layoutLoadWithBlogI18n(event, originalLoad) {
-	// This is similar to loadWithBlogI18n but typically used in +layout.server.js
-	return await loadWithBlogI18n(event, originalLoad)
-}
+export const layoutLoadWithBlogI18n = loadWithBlogI18n
 
 export default {
 	handleBlogI18n,
