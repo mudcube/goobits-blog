@@ -10,43 +10,58 @@ describe('readTimeUtils', () => {
     })
 
     it('calculates read time based on word count', () => {
-      // 225 words = 1 minute at default WPM, but minimum is 3
-      const shortContent = 'word '.repeat(225)
-      expect(calculateReadTime(shortContent)).toBe(3)
-
-      // 675 words = 3 minutes at default WPM
-      const mediumContent = 'word '.repeat(675)
-      expect(calculateReadTime(mediumContent)).toBe(3)
-
-      // 900 words = 4 minutes at default WPM
-      const longerContent = 'word '.repeat(900)
-      expect(calculateReadTime(longerContent)).toBe(4)
+      // At 225 WPM: 225 words = 1 min, 450 = 2 min, 675 = 3 min, 900 = 4 min
+      // Minimum is 3 minutes (defaultTime)
+      expect(calculateReadTime('word '.repeat(225))).toBe(3) // 1 min rounds to minimum
+      expect(calculateReadTime('word '.repeat(675))).toBe(3) // exactly 3 min
+      expect(calculateReadTime('word '.repeat(900))).toBe(4) // 4 min
+      expect(calculateReadTime('word '.repeat(1125))).toBe(5) // 5 min
     })
 
-    it('adds time for headings', () => {
-      // Content with headings should take longer
-      const contentWithHeadings = `
-# Heading 1
-${'word '.repeat(225)}
-
+    it('adds time for markdown headings', () => {
+      // 675 words in body + ~10 words in headings = ~685 words
+      // 685 / 225 = 3.04 -> ceil = 4 minutes base
+      // 5 headings / headingsWeight(5) = 1 additional minute
+      // Total = 5 minutes
+      const content = `# Heading 1
+${'word '.repeat(135)}
 ## Heading 2
-${'word '.repeat(225)}
-
+${'word '.repeat(135)}
 ### Heading 3
-${'word '.repeat(225)}
-`
-      const result = calculateReadTime(contentWithHeadings)
-      expect(result).toBeGreaterThanOrEqual(3)
+${'word '.repeat(135)}
+#### Heading 4
+${'word '.repeat(135)}
+##### Heading 5
+${'word '.repeat(135)}`
+      expect(calculateReadTime(content)).toBe(5)
     })
 
-    it('respects custom options', () => {
-      const content = 'word '.repeat(100)
-      const result = calculateReadTime(content, { wordsPerMinute: 100 })
-      // 100 words at 100 WPM = 1 minute, but default minimum is 3
-      expect(result).toBe(3)
+    it('respects custom wordsPerMinute option', () => {
+      // 200 words at 100 WPM = 2 minutes, but minimum is 3
+      // 400 words at 100 WPM = 4 minutes (exceeds minimum)
+      expect(calculateReadTime('word '.repeat(400), { wordsPerMinute: 100 })).toBe(4)
     })
 
-    it('strips HTML tags before counting', () => {
+    it('respects custom defaultTime option', () => {
+      expect(calculateReadTime('', { defaultTime: 5 })).toBe(5)
+      expect(calculateReadTime('word '.repeat(100), { defaultTime: 5 })).toBe(5)
+    })
+
+    it('enforces minimum time for long articles', () => {
+      // 1600 words > longArticleThreshold (1500), should be at least 5 min
+      const longContent = 'word '.repeat(1600)
+      const result = calculateReadTime(longContent)
+      expect(result).toBeGreaterThanOrEqual(DEFAULT_READ_TIME_CONFIG.minTimeForLongArticle)
+    })
+
+    it('enforces minimum time for very long articles', () => {
+      // 3100 words > veryLongArticleThreshold (3000), should be at least 10 min
+      const veryLongContent = 'word '.repeat(3100)
+      const result = calculateReadTime(veryLongContent)
+      expect(result).toBeGreaterThanOrEqual(DEFAULT_READ_TIME_CONFIG.minTimeForVeryLongArticle)
+    })
+
+    it('strips HTML tags before counting words', () => {
       const htmlContent = '<p>word </p>'.repeat(225)
       const plainContent = 'word '.repeat(225)
       expect(calculateReadTime(htmlContent)).toBe(calculateReadTime(plainContent))
@@ -59,47 +74,44 @@ ${'word '.repeat(225)}
       expect(getPostReadTime(undefined)).toBe(DEFAULT_READ_TIME_CONFIG.defaultTime)
     })
 
-    it('uses explicit readTime from metadata if provided', () => {
-      const post = {
-        metadata: {
-          fm: {
-            readTime: 10
-          }
-        }
-      }
+    it('uses explicit readTime from frontmatter when provided', () => {
+      const post = { metadata: { fm: { readTime: 10 } } }
       expect(getPostReadTime(post)).toBe(10)
     })
 
-    it('calculates from content if no explicit readTime', () => {
-      const post = {
-        content: 'word '.repeat(900)
-      }
+    it('calculates from content when no explicit readTime', () => {
+      const post = { content: 'word '.repeat(900) }
       expect(getPostReadTime(post)).toBe(4)
     })
 
-    it('estimates from excerpt if no content', () => {
-      const post = {
-        metadata: {
-          fm: {
-            excerpt: 'word '.repeat(100)
-          }
-        }
-      }
-      const result = getPostReadTime(post)
-      expect(result).toBeGreaterThanOrEqual(DEFAULT_READ_TIME_CONFIG.defaultTime)
+    it('estimates from excerpt when no content (multiplied by 3)', () => {
+      // Excerpt of 225 words -> calculateReadTime returns 3 (minimum)
+      // 3 * 3 = 9 minutes estimated for full article
+      const post = { metadata: { fm: { excerpt: 'word '.repeat(225) } } }
+      expect(getPostReadTime(post)).toBe(9)
     })
 
     it('returns default for empty post object', () => {
       expect(getPostReadTime({})).toBe(DEFAULT_READ_TIME_CONFIG.defaultTime)
     })
+
+    it('passes options through to calculation', () => {
+      const post = { content: 'word '.repeat(400) }
+      expect(getPostReadTime(post, { wordsPerMinute: 100 })).toBe(4)
+    })
   })
 
   describe('DEFAULT_READ_TIME_CONFIG', () => {
-    it('has expected default values', () => {
-      expect(DEFAULT_READ_TIME_CONFIG.wordsPerMinute).toBe(225)
-      expect(DEFAULT_READ_TIME_CONFIG.defaultTime).toBe(3)
-      expect(DEFAULT_READ_TIME_CONFIG.minTimeForLongArticle).toBe(5)
-      expect(DEFAULT_READ_TIME_CONFIG.minTimeForVeryLongArticle).toBe(10)
+    it('exports expected configuration values', () => {
+      expect(DEFAULT_READ_TIME_CONFIG).toEqual({
+        wordsPerMinute: 225,
+        defaultTime: 3,
+        minTimeForLongArticle: 5,
+        minTimeForVeryLongArticle: 10,
+        longArticleThreshold: 1500,
+        veryLongArticleThreshold: 3000,
+        headingsWeight: 5
+      })
     })
   })
 })
