@@ -50,7 +50,7 @@
 	{:else}
 		<!-- Normal breadcrumb rendering -->
 		{#if items.length > 0}
-			{#each items as item, index}
+			{#each items as item, index (item.href)}
 				{#if index > 0}
 					<span class="breadcrumbs__separator">/</span>
 				{/if}

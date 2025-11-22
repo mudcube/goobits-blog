@@ -158,7 +158,7 @@
 				role="listbox"
 				aria-label={selectLanguageLabel}
 			>
-				{#each languageOptions as { code, name }}
+				{#each languageOptions as { code, name } (code)}
 					<button
 						class="goo__lang-option"
 						class:goo__lang-option--state-active={code === currentLanguage}
@@ -176,7 +176,7 @@
 		{/if}
 	{:else if variant === 'buttons'}
 		<div class="goo__lang-buttons">
-			{#each languageOptions as { code, name }}
+			{#each languageOptions as { code, name } (code)}
 				<button
 					class="goo__lang-button"
 					class:goo__lang-button--state-active={code === currentLanguage}
@@ -198,7 +198,7 @@
 				onchange={(e) => handleLanguageChange(e.target.value)}
 				aria-label={selectLanguageLabel}
 			>
-				{#each languageOptions as { code, name }}
+				{#each languageOptions as { code, name } (code)}
 					<option value={code}>
 						{showLabels ? name : code}
 					</option>

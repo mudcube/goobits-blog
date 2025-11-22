@@ -77,15 +77,15 @@
 	let postContentComponent = $state(data.postContent || null)
 	let loadingError = $state(null)
 	let isImporting = $state(false)
-	let contentLoaded = $state(false)
+	let _contentLoaded = $state(false)
 	let copySuccess = $state(false)
 
 	// Log initial state
 	// Create constant values for the initial state to avoid reactivity warnings
 	// Don't capture reactive values in closures
-	const hasInitialPostContent = !!data.postContent
-	const isContentLoadedInitially = false
-	const hasInitialComponent = false
+	const _hasInitialPostContent = !!data.postContent
+	const _isContentLoadedInitially = false
+	const _hasInitialComponent = false
 
 	// Initial state:
 	// {
@@ -96,7 +96,7 @@
 
 	// Update contentLoaded when postContentComponent changes
 	$effect(() => {
-		contentLoaded = postContentComponent !== null
+		_contentLoaded = postContentComponent !== null
 	})
 
 	/**
@@ -133,7 +133,7 @@
 			const loadContent = async () => {
 				loadingError = null
 				isImporting = true
-				contentLoaded = false
+				_contentLoaded = false
 
 				const contentPath = data.post.path
 
@@ -141,7 +141,7 @@
 					const module = await import(/* @vite-ignore */ contentPath)
 					if (module && module.default) {
 						postContentComponent = module.default
-						contentLoaded = true
+						_contentLoaded = true
 					} else {
 						logger.error('Module imported but no default export found for path:', contentPath)
 						loadingError = getMessage('loadingError', 'Error loading content')
@@ -164,8 +164,8 @@
 	let readTime = isPostPage ? getReadTime() : undefined
 	let formattedDate = isPostPage ? getFormattedDate() : undefined
 	let postTitle = isPostPage ? data.post.metadata.fm.title : undefined
-	let postExcerpt = isPostPage ? (data.post.metadata.fm.excerpt || '') : ''
-	let postTags = isPostPage ? (data.post.metadata.fm.tags?.join(',') || '') : ''
+	let _postExcerpt = isPostPage ? (data.post.metadata.fm.excerpt || '') : ''
+	let _postTags = isPostPage ? (data.post.metadata.fm.tags?.join(',') || '') : ''
 	let coverImage = isPostPage ? getCoverImageUrl(data.post) : undefined
 	let authorAvatar = isPostPage ? 
 		getAuthorAvatarUrl(data.post, '/static/images/authors/marcus-fleming.jpg') : undefined
@@ -310,7 +310,7 @@
 				<div class="goo__related-posts">
 					<h2 class="goo__related-posts-heading">{getMessage('relatedPosts', 'Related Posts')}</h2>
 					<div class="goo__related-posts-list">
-						{#each similarPosts as post}
+						{#each similarPosts as post (post.urlPath)}
 							<div class="goo__related-post">
 								<a href={`${blogConfig.uri || '/blog'}${post.urlPath}`} class="goo__related-post-image-container">
 									{#if post.metadata?.fm?.image?.src}

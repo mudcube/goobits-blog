@@ -31,7 +31,7 @@ export function createMessageGetter(messages = {}) {
 				if (typeof msg === 'function') {
 					try {
 						return msg(...args)
-					} catch (error) {
+					} catch {
 						// Log minimal error info to avoid leaking sensitive data
 						logger.warn(`[BlogMessages] Error calling message function for key: ${ key }`)
 						return fallback || key
@@ -46,7 +46,7 @@ export function createMessageGetter(messages = {}) {
 				if (typeof defaultMsg === 'function') {
 					try {
 						return defaultMsg(...args)
-					} catch (error) {
+					} catch {
 						// Log minimal error info to avoid leaking sensitive data
 						logger.warn(`[BlogMessages] Error calling default message function for key: ${ key }`)
 						return fallback || key

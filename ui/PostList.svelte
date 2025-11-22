@@ -141,7 +141,7 @@
 			</div>
 
 			<div class="goo__post-list-secondary-posts">
-				{#each visiblePosts.slice(1, 5) as post}
+				{#each visiblePosts.slice(1, 5) as post (post.urlPath)}
 					<BlogCard
 							post={post}
 							isCompact={true}
@@ -162,7 +162,7 @@
 		<!-- Remaining posts in grid -->
 		{#if visiblePosts.length > 5}
 			<div class={bemClasses('goo__post-list-grid', { className: getColumnClass })}>
-				{#each visiblePosts.slice(5) as post}
+				{#each visiblePosts.slice(5) as post (post.urlPath)}
 					<BlogCard
 							post={post}
 							isCompact={isCompact}
@@ -183,7 +183,7 @@
 	{:else if layout === 'grid'}
 		<!-- Grid layout -->
 		<div class={bemClasses('goo__post-list-grid', { className: getColumnClass })}>
-			{#each visiblePosts as post}
+			{#each visiblePosts as post (post.urlPath)}
 				<BlogCard
 						post={post}
 						isCompact={isCompact}
@@ -203,7 +203,7 @@
 	{:else}
 		<!-- List layout (default) -->
 		<div class="goo__post-list-list">
-			{#each visiblePosts as post}
+			{#each visiblePosts as post (post.urlPath)}
 				<BlogCard
 						post={post}
 						isCompact={isCompact}
@@ -235,7 +235,7 @@
 			</button>
 
 			<div class="goo__post-list-pagination-numbers">
-				{#each getPageNumbers as page}
+				{#each getPageNumbers as page, index (index)}
 					{#if page === '...'}
 						<span class="goo__post-list-pagination-ellipsis">...</span>
 					{:else}

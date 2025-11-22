@@ -78,10 +78,10 @@
 		? post.metadata.fm.tags.filter(tag => tag !== currentTag)
 		: post?.metadata?.fm?.tags || []
 
-	// Get primary category and handle current category
-	let displayCategories = categories || []
+	// Get primary category and handle current category (reserved for future use)
+	let _displayCategories = categories || []
 	if (currentCategory && categories.includes(currentCategory)) {
-		displayCategories = categories.filter(cat => cat !== currentCategory)
+		_displayCategories = categories.filter(cat => cat !== currentCategory)
 	}
 
 	// Default excerpt text from i18n

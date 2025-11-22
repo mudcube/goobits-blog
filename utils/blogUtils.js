@@ -110,8 +110,8 @@ export function slugify(text) {
 		.toLowerCase()
 		.trim()
 		.replace(/\s+/g, '-')
-		.replace(/[^\w\-]+/g, '')
-		.replace(/\-\-+/g, '-')
+		.replace(/[^\w-]+/g, '')
+		.replace(/--+/g, '-')
 }
 
 /**
@@ -389,7 +389,7 @@ export async function loadCategoryDescriptions(lang = 'en') {
 	// Check if language-specific file exists, otherwise fall back to default
 	try {
 		await fs.access(categoriesPath)
-	} catch (e) {
+	} catch {
 		// Fallback to default if language-specific file doesn't exist
 		categoriesPath = join(process.cwd(), 'src/content/_categories.md')
 	}

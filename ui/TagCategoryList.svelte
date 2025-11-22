@@ -48,7 +48,7 @@
 		activeItem = '',
 		currentItem = '',
 		messages = {},
-		locale = 'en',
+		locale: _locale = 'en',
 		variant = 'default',
 		type = 'tags',
 		baseUrl = ''
@@ -83,7 +83,7 @@
     modifiers: [`spacing-${gap}`, `theme-${variant}`],
     className
   })}>
-		{#each items.slice(0, maxDisplay) as item}
+		{#each items.slice(0, maxDisplay) as item (item)}
 			<a
 					href={`${urlBase}/${slugify(item)}`}
 					class={bemClasses(`goo__${componentClass}-item`, {

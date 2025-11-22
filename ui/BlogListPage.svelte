@@ -82,21 +82,21 @@
 	}
 
 	/**
-	 * Formats a number based on the provided locale.
+	 * Formats a number based on the provided locale (reserved for future use).
 	 * @param {number} value - The number to format.
 	 * @returns {string} The formatted number string.
 	 */
-	function formatNumber(value) {
+	function _formatNumber(value) {
 		return new Intl.NumberFormat(locale).format(value)
 	}
 
 	/**
-	 * Generates a URL for a blog category or tag.
+	 * Generates a URL for a blog category or tag (reserved for future use).
 	 * @param {string} value - The category or tag name.
 	 * @param {string} type - The type of link ('category' or 'tag').
 	 * @returns {string} The generated URL.
 	 */
-	function getLink(value, type) {
+	function _getLink(value, type) {
 		return `${ blogConfig.uri }/${ type }/${ slugify(value) }`
 	}
 
