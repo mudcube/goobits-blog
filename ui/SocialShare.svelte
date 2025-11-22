@@ -15,6 +15,7 @@
 	 * @component
 	 */
 	import './SocialShare.scss'
+	import { onDestroy } from 'svelte'
 	import { createMessageGetter } from '@goobits/blog/utils/index.js'
 	import { defaultMessages } from '@goobits/blog/config/index.js'
 	import { createLogger } from '@goobits/blog/utils/logger.js'
@@ -43,6 +44,14 @@
 
 	// State for copy link success
 	let copySuccess = $state(false)
+	let copyTimeoutId = null
+
+	// Cleanup timeout on component destroy
+	onDestroy(() => {
+		if (copyTimeoutId) {
+			clearTimeout(copyTimeoutId)
+		}
+	})
 
 	// Function to copy URL to clipboard
 	async function copyLink() {
@@ -50,8 +59,13 @@
 			try {
 				await navigator.clipboard.writeText(url)
 				copySuccess = true
-				setTimeout(() => {
+				// Clear any existing timeout
+				if (copyTimeoutId) {
+					clearTimeout(copyTimeoutId)
+				}
+				copyTimeoutId = setTimeout(() => {
 					copySuccess = false
+					copyTimeoutId = null
 				}, 2000)
 			} catch (err) {
 				logger.error('Failed to copy URL:', err)

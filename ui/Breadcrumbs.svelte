@@ -14,7 +14,10 @@
 	 */
 
 	import { createMessageGetter } from '@goobits/blog/utils/index.js'
-	import { defaultMessages } from '@goobits/blog/config/index.js'
+	import { defaultMessages, blogConfig } from '@goobits/blog/config/index.js'
+
+	// Get the configured blog URI
+	const blogUri = blogConfig.uri || '/blog'
 
 	// Component Props
 	let {
@@ -36,8 +39,8 @@
 	{/if}
 
 	<!-- Add a Blog link for tags and categories, but not for the blog homepage -->
-	{#if !items.some(item => item.href === '/blog') && items.length > 0}
-		<a href="/blog" class="breadcrumbs__link">Blog</a>
+	{#if !items.some(item => item.href === blogUri) && items.length > 0}
+		<a href={blogUri} class="breadcrumbs__link">{getMessage('blog', 'Blog')}</a>
 		<span class="breadcrumbs__separator">/</span>
 	{/if}
 

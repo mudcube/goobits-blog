@@ -37,6 +37,10 @@
 			<BlogListPage {data} {messages} />
 		{:else if data.pageType === 'post' && data.post}
 			<BlogPostPage {data} {messages} />
+		{:else}
+			<div class="goo__blog-error">
+				<p>Unknown page type: {data.pageType || 'undefined'}</p>
+			</div>
 		{/if}
 	</BlogLayout>
 {:else}
@@ -44,5 +48,9 @@
 		<BlogListPage {data} {messages} />
 	{:else if data.pageType === 'post' && data.post}
 		<BlogPostPage {data} {messages} />
+	{:else}
+		<div class="goo__blog-error">
+			<p>Unknown page type: {data.pageType || 'undefined'}</p>
+		</div>
 	{/if}
 {/if}

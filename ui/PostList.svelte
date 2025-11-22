@@ -85,7 +85,7 @@
 	})
 
 	// Helper to create an array of page numbers for pagination
-	const getPageNumbers = $derived(() => {
+	const getPageNumbers = $derived.by(() => {
 		// Simple case: 7 or fewer pages
 		if (totalPages <= 7) {
 			return Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -113,7 +113,7 @@
 		return pages
 	})
 
-	const getColumnClass = $derived(() => {
+	const getColumnClass = $derived.by(() => {
 		if (columns > 0 && columns <= 4) return propertyModifier('goo__post-list-grid', 'columns', columns)
 		return propertyModifier('goo__post-list-grid', 'columns', 1) // Ensure we always have a class that enforces single column
 	})

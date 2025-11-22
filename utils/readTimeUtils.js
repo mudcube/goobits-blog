@@ -119,6 +119,7 @@ export function calculateReadTime(content, options = {}) {
 	} catch (error) {
 		// Use consistent error handling
 		handleError(MODULE_NAME, error)
+		return options.defaultTime || DEFAULT_READ_TIME_CONFIG.defaultTime
 	}
 }
 
@@ -179,6 +180,9 @@ export function getPostReadTime(post, options = {}) {
 	} catch (error) {
 		// Use consistent error handling
 		handleError(MODULE_NAME, error)
+		return options.defaultTime ||
+			(blogConfig?.posts?.readTime?.defaultTime) ||
+			DEFAULT_READ_TIME_CONFIG.defaultTime
 	}
 }
 

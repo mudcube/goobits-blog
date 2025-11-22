@@ -5,6 +5,7 @@
  */
 
 import { defaultBlogConfig, getDefaultBlogPostFiles } from './defaults.js'
+import { secureDeepMerge } from './secureDeepMerge.js'
 import { createLogger } from '../utils/logger.js'
 export { defaultMessages } from './defaultMessages.js'
 
@@ -16,26 +17,6 @@ let currentConfig = null
 // Store for custom functions that can't be serialized
 const customFunctions = {
 	getBlogPostFiles: null
-}
-
-/**
- * Deep merge two objects
- * @param {Object} target - Target object
- * @param {Object} source - Source object to merge in
- * @returns {Object} Merged object
- */
-function deepMerge(target, source) {
-	const result = { ...target }
-
-	for (const key in source) {
-		if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-			result[key] = deepMerge(result[key] || {}, source[key])
-		} else {
-			result[key] = source[key]
-		}
-	}
-
-	return result
 }
 
 /**
@@ -53,8 +34,8 @@ export function initBlogConfig(userConfig = {}, options = {}) {
 		customFunctions.getBlogPostFiles = options.getBlogPostFiles
 	}
 
-	// Merge configuration (excluding functions)
-	currentConfig = deepMerge(defaultBlogConfig, userConfig)
+	// Merge configuration securely (excluding functions)
+	currentConfig = secureDeepMerge(defaultBlogConfig, userConfig)
 	return currentConfig
 }
 

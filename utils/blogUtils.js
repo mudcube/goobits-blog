@@ -65,6 +65,10 @@ if (blogConfig.debug) {
  */
 export function formatDate(dateString, shortFormat = false) {
 	const date = new Date(dateString)
+	// Check for invalid date
+	if (isNaN(date.getTime())) {
+		return 'Unknown date'
+	}
 	if (shortFormat) {
 		return date.toLocaleDateString('en-US', {
 			month: 'numeric',
@@ -566,6 +570,9 @@ export function getAllCategories(posts, limit = blogConfig.posts.popularCategori
 	const categoryCount = {}
 
 	posts.forEach(post => {
+		// Skip posts with missing metadata
+		if (!post?.metadata?.fm) return
+
 		if (Array.isArray(post.metadata.fm.categories)) {
 			post.metadata.fm.categories.forEach(category => {
 				categoryCount[category] = (categoryCount[category] || 0) + 1
@@ -597,6 +604,9 @@ export function getAllTags(posts, limit = blogConfig.posts.popularTagsCount) {
 	const tagCount = {}
 
 	posts.forEach(post => {
+		// Skip posts with missing metadata
+		if (!post?.metadata?.fm) return
+
 		if (Array.isArray(post.metadata.fm.tags)) {
 			post.metadata.fm.tags.forEach(tag => {
 				tagCount[tag] = (tagCount[tag] || 0) + 1
