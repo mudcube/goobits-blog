@@ -1,14 +1,14 @@
 # @goobits/blog
 
-🚀 **STABLE RELEASE - v1.0.1**
+[![npm version](https://img.shields.io/npm/v/@goobits/blog.svg)](https://npmjs.com/package/@goobits/blog)
 
-Markdown-based blog framework with flexible i18n support and content categorization.
+Markdown-based blog framework with flexible i18n support and content categorization for Svelte 5.
 
 ## 🔒 Security Notice
 
 This package processes user-generated markdown content. Always sanitize markdown on the server-side before rendering. Do not trust user input.
 
-## ✨ Features
+## Features
 
 - Content in `src/content/Blog/{year}/{month}/`
 - Frontmatter for metadata (title, date, categories, tags)
@@ -18,13 +18,13 @@ This package processes user-generated markdown content. Always sanitize markdown
 - Pagination and search
 - Responsive layouts
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install @goobits/blog
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Configure Your Blog
 
@@ -65,16 +65,20 @@ initBlogConfig(blogConfig, {
 
 ### 3. Create Blog Routes
 
-Copy templates from `node_modules/@goobits/blog/templates/` to your routes directory:
+Create the following route structure in your SvelteKit project:
 
 ```
-src/routes/
-└── blog/
-    ├── +page.server.js  # Blog index
-    ├── +page.svelte     # Blog index display
-    ├── [...slug]/       # Blog posts, categories, tags
-    └── rss.xml/         # RSS feed
+src/routes/blog/
+├── +page.server.js    # Load blog posts list
+├── +page.svelte       # Blog index page
+├── [...slug]/
+│   ├── +page.server.js  # Load individual post/category/tag
+│   └── +page.svelte     # Post display page
+└── rss.xml/
+    └── +server.js     # RSS feed endpoint
 ```
+
+Use the route handlers from `@goobits/blog/handlers` to load blog data in your server files.
 
 ### 4. Use Components
 
@@ -92,7 +96,7 @@ src/routes/
 </div>
 ```
 
-## 🌐 Internationalization (i18n)
+## Internationalization (i18n)
 
 The blog package supports full internationalization through multiple integration methods:
 
@@ -164,20 +168,23 @@ const getMessage = createMessageGetter({
 })
 ```
 
-## 🧩 Components
+## Components
 
 - `BlogRouter` - Main router component
+- `BlogLayout` - Blog layout wrapper
 - `BlogListPage` - Blog index/archive page
 - `BlogPostPage` - Individual post page
 - `BlogCard` - Post preview card
+- `BlogSEO` - SEO meta tags for blog pages
 - `PostList` - List of blog posts with layouts
 - `Sidebar` - Blog sidebar with search/filters
 - `TagCategoryList` - Tag and category display
 - `SocialShare` - Social sharing buttons
 - `Newsletter` - Newsletter subscription form
 - `Breadcrumbs` - Navigation breadcrumbs
+- `LanguageSwitcher` - Language selection for i18n
 
-## 🎨 Styling
+## Styling
 
 Import component-specific SCSS files:
 
@@ -186,9 +193,9 @@ import '@goobits/blog/ui/BlogCard.scss'
 import '@goobits/blog/ui/Sidebar.scss'
 ```
 
-## 🔧 Configuration Options
+## Configuration
 
-The blog can be configured with many options:
+Override defaults by passing options to `initBlogConfig`:
 
 ```js
 initBlogConfig({
@@ -196,36 +203,37 @@ initBlogConfig({
   name: 'My Blog',
   description: 'Welcome to my blog',
   uri: '/blog',
-  
-  // Content settings
+
+  // Content settings (showing defaults)
   posts: {
-    excerptLength: 200,
-    relatedPostsCount: 5,
+    excerptLength: 160,        // characters
+    relatedPostsCount: 3,
     readTime: {
-      wordsPerMinute: 200
+      wordsPerMinute: 225
     }
   },
-  
-  // Theme
+
+  // Theme (showing defaults)
   theme: {
     colors: {
-      primary: '#3b82f6',
-      secondary: '#10b981'
+      primary: '#f59e0b',
+      secondary: '#22c55e'
     }
   },
-  
-  // i18n
+
+  // i18n (disabled by default)
   i18n: {
     enabled: true,
-    supportedLanguages: ['en', 'es', 'fr']
+    supportedLanguages: ['en', 'es', 'fr'],
+    defaultLanguage: 'en'
   }
 })
 ```
 
-## ♿ Accessibility
+## Accessibility
 
 Components include proper ARIA attributes, semantic HTML, and keyboard navigation support.
 
-## 📄 License
+## License
 
 MIT

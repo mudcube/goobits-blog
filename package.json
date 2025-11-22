@@ -49,8 +49,8 @@
       "default": "./handlers/*"
     },
     "./i18n": {
-      "svelte": "./i18n/hooks.js",
-      "default": "./i18n/hooks.js"
+      "svelte": "./i18n/index.js",
+      "default": "./i18n/index.js"
     }
   },
   "sideEffects": [
