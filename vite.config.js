@@ -37,7 +37,11 @@ export default defineConfig({
 	},
 	define: {
 		'import.meta.env.PACKAGE_VERSION': JSON.stringify(packageJson.version),
-		'import.meta.env.RECAPTCHA_SITE_KEY': JSON.stringify(RECAPTCHA_SITE_KEY)
+		'import.meta.env.RECAPTCHA_SITE_KEY': JSON.stringify(RECAPTCHA_SITE_KEY),
+		__SVELTEKIT_PATHS_BASE__: JSON.stringify(''),
+		__SVELTEKIT_PATHS_ASSETS__: JSON.stringify(''),
+		__SVELTEKIT_APP_DIR__: JSON.stringify('_app'),
+		__SVELTEKIT_PATHS_RELATIVE__: 'false'
 	},
 	envDir: './config/env',
 	optimizeDeps: {
