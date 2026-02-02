@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import adapterStatic from '@sveltejs/adapter-static'
+import adapterCloudflare from '@sveltejs/adapter-cloudflare'
 import { mdsvex } from 'mdsvex'
 import { remarkTableOfContents } from './src/lib/remarkTableOfContents.js'
 
@@ -9,13 +9,27 @@ const isDev = NODE_ENV === 'development'
 
 export default {
 	kit: {
-		adapter: adapterStatic({
-			pages: 'build', // Directory for all the pages (default: 'build')
-			assets: 'build', // Directory for all the assets (default: 'build')
-			fallback: '404.html', // The page that handles 404s and client-side routing (default: undefined)
-			precompress: false, // Enable Gzip and Brotli compression (default: false)
-			strict: false // Throws if any routes are not prerenderable (default: false)
+		adapter: adapterCloudflare({
+			routes: {
+				include: ['/*'],
+				exclude: ['<all>']
+			}
 		}),
+		prerender: {
+			handleHttpError: ({ path, status, message }) => {
+				// Ignore 404s for labs subpages (they're static HTML files, not SvelteKit routes)
+				if (path.startsWith('/labs/')) {
+					console.warn(`Ignoring prerender 404: ${path}`)
+					return
+				}
+				// Ignore errors from dynamic route placeholders (shouldn't be prerendered directly)
+				if (path.includes('[') && path.includes(']')) {
+					console.warn(`Ignoring prerender error for dynamic route: ${path}`)
+					return
+				}
+				throw new Error(message)
+			}
+		},
 		alias: {
 			'@components': './src/components',
 			'@config': './src/config',

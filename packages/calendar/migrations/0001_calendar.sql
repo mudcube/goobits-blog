@@ -44,3 +44,9 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   count INTEGER NOT NULL,
   reset_at INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at INTEGER NOT NULL
+);

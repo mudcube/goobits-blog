@@ -1,0 +1,22 @@
+name = "miko-art"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages will be deployed via `wrangler pages deploy`
+# For local development, use `wrangler pages dev`
+
+[[d1_databases]]
+binding = "DB"
+database_name = "miko-art-db"
+database_id = "your-database-id-here"  # Replace after running: wrangler d1 create miko-art-db
+
+[vars]
+# Non-sensitive environment variables
+# BOOKING_CAPACITY = "8"
+# BOOKING_SLOT_MINUTES = "30"
+
+# Secrets (set via `wrangler secret put <NAME>`):
+# - TOKEN_ENC_KEY
+# - ADMIN_PASSCODE
+# - GOOGLE_OAUTH_CLIENT_ID
+# - GOOGLE_OAUTH_CLIENT_SECRET

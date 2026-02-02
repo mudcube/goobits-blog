@@ -23,7 +23,7 @@ export default defineConfig({
 	assetsInclude: [ '**/*.md' ],
 	build: {
 		rollupOptions: {
-			external: [ 'node:dns/promises' ]
+			external: [ 'node:dns/promises', 'better-sqlite3', 'fs', 'path' ]
 		},
 		strict: false,
 		target: 'esnext'
