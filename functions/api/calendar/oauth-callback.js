@@ -20,7 +20,7 @@ export async function onRequest({ env, request }) {
 			base64Key: getTokenKey(env)
 		})
 
-		return Response.redirect(new URL('/admin/calendar?connected=1', request.url), 302)
+		return Response.redirect(new URL('/admin?connected=1', request.url), 302)
 	} catch (err) {
 		return errorResponse(err?.message || 'OAuth callback failed', 500, 'oauth_callback_error')
 	}
