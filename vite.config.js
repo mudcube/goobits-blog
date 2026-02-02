@@ -28,13 +28,6 @@ export default defineConfig({
 		strict: false,
 		target: 'esnext'
 	},
-	css: {
-		preprocessorOptions: {
-			scss: {
-				api: 'modern-compiler'
-			}
-		}
-	},
 	define: {
 		'import.meta.env.PACKAGE_VERSION': JSON.stringify(packageJson.version),
 		'import.meta.env.RECAPTCHA_SITE_KEY': JSON.stringify(RECAPTCHA_SITE_KEY),
