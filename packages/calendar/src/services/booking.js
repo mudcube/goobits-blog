@@ -9,13 +9,27 @@ export async function ensureIdempotentBooking({ storage, booking }) {
 }
 
 export function buildEvent({ booking, calendarName, location }) {
+	const attendees = new Set()
+	if (Array.isArray(booking.attendeeEmails)) {
+		for (const email of booking.attendeeEmails) {
+			if (email) attendees.add(email)
+		}
+	}
+	if (booking.email) attendees.add(booking.email)
+
+	let description = booking.note ? `Note: ${booking.note}` : undefined
+	if (booking.cancelLink) {
+		const cancelLine = `Need to cancel? No worries — use this private link: ${booking.cancelLink}`
+		description = description ? `${description}\n${cancelLine}` : cancelLine
+	}
+
 	return {
 		summary: `Rainbow Gym — ${booking.name}`,
-		description: booking.note ? `Note: ${booking.note}` : undefined,
+		description,
 		start: { dateTime: booking.start, timeZone: booking.timezone },
 		end: { dateTime: booking.end, timeZone: booking.timezone },
 		location: location ?? calendarName ?? 'Rainbow Gym',
-		attendees: booking.attendeeEmails?.map(email => ({ email })) ?? undefined,
+		attendees: attendees.size ? Array.from(attendees).map(email => ({ email })) : undefined,
 		guestsCanSeeOtherGuests: true,
 		transparency: 'opaque'
 	}
