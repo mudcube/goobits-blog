@@ -11,8 +11,8 @@ export default {
 	kit: {
 		adapter: adapterCloudflare({
 			routes: {
-				include: ['/*'],
-				exclude: ['<all>']
+				include: ['/api/*'],
+				exclude: ['<build>', '<files>', '<prerendered>']
 			}
 		}),
 		prerender: {
