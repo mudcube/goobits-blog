@@ -4,11 +4,10 @@ import {
 	googleFreeBusy,
 	googleCreateEvent,
 	buildEvent,
-	createBooking,
+	createBookingIfCapacity,
 	getBookingByIdempotency,
 	confirmBooking,
 	cancelBooking,
-	listBookingsBetween,
 	attachEventLink,
 	ensureIdempotentBooking,
 	saveConnection
@@ -19,16 +18,32 @@ function overlaps(aStart, aEnd, bStart, bEnd) {
 	return new Date(aStart) < new Date(bEnd) && new Date(bStart) < new Date(aEnd)
 }
 
+function generateCancelToken() {
+	const bytes = new Uint8Array(32)
+	crypto.getRandomValues(bytes)
+	return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
 export async function onRequest({ env, request }) {
 	try {
 		const rateLimit = await enforceRateLimit({ env, request, keySuffix: 'book', limit: 20, windowSeconds: 60 })
 		if (rateLimit) return rateLimit
 
 		const payload = await readJson(request)
+		if (payload === null) return errorResponse('Invalid JSON', 400, 'invalid_json')
 		const { start, end, timezone, seats, name, email, note, idempotencyKey, attendeeEmails } = payload
 
 		if (!start || !end || !timezone || !name || !email) {
 			return errorResponse('Missing required fields', 400, 'missing_fields')
+		}
+
+		const startTime = Date.parse(start)
+		const endTime = Date.parse(end)
+		if (!Number.isFinite(startTime) || !Number.isFinite(endTime)) {
+			return errorResponse('Invalid start or end time', 400, 'invalid_time')
+		}
+		if (endTime <= startTime) {
+			return errorResponse('End time must be after start time', 400, 'invalid_range')
 		}
 
 		const seatCount = Number.parseInt(seats ?? 1, 10)
@@ -69,12 +84,6 @@ export async function onRequest({ env, request }) {
 			return errorResponse('Time slot is busy', 409, 'busy')
 		}
 
-		const bookings = await listBookingsBetween({ db: env.DB, start, end })
-		const seatsBooked = bookings.reduce((sum, booking) => sum + (booking.seats ?? 1), 0)
-		if (seatsBooked + seatCount > capacity) {
-			return errorResponse('Slot is full', 409, 'full')
-		}
-
 		const storage = {
 			getBookingByIdempotency: ({ idempotencyKey: key }) => getBookingByIdempotency({ db: env.DB, idempotencyKey: key })
 		}
@@ -83,9 +92,10 @@ export async function onRequest({ env, request }) {
 			booking: { idempotencyKey }
 		})
 		if (existing) {
-			return jsonResponse({ ok: true, bookingId: existing.id, status: existing.status })
+			return jsonResponse({ ok: true, bookingId: existing.id, status: existing.status, cancelToken: existing.cancel_token ?? null })
 		}
 
+		const cancelToken = generateCancelToken()
 		const booking = {
 			start,
 			end,
@@ -95,10 +105,14 @@ export async function onRequest({ env, request }) {
 			email,
 			note,
 			idempotencyKey: normalizedKey,
-			attendeeEmails
+			attendeeEmails,
+			cancelToken
 		}
 
-		const bookingRecord = await createBooking({ db: env.DB, booking: { ...booking, status: 'pending' } })
+		const bookingRecord = await createBookingIfCapacity({ db: env.DB, booking: { ...booking, status: 'pending' }, capacity })
+		if (!bookingRecord) {
+			return errorResponse('Slot is full', 409, 'full')
+		}
 
 		const event = buildEvent({ booking, location: getLocation(env) })
 		const calendarId = getPrimaryCalendarId(env)
@@ -125,7 +139,7 @@ export async function onRequest({ env, request }) {
 			throw err
 		}
 
-		return jsonResponse({ ok: true, bookingId: bookingRecord.id, eventLink: created?.htmlLink })
+		return jsonResponse({ ok: true, bookingId: bookingRecord.id, eventLink: created?.htmlLink, cancelToken })
 	} catch (err) {
 		return errorResponse(err?.message || 'Booking failed', 500, 'booking_error')
 	}

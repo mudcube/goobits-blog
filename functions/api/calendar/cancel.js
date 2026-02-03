@@ -1,9 +1,8 @@
 import {
 	ensureValidGoogleToken,
 	getConnection,
-	googleDeleteEvent,
-	getEventLinks,
-	cancelBooking,
+	getBookingByCancelToken,
+	cancelBookingAndEvents,
 	saveConnection
 } from '../../../packages/calendar/src/index.js'
 import { enforceRateLimit, errorResponse, getTokenKey, jsonResponse, readJson } from './_helpers.js'
@@ -14,8 +13,12 @@ export async function onRequest({ env, request }) {
 		if (rateLimit) return rateLimit
 
 		const payload = await readJson(request)
-		const { bookingId } = payload
-		if (!bookingId) return errorResponse('Missing bookingId', 400, 'missing_booking')
+		if (payload === null) return errorResponse('Invalid JSON', 400, 'invalid_json')
+		const { cancelToken } = payload
+		if (!cancelToken) return errorResponse('Missing cancel token', 400, 'missing_token')
+
+		const booking = await getBookingByCancelToken({ db: env.DB, cancelToken })
+		if (!booking) return errorResponse('Invalid cancel token', 404, 'invalid_token')
 
 		const base64Key = getTokenKey(env)
 		const connection = await getConnection({ db: env.DB, provider: 'google', base64Key })
@@ -26,18 +29,7 @@ export async function onRequest({ env, request }) {
 			await saveConnection({ db: env.DB, provider: 'google', token, base64Key })
 		}
 
-		const links = await getEventLinks({ db: env.DB, bookingId })
-		for (const link of links) {
-			if (link.provider === 'google') {
-				await googleDeleteEvent({
-					accessToken: token.accessToken,
-					calendarId: link.calendar_id,
-					eventId: link.event_id
-				})
-			}
-		}
-
-		await cancelBooking({ db: env.DB, bookingId })
+		await cancelBookingAndEvents({ db: env.DB, accessToken: token.accessToken, bookingId: booking.id })
 
 		return jsonResponse({ ok: true })
 	} catch (err) {

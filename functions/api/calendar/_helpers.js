@@ -1,5 +1,5 @@
 import { getEnv, requireEnv } from '../../../packages/calendar/src/config/env.js'
-import { checkRateLimit } from '../../../packages/calendar/src/index.js'
+import { checkRateLimit, parseAdminSessionCookie, validateAdminSession } from '../../../packages/calendar/src/index.js'
 
 export function getCalendarIds(env) {
 	const ids = getEnv(env, 'GOOGLE_CALENDAR_IDS', '')
@@ -44,13 +44,11 @@ export function getAdminPasscode(env) {
 	return getEnv(env, 'ADMIN_PASSCODE', '')
 }
 
-export function requireAdmin({ env, request }) {
-	const expected = getAdminPasscode(env)
-	if (!expected) return true
-
-	const url = new URL(request.url)
-	const code = request.headers.get('x-admin-code') || url.searchParams.get('code') || ''
-	return code === expected
+export async function requireAdmin({ env, request }) {
+	const token = parseAdminSessionCookie(request.headers.get('cookie'))
+	if (!token) return false
+	const result = await validateAdminSession({ db: env.DB, token })
+	return result?.valid ?? false
 }
 
 export function errorResponse(message, status = 400, code = 'bad_request') {
@@ -67,7 +65,11 @@ export function jsonResponse(data, status = 200) {
 export async function readJson(request) {
 	const text = await request.text()
 	if (!text) return {}
-	return JSON.parse(text)
+	try {
+		return JSON.parse(text)
+	} catch (err) {
+		return null
+	}
 }
 
 export async function enforceRateLimit({ env, request, keySuffix, limit = 30, windowSeconds = 60 }) {
