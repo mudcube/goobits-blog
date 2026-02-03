@@ -3,7 +3,7 @@ import { errorResponse, jsonResponse, requireAdmin } from './_helpers.js'
 
 export async function onRequest({ env, request }) {
 	try {
-		if (!requireAdmin({ env, request })) {
+		if (!await requireAdmin({ env, request })) {
 			return errorResponse('Unauthorized', 401, 'unauthorized')
 		}
 
