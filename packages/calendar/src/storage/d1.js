@@ -35,11 +35,12 @@ export async function saveConnection({ db, provider, token, base64Key }) {
 
 export async function createBooking({ db, booking }) {
 	const result = await db.prepare(
-		`INSERT INTO bookings (idempotency_key, start_at, end_at, timezone, seats, name, email, note, status, created_at)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%s','now'))`
+		`INSERT INTO bookings (idempotency_key, cancel_token, start_at, end_at, timezone, seats, name, email, note, status, created_at)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%s','now'))`
 	)
 		.bind(
 			booking.idempotencyKey,
+			booking.cancelToken ?? null,
 			booking.start,
 			booking.end,
 			booking.timezone,
@@ -54,11 +55,53 @@ export async function createBooking({ db, booking }) {
 	return { id: result.meta.last_row_id }
 }
 
+export async function createBookingIfCapacity({ db, booking, capacity }) {
+	const result = await db.prepare(
+		`INSERT INTO bookings (idempotency_key, cancel_token, start_at, end_at, timezone, seats, name, email, note, status, created_at)
+		 SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%s','now')
+		 WHERE (
+		  SELECT COALESCE(SUM(seats), 0)
+		  FROM bookings
+		  WHERE status IN ('confirmed', 'pending')
+		    AND start_at < ?
+		    AND end_at > ?
+		 ) + ? <= ?`
+	)
+		.bind(
+			booking.idempotencyKey,
+			booking.cancelToken ?? null,
+			booking.start,
+			booking.end,
+			booking.timezone,
+			booking.seats,
+			booking.name,
+			booking.email,
+			booking.note ?? null,
+			booking.status ?? 'pending',
+			booking.end,
+			booking.start,
+			booking.seats,
+			capacity
+		)
+		.run()
+
+	const changes = result?.meta?.changes ?? 0
+	if (!changes) return null
+	return { id: result.meta.last_row_id }
+}
+
 export async function getBookingByIdempotency({ db, idempotencyKey }) {
 	if (!idempotencyKey) return null
 	return db.prepare(
 		`SELECT * FROM bookings WHERE idempotency_key = ? LIMIT 1`
 	).bind(idempotencyKey).first()
+}
+
+export async function getBookingByCancelToken({ db, cancelToken }) {
+	if (!cancelToken) return null
+	return db.prepare(
+		`SELECT * FROM bookings WHERE cancel_token = ? LIMIT 1`
+	).bind(cancelToken).first()
 }
 
 export async function listBookingsBetween({ db, start, end }) {
@@ -139,4 +182,66 @@ export async function checkRateLimit({ db, key, limit = 30, windowSeconds = 60 }
 	).bind(key).run()
 
 	return { allowed: true, remaining: limit - (row.count + 1), resetAt: row.reset_at }
+}
+
+// Rainbow Auth Functions
+
+export async function createRainbowUser({ db, provider, providerId, email, name, avatarUrl }) {
+	const result = await db.prepare(
+		`INSERT INTO rainbow_users (provider, provider_id, email, name, avatar_url, created_at, last_login_at)
+		 VALUES (?, ?, ?, ?, ?, strftime('%s','now'), strftime('%s','now'))
+		 ON CONFLICT(provider, provider_id) DO UPDATE SET
+		  email = excluded.email,
+		  name = COALESCE(excluded.name, rainbow_users.name),
+		  avatar_url = COALESCE(excluded.avatar_url, rainbow_users.avatar_url),
+		  last_login_at = strftime('%s','now')`
+	).bind(provider, providerId, email, name, avatarUrl).run()
+
+	// Get the user (either newly created or existing)
+	const user = await db.prepare(
+		`SELECT * FROM rainbow_users WHERE provider = ? AND provider_id = ? LIMIT 1`
+	).bind(provider, providerId).first()
+
+	return user
+}
+
+export async function getRainbowUserById({ db, userId }) {
+	return db.prepare(
+		`SELECT * FROM rainbow_users WHERE id = ? LIMIT 1`
+	).bind(userId).first()
+}
+
+export async function listRainbowUsers({ db }) {
+	const res = await db.prepare(
+		`SELECT * FROM rainbow_users ORDER BY last_login_at DESC`
+	).all()
+	return res?.results ?? []
+}
+
+export async function createRainbowOauthState({ db, state, provider, inviteCode, redirectTo }) {
+	await db.prepare(
+		`INSERT INTO rainbow_oauth_states (state, provider, invite_code, redirect_to, created_at)
+		 VALUES (?, ?, ?, ?, strftime('%s','now'))`
+	).bind(state, provider, inviteCode, redirectTo).run()
+}
+
+export async function consumeRainbowOauthState({ db, state, maxAgeSeconds = 600 }) {
+	const row = await db.prepare(
+		`SELECT state, provider, invite_code, redirect_to, created_at FROM rainbow_oauth_states WHERE state = ? LIMIT 1`
+	).bind(state).first()
+
+	if (!row) return null
+
+	const now = Math.floor(Date.now() / 1000)
+	if (now - row.created_at > maxAgeSeconds) {
+		await db.prepare(`DELETE FROM rainbow_oauth_states WHERE state = ?`).bind(state).run()
+		return null
+	}
+
+	await db.prepare(`DELETE FROM rainbow_oauth_states WHERE state = ?`).bind(state).run()
+	return {
+		provider: row.provider,
+		inviteCode: row.invite_code,
+		redirectTo: row.redirect_to
+	}
 }

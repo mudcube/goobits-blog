@@ -37,7 +37,8 @@ export default {
 			'@media': './src/media',
 			'@routes': './src/routes',
 			'@src': './src',
-			'@static': './static'
+			'@static': './static',
+			'@packages': './packages'
 		}
 	},
 	extensions: [ '.svelte', '.md' ],

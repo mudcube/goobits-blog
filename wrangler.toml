@@ -20,3 +20,10 @@ database_id = "your-database-id-here"  # Replace after running: wrangler d1 crea
 # - ADMIN_PASSCODE
 # - GOOGLE_OAUTH_CLIENT_ID
 # - GOOGLE_OAUTH_CLIENT_SECRET
+# - GOOGLE_CLIENT_ID (for Rainbow OAuth)
+# - GOOGLE_CLIENT_SECRET (for Rainbow OAuth)
+# - APPLE_CLIENT_ID
+# - APPLE_TEAM_ID
+# - APPLE_KEY_ID
+# - APPLE_PRIVATE_KEY
+# - PUBLIC_BASE_URL (e.g., https://yourdomain.com)
