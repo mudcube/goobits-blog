@@ -1,5 +1,5 @@
 import { getEnv, requireEnv } from '../../../packages/calendar/src/config/env.js'
-import { checkRateLimit, parseAdminSessionCookie, validateAdminSession } from '../../../packages/calendar/src/index.js'
+import { checkRateLimit, validateAdminSessionFromHeader } from '../../../packages/calendar/src/index.js'
 
 export function getCalendarIds(env) {
 	const ids = getEnv(env, 'GOOGLE_CALENDAR_IDS', '')
@@ -45,10 +45,12 @@ export function getAdminPasscode(env) {
 }
 
 export async function requireAdmin({ env, request }) {
-	const token = parseAdminSessionCookie(request.headers.get('cookie'))
-	if (!token) return false
-	const result = await validateAdminSession({ db: env.DB, token })
-	return result?.valid ?? false
+	const result = await validateAdminSessionFromHeader({
+		db: env.DB,
+		cookieHeader: request.headers.get('cookie'),
+		secureCookies: env.NODE_ENV !== 'development'
+	})
+	return result?.ok ?? false
 }
 
 export function errorResponse(message, status = 400, code = 'bad_request') {

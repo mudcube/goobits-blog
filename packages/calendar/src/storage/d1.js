@@ -186,62 +186,13 @@ export async function checkRateLimit({ db, key, limit = 30, windowSeconds = 60 }
 
 // Calendar Auth Functions
 
-export async function createCalendarUser({ db, provider, providerId, email, name, avatarUrl }) {
-	const result = await db.prepare(
-		`INSERT INTO calendar_users (provider, provider_id, email, name, avatar_url, created_at, last_login_at)
-		 VALUES (?, ?, ?, ?, ?, strftime('%s','now'), strftime('%s','now'))
-		 ON CONFLICT(provider, provider_id) DO UPDATE SET
-		  email = excluded.email,
-		  name = COALESCE(excluded.name, calendar_users.name),
-		  avatar_url = COALESCE(excluded.avatar_url, calendar_users.avatar_url),
-		  last_login_at = strftime('%s','now')`
-	).bind(provider, providerId, email, name, avatarUrl).run()
-
-	// Get the user (either newly created or existing)
-	const user = await db.prepare(
-		`SELECT * FROM calendar_users WHERE provider = ? AND provider_id = ? LIMIT 1`
-	).bind(provider, providerId).first()
-
-	return user
-}
-
-export async function getCalendarUserById({ db, userId }) {
-	return db.prepare(
-		`SELECT * FROM calendar_users WHERE id = ? LIMIT 1`
-	).bind(userId).first()
-}
-
 export async function listCalendarUsers({ db }) {
 	const res = await db.prepare(
-		`SELECT * FROM calendar_users ORDER BY last_login_at DESC`
+		`SELECT u.*, MIN(o.provider) as provider
+		 FROM calendar_users u
+		 LEFT JOIN calendar_oauth_accounts o ON o.user_id = u.id
+		 GROUP BY u.id
+		 ORDER BY u.last_login_at DESC`
 	).all()
 	return res?.results ?? []
-}
-
-export async function createCalendarOauthState({ db, state, provider, inviteCode, redirectTo }) {
-	await db.prepare(
-		`INSERT INTO calendar_oauth_states (state, provider, invite_code, redirect_to, created_at)
-		 VALUES (?, ?, ?, ?, strftime('%s','now'))`
-	).bind(state, provider, inviteCode, redirectTo).run()
-}
-
-export async function consumeCalendarOauthState({ db, state, maxAgeSeconds = 600 }) {
-	const row = await db.prepare(
-		`SELECT state, provider, invite_code, redirect_to, created_at FROM calendar_oauth_states WHERE state = ? LIMIT 1`
-	).bind(state).first()
-
-	if (!row) return null
-
-	const now = Math.floor(Date.now() / 1000)
-	if (now - row.created_at > maxAgeSeconds) {
-		await db.prepare(`DELETE FROM calendar_oauth_states WHERE state = ?`).bind(state).run()
-		return null
-	}
-
-	await db.prepare(`DELETE FROM calendar_oauth_states WHERE state = ?`).bind(state).run()
-	return {
-		provider: row.provider,
-		inviteCode: row.invite_code,
-		redirectTo: row.redirect_to
-	}
 }
