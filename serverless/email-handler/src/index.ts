@@ -9,18 +9,27 @@ const ALLOWED_ORIGINS = [
 	'http://localhost:4173'
 ]
 
-let cachedSesClient = null
-
-function getEnv(name) {
-	return typeof globalThis[name] !== 'undefined' ? globalThis[name] : undefined
+type FetchEventLike = {
+	request: Request
+	respondWith: (response: Response | Promise<Response>) => void
 }
 
-function isAllowedOrigin(origin) {
+declare const addEventListener: (type: 'fetch', listener: (event: FetchEventLike) => void) => void
+
+let cachedSesClient: SESClient | null = null
+
+function getEnv(name: string): string | undefined {
+	const globals = globalThis as Record<string, unknown>
+	const value = globals[name]
+	return typeof value === 'string' ? value : undefined
+}
+
+function isAllowedOrigin(origin: string | null) {
 	if (!origin) return true
 	return ALLOWED_ORIGINS.includes(origin)
 }
 
-function buildCorsHeaders(origin) {
+function buildCorsHeaders(origin: string | null) {
 	const headers = new Headers({
 		'Access-Control-Allow-Headers': 'content-type',
 		'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -32,19 +41,19 @@ function buildCorsHeaders(origin) {
 	return headers
 }
 
-function sanitizeHeader(value) {
+function sanitizeHeader(value: unknown) {
 	if (!value) return ''
 	return String(value).replace(/[\r\n]+/g, ' ').trim()
 }
 
-function normalizeText(value, maxLength) {
+function normalizeText(value: unknown, maxLength: number) {
 	if (typeof value !== 'string') return ''
 	const trimmed = value.trim()
 	if (!trimmed) return ''
 	return trimmed.length > maxLength ? '' : trimmed
 }
 
-function normalizeEmail(value) {
+function normalizeEmail(value: unknown) {
 	if (typeof value !== 'string') return ''
 	const trimmed = value.trim().toLowerCase()
 	if (!trimmed || trimmed.length > 254) return ''
@@ -65,7 +74,7 @@ function getSesClient() {
 	return cachedSesClient
 }
 
-async function readJson(request) {
+async function readJson(request: Request) {
 	const contentLength = request.headers.get('content-length')
 	if (contentLength) {
 		const bytes = Number.parseInt(contentLength, 10)
@@ -89,7 +98,7 @@ async function readJson(request) {
  * @param request
  * @returns {Promise<Response>}
  */
-async function handleRequest(request) {
+async function handleRequest(request: Request) {
 	const origin = request.headers.get('Origin')
 	const corsHeaders = buildCorsHeaders(origin)
 	if (origin && !isAllowedOrigin(origin)) {
@@ -130,7 +139,7 @@ async function handleRequest(request) {
 	try {
 		const safeName = sanitizeHeader(name) || 'Website Visitor'
 		const safeEmail = sanitizeHeader(email)
-		const { status } = await sesClient.send(new SendEmailCommand({
+		const response = await sesClient.send(new SendEmailCommand({
 			Source: `${safeName} <${MY_EMAIL}>`,
 			Destination: {
 				ToAddresses: [MY_EMAIL]
@@ -149,6 +158,7 @@ async function handleRequest(request) {
 				}
 			}
 		}))
+		const status = response.$metadata?.httpStatusCode ?? 200
 
 		return new Response(`SES responded okay ${status}`, {
 			status: 200,
@@ -162,16 +172,17 @@ async function handleRequest(request) {
 	}
 }
 
-addEventListener('fetch', event => {
-	switch (event.request.method) {
+addEventListener('fetch', (event: FetchEventLike) => {
+	const { request } = event
+	switch (request.method) {
 		case 'POST':
 			event.respondWith(
-				handleRequest(event.request)
+				handleRequest(request)
 			)
 			break
 
 		case 'OPTIONS': {
-			const origin = event.request.headers.get('Origin')
+			const origin = request.headers.get('Origin')
 			const corsHeaders = buildCorsHeaders(origin)
 			if (origin && !isAllowedOrigin(origin)) {
 				event.respondWith(
@@ -192,10 +203,23 @@ addEventListener('fetch', event => {
 		}
 
 		default:
+			{
+				const origin = request.headers.get('Origin')
+				const corsHeaders = buildCorsHeaders(origin)
+				if (origin && !isAllowedOrigin(origin)) {
+					event.respondWith(
+						new Response('Forbidden', {
+							status: 403,
+							headers: corsHeaders
+						})
+					)
+					break
+				}
+			}
 			event.respondWith(
 				new Response('Bad Request', {
 					status: 400,
-					headers: corsHeaders
+					headers: buildCorsHeaders(request.headers.get('Origin'))
 				})
 			)
 			break
