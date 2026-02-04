@@ -1,6 +1,12 @@
-import { normalizeIdempotencyKey } from '../security/idempotency.js'
+import { normalizeIdempotencyKey } from '../security/idempotency.ts'
 
-export async function ensureIdempotentBooking({ storage, booking }) {
+export async function ensureIdempotentBooking({
+	storage,
+	booking
+}: {
+	storage: { getBookingByIdempotency: (args: { idempotencyKey: string }) => Promise<any> }
+	booking: { idempotencyKey?: string | null }
+}) {
 	const idempotencyKey = normalizeIdempotencyKey(booking.idempotencyKey)
 	if (!idempotencyKey) return { existing: null, idempotencyKey: null }
 
@@ -8,7 +14,15 @@ export async function ensureIdempotentBooking({ storage, booking }) {
 	return { existing, idempotencyKey }
 }
 
-export function buildEvent({ booking, calendarName, location }) {
+export function buildEvent({
+	booking,
+	calendarName,
+	location
+}: {
+	booking: any
+	calendarName?: string
+	location?: string
+}) {
 	const attendees = new Set()
 	if (Array.isArray(booking.attendeeEmails)) {
 		for (const email of booking.attendeeEmails) {

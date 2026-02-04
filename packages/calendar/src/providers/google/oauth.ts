@@ -1,7 +1,17 @@
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 
-export function buildAuthUrl({ clientId, redirectUri, scopes, state }) {
+export function buildAuthUrl({
+	clientId,
+	redirectUri,
+	scopes,
+	state
+}: {
+	clientId: string
+	redirectUri: string
+	scopes: string[]
+	state: string
+}) {
 	const params = new URLSearchParams({
 		client_id: clientId,
 		redirect_uri: redirectUri,
@@ -15,7 +25,17 @@ export function buildAuthUrl({ clientId, redirectUri, scopes, state }) {
 	return `${GOOGLE_AUTH_URL}?${params.toString()}`
 }
 
-export async function exchangeCodeForTokens({ clientId, clientSecret, redirectUri, code }) {
+export async function exchangeCodeForTokens({
+	clientId,
+	clientSecret,
+	redirectUri,
+	code
+}: {
+	clientId: string
+	clientSecret: string
+	redirectUri: string
+	code: string
+}) {
 	const body = new URLSearchParams({
 		client_id: clientId,
 		client_secret: clientSecret,
@@ -38,7 +58,15 @@ export async function exchangeCodeForTokens({ clientId, clientSecret, redirectUr
 	return res.json()
 }
 
-export async function refreshAccessToken({ clientId, clientSecret, refreshToken }) {
+export async function refreshAccessToken({
+	clientId,
+	clientSecret,
+	refreshToken
+}: {
+	clientId: string
+	clientSecret: string
+	refreshToken: string
+}) {
 	const body = new URLSearchParams({
 		client_id: clientId,
 		client_secret: clientSecret,

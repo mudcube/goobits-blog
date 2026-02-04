@@ -4,7 +4,17 @@ export function generateInviteCode() {
 	return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-export async function createInvite({ db, email = null, usesRemaining = 1, expiresAt = null }) {
+export async function createInvite({
+	db,
+	email = null,
+	usesRemaining = 1,
+	expiresAt = null
+}: {
+	db: any
+	email?: string | null
+	usesRemaining?: number
+	expiresAt?: number | null
+}) {
 	const code = generateInviteCode()
 
 	const result = await db.prepare(
@@ -15,7 +25,15 @@ export async function createInvite({ db, email = null, usesRemaining = 1, expire
 	return { id: result.meta.last_row_id, code }
 }
 
-export async function validateInvite({ db, code, email = null }) {
+export async function validateInvite({
+	db,
+	code,
+	email = null
+}: {
+	db: any
+	code: string
+	email?: string | null
+}) {
 	if (!code) return { valid: false, reason: 'missing_code' }
 
 	const invite = await db.prepare(
@@ -33,14 +51,22 @@ export async function validateInvite({ db, code, email = null }) {
 		return { valid: false, reason: 'exhausted' }
 	}
 
-	if (invite.email && email && invite.email.toLowerCase() !== email.toLowerCase()) {
+	if (invite.email && email && String(invite.email).toLowerCase() !== email.toLowerCase()) {
 		return { valid: false, reason: 'email_mismatch' }
 	}
 
 	return { valid: true, invite }
 }
 
-export async function consumeInvite({ db, inviteId, userId }) {
+export async function consumeInvite({
+	db,
+	inviteId,
+	userId
+}: {
+	db: any
+	inviteId: number
+	userId: string
+}) {
 	await db.prepare(
 		`UPDATE calendar_invites SET uses_remaining = uses_remaining - 1 WHERE id = ? AND uses_remaining > 0`
 	).bind(inviteId).run()
@@ -51,7 +77,7 @@ export async function consumeInvite({ db, inviteId, userId }) {
 	).bind(inviteId, userId).run()
 }
 
-export async function listInvites({ db }) {
+export async function listInvites({ db }: { db: any }) {
 	const res = await db.prepare(
 		`SELECT i.*, COUNT(r.id) as times_used
 		 FROM calendar_invites i
@@ -62,11 +88,11 @@ export async function listInvites({ db }) {
 	return res?.results ?? []
 }
 
-export async function deleteInvite({ db, inviteId }) {
+export async function deleteInvite({ db, inviteId }: { db: any; inviteId: number }) {
 	await db.prepare(`DELETE FROM calendar_invites WHERE id = ?`).bind(inviteId).run()
 }
 
-export async function hasUserRedeemedAnyInvite({ db, userId }) {
+export async function hasUserRedeemedAnyInvite({ db, userId }: { db: any; userId: string }) {
 	const row = await db.prepare(
 		`SELECT id FROM calendar_invite_redemptions WHERE user_id = ? LIMIT 1`
 	).bind(userId).first()

@@ -1,4 +1,4 @@
-export function normalizeIdempotencyKey(key) {
+export function normalizeIdempotencyKey(key: unknown) {
 	if (!key || typeof key !== 'string') return null
 	const trimmed = key.trim()
 	if (!trimmed) return null

@@ -5,7 +5,20 @@ import { hashPassword } from '@goobits/auth/utils'
 export const ADMIN_EMAIL = 'admin@miko.art'
 export const ADMIN_COOKIE_NAME = 'admin_session'
 
-export function createAdminAdapters({ db, secureCookies = true, sessionLifetimeMs = 60 * 24 * 60 * 60 * 1000 } = {}) {
+type EnvLike = { [key: string]: any }
+
+export function createAdminAdapters({
+	db,
+	secureCookies = true,
+	sessionLifetimeMs = 60 * 24 * 60 * 60 * 1000
+}: {
+	db?: any
+	secureCookies?: boolean
+	sessionLifetimeMs?: number
+} = {}) {
+	if (!db) {
+		throw new Error('createAdminAdapters requires db')
+	}
 	const userAdapter = new D1UserAdapter(db, {
 		usersTable: 'admin_users',
 		columns: {
@@ -31,7 +44,13 @@ export function createAdminAdapters({ db, secureCookies = true, sessionLifetimeM
 	return { userAdapter, sessionAdapter, credentialsProvider }
 }
 
-export async function ensureAdminUser({ userAdapter, passcode }) {
+export async function ensureAdminUser({
+	userAdapter,
+	passcode
+}: {
+	userAdapter: any
+	passcode: string
+}) {
 	const existing = await userAdapter.getUserByEmail(ADMIN_EMAIL)
 	if (existing) return existing
 	const password = await hashPassword(passcode)
@@ -42,7 +61,7 @@ export async function ensureAdminUser({ userAdapter, passcode }) {
 	}, { password })
 }
 
-export function parseCookieHeader(cookieHeader, cookieName) {
+export function parseCookieHeader(cookieHeader: string | null, cookieName: string) {
 	if (!cookieHeader) return null
 	const cookies = Object.fromEntries(
 		cookieHeader.split(';').map(chunk => {
@@ -53,9 +72,17 @@ export function parseCookieHeader(cookieHeader, cookieName) {
 	return cookies[cookieName] || null
 }
 
-export async function validateAdminSessionFromHeader({ db, cookieHeader, secureCookies = true }) {
+export async function validateAdminSessionFromHeader({
+	db,
+	cookieHeader,
+	secureCookies = true
+}: {
+	db: any
+	cookieHeader: string | null
+	secureCookies?: boolean
+}) {
 	const { sessionAdapter } = createAdminAdapters({ db, secureCookies })
-	const token = parseCookieHeader(cookieHeader, sessionAdapter.cookieName)
+	const token = parseCookieHeader(cookieHeader, ADMIN_COOKIE_NAME)
 	if (!token) return { ok: false }
 	const { session, user } = await sessionAdapter.validateSession(token)
 	return { ok: !!session, session, user, sessionAdapter }

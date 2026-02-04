@@ -1,6 +1,14 @@
 const CALENDAR_BASE = 'https://www.googleapis.com/calendar/v3/calendars'
 
-export async function createEvent({ accessToken, calendarId, event }) {
+export async function createEvent({
+	accessToken,
+	calendarId,
+	event
+}: {
+	accessToken: string
+	calendarId: string
+	event: any
+}) {
 	const res = await fetch(`${CALENDAR_BASE}/${encodeURIComponent(calendarId)}/events`, {
 		method: 'POST',
 		headers: {
@@ -19,7 +27,15 @@ export async function createEvent({ accessToken, calendarId, event }) {
 	return { id: data.id, htmlLink: data.htmlLink }
 }
 
-export async function deleteEvent({ accessToken, calendarId, eventId }) {
+export async function deleteEvent({
+	accessToken,
+	calendarId,
+	eventId
+}: {
+	accessToken: string
+	calendarId: string
+	eventId: string
+}) {
 	const res = await fetch(`${CALENDAR_BASE}/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`, {
 		method: 'DELETE',
 		headers: {
