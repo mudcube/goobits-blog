@@ -11,10 +11,12 @@ import {
 	attachEventLink,
 	ensureIdempotentBooking,
 	saveConnection
-} from '../../../packages/calendar/src/index.js'
-import { enforceRateLimit, errorResponse, getCalendarIds, getCapacity, getLocation, getMinNoticeHours, getPrimaryCalendarId, getTokenKey, jsonResponse, readJson } from './_helpers.js'
+} from '../../../packages/calendar/src/index.ts'
+import { enforceRateLimit, errorResponse, getCalendarIds, getCapacity, getLocation, getMinNoticeHours, getPrimaryCalendarId, getTokenKey, jsonResponse, readJson } from './_helpers.ts'
 
-function overlaps(aStart, aEnd, bStart, bEnd) {
+type EnvLike = { DB?: any; [key: string]: any }
+
+function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
 	return new Date(aStart) < new Date(bEnd) && new Date(bStart) < new Date(aEnd)
 }
 
@@ -24,7 +26,7 @@ function generateCancelToken() {
 	return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-function normalizeText(value, maxLength) {
+function normalizeText(value: unknown, maxLength: number) {
 	if (typeof value !== 'string') return null
 	const trimmed = value.trim()
 	if (!trimmed) return null
@@ -32,7 +34,7 @@ function normalizeText(value, maxLength) {
 	return trimmed
 }
 
-function normalizeEmail(value) {
+function normalizeEmail(value: unknown) {
 	if (typeof value !== 'string') return null
 	const trimmed = value.trim().toLowerCase()
 	if (!trimmed || trimmed.length > 254) return null
@@ -40,7 +42,7 @@ function normalizeEmail(value) {
 	return emailPattern.test(trimmed) ? trimmed : null
 }
 
-function isValidTimeZone(value) {
+function isValidTimeZone(value: unknown) {
 	if (typeof value !== 'string' || value.length > 100) return false
 	try {
 		Intl.DateTimeFormat('en-US', { timeZone: value })
@@ -50,13 +52,19 @@ function isValidTimeZone(value) {
 	}
 }
 
-export async function onRequest({ env, request }) {
+export async function onRequest({ env, request }: { env: EnvLike; request: Request }) {
 	try {
 		const rateLimit = await enforceRateLimit({ env, request, keySuffix: 'book', limit: 20, windowSeconds: 60 })
 		if (rateLimit) return rateLimit
 
 		const parsed = await readJson(request, { maxBytes: 8192 })
-		if (!parsed.ok) return errorResponse(parsed.error.message, parsed.status, parsed.error.code)
+		if (!parsed.ok) {
+			return errorResponse(
+				parsed.error?.message ?? 'Invalid request',
+				parsed.status ?? 400,
+				parsed.error?.code ?? 'bad_request'
+			)
+		}
 		const payload = parsed.value || {}
 		const { start, end, timezone, seats, name, email, note, idempotencyKey } = payload
 
@@ -123,7 +131,8 @@ export async function onRequest({ env, request }) {
 		}
 
 		const storage = {
-			getBookingByIdempotency: ({ idempotencyKey: key }) => getBookingByIdempotency({ db: env.DB, idempotencyKey: key })
+			getBookingByIdempotency: ({ idempotencyKey: key }: { idempotencyKey: string }) =>
+				getBookingByIdempotency({ db: env.DB, idempotencyKey: key })
 		}
 		const { existing, idempotencyKey: normalizedKey } = await ensureIdempotentBooking({
 			storage,
@@ -156,8 +165,11 @@ export async function onRequest({ env, request }) {
 			return errorResponse('Slot is full', 409, 'full')
 		}
 
-		const event = buildEvent({ booking, location: getLocation(env) })
+		const event = buildEvent({ booking, location: getLocation(env), calendarName: getLocation(env) })
 		const calendarId = getPrimaryCalendarId(env)
+		if (!calendarId) {
+			return errorResponse('No primary calendar configured', 400, 'no_primary_calendar')
+		}
 		let created = null
 		try {
 			created = await googleCreateEvent({

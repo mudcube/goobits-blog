@@ -1,7 +1,9 @@
-import { consumeOauthState, exchangeGoogleCode, saveConnection } from '../../../packages/calendar/src/index.js'
-import { errorResponse, getTokenKey } from './_helpers.js'
+import { consumeOauthState, exchangeGoogleCode, saveConnection } from '../../../packages/calendar/src/index.ts'
+import { errorResponse, getTokenKey } from './_helpers.ts'
 
-export async function onRequest({ env, request }) {
+type EnvLike = { DB?: any; [key: string]: any }
+
+export async function onRequest({ env, request }: { env: EnvLike; request: Request }) {
 	try {
 		const url = new URL(request.url)
 		const code = url.searchParams.get('code')

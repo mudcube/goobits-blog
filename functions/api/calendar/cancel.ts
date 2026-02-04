@@ -4,16 +4,24 @@ import {
 	getBookingByCancelToken,
 	cancelBookingAndEvents,
 	saveConnection
-} from '../../../packages/calendar/src/index.js'
-import { enforceRateLimit, errorResponse, getTokenKey, jsonResponse, readJson } from './_helpers.js'
+} from '../../../packages/calendar/src/index.ts'
+import { enforceRateLimit, errorResponse, getTokenKey, jsonResponse, readJson } from './_helpers.ts'
 
-export async function onRequest({ env, request }) {
+type EnvLike = { DB?: any; [key: string]: any }
+
+export async function onRequest({ env, request }: { env: EnvLike; request: Request }) {
 	try {
 		const rateLimit = await enforceRateLimit({ env, request, keySuffix: 'cancel', limit: 20, windowSeconds: 60 })
 		if (rateLimit) return rateLimit
 
 		const parsed = await readJson(request, { maxBytes: 2048 })
-		if (!parsed.ok) return errorResponse(parsed.error.message, parsed.status, parsed.error.code)
+		if (!parsed.ok) {
+			return errorResponse(
+				parsed.error?.message ?? 'Invalid request',
+				parsed.status ?? 400,
+				parsed.error?.code ?? 'bad_request'
+			)
+		}
 		const payload = parsed.value || {}
 		const { cancelToken } = payload
 		if (!cancelToken) return errorResponse('Missing cancel token', 400, 'missing_token')

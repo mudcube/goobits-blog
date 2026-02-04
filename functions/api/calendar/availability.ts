@@ -5,10 +5,12 @@ import {
 	listBookingsBetween,
 	buildSlots,
 	saveConnection
-} from '../../../packages/calendar/src/index.js'
-import { enforceRateLimit, errorResponse, getCalendarIds, getBufferMinutes, getCapacity, getMinNoticeHours, getSlotMinutes, getTokenKey, jsonResponse } from './_helpers.js'
+} from '../../../packages/calendar/src/index.ts'
+import { enforceRateLimit, errorResponse, getCalendarIds, getBufferMinutes, getCapacity, getMinNoticeHours, getSlotMinutes, getTokenKey, jsonResponse } from './_helpers.ts'
 
-export async function onRequest({ env, request }) {
+type EnvLike = { DB?: any; NODE_ENV?: string; [key: string]: any }
+
+export async function onRequest({ env, request }: { env: EnvLike; request: Request }) {
 	try {
 		const rateLimit = await enforceRateLimit({ env, request, keySuffix: 'availability', limit: 60, windowSeconds: 60 })
 		if (rateLimit) return rateLimit
