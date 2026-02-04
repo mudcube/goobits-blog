@@ -12,10 +12,14 @@ export async function onRequest({ env, request }) {
 		const rateLimit = await enforceRateLimit({ env, request, keySuffix: 'cancel', limit: 20, windowSeconds: 60 })
 		if (rateLimit) return rateLimit
 
-		const payload = await readJson(request)
-		if (payload === null) return errorResponse('Invalid JSON', 400, 'invalid_json')
+		const parsed = await readJson(request, { maxBytes: 2048 })
+		if (!parsed.ok) return errorResponse(parsed.error.message, parsed.status, parsed.error.code)
+		const payload = parsed.value || {}
 		const { cancelToken } = payload
 		if (!cancelToken) return errorResponse('Missing cancel token', 400, 'missing_token')
+		if (typeof cancelToken !== 'string' || cancelToken.length !== 64 || !/^[a-f0-9]+$/i.test(cancelToken)) {
+			return errorResponse('Invalid cancel token', 400, 'invalid_token')
+		}
 
 		const booking = await getBookingByCancelToken({ db: env.DB, cancelToken })
 		if (!booking) return errorResponse('Invalid cancel token', 404, 'invalid_token')
@@ -33,6 +37,7 @@ export async function onRequest({ env, request }) {
 
 		return jsonResponse({ ok: true })
 	} catch (err) {
-		return errorResponse(err?.message || 'Cancel failed', 500, 'cancel_error')
+		console.error('Cancel error:', err)
+		return errorResponse('Cancel failed', 500, 'cancel_error')
 	}
 }

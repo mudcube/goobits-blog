@@ -19,6 +19,18 @@ export async function onRequest({ env, request }) {
 		if (!timeMin || !timeMax) {
 			return errorResponse('Missing start or end', 400, 'missing_range')
 		}
+		const startMs = Date.parse(timeMin)
+		const endMs = Date.parse(timeMax)
+		if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) {
+			return errorResponse('Invalid start or end time', 400, 'invalid_time')
+		}
+		if (endMs <= startMs) {
+			return errorResponse('End time must be after start time', 400, 'invalid_range')
+		}
+		const maxRangeMs = 90 * 24 * 60 * 60 * 1000
+		if (endMs - startMs > maxRangeMs) {
+			return errorResponse('Range is too large', 400, 'range_too_large')
+		}
 
 		const calendarIds = getCalendarIds(env)
 		if (calendarIds.length === 0) return errorResponse('No calendars configured', 400, 'no_calendars')
@@ -57,6 +69,7 @@ export async function onRequest({ env, request }) {
 
 		return jsonResponse({ slots })
 	} catch (err) {
-		return errorResponse(err?.message || 'Failed to load availability', 500, 'availability_error')
+		console.error('Availability error:', err)
+		return errorResponse('Failed to load availability', 500, 'availability_error')
 	}
 }

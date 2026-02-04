@@ -64,18 +64,31 @@ export function jsonResponse(data, status = 200) {
 	})
 }
 
-export async function readJson(request) {
+export async function readJson(request, { maxBytes = 8192 } = {}) {
+	const contentLength = request.headers.get('content-length')
+	if (contentLength) {
+		const bytes = Number.parseInt(contentLength, 10)
+		if (Number.isFinite(bytes) && bytes > maxBytes) {
+			return { ok: false, status: 413, error: { code: 'payload_too_large', message: 'Payload too large' } }
+		}
+	}
+
 	const text = await request.text()
-	if (!text) return {}
+	if (!text) return { ok: true, value: {} }
+	if (text.length > maxBytes) {
+		return { ok: false, status: 413, error: { code: 'payload_too_large', message: 'Payload too large' } }
+	}
+
 	try {
-		return JSON.parse(text)
+		return { ok: true, value: JSON.parse(text) }
 	} catch (err) {
-		return null
+		return { ok: false, status: 400, error: { code: 'invalid_json', message: 'Invalid JSON' } }
 	}
 }
 
 export async function enforceRateLimit({ env, request, keySuffix, limit = 30, windowSeconds = 60 }) {
-	const ip = request.headers.get('cf-connecting-ip') || 'unknown'
+	const forwarded = request.headers.get('x-forwarded-for')
+	const ip = request.headers.get('cf-connecting-ip') || (forwarded ? forwarded.split(',')[0].trim() : '') || 'unknown'
 	const key = `rate:${keySuffix}:${ip}`
 	const result = await checkRateLimit({ db: env.DB, key, limit, windowSeconds })
 	if (!result.allowed) {

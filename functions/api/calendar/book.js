@@ -24,17 +24,55 @@ function generateCancelToken() {
 	return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
+function normalizeText(value, maxLength) {
+	if (typeof value !== 'string') return null
+	const trimmed = value.trim()
+	if (!trimmed) return null
+	if (trimmed.length > maxLength) return null
+	return trimmed
+}
+
+function normalizeEmail(value) {
+	if (typeof value !== 'string') return null
+	const trimmed = value.trim().toLowerCase()
+	if (!trimmed || trimmed.length > 254) return null
+	const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+	return emailPattern.test(trimmed) ? trimmed : null
+}
+
+function isValidTimeZone(value) {
+	if (typeof value !== 'string' || value.length > 100) return false
+	try {
+		Intl.DateTimeFormat('en-US', { timeZone: value })
+		return true
+	} catch (err) {
+		return false
+	}
+}
+
 export async function onRequest({ env, request }) {
 	try {
 		const rateLimit = await enforceRateLimit({ env, request, keySuffix: 'book', limit: 20, windowSeconds: 60 })
 		if (rateLimit) return rateLimit
 
-		const payload = await readJson(request)
-		if (payload === null) return errorResponse('Invalid JSON', 400, 'invalid_json')
-		const { start, end, timezone, seats, name, email, note, idempotencyKey, attendeeEmails } = payload
+		const parsed = await readJson(request, { maxBytes: 8192 })
+		if (!parsed.ok) return errorResponse(parsed.error.message, parsed.status, parsed.error.code)
+		const payload = parsed.value || {}
+		const { start, end, timezone, seats, name, email, note, idempotencyKey } = payload
 
-		if (!start || !end || !timezone || !name || !email) {
+		const normalizedName = normalizeText(name, 120)
+		const normalizedEmail = normalizeEmail(email)
+		const normalizedTimezone = typeof timezone === 'string' ? timezone.trim() : null
+		const normalizedNote = typeof note === 'string' ? note.trim() : null
+
+		if (!start || !end || !normalizedTimezone || !normalizedName || !normalizedEmail) {
 			return errorResponse('Missing required fields', 400, 'missing_fields')
+		}
+		if (!isValidTimeZone(normalizedTimezone)) {
+			return errorResponse('Invalid timezone', 400, 'invalid_timezone')
+		}
+		if (normalizedNote && normalizedNote.length > 1000) {
+			return errorResponse('Note is too long', 400, 'note_too_long')
 		}
 
 		const startTime = Date.parse(start)
@@ -92,7 +130,10 @@ export async function onRequest({ env, request }) {
 			booking: { idempotencyKey }
 		})
 		if (existing) {
-			return jsonResponse({ ok: true, bookingId: existing.id, status: existing.status, cancelToken: existing.cancel_token ?? null })
+			if ((existing.email || '').toLowerCase() !== normalizedEmail) {
+				return errorResponse('Idempotency key already used', 409, 'idempotency_conflict')
+			}
+			return jsonResponse({ ok: true, status: existing.status, cancelToken: existing.cancel_token ?? null })
 		}
 
 		const cancelToken = generateCancelToken()
@@ -100,13 +141,12 @@ export async function onRequest({ env, request }) {
 		const booking = {
 			start,
 			end,
-			timezone,
+			timezone: normalizedTimezone,
 			seats: seatCount,
-			name,
-			email,
-			note,
+			name: normalizedName,
+			email: normalizedEmail,
+			note: normalizedNote ?? null,
 			idempotencyKey: normalizedKey,
-			attendeeEmails,
 			cancelLink,
 			cancelToken
 		}
@@ -141,8 +181,9 @@ export async function onRequest({ env, request }) {
 			throw err
 		}
 
-		return jsonResponse({ ok: true, bookingId: bookingRecord.id, eventLink: created?.htmlLink, cancelToken })
+		return jsonResponse({ ok: true, eventLink: created?.htmlLink, cancelToken })
 	} catch (err) {
-		return errorResponse(err?.message || 'Booking failed', 500, 'booking_error')
+		console.error('Booking error:', err)
+		return errorResponse('Booking failed', 500, 'booking_error')
 	}
 }

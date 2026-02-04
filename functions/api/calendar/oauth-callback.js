@@ -22,6 +22,7 @@ export async function onRequest({ env, request }) {
 
 		return Response.redirect(new URL('/admin?connected=1', request.url), 302)
 	} catch (err) {
-		return errorResponse(err?.message || 'OAuth callback failed', 500, 'oauth_callback_error')
+		console.error('OAuth callback error:', err)
+		return errorResponse('OAuth callback failed', 500, 'oauth_callback_error')
 	}
 }

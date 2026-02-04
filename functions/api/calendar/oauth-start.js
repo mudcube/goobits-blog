@@ -12,10 +12,10 @@ export async function onRequest({ env, request }) {
 		const authUrl = getGoogleAuthUrl({ env, state })
 
 		return jsonResponse({
-			authUrl,
-			state
+			authUrl
 		})
 	} catch (err) {
-		return errorResponse(err?.message || 'Failed to start OAuth', 500, 'oauth_start_error')
+		console.error('OAuth start error:', err)
+		return errorResponse('Failed to start OAuth', 500, 'oauth_start_error')
 	}
 }
