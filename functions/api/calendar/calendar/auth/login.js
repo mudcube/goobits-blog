@@ -6,7 +6,7 @@ import {
 	PROVIDERS,
 	buildGoogleAuthUrl,
 	buildAppleAuthUrl,
-	createRainbowOauthState
+	createCalendarOauthState
 } from '../_helpers.js'
 
 export async function onRequest({ env, request }) {
@@ -26,12 +26,12 @@ export async function onRequest({ env, request }) {
 
 	const state = generateState()
 
-	await createRainbowOauthState({
+	await createCalendarOauthState({
 		db: env.DB,
 		state,
 		provider,
 		inviteCode: invite || null,
-		redirectTo: redirectTo || '/rainbow'
+		redirectTo: redirectTo || '/calendar'
 	})
 
 	let authUrl

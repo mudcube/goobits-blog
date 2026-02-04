@@ -16,11 +16,17 @@ export const PROVIDERS = {
 	}
 }
 
+function getAuthRedirectUri(env) {
+	if (env.CALENDAR_AUTH_REDIRECT_URI) return env.CALENDAR_AUTH_REDIRECT_URI
+	const base = env.PUBLIC_BASE_URL || env.BASE_URL || ''
+	return `${base}/api/calendar/auth/callback`
+}
+
 export function getGoogleConfig(env) {
 	return {
 		clientId: env.GOOGLE_CLIENT_ID,
 		clientSecret: env.GOOGLE_CLIENT_SECRET,
-		redirectUri: `${env.PUBLIC_BASE_URL || env.BASE_URL}/api/rainbow/auth/callback`
+		redirectUri: getAuthRedirectUri(env)
 	}
 }
 
@@ -30,7 +36,7 @@ export function getAppleConfig(env) {
 		teamId: env.APPLE_TEAM_ID,
 		keyId: env.APPLE_KEY_ID,
 		privateKey: env.APPLE_PRIVATE_KEY,
-		redirectUri: `${env.PUBLIC_BASE_URL || env.BASE_URL}/api/rainbow/auth/callback`
+		redirectUri: getAuthRedirectUri(env)
 	}
 }
 

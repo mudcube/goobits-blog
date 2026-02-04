@@ -1,12 +1,12 @@
 import {
 	errorResponse,
 	getBaseUrl,
-	consumeRainbowOauthState,
+	consumeCalendarOauthState,
 	exchangeGoogleCode,
 	getGoogleUserInfo,
 	exchangeAppleCode,
 	parseAppleIdToken,
-	createRainbowUser,
+	createCalendarUser,
 	validateInvite,
 	consumeInvite,
 	hasUserRedeemedAnyInvite,
@@ -39,7 +39,7 @@ export async function onRequest({ env, request }) {
 		return redirectWithError(baseUrl, 'Missing code or state')
 	}
 
-	const stateData = await consumeRainbowOauthState({ db: env.DB, state })
+	const stateData = await consumeCalendarOauthState({ db: env.DB, state })
 	if (!stateData) {
 		return redirectWithError(baseUrl, 'Invalid or expired state')
 	}
@@ -65,7 +65,7 @@ export async function onRequest({ env, request }) {
 	}
 
 	// Create or update user
-	const user = await createRainbowUser({
+	const user = await createCalendarUser({
 		db: env.DB,
 		provider,
 		providerId: userInfo.providerId,
@@ -99,7 +99,7 @@ export async function onRequest({ env, request }) {
 	return new Response(null, {
 		status: 302,
 		headers: {
-			Location: redirectTo || '/rainbow',
+			Location: redirectTo || '/calendar',
 			'Set-Cookie': cookie
 		}
 	})
@@ -110,7 +110,7 @@ function redirectWithError(baseUrl, message) {
 	return new Response(null, {
 		status: 302,
 		headers: {
-			Location: `${baseUrl}/rainbow/login?${params.toString()}`
+			Location: `${baseUrl}/calendar/login?${params.toString()}`
 		}
 	})
 }

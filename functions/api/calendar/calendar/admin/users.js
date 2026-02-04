@@ -2,7 +2,7 @@ import {
 	errorResponse,
 	jsonResponse,
 	requireAdmin,
-	listRainbowUsers
+	listCalendarUsers
 } from '../_helpers.js'
 
 export async function onRequest({ env, request }) {
@@ -14,7 +14,7 @@ export async function onRequest({ env, request }) {
 		return errorResponse('Unauthorized', 401, 'unauthorized')
 	}
 
-	const users = await listRainbowUsers({ db: env.DB })
+	const users = await listCalendarUsers({ db: env.DB })
 
 	return jsonResponse({ ok: true, users })
 }

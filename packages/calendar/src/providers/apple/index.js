@@ -8,7 +8,7 @@ export function getAppleConfig(env) {
 		teamId: env.APPLE_TEAM_ID,
 		keyId: env.APPLE_KEY_ID,
 		privateKey: env.APPLE_PRIVATE_KEY,
-		redirectUri: `${env.PUBLIC_BASE_URL || env.BASE_URL}/api/rainbow/auth/callback`
+		redirectUri: `${env.PUBLIC_BASE_URL || env.BASE_URL}/api/calendar/auth/callback`
 	}
 }
 

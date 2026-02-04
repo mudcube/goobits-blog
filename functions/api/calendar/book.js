@@ -96,7 +96,7 @@ export async function onRequest({ env, request }) {
 		}
 
 		const cancelToken = generateCancelToken()
-		const cancelLink = new URL(`/rainbow-gym?cancel=${cancelToken}`, request.url).toString()
+		const cancelLink = new URL(`/calendar-gym?cancel=${cancelToken}`, request.url).toString()
 		const booking = {
 			start,
 			end,

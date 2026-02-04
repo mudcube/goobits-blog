@@ -5,8 +5,8 @@ import {
 	getSessionCookie,
 	clearSessionCookie,
 	parseSessionCookie
-} from '../../../packages/calendar/src/rainbow/session.js'
-import { parseAdminSessionCookie, validateAdminSession } from '../../../packages/calendar/src/admin/session.js'
+} from '../../../../packages/calendar/src/calendar/session.js'
+import { parseAdminSessionCookie, validateAdminSession } from '../../../../packages/calendar/src/admin/session.js'
 import {
 	createInvite,
 	validateInvite,
@@ -14,7 +14,7 @@ import {
 	listInvites,
 	deleteInvite,
 	hasUserRedeemedAnyInvite
-} from '../../../packages/calendar/src/rainbow/invites.js'
+} from '../../../../packages/calendar/src/calendar/invites.js'
 import {
 	PROVIDERS,
 	buildGoogleAuthUrl,
@@ -23,14 +23,14 @@ import {
 	getGoogleUserInfo,
 	exchangeAppleCode,
 	parseAppleIdToken
-} from '../../../packages/calendar/src/rainbow/providers.js'
+} from '../../../../packages/calendar/src/calendar/providers.js'
 import {
-	createRainbowUser,
-	getRainbowUserById,
-	listRainbowUsers,
-	createRainbowOauthState,
-	consumeRainbowOauthState
-} from '../../../packages/calendar/src/storage/d1.js'
+	createCalendarUser,
+	getCalendarUserById,
+	listCalendarUsers,
+	createCalendarOauthState,
+	consumeCalendarOauthState
+} from '../../../../packages/calendar/src/storage/d1.js'
 
 export function errorResponse(message, status = 400, code = 'bad_request') {
 	return jsonResponse({ ok: false, error: { code, message } }, status)
@@ -90,9 +90,9 @@ export {
 	getGoogleUserInfo,
 	exchangeAppleCode,
 	parseAppleIdToken,
-	createRainbowUser,
-	getRainbowUserById,
-	listRainbowUsers,
-	createRainbowOauthState,
-	consumeRainbowOauthState
+	createCalendarUser,
+	getCalendarUserById,
+	listCalendarUsers,
+	createCalendarOauthState,
+	consumeCalendarOauthState
 }

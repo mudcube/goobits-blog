@@ -1,4 +1,4 @@
-const SESSION_COOKIE_NAME = 'rainbow_session'
+const SESSION_COOKIE_NAME = 'calendar_session'
 const SESSION_DURATION_SECONDS = 7 * 24 * 60 * 60 // 7 days
 
 export function generateSessionId() {
@@ -12,7 +12,7 @@ export async function createSession({ db, userId }) {
 	const expiresAt = Math.floor(Date.now() / 1000) + SESSION_DURATION_SECONDS
 
 	await db.prepare(
-		`INSERT INTO rainbow_sessions (id, user_id, expires_at, created_at)
+		`INSERT INTO calendar_sessions (id, user_id, expires_at, created_at)
 		 VALUES (?, ?, ?, strftime('%s','now'))`
 	).bind(sessionId, userId, expiresAt).run()
 
@@ -24,8 +24,8 @@ export async function validateSession({ db, sessionId }) {
 
 	const row = await db.prepare(
 		`SELECT s.id, s.user_id, s.expires_at, u.id as uid, u.provider, u.email, u.name, u.avatar_url
-		 FROM rainbow_sessions s
-		 JOIN rainbow_users u ON s.user_id = u.id
+		 FROM calendar_sessions s
+		 JOIN calendar_users u ON s.user_id = u.id
 		 WHERE s.id = ? LIMIT 1`
 	).bind(sessionId).first()
 
@@ -48,7 +48,7 @@ export async function validateSession({ db, sessionId }) {
 
 export async function deleteSession({ db, sessionId }) {
 	await db.prepare(
-		`DELETE FROM rainbow_sessions WHERE id = ?`
+		`DELETE FROM calendar_sessions WHERE id = ?`
 	).bind(sessionId).run()
 }
 

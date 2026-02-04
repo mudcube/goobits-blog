@@ -184,61 +184,61 @@ export async function checkRateLimit({ db, key, limit = 30, windowSeconds = 60 }
 	return { allowed: true, remaining: limit - (row.count + 1), resetAt: row.reset_at }
 }
 
-// Rainbow Auth Functions
+// Calendar Auth Functions
 
-export async function createRainbowUser({ db, provider, providerId, email, name, avatarUrl }) {
+export async function createCalendarUser({ db, provider, providerId, email, name, avatarUrl }) {
 	const result = await db.prepare(
-		`INSERT INTO rainbow_users (provider, provider_id, email, name, avatar_url, created_at, last_login_at)
+		`INSERT INTO calendar_users (provider, provider_id, email, name, avatar_url, created_at, last_login_at)
 		 VALUES (?, ?, ?, ?, ?, strftime('%s','now'), strftime('%s','now'))
 		 ON CONFLICT(provider, provider_id) DO UPDATE SET
 		  email = excluded.email,
-		  name = COALESCE(excluded.name, rainbow_users.name),
-		  avatar_url = COALESCE(excluded.avatar_url, rainbow_users.avatar_url),
+		  name = COALESCE(excluded.name, calendar_users.name),
+		  avatar_url = COALESCE(excluded.avatar_url, calendar_users.avatar_url),
 		  last_login_at = strftime('%s','now')`
 	).bind(provider, providerId, email, name, avatarUrl).run()
 
 	// Get the user (either newly created or existing)
 	const user = await db.prepare(
-		`SELECT * FROM rainbow_users WHERE provider = ? AND provider_id = ? LIMIT 1`
+		`SELECT * FROM calendar_users WHERE provider = ? AND provider_id = ? LIMIT 1`
 	).bind(provider, providerId).first()
 
 	return user
 }
 
-export async function getRainbowUserById({ db, userId }) {
+export async function getCalendarUserById({ db, userId }) {
 	return db.prepare(
-		`SELECT * FROM rainbow_users WHERE id = ? LIMIT 1`
+		`SELECT * FROM calendar_users WHERE id = ? LIMIT 1`
 	).bind(userId).first()
 }
 
-export async function listRainbowUsers({ db }) {
+export async function listCalendarUsers({ db }) {
 	const res = await db.prepare(
-		`SELECT * FROM rainbow_users ORDER BY last_login_at DESC`
+		`SELECT * FROM calendar_users ORDER BY last_login_at DESC`
 	).all()
 	return res?.results ?? []
 }
 
-export async function createRainbowOauthState({ db, state, provider, inviteCode, redirectTo }) {
+export async function createCalendarOauthState({ db, state, provider, inviteCode, redirectTo }) {
 	await db.prepare(
-		`INSERT INTO rainbow_oauth_states (state, provider, invite_code, redirect_to, created_at)
+		`INSERT INTO calendar_oauth_states (state, provider, invite_code, redirect_to, created_at)
 		 VALUES (?, ?, ?, ?, strftime('%s','now'))`
 	).bind(state, provider, inviteCode, redirectTo).run()
 }
 
-export async function consumeRainbowOauthState({ db, state, maxAgeSeconds = 600 }) {
+export async function consumeCalendarOauthState({ db, state, maxAgeSeconds = 600 }) {
 	const row = await db.prepare(
-		`SELECT state, provider, invite_code, redirect_to, created_at FROM rainbow_oauth_states WHERE state = ? LIMIT 1`
+		`SELECT state, provider, invite_code, redirect_to, created_at FROM calendar_oauth_states WHERE state = ? LIMIT 1`
 	).bind(state).first()
 
 	if (!row) return null
 
 	const now = Math.floor(Date.now() / 1000)
 	if (now - row.created_at > maxAgeSeconds) {
-		await db.prepare(`DELETE FROM rainbow_oauth_states WHERE state = ?`).bind(state).run()
+		await db.prepare(`DELETE FROM calendar_oauth_states WHERE state = ?`).bind(state).run()
 		return null
 	}
 
-	await db.prepare(`DELETE FROM rainbow_oauth_states WHERE state = ?`).bind(state).run()
+	await db.prepare(`DELETE FROM calendar_oauth_states WHERE state = ?`).bind(state).run()
 	return {
 		provider: row.provider,
 		inviteCode: row.invite_code,
