@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import adapterCloudflare from '@sveltejs/adapter-cloudflare'
 import { mdsvex } from 'mdsvex'
-import { remarkTableOfContents } from './src/lib/remarkTableOfContents.js'
+import { remarkTableOfContents } from './src/lib/remarkTableOfContents.ts'
 
 const { NODE_ENV } = process.env
 
