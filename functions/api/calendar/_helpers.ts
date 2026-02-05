@@ -1,7 +1,9 @@
 import { getEnv, requireEnv } from '../../../packages/calendar/src/config/env.ts'
 import { checkRateLimit, validateAdminSessionFromHeader } from '../../../packages/calendar/src/index.ts'
 
-type EnvLike = Record<string, string | undefined> & { DB?: any; NODE_ENV?: string }
+import type { D1DatabaseLike } from '../../../packages/calendar/src/storage/d1.ts'
+
+export type EnvLike = Record<string, string | undefined> & { DB?: D1DatabaseLike; NODE_ENV?: string }
 
 export function getCalendarIds(env: EnvLike): string[] {
 	const ids = getEnv(env, 'GOOGLE_CALENDAR_IDS', '') || ''
@@ -59,6 +61,31 @@ export async function requireAdmin({
 		secureCookies: env.NODE_ENV !== 'development'
 	})
 	return result?.ok ?? false
+}
+
+function isSameOriginRequest(request: Request) {
+	const urlOrigin = new URL(request.url).origin
+
+	const origin = request.headers.get('origin')
+	if (origin) return origin === urlOrigin
+
+	const referer = request.headers.get('referer')
+	if (referer) {
+		try {
+			return new URL(referer).origin === urlOrigin
+		} catch {
+			return false
+		}
+	}
+
+	return false
+}
+
+export function enforceSameOriginRequest(request: Request) {
+	if (!isSameOriginRequest(request)) {
+		return errorResponse('Forbidden', 403, 'forbidden')
+	}
+	return null
 }
 
 export function errorResponse(message: string, status = 400, code = 'bad_request') {
