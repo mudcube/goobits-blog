@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import path from 'path'
 import packageJson from './package.json'
 import { defineConfig } from 'vite'
 import { enhancedImages } from '@sveltejs/enhanced-img'
@@ -27,13 +28,7 @@ export default defineConfig({
 				'node:dns/promises',
 				'better-sqlite3',
 				'fs',
-				'path',
-				'argon2',
-				'@node-rs/argon2',
-				'@node-rs/argon2-linux-arm64-gnu',
-				'bcrypt',
-				'@node-rs/bcrypt',
-				'@node-rs/bcrypt-linux-arm64-gnu'
+				'path'
 			]
 		},
 		strict: false,
@@ -55,6 +50,14 @@ export default defineConfig({
 		enhancedImages(),
 		sveltekit()
 	],
+	resolve: {
+		alias: {
+			'@node-rs/argon2': path.resolve('src/lib/stubs/argon2.ts'),
+			'argon2': path.resolve('src/lib/stubs/argon2.ts'),
+			'@node-rs/bcrypt': path.resolve('src/lib/stubs/bcrypt.ts'),
+			'bcrypt': path.resolve('src/lib/stubs/bcrypt.ts')
+		}
+	},
 	server: {
 		host: HOST,
 		https: HTTPS_KEY && HTTPS_CERT ? {
