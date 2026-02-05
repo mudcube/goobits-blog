@@ -10,11 +10,10 @@ import {
 	cancelBooking,
 	attachEventLink,
 	ensureIdempotentBooking,
+	getEventLinks,
 	saveConnection
 } from '../../../packages/calendar/src/index.ts'
-import { enforceRateLimit, errorResponse, getCalendarIds, getCapacity, getLocation, getMinNoticeHours, getPrimaryCalendarId, getTokenKey, jsonResponse, readJson } from './_helpers.ts'
-
-type EnvLike = { DB?: any; [key: string]: any }
+import { type EnvLike, enforceRateLimit, errorResponse, getCalendarIds, getCapacity, getLocation, getMinNoticeHours, getPrimaryCalendarId, getTokenKey, jsonResponse, readJson } from './_helpers.ts'
 
 function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
 	return new Date(aStart) < new Date(bEnd) && new Date(bStart) < new Date(aEnd)
@@ -142,7 +141,20 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 			if ((existing.email || '').toLowerCase() !== normalizedEmail) {
 				return errorResponse('Idempotency key already used', 409, 'idempotency_conflict')
 			}
-			return jsonResponse({ ok: true, status: existing.status, cancelToken: existing.cancel_token ?? null })
+			// If a previous attempt crashed after DB insert but before Google event creation,
+			// the booking is stuck in pending with no event link. Cancel it and let the retry
+			// proceed with a fresh booking.
+			if (existing.status === 'pending') {
+				const links = await getEventLinks({ db: env.DB, bookingId: existing.id })
+				if (!links || links.length === 0) {
+					await cancelBooking({ db: env.DB, bookingId: existing.id })
+					// Fall through to create a new booking below
+				} else {
+					return jsonResponse({ ok: true, status: existing.status, cancelToken: existing.cancel_token ?? null })
+				}
+			} else {
+				return jsonResponse({ ok: true, status: existing.status, cancelToken: existing.cancel_token ?? null })
+			}
 		}
 
 		const cancelToken = generateCancelToken()
@@ -177,7 +189,12 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 				calendarId,
 				event
 			})
+		} catch (err) {
+			await cancelBooking({ db: env.DB, bookingId: bookingRecord.id })
+			throw err
+		}
 
+		try {
 			await attachEventLink({
 				db: env.DB,
 				bookingId: bookingRecord.id,
@@ -189,6 +206,13 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 
 			await confirmBooking({ db: env.DB, bookingId: bookingRecord.id })
 		} catch (err) {
+			// Clean up the orphaned Google event before cancelling the booking
+			try {
+				const { deleteEvent } = await import('../../../packages/calendar/src/providers/google/events.ts')
+				await deleteEvent({ accessToken: token.accessToken, calendarId, eventId: created.id })
+			} catch {
+				console.error('Failed to clean up orphaned Google event:', created.id)
+			}
 			await cancelBooking({ db: env.DB, bookingId: bookingRecord.id })
 			throw err
 		}

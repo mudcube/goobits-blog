@@ -41,11 +41,22 @@ export async function decryptString({
 	ciphertext: string
 	base64Key: string
 }) {
-	const [ivB64, dataB64] = ciphertext.split('.')
-	if (!ivB64 || !dataB64) throw new Error('Invalid ciphertext')
+	if (!ciphertext || typeof ciphertext !== 'string') {
+		throw new Error('decryptString: ciphertext must be a non-empty string')
+	}
+	const parts = ciphertext.split('.')
+	if (parts.length !== 2 || !parts[0] || !parts[1]) {
+		throw new Error('decryptString: invalid ciphertext format (expected "iv.data")')
+	}
+	const [ivB64, dataB64] = parts
+	let iv: Uint8Array, data: Uint8Array
+	try {
+		iv = toUint8ArrayFromBase64(ivB64)
+		data = toUint8ArrayFromBase64(dataB64)
+	} catch {
+		throw new Error('decryptString: ciphertext contains invalid base64')
+	}
 	const key = await getKey(base64Key)
-	const iv = toUint8ArrayFromBase64(ivB64)
-	const data = toUint8ArrayFromBase64(dataB64)
 	const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data)
 	return new TextDecoder().decode(plain)
 }

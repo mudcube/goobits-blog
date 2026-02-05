@@ -336,27 +336,26 @@ export async function checkRateLimit({
 	windowSeconds?: number
 }) {
 	const now = Math.floor(Date.now() / 1000)
-	const row = await db.prepare(
-		`SELECT key, count, reset_at FROM rate_limits WHERE key = ? LIMIT 1`
-	).bind(key).first<{ key: string; count: number; reset_at: number }>()
+	const resetAt = now + windowSeconds
 
-	if (!row || now >= row.reset_at) {
-		await db.prepare(
-			`INSERT INTO rate_limits (key, count, reset_at) VALUES (?, 1, ?)
-			 ON CONFLICT(key) DO UPDATE SET count = 1, reset_at = excluded.reset_at`
-		).bind(key, now + windowSeconds).run()
-		return { allowed: true, remaining: limit - 1, resetAt: now + windowSeconds }
-	}
-
-	if (row.count >= limit) {
-		return { allowed: false, remaining: 0, resetAt: row.reset_at }
-	}
-
+	// Atomic upsert: insert with count=1 if new/expired, otherwise increment
 	await db.prepare(
-		`UPDATE rate_limits SET count = count + 1 WHERE key = ?`
-	).bind(key).run()
+		`INSERT INTO rate_limits (key, count, reset_at) VALUES (?, 1, ?)
+		 ON CONFLICT(key) DO UPDATE SET
+		   count = CASE WHEN reset_at <= ? THEN 1 ELSE count + 1 END,
+		   reset_at = CASE WHEN reset_at <= ? THEN excluded.reset_at ELSE reset_at END`
+	).bind(key, resetAt, now, now).run()
 
-	return { allowed: true, remaining: limit - (row.count + 1), resetAt: row.reset_at }
+	const row = await db.prepare(
+		`SELECT count, reset_at FROM rate_limits WHERE key = ? LIMIT 1`
+	).bind(key).first<{ count: number; reset_at: number }>()
+
+	if (!row) {
+		return { allowed: true, remaining: limit - 1, resetAt }
+	}
+
+	const allowed = row.count <= limit
+	return { allowed, remaining: Math.max(0, limit - row.count), resetAt: row.reset_at }
 }
 
 // Calendar Auth Functions
