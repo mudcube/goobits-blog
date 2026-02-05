@@ -1,10 +1,11 @@
 import { createOauthState, getGoogleAuthUrl } from '../../../packages/calendar/src/index.ts'
-import { errorResponse, jsonResponse, requireAdmin } from './_helpers.ts'
-
-type EnvLike = { DB?: any; [key: string]: any }
+import { type EnvLike, enforceSameOriginRequest, errorResponse, jsonResponse, requireAdmin } from './_helpers.ts'
 
 export async function onRequest({ env, request }: { env: EnvLike; request: Request }) {
 	try {
+		const csrf = enforceSameOriginRequest(request)
+		if (csrf) return csrf
+
 		if (!await requireAdmin({ env, request })) {
 			return errorResponse('Unauthorized', 401, 'unauthorized')
 		}

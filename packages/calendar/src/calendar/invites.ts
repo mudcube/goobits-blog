@@ -1,3 +1,5 @@
+import type { D1DatabaseLike } from '../storage/d1.ts'
+
 export function generateInviteCode() {
 	const bytes = new Uint8Array(12)
 	crypto.getRandomValues(bytes)
@@ -10,7 +12,7 @@ export async function createInvite({
 	usesRemaining = 1,
 	expiresAt = null
 }: {
-	db: any
+	db: D1DatabaseLike
 	email?: string | null
 	usesRemaining?: number
 	expiresAt?: number | null
@@ -30,7 +32,7 @@ export async function validateInvite({
 	code,
 	email = null
 }: {
-	db: any
+	db: D1DatabaseLike
 	code: string
 	email?: string | null
 }) {
@@ -63,7 +65,7 @@ export async function consumeInvite({
 	inviteId,
 	userId
 }: {
-	db: any
+	db: D1DatabaseLike
 	inviteId: number
 	userId: string
 }) {
@@ -77,7 +79,7 @@ export async function consumeInvite({
 	).bind(inviteId, userId).run()
 }
 
-export async function listInvites({ db }: { db: any }) {
+export async function listInvites({ db }: { db: D1DatabaseLike }) {
 	const res = await db.prepare(
 		`SELECT i.*, COUNT(r.id) as times_used
 		 FROM calendar_invites i
@@ -88,11 +90,11 @@ export async function listInvites({ db }: { db: any }) {
 	return res?.results ?? []
 }
 
-export async function deleteInvite({ db, inviteId }: { db: any; inviteId: number }) {
+export async function deleteInvite({ db, inviteId }: { db: D1DatabaseLike; inviteId: number }) {
 	await db.prepare(`DELETE FROM calendar_invites WHERE id = ?`).bind(inviteId).run()
 }
 
-export async function hasUserRedeemedAnyInvite({ db, userId }: { db: any; userId: string }) {
+export async function hasUserRedeemedAnyInvite({ db, userId }: { db: D1DatabaseLike; userId: string }) {
 	const row = await db.prepare(
 		`SELECT id FROM calendar_invite_redemptions WHERE user_id = ? LIMIT 1`
 	).bind(userId).first()

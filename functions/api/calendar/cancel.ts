@@ -5,9 +5,7 @@ import {
 	cancelBookingAndEvents,
 	saveConnection
 } from '../../../packages/calendar/src/index.ts'
-import { enforceRateLimit, errorResponse, getTokenKey, jsonResponse, readJson } from './_helpers.ts'
-
-type EnvLike = { DB?: any; [key: string]: any }
+import { type EnvLike, enforceRateLimit, errorResponse, getTokenKey, jsonResponse, readJson } from './_helpers.ts'
 
 export async function onRequest({ env, request }: { env: EnvLike; request: Request }) {
 	try {

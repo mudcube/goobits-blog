@@ -21,7 +21,7 @@ export function buildSlots({
 	let cursor = new Date(timeMin).toISOString()
 	const end = new Date(timeMax).toISOString()
 
-	const bufferedBusy = busy.map((range: any) => ({
+	const bufferedBusy = busy.map(range => ({
 		start: addMinutes(range.start, -bufferMinutes),
 		end: addMinutes(range.end, bufferMinutes)
 	}))
@@ -32,11 +32,11 @@ export function buildSlots({
 
 		if (new Date(slotEnd) > new Date(end)) break
 
-		const isBusy = bufferedBusy.some((range: any) => overlaps(slotStart, slotEnd, range.start, range.end))
+		const isBusy = bufferedBusy.some(range => overlaps(slotStart, slotEnd, range.start, range.end))
 
 		const seatsBooked = bookings
-			.filter((booking: any) => overlaps(slotStart, slotEnd, booking.start_at, booking.end_at))
-			.reduce((sum: number, booking: any) => sum + (booking.seats ?? 1), 0)
+			.filter(booking => overlaps(slotStart, slotEnd, booking.start_at, booking.end_at))
+			.reduce((sum, booking) => sum + (booking.seats ?? 1), 0)
 
 		const remaining = Math.max(0, capacityPerSlot - seatsBooked)
 

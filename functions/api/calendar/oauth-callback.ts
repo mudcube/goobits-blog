@@ -1,7 +1,5 @@
 import { consumeOauthState, exchangeGoogleCode, saveConnection } from '../../../packages/calendar/src/index.ts'
-import { errorResponse, getTokenKey } from './_helpers.ts'
-
-type EnvLike = { DB?: any; [key: string]: any }
+import { type EnvLike, errorResponse, getTokenKey } from './_helpers.ts'
 
 export async function onRequest({ env, request }: { env: EnvLike; request: Request }) {
 	try {

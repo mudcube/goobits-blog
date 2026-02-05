@@ -6,9 +6,7 @@ import {
 	buildSlots,
 	saveConnection
 } from '../../../packages/calendar/src/index.ts'
-import { enforceRateLimit, errorResponse, getCalendarIds, getBufferMinutes, getCapacity, getMinNoticeHours, getSlotMinutes, getTokenKey, jsonResponse } from './_helpers.ts'
-
-type EnvLike = { DB?: any; NODE_ENV?: string; [key: string]: any }
+import { type EnvLike, enforceRateLimit, errorResponse, getCalendarIds, getBufferMinutes, getCapacity, getMinNoticeHours, getSlotMinutes, getTokenKey, jsonResponse } from './_helpers.ts'
 
 export async function onRequest({ env, request }: { env: EnvLike; request: Request }) {
 	try {
