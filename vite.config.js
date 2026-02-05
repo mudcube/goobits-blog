@@ -14,7 +14,7 @@ const {
 	HTTPS_CERT,
 	HTTPS_KEY,
 	NODE_ENV,
-	PORT = 3020,
+	PORT = 3610,
 	RECAPTCHA_SITE_KEY
 } = process.env
 
