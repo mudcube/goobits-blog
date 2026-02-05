@@ -23,7 +23,18 @@ export default defineConfig({
 	assetsInclude: [ '**/*.md' ],
 	build: {
 		rollupOptions: {
-			external: [ 'node:dns/promises', 'better-sqlite3', 'fs', 'path' ]
+			external: [
+				'node:dns/promises',
+				'better-sqlite3',
+				'fs',
+				'path',
+				'argon2',
+				'@node-rs/argon2',
+				'@node-rs/argon2-linux-arm64-gnu',
+				'bcrypt',
+				'@node-rs/bcrypt',
+				'@node-rs/bcrypt-linux-arm64-gnu'
+			]
 		},
 		strict: false,
 		target: 'esnext'
