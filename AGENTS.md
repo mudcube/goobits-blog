@@ -24,7 +24,7 @@ SvelteKit 5 + Cloudflare Pages monorepo (pnpm workspaces).
 
 **API bridge pattern:** SvelteKit routes (`src/routes/api/`) delegate to functions (`functions/api/`) via `buildEnv(platform)` in `_bridge.ts`. Dev uses local SQLite (`.dev/db.sqlite`, auto-migrates); production uses Cloudflare D1.
 
-**Hooks** (`src/hooks.server.ts`): theme → redirects → calendar auth → require user → security headers
+**Hooks** (`src/hooks.server.ts`): theme → redirects → admin auth → calendar auth → require user → security headers
 
 **Database:** Migrations in `packages/calendar/migrations/`. Argon2/bcrypt stubbed for browser in `src/lib/stubs/`, aliased in `vite.config.js` and `wrangler.toml`.
 
