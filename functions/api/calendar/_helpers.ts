@@ -137,8 +137,15 @@ export async function enforceRateLimit({
 	limit?: number
 	windowSeconds?: number
 }) {
-	const forwarded = request.headers.get('x-forwarded-for')
-	const ip = request.headers.get('cf-connecting-ip') || (forwarded ? forwarded.split(',')[0].trim() : '') || 'unknown'
+	const cloudflareIp = request.headers.get('cf-connecting-ip')?.trim()
+	let ip = cloudflareIp || 'unknown'
+
+	// Only trust XFF when explicitly enabled (for non-Cloudflare deployments).
+	if (!cloudflareIp && env.RATE_LIMIT_TRUST_XFF === 'true') {
+		const forwarded = request.headers.get('x-forwarded-for')
+		ip = forwarded ? forwarded.split(',')[0].trim() || 'unknown' : 'unknown'
+	}
+
 	const key = `rate:${keySuffix}:${ip}`
 	const result = await checkRateLimit({ db: env.DB, key, limit, windowSeconds })
 	if (!result.allowed) {
