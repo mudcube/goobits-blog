@@ -26,15 +26,5 @@ database_id = "your-database-id-here"  # Replace after running: wrangler d1 crea
 "@node-rs/argon2-wasm32-wasi" = "./src/lib/stubs/argon2.ts"
 "@node-rs/bcrypt-wasm32-wasi" = "./src/lib/stubs/bcrypt.ts"
 
-# Secrets (set via `wrangler secret put <NAME>`):
-# - TOKEN_ENC_KEY
-# - ADMIN_PASSCODE
-# - GOOGLE_OAUTH_CLIENT_ID
-# - GOOGLE_OAUTH_CLIENT_SECRET
-# - GOOGLE_CLIENT_ID (for Rainbow OAuth)
-# - GOOGLE_CLIENT_SECRET (for Rainbow OAuth)
-# - APPLE_CLIENT_ID
-# - APPLE_TEAM_ID
-# - APPLE_KEY_ID
-# - APPLE_PRIVATE_KEY
-# - PUBLIC_BASE_URL (e.g., https://yourdomain.com)
+# Secrets are encrypted in config/env/.env.production (via dotenvx).
+# Push to Cloudflare with: pnpm deploy:secrets
