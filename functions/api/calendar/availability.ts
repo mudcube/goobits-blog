@@ -36,10 +36,22 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 		if (calendarIds.length === 0) return errorResponse('No calendars configured', 400, 'no_calendars')
 
 		const base64Key = getTokenKey(env)
-		const connection = await getConnection({ db: env.DB, provider: 'google', base64Key })
+		let connection = null
+		try {
+			connection = await getConnection({ db: env.DB, provider: 'google', base64Key })
+		} catch (err) {
+			console.warn('Availability: failed to load saved Google connection; treating as disconnected')
+			return errorResponse('Google not connected', 400, 'not_connected')
+		}
 		if (!connection) return errorResponse('Google not connected', 400, 'not_connected')
 
-		const token = await ensureValidGoogleToken({ env, token: connection })
+		let token
+		try {
+			token = await ensureValidGoogleToken({ env, token: connection })
+		} catch (err) {
+			console.warn('Availability: Google token invalid/expired and could not be refreshed')
+			return errorResponse('Google not connected', 400, 'not_connected')
+		}
 		if (token.expiresAt !== connection.expiresAt) {
 			await saveConnection({ db: env.DB, provider: 'google', token, base64Key })
 		}
