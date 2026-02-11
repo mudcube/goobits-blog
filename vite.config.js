@@ -64,7 +64,8 @@ export default defineConfig({
 			key: HTTPS_KEY,
 			cert: HTTPS_CERT
 		} : undefined,
-		open: isDev,
+		// Keep dev startup stable in headless/container environments.
+		open: false,
 		port: PORT,
 		proxy: {}
 	}
