@@ -23,6 +23,6 @@ the[Color Creator](http://colrd.com/create/color/) and the [Palette Creator](htt
 [![](images/Screen-Shot-2011-08-14-at-9.00.14-PM.png "Screen Shot 2011-08-14 at 9.00.14 PM")](http://colrd.com/create/color/)
 
 Once you create some content, or find some things you like, you can start building your own Swatch, where you can
-quickly find the content that you like. Check out my page, cool stuff![http://colrd.com/@/mud/](http://colrd.com/@/mud/)
+quickly find the content that you like. Check out my page, cool stuff: [http://colrd.com/@/mud/](http://colrd.com/@/mud/)
 
 Let us know what you think, and how we can improve your experience!
