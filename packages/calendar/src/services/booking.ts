@@ -1,10 +1,24 @@
 import { normalizeIdempotencyKey } from '../security/idempotency.ts'
+import type { BookingRow } from '../storage/d1.ts'
+import type { GoogleCalendarEventInput } from '../providers/google/events.ts'
+
+type ExistingBooking = BookingRow | null
+type BookingLike = {
+	attendeeEmails?: Array<string | null | undefined> | null
+	email?: string | null
+	note?: string | null
+	cancelLink?: string | null
+	name: string
+	start: string
+	end: string
+	timezone: string
+}
 
 export async function ensureIdempotentBooking({
 	storage,
 	booking
 }: {
-	storage: { getBookingByIdempotency: (args: { idempotencyKey: string }) => Promise<any> }
+	storage: { getBookingByIdempotency: (args: { idempotencyKey: string }) => Promise<ExistingBooking> }
 	booking: { idempotencyKey?: string | null }
 }) {
 	const idempotencyKey = normalizeIdempotencyKey(booking.idempotencyKey)
@@ -19,32 +33,37 @@ export function buildEvent({
 	calendarName,
 	location
 }: {
-	booking: any
+	booking: BookingLike
 	calendarName?: string
 	location?: string
-}) {
-	const attendees = new Set()
+}): GoogleCalendarEventInput {
+	const attendees = new Set<string>()
 	if (Array.isArray(booking.attendeeEmails)) {
 		for (const email of booking.attendeeEmails) {
-			if (email) attendees.add(email)
+			if (typeof email === 'string' && email) attendees.add(email)
 		}
 	}
-	if (booking.email) attendees.add(booking.email)
+	if (typeof booking.email === 'string' && booking.email) attendees.add(booking.email)
 
-	let description = booking.note ? `Note: ${booking.note}` : undefined
+	let description = booking.note ? `Note: ${booking.note}` : ''
 	if (booking.cancelLink) {
 		const cancelLine = `Need to cancel? No worries — use this private link: ${booking.cancelLink}`
 		description = description ? `${description}\n${cancelLine}` : cancelLine
 	}
 
-	return {
+	const event: GoogleCalendarEventInput = {
 		summary: `Rainbow Gym — ${booking.name}`,
-		description,
 		start: { dateTime: booking.start, timeZone: booking.timezone },
 		end: { dateTime: booking.end, timeZone: booking.timezone },
 		location: location ?? calendarName ?? 'Rainbow Gym',
-		attendees: attendees.size ? Array.from(attendees).map(email => ({ email })) : undefined,
 		guestsCanSeeOtherGuests: true,
 		transparency: 'opaque'
 	}
+	if (description) {
+		event.description = description
+	}
+	if (attendees.size) {
+		event.attendees = Array.from(attendees).map(email => ({ email }))
+	}
+	return event
 }

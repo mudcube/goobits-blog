@@ -24,7 +24,7 @@ export async function createInvite({
 		 VALUES (?, ?, ?, ?, strftime('%s','now'))`
 	).bind(code, email, usesRemaining, expiresAt).run()
 
-	return { id: result.meta.last_row_id, code }
+	return { id: result.meta.last_row_id, code, email }
 }
 
 export async function validateInvite({
@@ -40,7 +40,13 @@ export async function validateInvite({
 
 	const invite = await db.prepare(
 		`SELECT id, code, email, uses_remaining, expires_at FROM calendar_invites WHERE code = ? LIMIT 1`
-	).bind(code).first()
+	).bind(code).first() as {
+		id: number
+		code: string
+		email: string | null
+		uses_remaining: number | null
+		expires_at: number | null
+	} | null
 
 	if (!invite) return { valid: false, reason: 'not_found' }
 

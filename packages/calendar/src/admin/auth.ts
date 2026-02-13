@@ -1,18 +1,26 @@
 import { CredentialsProvider } from '@goobits/auth/providers'
 import { D1SessionAdapter, D1UserAdapter } from '@goobits/auth/adapters'
 import { hashPassword } from '@goobits/auth/utils'
+import type { D1DatabaseLike } from '../storage/d1.ts'
 
 export const ADMIN_EMAIL = 'admin@miko.art'
 export const ADMIN_COOKIE_NAME = 'admin_session'
 
-type EnvLike = { [key: string]: any }
+type AdminUser = { id: string | number; email: string; name?: string | null }
+type AdminUserAdapterLike = {
+	getUserByEmail: (email: string) => Promise<AdminUser | null>
+	createUser: (
+		profile: { email: string; name: string; verified_email: boolean },
+		metadata: { password: string }
+	) => Promise<AdminUser>
+}
 
 export function createAdminAdapters({
 	db,
 	secureCookies = true,
 	sessionLifetimeMs = 60 * 24 * 60 * 60 * 1000
 }: {
-	db?: any
+	db?: D1DatabaseLike
 	secureCookies?: boolean
 	sessionLifetimeMs?: number
 } = {}) {
@@ -48,7 +56,7 @@ export async function ensureAdminUser({
 	userAdapter,
 	passcode
 }: {
-	userAdapter: any
+	userAdapter: AdminUserAdapterLike
 	passcode: string
 }) {
 	const existing = await userAdapter.getUserByEmail(ADMIN_EMAIL)
@@ -77,7 +85,7 @@ export async function validateAdminSessionFromHeader({
 	cookieHeader,
 	secureCookies = true
 }: {
-	db: any
+	db: D1DatabaseLike
 	cookieHeader: string | null
 	secureCookies?: boolean
 }) {

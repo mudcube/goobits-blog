@@ -1,5 +1,16 @@
 const CALENDAR_BASE = 'https://www.googleapis.com/calendar/v3/calendars'
 
+export type GoogleCalendarEventInput = {
+	summary: string
+	description?: string
+	start: { dateTime: string; timeZone: string }
+	end: { dateTime: string; timeZone: string }
+	location?: string
+	attendees?: Array<{ email: string }>
+	guestsCanSeeOtherGuests?: boolean
+	transparency?: 'opaque' | 'transparent'
+}
+
 export async function createEvent({
 	accessToken,
 	calendarId,
@@ -7,7 +18,7 @@ export async function createEvent({
 }: {
 	accessToken: string
 	calendarId: string
-	event: any
+	event: GoogleCalendarEventInput
 }) {
 	const res = await fetch(`${CALENDAR_BASE}/${encodeURIComponent(calendarId)}/events`, {
 		method: 'POST',

@@ -1,6 +1,8 @@
 import { requireEnv } from '../../config/env.ts'
 
-export function getGoogleConfig(env: Record<string, any>) {
+type GoogleEnv = Record<string, unknown> | null | undefined
+
+export function getGoogleConfig(env: GoogleEnv) {
 	return {
 		clientId: requireEnv(env, 'GOOGLE_CLIENT_ID'),
 		clientSecret: requireEnv(env, 'GOOGLE_CLIENT_SECRET'),

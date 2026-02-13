@@ -79,17 +79,17 @@ async function readJson(request: Request) {
 	if (contentLength) {
 		const bytes = Number.parseInt(contentLength, 10)
 		if (Number.isFinite(bytes) && bytes > MAX_BODY_BYTES) {
-			return { ok: false, status: 413 }
+			return { ok: false as const, status: 413 as const }
 		}
 	}
 	const text = await request.text()
 	if (text.length > MAX_BODY_BYTES) {
-		return { ok: false, status: 413 }
+		return { ok: false as const, status: 413 as const }
 	}
 	try {
-		return { ok: true, value: JSON.parse(text) }
+		return { ok: true as const, value: JSON.parse(text) as unknown }
 	} catch (error) {
-		return { ok: false, status: 400 }
+		return { ok: false as const, status: 400 as const }
 	}
 }
 
@@ -116,10 +116,12 @@ async function handleRequest(request: Request) {
 		})
 	}
 
-	const payload = parsed.value || {}
-	const name = normalizeText(payload.name, 100)
-	const email = normalizeEmail(payload.email)
-	const message = normalizeText(payload.message, 2000)
+	const payload = (parsed.value && typeof parsed.value === 'object')
+		? (parsed.value as Record<string, unknown>)
+		: {}
+	const name = normalizeText(payload['name'], 100)
+	const email = normalizeEmail(payload['email'])
+	const message = normalizeText(payload['message'], 2000)
 
 	if (!email || !message) {
 		return new Response('Bad Request', {

@@ -1,8 +1,8 @@
-type EnvLike = Record<string, string | undefined> | undefined | null
+type EnvLike = Record<string, unknown> | undefined | null
 
 export function requireEnv(env: EnvLike, key: string): string {
 	const value = env?.[key]
-	if (!value) {
+	if (typeof value !== 'string' || value.length === 0) {
 		throw new Error(`Missing required env: ${key}`)
 	}
 	return value
@@ -14,5 +14,5 @@ export function getEnv(
 	fallback?: string
 ): string | undefined {
 	const value = env?.[key]
-	return value ?? fallback
+	return typeof value === 'string' ? value : fallback
 }

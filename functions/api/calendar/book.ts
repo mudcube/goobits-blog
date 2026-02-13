@@ -64,15 +64,27 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 				parsed.error?.code ?? 'bad_request'
 			)
 		}
-		const payload = parsed.value || {}
-		const { start, end, timezone, seats, name, email, note, idempotencyKey } = payload
+		const payload = (parsed.value && typeof parsed.value === 'object')
+			? (parsed.value as Record<string, unknown>)
+			: {}
+		const start = payload['start']
+		const end = payload['end']
+		const timezone = payload['timezone']
+		const seats = payload['seats']
+		const name = payload['name']
+		const email = payload['email']
+		const note = payload['note']
+		const idempotencyKey = payload['idempotencyKey']
 
 		const normalizedName = normalizeText(name, 120)
 		const normalizedEmail = normalizeEmail(email)
 		const normalizedTimezone = typeof timezone === 'string' ? timezone.trim() : null
 		const normalizedNote = typeof note === 'string' ? note.trim() : null
+		const normalizedStart = typeof start === 'string' ? start : null
+		const normalizedEnd = typeof end === 'string' ? end : null
+		const normalizedIdempotencyKey = typeof idempotencyKey === 'string' ? idempotencyKey : null
 
-		if (!start || !end || !normalizedTimezone || !normalizedName || !normalizedEmail) {
+		if (!normalizedStart || !normalizedEnd || !normalizedTimezone || !normalizedName || !normalizedEmail) {
 			return errorResponse('Missing required fields', 400, 'missing_fields')
 		}
 		if (!isValidTimeZone(normalizedTimezone)) {
@@ -82,8 +94,8 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 			return errorResponse('Note is too long', 400, 'note_too_long')
 		}
 
-		const startTime = Date.parse(start)
-		const endTime = Date.parse(end)
+		const startTime = Date.parse(normalizedStart)
+		const endTime = Date.parse(normalizedEnd)
 		if (!Number.isFinite(startTime) || !Number.isFinite(endTime)) {
 			return errorResponse('Invalid start or end time', 400, 'invalid_time')
 		}
@@ -91,7 +103,8 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 			return errorResponse('End time must be after start time', 400, 'invalid_range')
 		}
 
-		const seatCount = Number.parseInt(seats ?? 1, 10)
+		const seatValue = typeof seats === 'number' ? String(seats) : (typeof seats === 'string' ? seats : '1')
+		const seatCount = Number.parseInt(seatValue, 10)
 		if (!Number.isFinite(seatCount) || seatCount < 1) {
 			return errorResponse('Invalid seats', 400, 'invalid_seats')
 		}
@@ -102,7 +115,7 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 		}
 
 		const minNoticeMs = getMinNoticeHours(env) * 60 * 60 * 1000
-		if (new Date(start).getTime() < Date.now() + minNoticeMs) {
+		if (new Date(normalizedStart).getTime() < Date.now() + minNoticeMs) {
 			return errorResponse(`Bookings require at least ${getMinNoticeHours(env)} hours notice`, 400, 'min_notice')
 		}
 
@@ -118,13 +131,13 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 		const calendarIds = getCalendarIds(env)
 		if (calendarIds.length === 0) return errorResponse('No calendars configured', 400, 'no_calendars')
 		const { busy } = await googleFreeBusy({
-			accessToken: token.accessToken,
-			timeMin: start,
-			timeMax: end,
-			calendarIds
-		})
+				accessToken: token.accessToken,
+				timeMin: normalizedStart,
+				timeMax: normalizedEnd,
+				calendarIds
+			})
 
-		const hasConflict = busy.some(range => overlaps(start, end, range.start, range.end))
+		const hasConflict = busy.some(range => overlaps(normalizedStart, normalizedEnd, range.start, range.end))
 		if (hasConflict) {
 			return errorResponse('Time slot is busy', 409, 'busy')
 		}
@@ -134,9 +147,9 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 				getBookingByIdempotency({ db: env.DB, idempotencyKey: key })
 		}
 		const { existing, idempotencyKey: normalizedKey } = await ensureIdempotentBooking({
-			storage,
-			booking: { idempotencyKey }
-		})
+				storage,
+				booking: { idempotencyKey: normalizedIdempotencyKey }
+			})
 		if (existing) {
 			if ((existing.email || '').toLowerCase() !== normalizedEmail) {
 				return errorResponse('Idempotency key already used', 409, 'idempotency_conflict')
@@ -159,9 +172,9 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 
 		const cancelToken = generateCancelToken()
 		const cancelLink = new URL(`/calendar-gym?cancel=${cancelToken}`, request.url).toString()
-		const booking = {
-			start,
-			end,
+			const booking = {
+				start: normalizedStart,
+				end: normalizedEnd,
 			timezone: normalizedTimezone,
 			seats: seatCount,
 			name: normalizedName,

@@ -3,7 +3,11 @@ import { checkRateLimit, validateAdminSessionFromHeader } from '../../../package
 
 import type { D1DatabaseLike } from '../../../packages/calendar/src/storage/d1.ts'
 
-export type EnvLike = Record<string, string | undefined> & { DB?: D1DatabaseLike; NODE_ENV?: string }
+export type EnvLike = {
+	DB: D1DatabaseLike
+	NODE_ENV?: string
+	[key: string]: string | D1DatabaseLike | undefined
+}
 
 export function getCalendarIds(env: EnvLike): string[] {
 	const ids = getEnv(env, 'GOOGLE_CALENDAR_IDS', '') || ''
@@ -141,9 +145,10 @@ export async function enforceRateLimit({
 	let ip = cloudflareIp || 'unknown'
 
 	// Only trust XFF when explicitly enabled (for non-Cloudflare deployments).
-	if (!cloudflareIp && env.RATE_LIMIT_TRUST_XFF === 'true') {
+	if (!cloudflareIp && env['RATE_LIMIT_TRUST_XFF'] === 'true') {
 		const forwarded = request.headers.get('x-forwarded-for')
-		ip = forwarded ? forwarded.split(',')[0].trim() || 'unknown' : 'unknown'
+		const firstForwarded = forwarded?.split(',')[0]?.trim()
+		ip = firstForwarded || 'unknown'
 	}
 
 	const key = `rate:${keySuffix}:${ip}`

@@ -10,14 +10,15 @@ function toUint8ArrayFromBase64(base64: string) {
 function toBase64(bytes: Uint8Array) {
 	let binary = ''
 	for (let i = 0; i < bytes.length; i++) {
-		binary += String.fromCharCode(bytes[i])
+		binary += String.fromCharCode(bytes[i] ?? 0)
 	}
 	return btoa(binary)
 }
 
 async function getKey(base64Key: string) {
 	const raw = toUint8ArrayFromBase64(base64Key)
-	return crypto.subtle.importKey('raw', raw, 'AES-GCM', false, [ 'encrypt', 'decrypt' ])
+	const keyBytes = raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength)
+	return crypto.subtle.importKey('raw', keyBytes, 'AES-GCM', false, [ 'encrypt', 'decrypt' ])
 }
 
 export async function encryptString({
@@ -30,7 +31,7 @@ export async function encryptString({
 	const key = await getKey(base64Key)
 	const iv = crypto.getRandomValues(new Uint8Array(12))
 	const encoded = new TextEncoder().encode(plaintext)
-	const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded)
+	const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv as unknown as BufferSource }, key, encoded as unknown as BufferSource)
 	return `${toBase64(iv)}.${toBase64(new Uint8Array(cipher))}`
 }
 
@@ -57,6 +58,6 @@ export async function decryptString({
 		throw new Error('decryptString: ciphertext contains invalid base64')
 	}
 	const key = await getKey(base64Key)
-	const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data)
+	const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv as unknown as BufferSource }, key, data as unknown as BufferSource)
 	return new TextDecoder().decode(plain)
 }

@@ -1,8 +1,8 @@
 import { getGoogleConfig } from './client.ts'
 import { buildAuthUrl, exchangeCodeForTokens, refreshAccessToken } from './oauth.ts'
 import { getFreeBusy } from './freebusy.ts'
-import { createEvent, deleteEvent } from './events.ts'
-import { isTokenExpired, normalizeTokenResponse } from './tokens.ts'
+import { createEvent, deleteEvent, type GoogleCalendarEventInput } from './events.ts'
+import { isTokenExpired, normalizeTokenResponse, type NormalizedGoogleToken } from './tokens.ts'
 
 const DEFAULT_SCOPES = [
 	'https://www.googleapis.com/auth/calendar.events',
@@ -14,7 +14,7 @@ export function getGoogleAuthUrl({
 	state,
 	scopes = DEFAULT_SCOPES
 }: {
-	env: Record<string, any>
+	env: Record<string, unknown>
 	state: string
 	scopes?: string[]
 }) {
@@ -26,7 +26,7 @@ export async function exchangeGoogleCode({
 	env,
 	code
 }: {
-	env: Record<string, any>
+	env: Record<string, unknown>
 	code: string
 }) {
 	const { clientId, clientSecret, redirectUri } = getGoogleConfig(env)
@@ -38,7 +38,7 @@ export async function refreshGoogleToken({
 	env,
 	refreshToken
 }: {
-	env: Record<string, any>
+	env: Record<string, unknown>
 	refreshToken: string
 }) {
 	const { clientId, clientSecret } = getGoogleConfig(env)
@@ -50,8 +50,8 @@ export async function ensureValidGoogleToken({
 	env,
 	token
 }: {
-	env: Record<string, any>
-	token: any
+	env: Record<string, unknown>
+	token: NormalizedGoogleToken
 }) {
 	if (!isTokenExpired(token)) return token
 	return refreshGoogleToken({ env, refreshToken: token.refreshToken })
@@ -78,7 +78,7 @@ export async function googleCreateEvent({
 }: {
 	accessToken: string
 	calendarId: string
-	event: any
+	event: GoogleCalendarEventInput
 }) {
 	return createEvent({ accessToken, calendarId, event })
 }
