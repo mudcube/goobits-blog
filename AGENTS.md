@@ -35,3 +35,9 @@ SvelteKit 5 + Cloudflare Pages monorepo (pnpm workspaces).
 ## Environment
 
 Env files in `config/env/`, encrypted with dotenvx. See `.env.example` for all variables. Production secrets: `pnpm deploy:secrets`.
+
+## CSS Conventions
+
+- Prefer BEM-style class naming (`block__element--modifier`) for component and page styles.
+- Prefer nested SCSS under a block root so selectors stay scoped and readable.
+- Avoid introducing new legacy/flat selector patterns when adding or refactoring UI.
