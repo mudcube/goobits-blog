@@ -88,7 +88,7 @@ async function readJson(request: Request) {
 	}
 	try {
 		return { ok: true as const, value: JSON.parse(text) as unknown }
-	} catch (error) {
+	} catch {
 		return { ok: false as const, status: 400 as const }
 	}
 }
@@ -166,7 +166,7 @@ async function handleRequest(request: Request) {
 			status: 200,
 			headers: corsHeaders
 		})
-	} catch (error) {
+	} catch {
 		return new Response('Internal server error', {
 			status: 500,
 			headers: corsHeaders

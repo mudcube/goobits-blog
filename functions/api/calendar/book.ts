@@ -46,7 +46,7 @@ function isValidTimeZone(value: unknown) {
 	try {
 		Intl.DateTimeFormat('en-US', { timeZone: value })
 		return true
-	} catch (err) {
+	} catch {
 		return false
 	}
 }

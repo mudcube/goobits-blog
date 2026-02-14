@@ -123,7 +123,7 @@ export async function readJson(
 
 	try {
 		return { ok: true, value: JSON.parse(text) }
-	} catch (err) {
+	} catch {
 		return { ok: false, status: 400, error: { code: 'invalid_json', message: 'Invalid JSON' } }
 	}
 }

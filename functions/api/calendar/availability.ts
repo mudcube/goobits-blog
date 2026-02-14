@@ -39,7 +39,7 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 		let connection = null
 		try {
 			connection = await getConnection({ db: env.DB, provider: 'google', base64Key })
-		} catch (err) {
+		} catch {
 			console.warn('Availability: failed to load saved Google connection; treating as disconnected')
 			return errorResponse('Google not connected', 400, 'not_connected')
 		}
@@ -48,7 +48,7 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 		let token
 		try {
 			token = await ensureValidGoogleToken({ env, token: connection })
-		} catch (err) {
+		} catch {
 			console.warn('Availability: Google token invalid/expired and could not be refreshed')
 			return errorResponse('Google not connected', 400, 'not_connected')
 		}
