@@ -13,6 +13,12 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 		const rateLimit = await enforceRateLimit({ env, request, keySuffix: 'availability', limit: 60, windowSeconds: 60 })
 		if (rateLimit) return rateLimit
 
+		// For the UI, treat "not configured/connected" as a soft error to avoid noisy 400s in the console.
+		// The client can still display a friendly message, but the fetch itself should be a 200.
+		const softError = (code: string, message: string) => {
+			return jsonResponse({ slots: [], error: { code, message } })
+		}
+
 		const url = new URL(request.url)
 		const timeMin = url.searchParams.get('start')
 		const timeMax = url.searchParams.get('end')
@@ -33,7 +39,7 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 		}
 
 		const calendarIds = getCalendarIds(env)
-		if (calendarIds.length === 0) return errorResponse('No calendars configured', 400, 'no_calendars')
+		if (calendarIds.length === 0) return softError('no_calendars', 'Calendar is not configured yet.')
 
 		const base64Key = getTokenKey(env)
 		let connection = null
@@ -41,16 +47,16 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 			connection = await getConnection({ db: env.DB, provider: 'google', base64Key })
 		} catch {
 			console.warn('Availability: failed to load saved Google connection; treating as disconnected')
-			return errorResponse('Google not connected', 400, 'not_connected')
+			return softError('not_connected', 'Calendar is being connected. Please try again soon.')
 		}
-		if (!connection) return errorResponse('Google not connected', 400, 'not_connected')
+		if (!connection) return softError('not_connected', 'Calendar is being connected. Please try again soon.')
 
 		let token
 		try {
 			token = await ensureValidGoogleToken({ env, token: connection })
 		} catch {
 			console.warn('Availability: Google token invalid/expired and could not be refreshed')
-			return errorResponse('Google not connected', 400, 'not_connected')
+			return softError('not_connected', 'Calendar needs to be reconnected. Please try again soon.')
 		}
 		if (token.expiresAt !== connection.expiresAt) {
 			await saveConnection({ db: env.DB, provider: 'google', token, base64Key })
