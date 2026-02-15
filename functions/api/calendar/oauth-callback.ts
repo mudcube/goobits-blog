@@ -10,7 +10,13 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 		if (!state) return errorResponse('Missing state', 400, 'invalid_state')
 
 		const validState = await consumeOauthState({ db: env.DB, state })
-		if (!validState) return errorResponse('Invalid state', 400, 'invalid_state')
+		if (!validState) {
+			// Backward-compat: if this callback was used by the member auth flow,
+			// hand off to the Goobits provider callback route which validates cookie state.
+			const authCallback = new URL('/auth/google/callback', request.url)
+			authCallback.search = url.search
+			return Response.redirect(authCallback, 302)
+		}
 
 		const token = await exchangeGoogleCode({ env, code })
 		await saveConnection({
