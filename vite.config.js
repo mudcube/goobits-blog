@@ -28,7 +28,11 @@ export default defineConfig({
 	define: runtimeConfig.define,
 	envDir: './config/env',
 	optimizeDeps: {
-		exclude: [ '*.md' ]
+		// Treat local workspace deps as source so changes apply in dev and SSR behavior matches prod.
+		exclude: [ '*.md', '@goobits/auth' ]
+	},
+	ssr: {
+		noExternal: [ '@goobits/auth' ]
 	},
 	plugins: [
 		enhancedImages(),

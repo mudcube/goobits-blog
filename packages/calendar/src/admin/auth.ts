@@ -45,7 +45,11 @@ export function createAdminAdapters({
 		usersTable: 'admin_users',
 		cookieName: ADMIN_COOKIE_NAME,
 		secureCookies,
-		sessionLifetime: sessionLifetimeMs
+		sessionLifetime: sessionLifetimeMs,
+		// Keep user shape aligned with our admin_users table schema.
+		userColumns: {
+			avatar: 'avatar_url'
+		}
 	})
 
 	const credentialsProvider = new CredentialsProvider()
