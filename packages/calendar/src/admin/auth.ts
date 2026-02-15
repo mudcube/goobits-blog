@@ -9,6 +9,7 @@ export const ADMIN_COOKIE_NAME = 'admin_session'
 type AdminUser = { id: string | number; email: string; name?: string | null }
 type AdminUserAdapterLike = {
 	getUserByEmail: (email: string) => Promise<AdminUser | null>
+	updateUser?: (id: string, data: Record<string, unknown>) => Promise<AdminUser>
 	createUser: (
 		profile: { email: string; name: string; verified_email: boolean },
 		metadata: { password: string }
@@ -60,8 +61,14 @@ export async function ensureAdminUser({
 	passcode: string
 }) {
 	const existing = await userAdapter.getUserByEmail(ADMIN_EMAIL)
-	if (existing) return existing
 	const password = await hashPassword(passcode)
+	if (existing) {
+		// Keep the configured env passcode authoritative in case it changed.
+		if (userAdapter.updateUser) {
+			await userAdapter.updateUser(String(existing.id), { password })
+		}
+		return existing
+	}
 	return userAdapter.createUser({
 		email: ADMIN_EMAIL,
 		name: 'Admin',
