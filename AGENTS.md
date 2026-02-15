@@ -6,9 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 pnpm dev          # Start dev server (port 3610)
-pnpm stop         # Stop dev server
-pnpm restart      # Restart dev server
-pnpm build        # Production build (auto version bump)
+pnpm dev:stop     # Stop dev server
+pnpm dev:restart  # Restart dev server
+pnpm build        # Production build
+pnpm build:patch  # Patch bump + build
+pnpm check        # Types + svelte-check + lint + circular deps
+pnpm test         # Full e2e suite
 pnpm dev:wrangler # Dev with Cloudflare D1 runtime
 ```
 
