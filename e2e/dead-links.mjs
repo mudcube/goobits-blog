@@ -7,13 +7,24 @@ const ROUTES_DIR = path.join(ROOT, 'src', 'routes')
 const STATIC_DIR = path.join(ROOT, 'static')
 const SRC_DIR = path.join(ROOT, 'src')
 
-const SOURCE_EXTENSIONS = new Set(['.svelte', '.ts', '.js'])
+const SOURCE_EXTENSIONS = new Set(['.svelte', '.ts', '.js', '.scss', '.css', '.md', '.svx'])
 const PAGE_FILE_RE = /^\+page\.(svelte|ts|js)$/
 const SERVER_FILE_RE = /^\+server\.(ts|js)$/
 
 const EXEMPT_PATHS = new Set([
   '/sitemap.xml',
   '/robots.txt'
+])
+
+const IMAGE_EXTENSIONS = new Set([
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  '.svg',
+  '.avif',
+  '.ico'
 ])
 
 async function walk(dir) {
@@ -43,8 +54,10 @@ function routePathFromDir(dir) {
 
 function normalizeUrlPath(raw) {
   if (!raw) return null
-  if (/^(https?:|mailto:|tel:|#|javascript:)/i.test(raw)) return null
+  if (/^(https?:|mailto:|tel:|#|javascript:|data:)/i.test(raw)) return null
   let v = raw.trim()
+  // Avoid flagging templated paths like `/media/project-{id}.png` in Svelte styles.
+  if (/[{}]/.test(v)) return null
   if (!v.startsWith('/')) return null
   v = v.split('#')[0].split('?')[0]
   if (!v) return '/'
@@ -69,6 +82,46 @@ function extractAttrValues(content, attr) {
   const re = new RegExp(`${attr}\\s*=\\s*(["'])(.*?)\\1`, 'g')
   for (const match of content.matchAll(re)) values.push(match[2])
   return values
+}
+
+function extractCssUrlValues(content) {
+  const values = []
+  const re = /url\(\s*(["']?)([^"')]+)\1\s*\)/g
+  for (const match of content.matchAll(re)) values.push(match[2])
+  return values
+}
+
+function extractSrcsetUrls(raw) {
+  const urls = []
+  for (const part of String(raw).split(',')) {
+    const trimmed = part.trim()
+    if (!trimmed) continue
+    const url = trimmed.split(/\s+/)[0]
+    if (url) urls.push(url)
+  }
+  return urls
+}
+
+function extnameFromUrlPath(p) {
+  try {
+    return path.extname(p)
+  } catch {
+    return ''
+  }
+}
+
+function isLikelyImagePath(p) {
+  const ext = extnameFromUrlPath(p).toLowerCase()
+  return IMAGE_EXTENSIONS.has(ext)
+}
+
+async function fileExists(filePath) {
+  try {
+    await fs.access(filePath)
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function collectRoutes() {
@@ -96,7 +149,7 @@ async function run() {
   const sourceFiles = (await walk(SRC_DIR)).filter((f) => SOURCE_EXTENSIONS.has(path.extname(f)))
 
   const dead = []
-  const missingAssets = []
+  const missingImages = []
 
   for (const file of sourceFiles) {
     const content = await fs.readFile(file, 'utf8')
@@ -105,28 +158,52 @@ async function run() {
       const p = normalizeUrlPath(href)
       if (!p || EXEMPT_PATHS.has(p)) continue
 
-      const existsStatic = staticRoutes.has(p)
-      const existsDynamic = dynamicRoutes.some((re) => re.test(p))
-      if (!existsStatic && !existsDynamic) {
-        dead.push({ file: path.relative(ROOT, file), href: p })
+      if (isLikelyImagePath(p)) {
+        const assetPath = path.join(STATIC_DIR, p.slice(1))
+        if (!await fileExists(assetPath)) {
+          missingImages.push({ file: path.relative(ROOT, file), src: p })
+        }
+      } else {
+        const existsStatic = staticRoutes.has(p)
+        const existsDynamic = dynamicRoutes.some((re) => re.test(p))
+        if (!existsStatic && !existsDynamic) {
+          dead.push({ file: path.relative(ROOT, file), href: p })
+        }
       }
     }
 
-    for (const src of extractAttrValues(content, 'src')) {
+    const imageCandidates = [
+      ...extractAttrValues(content, 'src'),
+      ...extractAttrValues(content, 'poster'),
+      ...extractAttrValues(content, 'data-src'),
+      ...extractAttrValues(content, 'data-poster'),
+      ...extractCssUrlValues(content)
+    ]
+    for (const src of imageCandidates) {
       const p = normalizeUrlPath(src)
       if (!p) continue
-      if (!p.startsWith('/media/') && !p.startsWith('/fonts/') && !p.startsWith('/labs/')) continue
+      if (!isLikelyImagePath(p)) continue
       const assetPath = path.join(STATIC_DIR, p.slice(1))
-      try {
-        await fs.access(assetPath)
-      } catch {
-        missingAssets.push({ file: path.relative(ROOT, file), src: p })
+      if (!await fileExists(assetPath)) {
+        missingImages.push({ file: path.relative(ROOT, file), src: p })
+      }
+    }
+
+    for (const srcset of extractAttrValues(content, 'srcset')) {
+      for (const candidate of extractSrcsetUrls(srcset)) {
+        const p = normalizeUrlPath(candidate)
+        if (!p) continue
+        if (!isLikelyImagePath(p)) continue
+        const assetPath = path.join(STATIC_DIR, p.slice(1))
+        if (!await fileExists(assetPath)) {
+          missingImages.push({ file: path.relative(ROOT, file), src: p })
+        }
       }
     }
   }
 
-  if (dead.length === 0 && missingAssets.length === 0) {
-    console.log('OK: no dead internal href links or missing static assets detected.')
+  if (dead.length === 0 && missingImages.length === 0) {
+    console.log('OK: no dead internal href links or missing static images detected.')
     return
   }
 
@@ -135,9 +212,9 @@ async function run() {
     for (const d of dead) console.error(`- ${d.href} in ${d.file}`)
   }
 
-  if (missingAssets.length) {
-    console.error('\nMissing static assets:')
-    for (const d of missingAssets) console.error(`- ${d.src} in ${d.file}`)
+  if (missingImages.length) {
+    console.error('\nMissing static images:')
+    for (const d of missingImages) console.error(`- ${d.src} in ${d.file}`)
   }
 
   process.exitCode = 1
