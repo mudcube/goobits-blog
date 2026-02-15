@@ -121,7 +121,7 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 
 		const base64Key = getTokenKey(env)
 		const connection = await getConnection({ db: env.DB, provider: 'google', base64Key })
-		if (!connection) return errorResponse('Google not connected', 400, 'not_connected')
+		if (!connection) return errorResponse('Calendar is offline. Try again in a minute.', 503, 'not_connected')
 
 		const token = await ensureValidGoogleToken({ env, token: connection })
 		if (token.expiresAt !== connection.expiresAt) {
@@ -129,7 +129,7 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 		}
 
 		const calendarIds = getCalendarIds(env)
-		if (calendarIds.length === 0) return errorResponse('No calendars configured', 400, 'no_calendars')
+		if (calendarIds.length === 0) return errorResponse('Calendar is not configured yet.', 503, 'no_calendars')
 		const { busy } = await googleFreeBusy({
 				accessToken: token.accessToken,
 				timeMin: normalizedStart,

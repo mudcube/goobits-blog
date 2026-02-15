@@ -32,7 +32,7 @@ export async function onRequest({ env, request }: { env: EnvLike; request: Reque
 
 		const base64Key = getTokenKey(env)
 		const connection = await getConnection({ db: env.DB, provider: 'google', base64Key })
-		if (!connection) return errorResponse('Google not connected', 400, 'not_connected')
+		if (!connection) return errorResponse('Calendar is offline. Try again in a minute.', 503, 'not_connected')
 
 		const token = await ensureValidGoogleToken({ env, token: connection })
 		if (token.expiresAt !== connection.expiresAt) {
