@@ -38,7 +38,7 @@ experiments called “getTextMetrics”. Once you know the text metrics, you can
 It’s been very useful to me for many purposes:Unicode Profiling Project, Font-Family Profiling Project, calculating the
 “Ascent, Descent, and x-height”, and finding the bounding-box of unicode glyphs to create stamps, amongst other things.
 
-_See [getBitmapBounds demo](/labs/Typography/getBitmapBounds.html) in action._
+_See [getBitmapBounds demo](/labs/typography/getBitmapBounds.html) in action._
 
 ```js
 (function () {
@@ -191,7 +191,7 @@ and the “middle” baseline is half of the “x-height”. Given this informat
 
 To measure these baselines, the following code was used:
 
-_See [`<canvas>` baseline demo](/labs/Typography/googleFontsAPI.html) in action._
+_See [`<canvas>` baseline demo](/labs/typography/googleFontsAPI.html) in action._
 
 ```js
 // finding portion that protrudes past bottom of alphabetic baseline
@@ -257,8 +257,8 @@ an error margin of +/- 2px—many fonts are matched exactly. Likely, these discr
    a height of 0. In order to get the proper values the whole experiment must be offset vertically (so the text isn’t
    hidden off-screen).
 
-_See [CSS text-metrics demo](/labs/Typography/CSSTextMetrics.html) in action._  
-_See [text baseline demo](/labs/Typography/metrics.html#textBaseline) in action._
+_See [CSS text-metrics demo](/labs/typography/CSSTextMetrics.html) in action._  
+_See [text baseline demo](/labs/typography/metrics.html#textBaseline) in action._
 
 ```js
 // setting up html used for measuring text-metrics
@@ -349,7 +349,7 @@ font-properties, and measuring the span.offsetWidth (DOM level 0).
 Align to “start” and “end” require the additional knowledge of the directionality of the font to distinguish RTL from
 LTR languages. This poses a problem if the website doesn’t specify this information in the
 
-_See [textAlign demo](/labs/Typography/metrics.html#textAlign)_ _in action._
+_See [textAlign demo](/labs/typography/metrics.html#textAlign)_ _in action._
 
 ```js
 <span id="control">Hello world!</span>
@@ -392,7 +392,7 @@ properly, such as this CSS solution.
 We can fix old browsers with broken ctx.measureText support in CSS by calculating the span.offsetWidth using the same
 methods we used to fix ctx.textAlign:
 
-_See [measureText demo](/labs/Typography/googleFontsAPI.html#measureText) in action._
+_See [measureText demo](/labs/typography/googleFontsAPI.html#measureText) in action._
 
 ```js
 <span id="control">Hello world!</span>
@@ -440,7 +440,7 @@ When the word is so large it extends past the bounding box, we need to add in �
 hyphenation, but without the hyphen. Calculating letter-wrapping entails looping through the text.length of the long
 word in question, until the edge of the bounding-box is hit, at which point a line-break is added.
 
-_See [lineBreaks demo](/labs/Typography/metrics.html#lineBreak) in action._
+_See [lineBreaks demo](/labs/typography/metrics.html#lineBreak) in action._
 
 ```js
 function getLines(text, maxWidth) {
@@ -502,5 +502,5 @@ malfunctioning. In a future installment we’ll look into _embedded fonts_, incl
 ctx.strokeText by parsing SVG fonts and drawing them using the vector primitives ctx.moveTo, ctx.lineTo,
 ctx.quadradicCurveTo and ctx.bezierCurveTo.
 
-_View [CSS text-metrics in `<canvas>`](/labs/Typography/metrics.html)._  
-_View [CSS text-measurements](/labs/Typography/CSSTextMetrics.html)._
+_View [CSS text-metrics in `<canvas>`](/labs/typography/metrics.html)._  
+_View [CSS text-measurements](/labs/typography/CSSTextMetrics.html)._
