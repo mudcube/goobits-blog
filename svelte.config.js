@@ -13,6 +13,7 @@ export default {
 			}
 		}),
 		prerender: {
+			handleUnseenRoutes: 'ignore',
 			handleHttpError: ({ path, message }) => {
 				handlePrerenderHttpError(path, message)
 			}
