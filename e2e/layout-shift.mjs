@@ -33,12 +33,56 @@ async function run() {
 			// Capture CLS from the earliest possible moment.
 			await page.addInitScript(() => {
 				window.__e2e_cls = 0
+				window.__e2e_ls = []
+
+				const selectorFor = (el) => {
+					if (!el || el.nodeType !== 1) return ''
+					const id = el.getAttribute('id')
+					if (id) return `#${id}`
+
+					const parts = []
+					let cur = el
+					for (let i = 0; i < 4 && cur && cur.nodeType === 1; i++) {
+						let p = cur.tagName.toLowerCase()
+						const cls = (cur.getAttribute('class') || '')
+							.split(/\s+/)
+							.filter(Boolean)
+							.slice(0, 2)
+						if (cls.length) p += '.' + cls.join('.')
+						parts.unshift(p)
+						cur = cur.parentElement
+					}
+					return parts.join(' > ')
+				}
 				try {
 					new PerformanceObserver((list) => {
 						for (const entry of list.getEntries()) {
 							// Ignore shifts caused by user input.
 							if (entry && entry.hadRecentInput) continue
 							window.__e2e_cls += entry.value
+
+							// Store a small amount of debug data for failures.
+							const sources = []
+							if (entry.sources) {
+								for (const s of entry.sources) {
+									const node = s.node
+									sources.push({
+										selector: selectorFor(node),
+										previousRect: s.previousRect
+											? {
+													x: s.previousRect.x,
+													y: s.previousRect.y,
+													w: s.previousRect.width,
+													h: s.previousRect.height
+												}
+											: null,
+										currentRect: s.currentRect
+											? { x: s.currentRect.x, y: s.currentRect.y, w: s.currentRect.width, h: s.currentRect.height }
+											: null
+									})
+								}
+							}
+							window.__e2e_ls.push({ value: entry.value, sources })
 						}
 					}).observe({ type: 'layout-shift', buffered: true })
 				} catch {
@@ -64,7 +108,17 @@ async function run() {
 			// eslint-disable-next-line no-console
 			console.log(`[cls] ${route.padEnd(16)} cls=${cls.toFixed(4)} ${ok ? 'OK' : 'FAIL'}`)
 
-			if (!ok) failed++
+			if (!ok) {
+				failed++
+				const debug = await page.evaluate(() => {
+					const entries = Array.isArray(window.__e2e_ls) ? window.__e2e_ls.slice() : []
+					entries.sort((a, b) => b.value - a.value)
+					return entries.slice(0, 5)
+				})
+
+				// eslint-disable-next-line no-console
+				console.log('[cls] top entries:', JSON.stringify(debug, null, 2))
+			}
 			await page.close()
 		}
 
@@ -85,4 +139,3 @@ run().catch((err) => {
 	console.error('[cls] Failed:', err?.message || err)
 	process.exit(1)
 })
-

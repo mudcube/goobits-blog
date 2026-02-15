@@ -38,6 +38,33 @@ async function run() {
 			if (!res) throw new Error(`No response for ${url}`)
 			if (res.status() >= 500) throw new Error(`Server error for ${url}: ${res.status()}`)
 
+			// In dev, CSS can be injected over a few ticks after DOMContentLoaded.
+			// Define "first available" as "stylesheets stable + tokens present" to avoid flake
+			// and to measure drift after the page is actually styled.
+			await page.evaluate(async () => {
+				const hasTokens = () => {
+					const v = getComputedStyle(document.documentElement).getPropertyValue('--max-width')
+					return v && v.trim().length > 0
+				}
+
+				let lastLen = document.styleSheets.length
+				let stableFor = 0
+				let lastTs = performance.now()
+
+				while (stableFor < 250 || !hasTokens()) {
+					await new Promise((r) => requestAnimationFrame(() => r()))
+					const now = performance.now()
+					const len = document.styleSheets.length
+					if (len !== lastLen) {
+						lastLen = len
+						stableFor = 0
+						lastTs = now
+					} else {
+						stableFor = now - lastTs
+					}
+				}
+			})
+
 			// Snapshot "early": as close to first usable render as we can get, but after one frame.
 			const early = await page.evaluate(async () => {
 				const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()))
@@ -60,6 +87,8 @@ async function run() {
 					pick('header'),
 					pick('main'),
 					pick('.ui-hero'),
+					pick('.about-page__intro'),
+					pick('.about-page__bio'),
 					pick('h1'),
 					pick('.ui-shell')
 				].filter(Boolean)
@@ -100,6 +129,8 @@ async function run() {
 					pick('header'),
 					pick('main'),
 					pick('.ui-hero'),
+					pick('.about-page__intro'),
+					pick('.about-page__bio'),
 					pick('h1'),
 					pick('.ui-shell')
 				].filter(Boolean)
