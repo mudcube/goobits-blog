@@ -1,4 +1,4 @@
-import { CALENDAR_ACTIVITY_LIST, type CalendarActivityConfig } from '$lib/booking/activities'
+import { CALENDAR_ACTIVITY_LIST, type CalendarActivityConfig } from './activities.ts'
 
 export type CalendarProgramSlug = CalendarActivityConfig['slug']
 

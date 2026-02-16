@@ -1,6 +1,6 @@
-import { CALENDAR_ACTIVITY_LIST, type CalendarActivityConfig } from '$lib/booking/activities'
-import { isValidProgramSlug, type CalendarProgramSlug } from '$lib/booking/programs'
-import type { D1DatabaseLike } from '$lib/dev/devDb'
+import { CALENDAR_ACTIVITY_LIST, type CalendarActivityConfig } from '../social/activities.ts'
+import { isValidProgramSlug, type CalendarProgramSlug } from '../social/programs.ts'
+import type { D1DatabaseLike } from '../storage/d1.ts'
 
 export type CalendarProgramState = CalendarActivityConfig & {
 	enabled: boolean

@@ -1,5 +1,5 @@
-import type { D1DatabaseLike } from '$lib/dev/devDb'
-import type { CalendarProgramSlug } from '$lib/booking/programs'
+import type { D1DatabaseLike } from '../storage/d1.ts'
+import type { CalendarProgramSlug } from '../social/programs.ts'
 
 type EventRow = {
 	id: number

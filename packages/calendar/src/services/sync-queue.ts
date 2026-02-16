@@ -1,6 +1,7 @@
-import type { D1DatabaseLike } from '$lib/dev/devDb'
-import { ensureValidGoogleToken, getConnection, googleCreateEvent, googleDeleteEvent, saveConnection } from '@packages/calendar/src/index.ts'
-import { getEnv } from '@packages/calendar/src/config/env.ts'
+import type { D1DatabaseLike } from '../storage/d1.ts'
+import { ensureValidGoogleToken, googleCreateEvent, googleDeleteEvent } from '../providers/google/index.ts'
+import { getConnection, saveConnection } from '../storage/d1.ts'
+import { getEnv } from '../config/env.ts'
 
 type SyncJobRow = {
 	id: number
