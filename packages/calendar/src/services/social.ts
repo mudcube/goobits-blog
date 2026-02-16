@@ -80,6 +80,14 @@ export type CalendarProfile = {
 	chatHandle: string
 }
 
+export type CalendarEventMutationState = {
+	seatsTaken: number
+	seatsLeft: number
+	waitlistCount: number
+	userStatus: 'joined' | 'waitlist' | null
+	userGuestCount: number
+}
+
 async function listEventsByRange(
 	db: D1DatabaseLike,
 	userId: string,
@@ -270,6 +278,29 @@ async function getSeatsTaken(db: D1DatabaseLike, eventId: number) {
 	return row?.seats_taken ?? 0
 }
 
+export async function getEventMutationState(
+	db: D1DatabaseLike,
+	input: { eventId: number; userId: string }
+): Promise<CalendarEventMutationState | null> {
+	const event = await getEventCapacity(db, input.eventId)
+	if (!event) return null
+	const summary = await db.prepare(
+		`SELECT
+			COALESCE(SUM(CASE WHEN status = 'joined' THEN 1 + guest_count ELSE 0 END), 0) AS seats_taken,
+			COALESCE(SUM(CASE WHEN status = 'waitlist' THEN 1 ELSE 0 END), 0) AS waitlist_count
+		FROM calendar_event_participants
+		WHERE event_id = ?`
+	).bind(input.eventId).first<{ seats_taken: number; waitlist_count: number }>()
+	const user = await getParticipant(db, input.eventId, input.userId)
+	return {
+		seatsTaken: summary?.seats_taken ?? 0,
+		seatsLeft: Math.max(0, event.capacity - (summary?.seats_taken ?? 0)),
+		waitlistCount: summary?.waitlist_count ?? 0,
+		userStatus: user?.status === 'joined' || user?.status === 'waitlist' ? user.status : null,
+		userGuestCount: user?.status === 'joined' || user?.status === 'waitlist' ? (user.guest_count ?? 0) : 0
+	}
+}
+
 export async function joinEvent(
 	db: D1DatabaseLike,
 	input: { eventId: number; userId: string; guestCount: number; note?: string | null }
@@ -278,27 +309,58 @@ export async function joinEvent(
 	if (!event) return { ok: false as const, code: 'not_found', message: 'Event not found' }
 
 	const guestCount = Math.max(0, Math.min(8, input.guestCount))
-	const requestedSeats = 1 + guestCount
-	const seatsTaken = await getSeatsTaken(db, input.eventId)
-	const existing = await getParticipant(db, input.eventId, input.userId)
-	const existingSeats = existing?.status === 'joined' ? 1 + (existing.guest_count ?? 0) : 0
-	const seatsAfter = seatsTaken - existingSeats + requestedSeats
-	const canJoin = seatsAfter <= event.capacity
-	const status: 'joined' | 'waitlist' = canJoin ? 'joined' : 'waitlist'
-
 	await db.prepare(
 		`INSERT INTO calendar_event_participants (event_id, user_id, guest_count, status, attendance_status, note, created_at, updated_at)
-		 VALUES (?, ?, ?, ?, 'unknown', ?, unixepoch(), unixepoch())
+		 VALUES (
+			?,
+			?,
+			?,
+			CASE
+				WHEN (
+					(SELECT COALESCE(SUM(CASE WHEN status = 'joined' THEN 1 + guest_count ELSE 0 END), 0)
+					 FROM calendar_event_participants
+					 WHERE event_id = ?)
+					- COALESCE((
+						SELECT CASE WHEN status = 'joined' THEN 1 + guest_count ELSE 0 END
+						FROM calendar_event_participants
+						WHERE event_id = ? AND user_id = ?
+						LIMIT 1
+					), 0)
+					+ ?
+				) <= (SELECT capacity FROM calendar_events WHERE id = ?)
+				THEN 'joined'
+				ELSE 'waitlist'
+			END,
+			'unknown',
+			?,
+			unixepoch(),
+			unixepoch()
+		 )
 		 ON CONFLICT(event_id, user_id) DO UPDATE SET
 		   guest_count = excluded.guest_count,
 		   status = excluded.status,
 		   note = excluded.note,
 		   updated_at = unixepoch()`
-	).bind(input.eventId, input.userId, guestCount, status, input.note ?? null).run()
+	).bind(
+		input.eventId,
+		input.userId,
+		guestCount,
+		input.eventId,
+		input.eventId,
+		input.userId,
+		1 + guestCount,
+		input.eventId,
+		input.note ?? null
+	).run()
+
+	const participant = await getParticipant(db, input.eventId, input.userId)
+	const status: 'joined' | 'waitlist' = participant?.status === 'waitlist' ? 'waitlist' : 'joined'
+	const state = await getEventMutationState(db, { eventId: input.eventId, userId: input.userId })
 
 	return {
 		ok: true as const,
-		status
+		status,
+		state
 	}
 }
 
@@ -310,7 +372,8 @@ export async function leaveEvent(db: D1DatabaseLike, input: { eventId: number; u
 	).bind(input.eventId, input.userId).run()
 
 	await bumpWaitlist(db, input.eventId)
-	return { ok: true as const }
+	const state = await getEventMutationState(db, { eventId: input.eventId, userId: input.userId })
+	return { ok: true as const, state }
 }
 
 export async function bumpWaitlist(db: D1DatabaseLike, eventId: number) {
