@@ -13,8 +13,7 @@ Keep Google Calendar in sync with local booking changes without blocking joins/l
 ## Required Environment
 
 - `PUBLIC_BASE_URL`
-- `CALENDAR_SYNC_CRON_SECRET` (recommended)
-- `ADMIN_PASSCODE` (fallback if no cron secret configured)
+- `CALENDAR_SYNC_CRON_SECRET`
 
 ## Failure Signals
 

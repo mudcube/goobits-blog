@@ -2,11 +2,11 @@
 import process from 'node:process'
 
 const baseUrl = process.env.CALENDAR_SYNC_BASE_URL || process.env.PUBLIC_BASE_URL || 'http://localhost:3610'
-const secret = process.env.CALENDAR_SYNC_CRON_SECRET || process.env.ADMIN_PASSCODE || ''
+const secret = process.env.CALENDAR_SYNC_CRON_SECRET || ''
 const limit = Number.parseInt(process.env.CALENDAR_SYNC_LIMIT || '20', 10)
 
 if (!secret) {
-	console.error('[calendar-sync] missing CALENDAR_SYNC_CRON_SECRET (or ADMIN_PASSCODE fallback)')
+	console.error('[calendar-sync] missing CALENDAR_SYNC_CRON_SECRET')
 	process.exit(1)
 }
 
