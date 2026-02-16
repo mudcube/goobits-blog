@@ -1,8 +1,8 @@
 import { chromium } from 'playwright'
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3610'
+const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:3610'
 
-async function run() {
+export async function runAuthRegisterSmoke() {
 	const browser = await chromium.launch({ headless: true })
 	const context = await browser.newContext()
 	const page = await context.newPage()
@@ -52,8 +52,3 @@ async function run() {
 		await browser.close()
 	}
 }
-
-run().catch((err) => {
-	console.error('[auth-register-smoke] FAIL:', err.message)
-	process.exit(1)
-})

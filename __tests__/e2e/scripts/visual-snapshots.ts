@@ -38,7 +38,7 @@ async function applyTheme(page, theme) {
 	}, theme)
 }
 
-async function run() {
+export async function runVisualSnapshots() {
 	await fs.mkdir(OUT_DIR, { recursive: true })
 	const browser = await chromium.launch({ headless: true })
 	const context = await browser.newContext()
@@ -69,8 +69,3 @@ async function run() {
 
 	console.log(`[visual-snapshots] Captured ${ROUTES.length * THEMES.length * VIEWPORTS.length} screenshots in ${OUT_DIR}`)
 }
-
-run().catch((error) => {
-	console.error('[visual-snapshots] Failed:', error)
-	process.exit(1)
-})

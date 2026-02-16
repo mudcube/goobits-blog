@@ -1,7 +1,7 @@
 import { execSync } from 'node:child_process'
 import { chromium } from 'playwright'
 
-const BASE_URL = process.env.E2E_BASE_URL || process.env.BASE_URL || 'http://localhost:3610'
+const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:3610'
 const ADMIN_URL = `${BASE_URL}/admin/`
 
 function getAdminPasscode() {
@@ -18,7 +18,7 @@ function getAdminPasscode() {
 	}
 }
 
-async function run() {
+export async function runAdminLoginSmoke() {
 	const passcode = getAdminPasscode()
 	if (!passcode) throw new Error('ADMIN_PASSCODE not available (set env var or configure config/env/.env)')
 
@@ -73,8 +73,3 @@ async function run() {
 		await browser.close()
 	}
 }
-
-run().catch((err) => {
-	console.error('[admin-login-smoke] FAIL:', err.message)
-	process.exit(1)
-})

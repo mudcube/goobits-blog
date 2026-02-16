@@ -34,7 +34,7 @@ function shouldIgnoreConsoleError(text) {
 	return knownNoise.some((entry) => text.includes(entry));
 }
 
-async function run() {
+export async function runSitemapSmoke() {
 	const urls = await fetchSitemapUrls();
 	console.log(`[sitemap-smoke] Checking ${urls.length} URL(s) from ${SITEMAP_URL}`);
 
@@ -102,8 +102,3 @@ async function run() {
 
 	console.log('[sitemap-smoke] PASS: no console errors, page errors, or 5xx responses detected.');
 }
-
-run().catch((error) => {
-	console.error('[sitemap-smoke] Fatal error:', error);
-	process.exit(1);
-});

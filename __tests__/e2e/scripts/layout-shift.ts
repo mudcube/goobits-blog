@@ -19,7 +19,7 @@ const ROUTES = [
 const CLS_MAX = Number.parseFloat(process.env.E2E_CLS_MAX || '0.02')
 const POST_LOAD_SETTLE_MS = Number.parseInt(process.env.E2E_CLS_SETTLE_MS || '800', 10)
 
-async function run() {
+export async function runLayoutShift() {
 	const browser = await chromium.launch({ headless: true })
 	const context = await browser.newContext({
 		viewport: { width: 1440, height: 900 }
@@ -133,9 +133,3 @@ async function run() {
 		await browser.close()
 	}
 }
-
-run().catch((err) => {
-	// eslint-disable-next-line no-console
-	console.error('[cls] Failed:', err?.message || err)
-	process.exit(1)
-})

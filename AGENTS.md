@@ -15,7 +15,7 @@ pnpm test         # Full e2e suite
 pnpm dev:wrangler # Dev with Cloudflare D1 runtime
 ```
 
-No test runner at root. `repos/auth` has vitest.
+Root tests use Vitest + Playwright under `__tests__/e2e`. `repos/auth` also has Vitest.
 
 ## Architecture
 

@@ -23,7 +23,7 @@ function round1(n) {
 	return Math.round(n * 10) / 10
 }
 
-async function run() {
+export async function runLayoutDrift() {
 	const browser = await chromium.launch({ headless: true })
 	const context = await browser.newContext({ viewport: { width: 1440, height: 900 } })
 
@@ -211,9 +211,3 @@ async function run() {
 		await browser.close()
 	}
 }
-
-run().catch((err) => {
-	// eslint-disable-next-line no-console
-	console.error('[drift] Failed:', err?.message || err)
-	process.exit(1)
-})

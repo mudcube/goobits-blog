@@ -294,7 +294,7 @@ async function collectPageImagesWithPlaywright(paths) {
   return findings
 }
 
-async function run() {
+export async function runDeadLinks() {
   const { staticRoutes, dynamicRoutes } = await collectRoutes()
   const sourceFiles = (await walk(SRC_DIR)).filter((f) => SOURCE_EXTENSIONS.has(path.extname(f)))
 
@@ -390,10 +390,5 @@ async function run() {
     for (const i of runtimeImages) console.error(`- ${i.url} on ${i.page} (HTTP ${i.status || 'ERR'})`)
   }
 
-  process.exitCode = 1
+  throw new Error('Dead links/missing images detected.')
 }
-
-run().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
