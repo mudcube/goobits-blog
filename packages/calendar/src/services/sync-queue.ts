@@ -11,6 +11,7 @@ type SyncJobRow = {
 	payload_json: string | null
 	status: 'pending' | 'processing' | 'done' | 'failed'
 	attempt_count: number
+	created_at: number
 }
 
 type EventForSync = {
@@ -27,8 +28,15 @@ type JobQueueHealth = {
 	pending: number
 	processing: number
 	failed: number
+	deadLetter: number
 	oldestPendingSeconds: number
+	oldestDeadLetterSeconds: number
+	hasBacklogAlert: boolean
+	hasDeadLetterAlert: boolean
 }
+
+const MAX_SYNC_ATTEMPTS = 8
+const STALE_PENDING_SECONDS = 10 * 60
 
 function getPrimaryCalendarIdFromEnv(env: Record<string, unknown>) {
 	const primary = getEnv(env, 'GOOGLE_PRIMARY_CALENDAR_ID', '')?.trim()
@@ -70,26 +78,49 @@ export async function getCalendarSyncQueueHealth(db: D1DatabaseLike): Promise<Jo
 				COALESCE(SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END), 0) AS failed
 			FROM calendar_sync_jobs`
 		).first<{ pending: number; processing: number; failed: number }>()
+		const deadLetter = await db.prepare(
+			`SELECT COUNT(*) AS count FROM calendar_sync_dead_letters`
+		).first<{ count: number }>()
 
 		const oldestPending = await db.prepare(
 			`SELECT created_at FROM calendar_sync_jobs WHERE status = 'pending' ORDER BY created_at ASC LIMIT 1`
 		).first<{ created_at: number }>()
+		const oldestDeadLetter = await db.prepare(
+			`SELECT moved_at FROM calendar_sync_dead_letters ORDER BY moved_at ASC LIMIT 1`
+		).first<{ moved_at: number }>()
 
 		const now = Math.floor(Date.now() / 1000)
+		const oldestPendingSeconds = oldestPending?.created_at ? Math.max(0, now - oldestPending.created_at) : 0
+		const oldestDeadLetterSeconds = oldestDeadLetter?.moved_at ? Math.max(0, now - oldestDeadLetter.moved_at) : 0
+		const failed = counts?.failed ?? 0
+		const deadLetterCount = deadLetter?.count ?? 0
 		return {
 			pending: counts?.pending ?? 0,
 			processing: counts?.processing ?? 0,
-			failed: counts?.failed ?? 0,
-			oldestPendingSeconds: oldestPending?.created_at ? Math.max(0, now - oldestPending.created_at) : 0
+			failed,
+			deadLetter: deadLetterCount,
+			oldestPendingSeconds,
+			oldestDeadLetterSeconds,
+			hasBacklogAlert: failed > 0 || oldestPendingSeconds > STALE_PENDING_SECONDS,
+			hasDeadLetterAlert: deadLetterCount > 0
 		}
 	} catch {
-		return { pending: 0, processing: 0, failed: 0, oldestPendingSeconds: 0 }
+		return {
+			pending: 0,
+			processing: 0,
+			failed: 0,
+			deadLetter: 0,
+			oldestPendingSeconds: 0,
+			oldestDeadLetterSeconds: 0,
+			hasBacklogAlert: false,
+			hasDeadLetterAlert: false
+		}
 	}
 }
 
 async function claimDueJobs(db: D1DatabaseLike, limit = 10) {
 	const result = await db.prepare(
-		`SELECT id, event_id, trigger, requested_by_user_id, payload_json, status, attempt_count
+		`SELECT id, event_id, trigger, requested_by_user_id, payload_json, status, attempt_count, created_at
 		 FROM calendar_sync_jobs
 		 WHERE status IN ('pending', 'failed')
 		   AND next_attempt_at <= unixepoch()
@@ -130,6 +161,27 @@ async function markJobRetry(db: D1DatabaseLike, id: number, attemptCount: number
 		     locked_by = NULL
 		 WHERE id = ?`
 	).bind(attemptCount, backoff, errorMessage.slice(0, 400), id).run()
+}
+
+async function moveJobToDeadLetter(db: D1DatabaseLike, job: SyncJobRow, attemptCount: number, errorMessage: string) {
+	await db.prepare(
+		`INSERT INTO calendar_sync_dead_letters (
+			job_id, event_id, trigger, requested_by_user_id, payload_json, attempt_count, last_error, created_at, moved_at
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, unixepoch())`
+	).bind(
+		job.id,
+		job.event_id,
+		job.trigger,
+		job.requested_by_user_id ?? null,
+		job.payload_json ?? null,
+		attemptCount,
+		errorMessage.slice(0, 400),
+		job.created_at
+	).run()
+
+	await db.prepare(
+		`DELETE FROM calendar_sync_jobs WHERE id = ?`
+	).bind(job.id).run()
 }
 
 async function fetchEventForSync(db: D1DatabaseLike, eventId: number) {
@@ -239,6 +291,54 @@ async function processSingleJob(
 	await markJobDone(db, job.id)
 }
 
+export async function retryCalendarSyncDeadLetters(db: D1DatabaseLike, limit = 10) {
+	const normalizedLimit = Math.max(1, Math.min(50, Math.trunc(limit || 10)))
+	const result = await db.prepare(
+		`SELECT id, job_id, event_id, trigger, requested_by_user_id, payload_json
+		 FROM calendar_sync_dead_letters
+		 ORDER BY id ASC
+		 LIMIT ?`
+	).bind(normalizedLimit).all<{
+		id: number
+		job_id: number
+		event_id: number
+		trigger: string
+		requested_by_user_id: string | null
+		payload_json: string | null
+	}>()
+	const rows = result?.results ?? []
+	let requeued = 0
+	for (const row of rows) {
+		await db.prepare(
+			`INSERT INTO calendar_sync_jobs (
+				event_id, trigger, requested_by_user_id, payload_json, status, attempt_count, next_attempt_at, created_at, updated_at
+			) VALUES (?, ?, ?, ?, 'pending', 0, unixepoch(), unixepoch(), unixepoch())`
+		).bind(
+			row.event_id,
+			row.trigger,
+			row.requested_by_user_id ?? null,
+			row.payload_json ?? null
+		).run()
+		await db.prepare(`DELETE FROM calendar_sync_dead_letters WHERE id = ?`).bind(row.id).run()
+		requeued += 1
+	}
+	return { claimed: rows.length, requeued }
+}
+
+export async function purgeCalendarSyncDeadLetters(db: D1DatabaseLike, limit = 50) {
+	const normalizedLimit = Math.max(1, Math.min(500, Math.trunc(limit || 50)))
+	const ids = await db.prepare(
+		`SELECT id FROM calendar_sync_dead_letters ORDER BY id ASC LIMIT ?`
+	).bind(normalizedLimit).all<{ id: number }>()
+	const rows = ids?.results ?? []
+	let deleted = 0
+	for (const row of rows) {
+		await db.prepare(`DELETE FROM calendar_sync_dead_letters WHERE id = ?`).bind(row.id).run()
+		deleted += 1
+	}
+	return { deleted }
+}
+
 export async function processCalendarSyncQueue(
 	db: D1DatabaseLike,
 	env: Record<string, unknown>,
@@ -247,18 +347,24 @@ export async function processCalendarSyncQueue(
 	const jobs = await claimDueJobs(db, limit)
 	let processed = 0
 	let failed = 0
+	let deadLettered = 0
 
 	for (const job of jobs) {
 		try {
 			await processSingleJob(db, env, job)
 			processed += 1
 		} catch (error) {
-			failed += 1
 			const nextAttempt = (job.attempt_count ?? 0) + 1
 			const message = error instanceof Error ? error.message : 'Unknown sync error'
+			if (nextAttempt >= MAX_SYNC_ATTEMPTS) {
+				await moveJobToDeadLetter(db, job, nextAttempt, message)
+				deadLettered += 1
+				continue
+			}
 			await markJobRetry(db, job.id, nextAttempt, message)
+			failed += 1
 		}
 	}
 
-	return { claimed: jobs.length, processed, failed }
+	return { claimed: jobs.length, processed, failed, deadLettered }
 }
