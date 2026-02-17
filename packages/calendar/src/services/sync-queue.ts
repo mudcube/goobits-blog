@@ -38,6 +38,13 @@ type JobQueueHealth = {
 const MAX_SYNC_ATTEMPTS = 8
 const STALE_PENDING_SECONDS = 10 * 60
 
+function isMockSyncMode(env: Record<string, unknown>) {
+	const mode = String(getEnv(env, 'CALENDAR_SYNC_MODE', 'live') || '')
+		.trim()
+		.toLowerCase()
+	return mode === 'mock' || mode === 'noop' || mode === 'off' || mode === 'disabled'
+}
+
 function getPrimaryCalendarIdFromEnv(env: Record<string, unknown>) {
 	const primary = getEnv(env, 'GOOGLE_PRIMARY_CALENDAR_ID', '')?.trim()
 	if (primary) return primary
@@ -233,6 +240,18 @@ async function processSingleJob(
 	const event = await fetchEventForSync(db, job.event_id)
 	if (!event) {
 		// Event deleted; job can be marked done.
+		await markJobDone(db, job.id)
+		return
+	}
+
+	// In mock mode (used by E2E), we exercise the queue plumbing but never touch external providers.
+	if (isMockSyncMode(env)) {
+		await upsertCalendarEventSync(db, {
+			eventId: job.event_id,
+			googleEventId: `mock_${job.event_id}_${job.id}`,
+			googleHtmlLink: null,
+			lastError: null
+		})
 		await markJobDone(db, job.id)
 		return
 	}
