@@ -12,7 +12,7 @@ import {
 	updateAdminEventMemory,
 	updateAdminEventCapacity,
 	type AdminRulesInput
-} from '$lib/client/api/adminClient'
+} from '../../api/admin'
 import {
 	createCalendarInvite,
 	deleteCalendarInvite,
@@ -20,7 +20,7 @@ import {
 	getCalendarAdminUsers,
 	startCalendarOAuth,
 	type CreateInviteInput
-} from '$lib/client/api/calendarClient'
+} from '../../api/calendar'
 
 export type AdminTabId = 'dash' | 'cal' | 'events' | 'programs' | 'calendar-auth' | 'integrations'
 

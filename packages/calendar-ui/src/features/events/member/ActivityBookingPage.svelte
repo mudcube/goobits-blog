@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Hero from '$lib/ui/Hero.svelte'
-	import BookingCalendar from '$lib/booking/BookingCalendar.svelte'
-	import type { CalendarActivityConfig } from '@packages/calendar/src/social/activities.ts'
-	import type { CalendarEventsResponse } from '$lib/client/api/calendarClient'
+	import { Hero } from '@miko/ui'
+	import BookingCalendar from './BookingCalendar.svelte'
+	import type { CalendarActivityConfig } from '@miko/calendar'
+	import type { CalendarEventsResponse } from '../../../api/calendar'
 
 	const {
 		activity,

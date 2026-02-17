@@ -1,7 +1,7 @@
 import {
 	DEFAULT_ADMIN_RULES,
 	DEFAULT_ADMIN_STATS
-} from '$lib/viewmodels/admin'
+} from '../../admin/admin'
 import {
 	createAdminEventsBatch,
 	deleteDashboardProgram,
@@ -19,7 +19,7 @@ import {
 	updateAdminEventCapacityValue,
 	updateAdminEventMemoryValue,
 	updateAdminProgram
-} from '$lib/viewmodels/admin-dashboard'
+} from './admin-dashboard'
 
 type UnauthorizedHandler = (error: unknown) => boolean
 

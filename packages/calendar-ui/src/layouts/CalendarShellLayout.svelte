@@ -1,26 +1,16 @@
 <script>
 	import { page } from '$app/stores'
-	import { goto } from '$app/navigation'
 	import { Bell, UserRound } from '@lucide/svelte'
-	import { logoutCalendarSession } from '$lib/client/api/calendarClient'
-	import { buildCalendarLoginRedirect, shouldRedirectCalendarGuest } from '$lib/client/routing/auth'
-	import PillButton from '$lib/ui/buttons/PillButton.svelte'
-	import ShellNav from '$lib/ui/ShellNav.svelte'
-	import '@routes/calendar/Calendar.scss'
+	import { logoutCalendarSession } from '../api/calendar'
+	import { PillButton, ShellNav } from '@miko/ui'
 
 	const { data, children } = $props()
 	const headerLinks = $derived([...(data.activities ?? [])].sort((a, b) => a.label.localeCompare(b.label)))
 
-	$effect(() => {
-		const pathname = $page.url.pathname
-		if (shouldRedirectCalendarGuest(data.user, pathname)) {
-			goto(buildCalendarLoginRedirect(pathname))
-		}
-	})
-
 	async function logout() {
 		await logoutCalendarSession()
-		goto('/calendar/login')
+		// Server-side auth middleware will handle redirects cleanly on next navigation.
+		window.location.href = '/calendar/login'
 	}
 </script>
 

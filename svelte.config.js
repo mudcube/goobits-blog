@@ -25,7 +25,9 @@ export default {
 			'@routes': './src/routes',
 			'@src': './src',
 			'@static': './static',
-			'@packages': './packages'
+			'@packages': './packages',
+			'@miko/ui': './packages/ui/src',
+			'@miko/calendar-ui': './packages/calendar-ui/src'
 		}
 	},
 	extensions: [ '.svelte', '.md' ],

@@ -1,18 +1,20 @@
 <script>
-	import { joinCalendarEvent, leaveCalendarEvent } from '$lib/client/api/calendarClient'
-	import { applyEventMutationState } from '$lib/booking/feed-state'
-	import PillButton from '$lib/ui/buttons/PillButton.svelte'
-	import Hero from '$lib/ui/Hero.svelte'
+	import { joinCalendarEvent, leaveCalendarEvent } from '../../../api/calendar'
+	import { applyEventMutationState } from './feed-state'
+	import { formatWhen } from './formatWhen'
+	import { PillButton, Hero } from '@miko/ui'
 
 	let { data } = $props()
-	let upcoming = $state([])
-	let recent = $state([])
+	let upcoming = $state(data.upcoming ?? [])
+	let recent = $state(data.recent ?? [])
 	let pendingEventId = $state(null)
 	let feedError = $state('')
 
 	$effect(() => {
-		upcoming = data.upcoming ?? []
-		recent = data.recent ?? []
+		// During hydration/navigations, SvelteKit can transiently provide partial data.
+		// Only overwrite if the next values are explicitly provided.
+		if (Array.isArray(data.upcoming)) upcoming = data.upcoming
+		if (Array.isArray(data.recent)) recent = data.recent
 	})
 
 	async function join(eventId, guestCount = 0) {
@@ -41,14 +43,6 @@
 		}
 	}
 
-	function formatWhen(startIso, endIso) {
-		const start = new Date(startIso)
-		const end = new Date(endIso)
-		const day = start.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
-		const from = start.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
-		const to = end.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
-		return `${day} · ${from}-${to}`
-	}
 
 	const firstName = $derived(data.user?.name?.split(' ')[0] || '')
 	const homeTitleLines = $derived(firstName ? [`Hey, ${firstName}.`, "What's the move?"] : ['Hey.', "What's the move?"])
@@ -115,36 +109,36 @@
 								{/each}
 							</div>
 							{#if event.userStatus}
-								<PillButton
-									className="calendar-page__ghost-button"
-									variant="ghost"
-									size="md"
-									onClick={() => leave(event.id)}
-									disabled={pendingEventId === event.id}
-								>
-									{pendingEventId === event.id ? '...' : 'Leave'}
-								</PillButton>
-							{:else}
-								<PillButton
-									className="calendar-page__primary-button"
-									variant="primary"
-									size="lg"
-									onClick={() => join(event.id, 0)}
-									disabled={pendingEventId === event.id}
-								>
-									{pendingEventId === event.id ? '...' : event.seatsLeft > 0 ? 'Join' : 'Join waitlist'}
-								</PillButton>
-								{#if event.seatsLeft >= 2}
 									<PillButton
 										className="calendar-page__ghost-button"
 										variant="ghost"
 										size="md"
-										onClick={() => join(event.id, 1)}
+										onClick={() => leave(event.id)}
 										disabled={pendingEventId === event.id}
 									>
-										{pendingEventId === event.id ? '...' : 'Join +1'}
+										{pendingEventId === event.id ? '...' : 'Leave'}
 									</PillButton>
-								{/if}
+							{:else}
+									<PillButton
+										className="calendar-page__primary-button"
+										variant="primary"
+										size="lg"
+										onClick={() => join(event.id, 0)}
+										disabled={pendingEventId === event.id}
+									>
+										{pendingEventId === event.id ? '...' : event.seatsLeft > 0 ? 'Join' : 'Join waitlist'}
+									</PillButton>
+									{#if event.seatsLeft >= 2}
+										<PillButton
+											className="calendar-page__ghost-button"
+											variant="ghost"
+											size="md"
+											onClick={() => join(event.id, 1)}
+											disabled={pendingEventId === event.id}
+										>
+											{pendingEventId === event.id ? '...' : 'Join +1'}
+										</PillButton>
+									{/if}
 							{/if}
 						</div>
 					</article>

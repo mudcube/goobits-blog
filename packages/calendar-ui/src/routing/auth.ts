@@ -1,4 +1,4 @@
-import { ApiClientError } from '$lib/client/api/http'
+import { ApiClientError } from '../api/http'
 
 export function isCalendarLoginPath(pathname: string): boolean {
 	return pathname === '/calendar/login' || pathname === '/calendar/login/'

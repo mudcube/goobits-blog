@@ -1,6 +1,6 @@
-import { getAdminMe } from '$lib/client/api/adminClient'
-import { startCalendarOAuth } from '$lib/client/api/calendarClient'
-import { isCalendarConnectedFromParams, scheduleCalendarConnectedRedirect } from '$lib/client/routing/calendarState'
+import { getAdminMe } from '../../../../api/admin'
+import { startCalendarOAuth } from '../../../../api/calendar'
+import { isCalendarConnectedFromParams, scheduleCalendarConnectedRedirect } from '../../../../routing/calendarState'
 import { SvelteURLSearchParams } from 'svelte/reactivity'
 
 function hasAuthenticatedFlag(value: unknown): value is { authenticated?: unknown } {

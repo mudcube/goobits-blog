@@ -1,10 +1,10 @@
-import { DEFAULT_INVITE_DRAFT } from '$lib/viewmodels/admin'
+import { DEFAULT_INVITE_DRAFT } from '../../admin/admin'
 import {
 	createInviteShareLink,
 	createMemberInvite,
 	deleteMemberInvite,
 	loadMembersData
-} from '$lib/viewmodels/admin-dashboard'
+} from '../../sync-queue/admin/admin-dashboard'
 
 export function createAdminMembersController(
 	options: { onUnauthorized?: (error: unknown) => boolean } = {}

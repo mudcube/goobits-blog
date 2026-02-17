@@ -5,6 +5,6 @@
   "type": "module",
   "main": "./src/index.js",
   "dependencies": {
-    "@goobits/auth": "file:../../repos/auth"
+    "@goobits/auth": "workspace:*"
   }
 }

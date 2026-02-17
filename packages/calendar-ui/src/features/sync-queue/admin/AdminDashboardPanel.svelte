@@ -1,6 +1,6 @@
 <script>
 	import { AlertTriangle, ChevronRight, RefreshCw, RotateCcw, Trash2 } from '@lucide/svelte'
-	import PillButton from '$lib/ui/buttons/PillButton.svelte'
+	import { PillButton } from '@miko/ui'
 
 	const { dashboard } = $props()
 	const needsCalendarAttention = $derived(dashboard.connectionExpired || !dashboard.connected)
@@ -48,7 +48,7 @@
 				<AlertTriangle size={14} />
 				<span>{dashboard.connectionRefreshFailed ? 'Google Calendar refresh failed' : dashboard.connectionExpired ? 'Google Calendar token expired' : 'Google Calendar is not connected'}</span>
 			</div>
-			<PillButton className="admin-page__button-secondary admin-page__button-secondary--compact" variant="secondary" size="sm" onClick={dashboard.reconnect}>
+				<PillButton className="admin-page__button-secondary admin-page__button-secondary--compact" variant="secondary" size="sm" onClick={dashboard.reconnect}>
 				<RefreshCw size={12} />
 				Reconnect
 			</PillButton>
@@ -66,7 +66,7 @@
 					className="admin-page__button-secondary admin-page__button-secondary--compact"
 					variant="secondary"
 					size="sm"
-					onClick={dashboard.processSyncQueue}
+						onClick={dashboard.processSyncQueue}
 					disabled={dashboard.syncQueueBusy}
 				>
 					<RefreshCw size={12} />
@@ -77,7 +77,7 @@
 						className="admin-page__button-secondary admin-page__button-secondary--compact"
 						variant="secondary"
 						size="sm"
-						onClick={dashboard.retryDeadLetters}
+							onClick={dashboard.retryDeadLetters}
 						disabled={dashboard.syncQueueBusy}
 					>
 						<RotateCcw size={12} />
@@ -87,7 +87,7 @@
 						className="admin-page__button-secondary admin-page__button-secondary--compact"
 						variant="secondary"
 						size="sm"
-						onClick={dashboard.purgeDeadLetters}
+							onClick={dashboard.purgeDeadLetters}
 						disabled={dashboard.syncQueueBusy}
 					>
 						<Trash2 size={12} />
@@ -113,7 +113,7 @@
 		<p class="admin-page__section-description">Loading events...</p>
 	{:else if dashboard.error}
 		<p class="admin-page__section-description admin-page__section-description--error">{dashboard.error}</p>
-		<PillButton className="admin-page__button-secondary" variant="secondary" onClick={dashboard.loadBookings}>Retry</PillButton>
+			<PillButton className="admin-page__button-secondary" variant="secondary" onClick={dashboard.loadBookings}>Retry</PillButton>
 	{:else if dashboard.bookings.length === 0}
 		<p class="admin-page__section-description">No upcoming events yet.</p>
 	{:else}

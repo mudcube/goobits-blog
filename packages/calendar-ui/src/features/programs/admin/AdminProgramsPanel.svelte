@@ -1,5 +1,5 @@
 <script>
-	import PillButton from '$lib/ui/buttons/PillButton.svelte'
+	import { PillButton } from '@miko/ui'
 	const { dashboard } = $props()
 </script>
 

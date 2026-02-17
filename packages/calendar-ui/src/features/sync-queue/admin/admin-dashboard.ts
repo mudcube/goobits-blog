@@ -19,7 +19,7 @@ import {
 	saveAdminProgram,
 	removeInvite,
 	type AdminRulesState
-} from '$lib/viewmodels/admin'
+} from '../../admin/admin'
 
 export async function loadDashboardStatus() {
 	const data = await fetchAdminStatus()

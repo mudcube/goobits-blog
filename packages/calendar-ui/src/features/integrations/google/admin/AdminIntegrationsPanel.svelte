@@ -1,6 +1,6 @@
 <script>
 	import { Check, RefreshCw } from '@lucide/svelte'
-	import PillButton from '$lib/ui/buttons/PillButton.svelte'
+	import { PillButton } from '@miko/ui'
 	const { dashboard } = $props()
 </script>
 
@@ -27,20 +27,20 @@
 		</span>
 	</div>
 	<p class="admin-page__section-description">Your bookings automatically sync with Google Calendar. Blocked times remove availability.</p>
-	<div class="admin-page__button-row">
-		<PillButton className="admin-page__button-secondary" variant="secondary" onClick={dashboard.reconnect}>
-			<RefreshCw size={14} />
-			{dashboard.connected ? 'Reconnect' : 'Connect'}
-		</PillButton>
-		{#if dashboard.connected}
-			<PillButton
-				className="admin-page__button-secondary admin-page__button-secondary--danger"
-				variant="danger"
-				onClick={dashboard.disconnect}
-				disabled={dashboard.disconnecting}
-			>
-				{dashboard.disconnecting ? 'Disconnecting...' : 'Disconnect'}
+		<div class="admin-page__button-row">
+			<PillButton className="admin-page__button-secondary" variant="secondary" onClick={dashboard.reconnect}>
+				<RefreshCw size={14} />
+				{dashboard.connected ? 'Reconnect' : 'Connect'}
 			</PillButton>
-		{/if}
-	</div>
+			{#if dashboard.connected}
+				<PillButton
+					className="admin-page__button-secondary admin-page__button-secondary--danger"
+					variant="danger"
+					onClick={dashboard.disconnect}
+					disabled={dashboard.disconnecting}
+				>
+					{dashboard.disconnecting ? 'Disconnecting...' : 'Disconnect'}
+				</PillButton>
+			{/if}
+		</div>
 </div>

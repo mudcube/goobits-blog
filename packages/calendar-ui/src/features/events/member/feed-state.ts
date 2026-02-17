@@ -1,4 +1,4 @@
-import type { CalendarEventsResponse, CalendarJoinResponse, CalendarLeaveResponse } from '$lib/client/api/calendarClient'
+import type { CalendarEventsResponse, CalendarJoinResponse, CalendarLeaveResponse } from '../../../api/calendar'
 
 type FeedEvent = CalendarEventsResponse['upcoming'][number]
 type MutationState = NonNullable<CalendarJoinResponse['state'] | CalendarLeaveResponse['state']>

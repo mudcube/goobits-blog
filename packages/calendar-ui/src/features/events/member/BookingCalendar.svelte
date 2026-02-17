@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { joinCalendarEvent, leaveCalendarEvent, type CalendarEventsResponse } from '$lib/client/api/calendarClient'
-	import { applyEventMutationState } from '$lib/booking/feed-state'
-	import PillButton from '$lib/ui/buttons/PillButton.svelte'
+	import { joinCalendarEvent, leaveCalendarEvent, type CalendarEventsResponse } from '../../../api/calendar'
+	import { applyEventMutationState } from './feed-state'
+	import { formatWhen } from './formatWhen'
+	import { PillButton } from '@miko/ui'
 
 	let {
 		activitySlug,
@@ -22,15 +23,6 @@
 		upcoming = initialUpcoming
 		recent = initialRecent
 	})
-
-	function formatWhen(startIso: string, endIso: string) {
-		const start = new Date(startIso)
-		const end = new Date(endIso)
-		const day = start.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
-		const from = start.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
-		const to = end.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
-		return `${day} · ${from}-${to}`
-	}
 
 	async function join(eventId: number, guestCount = 0) {
 		pendingEventId = eventId
@@ -97,36 +89,36 @@
 							{/each}
 						</div>
 						{#if event.userStatus}
-							<PillButton
-								className="calendar-page__ghost-button"
-								variant="ghost"
-								size="md"
-								onClick={() => leave(event.id)}
-								disabled={pendingEventId === event.id}
-							>
-								{pendingEventId === event.id ? '...' : 'Leave'}
-							</PillButton>
-						{:else}
-							<PillButton
-								className="calendar-page__primary-button"
-								variant="primary"
-								size="lg"
-								onClick={() => join(event.id, 0)}
-								disabled={pendingEventId === event.id}
-							>
-								{pendingEventId === event.id ? '...' : event.seatsLeft > 0 ? 'Join' : 'Join waitlist'}
-							</PillButton>
-							{#if event.seatsLeft >= 2}
 								<PillButton
 									className="calendar-page__ghost-button"
 									variant="ghost"
 									size="md"
-									onClick={() => join(event.id, 1)}
+									onClick={() => leave(event.id)}
 									disabled={pendingEventId === event.id}
 								>
-									{pendingEventId === event.id ? '...' : 'Join +1'}
+									{pendingEventId === event.id ? '...' : 'Leave'}
 								</PillButton>
-							{/if}
+						{:else}
+								<PillButton
+									className="calendar-page__primary-button"
+									variant="primary"
+									size="lg"
+									onClick={() => join(event.id, 0)}
+									disabled={pendingEventId === event.id}
+								>
+									{pendingEventId === event.id ? '...' : event.seatsLeft > 0 ? 'Join' : 'Join waitlist'}
+								</PillButton>
+								{#if event.seatsLeft >= 2}
+									<PillButton
+										className="calendar-page__ghost-button"
+										variant="ghost"
+										size="md"
+										onClick={() => join(event.id, 1)}
+										disabled={pendingEventId === event.id}
+									>
+										{pendingEventId === event.id ? '...' : 'Join +1'}
+									</PillButton>
+								{/if}
 						{/if}
 					</div>
 				</article>

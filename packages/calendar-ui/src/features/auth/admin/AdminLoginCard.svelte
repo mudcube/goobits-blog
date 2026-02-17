@@ -1,5 +1,5 @@
 <script>
-	import Button from '$lib/ui/buttons/Button.svelte'
+	import { Button } from '@miko/ui'
 	const { form } = $props()
 </script>
 

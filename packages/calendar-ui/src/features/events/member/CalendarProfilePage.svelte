@@ -1,7 +1,6 @@
 <script>
-	import { saveCalendarProfile } from '$lib/client/api/calendarClient'
-	import PillButton from '$lib/ui/buttons/PillButton.svelte'
-	import Hero from '$lib/ui/Hero.svelte'
+	import { saveCalendarProfile } from '../../../api/calendar'
+	import { PillButton, Hero } from '@miko/ui'
 
 	let { data } = $props()
 	let emergencyContact = $derived(data.profile?.emergencyContact ?? '')
@@ -73,9 +72,9 @@
 					</div>
 				</div>
 				<div class="calendar-profile__actions">
-					<PillButton className="calendar-page__primary-button" variant="primary" size="lg" onClick={save} disabled={saving}>
-						{saving ? 'Saving...' : 'Save profile'}
-					</PillButton>
+						<PillButton className="calendar-page__primary-button" variant="primary" size="lg" onClick={save} disabled={saving}>
+							{saving ? 'Saving...' : 'Save profile'}
+						</PillButton>
 					<PillButton
 						className="calendar-page__ghost-button"
 						variant="ghost"

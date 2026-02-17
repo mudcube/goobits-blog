@@ -1,7 +1,5 @@
 <script>
-	import '@routes/admin/Admin.scss'
-	import ShellNav from '$lib/ui/ShellNav.svelte'
-	import PillButton from '$lib/ui/buttons/PillButton.svelte'
+	import { ShellNav, PillButton } from '@miko/ui'
 	import { enhance } from '$app/forms'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
