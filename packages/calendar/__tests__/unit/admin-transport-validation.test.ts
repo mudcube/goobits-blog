@@ -3,7 +3,7 @@ import {
 	parseAdminCreateEventsBatchInput,
 	parseAdminProgramMutationInput,
 	TransportValidationError
-} from '../../packages/calendar/src/index.ts'
+} from '../../src/index.ts'
 
 describe('admin transport validation', () => {
 	it('accepts valid program upsert payload', () => {

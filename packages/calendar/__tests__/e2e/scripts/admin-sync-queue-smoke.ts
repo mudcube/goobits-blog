@@ -1,21 +1,7 @@
-import { execSync } from 'node:child_process'
 import { chromium } from 'playwright'
+import { BASE_URL, getAdminPasscode } from './_helpers'
 
-const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:3610'
 const ADMIN_URL = `${BASE_URL}/admin/overview`
-
-function getAdminPasscode() {
-	if (process.env.ADMIN_PASSCODE) return process.env.ADMIN_PASSCODE
-	try {
-		return execSync('pnpm exec dotenvx get ADMIN_PASSCODE -f config/env/.env', {
-			stdio: ['ignore', 'pipe', 'ignore']
-		})
-			.toString('utf8')
-			.trim()
-	} catch {
-		return ''
-	}
-}
 
 export async function runAdminSyncQueueSmoke() {
 	const passcode = getAdminPasscode()
