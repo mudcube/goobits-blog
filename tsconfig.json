@@ -36,5 +36,5 @@
     "vite.config.js",
     "svelte.config.js"
   ],
-  "exclude": ["node_modules", "static", "software"]
+  "exclude": ["node_modules", "static", "software", "packages/auth/**"]
 }

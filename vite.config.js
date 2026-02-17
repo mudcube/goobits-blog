@@ -39,6 +39,11 @@ export default defineConfig({
 		enhancedImages(),
 		sveltekit()
 	],
-	resolve: runtimeConfig.resolve,
+	resolve: {
+		...runtimeConfig.resolve,
+		// Ensure a single @sveltejs/kit instance across workspace packages so `redirect()`/`error()`
+		// throws are recognized correctly by the app runtime.
+		dedupe: [ '@sveltejs/kit', 'svelte' ]
+	},
 	server: runtimeConfig.server
 })

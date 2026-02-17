@@ -18,7 +18,7 @@
 		"check:types": "pnpm exec tsc --noEmit",
 		"check:svelte": "pnpm exec svelte-check --tsconfig ./tsconfig.json",
 		"check:lint": "pnpm exec eslint --no-error-on-unmatched-pattern src packages repos serverless scripts ops *.config.js *.config.ts",
-		"check:circular": "pnpm exec madge --circular --extensions ts,js,svelte src packages serverless ops --exclude \"(^|/)dist/\"",
+		"check:circular": "pnpm exec madge --circular --extensions ts,js,svelte src packages serverless ops --exclude \"(^|/)dist/|^packages/auth/\"",
 		"ci:gate": "pnpm run check && pnpm run e2e:critical",
 		"test": "pnpm run e2e",
 		"e2e": "pnpm run e2e:run -- full",

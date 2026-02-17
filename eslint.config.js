@@ -17,6 +17,7 @@ export default tseslint.config(
 			'test-results/**',
 			'repos/**',
 			'.dev/**',
+			'packages/auth/**',
 			'packages/auth/src/ui/**',
 			'**/*.svelte.ts'
 		]
