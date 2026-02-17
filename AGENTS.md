@@ -37,7 +37,7 @@ SvelteKit 5 + Cloudflare Pages monorepo (pnpm workspaces).
 
 ## Environment
 
-Env files in `config/env/`, encrypted with dotenvx. See `.env.example` for all variables. Production secrets: `pnpm deploy:secrets`.
+Env files in `config/env/`, encrypted with dotenvx. Template: `config/env/.env.example`. Production secrets: `pnpm deploy:secrets`.
 
 ## CSS Conventions
 
