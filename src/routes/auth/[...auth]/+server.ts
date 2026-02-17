@@ -38,7 +38,7 @@ export const GET: RequestHandler = async (event) => {
 
 	// Forward-only auth routing: legacy provider route shapes are intentionally unsupported.
 	if (pathname.startsWith('/auth/signin/') || pathname.startsWith('/auth/callback/')) {
-		throw redirect(302, buildCalendarLoginErrorPath('oauth_route_removed'))
+		redirect(302, buildCalendarLoginErrorPath('oauth_route_removed'))
 	}
 
 	// Set invite/redirect cookies on signin routes (e.g. /auth/google)
@@ -57,7 +57,7 @@ export const GET: RequestHandler = async (event) => {
 	if (requestedProvider) {
 		const providers = auth?.providers ?? {}
 		if (!(requestedProvider in providers)) {
-			throw redirect(302, buildCalendarLoginErrorPath(`${requestedProvider}_not_enabled`))
+			redirect(302, buildCalendarLoginErrorPath(`${requestedProvider}_not_enabled`))
 		}
 	}
 
@@ -68,14 +68,14 @@ export const GET: RequestHandler = async (event) => {
 			cookies: event.cookies,
 			provider: callbackProvider
 		})) {
-			throw redirect(302, buildCalendarLoginErrorPath('oauth_state_invalid'))
+			redirect(302, buildCalendarLoginErrorPath('oauth_state_invalid'))
 		}
 	}
 
 	try {
 		const response = await auth.handlers.GET(event)
 		if (callbackProvider && response.status >= 400) {
-			throw redirect(302, buildCalendarLoginErrorPath('oauth_failed'))
+			redirect(302, buildCalendarLoginErrorPath('oauth_failed'))
 		}
 		if (requestedProvider) {
 			logProviderRedirectDiagnostics({
@@ -94,7 +94,7 @@ export const GET: RequestHandler = async (event) => {
 
 		if (callbackProvider && shouldWrapAsOauthFailure(error)) {
 			console.error('[auth oauth callback] unexpected failure', error)
-			throw redirect(302, buildCalendarLoginErrorPath('oauth_failed'))
+			redirect(302, buildCalendarLoginErrorPath('oauth_failed'))
 		}
 		throw error
 	}

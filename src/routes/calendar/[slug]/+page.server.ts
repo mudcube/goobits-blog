@@ -14,7 +14,7 @@ export async function load({
 	const env = await buildEnv(platform)
 	const activity = await getCalendarProgramBySlug(env.DB, params.slug)
 	if (!activity) {
-		throw error(404, 'Program not found')
+		error(404, 'Program not found')
 	}
 	const rawUserId = locals.user?.id
 	const userId = typeof rawUserId === 'string' ? rawUserId : typeof rawUserId === 'number' ? String(rawUserId) : ''

@@ -20,7 +20,7 @@ export const entries: EntryGenerator = async () => {
 
 export const load: PageServerLoad = async ({ params }) => {
 	const { slug } = params
-	if (!slug) throw error(404)
+	if (!slug) error(404)
 
 	const allPosts = await getJournalPosts()
 	const posts = allPosts.filter((post: JournalPost) => {
@@ -29,6 +29,6 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 	)
 
-	if (!posts.length) throw error(404)
+	if (!posts.length) error(404)
 	return { posts, tag: slug }
 }

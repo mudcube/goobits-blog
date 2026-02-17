@@ -171,14 +171,14 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 					if (!hasRedeemed) {
 						if (!canBypassInvite) {
 							if (!invite) {
-								throw redirect(302, '/calendar/login?error=invite_required')
+								redirect(302, '/calendar/login?error=invite_required')
 							}
 							const result = await validateInvite({ db, code: invite, email: profile.email })
 							if (!result.valid) {
-								throw redirect(302, `/calendar/login?error=invite_${result.reason}`)
+								redirect(302, `/calendar/login?error=invite_${result.reason}`)
 							}
 							if (!result.invite || typeof result.invite.id !== 'number') {
-								throw redirect(302, '/calendar/login?error=invite_invalid')
+								redirect(302, '/calendar/login?error=invite_invalid')
 							}
 
 							await consumeInvite({ db, inviteId: result.invite.id, userId: user.id })
@@ -191,7 +191,7 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 				}
 
 				if (!user) {
-					throw redirect(302, '/calendar/login?error=signin_failed')
+					redirect(302, '/calendar/login?error=signin_failed')
 				}
 				const session = await sessionAdapter.createSession(user.id)
 				sessionAdapter.setSessionCookie(evt.cookies, session)

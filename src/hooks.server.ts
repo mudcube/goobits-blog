@@ -53,7 +53,7 @@ async function handleRedirects({ event, resolve }: Parameters<Handle>[0]) {
 		redirectTo = pathname.replace(pattern, matchingRedirect.to)
 	}
 
-	throw redirect(matchingRedirect.status, redirectTo)
+	redirect(matchingRedirect.status, redirectTo)
 }
 
 const themeHandle = createThemeHooks(themeConfig, {
@@ -75,6 +75,10 @@ async function handleAdminAuth({ event, resolve }: Parameters<Handle>[0]) {
 		const { auth } = await getAdminAuth({ event })
 		return auth.handle()({ event, resolve })
 	} catch (error) {
+		// Never swallow SvelteKit control-flow exceptions (redirects / HTTP errors).
+		if (error && typeof error === 'object' && 'status' in error) {
+			throw error
+		}
 		// Keep /admin shell reachable even if auth adapters/env are temporarily unavailable.
 		// This prevents global hard-fail 500s during checks/dev startup races.
 		console.error('[admin-auth] unavailable', error)
@@ -119,7 +123,7 @@ async function requireCalendarUser({ event, resolve }: Parameters<Handle>[0]) {
 	const locals = event.locals as { user?: unknown }
 	if (!locals.user) {
 		const redirectTo = encodeURIComponent(pathname)
-		throw redirect(302, `/calendar/login?redirect=${redirectTo}`)
+			redirect(302, `/calendar/login?redirect=${redirectTo}`)
 	}
 
 	return resolve(event)

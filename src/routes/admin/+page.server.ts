@@ -16,48 +16,63 @@ function isAuthUser(value: unknown): value is User {
 export const load: PageServerLoad = async (event) => {
 	const locals = event.locals as { user?: Record<string, unknown> }
 	if (locals.user) {
-		throw redirect(302, '/admin/overview')
+		redirect(302, '/admin/overview')
 	}
 	return { user: locals.user ?? null, initialTab: 'dash' }
 }
 
 export const actions: Actions = {
-	login: async (event) => {
-		const { credentialsProvider, userAdapter, sessionAdapter, env, db } = await getAdminAuth({ event })
-		await ensureAdminAccount({ userAdapter, env })
-		type CredentialsInput = Parameters<typeof credentialsProvider.authenticate>[0]
+		login: async (event) => {
+			const { credentialsProvider, userAdapter, sessionAdapter, env, db } = await getAdminAuth({ event })
+			await ensureAdminAccount({ userAdapter, env })
+			type CredentialsInput = Parameters<typeof credentialsProvider.authenticate>[0]
 
-		return await createSigninHandler({
-			credentialsProvider: {
-				authenticate: async ({ email, password, userAdapter: adapter }: { email: string; password: string; userAdapter: unknown }) => {
-					const result = await credentialsProvider.authenticate({
-						email,
-						password,
-						userAdapter: adapter as CredentialsInput['userAdapter']
-					})
-					return {
-						user: isAuthUser(result.user) ? result.user : null,
-						valid: result.valid
+			const handler = createSigninHandler({
+				credentialsProvider: {
+					authenticate: async (input) => {
+						const result = await credentialsProvider.authenticate({
+							...(input as Omit<CredentialsInput, 'userAdapter'>),
+							userAdapter: input.userAdapter as CredentialsInput['userAdapter']
+						})
+						return {
+							user: isAuthUser(result.user) ? result.user : null,
+							valid: result.valid
+						}
 					}
-				}
-			},
-			userAdapter,
-			sessionAdapter,
+				},
+				userAdapter,
+				sessionAdapter,
 				redirectTo: '/admin/overview',
-			rateLimit: {
-				check: async (key: string) => {
-					try {
-						return await checkRateLimit({ db, key: `rate:admin_login:${key}`, limit: 10, windowSeconds: 60 })
-					} catch {
-						return { allowed: true }
+				rateLimit: {
+					check: async (key: string) => {
+						try {
+							return await checkRateLimit({ db, key: `rate:admin_login:${key}`, limit: 10, windowSeconds: 60 })
+						} catch {
+							return { allowed: true }
+						}
+					}
+				},
+				onSignin: () => {
+					logAdminEvent(event, 'login_success')
+				}
+			})
+
+			try {
+				return await handler(event)
+			} catch (err) {
+				// Some handler helpers throw SvelteKit control-flow objects. Normalize redirects so SvelteKit
+				// always recognizes them, even if they originate from a different module graph instance.
+				if (err && typeof err === 'object' && 'status' in err && 'location' in err) {
+					const status = Number((err as { status?: unknown }).status)
+					const location = (err as { location?: unknown }).location
+					if (Number.isFinite(status) && typeof location === 'string') {
+						throw redirect(status, location)
 					}
 				}
-			},
-			onSignin: () => {
-				logAdminEvent(event, 'login_success')
+				console.error('[admin] login handler threw', err)
+				throw err
 			}
-		})(event)
-	},
+		},
 
 	logout: async (event) => {
 		const { sessionAdapter } = await getAdminAuth({ event })

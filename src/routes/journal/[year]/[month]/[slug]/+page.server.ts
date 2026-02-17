@@ -16,8 +16,8 @@ export const entries: EntryGenerator = async () => {
 
 export const load: PageServerLoad = async ({ params }) => {
 	const { year, month, slug } = params
-	if (!year || !month || !slug) throw error(404)
+	if (!year || !month || !slug) error(404)
 	const post = await getPost({ year, month, slug })
-	if (!post) throw error(404)
+	if (!post) error(404)
 	return { post }
 }
