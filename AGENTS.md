@@ -25,7 +25,7 @@ SvelteKit 5 + Cloudflare Pages monorepo (pnpm workspaces).
 - `packages/calendar` (`@miko/calendar`) — Booking, D1 storage, Google Calendar, invites, admin auth
 - `repos/auth` (`@goobits/auth`) — OAuth (Google/Apple), sessions, credentials, WebAuthn
 
-**API bridge pattern:** SvelteKit routes (`src/routes/api/`) delegate to functions (`functions/api/`) via `buildEnv(platform)` in `_bridge.ts`. Dev uses local SQLite (`.dev/db.sqlite`, auto-migrates); production uses Cloudflare D1.
+**API env bridge:** API route handlers (`src/routes/api/**/+server.ts`) call `buildEnv(platform)` in `src/routes/api/calendar/_bridge.ts` to access D1 in production and a local SQLite-backed D1 wrapper in dev (`.dev/db.sqlite`, auto-migrates).
 
 **Hooks** (`src/hooks.server.ts`): theme → redirects → admin auth → calendar auth → require user → security headers
 
