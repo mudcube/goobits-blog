@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { NavItem } from '$lib/layout/nav'
-	import ThemeSelect from '$lib/ui/ThemeSelect.svelte'
+	import type { NavItem } from './types/nav'
+	import ThemeSelect from './ThemeSelect.svelte'
 
 	type TopbarProps = {
 		items: NavItem[]

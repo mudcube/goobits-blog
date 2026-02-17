@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
-	import Hero from '$lib/ui/Hero.svelte'
-	import PageShell from '$lib/ui/PageShell.svelte'
-	import Prose from '$lib/ui/Prose.svelte'
+	import Hero from './Hero.svelte'
+	import PageShell from './PageShell.svelte'
+	import Prose from './Prose.svelte'
 
 	type LegalPageProps = {
 		title: string

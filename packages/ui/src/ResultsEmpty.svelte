@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/ui/buttons/Button.svelte'
+	import Button from './buttons/Button.svelte'
 
 	type ResultsEmptyProps = {
 		message: string

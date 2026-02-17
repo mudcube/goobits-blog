@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SectionLabel from '$lib/ui/SectionLabel.svelte'
+	import SectionLabel from './SectionLabel.svelte'
 
 	type PageClosingProps = {
 		label: string

@@ -1,5 +1,5 @@
 <script>
-	import Button from '$lib/ui/buttons/Button.svelte'
+	import Button from './buttons/Button.svelte'
 
 	const {
 		category,
@@ -20,8 +20,8 @@
 	<div class="sitemap-page__category-card">
 		<div class="sitemap-page__bar" aria-hidden="true"></div>
 
-		<Button className="sitemap-page__category-header" variant="ghost" size="md" onClick={onToggle} type="button">
-			<h2 class="sitemap-page__category-title">
+			<Button className="sitemap-page__category-header" variant="ghost" size="md" onClick={onToggle} type="button">
+				<h2 class="sitemap-page__category-title">
 				{#if Icon}
 					<Icon class="sitemap-page__category-icon" size={14} strokeWidth={2.2} />
 				{/if}
