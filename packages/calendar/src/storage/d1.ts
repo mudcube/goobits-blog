@@ -96,6 +96,16 @@ export async function saveConnection({
 		.run()
 }
 
+export async function deleteConnection({
+	db,
+	provider
+}: {
+	db: D1DatabaseLike
+	provider: string
+}) {
+	await db.prepare(`DELETE FROM connections WHERE provider = ?`).bind(provider).run()
+}
+
 export async function createBooking({
 	db,
 	booking
