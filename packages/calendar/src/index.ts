@@ -5,6 +5,7 @@ export { ADMIN_EMAIL, ADMIN_COOKIE_NAME, createAdminAdapters, ensureAdminUser, p
 export * from './social/activities.ts'
 export * from './social/programs.ts'
 export * from './services/pay.ts'
+export * from './services/member-pages.ts'
 export * from './services/programs.ts'
 export * from './services/social.ts'
 export * from './services/sync-queue.ts'
