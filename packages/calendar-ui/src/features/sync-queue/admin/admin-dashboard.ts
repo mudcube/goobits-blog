@@ -1,6 +1,7 @@
 import {
 	beginCalendarOAuth,
 	buildInviteLink,
+	cleanupAdminE2EData,
 	disconnectCalendarOAuth,
 	fetchAdminEvents,
 	fetchAdminPrograms,
@@ -77,6 +78,10 @@ export async function createMemberInvite(input: { email: string | null, uses: nu
 export async function deleteMemberInvite(id: string) {
 	await removeInvite(id)
 	return { ok: true, error: '' }
+}
+
+export async function cleanupDevE2EData() {
+	return cleanupAdminE2EData()
 }
 
 export async function getCalendarReconnectUrl() {

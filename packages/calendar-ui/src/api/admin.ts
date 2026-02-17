@@ -46,6 +46,12 @@ export type AdminEventCreateInput = {
 
 export type AdminSyncQueueAction = 'process' | 'retry_dead_letters' | 'purge_dead_letters'
 
+const AdminCleanupE2EResponseSchema = z.object({
+	ok: z.literal(true),
+	events: z.object({ before: z.number(), after: z.number() }),
+	users: z.object({ before: z.number(), after: z.number() })
+})
+
 const AdminStatusResponseSchema = z.object({
 	ok: z.literal(true),
 	google: z.object({
@@ -183,10 +189,19 @@ export type AdminMeResponse = z.infer<typeof AdminMeResponseSchema>
 export type AdminProgramsResponse = z.infer<typeof AdminProgramsResponseSchema>
 export type AdminEventsResponse = z.infer<typeof AdminEventsResponseSchema>
 export type AdminSyncQueueMutationResponse = z.infer<typeof AdminSyncQueueMutationSchema>
+export type AdminCleanupE2EResponse = z.infer<typeof AdminCleanupE2EResponseSchema>
 
 export async function getAdminStatus() {
 	return requestApi<AdminStatusResponse>('/api/admin/status', {
 		parse: (payload) => AdminStatusResponseSchema.parse(payload)
+	})
+}
+
+export async function cleanupAdminE2E() {
+	return requestApi<AdminCleanupE2EResponse>('/api/admin/dev/cleanup-e2e', {
+		method: 'POST',
+		headers: { origin: window.location.origin },
+		parse: (payload) => AdminCleanupE2EResponseSchema.parse(payload)
 	})
 }
 

@@ -5,6 +5,7 @@ import {
 	getAdminEvents,
 	getAdminPrograms,
 	getAdminStatus,
+	cleanupAdminE2E,
 	saveAdminRules,
 	setAdminProgram,
 	toggleAdminProgram,
@@ -117,6 +118,10 @@ export function normalizeRulesInput(state: AdminRulesState): AdminRulesInput {
 
 export async function fetchAdminStatus() {
 	return getAdminStatus()
+}
+
+export async function cleanupAdminE2EData() {
+	return cleanupAdminE2E()
 }
 
 export async function persistAdminRules(state: AdminRulesState) {

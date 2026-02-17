@@ -2,6 +2,7 @@
 	import { Loader } from '@lucide/svelte'
 	import { PillButton } from '@miko/ui'
 	const { members, formatDate } = $props()
+	const isDev = import.meta.env.DEV
 
 	function initialsFor(user) {
 		const source = (user?.name || user?.email || '').trim()
@@ -21,6 +22,12 @@
 {#if members.error}
 	<div class="admin-page__section admin-page__section--error">
 		<p class="admin-page__calendar-error">{members.error}</p>
+	</div>
+{/if}
+
+{#if members.notice}
+	<div class="admin-page__section">
+		<p class="admin-page__section-description">{members.notice}</p>
 	</div>
 {/if}
 
@@ -108,6 +115,22 @@
 	<div class="admin-page__section-head">
 		<h3 class="admin-page__section-title">Users</h3>
 		<span class="admin-page__section-count">{members.users.length} total</span>
+		{#if isDev}
+			<PillButton
+				className="admin-page__button-secondary admin-page__button-secondary--compact"
+				variant="secondary"
+				size="sm"
+				onClick={members.cleanupE2E}
+				disabled={members.cleaning}
+			>
+				{#if members.cleaning}
+					<Loader size={12} class="admin-page__spin" />
+					Cleaning...
+				{:else}
+					Cleanup E2E
+				{/if}
+			</PillButton>
+		{/if}
 	</div>
 	{#if members.loading}
 		<p class="admin-page__section-description">Loading users...</p>
@@ -121,7 +144,7 @@
 						{#if user.avatar_url}
 							<img src={user.avatar_url} alt="" class="admin-page__members-avatar" />
 						{:else}
-							<span class="admin-page__members-avatar-fallback">{initialsFor(user)}</span>
+							<span class="admin-page__members-avatar-fallback" aria-hidden="true">{initialsFor(user)}</span>
 						{/if}
 						<span class="admin-page__members-user-name">{user.name || user.email}</span>
 					</div>
