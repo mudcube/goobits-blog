@@ -40,6 +40,11 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 	let connectionExpired = $state(false)
 	let connectionRefreshFailed = $state(false)
 	let disconnecting = $state(false)
+	let oauth = $state({
+		googleCalendarRedirectUri: null as string | null,
+		googleLoginRedirectUri: '',
+		appleLoginRedirectUri: ''
+	})
 	let syncQueue = $state({
 		pending: 0,
 		processing: 0,
@@ -161,6 +166,7 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 			connected = dashboardStatus.connected
 			connectionExpired = dashboardStatus.connectionExpired
 			connectionRefreshFailed = dashboardStatus.connectionRefreshFailed
+			oauth = dashboardStatus.oauth ?? oauth
 			syncQueue = dashboardStatus.syncQueue ?? {
 				pending: 0,
 				processing: 0,
@@ -564,6 +570,7 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		get connectionExpired() { return connectionExpired },
 		get connectionRefreshFailed() { return connectionRefreshFailed },
 		get disconnecting() { return disconnecting },
+		get oauth() { return oauth },
 		get syncQueue() { return syncQueue },
 		get bookings() { return bookings },
 		get stats() { return stats },

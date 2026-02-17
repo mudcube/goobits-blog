@@ -60,6 +60,11 @@ const AdminStatusResponseSchema = z.object({
 		expiresAt: z.number().nullable(),
 		refreshFailed: z.boolean().optional().default(false)
 	}),
+	oauth: z.object({
+		googleCalendarRedirectUri: z.union([z.string(), z.null()]),
+		googleLoginRedirectUri: z.string(),
+		appleLoginRedirectUri: z.string()
+	}),
 	syncQueue: z.object({
 		pending: z.number(),
 		processing: z.number(),

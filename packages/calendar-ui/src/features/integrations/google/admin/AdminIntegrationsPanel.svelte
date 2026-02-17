@@ -2,6 +2,7 @@
 	import { Check, RefreshCw } from '@lucide/svelte'
 	import { PillButton } from '@miko/ui'
 	const { dashboard } = $props()
+	const isDev = import.meta.env.DEV
 </script>
 
 <h1 class="admin-page__title">Integrations</h1>
@@ -43,4 +44,15 @@
 				</PillButton>
 			{/if}
 		</div>
+
+	{#if isDev}
+		<div class="admin-page__divider" aria-hidden="true"></div>
+		<p class="admin-page__section-description">
+			Google Console redirect URIs (copy/paste):
+		</p>
+		<ul class="admin-page__list">
+			<li><code class="admin-page__code">{dashboard.oauth.googleCalendarRedirectUri || '(missing GOOGLE_REDIRECT_URI)'}</code></li>
+			<li><code class="admin-page__code">{dashboard.oauth.googleLoginRedirectUri}</code></li>
+		</ul>
+	{/if}
 </div>
