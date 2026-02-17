@@ -9,11 +9,3 @@ export type D1DatabaseLike = {
 	prepare(query: string): D1PreparedStatement
 }
 
-let cachedDevDb: D1DatabaseLike | undefined
-
-export async function getDevDb(): Promise<D1DatabaseLike> {
-	if (cachedDevDb) return cachedDevDb
-	const { createSqliteDb } = await import('$lib/dev/sqliteDb.ts')
-	cachedDevDb = createSqliteDb()
-	return cachedDevDb
-}

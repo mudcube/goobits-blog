@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import { apiError } from '$lib/server/http/api'
-export { noStoreHeaders } from '$lib/server/http/api'
+import { apiError } from './api'
+export { noStoreHeaders } from './api'
 
 type CalendarLocals = {
 	user?: {

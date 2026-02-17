@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import Database from 'better-sqlite3'
-import type { D1DatabaseLike, D1PreparedStatement } from './devDb'
+import type { D1DatabaseLike, D1PreparedStatement } from './types'
 
 const DEFAULT_DB_PATH = path.join(process.cwd(), '.dev', 'db.sqlite')
 const MIGRATIONS_DIR = path.join(process.cwd(), 'packages', 'calendar', 'migrations')

@@ -1,7 +1,8 @@
 import { dev } from '$app/environment'
 import { GoobitsAuth } from '@goobits/auth'
 import { createAdminAdapters, ensureAdminUser } from '@miko/calendar'
-import { getDevDb, type D1DatabaseLike } from '$lib/dev/devDb.ts'
+import { getDevDb } from '../dev/devDb'
+import type { D1DatabaseLike } from '../dev/types'
 import type { User } from '@goobits/auth/types'
 
 type PlatformEnv = {
