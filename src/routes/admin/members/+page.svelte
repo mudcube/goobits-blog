@@ -1,5 +1,5 @@
 <script>
-	import { AdminPageShell } from '@miko/calendar-ui'
+	import { AdminPageShell } from '@calendar/ui'
 	let { data, form } = $props()
 </script>
 

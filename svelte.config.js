@@ -27,7 +27,8 @@ export default {
 			'@static': './static',
 			'@packages': './packages',
 			'@miko/ui': './packages/ui/src',
-			'@miko/calendar-ui': './packages/calendar-ui/src'
+			'@calendar/app': './packages/calendar/app/src',
+			'@calendar/ui': './packages/calendar/ui/src'
 		}
 	},
 	extensions: [ '.svelte', '.md' ],

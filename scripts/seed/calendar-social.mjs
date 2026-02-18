@@ -2,9 +2,10 @@
 import path from 'node:path'
 import fs from 'node:fs'
 import Database from 'better-sqlite3'
+import { resolveCalendarMigrationsDir } from '@calendar/migrations'
 
 const dbPath = path.join(process.cwd(), '.dev', 'db.sqlite')
-const migrationsDir = path.join(process.cwd(), 'packages', 'calendar', 'migrations')
+const migrationsDir = resolveCalendarMigrationsDir(process.cwd())
 const db = new Database(dbPath)
 
 const SEED_OWNER = 'seed-script'

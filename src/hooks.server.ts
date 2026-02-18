@@ -3,7 +3,7 @@ import { redirects } from '@src/redirects.ts'
 import { sequence } from '@sveltejs/kit/hooks'
 import { createThemeHooks } from '@goobits/themes/server'
 import { themeConfig } from '$lib/config/theme.ts'
-import { getCalendarAuth, getAdminAuth } from '@miko/calendar-kit'
+import { createCalendarAuthHandles } from '@calendar/app'
 import { dev } from '$app/environment'
 import type { Handle } from '@sveltejs/kit'
 
@@ -60,74 +60,16 @@ const themeHandle = createThemeHooks(themeConfig, {
 	blockingScript: true
 }).transform
 
-async function handleAdminAuth({ event, resolve }: Parameters<Handle>[0]) {
-	const pathname = event.url.pathname
-
-	if (
-		!pathname.startsWith('/admin') &&
-		!pathname.startsWith('/api/admin') &&
-		!pathname.startsWith('/api/calendar/admin')
-	) {
-		return resolve(event)
-	}
-
-	try {
-		const { auth } = await getAdminAuth({ event })
-		return auth.handle()({ event, resolve })
-	} catch (error) {
-		// Never swallow SvelteKit control-flow exceptions (redirects / HTTP errors).
-		if (error && typeof error === 'object' && 'status' in error) {
-			throw error
-		}
-		// Keep /admin shell reachable even if auth adapters/env are temporarily unavailable.
-		// This prevents global hard-fail 500s during checks/dev startup races.
-		console.error('[admin-auth] unavailable', error)
-		if (pathname.startsWith('/admin')) {
-			;(event.locals as { user?: unknown }).user = undefined
-			return resolve(event)
-		}
-		return new Response('Admin auth unavailable', { status: 503 })
-	}
-}
-
-async function handleCalendarAuth({ event, resolve }: Parameters<Handle>[0]) {
-	const pathname = event.url.pathname
-
-	// Attach auth locals for calendar pages, calendar APIs, and auth routes
-	if (!pathname.startsWith('/calendar') && !pathname.startsWith('/api/calendar') && !pathname.startsWith('/auth')) {
-		return resolve(event)
-	}
-
-	const { auth } = await getCalendarAuth({ event })
-	return auth.handle()({ event, resolve })
-}
-
-async function requireCalendarUser({ event, resolve }: Parameters<Handle>[0]) {
-	const pathname = event.url.pathname
-
-	if (!pathname.startsWith('/calendar')) {
-		return resolve(event)
-	}
-
-	// Allow login page (with or without trailing slash) and API routes
-	if (
-		pathname === '/calendar/login' ||
-		pathname === '/calendar/login/' ||
-		pathname === '/calendar/login/redirect' ||
-		pathname === '/calendar/login/redirect/' ||
-		pathname.startsWith('/api/calendar')
-	) {
-		return resolve(event)
-	}
-
-	const locals = event.locals as { user?: unknown }
-	if (!locals.user) {
-		const redirectTo = encodeURIComponent(pathname)
-			redirect(302, `/calendar/login?redirect=${redirectTo}`)
-	}
-
-	return resolve(event)
-}
+const { handleAdminAuth, handleCalendarAuth, requireCalendarUser } = createCalendarAuthHandles({
+	adminBase: '/admin',
+	apiAdminBase: '/api/admin',
+	apiCalendarAdminBase: '/api/calendar/admin',
+	calendarBase: '/calendar',
+	apiCalendarBase: '/api/calendar',
+	authBase: '/auth',
+	calendarLoginPath: '/calendar/login',
+	calendarLoginRedirectPath: '/calendar/login/redirect'
+})
 
 function setIfMissing(headers: Headers, key: string, value: string) {
 	if (!headers.has(key)) headers.set(key, value)

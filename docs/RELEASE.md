@@ -29,7 +29,7 @@ Add these to your environment and rotate secrets periodically:
 
 ## Rollout checklist
 
-1. Apply DB migration `packages/calendar/migrations/0006_email_verification_tokens.sql`.
+1. Apply DB migration `packages/calendar/migrations/sql/0006_email_verification_tokens.sql`.
 2. Deploy with `ANTIABUSE_ENABLED=true`, `TURNSTILE_REQUIRED=false`.
 3. Verify `/register` submission flow in dev/prod.
 4. Verify `/verify-email` link activation path.

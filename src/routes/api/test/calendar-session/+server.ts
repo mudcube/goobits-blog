@@ -1,7 +1,7 @@
 import { json, type RequestEvent } from '@sveltejs/kit'
 import { D1SessionAdapter } from '@goobits/auth/adapters'
-import { buildEnv } from '@miko/calendar-kit'
-import { parseCalendarSessionBootstrapInput, TransportValidationError } from '@miko/calendar'
+import { buildEnv } from '@calendar/kit'
+import { parseCalendarSessionBootstrapInput, TransportValidationError } from '@calendar/core'
 
 type CalendarUserRow = { id: string | number }
 

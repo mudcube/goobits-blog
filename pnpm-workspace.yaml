@@ -1,2 +1,4 @@
 packages:
   - "packages/*"
+  - "packages/calendar/*"
+  - "packages/calendar/presets/*"

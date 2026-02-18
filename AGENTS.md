@@ -22,14 +22,14 @@ Root tests use Vitest + Playwright under `__tests__/e2e`. `repos/auth` also has 
 SvelteKit 5 + Cloudflare Pages monorepo (pnpm workspaces).
 
 **Internal packages:**
-- `packages/calendar` (`@miko/calendar`) — Booking, D1 storage, Google Calendar, invites, admin auth
+- `packages/calendar/core` (`@calendar/core`) — Booking, D1 storage, Google Calendar, invites, admin auth
 - `repos/auth` (`@goobits/auth`) — OAuth (Google/Apple), sessions, credentials, WebAuthn
 
-**API env bridge:** API route handlers (`src/routes/api/**/+server.ts`) call `buildEnv(platform)` in `src/routes/api/calendar/_bridge.ts` to access D1 in production and a local SQLite-backed D1 wrapper in dev (`.dev/db.sqlite`, auto-migrates).
+**API env bridge:** API route handlers (`src/routes/api/**/+server.ts`) call `buildEnv(platform)` in `packages/calendar/kit/src/runtime/build-env.ts` to access D1 in production and a local SQLite-backed D1 wrapper in dev (`.dev/db.sqlite`, auto-migrates).
 
 **Hooks** (`src/hooks.server.ts`): theme → redirects → admin auth → calendar auth → require user → security headers
 
-**Database:** Migrations in `packages/calendar/migrations/`. Argon2/bcrypt stubbed for browser in `src/lib/stubs/`, aliased in `vite.config.js` and `wrangler.toml`.
+**Database:** Migrations in `packages/calendar/migrations/sql/`. Argon2/bcrypt stubbed for browser in `src/lib/stubs/`, aliased in `vite.config.js` and `wrangler.toml`.
 
 ## Path Aliases (svelte.config.js)
 

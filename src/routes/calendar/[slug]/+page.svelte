@@ -1,5 +1,5 @@
 <script>
-	import { ActivityBookingPage } from '@miko/calendar-ui'
+	import { ActivityBookingPage } from '@calendar/ui'
 	const { data } = $props()
 </script>
 

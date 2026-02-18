@@ -1,5 +1,5 @@
 <script>
-	import { CalendarHomePage } from '@miko/calendar-ui'
+	import { CalendarHomePage } from '@calendar/ui'
 
 	let { data } = $props()
 </script>

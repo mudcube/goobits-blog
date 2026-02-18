@@ -1,12 +1,12 @@
 <script lang="ts">
 import { page } from '$app/stores'
-import { getProviderErrorMessage, type CalendarProviderName } from '@miko/calendar-ui/auth/ui/providers'
-import { buildProviderLoginHref } from '@miko/calendar-ui/auth/ui/redirects'
+import { getProviderErrorMessage, type CalendarProviderName } from '@calendar/ui/auth/ui/providers'
+import { buildProviderLoginHref } from '@calendar/ui/auth/ui/redirects'
 import { PillButton } from '@miko/ui'
 import {
 	resolveCalendarLoginTargetActivity,
 	resolveFirstAvailableProvider
-} from '@miko/calendar-ui/features/auth/member/calendar-login'
+} from '@calendar/ui/features/auth/member/calendar-login'
 
 	const { data } = $props<{
 		data: {

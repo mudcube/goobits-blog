@@ -22,6 +22,24 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.990.0
         version: 3.990.0
+      '@calendar/app':
+        specifier: workspace:*
+        version: link:packages/calendar/app
+      '@calendar/core':
+        specifier: workspace:*
+        version: link:packages/calendar/core
+      '@calendar/kit':
+        specifier: workspace:*
+        version: link:packages/calendar/kit
+      '@calendar/migrations':
+        specifier: workspace:*
+        version: link:packages/calendar/migrations
+      '@calendar/preset-miko':
+        specifier: workspace:*
+        version: link:packages/calendar/presets/miko
+      '@calendar/ui':
+        specifier: workspace:*
+        version: link:packages/calendar/ui
       '@goobits/auth':
         specifier: workspace:*
         version: link:packages/auth
@@ -31,15 +49,6 @@ importers:
       '@lucide/svelte':
         specifier: ^0.564.0
         version: 0.564.0(svelte@5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242))
-      '@miko/calendar':
-        specifier: workspace:*
-        version: link:packages/calendar
-      '@miko/calendar-kit':
-        specifier: workspace:*
-        version: link:packages/calendar-kit
-      '@miko/calendar-ui':
-        specifier: workspace:*
-        version: link:packages/calendar-ui
       '@miko/ui':
         specifier: workspace:*
         version: link:packages/ui
@@ -215,23 +224,38 @@ importers:
         specifier: ^2.0.2
         version: 2.0.2
 
-  packages/calendar:
+  packages/calendar/app:
     dependencies:
-      '@goobits/auth':
+      '@calendar/kit':
         specifier: workspace:*
-        version: link:../auth
-
-  packages/calendar-kit:
-    dependencies:
-      '@goobits/auth':
-        specifier: workspace:*
-        version: link:../auth
-      '@miko/calendar':
-        specifier: workspace:*
-        version: link:../calendar
+        version: link:../kit
       '@sveltejs/kit':
         specifier: ^2.0.0
-        version: 2.51.0(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242))(vite@7.3.1(@types/node@25.2.3)(sass-embedded@1.97.3)(sass@1.97.3)(stylus@0.64.0)))(svelte@5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242))(typescript@5.9.3)(vite@7.3.1(@types/node@25.2.3)(sass-embedded@1.97.3)(sass@1.97.3)(stylus@0.64.0))
+        version: 2.52.0(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242))(vite@7.3.1(@types/node@25.2.3)(sass-embedded@1.97.3)(sass@1.97.3)(stylus@0.64.0)))(svelte@5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242))(typescript@5.9.3)(vite@7.3.1(@types/node@25.2.3)(sass-embedded@1.97.3)(sass@1.97.3)(stylus@0.64.0))
+      svelte:
+        specifier: ^5.0.0
+        version: 5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242)
+
+  packages/calendar/core:
+    dependencies:
+      '@goobits/auth':
+        specifier: workspace:*
+        version: link:../../auth
+
+  packages/calendar/kit:
+    dependencies:
+      '@calendar/core':
+        specifier: workspace:*
+        version: link:../core
+      '@calendar/migrations':
+        specifier: workspace:*
+        version: link:../migrations
+      '@goobits/auth':
+        specifier: workspace:*
+        version: link:../../auth
+      '@sveltejs/kit':
+        specifier: ^2.0.0
+        version: 2.52.0(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242))(vite@7.3.1(@types/node@25.2.3)(sass-embedded@1.97.3)(sass@1.97.3)(stylus@0.64.0)))(svelte@5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242))(typescript@5.9.3)(vite@7.3.1(@types/node@25.2.3)(sass-embedded@1.97.3)(sass@1.97.3)(stylus@0.64.0))
       better-sqlite3:
         specifier: ^12.6.2
         version: 12.6.2
@@ -239,17 +263,21 @@ importers:
         specifier: ^5.0.0
         version: 5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242)
 
-  packages/calendar-ui:
+  packages/calendar/migrations: {}
+
+  packages/calendar/presets/miko: {}
+
+  packages/calendar/ui:
     dependencies:
+      '@calendar/core':
+        specifier: workspace:*
+        version: link:../core
       '@lucide/svelte':
         specifier: ^0.564.0
         version: 0.564.0(svelte@5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242))
-      '@miko/calendar':
-        specifier: workspace:*
-        version: link:../calendar
       '@miko/ui':
         specifier: workspace:*
-        version: link:../ui
+        version: link:../../ui
       svelte:
         specifier: ^5.0.0
         version: 5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242)

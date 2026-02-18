@@ -1,4 +1,1 @@
-import { createAdminSectionLoad } from '../_section.server'
-
-export { actions } from '../+page.server'
-export const load = createAdminSectionLoad('dash')
+export * from '@calendar/app/routes/admin/overview/page.server'

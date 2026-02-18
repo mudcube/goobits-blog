@@ -1,5 +1,1 @@
-import { redirect } from '@sveltejs/kit'
-
-export function load() {
-	redirect(308, '/admin')
-}
+export * from '@calendar/app/routes/calendar/admin/page.server'
