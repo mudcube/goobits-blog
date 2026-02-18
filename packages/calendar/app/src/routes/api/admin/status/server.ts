@@ -1,6 +1,13 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { ensureValidGoogleToken, getConnection, saveConnection, requireEnv, getCalendarSyncQueueHealth } from '@calendar/core'
+import {
+	ensureValidGoogleToken,
+	getConnection,
+	saveConnection,
+	requireEnv,
+	getCalendarSyncQueueHealth,
+	getAdminPaymentDefaults
+} from '@calendar/core'
 import { requireAdminSession, unauthorized } from '@calendar/app/admin-api-helpers'
 import { apiError, apiOk, logApiError } from '@calendar/kit'
 
@@ -62,7 +69,10 @@ export async function GET(event: RequestEvent) {
 			notice: parseInt(settings['notice'] || envValue('BOOKING_MIN_NOTICE_HOURS', '24'), 10),
 			capacity: parseInt(settings['capacity'] || envValue('BOOKING_CAPACITY', '4'), 10)
 		}
-		const syncQueue = await getCalendarSyncQueueHealth(db)
+		const [syncQueue, paymentDefaults] = await Promise.all([
+			getCalendarSyncQueueHealth(db),
+			getAdminPaymentDefaults(db)
+		])
 
 		const baseUrl =
 			(typeof env['PUBLIC_BASE_URL'] === 'string' && env['PUBLIC_BASE_URL']) ||
@@ -90,7 +100,8 @@ export async function GET(event: RequestEvent) {
 						: normalize(`${baseUrl}/auth/apple/callback`)
 			},
 			syncQueue,
-			rules
+			rules,
+			paymentDefaults
 		})
 	} catch (err) {
 		logApiError('admin.status', err)

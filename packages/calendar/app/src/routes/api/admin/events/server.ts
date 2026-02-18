@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { createEventsBatch, listEventsFeed } from '@calendar/core'
+import { createEventsBatch, getAdminPaymentDefaults, listEventsFeed } from '@calendar/core'
 import { enforceSameOrigin, logAdminEvent, requireAdminSession, unauthorized } from '@calendar/app/admin-api-helpers'
 import { getCalendarProgramBySlug, parseAdminCreateEventsBatchInput, TransportValidationError } from '@calendar/core'
 import { apiOk, apiError, apiValidationError, logApiError } from '@calendar/kit'
@@ -29,6 +29,7 @@ export async function POST(event: RequestEvent) {
 		const input = parseAdminCreateEventsBatchInput(await event.request.json().catch(() => null))
 
 		const env = await buildEnv(event.platform)
+		const defaults = await getAdminPaymentDefaults(env.DB)
 		const program = await getCalendarProgramBySlug(env.DB, input.activitySlug, { includeDisabled: true })
 		if (!program) {
 			return apiError('Program not found', { status: 404 })
@@ -41,8 +42,8 @@ export async function POST(event: RequestEvent) {
 			capacity: input.capacity,
 			costCents: input.costCents,
 			currency: input.currency,
-			paymentProvider: input.paymentProvider,
-			paymentHandle: input.paymentHandle,
+			paymentProvider: input.paymentProvider || defaults.provider || null,
+			paymentHandle: input.paymentHandle || defaults.handle || null,
 			paymentNoteTemplate: input.paymentNoteTemplate,
 			location: input.location,
 			note: input.note,

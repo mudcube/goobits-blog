@@ -17,7 +17,8 @@ export function shouldRedirectCalendarGuest(user: unknown, pathname: string): bo
 
 export function handleUnauthorizedSessionError(error: unknown): boolean {
 	if (error instanceof ApiClientError && error.status === 401) {
-		window.location.reload()
+		const adminBase = getCalendarUiConfig().routes.adminBase
+		window.location.href = adminBase
 		return true
 	}
 	return false

@@ -1,0 +1,9 @@
+@use './vars' as *;
+
+.admin-page__stats {
+	margin-bottom: $grid-unit * 2;
+}
+
+.admin-page__attention-card {
+	gap: $grid-unit;
+}

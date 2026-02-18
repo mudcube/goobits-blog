@@ -42,7 +42,8 @@ export async function POST(event: RequestEvent) {
 		}
 
 		if (!result.ok) {
-			return apiError(result.message, { status: 404, code: result.code })
+			const status = result.code === 'forbidden' ? 403 : 404
+			return apiError(result.message, { status, code: result.code })
 		}
 		return apiOk({ status: result.status, state: result.state })
 	} catch (err) {

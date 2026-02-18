@@ -1,7 +1,10 @@
 <script>
 	import PillButton from '../../../primitives/PillButton.svelte'
+	import AdminNewEventModal from '../../modals/admin/AdminNewEventModal.svelte'
+	import AdminEventDetailSheet from './AdminEventDetailSheet.svelte'
 	const { dashboard } = $props()
 	let memoryDrafts = $state({})
+	let showNewEventModal = $state(false)
 
 	function formatDateTime(iso) {
 		return new Date(iso).toLocaleString(undefined, {
@@ -24,141 +27,20 @@
 
 <div class="admin-page__section">
 	<div class="admin-page__section-head">
-		<h3 class="admin-page__section-title">Batch creator</h3>
-	</div>
-	<p class="admin-page__section-description">Create one event or a weekly series in a single action.</p>
-
-	<div class="admin-page__fields-grid">
-		<div class="admin-page__fields-row admin-page__fields-row--invite">
-			<div class="admin-page__field admin-page__field--email">
-				<label class="admin-page__field-label" for="event-draft-activity">Activity</label>
-				<select
-					id="event-draft-activity"
-					class="admin-page__input"
-					value={dashboard.eventDraft.activitySlug}
-					onchange={(event) => dashboard.eventDraft = { ...dashboard.eventDraft, activitySlug: event.currentTarget.value }}
-				>
-					{#each dashboard.enabledPrograms as activity}
-						<option value={activity.slug}>{activity.label}</option>
-					{/each}
-				</select>
-			</div>
-			<div class="admin-page__field admin-page__field--email">
-				<label class="admin-page__field-label" for="event-draft-title">Title</label>
-				<input
-					id="event-draft-title"
-					class="admin-page__input"
-					type="text"
-					placeholder="Leg Day Crew"
-					value={dashboard.eventDraft.title}
-					oninput={(event) => dashboard.eventDraft = { ...dashboard.eventDraft, title: event.currentTarget.value }}
-				/>
-			</div>
-		</div>
-
-		<div class="admin-page__fields-row admin-page__fields-row--invite">
-			<div class="admin-page__field">
-				<label class="admin-page__field-label" for="event-draft-starts">Starts</label>
-				<input
-					id="event-draft-starts"
-					class="admin-page__input"
-					type="datetime-local"
-					value={dashboard.eventDraft.startsAt}
-					oninput={(event) => dashboard.eventDraft = { ...dashboard.eventDraft, startsAt: event.currentTarget.value }}
-				/>
-			</div>
-			<div class="admin-page__field">
-				<label class="admin-page__field-label" for="event-draft-ends">Ends</label>
-				<input
-					id="event-draft-ends"
-					class="admin-page__input"
-					type="datetime-local"
-					value={dashboard.eventDraft.endsAt}
-					oninput={(event) => dashboard.eventDraft = { ...dashboard.eventDraft, endsAt: event.currentTarget.value }}
-				/>
-			</div>
-			<div class="admin-page__field admin-page__field--uses">
-				<label class="admin-page__field-label" for="event-draft-capacity">Capacity</label>
-				<input
-					id="event-draft-capacity"
-					class="admin-page__input admin-page__input--number"
-					type="number"
-					min="1"
-					max="50"
-					value={dashboard.eventDraft.capacity}
-					oninput={(event) => dashboard.eventDraft = { ...dashboard.eventDraft, capacity: Number(event.currentTarget.value) || 1 }}
-				/>
-			</div>
-			<div class="admin-page__field admin-page__field--expires">
-				<label class="admin-page__field-label" for="event-draft-repeat">Repeat weeks</label>
-				<input
-					id="event-draft-repeat"
-					class="admin-page__input admin-page__input--number"
-					type="number"
-					min="0"
-					max="24"
-					value={dashboard.eventDraft.repeatWeeks}
-					oninput={(event) => dashboard.eventDraft = { ...dashboard.eventDraft, repeatWeeks: Number(event.currentTarget.value) || 0 }}
-				/>
-			</div>
-			<div class="admin-page__field admin-page__field--uses">
-				<label class="admin-page__field-label" for="event-draft-cost">Cost (cents)</label>
-				<input
-					id="event-draft-cost"
-					class="admin-page__input admin-page__input--number"
-					type="number"
-					min="0"
-					max="200000"
-					value={dashboard.eventDraft.costCents}
-					oninput={(event) => dashboard.eventDraft = { ...dashboard.eventDraft, costCents: Number(event.currentTarget.value) || 0 }}
-				/>
-			</div>
-			<div class="admin-page__field admin-page__field--expires">
-				<label class="admin-page__field-label" for="event-draft-provider">Pay provider</label>
-				<select
-					id="event-draft-provider"
-					class="admin-page__input"
-					value={dashboard.eventDraft.paymentProvider}
-					onchange={(event) => dashboard.eventDraft = { ...dashboard.eventDraft, paymentProvider: event.currentTarget.value }}
-				>
-					<option value="venmo">Venmo</option>
-					<option value="cashapp">Cash App</option>
-					<option value="paypal">PayPal</option>
-					<option value="">None</option>
-				</select>
-			</div>
-			<div class="admin-page__field admin-page__field--email">
-				<label class="admin-page__field-label" for="event-draft-handle">Payment handle</label>
-				<input
-					id="event-draft-handle"
-					class="admin-page__input"
-					type="text"
-					placeholder="@mudcube"
-					value={dashboard.eventDraft.paymentHandle}
-					oninput={(event) => dashboard.eventDraft = { ...dashboard.eventDraft, paymentHandle: event.currentTarget.value }}
-				/>
-			</div>
-			<div class="admin-page__field admin-page__field--email">
-				<label class="admin-page__field-label" for="event-draft-note-template">Payment note</label>
-				<input
-					id="event-draft-note-template"
-					class="admin-page__input"
-					type="text"
-					placeholder="Adventure ticket"
-					value={dashboard.eventDraft.paymentNoteTemplate}
-					oninput={(event) => dashboard.eventDraft = { ...dashboard.eventDraft, paymentNoteTemplate: event.currentTarget.value }}
-				/>
-			</div>
-		</div>
-	</div>
-
-		<PillButton className="admin-page__button-secondary" variant="secondary" onClick={dashboard.createEvents} disabled={dashboard.eventsCreating || dashboard.enabledPrograms.length === 0}>
-			{dashboard.eventsCreating ? 'Creating...' : 'Create Events'}
+		<h3 class="admin-page__section-title">New event</h3>
+		<PillButton className="admin-page__button-secondary admin-page__button-secondary--compact" variant="secondary" size="sm" onClick={() => showNewEventModal = true}>
+			+ New
 		</PillButton>
+	</div>
+	<p class="admin-page__section-description">Open modal to create one event or a weekly series.</p>
 	{#if dashboard.enabledPrograms.length === 0}
 		<p class="admin-page__section-description">Enable at least one program before creating events.</p>
 	{/if}
 </div>
+
+{#if showNewEventModal}
+	<AdminNewEventModal {dashboard} onClose={() => showNewEventModal = false} />
+{/if}
 
 <div class="admin-page__divider" aria-hidden="true"></div>
 
@@ -257,6 +139,14 @@
 						</div>
 					</div>
 					<div class="admin-page__members-actions">
+						<PillButton
+							className="admin-page__button-secondary admin-page__button-secondary--compact"
+							variant="secondary"
+							size="sm"
+							onClick={() => dashboard.openEventDetail(session.id)}
+						>
+							Details
+						</PillButton>
 						<input
 							class="admin-page__input admin-page__input--number admin-page__input--capacity"
 							type="number"
@@ -273,3 +163,8 @@
 		</div>
 	{/if}
 </div>
+
+{#if dashboard.selectedEventDetail}
+	<div class="admin-page__divider" aria-hidden="true"></div>
+	<AdminEventDetailSheet {dashboard} detail={dashboard.selectedEventDetail} />
+{/if}

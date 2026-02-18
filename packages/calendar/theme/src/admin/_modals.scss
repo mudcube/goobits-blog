@@ -1,0 +1,6 @@
+@use './vars' as *;
+
+.admin-page__modal-card {
+	max-height: min(90vh, 56rem);
+	overflow: auto;
+}

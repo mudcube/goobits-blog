@@ -24,11 +24,12 @@ import {
 } from '../../api/calendar'
 import { getCalendarUiConfig } from '../../config'
 
-export type AdminTabId = 'dash' | 'cal' | 'events' | 'programs' | 'calendar-auth' | 'integrations'
+export type AdminTabId = 'dashboard' | 'events' | 'rules' | 'programs' | 'people' | 'connections'
 
 export type AdminNavItem = {
 	label: string
 	id: AdminTabId
+	section: 'schedule' | 'settings'
 }
 
 export type AdminHours = {
@@ -49,21 +50,21 @@ export type AdminRulesState = {
 }
 
 export const ADMIN_NAV: AdminNavItem[] = [
-	{ label: 'Overview', id: 'dash' },
-	{ label: 'Availability', id: 'cal' },
-	{ label: 'Events', id: 'events' },
-	{ label: 'Programs', id: 'programs' },
-	{ label: 'Members', id: 'calendar-auth' },
-	{ label: 'Integrations', id: 'integrations' }
+	{ label: 'Dashboard', id: 'dashboard', section: 'schedule' },
+	{ label: 'Events', id: 'events', section: 'schedule' },
+	{ label: 'Rules', id: 'rules', section: 'settings' },
+	{ label: 'Programs', id: 'programs', section: 'settings' },
+	{ label: 'People', id: 'people', section: 'settings' },
+	{ label: 'Connections', id: 'connections', section: 'settings' }
 ]
 
 const ADMIN_TAB_SEGMENTS: Record<AdminTabId, string> = {
-	dash: 'overview',
-	cal: 'availability',
+	dashboard: 'overview',
 	events: 'events',
+	rules: 'availability',
 	programs: 'programs',
-	'calendar-auth': 'members',
-	integrations: 'integrations'
+	people: 'members',
+	connections: 'integrations'
 }
 
 export function getAdminTabHref(tab: AdminTabId) {
@@ -73,12 +74,12 @@ export function getAdminTabHref(tab: AdminTabId) {
 }
 
 export function isAdminTabId(value: string): value is AdminTabId {
-	return value === 'dash' ||
-		value === 'cal' ||
+	return value === 'dashboard' ||
 		value === 'events' ||
+		value === 'rules' ||
 		value === 'programs' ||
-		value === 'calendar-auth' ||
-		value === 'integrations'
+		value === 'people' ||
+		value === 'connections'
 }
 
 export const DEFAULT_ADMIN_RULES: AdminRulesState = {

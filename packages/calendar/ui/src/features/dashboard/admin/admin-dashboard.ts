@@ -21,6 +21,7 @@ import {
 	removeInvite,
 	type AdminRulesState
 } from '../../admin/admin'
+import { getCalendarAdminPaymentDefaults, saveCalendarAdminPaymentDefaults, getCalendarAdminEventTemplates, getCalendarAdminEventDetail, promoteCalendarWaitlistEntry } from '../../../api/calendar'
 
 export async function loadDashboardStatus() {
 	const data = await fetchAdminStatus()
@@ -30,7 +31,8 @@ export async function loadDashboardStatus() {
 		connectionRefreshFailed: data.google.refreshFailed ?? false,
 		oauth: data.oauth,
 		syncQueue: data.syncQueue,
-		rules: data.rules
+		rules: data.rules,
+		paymentDefaults: data.paymentDefaults
 	}
 }
 
@@ -186,6 +188,27 @@ export async function retryDashboardSyncDeadLetters(limit = 10) {
 export async function purgeDashboardSyncDeadLetters(limit = 50) {
 	await purgeAdminSyncDeadLetters(limit)
 	return { ok: true, error: '' }
+}
+
+export async function loadAdminPaymentDefaults() {
+	return getCalendarAdminPaymentDefaults()
+}
+
+export async function saveAdminPaymentDefaults(input: { provider: string | null; handle: string | null }) {
+	await saveCalendarAdminPaymentDefaults(input)
+	return { ok: true, error: '' }
+}
+
+export async function loadAdminEventTemplates() {
+	return getCalendarAdminEventTemplates()
+}
+
+export async function loadAdminEventDetail(eventId: number) {
+	return getCalendarAdminEventDetail(eventId)
+}
+
+export async function promoteWaitlistEntry(eventId: number, entryId: number) {
+	return promoteCalendarWaitlistEntry(eventId, entryId)
 }
 
 export function createInviteShareLink(origin: string, code: string) {

@@ -26,6 +26,86 @@ const CalendarUsersResponseSchema = z.object({
 	users: z.array(z.unknown())
 })
 
+const CalendarUserAccessResponseSchema = z.object({
+	ok: z.literal(true),
+	access: z.array(z.object({
+		programSlug: z.string(),
+		allowed: z.boolean()
+	}))
+})
+
+const CalendarPaymentDefaultsResponseSchema = z.object({
+	ok: z.literal(true),
+	payment: z.object({
+		provider: z.union([z.string(), z.null()]),
+		handle: z.union([z.string(), z.null()])
+	})
+})
+
+const CalendarEventTemplatesResponseSchema = z.object({
+	ok: z.literal(true),
+	templates: z.array(z.object({
+		id: z.number(),
+		title: z.string(),
+		activitySlug: z.string(),
+		capacity: z.number(),
+		costCents: z.number(),
+		currency: z.string(),
+		paymentProvider: z.union([z.string(), z.null()]),
+		paymentHandle: z.union([z.string(), z.null()]),
+		paymentNoteTemplate: z.union([z.string(), z.null()]),
+		location: z.union([z.string(), z.null()]),
+		note: z.union([z.string(), z.null()])
+	}))
+})
+
+const CalendarAdminEventDetailResponseSchema = z.object({
+	ok: z.literal(true),
+	event: z.object({
+		id: z.number(),
+		activitySlug: z.string(),
+		activityLabel: z.string(),
+		title: z.string(),
+		startsAt: z.string(),
+		endsAt: z.string(),
+		capacity: z.number(),
+		seatsTaken: z.number(),
+		seatsLeft: z.number(),
+		waitlistCount: z.number(),
+		costCents: z.number(),
+		currency: z.string(),
+		paymentProvider: z.union([z.string(), z.null()]),
+		paymentHandle: z.union([z.string(), z.null()]),
+		paymentNoteTemplate: z.union([z.string(), z.null()]),
+		recapText: z.union([z.string(), z.null()]),
+		heroImageUrl: z.union([z.string(), z.null()])
+	}),
+	attendees: z.array(z.object({
+		entryId: z.number(),
+		userId: z.string(),
+		name: z.union([z.string(), z.null()]),
+		email: z.union([z.string(), z.null()]),
+		status: z.union([z.literal('joined'), z.literal('waitlist')]),
+		waitlistPosition: z.union([z.number(), z.null()])
+	})),
+	weather: z.union([
+		z.object({
+			summary: z.string(),
+			temperatureF: z.number()
+		}),
+		z.null()
+	])
+})
+
+const CalendarPromoteResponseSchema = z.object({
+	ok: z.literal(true),
+	status: z.union([
+		z.literal('promoted'),
+		z.literal('already_joined'),
+		z.literal('full')
+	])
+})
+
 const CalendarFeedEventSchema = z.object({
 	id: z.number(),
 	activitySlug: z.string(),
@@ -106,6 +186,11 @@ export type CalendarEventsResponse = z.infer<typeof CalendarEventsResponseSchema
 export type CalendarJoinResponse = z.infer<typeof CalendarJoinResponseSchema>
 export type CalendarLeaveResponse = z.infer<typeof CalendarLeaveResponseSchema>
 export type CalendarProfile = z.infer<typeof CalendarProfileSchema>
+export type CalendarUserAccessResponse = z.infer<typeof CalendarUserAccessResponseSchema>
+export type CalendarPaymentDefaultsResponse = z.infer<typeof CalendarPaymentDefaultsResponseSchema>
+export type CalendarEventTemplatesResponse = z.infer<typeof CalendarEventTemplatesResponseSchema>
+export type CalendarAdminEventDetailResponse = z.infer<typeof CalendarAdminEventDetailResponseSchema>
+export type CalendarPromoteResponse = z.infer<typeof CalendarPromoteResponseSchema>
 
 export async function startCalendarOAuth() {
 	return requestApi<CalendarOAuthStartResponse>(withCalendarApi('/oauth-start'), {
@@ -127,6 +212,23 @@ export async function getCalendarAdminUsers() {
 	})
 }
 
+export async function getCalendarAdminUserAccess(userId: string) {
+	const base = getCalendarUiConfig().routes.apiCalendarAdminBase
+	return requestApi<CalendarUserAccessResponse>(`${base}/users/${encodeURIComponent(userId)}/access`, {
+		parse: (payload) => CalendarUserAccessResponseSchema.parse(payload)
+	})
+}
+
+export async function saveCalendarAdminUserAccess(userId: string, access: Array<{ programSlug: string; allowed: boolean }>) {
+	const base = getCalendarUiConfig().routes.apiCalendarAdminBase
+	return requestApi<CalendarMutationOk>(`${base}/users/${encodeURIComponent(userId)}/access`, {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ access }),
+		parse: (payload) => CalendarMutationOkSchema.parse(payload)
+	})
+}
+
 export async function createCalendarInvite(input: CreateInviteInput) {
 	const base = getCalendarUiConfig().routes.apiCalendarAdminBase
 	return requestApi<CalendarInvitesResponse>(`${base}/invites`, {
@@ -142,6 +244,45 @@ export async function deleteCalendarInvite(id: string) {
 	return requestApi<CalendarInvitesResponse>(`${base}/invites?id=${encodeURIComponent(id)}`, {
 		method: 'DELETE',
 		parse: (payload) => CalendarInvitesResponseSchema.parse(payload)
+	})
+}
+
+export async function getCalendarAdminPaymentDefaults() {
+	const base = getCalendarUiConfig().routes.apiCalendarAdminBase
+	return requestApi<CalendarPaymentDefaultsResponse>(`${base}/settings/payment`, {
+		parse: (payload) => CalendarPaymentDefaultsResponseSchema.parse(payload)
+	})
+}
+
+export async function saveCalendarAdminPaymentDefaults(input: { provider: string | null; handle: string | null }) {
+	const base = getCalendarUiConfig().routes.apiCalendarAdminBase
+	return requestApi<CalendarMutationOk>(`${base}/settings/payment`, {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(input),
+		parse: (payload) => CalendarMutationOkSchema.parse(payload)
+	})
+}
+
+export async function getCalendarAdminEventTemplates() {
+	const base = getCalendarUiConfig().routes.apiCalendarAdminBase
+	return requestApi<CalendarEventTemplatesResponse>(`${base}/events/templates`, {
+		parse: (payload) => CalendarEventTemplatesResponseSchema.parse(payload)
+	})
+}
+
+export async function getCalendarAdminEventDetail(eventId: number) {
+	const base = getCalendarUiConfig().routes.apiCalendarAdminBase
+	return requestApi<CalendarAdminEventDetailResponse>(`${base}/events/${eventId}/detail`, {
+		parse: (payload) => CalendarAdminEventDetailResponseSchema.parse(payload)
+	})
+}
+
+export async function promoteCalendarWaitlistEntry(eventId: number, entryId: number) {
+	const base = getCalendarUiConfig().routes.apiCalendarAdminBase
+	return requestApi<CalendarPromoteResponse>(`${base}/events/${eventId}/waitlist/${entryId}/promote`, {
+		method: 'POST',
+		parse: (payload) => CalendarPromoteResponseSchema.parse(payload)
 	})
 }
 

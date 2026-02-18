@@ -9,11 +9,16 @@ import {
 	getCalendarReconnectUrl,
 	loadAdminEventsData,
 	loadAdminPrograms,
+	loadAdminPaymentDefaults,
+	loadAdminEventTemplates,
+	loadAdminEventDetail,
 	loadDashboardBookings,
 	loadDashboardStatus,
+	promoteWaitlistEntry,
 	processDashboardSyncQueue,
 	purgeDashboardSyncDeadLetters,
 	retryDashboardSyncDeadLetters,
+	saveAdminPaymentDefaults,
 	saveDashboardProgram,
 	saveDashboardRules,
 	updateAdminEventCapacityValue,
@@ -56,6 +61,10 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		hasDeadLetterAlert: false
 	})
 	let bookings = $state<unknown[]>([])
+	let paymentDefaults = $state({
+		provider: '',
+		handle: ''
+	})
 	let stats = $state(DEFAULT_ADMIN_STATS)
 	let loading = $state(true)
 	let error = $state('')
@@ -159,6 +168,31 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		location: '',
 		note: ''
 	})
+	let eventTemplates = $state<Array<{
+		id: number
+		title: string
+		activitySlug: string
+		capacity: number
+		costCents: number
+		currency: string
+		paymentProvider: string | null
+		paymentHandle: string | null
+		paymentNoteTemplate: string | null
+		location: string | null
+		note: string | null
+	}>>([])
+	let selectedEventDetail = $state<{
+		event: {
+			id: number
+			title: string
+			startsAt: string
+			endsAt: string
+			capacity: number
+			waitlistCount: number
+		}
+		attendees: Array<{ entryId: number; userId: string; name: string | null; email: string | null; status: 'joined' | 'waitlist'; waitlistPosition: number | null }>
+		weather: { summary: string; temperatureF: number } | null
+	} | null>(null)
 
 	async function loadStatus() {
 		try {
@@ -177,6 +211,12 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 				hasBacklogAlert: false,
 				hasDeadLetterAlert: false
 			}
+			paymentDefaults = dashboardStatus.paymentDefaults
+				? {
+					provider: dashboardStatus.paymentDefaults.provider ?? '',
+					handle: dashboardStatus.paymentDefaults.handle ?? ''
+				}
+				: paymentDefaults
 			if (dashboardStatus.rules) {
 				hours = { from: dashboardStatus.rules.hoursFrom, to: dashboardStatus.rules.hoursTo }
 				buffer = dashboardStatus.rules.buffer
@@ -186,6 +226,40 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		} catch (err) {
 			if (onUnauthorized?.(err)) return
 			console.error('Failed to load status:', err)
+		}
+	}
+
+	async function loadPaymentDefaults() {
+		try {
+			const result = await loadAdminPaymentDefaults()
+			paymentDefaults = {
+				provider: result.payment.provider ?? '',
+				handle: result.payment.handle ?? ''
+			}
+			if (!eventDraft.paymentProvider && paymentDefaults.provider) {
+				eventDraft = { ...eventDraft, paymentProvider: paymentDefaults.provider }
+			}
+			if (!eventDraft.paymentHandle && paymentDefaults.handle) {
+				eventDraft = { ...eventDraft, paymentHandle: paymentDefaults.handle }
+			}
+		} catch (err) {
+			if (onUnauthorized?.(err)) return
+		}
+	}
+
+	async function savePaymentDefaults() {
+		error = ''
+		try {
+			const result = await saveAdminPaymentDefaults({
+				provider: paymentDefaults.provider.trim() || null,
+				handle: paymentDefaults.handle.trim() || null
+			})
+			if (!result.ok) {
+				error = result.error
+			}
+		} catch (err) {
+			if (onUnauthorized?.(err)) return
+			error = err instanceof Error ? err.message : 'Failed to save payment defaults'
 		}
 	}
 
@@ -416,6 +490,8 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 			events = result.upcoming
 			recentEvents = result.recent
 			error = result.error
+			const templatesResult = await loadAdminEventTemplates()
+			eventTemplates = templatesResult.templates
 		} catch (err) {
 			if (onUnauthorized?.(err)) return
 			error = err instanceof Error ? err.message : 'Failed to load events'
@@ -457,6 +533,60 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 			error = err instanceof Error ? err.message : 'Failed to create events'
 		} finally {
 			eventsCreating = false
+		}
+	}
+
+	function applyTemplate(templateId: number) {
+		const template = eventTemplates.find((item) => item.id === templateId)
+		if (!template) return
+		eventDraft = {
+			...eventDraft,
+			activitySlug: template.activitySlug,
+			title: template.title,
+			capacity: template.capacity,
+			costCents: template.costCents,
+			currency: template.currency || 'USD',
+			paymentProvider: template.paymentProvider ?? paymentDefaults.provider ?? 'venmo',
+			paymentHandle: template.paymentHandle ?? paymentDefaults.handle ?? '',
+			paymentNoteTemplate: template.paymentNoteTemplate ?? '',
+			location: template.location ?? '',
+			note: template.note ?? ''
+		}
+	}
+
+	async function openEventDetail(eventId: number) {
+		error = ''
+		try {
+			const result = await loadAdminEventDetail(eventId)
+			selectedEventDetail = {
+				event: {
+					id: result.event.id,
+					title: result.event.title,
+					startsAt: result.event.startsAt,
+					endsAt: result.event.endsAt,
+					capacity: result.event.capacity,
+					waitlistCount: result.event.waitlistCount
+				},
+				attendees: result.attendees,
+				weather: result.weather
+			}
+		} catch (err) {
+			if (onUnauthorized?.(err)) return
+			error = err instanceof Error ? err.message : 'Failed to load event detail'
+		}
+	}
+
+	function closeEventDetail() {
+		selectedEventDetail = null
+	}
+
+	async function promoteWaitlist(eventId: number, entryId: number) {
+		try {
+			await promoteWaitlistEntry(eventId, entryId)
+			await Promise.all([loadEvents(), openEventDetail(eventId)])
+		} catch (err) {
+			if (onUnauthorized?.(err)) return
+			error = err instanceof Error ? err.message : 'Failed to promote waitlist user'
 		}
 	}
 
@@ -572,6 +702,8 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		get disconnecting() { return disconnecting },
 		get oauth() { return oauth },
 		get syncQueue() { return syncQueue },
+		get paymentDefaults() { return paymentDefaults },
+		set paymentDefaults(value) { paymentDefaults = value },
 		get bookings() { return bookings },
 		get stats() { return stats },
 		get loading() { return loading },
@@ -593,8 +725,11 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		get recentEvents() { return recentEvents },
 		get eventDraft() { return eventDraft },
 		set eventDraft(value) { eventDraft = value },
+		get eventTemplates() { return eventTemplates },
+		get selectedEventDetail() { return selectedEventDetail },
 		loadStatus,
 		loadBookings,
+		loadPaymentDefaults,
 		loadPrograms,
 		loadEvents,
 		save,
@@ -606,8 +741,13 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		saveProgram,
 		deleteProgram,
 		createEvents,
+		applyTemplate,
+		openEventDetail,
+		closeEventDetail,
+		promoteWaitlist,
 		updateEventCapacity,
 		updateEventMemory,
+		savePaymentDefaults,
 		processSyncQueue,
 		retryDeadLetters,
 		purgeDeadLetters

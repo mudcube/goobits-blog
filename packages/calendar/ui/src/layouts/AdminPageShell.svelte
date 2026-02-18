@@ -4,11 +4,11 @@
 	import { handleUnauthorizedSessionError } from '../routing/auth'
 	import { getCalendarUiConfig } from '../config'
 	import { formatAdminDate, getAdminTabHref, isAdminTabId } from '../features/admin/admin'
-	import { createAdminDashboardController } from '../features/sync-queue/admin/admin-dashboard-controller.svelte'
+	import { createAdminDashboardController } from '../features/dashboard/admin/admin-dashboard-controller.svelte'
 	import { createAdminMembersController } from '../features/members/admin/admin-members.svelte'
 	import AdminLoginCard from '../features/auth/admin/AdminLoginCard.svelte'
 	import AdminSidebar from './AdminSidebar.svelte'
-	import AdminDashboardPanel from '../features/sync-queue/admin/AdminDashboardPanel.svelte'
+	import AdminDashboardPanel from '../features/dashboard/admin/AdminDashboardPanel.svelte'
 	import AdminCalendarPanel from '../features/availability/admin/AdminCalendarPanel.svelte'
 	import AdminProgramsPanel from '../features/programs/admin/AdminProgramsPanel.svelte'
 	import AdminEventsPanel from '../features/events/admin/AdminEventsPanel.svelte'
@@ -16,10 +16,10 @@
 	import AdminIntegrationsPanel from '../features/integrations/google/admin/AdminIntegrationsPanel.svelte'
 	import AdminToast from './AdminToast.svelte'
 
-	let { data, form, initialTab = 'dash' } = $props()
+	let { data, form, initialTab = 'dashboard' } = $props()
 	const calendarConfig = getCalendarUiConfig()
 
-	let tab = $state('dash')
+	let tab = $state('dashboard')
 	let authed = $derived(!!data.user)
 
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
@@ -36,8 +36,8 @@
 	$effect(() => {
 		if (isAdminTabId(initialTab) && tab !== initialTab) {
 			tab = initialTab
-		} else if (!isAdminTabId(initialTab) && tab !== 'dash') {
-			tab = 'dash'
+		} else if (!isAdminTabId(initialTab) && tab !== 'dashboard') {
+			tab = 'dashboard'
 		}
 	})
 
@@ -45,11 +45,12 @@
 		if (authed) {
 			dashboard.loadStatus()
 			dashboard.loadBookings()
+			dashboard.loadPaymentDefaults()
 		}
 	})
 
 	$effect(() => {
-		if (tab === 'calendar-auth') {
+		if (tab === 'people') {
 			members.load()
 		}
 	})
@@ -79,15 +80,15 @@
 		<AdminSidebar {tab} onSelect={setTab} />
 
 		<main class="admin-page__main">
-			{#if tab === 'dash'}
+			{#if tab === 'dashboard'}
 				<AdminDashboardPanel {dashboard} />
 			{/if}
 
-			{#if tab === 'cal'}
+			{#if tab === 'rules'}
 				<AdminCalendarPanel {dashboard} />
 			{/if}
 
-			{#if tab === 'calendar-auth'}
+			{#if tab === 'people'}
 				<AdminMembersPanel {members} formatDate={formatAdminDate} />
 			{/if}
 
@@ -99,7 +100,7 @@
 				<AdminEventsPanel {dashboard} />
 			{/if}
 
-			{#if tab === 'integrations'}
+			{#if tab === 'connections'}
 				<AdminIntegrationsPanel {dashboard} />
 			{/if}
 		</main>

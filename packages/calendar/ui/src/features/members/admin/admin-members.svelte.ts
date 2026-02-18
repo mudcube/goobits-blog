@@ -5,7 +5,8 @@ import {
 	cleanupDevE2EData,
 	deleteMemberInvite,
 	loadMembersData
-} from '../../sync-queue/admin/admin-dashboard'
+} from '../../dashboard/admin/admin-dashboard'
+import { getCalendarAdminUserAccess, saveCalendarAdminUserAccess } from '../../../api/calendar'
 
 export function createAdminMembersController(
 	options: { onUnauthorized?: (error: unknown) => boolean } = {}
@@ -22,6 +23,10 @@ export function createAdminMembersController(
 	let creating = $state(false)
 	let cleaning = $state(false)
 	let notice = $state('')
+	let selectedUserId = $state<string | null>(null)
+	let accessRows = $state<Array<{ programSlug: string; allowed: boolean }>>([])
+	let accessLoading = $state(false)
+	let accessSaving = $state(false)
 
 	async function load() {
 		loading = true
@@ -108,6 +113,48 @@ export function createAdminMembersController(
 		}
 	}
 
+	async function openAccess(userId: string) {
+		selectedUserId = userId
+		accessLoading = true
+		error = ''
+		try {
+			const result = await getCalendarAdminUserAccess(userId)
+			accessRows = result.access.map((row) => ({ ...row }))
+		} catch (err) {
+			if (onUnauthorized?.(err)) return
+			error = err instanceof Error ? err.message : 'Failed to load access rules'
+		} finally {
+			accessLoading = false
+		}
+	}
+
+	function closeAccess() {
+		selectedUserId = null
+		accessRows = []
+	}
+
+	function toggleAccess(programSlug: string) {
+		accessRows = accessRows.map((row) =>
+			row.programSlug === programSlug ? { ...row, allowed: !row.allowed } : row
+		)
+	}
+
+	async function saveAccess() {
+		if (!selectedUserId) return
+		accessSaving = true
+		error = ''
+		try {
+			await saveCalendarAdminUserAccess(selectedUserId, accessRows)
+			notice = 'Updated member access.'
+			closeAccess()
+		} catch (err) {
+			if (onUnauthorized?.(err)) return
+			error = err instanceof Error ? err.message : 'Failed to save access rules'
+		} finally {
+			accessSaving = false
+		}
+	}
+
 	return {
 		get invites() { return invites },
 		get users() { return users },
@@ -122,10 +169,18 @@ export function createAdminMembersController(
 		set inviteExpires(value) { inviteExpires = value },
 		get creating() { return creating },
 		get cleaning() { return cleaning },
+		get selectedUserId() { return selectedUserId },
+		get accessRows() { return accessRows },
+		get accessLoading() { return accessLoading },
+		get accessSaving() { return accessSaving },
 		load,
 		createInvite,
 		deleteInvite,
 		copyInvite,
-		cleanupE2E
+		cleanupE2E,
+		openAccess,
+		closeAccess,
+		toggleAccess,
+		saveAccess
 	}
 }

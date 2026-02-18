@@ -3,6 +3,7 @@
 	import PillButton from '../../../primitives/PillButton.svelte'
 	const { members, formatDate } = $props()
 	const isDev = import.meta.env.DEV
+	let search = $state('')
 
 	function initialsFor(user) {
 		const source = (user?.name || user?.email || '').trim()
@@ -113,6 +114,20 @@
 
 <div class="admin-page__section">
 	<div class="admin-page__section-head">
+		<h3 class="admin-page__section-title">Search</h3>
+	</div>
+	<input
+		class="admin-page__input"
+		type="search"
+		placeholder="Search friends..."
+		bind:value={search}
+	/>
+</div>
+
+<div class="admin-page__divider" aria-hidden="true"></div>
+
+<div class="admin-page__section">
+	<div class="admin-page__section-head">
 		<h3 class="admin-page__section-title">Users</h3>
 		<span class="admin-page__section-count">{members.users.length} total</span>
 		{#if isDev}
@@ -138,18 +153,37 @@
 		<p class="admin-page__section-description">No users have signed up yet.</p>
 	{:else}
 		<div class="admin-page__members-list">
-			{#each members.users as user, i}
+			{#each members.users.filter((user) => {
+				const needle = search.trim().toLowerCase()
+				if (!needle) return true
+				return (
+					(user.name || '').toLowerCase().includes(needle) ||
+					(user.email || '').toLowerCase().includes(needle)
+				)
+			}) as user, i}
 				<div class="admin-page__members-row">
-					<div class="admin-page__members-user">
-						{#if user.avatar_url}
-							<img src={user.avatar_url} alt="" class="admin-page__members-avatar" />
-						{:else}
-							<span class="admin-page__members-avatar-fallback" aria-hidden="true">{initialsFor(user)}</span>
-						{/if}
-						<span class="admin-page__members-user-name">{user.name || user.email}</span>
+					<div class="admin-page__members-main">
+						<div class="admin-page__members-user">
+							{#if user.avatar_url}
+								<img src={user.avatar_url} alt="" class="admin-page__members-avatar" />
+							{:else}
+								<span class="admin-page__members-avatar-fallback" aria-hidden="true">{initialsFor(user)}</span>
+							{/if}
+							<span class="admin-page__members-user-name">{user.name || user.email}</span>
+						</div>
+						<div class="admin-page__members-meta">
+							{user.provider || 'member'} · last login {formatDate(user.last_login_at)}
+						</div>
 					</div>
-					<div class="admin-page__members-meta">
-						{user.provider || 'member'} · last login {formatDate(user.last_login_at)}
+					<div class="admin-page__members-actions">
+						<PillButton
+							className="admin-page__button-secondary admin-page__button-secondary--compact"
+							variant="secondary"
+							size="sm"
+							onClick={() => members.openAccess(String(user.id))}
+						>
+							Edit Access
+						</PillButton>
 					</div>
 				</div>
 				{#if i < members.users.length - 1}<div class="admin-page__booking-divider"></div>{/if}
@@ -157,3 +191,50 @@
 		</div>
 	{/if}
 </div>
+
+{#if members.selectedUserId}
+	<div class="admin-page__divider" aria-hidden="true"></div>
+	<div class="admin-page__section">
+		<div class="admin-page__section-head">
+			<h3 class="admin-page__section-title">Program Access</h3>
+		</div>
+		{#if members.accessLoading}
+			<p class="admin-page__section-description">Loading access...</p>
+		{:else}
+			<div class="admin-page__members-list">
+				{#each members.accessRows as row, i}
+					<div class="admin-page__members-row">
+						<div class="admin-page__members-main">
+							<div class="admin-page__members-user-name">{row.programSlug}</div>
+							<div class="admin-page__members-meta">{row.allowed ? 'Can book' : 'Blocked'}</div>
+						</div>
+						<div class="admin-page__members-actions">
+							<PillButton
+								className="admin-page__button-secondary admin-page__button-secondary--compact"
+								variant="secondary"
+								size="sm"
+								onClick={() => members.toggleAccess(row.programSlug)}
+							>
+								{row.allowed ? 'Disable' : 'Enable'}
+							</PillButton>
+						</div>
+					</div>
+					{#if i < members.accessRows.length - 1}<div class="admin-page__booking-divider"></div>{/if}
+				{/each}
+			</div>
+			<div class="admin-page__button-row">
+				<PillButton className="admin-page__button-secondary" variant="secondary" onClick={members.closeAccess}>
+					Cancel
+				</PillButton>
+				<PillButton className="admin-page__button-secondary" variant="secondary" onClick={members.saveAccess} disabled={members.accessSaving}>
+					{#if members.accessSaving}
+						<Loader size={12} class="admin-page__spin" />
+						Saving...
+					{:else}
+						Save Access
+					{/if}
+				</PillButton>
+			</div>
+		{/if}
+	</div>
+{/if}

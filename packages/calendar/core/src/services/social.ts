@@ -1,5 +1,6 @@
 import type { D1DatabaseLike } from '../storage/d1.ts'
 import type { CalendarProgramSlug } from '../social/programs.ts'
+import { hasUserProgramAccess } from '../access/user-program-access.ts'
 
 type EventRow = {
 	id: number
@@ -108,10 +109,30 @@ async function listEventsByRange(
 		 FROM calendar_events e
 		 LEFT JOIN calendar_programs p ON p.slug = e.activity_slug
 		 WHERE ${input.whereSql}
+		   AND (
+		   	NOT EXISTS (
+		   		SELECT 1
+		   		FROM calendar_user_program_access access_any
+		   		WHERE access_any.user_id = ?
+		   	)
+		   	OR EXISTS (
+		   		SELECT 1
+		   		FROM calendar_user_program_access access_match
+		   		WHERE access_match.user_id = ?
+		   		  AND access_match.program_slug = e.activity_slug
+		   		  AND access_match.allowed = 1
+		   	)
+		   )
 		   ${whereMine}
 		 ORDER BY datetime(e.starts_at) ASC
 		 LIMIT ?`
-	).bind(...(input.bindValues ?? []), ...(onlyMine ? [userId] : []), input.limit ?? 60).all<EventRow>()
+	).bind(
+		...(input.bindValues ?? []),
+		userId,
+		userId,
+		...(onlyMine ? [userId] : []),
+		input.limit ?? 60
+	).all<EventRow>()
 
 	const rows = eventResult?.results ?? []
 	if (rows.length === 0) return []
@@ -264,8 +285,8 @@ async function getParticipant(db: D1DatabaseLike, eventId: number, userId: strin
 
 async function getEventCapacity(db: D1DatabaseLike, eventId: number) {
 	const event = await db.prepare(
-		`SELECT id, capacity FROM calendar_events WHERE id = ? AND status = 'scheduled' LIMIT 1`
-	).bind(eventId).first<{ id: number; capacity: number }>()
+		`SELECT id, activity_slug, capacity FROM calendar_events WHERE id = ? AND status = 'scheduled' LIMIT 1`
+	).bind(eventId).first<{ id: number; activity_slug: string; capacity: number }>()
 	return event ?? null
 }
 
@@ -307,6 +328,8 @@ export async function joinEvent(
 ) {
 	const event = await getEventCapacity(db, input.eventId)
 	if (!event) return { ok: false as const, code: 'not_found', message: 'Event not found' }
+	const hasAccess = await hasUserProgramAccess(db, input.userId, event.activity_slug)
+	if (!hasAccess) return { ok: false as const, code: 'forbidden', message: 'Access denied for this program' }
 
 	const guestCount = Math.max(0, Math.min(8, input.guestCount))
 	await db.prepare(

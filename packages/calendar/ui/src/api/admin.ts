@@ -82,6 +82,10 @@ const AdminStatusResponseSchema = z.object({
 		buffer: z.number(),
 		notice: z.number(),
 		capacity: z.number()
+	}),
+	paymentDefaults: z.object({
+		provider: z.union([z.string(), z.null()]),
+		handle: z.union([z.string(), z.null()])
 	})
 })
 

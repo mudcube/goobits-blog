@@ -95,18 +95,37 @@ import {
 	hasUserRedeemedAnyInvite
 } from './calendar/invites.ts'
 import {
+	listUserProgramAccess,
+	setUserProgramAccess,
+	hasUserProgramAccess,
+	type CalendarUserProgramAccess
+} from './access/user-program-access.ts'
+import {
+	getAdminPaymentDefaults,
+	setAdminPaymentDefaults,
+	type AdminPaymentDefaults
+} from './payments/admin-payment-defaults.ts'
+import { listEventTemplates, type CalendarEventTemplate } from './events/event-templates.ts'
+import { promoteWaitlistedParticipant, type PromoteWaitlistResult } from './events/promote-waitlist.ts'
+import { getAdminEventDetail, type AdminEventDetail } from './events/event-detail.ts'
+import { fetchWeatherForEvent, type WeatherSnapshot } from './weather/weather-provider.ts'
+import {
 	parseAdminRulesInput,
 	parseAdminProgramMutationInput,
 	parseAdminCreateEventsBatchInput,
 	parseAdminEventUpdateInput,
 	parseAdminSyncQueueActionInput,
 	parseSyncQueueProcessLimitInput,
+	parseAdminUserProgramAccessInput,
+	parseAdminPaymentDefaultsInput,
 	type AdminRulesInput,
 	type AdminProgramUpsertInput,
 	type AdminProgramMutationInput,
 	type AdminCreateEventsBatchInput,
 	type AdminEventUpdateInput,
-	type AdminSyncQueueActionInput
+	type AdminSyncQueueActionInput,
+	type AdminUserProgramAccessInput,
+	type AdminPaymentDefaultsInput
 } from './transport/admin.ts'
 import {
 	parseCalendarJoinEventInput,
@@ -189,12 +208,23 @@ export {
 	listInvites,
 	deleteInvite,
 	hasUserRedeemedAnyInvite,
+	listUserProgramAccess,
+	setUserProgramAccess,
+	hasUserProgramAccess,
+	getAdminPaymentDefaults,
+	setAdminPaymentDefaults,
+	listEventTemplates,
+	promoteWaitlistedParticipant,
+	getAdminEventDetail,
+	fetchWeatherForEvent,
 	parseAdminRulesInput,
 	parseAdminProgramMutationInput,
 	parseAdminCreateEventsBatchInput,
 	parseAdminEventUpdateInput,
 	parseAdminSyncQueueActionInput,
 	parseSyncQueueProcessLimitInput,
+	parseAdminUserProgramAccessInput,
+	parseAdminPaymentDefaultsInput,
 	parseCalendarJoinEventInput,
 	parseCalendarProfileInput,
 	parseCalendarInviteCreateInput,
@@ -228,8 +258,16 @@ export type {
 	AdminCreateEventsBatchInput,
 	AdminEventUpdateInput,
 	AdminSyncQueueActionInput,
+	AdminUserProgramAccessInput,
+	AdminPaymentDefaultsInput,
 	CalendarJoinEventInput,
 	CalendarProfileInput,
 	CalendarInviteCreateInput,
-	CalendarSessionBootstrapInput
+	CalendarSessionBootstrapInput,
+	CalendarUserProgramAccess,
+	AdminPaymentDefaults,
+	CalendarEventTemplate,
+	PromoteWaitlistResult,
+	AdminEventDetail,
+	WeatherSnapshot
 }

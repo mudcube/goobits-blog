@@ -60,6 +60,15 @@ export type AdminSyncQueueActionInput = {
 	limit: number
 }
 
+export type AdminUserProgramAccessInput = {
+	access: Array<{ programSlug: string; allowed: boolean }>
+}
+
+export type AdminPaymentDefaultsInput = {
+	provider: string | null
+	handle: string | null
+}
+
 export function parseAdminRulesInput(input: unknown): AdminRulesInput {
 	const body = asJsonObject(input)
 	const hoursFrom = readRequiredString(body, 'hoursFrom', { trim: true, maxLength: 5 })
@@ -179,4 +188,31 @@ export function parseAdminSyncQueueActionInput(input: unknown): AdminSyncQueueAc
 export function parseSyncQueueProcessLimitInput(input: unknown) {
 	const body = input == null ? {} : asJsonObject(input)
 	return readIntInRange(body, 'limit', { min: 1, max: 50, defaultValue: 10 })
+}
+
+export function parseAdminUserProgramAccessInput(input: unknown): AdminUserProgramAccessInput {
+	const body = asJsonObject(input)
+	const raw = body['access']
+	if (!Array.isArray(raw)) throw new TransportValidationError('Invalid access payload')
+
+	const access = raw.map((entry) => {
+		const row = asJsonObject(entry)
+		const programSlug = readRequiredString(row, 'programSlug', { trim: true, maxLength: 64 })
+		if (!isValidProgramSlug(programSlug)) {
+			throw new TransportValidationError('Invalid program slug')
+		}
+		return {
+			programSlug,
+			allowed: readBoolean(row, 'allowed')
+		}
+	})
+	return { access }
+}
+
+export function parseAdminPaymentDefaultsInput(input: unknown): AdminPaymentDefaultsInput {
+	const body = asJsonObject(input)
+	return {
+		provider: readOptionalString(body, 'provider', { maxLength: 32 })?.toLowerCase() ?? null,
+		handle: readOptionalString(body, 'handle', { maxLength: 80 }) ?? null
+	}
 }

@@ -56,3 +56,42 @@
 		</ul>
 	{/if}
 </div>
+
+<div class="admin-page__divider" aria-hidden="true"></div>
+
+<div class="admin-page__section">
+	<div class="admin-page__section-head">
+		<h3 class="admin-page__section-title">Payment defaults</h3>
+		<span class="admin-page__status-badge admin-page__status-badge--connected">Active</span>
+	</div>
+	<p class="admin-page__section-description">Global default payment handle. Events can override this.</p>
+	<div class="admin-page__fields-grid">
+		<div class="admin-page__fields-row admin-page__fields-row--invite">
+			<div class="admin-page__field">
+				<label class="admin-page__field-label" for="payment-provider">Provider</label>
+				<input
+					id="payment-provider"
+					class="admin-page__input"
+					type="text"
+					bind:value={dashboard.paymentDefaults.provider}
+					placeholder="venmo"
+				/>
+			</div>
+			<div class="admin-page__field admin-page__field--email">
+				<label class="admin-page__field-label" for="payment-handle">Handle</label>
+				<input
+					id="payment-handle"
+					class="admin-page__input"
+					type="text"
+					bind:value={dashboard.paymentDefaults.handle}
+					placeholder="@mudcube"
+				/>
+			</div>
+		</div>
+	</div>
+	<div class="admin-page__button-row">
+		<PillButton className="admin-page__button-secondary" variant="secondary" onClick={dashboard.savePaymentDefaults}>
+			Save
+		</PillButton>
+	</div>
+</div>

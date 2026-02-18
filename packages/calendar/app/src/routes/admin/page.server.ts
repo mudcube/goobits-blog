@@ -19,7 +19,7 @@ export const load = async (event: RequestEvent) => {
 	if (locals.user) {
 		redirect(302, `${adminBase}/overview`)
 	}
-	return { user: locals.user ?? null, initialTab: 'dash' }
+	return { user: locals.user ?? null, initialTab: 'dashboard' }
 }
 
 export const actions: Actions = {
