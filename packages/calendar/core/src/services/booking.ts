@@ -1,6 +1,7 @@
 import { normalizeIdempotencyKey } from '../security/idempotency.ts'
 import type { BookingRow } from '../storage/d1.ts'
 import type { GoogleCalendarEventInput } from '../providers/google/events.ts'
+import { getCalendarConfig } from '../config/calendar.ts'
 
 type ExistingBooking = BookingRow | null
 type BookingLike = {
@@ -37,6 +38,7 @@ export function buildEvent({
 	calendarName?: string
 	location?: string
 }): GoogleCalendarEventInput {
+	const configuredCalendarName = getCalendarConfig().brand.calendarName
 	const attendees = new Set<string>()
 	if (Array.isArray(booking.attendeeEmails)) {
 		for (const email of booking.attendeeEmails) {
@@ -52,10 +54,10 @@ export function buildEvent({
 	}
 
 	const event: GoogleCalendarEventInput = {
-		summary: `Rainbow Gym — ${booking.name}`,
+		summary: `${configuredCalendarName} — ${booking.name}`,
 		start: { dateTime: booking.start, timeZone: booking.timezone },
 		end: { dateTime: booking.end, timeZone: booking.timezone },
-		location: location ?? calendarName ?? 'Rainbow Gym',
+		location: location ?? calendarName ?? configuredCalendarName,
 		guestsCanSeeOtherGuests: true,
 		transparency: 'opaque'
 	}

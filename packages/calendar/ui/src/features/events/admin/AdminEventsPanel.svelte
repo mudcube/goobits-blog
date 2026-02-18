@@ -1,5 +1,5 @@
 <script>
-	import { PillButton } from '@miko/ui'
+	import PillButton from '../../../primitives/PillButton.svelte'
 	const { dashboard } = $props()
 	let memoryDrafts = $state({})
 

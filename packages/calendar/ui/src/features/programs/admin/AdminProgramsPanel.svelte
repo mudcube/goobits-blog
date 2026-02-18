@@ -1,6 +1,8 @@
 <script>
-	import { PillButton } from '@miko/ui'
+	import PillButton from '../../../primitives/PillButton.svelte'
+	import { getCalendarUiConfig } from '../../../config'
 	const { dashboard } = $props()
+	const calendarConfig = getCalendarUiConfig()
 </script>
 
 <h1 class="admin-page__title">Programs</h1>
@@ -30,7 +32,7 @@
 					<div class="admin-page__members-main">
 						<div class="admin-page__members-code-row">
 							<strong>{program.label}</strong>
-							<span class="admin-page__members-meta"> · /calendar/{program.slug}</span>
+							<span class="admin-page__members-meta"> · {calendarConfig.routes.calendarBase}/{program.slug}</span>
 						</div>
 						<div class="admin-page__members-meta">
 							{program.description}

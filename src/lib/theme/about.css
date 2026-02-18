@@ -1,3 +1,14 @@
+.about-page__hero-title {
+	/* Keep title stable on one line during first paint/hydration */
+	white-space: nowrap !important;
+	text-wrap: nowrap !important;
+}
+
+.about-page__hero-title .ui-hero__title-text,
+.about-page__hero-title .ui-hero__tail {
+	white-space: nowrap !important;
+}
+
 .about-page__intro {
 	padding-top: var(--space-10);
 	display: grid;
@@ -172,4 +183,3 @@
 		grid-template-columns: 1fr;
 	}
 }
-

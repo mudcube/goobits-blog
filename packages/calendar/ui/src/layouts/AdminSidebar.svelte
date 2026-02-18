@@ -1,8 +1,7 @@
 <script>
 	import { Clock, Calendar, CalendarClock, LayoutGrid, Users, Link2 } from '@lucide/svelte'
 	import { ADMIN_NAV, getAdminTabHref } from '../features/admin/admin'
-	import { PillButton } from '@miko/ui'
-
+	import PillButton from '../primitives/PillButton.svelte'
 	const { tab, onSelect } = $props()
 </script>
 

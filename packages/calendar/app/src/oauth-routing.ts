@@ -1,10 +1,12 @@
 import type { Cookies } from '@sveltejs/kit'
+import { getCalendarConfig } from '@calendar/core'
 
 const AUTH_RESERVED = new Set(['auth', 'signout', 'logout', 'magic-link', 'passkey', 'sessions'])
 
 export function resolveRequestedProvider(pathname: string) {
+	const authBaseSegment = getCalendarConfig().routes.authBase.replace(/^\/+|\/+$/g, '')
 	const parts = pathname.split('/').filter(Boolean)
-	if (parts[0] !== 'auth') return null
+	if (parts[0] !== authBaseSegment) return null
 	if (parts.length === 2) {
 		const provider = parts[1]
 		if (!provider || AUTH_RESERVED.has(provider)) return null
@@ -14,8 +16,9 @@ export function resolveRequestedProvider(pathname: string) {
 }
 
 export function resolveCallbackProvider(pathname: string) {
+	const authBaseSegment = getCalendarConfig().routes.authBase.replace(/^\/+|\/+$/g, '')
 	const parts = pathname.split('/').filter(Boolean)
-	if (parts[0] !== 'auth') return null
+	if (parts[0] !== authBaseSegment) return null
 	if (parts.length === 3 && parts[2] === 'callback') {
 		const provider = parts[1]
 		if (!provider || AUTH_RESERVED.has(provider)) return null
@@ -60,9 +63,10 @@ export function shouldWrapAsOauthFailure(error: unknown) {
 }
 
 export function buildCalendarLoginErrorPath(errorCode: string) {
+	const calendarLoginPath = getCalendarConfig().routes.calendarLoginPath
 	const params = new URLSearchParams()
 	params.set('error', errorCode)
-	return `/calendar/login?${params.toString()}`
+	return `${calendarLoginPath}?${params.toString()}`
 }
 
 export function getRedirectLocationFromError(error: unknown) {

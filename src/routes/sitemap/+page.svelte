@@ -1,15 +1,5 @@
 <script>
-	import {
-		BookOpen,
-		ChevronDown,
-		ChevronRight,
-		Cpu,
-		Filter,
-		FileText,
-		House,
-		Shield,
-		Wrench
-	} from '@lucide/svelte'
+	import { Filter } from '@lucide/svelte'
 	import {
 		FilterChipGroup,
 		FilterableCollection,
@@ -72,15 +62,6 @@
 		const idx = hashString(category || '') % accentColors.length
 		return accentColors[idx]
 	}
-	const categoryIcons = {
-		'Main Pages': House,
-		'Journal Pages': BookOpen,
-		'Journal Posts': FileText,
-		'Admin Pages': Shield,
-		'API Routes': Cpu,
-		'Utility Pages': Wrench
-	}
-
 	function toggleCategory(category) {
 		collapsedCategories[category] = !collapsedCategories[category]
 	}
@@ -98,7 +79,9 @@
 	<div class="sitemap-page__inner">
 		<Hero
 			eyebrow="Sitemap"
-			title="Sitemap 🧭"
+			title="Sitemap"
+			icon="/media/sitemap-compass.png"
+			iconAlt="Compass icon"
 			subtitle="A friendly map of everything on this site."
 		/>
 
@@ -148,7 +131,6 @@
 
 				{#each categoryOrder as category}
 					{#if filteredGrouped[category]}
-						{@const CategoryIcon = categoryIcons[category] || FileText}
 						<SitemapCategory
 							category={category}
 							count={filteredGrouped[category].length}
@@ -158,9 +140,6 @@
 							routes={filteredGrouped[category]}
 							getRouteTags={getRouteTags}
 							formatDate={formatDateMmDdYyyy}
-							icon={CategoryIcon}
-							ChevronDownIcon={ChevronDown}
-							ChevronRightIcon={ChevronRight}
 						/>
 					{/if}
 				{/each}

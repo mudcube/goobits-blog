@@ -1,11 +1,10 @@
-import { CALENDAR_ACTIVITY_LIST, type CalendarActivityConfig } from './activities.ts'
+import { getCalendarActivityList, type CalendarActivityConfig } from './activities.ts'
 
 export type CalendarProgramSlug = CalendarActivityConfig['slug']
 
-const KNOWN_PROGRAM_SLUGS = new Set<CalendarProgramSlug>(CALENDAR_ACTIVITY_LIST.map((activity) => activity.slug))
-
 export function isKnownProgramSlug(value: string): value is CalendarProgramSlug {
-	return KNOWN_PROGRAM_SLUGS.has(value as CalendarProgramSlug)
+	const knownProgramSlugs = new Set<CalendarProgramSlug>(getCalendarActivityList().map((activity) => activity.slug))
+	return knownProgramSlugs.has(value as CalendarProgramSlug)
 }
 
 export function isValidProgramSlug(slug: string) {

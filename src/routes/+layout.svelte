@@ -7,14 +7,16 @@
 	import { browser } from '$app/environment'
 	import { onMount } from 'svelte'
 	import { Topbar, FooterNav } from '@miko/ui'
+	import { getCalendarConfig } from '@calendar/core'
 	import { footerElsewhereItems, footerLegalItems, footerPrimaryItems, headerNavItems } from '$lib/layout/nav'
 	import { enableLayoutShiftDebug } from '$lib/client/debug/layoutShift'
 
 	const { data, children } = $props()
+	const calendarConfig = getCalendarConfig()
 
 	const isCalendarRoute = $derived(
-		$page.url.pathname.startsWith('/calendar') ||
-			$page.url.pathname.startsWith('/admin')
+		$page.url.pathname.startsWith(calendarConfig.routes.calendarBase) ||
+			$page.url.pathname.startsWith(calendarConfig.routes.adminBase)
 	)
 
 	onMount(() => {

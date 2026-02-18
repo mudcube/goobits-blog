@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '../routing/auth'
+	import { getCalendarUiConfig } from '../config'
 	import { formatAdminDate, getAdminTabHref, isAdminTabId } from '../features/admin/admin'
 	import { createAdminDashboardController } from '../features/sync-queue/admin/admin-dashboard-controller.svelte'
 	import { createAdminMembersController } from '../features/members/admin/admin-members.svelte'
@@ -16,6 +17,7 @@
 	import AdminToast from './AdminToast.svelte'
 
 	let { data, form, initialTab = 'dash' } = $props()
+	const calendarConfig = getCalendarUiConfig()
 
 	let tab = $state('dash')
 	let authed = $derived(!!data.user)
@@ -67,7 +69,7 @@
 </script>
 
 <svelte:head>
-	<title>Admin | Rainbow Gym | MIKO.ART</title>
+	<title>Admin | {calendarConfig.brand.calendarName} | {calendarConfig.brand.siteName}</title>
 </svelte:head>
 
 {#if !authed}

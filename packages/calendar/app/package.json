@@ -9,6 +9,7 @@
     "svelte": "^5.0.0"
   },
   "dependencies": {
+    "@calendar/core": "workspace:*",
     "@calendar/kit": "workspace:*"
   }
 }

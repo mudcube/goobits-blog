@@ -68,7 +68,7 @@
 	<div class="art-page__inner">
 		<Hero
 			eyebrow="Art"
-			title="Product design, playful merch, and weirdly fun ideas"
+			titleLines={['Product design, playful merch,', 'and weirdly fun ideas']}
 			icon="/media/art-rainbow-imagination.png"
 			iconAlt="Art rainbow icon"
 			subtitle="A working gallery of t-shirt concepts, Portland Ketchup experiments, packaging directions, and other product-ready visuals."

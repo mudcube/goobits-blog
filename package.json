@@ -92,6 +92,7 @@
     "@calendar/kit": "workspace:*",
     "@calendar/migrations": "workspace:*",
     "@calendar/preset-miko": "workspace:*",
+    "@calendar/theme": "workspace:*",
     "@calendar/ui": "workspace:*",
     "@goobits/auth": "workspace:*",
     "@goobits/themes": "^1.3.2",

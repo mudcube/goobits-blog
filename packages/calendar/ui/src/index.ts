@@ -1,16 +1,41 @@
-export { default as CalendarShellLayout } from './layouts/CalendarShellLayout.svelte'
-export { default as AdminShellLayout } from './layouts/AdminShellLayout.svelte'
-export { default as AdminSidebar } from './layouts/AdminSidebar.svelte'
-export { default as AdminPageShell } from './layouts/AdminPageShell.svelte'
+import CalendarShellLayout from './layouts/CalendarShellLayout.svelte'
+import AdminShellLayout from './layouts/AdminShellLayout.svelte'
+import AdminSidebar from './layouts/AdminSidebar.svelte'
+import AdminPageShell from './layouts/AdminPageShell.svelte'
 
-export { default as CalendarHomePage } from './features/events/member/CalendarHomePage.svelte'
-export { default as ActivityBookingPage } from './features/events/member/ActivityBookingPage.svelte'
-export { default as CalendarProfilePage } from './features/events/member/CalendarProfilePage.svelte'
+import CalendarHomePage from './features/events/member/CalendarHomePage.svelte'
+import ActivityBookingPage from './features/events/member/ActivityBookingPage.svelte'
+import CalendarProfilePage from './features/events/member/CalendarProfilePage.svelte'
 
-export { default as AdminLoginCard } from './features/auth/admin/AdminLoginCard.svelte'
-export { default as AdminCalendarPanel } from './features/availability/admin/AdminCalendarPanel.svelte'
-export { default as AdminDashboardPanel } from './features/sync-queue/admin/AdminDashboardPanel.svelte'
-export { default as AdminProgramsPanel } from './features/programs/admin/AdminProgramsPanel.svelte'
-export { default as AdminEventsPanel } from './features/events/admin/AdminEventsPanel.svelte'
-export { default as AdminMembersPanel } from './features/members/admin/AdminMembersPanel.svelte'
-export { default as AdminIntegrationsPanel } from './features/integrations/google/admin/AdminIntegrationsPanel.svelte'
+import AdminLoginCard from './features/auth/admin/AdminLoginCard.svelte'
+import AdminCalendarPanel from './features/availability/admin/AdminCalendarPanel.svelte'
+import AdminDashboardPanel from './features/sync-queue/admin/AdminDashboardPanel.svelte'
+import AdminProgramsPanel from './features/programs/admin/AdminProgramsPanel.svelte'
+import AdminEventsPanel from './features/events/admin/AdminEventsPanel.svelte'
+import AdminMembersPanel from './features/members/admin/AdminMembersPanel.svelte'
+import AdminIntegrationsPanel from './features/integrations/google/admin/AdminIntegrationsPanel.svelte'
+import PillButton from './primitives/PillButton.svelte'
+import Button from './primitives/Button.svelte'
+import Hero from './primitives/Hero.svelte'
+import ShellNav from './primitives/ShellNav.svelte'
+
+export {
+	CalendarShellLayout,
+	AdminShellLayout,
+	AdminSidebar,
+	AdminPageShell,
+	CalendarHomePage,
+	ActivityBookingPage,
+	CalendarProfilePage,
+	AdminLoginCard,
+	AdminCalendarPanel,
+	AdminDashboardPanel,
+	AdminProgramsPanel,
+	AdminEventsPanel,
+	AdminMembersPanel,
+	AdminIntegrationsPanel,
+	PillButton,
+	Button,
+	Hero,
+	ShellNav
+}

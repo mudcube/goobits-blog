@@ -1,6 +1,7 @@
 import { getAdminMe } from '../../../../api/admin'
 import { startCalendarOAuth } from '../../../../api/calendar'
 import { isCalendarConnectedFromParams, scheduleCalendarConnectedRedirect } from '../../../../routing/calendarState'
+import { getCalendarUiConfig } from '../../../../config'
 import { SvelteURLSearchParams } from 'svelte/reactivity'
 
 function hasAuthenticatedFlag(value: unknown): value is { authenticated?: unknown } {
@@ -14,6 +15,7 @@ function hasAuthUrl(value: unknown): value is { authUrl: string } {
 }
 
 export function createAdminCalendarConnectionController() {
+	const calendarConfig = getCalendarUiConfig()
 	let authUrl = $state('')
 	let error = $state('')
 	let status = $state('')
@@ -38,7 +40,7 @@ export function createAdminCalendarConnectionController() {
 		error = ''
 		try {
 			if (!authed) {
-				throw new Error('Admin session required. Please log in at /admin.')
+				throw new Error(`Admin session required. Please log in at ${calendarConfig.routes.adminBase}.`)
 			}
 			const data = await startCalendarOAuth()
 			if (!hasAuthUrl(data)) {
@@ -58,7 +60,7 @@ export function createAdminCalendarConnectionController() {
 			status = 'Connected! Redirecting you to calendar...'
 			connected = true
 			scheduleCalendarConnectedRedirect(() => {
-				window.location.href = '/calendar'
+				window.location.href = calendarConfig.routes.calendarBase
 			})
 		}
 		checkAuth()

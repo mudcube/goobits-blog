@@ -1,27 +1,20 @@
 import { redirect } from '@sveltejs/kit'
 import type { Handle } from '@sveltejs/kit'
 import { getAdminAuth, getCalendarAuth } from '@calendar/kit'
+import { getCalendarConfig, type CalendarConfigInput } from '@calendar/core'
 
-export type CalendarAppHookConfig = {
-	adminBase?: string
-	apiAdminBase?: string
-	apiCalendarAdminBase?: string
-	calendarBase?: string
-	apiCalendarBase?: string
-	authBase?: string
-	calendarLoginPath?: string
-	calendarLoginRedirectPath?: string
-}
+export type CalendarAppHookConfig = CalendarConfigInput['routes']
 
 export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
-	const adminBase = config.adminBase ?? '/admin'
-	const apiAdminBase = config.apiAdminBase ?? '/api/admin'
-	const apiCalendarAdminBase = config.apiCalendarAdminBase ?? '/api/calendar/admin'
-	const calendarBase = config.calendarBase ?? '/calendar'
-	const apiCalendarBase = config.apiCalendarBase ?? '/api/calendar'
-	const authBase = config.authBase ?? '/auth'
-	const calendarLoginPath = config.calendarLoginPath ?? '/calendar/login'
-	const calendarLoginRedirectPath = config.calendarLoginRedirectPath ?? '/calendar/login/redirect'
+	const routes = { ...getCalendarConfig().routes, ...config }
+	const adminBase = routes.adminBase
+	const apiAdminBase = routes.apiAdminBase
+	const apiCalendarAdminBase = routes.apiCalendarAdminBase
+	const calendarBase = routes.calendarBase
+	const apiCalendarBase = routes.apiCalendarBase
+	const authBase = routes.authBase
+	const calendarLoginPath = routes.calendarLoginPath
+	const calendarLoginRedirectPath = routes.calendarLoginRedirectPath
 
 	const handleAdminAuth: Handle = async ({ event, resolve }) => {
 		const pathname = event.url.pathname

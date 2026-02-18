@@ -3,7 +3,7 @@ import { D1SessionAdapter, D1UserAdapter } from '@goobits/auth/adapters'
 import { GoogleProvider, AppleProvider } from '@goobits/auth/providers'
 import type { OAuthProfile, OAuthTokens, RequestEventLike, User } from '@goobits/auth/types'
 import { dev } from '$app/environment'
-import { hasUserRedeemedAnyInvite, validateInvite, consumeInvite } from '@calendar/core'
+import { consumeInvite, getCalendarConfig, hasUserRedeemedAnyInvite, validateInvite } from '@calendar/core'
 import { redirect } from '@sveltejs/kit'
 import type { Cookies } from '@sveltejs/kit'
 import { getDevDb } from '../dev/devDb'
@@ -12,8 +12,6 @@ import type { D1DatabaseLike } from '../dev/types'
 const INVITE_COOKIE = 'calendar_invite'
 const REDIRECT_COOKIE = 'calendar_redirect'
 const INVITE_TTL_SECONDS = 600
-const SAFE_REDIRECT_PREFIXES = ['/calendar', '/admin']
-const INVITE_BYPASS_DOMAIN = '@miko.art'
 
 type PlatformEnv = {
 	DB?: D1DatabaseLike
@@ -51,13 +49,15 @@ function normalizeRedirectUri(value: string) {
 }
 
 function normalizeRedirect(redirectTo: unknown) {
+	const config = getCalendarConfig()
+	const safeRedirectPrefixes = [config.routes.calendarBase, config.routes.adminBase]
 	if (!redirectTo || typeof redirectTo !== 'string') return null
 	const trimmed = redirectTo.trim()
 	if (!trimmed.startsWith('/')) return null
 	if (trimmed.startsWith('//')) return null
 	if (trimmed.includes('\\')) return null
 	if (/[\r\n]/.test(trimmed)) return null
-	if (!SAFE_REDIRECT_PREFIXES.some(prefix => trimmed.startsWith(prefix))) return null
+	if (!safeRedirectPrefixes.some(prefix => trimmed.startsWith(prefix))) return null
 	return trimmed
 }
 
@@ -73,6 +73,7 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 	} as Record<string, string | undefined>
 	const baseUrl = getBaseUrl({ env, url: event.url })
 	const secureCookies = env['NODE_ENV'] !== 'development'
+	const config = getCalendarConfig()
 
 	const sessionAdapter = new D1SessionAdapter(db, {
 		sessionsTable: 'calendar_sessions',
@@ -147,8 +148,8 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 		},
 		providers,
 		urls: {
-			afterLogin: '/calendar/login/redirect',
-			afterLogout: '/calendar/login'
+			afterLogin: config.routes.calendarLoginRedirectPath,
+			afterLogout: config.routes.calendarLoginPath
 		},
 		profile: 'secure',
 		sessions: {},
@@ -167,18 +168,19 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 				if (user) {
 					const hasRedeemed = await hasUserRedeemedAnyInvite({ db, userId: user.id })
 					const normalizedEmail = (profile.email || '').trim().toLowerCase()
-					const canBypassInvite = normalizedEmail.endsWith(INVITE_BYPASS_DOMAIN)
+					const inviteBypassDomain = config.brand.inviteBypassDomain.trim().toLowerCase()
+					const canBypassInvite = !!inviteBypassDomain && normalizedEmail.endsWith(inviteBypassDomain)
 					if (!hasRedeemed) {
 						if (!canBypassInvite) {
 							if (!invite) {
-								redirect(302, '/calendar/login?error=invite_required')
+								redirect(302, `${config.routes.calendarLoginPath}?error=invite_required`)
 							}
 							const result = await validateInvite({ db, code: invite, email: profile.email })
 							if (!result.valid) {
-								redirect(302, `/calendar/login?error=invite_${result.reason}`)
+								redirect(302, `${config.routes.calendarLoginPath}?error=invite_${result.reason}`)
 							}
 							if (!result.invite || typeof result.invite.id !== 'number') {
-								redirect(302, '/calendar/login?error=invite_invalid')
+								redirect(302, `${config.routes.calendarLoginPath}?error=invite_invalid`)
 							}
 
 							await consumeInvite({ db, inviteId: result.invite.id, userId: user.id })
@@ -191,7 +193,7 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 				}
 
 				if (!user) {
-					redirect(302, '/calendar/login?error=signin_failed')
+					redirect(302, `${config.routes.calendarLoginPath}?error=signin_failed`)
 				}
 				const session = await sessionAdapter.createSession(user.id)
 				sessionAdapter.setSessionCookie(evt.cookies, session)

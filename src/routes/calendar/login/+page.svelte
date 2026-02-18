@@ -2,7 +2,8 @@
 import { page } from '$app/stores'
 import { getProviderErrorMessage, type CalendarProviderName } from '@calendar/ui/auth/ui/providers'
 import { buildProviderLoginHref } from '@calendar/ui/auth/ui/redirects'
-import { PillButton } from '@miko/ui'
+import { PillButton } from '@calendar/ui'
+import { getCalendarConfig } from '@calendar/core'
 import {
 	resolveCalendarLoginTargetActivity,
 	resolveFirstAvailableProvider
@@ -16,11 +17,12 @@ import {
 	}>()
 
 	let loading = $state(false)
+	const calendarConfig = getCalendarConfig()
 	const rawError = $page.url.searchParams.get('error') || ''
 	let error = $state(getProviderErrorMessage(rawError))
 
 	const inviteCode = $page.url.searchParams.get('invite') || ''
-	const redirectTo = $page.url.searchParams.get('redirect') || '/calendar'
+	const redirectTo = $page.url.searchParams.get('redirect') || calendarConfig.routes.calendarBase
 	const verifiedStatus = $page.url.searchParams.get('verified') || ''
 	let inviteInput = $state(inviteCode)
 
@@ -58,7 +60,7 @@ import {
 </script>
 
 <svelte:head>
-	<title>Sign In | Rainbow Gym | MIKO.ART</title>
+	<title>Sign In | {calendarConfig.brand.calendarName} | {calendarConfig.brand.siteName}</title>
 </svelte:head>
 
 <div class="calendar-page calendar-login">
@@ -167,7 +169,7 @@ import {
 
 			{#if !inviteCode}
 				<p class="calendar-page__invite-hint calendar-login__hint">
-					Don't have a code? Invites are shared directly by Miko.
+					Don't have a code? Invites are shared directly by an admin.
 				</p>
 			{/if}
 		</section>

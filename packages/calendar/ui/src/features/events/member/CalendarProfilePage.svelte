@@ -1,13 +1,15 @@
 <script>
 	import { saveCalendarProfile } from '../../../api/calendar'
-	import { PillButton, Hero } from '@miko/ui'
-
+	import { getCalendarUiConfig } from '../../../config'
+	import PillButton from '../../../primitives/PillButton.svelte'
+import Hero from '../../../primitives/Hero.svelte'
 	let { data } = $props()
 	let emergencyContact = $derived(data.profile?.emergencyContact ?? '')
 	let dietaryRestrictions = $derived(data.profile?.dietaryRestrictions ?? '')
 	let chatHandle = $derived(data.profile?.chatHandle ?? '')
 	let saving = $state(false)
 	let status = $state('')
+	const calendarConfig = getCalendarUiConfig()
 
 	async function save() {
 		saving = true
@@ -38,7 +40,7 @@
 </script>
 
 <svelte:head>
-	<title>Profile | Rainbow Gym | MIKO.ART</title>
+	<title>Profile | {calendarConfig.brand.calendarName} | {calendarConfig.brand.siteName}</title>
 </svelte:head>
 
 <div class="calendar-page calendar-home">
@@ -79,7 +81,7 @@
 						className="calendar-page__ghost-button"
 						variant="ghost"
 						size="md"
-						href="/api/calendar/ics"
+						href={`${calendarConfig.routes.apiCalendarBase}/ics`}
 						target="_blank"
 						rel="noopener noreferrer"
 					>

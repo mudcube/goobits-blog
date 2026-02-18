@@ -1,5 +1,5 @@
 <script>
-	import './Calendar.scss'
+	import '@calendar/theme/calendar.scss'
 	import { CalendarShellLayout } from '@calendar/ui'
 
 	const { data, children } = $props()

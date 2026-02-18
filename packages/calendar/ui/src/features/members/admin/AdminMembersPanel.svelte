@@ -1,6 +1,6 @@
 <script>
 	import { Loader } from '@lucide/svelte'
-	import { PillButton } from '@miko/ui'
+	import PillButton from '../../../primitives/PillButton.svelte'
 	const { members, formatDate } = $props()
 	const isDev = import.meta.env.DEV
 

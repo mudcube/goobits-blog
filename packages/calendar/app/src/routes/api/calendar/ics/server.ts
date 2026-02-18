@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { listUpcomingEvents } from '@calendar/core'
+import { getCalendarConfig, listUpcomingEvents } from '@calendar/core'
 import { getCalendarUserId } from '@calendar/kit'
 
 function escapeIcsText(value: string) {
@@ -16,6 +16,7 @@ function toIcsDate(value: string) {
 }
 
 export async function GET(event: RequestEvent) {
+	const calendarConfig = getCalendarConfig()
 	const userId = getCalendarUserId(event)
 	if (!userId) {
 		return new Response('Unauthorized', { status: 401 })
@@ -27,14 +28,14 @@ export async function GET(event: RequestEvent) {
 	const lines = [
 		'BEGIN:VCALENDAR',
 		'VERSION:2.0',
-		'PRODID:-//MIKO.ART//Calendar Social//EN',
+		`PRODID:${calendarConfig.ics.productId}`,
 		'CALSCALE:GREGORIAN'
 	]
 
 	for (const eventItem of events) {
 		if (eventItem.userStatus !== 'joined') continue
 		lines.push('BEGIN:VEVENT')
-		lines.push(`UID:miko-calendar-${eventItem.id}@miko.art`)
+		lines.push(`UID:${calendarConfig.ics.uidPrefix}-${eventItem.id}@${calendarConfig.ics.uidDomain}`)
 		lines.push(`DTSTAMP:${toIcsDate(new Date().toISOString())}`)
 		lines.push(`DTSTART:${toIcsDate(eventItem.startsAt)}`)
 		lines.push(`DTEND:${toIcsDate(eventItem.endsAt)}`)
@@ -47,8 +48,8 @@ export async function GET(event: RequestEvent) {
 
 	return new Response(lines.join('\r\n'), {
 		headers: {
-			'Content-Type': 'text/core; charset=utf-8',
-			'Content-Disposition': 'inline; filename="miko-events.ics"',
+			'Content-Type': 'text/calendar; charset=utf-8',
+			'Content-Disposition': `inline; filename="${calendarConfig.ics.filename}"`,
 			'Cache-Control': 'no-store, max-age=0'
 		}
 	})

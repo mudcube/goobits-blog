@@ -1,6 +1,8 @@
 <script>
-	import { Button } from '@miko/ui'
+	import Button from '../../../primitives/Button.svelte'
+	import { getCalendarUiConfig } from '../../../config'
 	const { form } = $props()
+	const calendarConfig = getCalendarUiConfig()
 </script>
 
 <div class="admin-page__login">
@@ -10,7 +12,7 @@
 		<p class="admin-login__subtitle">Bookings, invites, and calendar management.</p>
 
 		<form class="admin-login__form" method="POST" action="?/login">
-			<input type="hidden" name="email" value="admin@miko.art" />
+			<input type="hidden" name="email" value={calendarConfig.brand.adminEmail} />
 			<div class="admin-login__row">
 				<input
 					class="admin-login__passcode"

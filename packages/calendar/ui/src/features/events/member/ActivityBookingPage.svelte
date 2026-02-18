@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Hero } from '@miko/ui'
+	import Hero from '../../../primitives/Hero.svelte'
 	import BookingCalendar from './BookingCalendar.svelte'
 	import type { CalendarActivityConfig } from '@calendar/core'
 	import type { CalendarEventsResponse } from '../../../api/calendar'

@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { consumeOauthState, exchangeGoogleCode, requireEnv, saveConnection } from '@calendar/core'
+import { consumeOauthState, exchangeGoogleCode, getCalendarConfig, requireEnv, saveConnection } from '@calendar/core'
 
 export async function GET(event: RequestEvent) {
 	try {
@@ -30,7 +30,8 @@ export async function GET(event: RequestEvent) {
 			base64Key: requireEnv(env, 'TOKEN_ENC_KEY')
 		})
 
-		return Response.redirect(new URL('/admin?connected=1', event.request.url), 302)
+		const adminBase = getCalendarConfig().routes.adminBase
+		return Response.redirect(new URL(`${adminBase}?connected=1`, event.request.url), 302)
 	} catch (err) {
 		console.error('OAuth callback error:', err)
 		return new Response('OAuth callback failed', { status: 500 })

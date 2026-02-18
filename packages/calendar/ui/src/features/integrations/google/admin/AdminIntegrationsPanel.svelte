@@ -1,6 +1,6 @@
 <script>
 	import { Check, RefreshCw } from '@lucide/svelte'
-	import { PillButton } from '@miko/ui'
+	import PillButton from '../../../primitives/PillButton.svelte'
 	const { dashboard } = $props()
 	const isDev = import.meta.env.DEV
 </script>

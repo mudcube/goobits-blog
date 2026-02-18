@@ -2,22 +2,24 @@
 	import { page } from '$app/stores'
 	import { Bell, UserRound } from '@lucide/svelte'
 	import { logoutCalendarSession } from '../api/calendar'
-	import { PillButton, ShellNav } from '@miko/ui'
-
+	import { getCalendarUiConfig } from '../config'
+	import PillButton from '../primitives/PillButton.svelte'
+import ShellNav from '../primitives/ShellNav.svelte'
 	const { data, children } = $props()
 	const headerLinks = $derived([...(data.activities ?? [])].sort((a, b) => a.label.localeCompare(b.label)))
+	const calendarConfig = getCalendarUiConfig()
 
 	async function logout() {
 		await logoutCalendarSession()
 		// Server-side auth middleware will handle redirects cleanly on next navigation.
-		window.location.href = '/calendar/login'
+		window.location.href = calendarConfig.routes.calendarLoginPath
 	}
 </script>
 
 <div class="calendar-shell">
 	<ShellNav
 		brandLabel="Members"
-		brandHref="/calendar"
+		brandHref={calendarConfig.routes.calendarBase}
 		links={headerLinks}
 		currentPath={$page.url.pathname}
 	>
@@ -25,7 +27,7 @@
 			<div class="calendar-shell__nav-user">
 				{#if data.user}
 					<PillButton
-						href="/calendar?mine=1"
+						href={`${calendarConfig.routes.calendarBase}?mine=1`}
 						variant="secondary"
 						size="sm"
 						className="calendar-shell__nav-button calendar-shell__nav-button--link"
@@ -35,7 +37,7 @@
 						My schedule
 					</PillButton>
 					<PillButton
-						href="/calendar/profile"
+						href={`${calendarConfig.routes.calendarBase}/profile`}
 						variant="secondary"
 						size="sm"
 						className="calendar-shell__nav-button calendar-shell__nav-button--link"

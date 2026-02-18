@@ -2,9 +2,12 @@ import { CredentialsProvider } from '@goobits/auth/providers'
 import { D1SessionAdapter, D1UserAdapter } from '@goobits/auth/adapters'
 import { hashPassword } from '@goobits/auth/utils'
 import type { D1DatabaseLike } from '../storage/d1.ts'
+import { getCalendarConfig } from '../config/calendar.ts'
 
-export const ADMIN_EMAIL = 'admin@miko.art'
 export const ADMIN_COOKIE_NAME = 'admin_session'
+export function getAdminEmail() {
+	return getCalendarConfig().brand.adminEmail
+}
 
 type AdminUser = { id: string | number; email: string; name?: string | null }
 type AdminUserAdapterLike = {
@@ -64,7 +67,8 @@ export async function ensureAdminUser({
 	userAdapter: AdminUserAdapterLike
 	passcode: string
 }) {
-	const existing = await userAdapter.getUserByEmail(ADMIN_EMAIL)
+	const adminEmail = getAdminEmail()
+	const existing = await userAdapter.getUserByEmail(adminEmail)
 	const password = await hashPassword(passcode)
 	if (existing) {
 		// Keep the configured env passcode authoritative in case it changed.
@@ -74,7 +78,7 @@ export async function ensureAdminUser({
 		return existing
 	}
 	return userAdapter.createUser({
-		email: ADMIN_EMAIL,
+		email: adminEmail,
 		name: 'Admin',
 		verified_email: true
 	}, { password })

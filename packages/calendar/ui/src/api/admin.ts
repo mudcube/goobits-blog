@@ -1,5 +1,6 @@
 import { requestApi } from './http'
 import { z } from 'zod'
+import { withAdminApi } from '../config'
 
 export type AdminRulesInput = {
 	hoursFrom: string
@@ -197,13 +198,13 @@ export type AdminSyncQueueMutationResponse = z.infer<typeof AdminSyncQueueMutati
 export type AdminCleanupE2EResponse = z.infer<typeof AdminCleanupE2EResponseSchema>
 
 export async function getAdminStatus() {
-	return requestApi<AdminStatusResponse>('/api/admin/status', {
+	return requestApi<AdminStatusResponse>(withAdminApi('/status'), {
 		parse: (payload) => AdminStatusResponseSchema.parse(payload)
 	})
 }
 
 export async function cleanupAdminE2E() {
-	return requestApi<AdminCleanupE2EResponse>('/api/admin/dev/cleanup-e2e', {
+	return requestApi<AdminCleanupE2EResponse>(withAdminApi('/dev/cleanup-e2e'), {
 		method: 'POST',
 		headers: { origin: window.location.origin },
 		parse: (payload) => AdminCleanupE2EResponseSchema.parse(payload)
@@ -211,7 +212,7 @@ export async function cleanupAdminE2E() {
 }
 
 export async function saveAdminRules(input: AdminRulesInput) {
-	return requestApi<AdminMutationOk>('/api/admin/rules', {
+	return requestApi<AdminMutationOk>(withAdminApi('/rules'), {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(input),
@@ -220,19 +221,19 @@ export async function saveAdminRules(input: AdminRulesInput) {
 }
 
 export async function getAdminMe() {
-	return requestApi<AdminMeResponse>('/api/admin/me', {
+	return requestApi<AdminMeResponse>(withAdminApi('/me'), {
 		parse: (payload) => AdminMeResponseSchema.parse(payload)
 	})
 }
 
 export async function getAdminPrograms() {
-	return requestApi<AdminProgramsResponse>('/api/admin/programs', {
+	return requestApi<AdminProgramsResponse>(withAdminApi('/programs'), {
 		parse: (payload) => AdminProgramsResponseSchema.parse(payload)
 	})
 }
 
 export async function setAdminProgram(input: AdminProgramInput) {
-	return requestApi<AdminMutationOk>('/api/admin/programs', {
+	return requestApi<AdminMutationOk>(withAdminApi('/programs'), {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ action: 'upsert', ...input }),
@@ -241,7 +242,7 @@ export async function setAdminProgram(input: AdminProgramInput) {
 }
 
 export async function toggleAdminProgram(slug: string, enabled: boolean) {
-	return requestApi<AdminMutationOk>('/api/admin/programs', {
+	return requestApi<AdminMutationOk>(withAdminApi('/programs'), {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ action: 'toggle', slug, enabled }),
@@ -250,7 +251,7 @@ export async function toggleAdminProgram(slug: string, enabled: boolean) {
 }
 
 export async function deleteAdminProgram(slug: string) {
-	return requestApi<AdminMutationOk>('/api/admin/programs', {
+	return requestApi<AdminMutationOk>(withAdminApi('/programs'), {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ action: 'delete', slug }),
@@ -259,13 +260,13 @@ export async function deleteAdminProgram(slug: string) {
 }
 
 export async function getAdminEvents() {
-	return requestApi<AdminEventsResponse>('/api/admin/events', {
+	return requestApi<AdminEventsResponse>(withAdminApi('/events'), {
 		parse: (payload) => AdminEventsResponseSchema.parse(payload)
 	})
 }
 
 export async function createAdminEvents(input: AdminEventCreateInput) {
-	return requestApi<AdminMutationOk>('/api/admin/events', {
+	return requestApi<AdminMutationOk>(withAdminApi('/events'), {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(input),
@@ -274,7 +275,7 @@ export async function createAdminEvents(input: AdminEventCreateInput) {
 }
 
 export async function updateAdminEventCapacity(eventId: number, capacity: number) {
-	return requestApi<AdminMutationOk>(`/api/admin/events/${eventId}`, {
+	return requestApi<AdminMutationOk>(withAdminApi(`/events/${eventId}`), {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ action: 'capacity', capacity }),
@@ -283,7 +284,7 @@ export async function updateAdminEventCapacity(eventId: number, capacity: number
 }
 
 export async function updateAdminEventMemory(eventId: number, input: { recapText?: string; heroImageUrl?: string }) {
-	return requestApi<AdminMutationOk>(`/api/admin/events/${eventId}`, {
+	return requestApi<AdminMutationOk>(withAdminApi(`/events/${eventId}`), {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
@@ -296,7 +297,7 @@ export async function updateAdminEventMemory(eventId: number, input: { recapText
 }
 
 export async function mutateAdminSyncQueue(action: AdminSyncQueueAction, limit = 10) {
-	return requestApi<AdminSyncQueueMutationResponse>('/api/admin/sync-queue', {
+	return requestApi<AdminSyncQueueMutationResponse>(withAdminApi('/sync-queue'), {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ action, limit }),
@@ -305,7 +306,7 @@ export async function mutateAdminSyncQueue(action: AdminSyncQueueAction, limit =
 }
 
 export async function disconnectAdminGoogleIntegration() {
-	return requestApi<AdminMutationOk>('/api/admin/integrations/google/disconnect', {
+	return requestApi<AdminMutationOk>(withAdminApi('/integrations/google/disconnect'), {
 		method: 'POST',
 		parse: (payload) => AdminMutationOkSchema.parse(payload)
 	})

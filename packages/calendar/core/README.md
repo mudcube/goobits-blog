@@ -1,6 +1,6 @@
 # @calendar/core
 
-Calendar integration core for Rainbow Gym.
+Calendar integration core for reusable social booking and scheduling flows.
 
 - Google OAuth + free/busy + event creation via official Google Calendar REST APIs.
 - D1 storage helpers for Cloudflare.

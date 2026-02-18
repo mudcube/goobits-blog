@@ -9,10 +9,7 @@
 		onToggle,
 		routes = [],
 		getRouteTags,
-		formatDate,
-		icon: Icon,
-		ChevronDownIcon,
-		ChevronRightIcon
+		formatDate
 	} = $props()
 </script>
 
@@ -22,14 +19,6 @@
 
 			<Button className="sitemap-page__category-header" variant="ghost" size="md" onClick={onToggle} type="button">
 				<h2 class="sitemap-page__category-title">
-				{#if Icon}
-					<Icon class="sitemap-page__category-icon" size={14} strokeWidth={2.2} />
-				{/if}
-				{#if collapsed}
-					<ChevronRightIcon class="sitemap-page__toggle-icon" size={14} strokeWidth={2.25} />
-				{:else}
-					<ChevronDownIcon class="sitemap-page__toggle-icon" size={14} strokeWidth={2.25} />
-				{/if}
 				<span class="sitemap-page__category-title-text">{category}</span>
 				<span class="sitemap-page__count">{count}</span>
 			</h2>

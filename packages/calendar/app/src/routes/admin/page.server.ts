@@ -1,6 +1,6 @@
 import { getAdminAuth, ensureAdminAccount } from '@calendar/kit'
 import { createSigninHandler, createLogoutHandler } from '@goobits/auth/handlers'
-import { checkRateLimit } from '@calendar/core'
+import { checkRateLimit, getCalendarConfig } from '@calendar/core'
 import { logAdminEvent } from '@calendar/app/admin-api-helpers'
 import { redirect } from '@sveltejs/kit'
 import type { Actions, RequestEvent } from '@sveltejs/kit'
@@ -14,9 +14,10 @@ function isAuthUser(value: unknown): value is User {
 }
 
 export const load = async (event: RequestEvent) => {
+	const adminBase = getCalendarConfig().routes.adminBase
 	const locals = event.locals as { user?: Record<string, unknown> }
 	if (locals.user) {
-		redirect(302, '/admin/overview')
+		redirect(302, `${adminBase}/overview`)
 	}
 	return { user: locals.user ?? null, initialTab: 'dash' }
 }
@@ -42,7 +43,7 @@ export const actions: Actions = {
 				},
 				userAdapter,
 				sessionAdapter,
-				redirectTo: '/admin/overview',
+				redirectTo: `${getCalendarConfig().routes.adminBase}/overview`,
 				rateLimit: {
 					check: async (key: string) => {
 						try {
@@ -76,6 +77,6 @@ export const actions: Actions = {
 
 	logout: async (event) => {
 		const { sessionAdapter } = await getAdminAuth({ event })
-		return createLogoutHandler({ sessionAdapter, redirectAfterLogout: '/admin' })(event)
+		return createLogoutHandler({ sessionAdapter, redirectAfterLogout: getCalendarConfig().routes.adminBase })(event)
 	}
 }

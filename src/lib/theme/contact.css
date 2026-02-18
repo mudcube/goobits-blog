@@ -2,6 +2,17 @@
 	--hero-max-width: 31.25rem;
 }
 
+.contact-page__hero-title {
+	/* Prevent first-paint reflow from balance wrapping on this short heading */
+	white-space: nowrap !important;
+	text-wrap: nowrap !important;
+}
+
+.contact-page__hero-title .ui-hero__title-text,
+.contact-page__hero-title .ui-hero__tail {
+	white-space: nowrap !important;
+}
+
 .contact-page__layout {
 	padding: 0 0 7.5rem;
 	display: grid;

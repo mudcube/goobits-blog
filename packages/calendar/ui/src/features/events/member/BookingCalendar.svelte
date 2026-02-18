@@ -2,8 +2,7 @@
 	import { joinCalendarEvent, leaveCalendarEvent, type CalendarEventsResponse } from '../../../api/calendar'
 	import { applyEventMutationState } from './feed-state'
 	import { formatWhen } from './formatWhen'
-	import { PillButton } from '@miko/ui'
-
+	import PillButton from '../../../primitives/PillButton.svelte'
 	let {
 		activitySlug,
 		initialUpcoming = [],

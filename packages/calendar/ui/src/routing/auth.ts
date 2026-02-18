@@ -1,11 +1,14 @@
 import { ApiClientError } from '../api/http'
+import { getCalendarUiConfig } from '../config'
 
 export function isCalendarLoginPath(pathname: string): boolean {
-	return pathname === '/calendar/login' || pathname === '/calendar/login/'
+	const calendarLoginPath = getCalendarUiConfig().routes.calendarLoginPath
+	return pathname === calendarLoginPath || pathname === `${calendarLoginPath}/`
 }
 
 export function buildCalendarLoginRedirect(pathname: string): string {
-	return `/calendar/login?redirect=${encodeURIComponent(pathname)}`
+	const calendarLoginPath = getCalendarUiConfig().routes.calendarLoginPath
+	return `${calendarLoginPath}?redirect=${encodeURIComponent(pathname)}`
 }
 
 export function shouldRedirectCalendarGuest(user: unknown, pathname: string): boolean {

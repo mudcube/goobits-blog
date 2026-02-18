@@ -2,13 +2,15 @@
 	import { joinCalendarEvent, leaveCalendarEvent } from '../../../api/calendar'
 	import { applyEventMutationState } from './feed-state'
 	import { formatWhen } from './formatWhen'
-	import { PillButton, Hero } from '@miko/ui'
-
+	import { getCalendarUiConfig } from '../../../config'
+	import PillButton from '../../../primitives/PillButton.svelte'
+import Hero from '../../../primitives/Hero.svelte'
 	let { data } = $props()
 	let upcoming = $state(data.upcoming ?? [])
 	let recent = $state(data.recent ?? [])
 	let pendingEventId = $state(null)
 	let feedError = $state('')
+	const calendarConfig = getCalendarUiConfig()
 
 	$effect(() => {
 		// During hydration/navigations, SvelteKit can transiently provide partial data.
@@ -49,7 +51,7 @@
 </script>
 
 <svelte:head>
-	<title>Rainbow Gym | MIKO.ART</title>
+	<title>{calendarConfig.brand.calendarName} | {calendarConfig.brand.siteName}</title>
 </svelte:head>
 
 <div class="calendar-page calendar-home">
@@ -65,9 +67,9 @@
 
 	<section class="calendar-page__section calendar-home__section">
 		<div class="calendar-home__feed-head">
-			<h2 class="calendar-home__feed-title">{data.onlyMine ? 'My Schedule' : 'Upcoming Events'}</h2>
+				<h2 class="calendar-home__feed-title">{data.onlyMine ? 'My Schedule' : 'Upcoming Events'}</h2>
 			<PillButton
-				href={data.onlyMine ? '/calendar' : '/calendar?mine=1'}
+				href={data.onlyMine ? calendarConfig.routes.calendarBase : `${calendarConfig.routes.calendarBase}?mine=1`}
 				variant="ghost"
 				size="md"
 				className="calendar-page__ghost-button"

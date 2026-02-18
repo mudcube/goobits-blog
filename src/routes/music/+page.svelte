@@ -42,7 +42,7 @@
 	<div class="music-page">
 		<Hero
 			eyebrow="Music"
-			title="Songs, sketches, and sound experiments"
+			titleLines={['Songs, sketches, and', 'sound\u00A0experiments']}
 			icon="/media/music-notes-flow.png"
 			iconAlt="Music notes icon"
 			subtitle="Melody has always been part of the build process. Tracks, demos, and music-related experiments from Miko."

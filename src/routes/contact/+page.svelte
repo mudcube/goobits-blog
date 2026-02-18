@@ -68,7 +68,8 @@
 	<Hero
 		className="contact-page__hero"
 		eyebrow="Contact"
-		title="Say hello"
+		title="Say Hello"
+		titleClass="contact-page__hero-title"
 		icon="/media/contact-email-heart.png"
 		iconAlt="Email heart icon"
 		subtitle="Got a question, a project idea, or just want to chat? Drop me a line."

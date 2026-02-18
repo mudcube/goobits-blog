@@ -1,6 +1,6 @@
 <script>
 	import { Save, Loader } from '@lucide/svelte'
-	import { PillButton } from '@miko/ui'
+	import PillButton from '../../../primitives/PillButton.svelte'
 	const { dashboard } = $props()
 </script>
 

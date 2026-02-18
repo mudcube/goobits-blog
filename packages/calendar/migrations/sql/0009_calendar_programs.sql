@@ -25,20 +25,19 @@ INSERT OR IGNORE INTO calendar_programs (
   eyebrow_class, glow_class, form_glow_class, service_status_note,
   enabled, sort_order
 ) VALUES
-  ('gym', 'Gym', 'Rainbow Gym', 'Gym | Rainbow Gym | MIKO.ART', 'Rainbow Gym',
+  ('gym', 'Gym', 'Community Gym', 'Gym | Community Calendar | SITE', 'Community Gym',
    'Hang out. Work out.', 'Whatever.', 'Grab a time slot and let''s do something fun together.',
    'Book sessions and work out together', '💪',
    NULL, NULL, NULL, NULL, 1, 10),
-  ('circus', 'Circus', 'Rainbow Circus', 'Circus | Rainbow Gym | MIKO.ART', 'Rainbow Circus',
+  ('circus', 'Circus', 'Community Circus', 'Circus | Community Calendar | SITE', 'Community Circus',
    'Fly high. Spin fast.', 'Be brave.', 'Aerial arts and circus skills training for all levels.',
    'Aerial arts and circus skills', '🎪',
    'eyebrow-circus', 'glow-circus', 'form-glow-circus', NULL, 1, 20),
-  ('adventure', 'Adventure', 'Rainbow Adventure', 'Adventure | Rainbow Gym | MIKO.ART', 'Rainbow Adventure',
+  ('adventure', 'Adventure', 'Community Adventure', 'Adventure | Community Calendar | SITE', 'Community Adventure',
    'Get outside.', 'Find something new.', 'Outdoor excursions and group adventures in the Pacific Northwest.',
    'Outdoor excursions and trips', '🏔️',
    'eyebrow-adventure', 'glow-adventure', 'form-glow-adventure', NULL, 1, 30),
-  ('movie-night', 'Movies', 'Movie Night', 'Movie Night | Rainbow Gym | MIKO.ART', 'Movie Night',
+  ('movie-night', 'Movies', 'Movie Night', 'Movie Night | Community Calendar | SITE', 'Movie Night',
    'Grab some snacks.', 'Watch together.', 'Community movie screenings and cozy film nights.',
    'Community film screenings', '🎬',
    'eyebrow-movie', 'glow-movie', 'form-glow-movie', NULL, 1, 40);
-

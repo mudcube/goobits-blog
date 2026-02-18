@@ -1,1 +1,2 @@
-export * from '@calendar/app/routes/api/calendar/events/server'
+import * as routeModule from '@calendar/app/routes/api/calendar/events/server'
+export const GET = routeModule.GET

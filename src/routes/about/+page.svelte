@@ -69,6 +69,7 @@
 	<Hero
 		eyebrow="About"
 		title="Haai! I'm Miko"
+		titleClass="about-page__hero-title"
 		icon="/media/about-kitty-unicorn.png"
 		iconAlt="Unicorn kitty icon"
 		subtitle="Developer, designer & musician"

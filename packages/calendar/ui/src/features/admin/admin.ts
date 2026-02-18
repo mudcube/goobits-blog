@@ -22,6 +22,7 @@ import {
 	startCalendarOAuth,
 	type CreateInviteInput
 } from '../../api/calendar'
+import { getCalendarUiConfig } from '../../config'
 
 export type AdminTabId = 'dash' | 'cal' | 'events' | 'programs' | 'calendar-auth' | 'integrations'
 
@@ -66,8 +67,9 @@ const ADMIN_TAB_SEGMENTS: Record<AdminTabId, string> = {
 }
 
 export function getAdminTabHref(tab: AdminTabId) {
+	const adminBase = getCalendarUiConfig().routes.adminBase
 	const segment = ADMIN_TAB_SEGMENTS[tab]
-	return segment ? `/admin/${segment}` : '/admin'
+	return segment ? `${adminBase}/${segment}` : adminBase
 }
 
 export function isAdminTabId(value: string): value is AdminTabId {
@@ -103,7 +105,8 @@ export function formatAdminDate(timestamp?: number | null) {
 }
 
 export function buildInviteLink(origin: string, code: string) {
-	return `${origin}/calendar/login?invite=${code}`
+	const calendarLoginPath = getCalendarUiConfig().routes.calendarLoginPath
+	return `${origin}${calendarLoginPath}?invite=${code}`
 }
 
 export function normalizeRulesInput(state: AdminRulesState): AdminRulesInput {

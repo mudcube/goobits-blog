@@ -4,8 +4,12 @@ import { sequence } from '@sveltejs/kit/hooks'
 import { createThemeHooks } from '@goobits/themes/server'
 import { themeConfig } from '$lib/config/theme.ts'
 import { createCalendarAuthHandles } from '@calendar/app'
+import { getCalendarConfig } from '@calendar/core'
+import { applyMikoCalendarPreset } from '@calendar/preset-miko'
 import { dev } from '$app/environment'
 import type { Handle } from '@sveltejs/kit'
+applyMikoCalendarPreset()
+const calendarConfig = getCalendarConfig()
 
 /**
  * Processes redirects based on configured rules
@@ -61,14 +65,14 @@ const themeHandle = createThemeHooks(themeConfig, {
 }).transform
 
 const { handleAdminAuth, handleCalendarAuth, requireCalendarUser } = createCalendarAuthHandles({
-	adminBase: '/admin',
-	apiAdminBase: '/api/admin',
-	apiCalendarAdminBase: '/api/calendar/admin',
-	calendarBase: '/calendar',
-	apiCalendarBase: '/api/calendar',
-	authBase: '/auth',
-	calendarLoginPath: '/calendar/login',
-	calendarLoginRedirectPath: '/calendar/login/redirect'
+	adminBase: calendarConfig.routes.adminBase,
+	apiAdminBase: calendarConfig.routes.apiAdminBase,
+	apiCalendarAdminBase: calendarConfig.routes.apiCalendarAdminBase,
+	calendarBase: calendarConfig.routes.calendarBase,
+	apiCalendarBase: calendarConfig.routes.apiCalendarBase,
+	authBase: calendarConfig.routes.authBase,
+	calendarLoginPath: calendarConfig.routes.calendarLoginPath,
+	calendarLoginRedirectPath: calendarConfig.routes.calendarLoginRedirectPath
 })
 
 function setIfMissing(headers: Headers, key: string, value: string) {

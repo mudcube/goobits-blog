@@ -1,4 +1,5 @@
 import { createAdminSectionLoad } from '../_section.server'
 
-export { actions } from '../page.server'
+import { actions as parentActions } from '../page.server'
+export const actions = parentActions
 export const load = createAdminSectionLoad('programs')

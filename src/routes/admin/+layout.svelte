@@ -1,5 +1,5 @@
 <script>
-	import './Admin.scss'
+	import '@calendar/theme/admin.scss'
 	import { AdminShellLayout } from '@calendar/ui'
 
 	const { children, data } = $props()

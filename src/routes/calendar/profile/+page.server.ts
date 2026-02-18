@@ -1,1 +1,2 @@
-export * from '@calendar/app/routes/calendar/profile/page.server'
+import * as routeModule from '@calendar/app/routes/calendar/profile/page.server'
+export const load = routeModule.load

@@ -1,6 +1,7 @@
-import { CALENDAR_ACTIVITY_LIST, type CalendarActivityConfig } from '../social/activities.ts'
+import { getCalendarActivityList, type CalendarActivityConfig } from '../social/activities.ts'
 import { isValidProgramSlug, type CalendarProgramSlug } from '../social/programs.ts'
 import type { D1DatabaseLike } from '../storage/d1.ts'
+import { getCalendarConfig } from '../config/calendar.ts'
 
 export type CalendarProgramState = CalendarActivityConfig & {
 	enabled: boolean
@@ -27,13 +28,14 @@ type ProgramRow = {
 }
 
 function toProgram(row: ProgramRow): CalendarProgramState {
+	const calendarBase = getCalendarConfig().routes.calendarBase
 	const titleLines = row.hero_title_line_2
 		? [row.hero_title_line_1, row.hero_title_line_2] as [string, string]
 		: [row.hero_title_line_1] as [string]
 
 	const base: CalendarProgramState = {
 		slug: row.slug,
-		href: `/calendar/${row.slug}`,
+		href: `${calendarBase}/${row.slug}`,
 		label: row.label,
 		activityName: row.activity_name,
 		pageTitle: row.page_title,
@@ -64,7 +66,7 @@ async function listProgramRows(db: D1DatabaseLike) {
 }
 
 async function seedProgramRows(db: D1DatabaseLike) {
-	for (const [index, program] of CALENDAR_ACTIVITY_LIST.entries()) {
+	for (const [index, program] of getCalendarActivityList().entries()) {
 		const titleLine2 = program.heroTitleLines.length > 1 ? program.heroTitleLines[1] : null
 		await db.prepare(
 			`INSERT OR IGNORE INTO calendar_programs (

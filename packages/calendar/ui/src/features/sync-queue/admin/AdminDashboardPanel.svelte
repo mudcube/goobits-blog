@@ -1,7 +1,6 @@
 <script>
 	import { AlertTriangle, ChevronRight, RefreshCw, RotateCcw, Trash2 } from '@lucide/svelte'
-	import { PillButton } from '@miko/ui'
-
+	import PillButton from '../../../primitives/PillButton.svelte'
 	const { dashboard } = $props()
 	const needsCalendarAttention = $derived(dashboard.connectionExpired || !dashboard.connected)
 	const needsQueueAttention = $derived(
