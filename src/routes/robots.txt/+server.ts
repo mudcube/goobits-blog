@@ -1,15 +1,7 @@
 import type { RequestHandler } from './$types'
-import { resolveSiteOrigin } from '$lib/server/seo'
+import { getBaseUrl, getPlatformEnv, resolveSiteOrigin } from '$lib/server/seo'
 
 export const prerender = true
-
-function getBaseUrl(platformEnv: Record<string, string | undefined> | undefined) {
-	return platformEnv?.['PUBLIC_BASE_URL'] || platformEnv?.['BASE_URL'] || process.env['PUBLIC_BASE_URL'] || process.env['BASE_URL']
-}
-
-function getPlatformEnv(platform: unknown): Record<string, string | undefined> | undefined {
-	return (platform as { env?: Record<string, string | undefined> } | undefined)?.env
-}
 
 export const GET: RequestHandler = ({ platform, url }) => {
 	const baseUrl = getBaseUrl(getPlatformEnv(platform))

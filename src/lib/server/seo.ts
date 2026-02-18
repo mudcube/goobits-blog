@@ -29,6 +29,14 @@ export function resolveSiteOrigin({ baseUrl, requestUrl }: { baseUrl?: string; r
 	return FALLBACK_SITE_ORIGIN
 }
 
+export function getPlatformEnv(platform: unknown): Record<string, string | undefined> | undefined {
+	return (platform as { env?: Record<string, string | undefined> } | undefined)?.env
+}
+
+export function getBaseUrl(platformEnv: Record<string, string | undefined> | undefined) {
+	return platformEnv?.['PUBLIC_BASE_URL'] || platformEnv?.['BASE_URL'] || process.env['PUBLIC_BASE_URL'] || process.env['BASE_URL']
+}
+
 export function formatSitemapLastMod(isoString: string) {
 	const date = new Date(isoString)
 	return Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString()
