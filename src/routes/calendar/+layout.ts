@@ -1,2 +1,1 @@
-import * as routeModule from '@calendar/app/routes/calendar/layout'
-export const prerender = routeModule.prerender
+export { prerender } from '@calendar/app/routes/calendar/layout'
