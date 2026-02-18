@@ -4,7 +4,7 @@
 	import { ThemeProvider } from '@goobits/themes/svelte'
 	import { themeConfig } from '$lib/config/theme.js'
 	import { page } from '$app/stores'
-	import { browser } from '$app/environment'
+	import { browser, dev } from '$app/environment'
 	import { onMount } from 'svelte'
 	import { Topbar, FooterNav } from '@miko/ui'
 	import { getCalendarConfig } from '@calendar/core'
@@ -17,6 +17,16 @@
 	const isCalendarRoute = $derived(
 		$page.url.pathname.startsWith(calendarConfig.routes.calendarBase) ||
 			$page.url.pathname.startsWith(calendarConfig.routes.adminBase)
+	)
+	const topbarItems = $derived(
+		dev
+			? [
+				...headerNavItems,
+				{ href: '', label: '|' },
+				{ href: calendarConfig.routes.calendarBase, label: 'CALENDAR', matchPrefix: true },
+				{ href: calendarConfig.routes.adminBase, label: 'ADMIN', matchPrefix: true }
+			]
+			: headerNavItems
 	)
 
 	onMount(() => {
@@ -31,7 +41,7 @@
 		{#if isCalendarRoute}
 			{@render children()}
 		{:else}
-			<Topbar items={headerNavItems} currentPath={$page.url.pathname} />
+			<Topbar items={topbarItems} currentPath={$page.url.pathname} />
 
 			<main>
 				{@render children()}

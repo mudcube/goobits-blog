@@ -30,7 +30,8 @@
 
 .sitemap-page__category-header {
 	width: 100%;
-	display: block;
+	display: flex;
+	align-items: center;
 	background: transparent;
 	border: 0;
 	padding: 0.95rem 1.1rem;
@@ -61,6 +62,11 @@
 	height: 1rem;
 	flex-shrink: 0;
 	color: color-mix(in srgb, var(--muted) 92%, var(--text));
+	transition: transform 0.18s ease;
+}
+
+.sitemap-page__toggle-icon--collapsed {
+	transform: rotate(-90deg);
 }
 
 .sitemap-page__category-icon {

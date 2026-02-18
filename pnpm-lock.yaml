@@ -37,6 +37,9 @@ importers:
       '@calendar/preset-miko':
         specifier: workspace:*
         version: link:packages/calendar/presets/miko
+      '@calendar/theme':
+        specifier: workspace:*
+        version: link:packages/calendar/theme
       '@calendar/ui':
         specifier: workspace:*
         version: link:packages/calendar/ui
@@ -226,6 +229,9 @@ importers:
 
   packages/calendar/app:
     dependencies:
+      '@calendar/core':
+        specifier: workspace:*
+        version: link:../core
       '@calendar/kit':
         specifier: workspace:*
         version: link:../kit
@@ -265,7 +271,13 @@ importers:
 
   packages/calendar/migrations: {}
 
-  packages/calendar/presets/miko: {}
+  packages/calendar/presets/miko:
+    dependencies:
+      '@calendar/core':
+        specifier: workspace:*
+        version: link:../../core
+
+  packages/calendar/theme: {}
 
   packages/calendar/ui:
     dependencies:
@@ -275,9 +287,6 @@ importers:
       '@lucide/svelte':
         specifier: ^0.564.0
         version: 0.564.0(svelte@5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242))
-      '@miko/ui':
-        specifier: workspace:*
-        version: link:../../ui
       svelte:
         specifier: ^5.0.0
         version: 5.51.1(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242)

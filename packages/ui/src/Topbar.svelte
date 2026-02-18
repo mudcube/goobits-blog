@@ -26,6 +26,10 @@
 		// Calendar/Admin pages load large route-level styling; avoid "hover prefetch" injecting it on other pages.
 		return href.startsWith('/calendar') || href.startsWith('/admin')
 	}
+
+	function isSeparator(item: NavItem) {
+		return item.href === ''
+	}
 </script>
 
 <header class="layout-header">
@@ -38,15 +42,19 @@
 			</div>
 			<nav class="layout-header__nav">
 				{#each items as item}
-					<a
-						href={item.href}
-						class="layout-header__nav-link"
-						class:layout-header__nav-link--active={isActive(item)}
-						data-sveltekit-preload-data={shouldDisablePrefetch(item.href) ? 'off' : undefined}
-						data-sveltekit-preload-code={shouldDisablePrefetch(item.href) ? 'off' : undefined}
-					>
-						{item.label}
-					</a>
+					{#if isSeparator(item)}
+						<span class="layout-header__nav-separator" aria-hidden="true">{item.label}</span>
+					{:else}
+						<a
+							href={item.href}
+							class="layout-header__nav-link"
+							class:layout-header__nav-link--active={isActive(item)}
+							data-sveltekit-preload-data={shouldDisablePrefetch(item.href) ? 'off' : undefined}
+							data-sveltekit-preload-code={shouldDisablePrefetch(item.href) ? 'off' : undefined}
+						>
+							{item.label}
+						</a>
+					{/if}
 				{/each}
 			</nav>
 		</div>
@@ -55,3 +63,13 @@
 		</div>
 	</div>
 </header>
+
+<style>
+	.layout-header__nav-separator {
+		display: inline-flex;
+		align-items: center;
+		padding: 0 0.2rem;
+		opacity: 0.6;
+		user-select: none;
+	}
+</style>

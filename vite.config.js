@@ -29,11 +29,11 @@ export default defineConfig({
 	envDir: './config/env',
 	optimizeDeps: {
 		// Treat local workspace deps as source so changes apply in dev and SSR behavior matches prod.
-		exclude: [ '*.md', '@goobits/auth', '@miko/ui', '@calendar/app', '@calendar/core', '@calendar/kit', '@calendar/ui' ]
+		exclude: [ '*.md', '@goobits/auth', '@miko/ui', '@calendar/app', '@calendar/core', '@calendar/kit', '@calendar/ui', '@calendar/theme' ]
 	},
 	ssr: {
 		// Keep workspace UI packages as source during SSR for fast iteration.
-		noExternal: [ '@miko/ui', '@calendar/app', '@calendar/core', '@calendar/kit', '@calendar/ui' ]
+		noExternal: [ '@miko/ui', '@calendar/app', '@calendar/core', '@calendar/kit', '@calendar/ui', '@calendar/theme' ]
 	},
 	plugins: [
 		enhancedImages(),

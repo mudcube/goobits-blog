@@ -45,7 +45,10 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 
 	const handleCalendarAuth: Handle = async ({ event, resolve }) => {
 		const pathname = event.url.pathname
-		if (!pathname.startsWith(calendarBase) && !pathname.startsWith(apiCalendarBase) && !pathname.startsWith(authBase)) {
+		if (
+			pathname.startsWith(apiCalendarAdminBase) ||
+			(!pathname.startsWith(calendarBase) && !pathname.startsWith(apiCalendarBase) && !pathname.startsWith(authBase))
+		) {
 			return resolve(event)
 		}
 

@@ -1,5 +1,5 @@
 @use './vars' as *;
-@use '../../../lib/styles/primitives' as ui;
+@use '../shared/primitives' as ui;
 
 // Buttons
 .admin-page__button-row {

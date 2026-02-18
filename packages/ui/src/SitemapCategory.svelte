@@ -17,12 +17,12 @@
 	<div class="sitemap-page__category-card">
 		<div class="sitemap-page__bar" aria-hidden="true"></div>
 
+		<h2 class="sitemap-page__category-title">
 			<Button className="sitemap-page__category-header" variant="ghost" size="md" onClick={onToggle} type="button">
-				<h2 class="sitemap-page__category-title">
 				<span class="sitemap-page__category-title-text">{category}</span>
 				<span class="sitemap-page__count">{count}</span>
-			</h2>
-		</Button>
+			</Button>
+		</h2>
 
 		{#if !collapsed}
 			<div class="sitemap-page__category-body">
