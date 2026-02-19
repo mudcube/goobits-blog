@@ -11,7 +11,7 @@
     "audit:css-vars": "node scripts/audit/check-css-tokens.mjs",
     "audit:labs-lowercase": "node scripts/audit/labs-lowercase-map.mjs",
     "audit:static-orphans": "node scripts/audit/report-orphan-static-assets.mjs",
-    "auth:pull": "git fetch goobits-auth && git subtree pull --prefix=packages/auth goobits-auth main --squash",
+    "auth:pull": "git fetch --no-tags goobits-auth refs/heads/main:refs/remotes/goobits-auth/main && git subtree pull --prefix=packages/auth goobits-auth main --squash",
     "auth:push": "git diff --quiet && git diff --cached --quiet || (echo 'Working tree is dirty; commit or stash before pushing subtree.' && exit 1); git subtree push --prefix=packages/auth goobits-auth main",
     "auth:status": "git log -1 --grep='git-subtree-dir: packages/auth' --pretty=format:'%h %s%n%n%B'",
     "build": "NODE_ENV=production dotenvx run -f config/env/.env -- vite build",
