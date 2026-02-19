@@ -1,7 +1,7 @@
 import { chromium } from 'playwright'
 import { BASE_URL, getAdminPasscode } from './_helpers'
 
-const ADMIN_URL = `${BASE_URL}/admin/overview`
+const ADMIN_URL = `${BASE_URL}/admin/`
 
 export async function runAdminSyncQueueSmoke() {
 	const passcode = getAdminPasscode()
@@ -14,16 +14,22 @@ export async function runAdminSyncQueueSmoke() {
 	try {
 		await page.goto(ADMIN_URL, { waitUntil: 'domcontentloaded', timeout: 30000 })
 
-		const alreadyAuthed = (await page.locator('.admin-page__sidebar').count()) > 0
-		if (!alreadyAuthed) {
+		if (await page.locator('input[name="password"]').count()) {
 			await page.fill('input[name="password"]', passcode)
-			const navWait = page.waitForURL((url) => url.pathname.startsWith('/admin/overview'), { timeout: 30000 }).catch(() => null)
+			const navWait = page.waitForURL((url) => url.pathname.startsWith('/admin'), { timeout: 30000 }).catch(() => null)
 			await page.click('button[type="submit"]')
 			await navWait
+			for (let attempt = 0; attempt < 20; attempt += 1) {
+				const cookies = await context.cookies(ADMIN_URL)
+				if (cookies.some((cookie) => cookie.name === 'admin_session')) break
+				await page.waitForTimeout(150)
+			}
 		}
 
 		await page.goto(ADMIN_URL, { waitUntil: 'domcontentloaded', timeout: 30000 })
-		await page.locator('.admin-page__sidebar').first().waitFor({ timeout: 30000 })
+		if (await page.locator('input[name="password"]').count()) {
+			throw new Error('admin auth failed')
+		}
 
 		const statusRes = await context.request.get(`${BASE_URL}/api/admin/status`)
 		if (!statusRes.ok()) throw new Error(`admin status failed: ${statusRes.status()}`)
@@ -31,7 +37,7 @@ export async function runAdminSyncQueueSmoke() {
 		const deadLetterCount = Number(statusPayload?.syncQueue?.deadLetter || 0)
 		const sameOriginHeaders = {
 			origin: BASE_URL,
-			referer: `${BASE_URL}/admin/overview`
+			referer: `${BASE_URL}/admin/`
 		}
 
 		const processRes = await context.request.post(`${BASE_URL}/api/admin/sync-queue`, {

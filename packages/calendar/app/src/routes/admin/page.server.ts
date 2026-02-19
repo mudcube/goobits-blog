@@ -14,11 +14,7 @@ function isAuthUser(value: unknown): value is User {
 }
 
 export const load = async (event: RequestEvent) => {
-	const adminBase = getCalendarConfig().routes.adminBase
 	const locals = event.locals as { user?: Record<string, unknown> }
-	if (locals.user) {
-		redirect(302, `${adminBase}/overview`)
-	}
 	return { user: locals.user ?? null, initialTab: 'dashboard' }
 }
 
@@ -43,7 +39,7 @@ export const actions: Actions = {
 				},
 				userAdapter,
 				sessionAdapter,
-				redirectTo: `${getCalendarConfig().routes.adminBase}/overview`,
+				redirectTo: getCalendarConfig().routes.adminBase,
 				rateLimit: {
 					check: async (key: string) => {
 						try {

@@ -15,3 +15,16 @@ export function getAdminPasscode() {
 		return ''
 	}
 }
+
+export function getE2ETestToken() {
+	if (process.env['E2E_TEST_TOKEN']) return process.env['E2E_TEST_TOKEN']
+	try {
+		return execSync('pnpm exec dotenvx get E2E_TEST_TOKEN -f config/env/.env', {
+			stdio: ['ignore', 'pipe', 'ignore']
+		})
+			.toString('utf8')
+			.trim()
+	} catch {
+		return getAdminPasscode()
+	}
+}

@@ -16,10 +16,10 @@ async function loginAdminContext(page: import('playwright').Page) {
 			await page.waitForTimeout(150)
 		}
 	}
-	await page.goto(`${BASE_URL}/admin/overview/`, { waitUntil: 'domcontentloaded', timeout: 30000 })
+	await page.goto(`${BASE_URL}/admin/`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 
-	const hasSidebar = (await page.locator('.admin-page__sidebar').count()) > 0
-	if (!hasSidebar) throw new Error('admin auth failed')
+	const hasLogin = (await page.locator('input[name="password"]').count()) > 0
+	if (hasLogin) throw new Error('admin auth failed')
 }
 
 export async function runAdminPaymentDefaultsSmoke() {

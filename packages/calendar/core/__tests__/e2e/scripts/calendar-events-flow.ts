@@ -1,5 +1,5 @@
 import { chromium } from 'playwright'
-import { BASE_URL, getAdminPasscode } from './_helpers'
+import { BASE_URL, getAdminPasscode, getE2ETestToken } from './_helpers'
 
 const ADMIN_URL = `${BASE_URL}/admin/`
 
@@ -67,6 +67,7 @@ async function createAdminEvent(
 export async function runCalendarEventsFlow() {
 	const passcode = getAdminPasscode()
 	if (!passcode) throw new Error('ADMIN_PASSCODE not available')
+	const e2eToken = getE2ETestToken() || passcode
 
 	const browser = await chromium.launch({ headless: true })
 	const context = await browser.newContext()
@@ -76,8 +77,7 @@ export async function runCalendarEventsFlow() {
 	try {
 		await page.goto(ADMIN_URL, { waitUntil: 'domcontentloaded', timeout: 30000 })
 
-			const alreadyAuthed = (await page.locator('.admin-page__sidebar').count()) > 0
-			if (!alreadyAuthed && (await page.locator('.admin-login').count()) > 0) {
+			if ((await page.locator('.admin-login').count()) > 0) {
 				await page.fill('input[name="password"]', passcode)
 				await page.click('button[type="submit"]')
 				// Some runtimes/forms can complete without a full navigation; wait for the cookie instead.
@@ -97,8 +97,8 @@ export async function runCalendarEventsFlow() {
 			.post(`${BASE_URL}/api/admin/dev/cleanup-e2e`, { headers: { origin: BASE_URL } })
 			.catch(() => null)
 
-		await page.goto(`${BASE_URL}/admin/events`, { waitUntil: 'domcontentloaded', timeout: 30000 })
-		await page.locator('.admin-page__sidebar').first().waitFor({ timeout: 30000 })
+		await page.goto(`${BASE_URL}/admin/`, { waitUntil: 'domcontentloaded', timeout: 30000 })
+		if (await page.locator('input[name="password"]').count()) throw new Error('admin auth failed')
 		await page.locator('.admin-page__title').first().waitFor({ timeout: 30000 })
 
 		const title = `E2E Calendar Event ${Date.now()}`
@@ -137,14 +137,14 @@ export async function runCalendarEventsFlow() {
 		})
 
 		const bootstrapRes = await context.request.post(`${BASE_URL}/api/test/calendar-session`, {
-			headers: { authorization: `Bearer ${passcode}` },
+			headers: { authorization: `Bearer ${e2eToken}` },
 			data: { email: `e2e-calendar-${Date.now()}@example.com`, name: 'E2E Calendar User' }
 		})
 		if (!bootstrapRes.ok()) {
 			throw new Error(`calendar member bootstrap failed: ${bootstrapRes.status()}`)
 		}
 			const bootstrapResB = await contextB.request.post(`${BASE_URL}/api/test/calendar-session`, {
-				headers: { authorization: `Bearer ${passcode}` },
+				headers: { authorization: `Bearer ${e2eToken}` },
 				data: { email: `e2e-calendar-b-${Date.now()}@example.com`, name: 'E2E Calendar User B' }
 			})
 			if (!bootstrapResB.ok()) {
