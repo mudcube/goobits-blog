@@ -1,5 +1,5 @@
 import { apiError, apiOk, apiValidationError, logApiError, noStoreHeaders } from './http/api'
-import { getCalendarUserId, unauthorizedCalendar } from './http/calendar-auth'
+import { getCalendarUserId, requireCalendarUserId, runCalendarRequest, unauthorizedCalendar } from './http/calendar-auth'
 import { buildEnv, type RuntimeEnv } from './runtime/build-env'
 import { getAdminAuth, ensureAdminAccount } from './auth/admin'
 import { getCalendarAuth, getCalendarRedirect, setCalendarLoginContext } from './auth/calendar'
@@ -13,6 +13,8 @@ export {
 	logApiError,
 	noStoreHeaders,
 	getCalendarUserId,
+	requireCalendarUserId,
+	runCalendarRequest,
 	unauthorizedCalendar,
 	buildEnv,
 	getAdminAuth,

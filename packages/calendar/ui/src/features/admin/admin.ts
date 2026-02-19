@@ -120,29 +120,16 @@ export function normalizeRulesInput(state: AdminRulesState): AdminRulesInput {
 	}
 }
 
-export async function fetchAdminStatus() {
-	return getAdminStatus()
-}
-
-export async function cleanupAdminE2EData() {
-	return cleanupAdminE2E()
-}
+export const fetchAdminStatus = getAdminStatus
+export const cleanupAdminE2EData = cleanupAdminE2E
 
 export async function persistAdminRules(state: AdminRulesState) {
 	return saveAdminRules(normalizeRulesInput(state))
 }
 
-export async function beginCalendarOAuth() {
-	return startCalendarOAuth()
-}
-
-export async function disconnectCalendarOAuth() {
-	return disconnectAdminGoogleIntegration()
-}
-
-export async function fetchAdminPrograms() {
-	return getAdminPrograms()
-}
+export const beginCalendarOAuth = startCalendarOAuth
+export const disconnectCalendarOAuth = disconnectAdminGoogleIntegration
+export const fetchAdminPrograms = getAdminPrograms
 
 export async function persistAdminProgram(input: { slug: string; enabled: boolean }) {
 	return toggleAdminProgram(input.slug, input.enabled)
@@ -169,13 +156,8 @@ export async function saveAdminProgram(input: {
 	return setAdminProgram(input)
 }
 
-export async function removeAdminProgram(slug: string) {
-	return deleteAdminProgram(slug)
-}
-
-export async function fetchAdminEvents() {
-	return getAdminEvents()
-}
+export const removeAdminProgram = deleteAdminProgram
+export const fetchAdminEvents = getAdminEvents
 
 export async function persistAdminEvents(input: {
 	activitySlug: string
@@ -195,13 +177,8 @@ export async function persistAdminEvents(input: {
 	return createAdminEvents(input)
 }
 
-export async function persistAdminEventCapacity(eventId: number, capacity: number) {
-	return updateAdminEventCapacity(eventId, capacity)
-}
-
-export async function persistAdminEventMemory(eventId: number, input: { recapText?: string; heroImageUrl?: string }) {
-	return updateAdminEventMemory(eventId, input)
-}
+export const persistAdminEventCapacity = updateAdminEventCapacity
+export const persistAdminEventMemory = updateAdminEventMemory
 
 export async function processAdminSyncQueue(limit = 10) {
 	return mutateAdminSyncQueue('process', limit)
@@ -220,13 +197,8 @@ export async function fetchCalendarMembersData() {
 	return { invitesData, usersData }
 }
 
-export async function persistInvite(input: CreateInviteInput) {
-	return createCalendarInvite(input)
-}
-
-export async function removeInvite(id: string) {
-	return deleteCalendarInvite(id)
-}
+export const persistInvite = createCalendarInvite
+export const removeInvite = deleteCalendarInvite
 
 export function getApiErrorMessage(data: unknown, fallback: string) {
 	if (

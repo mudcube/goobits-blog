@@ -18,6 +18,10 @@
 	width: 100%;
 }
 
+.admin-page__modal-card.admin-page__program-modal-card {
+	max-width: min(37.5rem, calc(100vw - 1.5rem));
+}
+
 .admin-page__modal-title {
 	font-size: 0.9375rem;
 	font-weight: 600;

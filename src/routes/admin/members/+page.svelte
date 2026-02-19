@@ -1,6 +1,6 @@
 <script>
-	import { AdminPageShell } from '@calendar/ui'
+	import AdminShell from '../_AdminPageShell.svelte'
 	let { data, form } = $props()
 </script>
 
-<AdminPageShell {data} {form} initialTab={data.initialTab || 'dash'} />
+<AdminShell {data} {form} />

@@ -1,15 +1,13 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { parseAdminEventUpdateInput, setAttendanceStatus, TransportValidationError, updateEventCapacity, updateEventMemory } from '@calendar/core'
-import { enforceSameOrigin, logAdminEvent, requireAdminSession, unauthorized } from '@calendar/app/admin-api-helpers'
-import { apiOk, apiError, apiValidationError, logApiError } from '@calendar/kit'
+import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
+import { apiOk, apiError, apiValidationError } from '@calendar/kit'
 
 export async function POST(event: RequestEvent) {
-	try {
-		const csrf = enforceSameOrigin(event)
-		if (csrf) return csrf
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
+	return runApiRequest('admin.events.update', async () => {
+		const guard = requireAdminRequest(event, { csrf: true })
+		if (guard) return guard
 
 		const eventParam = event.params['id']
 		if (!eventParam) {
@@ -45,11 +43,7 @@ export async function POST(event: RequestEvent) {
 		}
 
 		return apiError('Unknown action', { status: 400 })
-	} catch (err) {
-		if (err instanceof TransportValidationError) {
-			return apiValidationError(err)
-		}
-		logApiError('admin.events.update', err)
-		return apiError('Internal server error')
-	}
+	}, {
+		onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
+	})
 }

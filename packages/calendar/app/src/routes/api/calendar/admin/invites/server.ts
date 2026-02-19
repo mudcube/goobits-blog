@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import { enforceSameOrigin, logAdminEvent, requireAdminSession, unauthorized } from '@calendar/app/admin-api-helpers'
+import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { getAdminAuth } from '@calendar/kit'
 import {
 	createInvite,
@@ -8,30 +8,22 @@ import {
 	parseCalendarInviteCreateInput,
 	TransportValidationError
 } from '@calendar/core'
-import { apiOk, apiError, apiValidationError, logApiError } from '@calendar/kit'
+import { apiOk, apiError, apiValidationError } from '@calendar/kit'
 
 export async function GET(event: RequestEvent) {
-	try {
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
-
+	return runApiRequest('admin.invites.list', async () => {
+		const guard = requireAdminRequest(event)
+		if (guard) return guard
 		const { db } = await getAdminAuth({ event })
 		const invites = await listInvites({ db })
 		return apiOk({ invites })
-	} catch (err) {
-		logApiError('admin.invites.list', err)
-		return apiError('Internal server error')
-	}
+	})
 }
 
 export async function POST(event: RequestEvent) {
-	try {
-		const csrf = enforceSameOrigin(event)
-		if (csrf) return csrf
-
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
-
+	return runApiRequest('admin.invites.create', async () => {
+		const guard = requireAdminRequest(event, { csrf: true })
+		if (guard) return guard
 		const { db } = await getAdminAuth({ event })
 		const input = parseCalendarInviteCreateInput(await event.request.json().catch(() => null))
 		const uses = input.uses
@@ -49,23 +41,15 @@ export async function POST(event: RequestEvent) {
 
 		logAdminEvent(event, 'invite_create', { inviteId: invite?.id, email: invite?.email ?? null })
 		return apiOk({ invite })
-	} catch (err) {
-		if (err instanceof TransportValidationError) {
-			return apiValidationError(err)
-		}
-		logApiError('admin.invites.create', err)
-		return apiError('Internal server error')
-	}
+	}, {
+		onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
+	})
 }
 
 export async function DELETE(event: RequestEvent) {
-	try {
-		const csrf = enforceSameOrigin(event)
-		if (csrf) return csrf
-
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
-
+	return runApiRequest('admin.invites.delete', async () => {
+		const guard = requireAdminRequest(event, { csrf: true })
+		if (guard) return guard
 		const inviteId = Number(event.url.searchParams.get('id'))
 		if (!inviteId) {
 			return apiError('Missing invite id', { status: 400 })
@@ -75,8 +59,5 @@ export async function DELETE(event: RequestEvent) {
 		await deleteInvite({ db, inviteId })
 		logAdminEvent(event, 'invite_delete', { inviteId })
 		return apiOk({})
-	} catch (err) {
-		logApiError('admin.invites.delete', err)
-		return apiError('Internal server error')
-	}
+	})
 }

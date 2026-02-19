@@ -7,8 +7,8 @@ import {
 	setUserProgramAccess,
 	TransportValidationError
 } from '@calendar/core'
-import { apiError, apiOk, apiValidationError, logApiError } from '@calendar/kit'
-import { enforceSameOrigin, requireAdminSession, unauthorized } from '@calendar/app/admin-api-helpers'
+import { apiError, apiOk, apiValidationError } from '@calendar/kit'
+import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 
 function normalizeUserId(param: string | undefined) {
 	if (!param) return null
@@ -17,10 +17,9 @@ function normalizeUserId(param: string | undefined) {
 }
 
 export async function GET(event: RequestEvent) {
-	try {
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
-
+	return runApiRequest('admin.users.access.get', async () => {
+		const guard = requireAdminRequest(event)
+		if (guard) return guard
 		const userId = normalizeUserId(event.params['id'])
 		if (!userId) return apiError('Invalid user id', { status: 400 })
 
@@ -36,20 +35,13 @@ export async function GET(event: RequestEvent) {
 				allowed: accessMap.get(program.slug) ?? true
 			}))
 		})
-	} catch (err) {
-		logApiError('admin.users.access.get', err)
-		return apiError('Internal server error')
-	}
+	})
 }
 
 export async function PUT(event: RequestEvent) {
-	try {
-		const csrf = enforceSameOrigin(event)
-		if (csrf) return csrf
-
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
-
+	return runApiRequest('admin.users.access.put', async () => {
+		const guard = requireAdminRequest(event, { csrf: true })
+		if (guard) return guard
 		const userId = normalizeUserId(event.params['id'])
 		if (!userId) return apiError('Invalid user id', { status: 400 })
 
@@ -57,11 +49,7 @@ export async function PUT(event: RequestEvent) {
 		const { db } = await getAdminAuth({ event })
 		await setUserProgramAccess(db, userId, input.access)
 		return apiOk({})
-	} catch (err) {
-		if (err instanceof TransportValidationError) {
-			return apiValidationError(err)
-		}
-		logApiError('admin.users.access.put', err)
-		return apiError('Internal server error')
-	}
+	}, {
+		onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
+	})
 }

@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { enforceSameOrigin, requireAdminSession, unauthorized } from '@calendar/app/admin-api-helpers'
+import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import {
 	parseAdminSyncQueueActionInput,
 	processCalendarSyncQueue,
@@ -8,16 +8,12 @@ import {
 	retryCalendarSyncDeadLetters,
 	TransportValidationError
 } from '@calendar/core'
-import { apiError, apiOk, apiValidationError, logApiError } from '@calendar/kit'
+import { apiOk, apiValidationError } from '@calendar/kit'
 
 export async function POST(event: RequestEvent) {
-	try {
-		const csrf = enforceSameOrigin(event)
-		if (csrf) return csrf
-
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
-
+	return runApiRequest('admin.sync-queue', async () => {
+		const guard = requireAdminRequest(event, { csrf: true })
+		if (guard) return guard
 		const env = await buildEnv(event.platform)
 		const input = parseAdminSyncQueueActionInput(await event.request.json().catch(() => null))
 		if (input.action === 'retry_dead_letters') {
@@ -30,11 +26,7 @@ export async function POST(event: RequestEvent) {
 		}
 		const result = await processCalendarSyncQueue(env.DB, env, input.limit)
 		return apiOk({ action: input.action, ...result })
-	} catch (err) {
-		if (err instanceof TransportValidationError) {
-			return apiValidationError(err)
-		}
-		logApiError('admin.sync-queue', err)
-		return apiError('Internal server error')
-	}
+	}, {
+		onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
+	})
 }

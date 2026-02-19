@@ -1,14 +1,13 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import { requireAdminSession, unauthorized } from '@calendar/app/admin-api-helpers'
+import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { getAdminAuth } from '@calendar/kit'
 import { listCalendarUsers } from '@calendar/core'
-import { apiError, apiOk, logApiError } from '@calendar/kit'
+import { apiOk } from '@calendar/kit'
 
 export async function GET(event: RequestEvent) {
-	try {
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
-
+	return runApiRequest('admin.users.list', async () => {
+		const guard = requireAdminRequest(event)
+		if (guard) return guard
 		const { db } = await getAdminAuth({ event })
 		const users = await listCalendarUsers({ db })
 		type UserRow = { id: number; email: string; name: string; avatar_url: string | null; email_verified: number; last_login_at: number | null; provider: string | null }
@@ -22,8 +21,5 @@ export async function GET(event: RequestEvent) {
 			provider: user.provider
 		}))
 		return apiOk({ users: sanitized })
-	} catch (err) {
-		logApiError('admin.users.list', err)
-		return apiError('Internal server error')
-	}
+	})
 }

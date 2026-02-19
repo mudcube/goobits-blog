@@ -1,13 +1,13 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { buildPaymentLink, listEventsFeed } from '@calendar/core'
-import { apiError, apiOk, getCalendarUserId, logApiError, unauthorizedCalendar } from '@calendar/kit'
+import { apiOk, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 
 export async function GET(event: RequestEvent) {
-	try {
-		const userId = getCalendarUserId(event)
-		if (!userId) return unauthorizedCalendar()
-
+	return runCalendarRequest('calendar.events.list', async () => {
+		const user = requireCalendarUserId(event)
+		if (user.response) return user.response
+		const userId = user.userId
 		const env = await buildEnv(event.platform)
 		const onlyMine = event.url.searchParams.get('mine') === '1'
 		const feed = await listEventsFeed(env.DB, userId, onlyMine)
@@ -25,8 +25,5 @@ export async function GET(event: RequestEvent) {
 			recent: feed.recent
 		}
 		return apiOk(withPayLinks)
-	} catch (err) {
-		logApiError('calendar.events.list', err)
-		return apiError('Internal server error')
-	}
+	})
 }

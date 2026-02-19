@@ -2,24 +2,21 @@ import { json, type RequestEvent } from '@sveltejs/kit'
 import { D1SessionAdapter } from '@goobits/auth/adapters'
 import { buildEnv } from '@calendar/kit'
 import { parseCalendarSessionBootstrapInput, TransportValidationError } from '@calendar/core'
+import { apiError, apiValidationError } from '@calendar/kit'
 
 type CalendarUserRow = { id: string | number }
-
-function unauthorized() {
-	return json({ ok: false, error: { message: 'Unauthorized' } }, { status: 401 })
-}
 
 export async function POST(event: RequestEvent) {
 	try {
 		const env = await buildEnv(event.platform)
-		if (env['NODE_ENV'] !== 'development') return unauthorized()
-		if (env['E2E_RUN'] !== '1') return unauthorized()
+		if (env['NODE_ENV'] !== 'development') return apiError('Unauthorized', { status: 401 })
+		if (env['E2E_RUN'] !== '1') return apiError('Unauthorized', { status: 401 })
 
 		const expected = String(env['E2E_TEST_TOKEN'] || env['ADMIN_PASSCODE'] || '')
-		if (!expected) return unauthorized()
+		if (!expected) return apiError('Unauthorized', { status: 401 })
 		const authHeader = event.request.headers.get('authorization') || ''
 		const token = authHeader.startsWith('Bearer ') ? authHeader.slice('Bearer '.length).trim() : ''
-		if (!token || token !== expected) return unauthorized()
+		if (!token || token !== expected) return apiError('Unauthorized', { status: 401 })
 
 		const { email, name } = parseCalendarSessionBootstrapInput(await event.request.json().catch(() => null))
 
@@ -62,9 +59,9 @@ export async function POST(event: RequestEvent) {
 		return json({ ok: true, email, userId: String(userId) })
 	} catch (error) {
 		if (error instanceof TransportValidationError) {
-			return json({ ok: false, error: { message: error.message } }, { status: error.status })
+			return apiValidationError(error)
 		}
 		console.error('E2E calendar session bootstrap failed:', error)
-		return json({ ok: false, error: { message: 'Internal server error' } }, { status: 500 })
+		return apiError('Internal server error')
 	}
 }

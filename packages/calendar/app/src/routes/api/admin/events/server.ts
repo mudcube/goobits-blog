@@ -1,30 +1,24 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { createEventsBatch, getAdminPaymentDefaults, listEventsFeed } from '@calendar/core'
-import { enforceSameOrigin, logAdminEvent, requireAdminSession, unauthorized } from '@calendar/app/admin-api-helpers'
+import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { getCalendarProgramBySlug, parseAdminCreateEventsBatchInput, TransportValidationError } from '@calendar/core'
-import { apiOk, apiError, apiValidationError, logApiError } from '@calendar/kit'
+import { apiOk, apiError, apiValidationError } from '@calendar/kit'
 
 export async function GET(event: RequestEvent) {
-	try {
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
+	return runApiRequest('admin.events.list', async () => {
+		const guard = requireAdminRequest(event)
+		if (guard) return guard
 		const env = await buildEnv(event.platform)
 		const feed = await listEventsFeed(env.DB, '__admin__', false)
 		return apiOk({ upcoming: feed.upcoming, recent: feed.recent })
-	} catch (err) {
-		logApiError('admin.events.list', err)
-		return apiError('Internal server error')
-	}
+	})
 }
 
 export async function POST(event: RequestEvent) {
-	try {
-		const csrf = enforceSameOrigin(event)
-		if (csrf) return csrf
-
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
+	return runApiRequest('admin.events.create', async () => {
+		const guard = requireAdminRequest(event, { csrf: true })
+		if (guard) return guard
 
 		const input = parseAdminCreateEventsBatchInput(await event.request.json().catch(() => null))
 
@@ -52,11 +46,7 @@ export async function POST(event: RequestEvent) {
 
 		logAdminEvent(event, 'events_create_batch', { count: ids.length, activitySlug: input.activitySlug })
 		return apiOk({ ids })
-	} catch (err) {
-		if (err instanceof TransportValidationError) {
-			return apiValidationError(err)
-		}
-		logApiError('admin.events.create', err)
-		return apiError('Internal server error')
-	}
+	}, {
+		onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
+	})
 }

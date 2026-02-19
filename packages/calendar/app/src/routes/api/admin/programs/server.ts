@@ -1,35 +1,26 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { deleteCalendarProgram, getCalendarPrograms, parseAdminProgramMutationInput, TransportValidationError, upsertCalendarProgram } from '@calendar/core'
-import { enforceSameOrigin, logAdminEvent, requireAdminSession, unauthorized } from '@calendar/app/admin-api-helpers'
-import { apiError, apiOk, apiValidationError, logApiError } from '@calendar/kit'
+import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
+import { apiError, apiOk, apiValidationError } from '@calendar/kit'
 
 export async function GET(event: RequestEvent) {
-	try {
+	return runApiRequest('admin.programs.list', async () => {
+		const guard = requireAdminRequest(event)
+		if (guard) return guard
 		const env = await buildEnv(event.platform)
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) {
-			return unauthorized()
-		}
 
 		const programs = await getCalendarPrograms(env.DB)
 		return apiOk({ programs })
-	} catch (err) {
-		logApiError('admin.programs.list', err)
-		return apiError('Internal server error')
-	}
+	})
 }
 
 export async function POST(event: RequestEvent) {
-	try {
-		const csrf = enforceSameOrigin(event)
-		if (csrf) return csrf
+	return runApiRequest('admin.programs.mutate', async () => {
+		const guard = requireAdminRequest(event, { csrf: true })
+		if (guard) return guard
 
 		const env = await buildEnv(event.platform)
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) {
-			return unauthorized()
-		}
 
 		const input = parseAdminProgramMutationInput(await event.request.json().catch(() => null))
 
@@ -76,11 +67,7 @@ export async function POST(event: RequestEvent) {
 		})
 		logAdminEvent(event, 'program_upsert', { slug: program.slug, enabled: program.enabled })
 		return apiOk({})
-	} catch (err) {
-		if (err instanceof TransportValidationError) {
-			return apiValidationError(err)
-		}
-		logApiError('admin.programs.mutate', err)
-		return apiError('Internal server error')
-	}
+	}, {
+		onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
+	})
 }

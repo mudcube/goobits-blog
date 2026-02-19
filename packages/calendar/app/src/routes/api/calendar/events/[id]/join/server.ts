@@ -1,12 +1,13 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { enqueueCalendarSyncJob, joinEvent, parseCalendarJoinEventInput, processCalendarSyncQueue, TransportValidationError } from '@calendar/core'
-import { apiError, apiOk, apiValidationError, getCalendarUserId, logApiError, unauthorizedCalendar } from '@calendar/kit'
+import { apiError, apiOk, apiValidationError, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 
 export async function POST(event: RequestEvent) {
-	try {
-		const userId = getCalendarUserId(event)
-		if (!userId) return unauthorizedCalendar()
+	return runCalendarRequest('calendar.events.join', async () => {
+		const user = requireCalendarUserId(event)
+		if (user.response) return user.response
+		const userId = user.userId
 
 		const eventParam = event.params['id']
 		if (!eventParam) {
@@ -46,11 +47,7 @@ export async function POST(event: RequestEvent) {
 			return apiError(result.message, { status, code: result.code })
 		}
 		return apiOk({ status: result.status, state: result.state })
-	} catch (err) {
-		if (err instanceof TransportValidationError) {
-			return apiValidationError(err)
-		}
-		logApiError('calendar.events.join', err)
-		return apiError('Internal server error')
-	}
+	}, {
+		onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
+	})
 }

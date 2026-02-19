@@ -8,16 +8,14 @@ import {
 	getCalendarSyncQueueHealth,
 	getAdminPaymentDefaults
 } from '@calendar/core'
-import { requireAdminSession, unauthorized } from '@calendar/app/admin-api-helpers'
-import { apiError, apiOk, logApiError } from '@calendar/kit'
+import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
+import { apiOk } from '@calendar/kit'
 
 export async function GET(event: RequestEvent) {
-	try {
+	return runApiRequest('admin.status', async () => {
+		const guard = requireAdminRequest(event)
+		if (guard) return guard
 		const env = await buildEnv(event.platform)
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) {
-			return unauthorized()
-		}
 		const db = env.DB
 
 		let connected = false
@@ -103,8 +101,5 @@ export async function GET(event: RequestEvent) {
 			rules,
 			paymentDefaults
 		})
-	} catch (err) {
-		logApiError('admin.status', err)
-		return apiError('Internal server error')
-	}
+	})
 }

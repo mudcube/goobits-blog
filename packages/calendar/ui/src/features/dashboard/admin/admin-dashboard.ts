@@ -23,6 +23,11 @@ import {
 } from '../../admin/admin'
 import { getCalendarAdminPaymentDefaults, saveCalendarAdminPaymentDefaults, getCalendarAdminEventTemplates, getCalendarAdminEventDetail, promoteCalendarWaitlistEntry } from '../../../api/calendar'
 
+async function runSuccess(task: () => Promise<unknown>) {
+	await task()
+	return { ok: true, error: '' }
+}
+
 export async function loadDashboardStatus() {
 	const data = await fetchAdminStatus()
 	return {
@@ -59,8 +64,7 @@ export async function loadDashboardBookings() {
 }
 
 export async function saveDashboardRules(input: AdminRulesState) {
-	await persistAdminRules(input)
-	return { ok: true, error: '' }
+	return runSuccess(() => persistAdminRules(input))
 }
 
 export async function loadMembersData() {
@@ -74,13 +78,11 @@ export async function loadMembersData() {
 }
 
 export async function createMemberInvite(input: { email: string | null, uses: number, expiresInDays: number }) {
-	await persistInvite(input)
-	return { ok: true, error: '' }
+	return runSuccess(() => persistInvite(input))
 }
 
 export async function deleteMemberInvite(id: string) {
-	await removeInvite(id)
-	return { ok: true, error: '' }
+	return runSuccess(() => removeInvite(id))
 }
 
 export async function cleanupDevE2EData() {
@@ -93,8 +95,7 @@ export async function getCalendarReconnectUrl() {
 }
 
 export async function disconnectCalendarReconnect() {
-	await disconnectCalendarOAuth()
-	return { ok: true, error: '' }
+	return runSuccess(() => disconnectCalendarOAuth())
 }
 
 export async function loadAdminPrograms() {
@@ -106,8 +107,7 @@ export async function loadAdminPrograms() {
 }
 
 export async function updateAdminProgram(input: { slug: string; enabled: boolean }) {
-	await persistAdminProgram(input)
-	return { ok: true, error: '' }
+	return runSuccess(() => persistAdminProgram(input))
 }
 
 export async function saveDashboardProgram(input: {
@@ -128,13 +128,11 @@ export async function saveDashboardProgram(input: {
 	enabled: boolean
 	sortOrder: number
 }) {
-	await saveAdminProgram(input)
-	return { ok: true, error: '' }
+	return runSuccess(() => saveAdminProgram(input))
 }
 
 export async function deleteDashboardProgram(slug: string) {
-	await removeAdminProgram(slug)
-	return { ok: true, error: '' }
+	return runSuccess(() => removeAdminProgram(slug))
 }
 
 export async function loadAdminEventsData() {
@@ -161,33 +159,27 @@ export async function createAdminEventsBatch(input: {
 	location?: string
 	note?: string
 }) {
-	await persistAdminEvents(input)
-	return { ok: true, error: '' }
+	return runSuccess(() => persistAdminEvents(input))
 }
 
 export async function updateAdminEventCapacityValue(eventId: number, capacity: number) {
-	await persistAdminEventCapacity(eventId, capacity)
-	return { ok: true, error: '' }
+	return runSuccess(() => persistAdminEventCapacity(eventId, capacity))
 }
 
 export async function updateAdminEventMemoryValue(eventId: number, input: { recapText?: string; heroImageUrl?: string }) {
-	await persistAdminEventMemory(eventId, input)
-	return { ok: true, error: '' }
+	return runSuccess(() => persistAdminEventMemory(eventId, input))
 }
 
 export async function processDashboardSyncQueue(limit = 10) {
-	await processAdminSyncQueue(limit)
-	return { ok: true, error: '' }
+	return runSuccess(() => processAdminSyncQueue(limit))
 }
 
 export async function retryDashboardSyncDeadLetters(limit = 10) {
-	await retryAdminSyncDeadLetters(limit)
-	return { ok: true, error: '' }
+	return runSuccess(() => retryAdminSyncDeadLetters(limit))
 }
 
 export async function purgeDashboardSyncDeadLetters(limit = 50) {
-	await purgeAdminSyncDeadLetters(limit)
-	return { ok: true, error: '' }
+	return runSuccess(() => purgeAdminSyncDeadLetters(limit))
 }
 
 export async function loadAdminPaymentDefaults() {
@@ -195,8 +187,7 @@ export async function loadAdminPaymentDefaults() {
 }
 
 export async function saveAdminPaymentDefaults(input: { provider: string | null; handle: string | null }) {
-	await saveCalendarAdminPaymentDefaults(input)
-	return { ok: true, error: '' }
+	return runSuccess(() => saveCalendarAdminPaymentDefaults(input))
 }
 
 export async function loadAdminEventTemplates() {

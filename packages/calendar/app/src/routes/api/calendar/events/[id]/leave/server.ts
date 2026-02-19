@@ -1,12 +1,13 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { enqueueCalendarSyncJob, leaveEvent, processCalendarSyncQueue } from '@calendar/core'
-import { apiError, apiOk, getCalendarUserId, logApiError, unauthorizedCalendar } from '@calendar/kit'
+import { apiError, apiOk, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 
 export async function POST(event: RequestEvent) {
-	try {
-		const userId = getCalendarUserId(event)
-		if (!userId) return unauthorizedCalendar()
+	return runCalendarRequest('calendar.events.leave', async () => {
+		const user = requireCalendarUserId(event)
+		if (user.response) return user.response
+		const userId = user.userId
 
 		const eventParam = event.params['id']
 		if (!eventParam) {
@@ -33,8 +34,5 @@ export async function POST(event: RequestEvent) {
 			console.warn('Failed to enqueue calendar sync after leave:', error)
 		}
 		return apiOk({ state: result.state })
-	} catch (err) {
-		logApiError('calendar.events.leave', err)
-		return apiError('Internal server error')
-	}
+	})
 }

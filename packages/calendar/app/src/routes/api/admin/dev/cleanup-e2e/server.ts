@@ -1,8 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import type { D1DatabaseLike } from '@calendar/kit'
-import { enforceSameOrigin, requireAdminSession, unauthorized, forbidden, logAdminEvent } from '@calendar/app/admin-api-helpers'
-import { apiError, apiOk, logApiError } from '@calendar/kit'
+import { requireAdminRequest, forbidden, logAdminEvent, runApiRequest } from '@calendar/app/admin-api-helpers'
+import { apiOk } from '@calendar/kit'
 
 type CleanupResult = {
 	events: { before: number; after: number }
@@ -15,13 +15,9 @@ async function countLike(db: D1DatabaseLike, sql: string) {
 }
 
 export async function POST(event: RequestEvent) {
-	try {
-		const csrf = enforceSameOrigin(event)
-		if (csrf) return csrf
-
-		const auth = await requireAdminSession({ event })
-		if (!auth.ok) return unauthorized()
-
+	return runApiRequest('admin.dev.cleanup-e2e', async () => {
+		const guard = requireAdminRequest(event, { csrf: true })
+		if (guard) return guard
 		// Never allow destructive cleanup outside local dev.
 		if (process.env['NODE_ENV'] !== 'development') {
 			return forbidden()
@@ -140,8 +136,5 @@ export async function POST(event: RequestEvent) {
 			users: { before: beforeUsers, after: afterUsers }
 		}
 		return apiOk(result)
-	} catch (error) {
-		logApiError('admin.dev.cleanup-e2e', error)
-		return apiError('Internal server error')
-	}
+	})
 }

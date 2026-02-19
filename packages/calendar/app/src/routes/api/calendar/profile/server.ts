@@ -1,25 +1,24 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { getCalendarProfile, parseCalendarProfileInput, saveCalendarProfile, TransportValidationError } from '@calendar/core'
-import { apiError, apiOk, apiValidationError, getCalendarUserId, logApiError, unauthorizedCalendar } from '@calendar/kit'
+import { apiOk, apiValidationError, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 
 export async function GET(event: RequestEvent) {
-	try {
-		const userId = getCalendarUserId(event)
-		if (!userId) return unauthorizedCalendar()
+	return runCalendarRequest('calendar.profile.get', async () => {
+		const user = requireCalendarUserId(event)
+		if (user.response) return user.response
+		const userId = user.userId
 		const env = await buildEnv(event.platform)
 		const profile = await getCalendarProfile(env.DB, userId)
 		return apiOk({ profile })
-	} catch (err) {
-		logApiError('calendar.profile.get', err)
-		return apiError('Internal server error')
-	}
+	})
 }
 
 export async function POST(event: RequestEvent) {
-	try {
-		const userId = getCalendarUserId(event)
-		if (!userId) return unauthorizedCalendar()
+	return runCalendarRequest('calendar.profile.save', async () => {
+		const user = requireCalendarUserId(event)
+		if (user.response) return user.response
+		const userId = user.userId
 		const input = parseCalendarProfileInput(await event.request.json().catch(() => null))
 
 		const env = await buildEnv(event.platform)
@@ -29,11 +28,7 @@ export async function POST(event: RequestEvent) {
 			chatHandle: input.chatHandle
 		})
 		return apiOk({})
-	} catch (err) {
-		if (err instanceof TransportValidationError) {
-			return apiValidationError(err)
-		}
-		logApiError('calendar.profile.save', err)
-		return apiError('Internal server error')
-	}
+	}, {
+		onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
+	})
 }

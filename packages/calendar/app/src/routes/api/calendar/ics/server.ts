@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { getCalendarConfig, listUpcomingEvents } from '@calendar/core'
-import { getCalendarUserId } from '@calendar/kit'
+import { requireCalendarUserId } from '@calendar/kit'
 
 function escapeIcsText(value: string) {
 	return value
@@ -17,10 +17,9 @@ function toIcsDate(value: string) {
 
 export async function GET(event: RequestEvent) {
 	const calendarConfig = getCalendarConfig()
-	const userId = getCalendarUserId(event)
-	if (!userId) {
-		return new Response('Unauthorized', { status: 401 })
-	}
+	const user = requireCalendarUserId(event)
+	if (user.response) return user.response
+	const userId = user.userId
 
 	const env = await buildEnv(event.platform)
 	const events = await listUpcomingEvents(env.DB, userId, true)
