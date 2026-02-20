@@ -2,20 +2,37 @@
 	import '@calendar/theme/admin.scss'
 	import { page } from '$app/stores'
 	import { enhance } from '$app/forms'
+	import { getCalendarUiConfig } from '@calendar/ui/config'
 
 	const { data, children } = $props<{ data: { user: unknown | null }; children: () => unknown }>()
+	const calendarConfig = getCalendarUiConfig()
 
 	const nav = [
-		{ href: '/admin', label: 'Home', icon: '🏠' },
-		{ href: '/admin/crew', label: 'Crew', icon: '👥' },
-		{ href: '/admin/config', label: 'Config', icon: '⚙️' }
+		{ href: '/admin/', label: 'Home', icon: '🏠' },
+		{ href: '/admin/crew/', label: 'Crew', icon: '👥' },
+		{ href: '/admin/config/', label: 'Config', icon: '⚙️' }
 	]
 
 	function active(path: string) {
-		if (path === '/admin') return $page.url.pathname === '/admin' || $page.url.pathname === '/admin/'
-		return $page.url.pathname === path || $page.url.pathname.startsWith(`${path}/`)
+		const normalizedPath = path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path
+		const current = $page.url.pathname.endsWith('/') && $page.url.pathname.length > 1
+			? $page.url.pathname.slice(0, -1)
+			: $page.url.pathname
+		if (normalizedPath === '/admin') return current === '/admin'
+		return current === normalizedPath || current.startsWith(`${normalizedPath}/`)
+	}
+
+	function adminSectionTitle(pathname: string) {
+		if (pathname === '/admin/crew' || pathname.startsWith('/admin/crew/')) return 'Crew'
+		if (pathname === '/admin/config' || pathname.startsWith('/admin/config/')) return 'Config'
+		if (pathname.startsWith('/admin/events/')) return 'Event Detail'
+		return 'Home'
 	}
 </script>
+
+<svelte:head>
+	<title>{adminSectionTitle($page.url.pathname)} | {calendarConfig.brand.calendarName} | {calendarConfig.brand.siteName}</title>
+</svelte:head>
 
 <div class="social-admin">
 	<aside class="social-admin__sidebar">
@@ -49,15 +66,22 @@
 
 <style>
 	.social-admin {
+		--social-admin-muted: color-mix(in srgb, var(--text) 62%, transparent);
+		--social-admin-border: color-mix(in srgb, var(--text) 12%, transparent);
+		--social-admin-border-strong: color-mix(in srgb, var(--text) 18%, transparent);
+		--social-admin-panel: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
+		--social-admin-active-bg: color-mix(in srgb, var(--text) 10%, transparent);
+		--social-admin-active-fg: var(--text);
 		min-height: 100vh;
 		display: grid;
 		grid-template-columns: 220px 1fr;
-		background: linear-gradient(180deg, #faf8ff 0%, #f8fafc 40%);
+		background: var(--bg);
+		color: var(--text);
 	}
 	.social-admin__sidebar {
 		padding: 1rem;
-		border-right: 1px solid color-mix(in srgb, var(--calendar-shell-text) 12%, transparent);
-		background: color-mix(in srgb, #ffffff 85%, #f1f5f9 15%);
+		border-right: 1px solid var(--social-admin-border);
+		background: var(--social-admin-panel);
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
@@ -79,12 +103,12 @@
 		padding: 0.65rem 0.7rem;
 		border-radius: 0.75rem;
 		text-decoration: none;
-		color: #475569;
+		color: var(--social-admin-muted);
 		font-weight: 600;
 	}
 	.social-admin__nav-item--active {
-		background: color-mix(in srgb, #6366f1 14%, white);
-		color: #4338ca;
+		background: var(--social-admin-active-bg);
+		color: var(--social-admin-active-fg);
 	}
 	.social-admin__logout {
 		margin-top: auto;
@@ -93,8 +117,9 @@
 		width: 100%;
 		padding: 0.6rem 0.8rem;
 		border-radius: 0.75rem;
-		border: 1px solid #cbd5e1;
-		background: #fff;
+		border: 1px solid var(--social-admin-border-strong);
+		background: color-mix(in srgb, var(--bg) 92%, var(--text) 8%);
+		color: var(--text);
 		cursor: pointer;
 	}
 	.social-admin__content {
@@ -124,8 +149,8 @@
 			grid-template-columns: repeat(3, 1fr);
 			gap: 0.35rem;
 			padding: 0.45rem 0.55rem;
-			background: color-mix(in srgb, #ffffff 92%, #e2e8f0 8%);
-			border-top: 1px solid #e2e8f0;
+			background: var(--social-admin-panel);
+			border-top: 1px solid var(--social-admin-border);
 		}
 		.social-admin__tab {
 			display: flex;
@@ -136,13 +161,13 @@
 			min-height: 44px;
 			border-radius: 0.6rem;
 			text-decoration: none;
-			color: #64748b;
+			color: var(--social-admin-muted);
 			font-size: 0.75rem;
 			font-weight: 600;
 		}
 		.social-admin__tab--active {
-			background: color-mix(in srgb, #6366f1 16%, white);
-			color: #4338ca;
+			background: var(--social-admin-active-bg);
+			color: var(--social-admin-active-fg);
 		}
 	}
 </style>

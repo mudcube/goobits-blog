@@ -139,14 +139,14 @@ export function createAdminMembersController(
 		)
 	}
 
-	async function saveAccess() {
+	async function saveAccess(closeAfterSave = true) {
 		if (!selectedUserId) return
 		accessSaving = true
 		error = ''
 		try {
 			await saveCalendarAdminUserAccess(selectedUserId, accessRows)
 			notice = 'Updated member access.'
-			closeAccess()
+			if (closeAfterSave) closeAccess()
 		} catch (err) {
 			if (onUnauthorized?.(err)) return
 			error = err instanceof Error ? err.message : 'Failed to save access rules'

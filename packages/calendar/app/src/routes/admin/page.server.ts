@@ -39,7 +39,7 @@ export const actions: Actions = {
 				},
 				userAdapter,
 				sessionAdapter,
-				redirectTo: getCalendarConfig().routes.adminBase,
+				redirectTo: `${getCalendarConfig().routes.adminBase}/`,
 				rateLimit: {
 					check: async (key: string) => {
 						try {
@@ -73,6 +73,6 @@ export const actions: Actions = {
 
 	logout: async (event) => {
 		const { sessionAdapter } = await getAdminAuth({ event })
-		return createLogoutHandler({ sessionAdapter, redirectAfterLogout: getCalendarConfig().routes.adminBase })(event)
+		return createLogoutHandler({ sessionAdapter, redirectAfterLogout: `${getCalendarConfig().routes.adminBase}/` })(event)
 	}
 }

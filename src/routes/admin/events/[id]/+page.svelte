@@ -25,14 +25,14 @@
 	$effect(() => {
 		if (!authed || !attemptedLoad || loading) return
 		if (!dashboard.selectedEventDetail) {
-			goto('/admin', { replaceState: true })
+			goto('/admin/', { replaceState: true })
 		}
 	})
 </script>
 
 {#if authed}
 	<div class="admin-event-detail">
-		<a class="admin-event-detail__back" href="/admin">Back to Home</a>
+		<a class="admin-event-detail__back" href="/admin/">Back to Home</a>
 		{#if loading}
 			<p class="admin-event-detail__loading">Loading event detail...</p>
 		{:else if dashboard.selectedEventDetail}
@@ -53,11 +53,11 @@
 		font-size: 0.9rem;
 		font-weight: 600;
 		text-decoration: none;
-		color: #4338ca;
+		color: var(--text);
 	}
 
 	.admin-event-detail__loading {
 		margin: 0;
-		color: #64748b;
+		color: color-mix(in srgb, var(--text) 62%, transparent);
 	}
 </style>
