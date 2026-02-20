@@ -116,16 +116,6 @@
 		dashboard.closeEventDetail()
 	}
 
-	function openCreate() {
-		showCreate = true
-		selectedActivitySlug = ''
-		createTitle = ''
-		createStartsAt = ''
-		createEndsAt = ''
-		createCapacity = dashboard.capacity
-		createCostDollars = 0
-	}
-
 	function selectActivity(slug: string, label: string) {
 		selectedActivitySlug = slug
 		createTitle = label === 'Gym'
@@ -179,7 +169,7 @@
 
 			<div class="social-home__section-head">
 				<h3>THIS WEEK</h3>
-				<button type="button" class="social-home__new" onclick={openCreate}>+ New</button>
+				<a class="social-home__new" href="/admin/events/new/">+ New</a>
 			</div>
 
 			{#if dashboard.eventsLoading}
@@ -213,7 +203,7 @@
 			<div class="social-home__day">SAT — SUN</div>
 			<div class="social-home__empty-weekend">
 				<p>Nothing planned yet.</p>
-				<button type="button" onclick={openCreate}>+ Start an Adventure?</button>
+				<a href="/admin/events/new/">+ Start an Adventure?</a>
 			</div>
 
 			<div class="social-home__memory-lane">
@@ -241,9 +231,11 @@
 				>
 					<button type="button" class="social-home__back" onclick={closeEventDetail}>← Back</button>
 					<AdminEventDetailSheet {dashboard} detail={dashboard.selectedEventDetail} />
-					<div class="social-home__detail-actions">
-						<button type="button" onclick={() => goto('/admin/')}>Edit Event</button>
-					</div>
+						<div class="social-home__detail-actions">
+							<button type="button" onclick={() => dashboard.selectedEventDetail && goto(`/admin/events/${dashboard.selectedEventDetail.event.id}`)}>
+								Edit Event
+							</button>
+						</div>
 				</div>
 			</div>
 		{/if}
@@ -330,7 +322,6 @@
 	}
 
 	.social-home__main {
-		max-width: 48rem;
 		display: grid;
 		gap: 0.75rem;
 	}
@@ -401,6 +392,11 @@
 		font-weight: 700;
 		cursor: pointer;
 	}
+	.social-home__new {
+		display: inline-flex;
+		align-items: center;
+		text-decoration: none;
+	}
 
 	.social-home__day {
 		margin-top: 0.5rem;
@@ -470,7 +466,7 @@
 		text-align: center;
 	}
 
-	.social-home__empty-weekend button {
+	.social-home__empty-weekend a {
 		min-height: 32px;
 		padding: 0 1rem;
 		border-radius: 10px;
@@ -479,6 +475,9 @@
 		color: var(--text);
 		font-weight: 700;
 		cursor: pointer;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
 	}
 
 	.social-home__memory-lane {
@@ -651,9 +650,4 @@
 		}
 	}
 
-	@media (max-width: 820px) {
-		.social-home__main {
-			max-width: none;
-		}
-	}
 </style>

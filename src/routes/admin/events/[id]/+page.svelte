@@ -32,7 +32,7 @@
 
 {#if authed}
 	<div class="admin-event-detail">
-		<a class="admin-event-detail__back" href="/admin/">Back to Home</a>
+		<a class="admin-event-detail__back" href="/admin/events/">Back to Events</a>
 		{#if loading}
 			<p class="admin-event-detail__loading">Loading event detail...</p>
 		{:else if dashboard.selectedEventDetail}

@@ -244,7 +244,6 @@
 
 <style>
 	.social-crew {
-		max-width: 48rem;
 		display: grid;
 		gap: 1rem;
 	}
