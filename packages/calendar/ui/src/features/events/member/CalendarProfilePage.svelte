@@ -3,6 +3,7 @@
 	import { getCalendarUiConfig } from '../../../config'
 	import PillButton from '../../../primitives/PillButton.svelte'
 import Hero from '../../../primitives/Hero.svelte'
+	import MonthEventCalendar from './MonthEventCalendar.svelte'
 	let { data } = $props()
 	let emergencyContact = $derived(data.profile?.emergencyContact ?? '')
 	let dietaryRestrictions = $derived(data.profile?.dietaryRestrictions ?? '')
@@ -92,6 +93,8 @@ import Hero from '../../../primitives/Hero.svelte'
 			</div>
 		</div>
 	</section>
+
+	<MonthEventCalendar title="My calendar" events={data.events} />
 
 	<section class="calendar-page__section calendar-home__section">
 		<h2 class="calendar-home__feed-title">My upcoming events</h2>

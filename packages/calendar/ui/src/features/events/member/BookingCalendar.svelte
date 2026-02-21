@@ -3,6 +3,7 @@
 	import { applyEventMutationState } from './feed-state'
 	import { formatWhen } from './formatWhen'
 	import PillButton from '../../../primitives/PillButton.svelte'
+	import MonthEventCalendar from './MonthEventCalendar.svelte'
 	let {
 		activitySlug,
 		initialUpcoming = [],
@@ -49,6 +50,14 @@
 		}
 	}
 </script>
+
+<MonthEventCalendar
+	title="Calendar"
+	events={upcoming}
+	{pendingEventId}
+	onJoin={join}
+	onLeave={leave}
+/>
 
 <section class="calendar-page__section calendar-home__section">
 	<div class="calendar-home__feed-head">

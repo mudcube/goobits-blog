@@ -5,6 +5,7 @@
 	import { getCalendarUiConfig } from '../../../config'
 	import PillButton from '../../../primitives/PillButton.svelte'
 import Hero from '../../../primitives/Hero.svelte'
+	import MonthEventCalendar from './MonthEventCalendar.svelte'
 	let { data } = $props()
 	let upcoming = $state(data.upcoming ?? [])
 	let recent = $state(data.recent ?? [])
@@ -63,6 +64,14 @@ import Hero from '../../../primitives/Hero.svelte'
 		eyebrow="Members"
 		titleLines={homeTitleLines}
 		subtitle="Pick an activity and let's make something happen."
+	/>
+
+	<MonthEventCalendar
+		title={data.onlyMine ? 'My calendar' : 'Calendar'}
+		events={upcoming}
+		{pendingEventId}
+		onJoin={join}
+		onLeave={leave}
 	/>
 
 	<section class="calendar-page__section calendar-home__section">
