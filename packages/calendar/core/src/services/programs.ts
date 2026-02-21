@@ -118,6 +118,7 @@ export async function setCalendarProgramEnabled(db: D1DatabaseLike, slug: Calend
 }
 
 export async function getCalendarProgramBySlug(db: D1DatabaseLike, slug: string, options: { includeDisabled?: boolean } = {}) {
+	await seedProgramRows(db)
 	const row = await db.prepare(
 		`SELECT slug, label, activity_name, page_title, eyebrow, hero_title_line_1, hero_title_line_2,
 		        hero_subtitle, description, icon, eyebrow_class, glow_class, form_glow_class,

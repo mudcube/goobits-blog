@@ -53,6 +53,7 @@ export type AdminCreateEventsBatchInput = {
 export type AdminEventUpdateInput =
 	| { action: 'capacity'; capacity: number }
 	| { action: 'attendance'; userId: string; attendanceStatus: 'unknown' | 'attended' | 'flaked' }
+	| { action: 'delete' }
 	| { action: 'memory'; recapText: string | null; heroImageUrl: string | null }
 
 export type AdminSyncQueueActionInput = {
@@ -155,7 +156,7 @@ export function parseAdminCreateEventsBatchInput(input: unknown): AdminCreateEve
 
 export function parseAdminEventUpdateInput(input: unknown): AdminEventUpdateInput {
 	const body = asJsonObject(input)
-	const action = readEnum(body, 'action', ['capacity', 'attendance', 'memory'] as const, 'Unknown action')
+	const action = readEnum(body, 'action', ['capacity', 'attendance', 'memory', 'delete'] as const, 'Unknown action')
 	if (action === 'capacity') {
 		return { action, capacity: readIntInRange(body, 'capacity', { min: 1, max: 50, message: 'Invalid capacity' }) }
 	}
@@ -165,6 +166,9 @@ export function parseAdminEventUpdateInput(input: unknown): AdminEventUpdateInpu
 			userId: readRequiredString(body, 'userId', { trim: true, maxLength: 128, message: 'Invalid attendance input' }),
 			attendanceStatus: readEnum(body, 'attendanceStatus', ['unknown', 'attended', 'flaked'] as const, 'Invalid attendance input')
 		}
+	}
+	if (action === 'delete') {
+		return { action }
 	}
 	return {
 		action,

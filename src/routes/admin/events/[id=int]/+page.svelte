@@ -50,10 +50,18 @@
 	}
 
 	.admin-event-detail__back {
+		display: inline-flex;
+		align-items: center;
+		width: fit-content;
 		font-size: 0.9rem;
 		font-weight: 600;
+		padding: 0.32rem 0.6rem;
+		border-radius: var(--admin-control-radius);
 		text-decoration: none;
 		color: var(--text);
+	}
+	.admin-event-detail__back:hover {
+		background: var(--admin-control-bg);
 	}
 
 	.admin-event-detail__loading {

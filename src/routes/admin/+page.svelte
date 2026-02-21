@@ -160,16 +160,15 @@
 						<span>{attentionEvent()?.title} needs attention</span>
 					</div>
 					<div class="social-home__alert-actions">
-						<button type="button" onclick={expandSpotsForAttention}>Expand Spots</button>
-						<button type="button" onclick={openWaitlistForAttention}>Open Waitlist</button>
-						<button type="button" onclick={ignoreAttention}>Ignore</button>
+						<button type="button" class="admin-ui-btn" onclick={expandSpotsForAttention}>Expand Spots</button>
+						<button type="button" class="admin-ui-btn" onclick={openWaitlistForAttention}>Open Waitlist</button>
+						<button type="button" class="admin-ui-btn" onclick={ignoreAttention}>Ignore</button>
 					</div>
 				</div>
 			{/if}
 
 			<div class="social-home__section-head">
 				<h3>THIS WEEK</h3>
-				<a class="social-home__new" href="/admin/events/new/">+ New</a>
 			</div>
 
 			{#if dashboard.eventsLoading}
@@ -232,7 +231,7 @@
 					<button type="button" class="social-home__back" onclick={closeEventDetail}>← Back</button>
 					<AdminEventDetailSheet {dashboard} detail={dashboard.selectedEventDetail} />
 						<div class="social-home__detail-actions">
-							<button type="button" onclick={() => dashboard.selectedEventDetail && goto(`/admin/events/${dashboard.selectedEventDetail.event.id}`)}>
+							<button type="button" class="admin-ui-btn" onclick={() => dashboard.selectedEventDetail && goto(`/admin/events/${dashboard.selectedEventDetail.event.id}`)}>
 								Edit Event
 							</button>
 						</div>
@@ -279,33 +278,33 @@
 				{#if selectedActivitySlug}
 					<div class="social-home__create-form">
 						<label for="social-create-title">Title</label>
-						<input id="social-create-title" type="text" bind:value={createTitle} />
+						<input id="social-create-title" class="admin-ui-input" type="text" bind:value={createTitle} />
 
 						<div class="social-home__grid-2">
 							<div>
 								<label for="social-create-starts">Starts</label>
-								<input id="social-create-starts" type="datetime-local" bind:value={createStartsAt} />
+								<input id="social-create-starts" class="admin-ui-input" type="datetime-local" bind:value={createStartsAt} />
 							</div>
 							<div>
 								<label for="social-create-ends">Ends</label>
-								<input id="social-create-ends" type="datetime-local" bind:value={createEndsAt} />
+								<input id="social-create-ends" class="admin-ui-input" type="datetime-local" bind:value={createEndsAt} />
 							</div>
 						</div>
 
 						<div class="social-home__grid-2">
 							<div>
 								<label for="social-create-spots">Spots</label>
-								<input id="social-create-spots" type="number" min="2" max="20" bind:value={createCapacity} />
+								<input id="social-create-spots" class="admin-ui-input" type="number" min="2" max="20" bind:value={createCapacity} />
 							</div>
 							<div>
 								<label for="social-create-cost">Cost ($)</label>
-								<input id="social-create-cost" type="number" min="0" step="1" bind:value={createCostDollars} />
+								<input id="social-create-cost" class="admin-ui-input" type="number" min="0" step="1" bind:value={createCostDollars} />
 							</div>
 						</div>
 
 						<div class="social-home__create-actions">
-							<button type="button" class="social-home__secondary" onclick={() => (showCreate = false)}>Cancel</button>
-							<button type="button" onclick={submitCreate} disabled={dashboard.eventsCreating}>
+							<button type="button" class="admin-ui-btn social-home__secondary" onclick={() => (showCreate = false)}>Cancel</button>
+							<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={submitCreate} disabled={dashboard.eventsCreating}>
 								{dashboard.eventsCreating ? 'Creating…' : "Let's Go"}
 							</button>
 						</div>
@@ -357,16 +356,6 @@
 		margin-top: 0.75rem;
 	}
 
-	.social-home__alert-actions button {
-		min-height: 32px;
-		padding: 0 0.75rem;
-		border-radius: 10px;
-		border: 1px solid color-mix(in srgb, var(--text) 24%, transparent);
-		background: color-mix(in srgb, var(--bg) 90%, var(--text) 10%);
-		color: var(--text);
-		cursor: pointer;
-	}
-
 	.social-home__section-head {
 		display: flex;
 		justify-content: space-between;
@@ -379,23 +368,6 @@
 		font-size: 0.75rem;
 		letter-spacing: 0.1em;
 		color: color-mix(in srgb, var(--text) 50%, transparent);
-	}
-
-	.social-home__new,
-	.social-home__create-actions button {
-		min-height: 32px;
-		padding: 0 1rem;
-		border-radius: 10px;
-		border: 1px solid color-mix(in srgb, var(--text) 24%, transparent);
-		background: var(--text);
-		color: var(--bg);
-		font-weight: 700;
-		cursor: pointer;
-	}
-	.social-home__new {
-		display: inline-flex;
-		align-items: center;
-		text-decoration: none;
 	}
 
 	.social-home__day {
@@ -414,6 +386,12 @@
 		background: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
 		text-align: left;
 		cursor: pointer;
+		transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+	}
+	.social-home__event-card:hover {
+		border-color: color-mix(in srgb, var(--text) 22%, transparent);
+		box-shadow: 0 6px 16px var(--shadow-soft);
+		transform: translateY(-1px);
 	}
 
 	.social-home__event-head,
@@ -469,7 +447,7 @@
 	.social-home__empty-weekend a {
 		min-height: 32px;
 		padding: 0 1rem;
-		border-radius: 10px;
+		border-radius: var(--admin-control-radius);
 		border: 1px dashed color-mix(in srgb, var(--text) 35%, transparent);
 		background: transparent;
 		color: var(--text);
@@ -533,17 +511,6 @@
 		margin-top: 0.75rem;
 	}
 
-	.social-home__detail-actions button {
-		min-height: 32px;
-		padding: 0 1rem;
-		border-radius: 10px;
-		border: 1px solid color-mix(in srgb, var(--text) 24%, transparent);
-		background: color-mix(in srgb, var(--bg) 90%, var(--text) 10%);
-		color: var(--text);
-		font-weight: 700;
-		cursor: pointer;
-	}
-
 	.social-home__modal-scrim {
 		align-items: center;
 		justify-content: center;
@@ -592,11 +559,16 @@
 		place-items: center;
 		gap: 0.125rem;
 		cursor: pointer;
+		transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+	}
+	.social-home__activity:hover {
+		border-color: color-mix(in srgb, var(--text) 28%, transparent);
+		transform: translateY(-1px);
 	}
 
 	.social-home__activity--active {
-		border-color: color-mix(in srgb, var(--text) 45%, transparent);
-		background: color-mix(in srgb, var(--text) 10%, var(--bg));
+		border-color: var(--admin-selected-border);
+		background: var(--admin-selected-bg);
 	}
 
 	.social-home__create-form {
@@ -612,16 +584,6 @@
 		color: color-mix(in srgb, var(--text) 62%, transparent);
 	}
 
-	.social-home__create-form input {
-		width: 100%;
-		min-height: 40px;
-		border-radius: 10px;
-		border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
-		background: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
-		color: var(--text);
-		padding: 0 0.75rem;
-	}
-
 	.social-home__grid-2 {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
@@ -635,8 +597,9 @@
 	}
 
 	.social-home__create-actions .social-home__secondary {
-		background: color-mix(in srgb, var(--bg) 90%, var(--text) 10%);
-		color: var(--text);
+		background: var(--admin-control-bg);
+		color: var(--admin-control-fg);
+		border-color: var(--admin-control-border);
 	}
 
 	@keyframes social-home-sheet-in {

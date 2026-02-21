@@ -57,7 +57,6 @@
 	<div class="social-events">
 		<div class="social-events__head">
 			<h2>Events</h2>
-			<button type="button" class="social-events__new" onclick={() => goto('/admin/events/new/')}>+ New Event</button>
 		</div>
 
 		<h4>ACTIVITY PAGES</h4>
@@ -67,7 +66,7 @@
 					type="button"
 					class="social-events__program-card"
 					style={`--activity-color: ${colorForActivity(program.label, program.slug)}`}
-					onclick={() => goto(`/admin/events/program/${program.slug}/`)}
+					onclick={() => goto(`/admin/events/${program.slug}/`)}
 				>
 					<div class="social-events__program-icon">{program.icon || emojiForActivity(program.label, program.slug)}</div>
 					<div class="social-events__program-label">{program.label}</div>
@@ -119,7 +118,7 @@
 							<div class="social-events__past-title">{recent.title}</div>
 							<div class="social-events__event-sub">{dayLabel(recent.startsAt)} · {recent.seatsTaken}/{recent.capacity} attended</div>
 						</div>
-						<button type="button" onclick={() => goto(`/admin/events/${recent.id}`)}>View</button>
+						<button type="button" class="admin-ui-btn" onclick={() => goto(`/admin/events/${recent.id}`)}>View</button>
 					</div>
 				{/each}
 			{/if}
@@ -136,7 +135,7 @@
 	.social-events__head {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: flex-start;
 		gap: 0.8rem;
 		margin-bottom: 0.25rem;
 	}
@@ -154,24 +153,6 @@
 		letter-spacing: 0.08em;
 		font-weight: 700;
 		color: color-mix(in srgb, var(--text) 55%, transparent);
-	}
-
-	.social-events__new,
-	.social-events__past-row button {
-		min-height: 36px;
-		padding: 0 1rem;
-		border-radius: 10px;
-		border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
-		background: color-mix(in srgb, var(--text) 78%, var(--bg) 22%);
-		color: var(--bg);
-		font-weight: 700;
-		cursor: pointer;
-		transition: transform 120ms ease, box-shadow 120ms ease;
-	}
-
-	.social-events__new:hover {
-		transform: translateY(-1px);
-		box-shadow: 0 4px 14px color-mix(in srgb, var(--text) 20%, transparent);
 	}
 
 	.social-events__program-grid {
@@ -200,6 +181,10 @@
 		border-color: color-mix(in srgb, var(--activity-color) 42%, transparent);
 		box-shadow: 0 4px 14px color-mix(in srgb, var(--activity-color) 22%, transparent);
 		transform: translateY(-2px);
+	}
+	.social-events__program-card:focus-visible {
+		border-color: var(--admin-selected-border);
+		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
 	}
 
 	.social-events__program-icon {
@@ -263,6 +248,10 @@
 	.social-events__event:hover {
 		border-color: color-mix(in srgb, var(--text) 22%, transparent);
 		box-shadow: 0 4px 14px var(--shadow-soft);
+	}
+	.social-events__event:focus-visible {
+		border-color: var(--admin-selected-border);
+		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
 	}
 
 	.social-events__event-main {
@@ -334,11 +323,16 @@
 
 	.social-events__past-row button {
 		background: transparent;
-		border-color: color-mix(in srgb, var(--text) 20%, transparent);
-		color: color-mix(in srgb, var(--text) 80%, transparent);
+		border-color: var(--admin-control-border);
+		color: color-mix(in srgb, var(--admin-control-fg) 82%, transparent);
 		font-size: 0.72rem;
 		min-height: 30px;
 		padding: 0 0.8rem;
+		transition: background 120ms ease, color 120ms ease;
+	}
+	.social-events__past-row button:hover {
+		background: var(--admin-control-bg-hover);
+		color: var(--admin-control-fg);
 	}
 
 	.social-events__meta {

@@ -1,9 +1,11 @@
-import { redirect } from '@sveltejs/kit'
 import type { RequestEvent } from './$types'
 import { actions as parentActions } from '@calendar/app/routes/admin/page.server'
 
 export const actions = parentActions
 
 export function load(event: RequestEvent) {
-	redirect(308, `/admin/events/${event.params.slug}/`)
+	return {
+		user: event.locals.user ?? null,
+		slug: event.params.slug
+	}
 }

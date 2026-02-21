@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { parseAdminEventUpdateInput, setAttendanceStatus, TransportValidationError, updateEventCapacity, updateEventMemory } from '@calendar/core'
+import { cancelEvent, parseAdminEventUpdateInput, setAttendanceStatus, TransportValidationError, updateEventCapacity, updateEventMemory } from '@calendar/core'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
 
@@ -39,6 +39,12 @@ export async function POST(event: RequestEvent) {
 				heroImageUrl: input.heroImageUrl
 			})
 			logAdminEvent(event, 'event_memory_update', { eventId })
+			return apiOk({})
+		}
+
+		if (input.action === 'delete') {
+			await cancelEvent(env.DB, { eventId })
+			logAdminEvent(event, 'event_delete', { eventId })
 			return apiOk({})
 		}
 

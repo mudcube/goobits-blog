@@ -454,6 +454,14 @@ export async function updateEventMemory(db: D1DatabaseLike, input: {
 	).bind(input.recapText ?? null, input.heroImageUrl ?? null, input.eventId).run()
 }
 
+export async function cancelEvent(db: D1DatabaseLike, input: { eventId: number }) {
+	await db.prepare(
+		`UPDATE calendar_events
+		 SET status = 'canceled', updated_at = unixepoch()
+		 WHERE id = ?`
+	).bind(input.eventId).run()
+}
+
 export async function getCalendarProfile(db: D1DatabaseLike, userId: string): Promise<CalendarProfile> {
 	const row = await db.prepare(
 		`SELECT emergency_contact, dietary_restrictions, chat_handle

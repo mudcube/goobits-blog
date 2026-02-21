@@ -23,6 +23,7 @@ import {
 	saveDashboardRules,
 	updateAdminEventCapacityValue,
 	updateAdminEventMemoryValue,
+	deleteAdminEventValue,
 	updateAdminProgram
 } from './admin-dashboard'
 
@@ -630,6 +631,28 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		}
 	}
 
+	async function deleteEvent(eventId: number) {
+		eventUpdatingId = eventId
+		error = ''
+		try {
+			const result = await deleteAdminEventValue(eventId)
+			if (!result.ok) {
+				error = result.error
+				return
+			}
+			events = events.filter((event) => event.id !== eventId)
+			recentEvents = recentEvents.filter((event) => event.id !== eventId)
+			if (selectedEventDetail?.event.id === eventId) {
+				selectedEventDetail = null
+			}
+		} catch (err) {
+			if (onUnauthorized?.(err)) return
+			error = err instanceof Error ? err.message : 'Failed to delete event'
+		} finally {
+			eventUpdatingId = null
+		}
+	}
+
 	async function processSyncQueue() {
 		syncQueueBusy = true
 		error = ''
@@ -747,6 +770,7 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		promoteWaitlist,
 		updateEventCapacity,
 		updateEventMemory,
+		deleteEvent,
 		savePaymentDefaults,
 		processSyncQueue,
 		retryDeadLetters,

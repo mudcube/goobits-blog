@@ -9,6 +9,7 @@ import {
 	fetchCalendarMembersData,
 	persistAdminEventCapacity,
 	persistAdminEventMemory,
+	removeAdminEvent,
 	persistAdminEvents,
 	persistAdminProgram,
 	persistAdminRules,
@@ -168,6 +169,10 @@ export async function updateAdminEventCapacityValue(eventId: number, capacity: n
 
 export async function updateAdminEventMemoryValue(eventId: number, input: { recapText?: string; heroImageUrl?: string }) {
 	return runSuccess(() => persistAdminEventMemory(eventId, input))
+}
+
+export async function deleteAdminEventValue(eventId: number) {
+	return runSuccess(() => removeAdminEvent(eventId))
 }
 
 export async function processDashboardSyncQueue(limit = 10) {

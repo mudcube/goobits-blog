@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminMembersController } from '@calendar/ui/features/members/admin/admin-members.svelte'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
@@ -160,15 +161,23 @@
 			toastVisible = false
 		})
 	}
+
+	function onTopbarCreateInvite() {
+		void members.createInvite()
+	}
+
+	onMount(() => {
+		window.addEventListener('admin-crew-create-invite', onTopbarCreateInvite)
+		return () => {
+			window.removeEventListener('admin-crew-create-invite', onTopbarCreateInvite)
+		}
+	})
 </script>
 
 {#if authed}
 	<div class="social-crew">
 		<div class="social-crew__head">
 			<h2>The Crew</h2>
-			<button type="button" onclick={members.createInvite} disabled={members.creating}>
-				{members.creating ? 'Inviting…' : 'Invite Friend'}
-			</button>
 		</div>
 
 		<h4>ACTIVE MEMBERS ({users.length})</h4>
@@ -182,7 +191,7 @@
 								<span class="social-crew__badge">{deriveBadge(user)}</span>
 							{/if}
 						</div>
-						<button type="button" class="social-crew__edit" onclick={() => toggleEdit(String(user['id']))}>Edit</button>
+						<button type="button" class="social-crew__edit admin-ui-btn" onclick={() => toggleEdit(String(user['id']))}>Edit</button>
 					</div>
 
 					{#if expandedUserId === String(user['id'])}
@@ -195,7 +204,8 @@
 									{#each members.accessRows as row}
 										<button
 											type="button"
-											class="social-crew__tag"
+											class="social-crew__tag admin-ui-chip"
+											class:admin-ui-chip--active={row.allowed}
 											class:social-crew__tag--on={row.allowed}
 											onclick={() => toggleAccessWithSave(row.programSlug)}
 										>
@@ -222,7 +232,7 @@
 							<span class="social-crew__name">{String(invite['email'] || invite['code'])}</span>
 							<span class="social-crew__meta">({String(invite['code'] || '')})</span>
 						</div>
-						<button type="button" class="social-crew__edit" onclick={() => members.copyInvite(String(invite['code'] || ''))}>Resend</button>
+						<button type="button" class="social-crew__edit admin-ui-btn" onclick={() => members.copyInvite(String(invite['code'] || ''))}>Resend</button>
 					</div>
 					{#if i < invites.length - 1}<div class="social-crew__divider"></div>{/if}
 				{/each}
@@ -234,7 +244,7 @@
 		<div class="social-crew__toast" role="status">
 			<span>{toastMessage}</span>
 			{#if undoAction}
-				<button type="button" onclick={handleUndoClick}>
+				<button type="button" class="admin-ui-btn" onclick={handleUndoClick}>
 					Undo
 				</button>
 			{/if}
@@ -260,17 +270,9 @@
 		font-size: 1.375rem;
 	}
 
-	.social-crew__head button,
 	.social-crew__edit,
 	.social-crew__toast button {
-		min-height: 32px;
-		padding: 0 0.875rem;
-		border-radius: 10px;
-		border: 1px solid color-mix(in srgb, var(--text) 24%, transparent);
-		background: color-mix(in srgb, var(--bg) 90%, var(--text) 10%);
-		color: var(--text);
 		font-weight: 600;
-		cursor: pointer;
 	}
 
 	.social-crew h4 {
@@ -336,21 +338,13 @@
 
 	.social-crew__tag {
 		min-width: 44px;
-		min-height: 32px;
 		padding: 0 0.625rem;
-		border-radius: 20px;
-		border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
-		background: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
-		color: color-mix(in srgb, var(--text) 65%, transparent);
 		font-size: 0.75rem;
 		font-weight: 600;
-		cursor: pointer;
 	}
 
 	.social-crew__tag--on {
-		background: color-mix(in srgb, var(--text) 18%, var(--bg));
-		color: var(--text);
-		border-color: color-mix(in srgb, var(--text) 32%, transparent);
+		font-weight: 700;
 	}
 
 	.social-crew__divider {

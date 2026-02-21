@@ -144,7 +144,7 @@
 				<div class="social-events__canvas">
 					<div class="social-events__picker-grid">
 						{#each dashboard.enabledPrograms as program}
-							<button type="button" class="social-events__picker-card" class:social-events__picker-card--active={selectedActivitySlug === program.slug} style={`--activity-color: ${colorForActivity(program.label, program.slug)}`} onclick={() => selectCreateActivity(program.slug, program.label)}>
+							<button type="button" class="social-events__picker-card admin-ui-card" class:social-events__picker-card--active={selectedActivitySlug === program.slug} style={`--activity-color: ${colorForActivity(program.label, program.slug)}`} onclick={() => selectCreateActivity(program.slug, program.label)}>
 								<span>{emojiForActivity(program.label, program.slug)}</span>
 								<span>{program.label}</span>
 							</button>
@@ -165,10 +165,10 @@
 					<button type="button" onclick={() => (drawerOpen = false)}>✕</button>
 				</div>
 				<div class="social-events__drawer-body">
-					<label><span>Starts</span><input type="datetime-local" bind:value={createStartsAt} /></label>
-					<label><span>Ends</span><input type="datetime-local" bind:value={createEndsAt} /></label>
-					<label><span>Spots</span><input type="number" min="2" max="20" bind:value={createCapacity} /></label>
-					<label><span>Cost ($)</span><input type="number" min="0" step="1" bind:value={createCostDollars} /></label>
+					<label><span>Starts</span><input class="admin-ui-input" type="datetime-local" bind:value={createStartsAt} /></label>
+					<label><span>Ends</span><input class="admin-ui-input" type="datetime-local" bind:value={createEndsAt} /></label>
+					<label><span>Spots</span><input class="admin-ui-input" type="number" min="2" max="20" bind:value={createCapacity} /></label>
+					<label><span>Cost ($)</span><input class="admin-ui-input" type="number" min="0" step="1" bind:value={createCostDollars} /></label>
 				</div>
 			{/snippet}
 		</AdminWysiwygWorkspace>
@@ -177,8 +177,8 @@
 
 <style>
 	.social-events__editor {
-		max-width: 760px;
-		margin: 0 auto;
+		max-width: none;
+		margin: 0;
 	}
 	.social-events__editor--shell {
 		min-height: calc(100vh - 8rem);
@@ -189,8 +189,9 @@
 		box-shadow: 0 20px 60px color-mix(in srgb, black 14%, transparent);
 	}
 	.social-events__canvas {
-		max-width: 36rem;
-		margin: 0 auto;
+		max-width: none;
+		width: 100%;
+		margin: 0;
 		padding: 0.4rem 0 1rem;
 		display: grid;
 		gap: 0.8rem;
@@ -211,25 +212,30 @@
 		align-items: center;
 		gap: 0.3rem;
 		cursor: pointer;
+		transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+	}
+	.social-events__picker-card:hover {
+		border-color: color-mix(in srgb, var(--text) 30%, transparent);
+		transform: translateY(-1px);
 	}
 	.social-events__picker-card--active {
-		border-color: color-mix(in srgb, var(--activity-color) 72%, transparent);
-		background: color-mix(in srgb, var(--activity-color) 10%, var(--bg) 90%);
+		border-color: var(--admin-selected-border);
+		background: var(--admin-selected-bg);
 	}
-	.social-events__hero-icon-wrap { display: flex; justify-content: center; }
+	.social-events__hero-icon-wrap { display: flex; justify-content: flex-start; }
 	.social-events__hero-icon { font-size: 2.6rem; line-height: 1; }
-	.social-events__editable { outline: none; border-radius: 8px; padding: 0.2rem 0.5rem; text-align: center; }
+	.social-events__editable { outline: none; border-radius: 8px; padding: 0.2rem 0.5rem; text-align: left; }
 	.social-events__editable:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
 	.social-events__editable:focus { background: color-mix(in srgb, var(--text) 7%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--text) 16%, transparent); }
 	.social-events__hero-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--text); }
-	.social-events__hero-sub { max-width: 24rem; margin: 0 auto; font-size: 0.95rem; line-height: 1.45; color: color-mix(in srgb, var(--text) 64%, transparent); }
+	.social-events__hero-sub { max-width: 24rem; margin: 0; font-size: 0.95rem; line-height: 1.45; color: color-mix(in srgb, var(--text) 64%, transparent); }
 	.social-events__drawer-head { padding: 0.8rem 0.95rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent); }
 	.social-events__drawer-head strong { font-size: 0.83rem; color: var(--text); }
 	.social-events__drawer-head button { width: 28px; height: 28px; border-radius: 8px; border: none; background: transparent; color: color-mix(in srgb, var(--text) 58%, transparent); cursor: pointer; }
 	.social-events__drawer-body { padding: 0.9rem; display: grid; gap: 0.65rem; overflow: auto; }
 	.social-events__drawer-body label { display: grid; gap: 0.2rem; }
 	.social-events__drawer-body label span { font-size: 0.69rem; font-weight: 600; color: color-mix(in srgb, var(--text) 58%, transparent); }
-	.social-events__drawer-body input { width: 100%; min-height: 34px; padding: 0.35rem 0.6rem; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--text) 15%, transparent); background: var(--bg); color: var(--text); font: inherit; }
+	.social-events__drawer-body input { width: 100%; }
 	.social-events__toast { position: fixed; left: 50%; bottom: 1rem; transform: translateX(-50%); padding: 0.5rem 1rem; border-radius: 999px; background: color-mix(in srgb, #10b981 88%, var(--bg) 12%); color: var(--bg); font-size: 0.8rem; font-weight: 700; z-index: 140; }
 	.social-events__toast--error { background: color-mix(in srgb, #ef4444 85%, var(--bg) 15%); }
 	@media (max-width: 720px) {

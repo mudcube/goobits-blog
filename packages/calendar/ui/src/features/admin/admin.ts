@@ -12,6 +12,7 @@ import {
 	mutateAdminSyncQueue,
 	updateAdminEventMemory,
 	updateAdminEventCapacity,
+	deleteAdminEvent,
 	type AdminRulesInput
 } from '../../api/admin'
 import {
@@ -179,6 +180,7 @@ export async function persistAdminEvents(input: {
 
 export const persistAdminEventCapacity = updateAdminEventCapacity
 export const persistAdminEventMemory = updateAdminEventMemory
+export const removeAdminEvent = deleteAdminEvent
 
 export async function processAdminSyncQueue(limit = 10) {
 	return mutateAdminSyncQueue('process', limit)

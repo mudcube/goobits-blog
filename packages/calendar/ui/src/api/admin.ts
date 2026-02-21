@@ -300,6 +300,15 @@ export async function updateAdminEventMemory(eventId: number, input: { recapText
 	})
 }
 
+export async function deleteAdminEvent(eventId: number) {
+	return requestApi<AdminMutationOk>(withAdminApi(`/events/${eventId}`), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ action: 'delete' }),
+		parse: (payload) => AdminMutationOkSchema.parse(payload)
+	})
+}
+
 export async function mutateAdminSyncQueue(action: AdminSyncQueueAction, limit = 10) {
 	return requestApi<AdminSyncQueueMutationResponse>(withAdminApi('/sync-queue'), {
 		method: 'POST',
