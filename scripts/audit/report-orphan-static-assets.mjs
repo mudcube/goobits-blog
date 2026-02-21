@@ -4,11 +4,45 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const STATIC_DIR = path.join(ROOT, 'static')
-const SEARCH_DIRS = [path.join(ROOT, 'src'), path.join(ROOT, 'static')]
+const SEARCH_DIRS = [
+  path.join(ROOT, 'src'),
+  path.join(ROOT, 'packages'),
+  path.join(ROOT, 'repos'),
+  path.join(ROOT, 'static')
+]
 const IMAGE_EXTS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.avif', '.ico'])
 const REPORT_PATH = path.join(ROOT, '.llm', 'scratch', 'unused-image-candidates.txt')
-const RELATIVE_IMAGE_RE = /["'`(]((?:\.\.?\/)?[^"'`\s)]+\.(?:png|jpe?g|gif|webp|svg|avif|ico))(?:[?#][^"'`\s)]*)?["'`)]/gi
-const ABSOLUTE_IMAGE_RE = /\/static\/[\w./-]+\.(?:png|jpe?g|gif|webp|svg|avif|ico)|\/[\w./-]+\.(?:png|jpe?g|gif|webp|svg|avif|ico)/gi
+const EXCLUDED_IMAGE_PREFIXES = ['labs/']
+const RESERVED_IMAGE_PATHS = new Set(['favicon.png', 'favicon.ico', 'favicon.svg'])
+const IMAGE_PATTERN = '(?:png|jpe?g|gif|webp|svg|avif|ico)'
+const QUOTED_IMAGE_RE = new RegExp(`["'\`]([^"'\\\`\\s]+\\.(${IMAGE_PATTERN})(?:\\?[^"'\\\`\\s]*)?)["'\`]`, 'gi')
+const MARKDOWN_IMAGE_RE = new RegExp(`\\(([^)\\s]+\\.(${IMAGE_PATTERN})(?:\\?[^)\\s]*)?)(?:\\s+["'][^"']*["'])?\\)`, 'gi')
+const CSS_URL_IMAGE_RE = new RegExp(`url\\(\\s*(['"]?)([^)'"\\s]+\\.(${IMAGE_PATTERN})(?:\\?[^)'"\\s]*)?)\\1\\s*\\)`, 'gi')
+const ATTR_IMAGE_RE = new RegExp(`\\b(?:src|href)=([^"'\\s>]+\\.(${IMAGE_PATTERN})(?:\\?[^"'\\s>]*)?)`, 'gi')
+const TEXT_EXTS = new Set([
+  '.ts',
+  '.js',
+  '.mjs',
+  '.cjs',
+  '.tsx',
+  '.jsx',
+  '.svelte',
+  '.css',
+  '.scss',
+  '.sass',
+  '.less',
+  '.styl',
+  '.html',
+  '.md',
+  '.mdx',
+  '.svx',
+  '.json',
+  '.yml',
+  '.yaml',
+  '.txt',
+  '.xml',
+  '.webmanifest'
+])
 
 async function walk(dir) {
   const files = []
@@ -37,13 +71,72 @@ function toPosix(filePath) {
 function normalizeRef(match) {
   const clean = match.replace(/[?#].*$/, '')
   if (clean.startsWith('/static/')) return clean.slice('/static/'.length)
-  if (clean.startsWith('/')) return clean.slice(1)
+  if (clean.startsWith('/')) return clean
   return clean
+}
+
+function shouldSkipImage(rel) {
+  return EXCLUDED_IMAGE_PREFIXES.some((prefix) => rel.startsWith(prefix))
+}
+
+function isTextLikeFile(filePath) {
+  return TEXT_EXTS.has(path.extname(filePath).toLowerCase())
+}
+
+function addReference(rawRef, sourceFile, referenced) {
+  if (!rawRef) return
+  const normalizedRef = normalizeRef(rawRef.trim())
+  if (!normalizedRef) return
+
+  if (normalizedRef.startsWith('http://') || normalizedRef.startsWith('https://') || normalizedRef.startsWith('data:')) return
+
+  if (normalizedRef.startsWith('/')) {
+    referenced.add(normalizedRef.replace(/^\//, ''))
+    return
+  }
+
+  const resolved = path.resolve(path.dirname(sourceFile), normalizedRef)
+  if (!resolved.startsWith(STATIC_DIR)) return
+
+  const staticRelative = toPosix(path.relative(STATIC_DIR, resolved))
+  referenced.add(staticRelative)
+}
+
+function buildTemplatePattern(patternRef) {
+  const escaped = patternRef.replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+  const wildcarded = escaped.replace(/\\\{[^}]+\\\}/g, '[^/]+')
+  return new RegExp(`^${wildcarded}$`)
+}
+
+function extractImageRefs(content) {
+  const refs = []
+  for (const match of content.matchAll(QUOTED_IMAGE_RE)) refs.push(match[1])
+  for (const match of content.matchAll(MARKDOWN_IMAGE_RE)) refs.push(match[1])
+  for (const match of content.matchAll(CSS_URL_IMAGE_RE)) refs.push(match[2])
+  for (const match of content.matchAll(ATTR_IMAGE_RE)) refs.push(match[1])
+  return refs
+}
+
+function extractFrontmatter(md) {
+  if (!md.startsWith('---')) return ''
+  const endIndex = md.indexOf('\n---', 3)
+  if (endIndex === -1) return ''
+  return md.slice(3, endIndex)
+}
+
+function extractCoverImage(frontmatter) {
+  if (!frontmatter) return ''
+  const match = frontmatter.match(/^\s*coverImage\s*:\s*["']?([^"'#\n]+?)["']?\s*$/m)
+  return match?.[1]?.trim() ?? ''
 }
 
 async function run() {
   const staticFiles = await walk(STATIC_DIR)
-  const images = staticFiles.filter((file) => IMAGE_EXTS.has(path.extname(file).toLowerCase()))
+  const images = staticFiles.filter((file) => {
+    if (!IMAGE_EXTS.has(path.extname(file).toLowerCase())) return false
+    const rel = toPosix(path.relative(STATIC_DIR, file))
+    return !shouldSkipImage(rel)
+  })
 
   const sourceFiles = []
   for (const dir of SEARCH_DIRS) {
@@ -51,9 +144,12 @@ async function run() {
   }
 
   const referenced = new Set()
+  const templatePatterns = []
   for (const sourceFile of sourceFiles) {
     const relSource = toPosix(path.relative(ROOT, sourceFile))
     if (relSource === toPosix(path.relative(ROOT, REPORT_PATH))) continue
+
+    if (!isTextLikeFile(sourceFile)) continue
 
     let content = ''
     try {
@@ -62,26 +158,44 @@ async function run() {
       continue
     }
 
-    const absoluteMatches = content.match(ABSOLUTE_IMAGE_RE) || []
-    for (const match of absoluteMatches) {
-      referenced.add(normalizeRef(match))
+    const imageRefs = extractImageRefs(content)
+    for (const imageRef of imageRefs) {
+      if (imageRef.includes('{') && imageRef.includes('}')) {
+        const normalized = normalizeRef(imageRef.trim()).replace(/^\//, '')
+        templatePatterns.push(buildTemplatePattern(normalized))
+      }
+      addReference(imageRef, sourceFile, referenced)
     }
 
-    const relativeMatches = [...content.matchAll(RELATIVE_IMAGE_RE)]
-    for (const relativeMatch of relativeMatches) {
-      const rawRef = relativeMatch[1]
-      if (!rawRef) continue
-      const normalizedRef = normalizeRef(rawRef)
-      const resolved = path.resolve(path.dirname(sourceFile), normalizedRef)
-      if (!resolved.startsWith(STATIC_DIR)) continue
-      const staticRelative = toPosix(path.relative(STATIC_DIR, resolved))
-      referenced.add(staticRelative)
+    // Journal post cover images are often defined in frontmatter as bare filenames.
+    // Resolve those to the post-local images/ directory.
+    if (sourceFile.endsWith('/index.md') && toPosix(sourceFile).includes('/static/journal/')) {
+      const frontmatter = extractFrontmatter(content)
+      const coverImage = extractCoverImage(frontmatter)
+      if (coverImage) {
+        if (coverImage.startsWith('http://') || coverImage.startsWith('https://')) {
+          // External cover image; no local static asset to mark.
+        } else if (coverImage.startsWith('/')) {
+          addReference(coverImage, sourceFile, referenced)
+        } else {
+          addReference(`images/${coverImage}`, sourceFile, referenced)
+        }
+      }
+    }
+  }
+
+  for (const imagePath of images) {
+    const rel = toPosix(path.relative(STATIC_DIR, imagePath))
+    if (templatePatterns.some((pattern) => pattern.test(rel))) {
+      referenced.add(rel)
     }
   }
 
   const unused = []
   for (const imagePath of images) {
     const rel = toPosix(path.relative(STATIC_DIR, imagePath))
+    if (shouldSkipImage(rel)) continue
+    if (RESERVED_IMAGE_PATHS.has(rel)) continue
     if (!referenced.has(rel)) unused.push(rel)
   }
 
