@@ -2,6 +2,7 @@
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import AdminSelect from '@components/Admin/AdminSelect.svelte'
+	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
@@ -94,14 +95,18 @@
 </script>
 
 {#if authed}
-	<div class="admin-settings">
+	<div class="admin-settings admin-content">
 		{#if toastMessage}
-			<div class="admin-settings__toast" class:admin-settings__toast--error={toastIsError} role="status">
+			<div class="admin-settings__toast admin-ui-toast" class:admin-ui-toast--error={toastIsError} role="status">
 				{#if !toastIsError}✓ {/if}{toastMessage}
 			</div>
 		{/if}
 
-		<h2 class="admin-settings__title">Settings</h2>
+		<AdminPageHero
+			eyebrow="Admin"
+			title="Settings"
+			subtitle="Configure sync and payment defaults for your space."
+		/>
 
 		<section class="admin-settings__section">
 			<div class="admin-settings__section-head">
@@ -192,23 +197,14 @@
 		font-family: var(--font-ui-sans, var(--font-sans));
 		display: grid;
 		gap: 0.9rem;
-		width: min(100%, 40rem);
-	}
-
-	.admin-settings__title {
-		margin: 0 0 1.25rem;
-		font-size: 1.5rem;
-		font-weight: 600;
-		letter-spacing: -0.03em;
-		line-height: 1.2;
-		color: var(--text);
+		width: 100%;
 	}
 
 	.admin-settings__section {
 		display: grid;
 		gap: 0.85rem;
 		padding: 1.35rem 0 0;
-		border-top: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+		border-top: 1px solid var(--admin-card-border);
 	}
 
 	.admin-settings__section:first-of-type {
@@ -260,27 +256,27 @@
 	}
 
 	.admin-settings__status--warn {
-		background: color-mix(in srgb, #ff9500 10%, transparent);
-		color: color-mix(in srgb, #c27800 88%, var(--text) 12%);
+		background: var(--admin-status-warn-bg);
+		color: var(--admin-status-warn-fg);
 	}
 
 	.admin-settings__status--warn .admin-settings__status-dot {
-		background: #ff9500;
+		background: var(--admin-status-warn-dot);
 	}
 
 	.admin-settings__status--ok {
-		background: color-mix(in srgb, #34c759 12%, transparent);
-		color: color-mix(in srgb, #248a3d 84%, var(--text) 16%);
+		background: var(--admin-status-success-bg);
+		color: var(--admin-status-success-fg);
 	}
 
 	.admin-settings__status--ok .admin-settings__status-dot {
-		background: #34c759;
+		background: var(--admin-status-success-dot);
 	}
 
 	.admin-settings__module {
 		border-radius: 0.9rem;
-		border: 1px solid color-mix(in srgb, var(--text) 11%, transparent);
-		background: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
+		border: 1px solid var(--admin-card-border);
+		background: var(--admin-card-bg);
 		padding: 0.95rem;
 		display: grid;
 		gap: 0.75rem;
@@ -293,14 +289,14 @@
 		justify-content: space-between;
 		padding: 0.6rem 0.7rem;
 		border-radius: 0.6rem;
-		border: 1px solid color-mix(in srgb, #34c759 24%, transparent);
-		background: color-mix(in srgb, #34c759 8%, transparent);
+		border: 1px solid color-mix(in srgb, var(--admin-status-success-dot) 24%, transparent);
+		background: color-mix(in srgb, var(--admin-status-success-dot) 8%, transparent);
 	}
 
 	.admin-settings__connected-label {
 		font-size: 0.82rem;
 		font-weight: 600;
-		color: color-mix(in srgb, #248a3d 84%, var(--text) 16%);
+		color: var(--admin-status-success-fg);
 	}
 
 	.admin-settings__connected-action {
@@ -375,21 +371,9 @@
 	}
 
 	.admin-settings__toast {
-		position: fixed;
-		left: 50%;
 		bottom: 1rem;
-		transform: translateX(-50%);
 		z-index: 120;
-		padding: 0.5rem 1rem;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--status-success-text) 88%, var(--bg) 12%);
-		color: var(--bg);
 		font-size: 0.78rem;
-		font-weight: 700;
-	}
-
-	.admin-settings__toast--error {
-		background: color-mix(in srgb, var(--status-error-text) 85%, var(--bg) 15%);
 	}
 
 	@media (max-width: 720px) {

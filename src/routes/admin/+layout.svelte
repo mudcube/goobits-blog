@@ -205,6 +205,26 @@
 		--admin-selected-border: color-mix(in srgb, var(--text) 38%, transparent);
 		--admin-selected-bg: color-mix(in srgb, var(--text) 11%, var(--bg) 89%);
 		--admin-focus-ring: color-mix(in srgb, #0a84ff 52%, transparent);
+		--admin-accent: color-mix(in srgb, var(--link) 72%, #7a5af8 28%);
+		--admin-content-max: 96rem;
+		--admin-card-bg: color-mix(in srgb, var(--bg) 95%, var(--text) 5%);
+		--admin-card-border: color-mix(in srgb, var(--text) 12%, transparent);
+		--admin-status-success-bg: color-mix(in srgb, #34c759 12%, transparent);
+		--admin-status-success-fg: color-mix(in srgb, #248a3d 84%, var(--text) 16%);
+		--admin-status-success-dot: #34c759;
+		--admin-status-warn-bg: color-mix(in srgb, #ff9500 10%, transparent);
+		--admin-status-warn-fg: color-mix(in srgb, #c27800 88%, var(--text) 12%);
+		--admin-status-warn-dot: #ff9500;
+		--admin-toast-success-bg: color-mix(in srgb, #10b981 88%, var(--bg) 12%);
+		--admin-toast-error-bg: color-mix(in srgb, #ef4444 86%, var(--bg) 14%);
+		--admin-elev-surface-1: color-mix(in srgb, var(--text) 86%, var(--bg) 14%);
+		--admin-elev-surface-2: color-mix(in srgb, var(--text) 82%, var(--bg) 18%);
+		--admin-elev-border: color-mix(in srgb, var(--admin-accent) 52%, transparent);
+		--admin-elev-text: color-mix(in srgb, var(--bg) 94%, transparent);
+		--admin-elev-subtext: color-mix(in srgb, var(--bg) 74%, transparent);
+		--admin-elev-control: color-mix(in srgb, var(--text) 76%, var(--bg) 24%);
+		--admin-elev-control-hover: color-mix(in srgb, var(--text) 72%, var(--bg) 28%);
+		--admin-elev-control-active: color-mix(in srgb, var(--admin-accent) 44%, var(--text) 56%);
 		min-height: 100vh;
 		min-width: 0;
 		display: grid;
@@ -222,9 +242,102 @@
 
 	:global(.social-admin .admin-ui-card) {
 		border-radius: 14px;
-		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
-		background: color-mix(in srgb, var(--bg) 95%, var(--text) 5%);
+		border: 1px solid var(--admin-card-border);
+		background: var(--admin-card-bg);
 		box-shadow: 0 1px 2px var(--shadow-softest);
+	}
+
+	:global(.social-admin .admin-ui-overlay) {
+		position: fixed;
+		inset: 0;
+		background: color-mix(in srgb, var(--text) 30%, transparent);
+		display: flex;
+		z-index: 100;
+	}
+
+	:global(.social-admin .admin-ui-overlay--end) {
+		justify-content: flex-end;
+	}
+
+	:global(.social-admin .admin-ui-overlay--center) {
+		align-items: center;
+		justify-content: center;
+	}
+
+	:global(.social-admin .admin-ui-dialog) {
+		background: var(--admin-card-bg);
+		border: 1px solid var(--admin-card-border);
+	}
+
+	:global(.social-admin .admin-ui-toast) {
+		position: fixed;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 0.5rem 1rem;
+		border-radius: 999px;
+		background: var(--admin-toast-success-bg);
+		color: var(--bg);
+		font-size: 0.8rem;
+		font-weight: 700;
+		z-index: 140;
+	}
+
+	:global(.social-admin .admin-ui-toast--error) {
+		background: var(--admin-toast-error-bg);
+	}
+
+	:global(.social-admin .admin-ui-drawer-head) {
+		padding: 0.8rem 0.95rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+	}
+
+	:global(.social-admin .admin-ui-drawer-head > strong) {
+		font-size: 0.83rem;
+		color: var(--text);
+	}
+
+	:global(.social-admin .admin-ui-drawer-close) {
+		width: 28px;
+		height: 28px;
+		border-radius: 8px;
+		border: none;
+		background: transparent;
+		color: color-mix(in srgb, var(--text) 58%, transparent);
+		cursor: pointer;
+	}
+
+	:global(.social-admin .admin-ui-drawer-body) {
+		padding: 0.9rem;
+		display: grid;
+		gap: 0.65rem;
+		overflow: auto;
+	}
+
+	:global(.social-admin .admin-ui-drawer-body label) {
+		display: grid;
+		gap: 0.2rem;
+	}
+
+	:global(.social-admin .admin-ui-drawer-body label > span) {
+		font-size: 0.69rem;
+		font-weight: 600;
+		color: color-mix(in srgb, var(--text) 58%, transparent);
+	}
+
+	:global(.social-admin .admin-content) {
+		width: 100%;
+		max-width: var(--admin-content-max);
+	}
+
+	:global(.social-admin .admin-content > h4) {
+		margin: 0 0 0.35rem;
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+		font-weight: 700;
+		color: color-mix(in srgb, var(--text) 55%, transparent);
 	}
 
 	:global(.social-admin .admin-ui-btn) {
@@ -460,8 +573,8 @@
 	.social-admin__main {
 		grid-row: 2;
 		grid-column: 2;
-		width: min(100%, 72rem);
-		padding: 1.25rem 1.25rem 1.75rem;
+		width: 100%;
+		padding: 1.1rem 1rem 1.6rem 0.85rem;
 		min-width: 0;
 		overflow-x: clip;
 	}

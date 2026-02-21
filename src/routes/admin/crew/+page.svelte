@@ -3,6 +3,8 @@
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminMembersController } from '@calendar/ui/features/members/admin/admin-members.svelte'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
+	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
+	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const members = createAdminMembersController({ onUnauthorized: handleUnauthorizedSessionError })
@@ -100,13 +102,7 @@
 	}
 
 	function emojiForActivity(label: string) {
-		const key = label.toLowerCase()
-		if (key.includes('gym')) return '🏋'
-		if (key.includes('movie')) return '🎬'
-		if (key.includes('adventure') || key.includes('hike')) return '🏔'
-		if (key.includes('circus')) return '🎪'
-		if (key.includes('social')) return '🍺'
-		return '✨'
+		return getAdminActivityEmoji(label)
 	}
 
 	async function toggleEdit(userId: string) {
@@ -175,13 +171,15 @@
 </script>
 
 {#if authed}
-	<div class="social-crew">
-		<div class="social-crew__head">
-			<h2>The Crew</h2>
-		</div>
+	<div class="social-crew admin-content">
+		<AdminPageHero
+			eyebrow="Admin"
+			title="The Crew"
+			subtitle="Manage member access and invites."
+		/>
 
 		<h4>ACTIVE MEMBERS ({users.length})</h4>
-		<div class="social-crew__list">
+		<div class="social-crew__list admin-ui-card">
 			{#each users as user, i}
 				<div class="social-crew__row">
 					<div class="social-crew__row-head">
@@ -222,7 +220,7 @@
 		</div>
 
 		<h4>PENDING INVITES ({invites.length})</h4>
-		<div class="social-crew__pending">
+		<div class="social-crew__pending admin-ui-card">
 			{#if invites.length === 0}
 				<p class="social-crew__meta">No pending invites.</p>
 			{:else}
@@ -258,35 +256,13 @@
 		gap: 1rem;
 	}
 
-	.social-crew__head {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.social-crew__head h2 {
-		margin: 0;
-		color: var(--text);
-		font-size: 1.375rem;
-	}
-
 	.social-crew__edit,
 	.social-crew__toast button {
 		font-weight: 600;
 	}
 
-	.social-crew h4 {
-		margin: 0;
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
-	}
-
 	.social-crew__list,
 	.social-crew__pending {
-		border-radius: 14px;
-		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
-		background: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
 		padding: 0.25rem 0.875rem;
 	}
 

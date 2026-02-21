@@ -3,6 +3,7 @@
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import AdminWysiwygWorkspace from '$lib/admin/AdminWysiwygWorkspace.svelte'
+	import { getAdminActivityColor, getAdminActivityEmoji } from '$lib/admin/activity-display'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
@@ -21,26 +22,6 @@
 	let toastError = $state(false)
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
 
-	const activityEmojis: Record<string, string> = {
-		gym: '💪',
-		circus: '🎪',
-		movie: '🎬',
-		movies: '🎬',
-		hike: '🏔️',
-		adventure: '🏔️',
-		social: '🍺'
-	}
-
-	const activityColors: Record<string, string> = {
-		gym: '#6366f1',
-		circus: '#ec4899',
-		movie: '#f59e0b',
-		movies: '#f59e0b',
-		hike: '#10b981',
-		adventure: '#10b981',
-		social: '#8b5cf6'
-	}
-
 	$effect(() => {
 		if (!authed) return
 		dashboard.loadPrograms()
@@ -58,13 +39,11 @@
 	}
 
 	function emojiForActivity(label: string, slug?: string) {
-		const key = (slug || label || '').toLowerCase().trim()
-		return activityEmojis[key] || '✨'
+		return getAdminActivityEmoji(label, slug)
 	}
 
 	function colorForActivity(label: string, slug?: string) {
-		const key = (slug || label || '').toLowerCase().trim()
-		return activityColors[key] || '#64748b'
+		return getAdminActivityColor(label, slug)
 	}
 
 	function toLocalDateTimeInput(date: Date) {
@@ -121,12 +100,12 @@
 
 {#if authed}
 	{#if toast}
-		<div class="social-events__toast" class:social-events__toast--error={toastError} role="status">
+		<div class="social-events__toast admin-ui-toast" class:admin-ui-toast--error={toastError} role="status">
 			{#if !toastError}✓ {/if}{toast}
 		</div>
 	{/if}
 
-	<div class="social-events__editor social-events__editor--shell">
+	<div class="social-events__editor social-events__editor--shell admin-content">
 		<AdminWysiwygWorkspace
 			backLabel="Events"
 			modeLabel={preview ? 'Preview' : 'Editing'}
@@ -160,11 +139,11 @@
 				</div>
 			{/snippet}
 			{#snippet drawer()}
-				<div class="social-events__drawer-head">
+				<div class="social-events__drawer-head admin-ui-drawer-head">
 					<strong>Event settings</strong>
-					<button type="button" onclick={() => (drawerOpen = false)}>✕</button>
+					<button type="button" class="admin-ui-drawer-close" onclick={() => (drawerOpen = false)}>✕</button>
 				</div>
-				<div class="social-events__drawer-body">
+				<div class="social-events__drawer-body admin-ui-drawer-body">
 					<label><span>Starts</span><input class="admin-ui-input" type="datetime-local" bind:value={createStartsAt} /></label>
 					<label><span>Ends</span><input class="admin-ui-input" type="datetime-local" bind:value={createEndsAt} /></label>
 					<label><span>Spots</span><input class="admin-ui-input" type="number" min="2" max="20" bind:value={createCapacity} /></label>
@@ -205,7 +184,7 @@
 	.social-events__picker-card {
 		border-radius: 12px;
 		border: 2px solid color-mix(in srgb, var(--text) 16%, transparent);
-		background: color-mix(in srgb, var(--bg) 95%, var(--text) 5%);
+		background: var(--admin-card-bg);
 		padding: 0.75rem 0.45rem;
 		display: flex;
 		flex-direction: column;
@@ -229,15 +208,8 @@
 	.social-events__editable:focus { background: color-mix(in srgb, var(--text) 7%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--text) 16%, transparent); }
 	.social-events__hero-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--text); }
 	.social-events__hero-sub { max-width: 24rem; margin: 0; font-size: 0.95rem; line-height: 1.45; color: color-mix(in srgb, var(--text) 64%, transparent); }
-	.social-events__drawer-head { padding: 0.8rem 0.95rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent); }
-	.social-events__drawer-head strong { font-size: 0.83rem; color: var(--text); }
-	.social-events__drawer-head button { width: 28px; height: 28px; border-radius: 8px; border: none; background: transparent; color: color-mix(in srgb, var(--text) 58%, transparent); cursor: pointer; }
-	.social-events__drawer-body { padding: 0.9rem; display: grid; gap: 0.65rem; overflow: auto; }
-	.social-events__drawer-body label { display: grid; gap: 0.2rem; }
-	.social-events__drawer-body label span { font-size: 0.69rem; font-weight: 600; color: color-mix(in srgb, var(--text) 58%, transparent); }
 	.social-events__drawer-body input { width: 100%; }
-	.social-events__toast { position: fixed; left: 50%; bottom: 1rem; transform: translateX(-50%); padding: 0.5rem 1rem; border-radius: 999px; background: color-mix(in srgb, #10b981 88%, var(--bg) 12%); color: var(--bg); font-size: 0.8rem; font-weight: 700; z-index: 140; }
-	.social-events__toast--error { background: color-mix(in srgb, #ef4444 85%, var(--bg) 15%); }
+	.social-events__toast { bottom: 1rem; }
 	@media (max-width: 720px) {
 		.social-events__picker-grid { grid-template-columns: repeat(2, 1fr); }
 	}

@@ -2,30 +2,13 @@
 	import { goto } from '$app/navigation'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
+	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
+	import { getAdminActivityColor, getAdminActivityEmoji } from '$lib/admin/activity-display'
+	import { formatAdminDayLabel, formatAdminTimeLabel } from '$lib/admin/date-format'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	const authed = $derived(!!data.user)
-
-	const activityEmojis: Record<string, string> = {
-		gym: '💪',
-		circus: '🎪',
-		movie: '🎬',
-		movies: '🎬',
-		hike: '🏔️',
-		adventure: '🏔️',
-		social: '🍺'
-	}
-
-	const activityColors: Record<string, string> = {
-		gym: '#6366f1',
-		circus: '#ec4899',
-		movie: '#f59e0b',
-		movies: '#f59e0b',
-		hike: '#10b981',
-		adventure: '#10b981',
-		social: '#8b5cf6'
-	}
 
 	$effect(() => {
 		if (!authed) return
@@ -34,37 +17,36 @@
 	})
 
 	function emojiForActivity(label: string, slug?: string) {
-		const key = (slug || label || '').toLowerCase().trim()
-		return activityEmojis[key] || '✨'
+		return getAdminActivityEmoji(label, slug)
 	}
 
 	function colorForActivity(label: string, slug?: string) {
-		const key = (slug || label || '').toLowerCase().trim()
-		return activityColors[key] || '#64748b'
+		return getAdminActivityColor(label, slug)
 	}
 
 	function dayLabel(iso: string) {
-		const date = new Date(iso)
-		return date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' }).toUpperCase()
+		return formatAdminDayLabel(iso)
 	}
 
 	function timeLabel(iso: string) {
-		return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }).replace(' ', '').toLowerCase()
+		return formatAdminTimeLabel(iso)
 	}
 </script>
 
 {#if authed}
-	<div class="social-events">
-		<div class="social-events__head">
-			<h2>Events</h2>
-		</div>
+	<div class="social-events admin-content">
+		<AdminPageHero
+			eyebrow="Admin"
+			title="Events"
+			subtitle="Manage program pages and upcoming sessions."
+		/>
 
 		<h4>ACTIVITY PAGES</h4>
 		<div class="social-events__program-grid">
 			{#each dashboard.programs as program}
 				<button
 					type="button"
-					class="social-events__program-card"
+					class="social-events__program-card admin-ui-card"
 					style={`--activity-color: ${colorForActivity(program.label, program.slug)}`}
 					onclick={() => goto(`/admin/events/${program.slug}/`)}
 				>
@@ -86,7 +68,7 @@
 		{:else}
 			<div class="social-events__list">
 				{#each dashboard.events as ev}
-					<button type="button" class="social-events__event" onclick={() => goto(`/admin/events/${ev.id}`)}>
+					<button type="button" class="social-events__event admin-ui-card" onclick={() => goto(`/admin/events/${ev.id}`)}>
 						<div class="social-events__event-main">
 							<span class="social-events__event-emoji">{emojiForActivity(ev.activityLabel, ev.activitySlug)}</span>
 							<div>
@@ -108,12 +90,12 @@
 		<h4>PAST</h4>
 		<div class="social-events__list social-events__list--past">
 			{#if dashboard.recentEvents.length === 0}
-				<div class="social-events__past-row social-events__past-row--empty">
+				<div class="social-events__past-row social-events__past-row--empty admin-ui-card">
 					<div class="social-events__meta">Past adventures will show up here soon.</div>
 				</div>
 			{:else}
 				{#each dashboard.recentEvents.slice(0, 8) as recent}
-					<div class="social-events__past-row">
+					<div class="social-events__past-row admin-ui-card">
 						<div>
 							<div class="social-events__past-title">{recent.title}</div>
 							<div class="social-events__event-sub">{dayLabel(recent.startsAt)} · {recent.seatsTaken}/{recent.capacity} attended</div>
@@ -132,29 +114,6 @@
 		gap: 1rem;
 	}
 
-	.social-events__head {
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		gap: 0.8rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.social-events h2 {
-		margin: 0;
-		font-size: 1.5rem;
-		font-weight: 800;
-		color: var(--text);
-	}
-
-	.social-events h4 {
-		margin: 0 0 0.35rem;
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		font-weight: 700;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
-	}
-
 	.social-events__program-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -163,16 +122,12 @@
 	}
 
 	.social-events__program-card {
-		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
-		border-radius: 14px;
 		padding: 0.95rem 0.7rem;
-		background: color-mix(in srgb, var(--bg) 95%, var(--text) 5%);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		gap: 0.35rem;
 		cursor: pointer;
-		box-shadow: 0 1px 2px var(--shadow-softest);
 		transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 		text-align: center;
 	}
@@ -232,9 +187,6 @@
 	}
 
 	.social-events__event {
-		background: color-mix(in srgb, var(--bg) 95%, var(--text) 5%);
-		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
-		border-radius: 14px;
 		padding: 0.85rem 1rem;
 		display: flex;
 		justify-content: space-between;
@@ -242,7 +194,6 @@
 		cursor: pointer;
 		text-align: left;
 		transition: border-color 120ms ease, box-shadow 120ms ease;
-		box-shadow: 0 1px 2px var(--shadow-softest);
 	}
 
 	.social-events__event:hover {
@@ -300,15 +251,11 @@
 	}
 
 	.social-events__list--past .social-events__past-row {
-		background: color-mix(in srgb, var(--bg) 95%, var(--text) 5%);
-		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
-		border-radius: 14px;
 		padding: 0.85rem 1rem;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		gap: 0.8rem;
-		box-shadow: 0 1px 2px var(--shadow-softest);
 	}
 
 	.social-events__past-row--empty {

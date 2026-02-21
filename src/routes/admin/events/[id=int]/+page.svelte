@@ -31,7 +31,7 @@
 </script>
 
 {#if authed}
-	<div class="admin-event-detail">
+	<div class="admin-event-detail admin-content">
 		<a class="admin-event-detail__back" href="/admin/events/">Back to Events</a>
 		{#if loading}
 			<p class="admin-event-detail__loading">Loading event detail...</p>

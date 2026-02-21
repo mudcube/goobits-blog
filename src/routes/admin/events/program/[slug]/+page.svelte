@@ -550,38 +550,48 @@
 					</div>
 				{/if}
 
-				<p class="program-editor__hint">
-					<span>Click text to edit, click a day to schedule it</span>
-					<Lightbulb class="program-editor__hint-icon" size={14} strokeWidth={1.9} aria-hidden="true" />
-				</p>
+					<p class="program-editor__hint">
+						<Lightbulb class="program-editor__hint-icon" size={14} strokeWidth={1.9} aria-hidden="true" />
+						<span>Click text to edit, click a day to schedule it.</span>
+					</p>
 			</div>
 
-			{#if settingsOpen}
-				<aside class="program-editor__settings">
-					<div class="program-editor__settings-head">
-						<strong>Program settings</strong>
-						<button type="button" onclick={() => (settingsOpen = false)}>✕</button>
-					</div>
-					<div class="program-editor__settings-body">
-						<div class="program-editor__toggle-row">
-							<span>Accepting bookings</span>
+				{#if settingsOpen}
+					<button
+						type="button"
+						class="program-editor__settings-overlay"
+						aria-label="Close settings"
+						onclick={() => (settingsOpen = false)}
+					></button>
+					<aside class="program-editor__settings">
+						<div class="program-editor__settings-head">
+							<strong>Program settings</strong>
+							<button type="button" class="admin-ui-btn" onclick={() => (settingsOpen = false)}>Close</button>
+						</div>
+						<div class="program-editor__settings-body">
+							<div class="program-editor__toggle-row">
+								<span>Accepting bookings</span>
 							<button type="button" aria-label={dashboard.programDraft.enabled ? 'Disable bookings' : 'Enable bookings'} class="program-editor__switch" class:program-editor__switch--on={dashboard.programDraft.enabled} onclick={() => (dashboard.programDraft = { ...dashboard.programDraft, enabled: !dashboard.programDraft.enabled })}><span></span></button>
 						</div>
-						<label><span>URL path</span><input type="text" bind:value={dashboard.programDraft.slug} /></label>
-						<label><span>Sort order</span><input type="number" bind:value={dashboard.programDraft.sortOrder} /></label>
-						<label><span>Status note</span><input type="text" bind:value={dashboard.programDraft.serviceStatusNote} /></label>
-						<label><span>Page title</span><input type="text" bind:value={dashboard.programDraft.pageTitle} /></label>
-						<label><span>Activity name</span><input type="text" bind:value={dashboard.programDraft.activityName} /></label>
-						<label><span>Eyebrow class</span><input type="text" bind:value={dashboard.programDraft.eyebrowClass} /></label>
-						<label><span>Glow class</span><input type="text" bind:value={dashboard.programDraft.glowClass} /></label>
-						<label><span>Form glow class</span><input type="text" bind:value={dashboard.programDraft.formGlowClass} /></label>
-						<div class="program-editor__settings-actions">
-							<button type="button" class="program-editor__danger" onclick={() => void deleteProgram()} disabled={dashboard.programDeleting}>{dashboard.programDeleting ? 'Deleting…' : 'Delete'}</button>
-							<button type="button" class="program-editor__btn program-editor__btn--save" onclick={() => void saveProgram()} disabled={dashboard.programSaving}>{dashboard.programSaving ? 'Saving…' : 'Save'}</button>
+							<label><span>URL path</span><input class="admin-ui-input" type="text" bind:value={dashboard.programDraft.slug} /></label>
+							<label><span>Sort order</span><input class="admin-ui-input" type="number" bind:value={dashboard.programDraft.sortOrder} /></label>
+							<label><span>Status note</span><input class="admin-ui-input" type="text" bind:value={dashboard.programDraft.serviceStatusNote} /></label>
+							<label><span>Page title</span><input class="admin-ui-input" type="text" bind:value={dashboard.programDraft.pageTitle} /></label>
+							<label><span>Activity name</span><input class="admin-ui-input" type="text" bind:value={dashboard.programDraft.activityName} /></label>
+							<label><span>Eyebrow class</span><input class="admin-ui-input" type="text" bind:value={dashboard.programDraft.eyebrowClass} /></label>
+							<label><span>Glow class</span><input class="admin-ui-input" type="text" bind:value={dashboard.programDraft.glowClass} /></label>
+							<label><span>Form glow class</span><input class="admin-ui-input" type="text" bind:value={dashboard.programDraft.formGlowClass} /></label>
+							<div class="program-editor__settings-actions">
+								<AdminActionButton variant="danger" onclick={() => void deleteProgram()} disabled={dashboard.programDeleting}>
+									{dashboard.programDeleting ? 'Deleting…' : 'Delete'}
+								</AdminActionButton>
+								<AdminActionButton variant="primary" onclick={() => void saveProgram()} disabled={dashboard.programSaving}>
+									{dashboard.programSaving ? 'Saving…' : 'Save'}
+								</AdminActionButton>
+							</div>
 						</div>
-					</div>
-				</aside>
-			{/if}
+					</aside>
+				{/if}
 		</div>
 	</div>
 {/if}
@@ -594,7 +604,7 @@
 	.program-editor {
 		font-family: var(--font-sans);
 		--bg: var(--bg);
-		--surface: color-mix(in srgb, #f6f2ff 78%, var(--panel-bg) 22%);
+		--surface: color-mix(in srgb, var(--panel-bg) 88%, var(--text) 12%);
 		--text: var(--text);
 		--text-2: color-mix(in srgb, var(--text) 55%, transparent);
 		--text-3: color-mix(in srgb, var(--text) 36%, transparent);
@@ -603,9 +613,17 @@
 		--green: #34c759;
 		--green-soft: color-mix(in srgb, #34c759 12%, transparent);
 		--green-text: color-mix(in srgb, #34c759 70%, var(--text));
-		--blue: #7a5af8;
+		--blue: color-mix(in srgb, var(--link) 72%, #7a5af8 28%);
 		--blue-soft: color-mix(in srgb, #0071e3 12%, transparent);
 		--red: #ff3b30;
+		--elev-surface-1: color-mix(in srgb, var(--text) 86%, var(--bg) 14%);
+		--elev-surface-2: color-mix(in srgb, var(--text) 82%, var(--bg) 18%);
+		--elev-border: color-mix(in srgb, var(--blue) 52%, transparent);
+		--elev-text: color-mix(in srgb, var(--bg) 94%, transparent);
+		--elev-subtext: color-mix(in srgb, var(--bg) 74%, transparent);
+		--elev-control: color-mix(in srgb, var(--text) 76%, var(--bg) 24%);
+		--elev-control-hover: color-mix(in srgb, var(--text) 72%, var(--bg) 28%);
+		--elev-control-active: color-mix(in srgb, var(--blue) 44%, var(--text) 56%);
 		background:
 			radial-gradient(ellipse 520px 360px at 52% 68px, color-mix(in srgb, #a78bfa 16%, transparent) 0%, transparent 72%),
 			radial-gradient(ellipse 500px 320px at 78% 22%, color-mix(in srgb, #f0abfc 10%, transparent) 0%, transparent 72%),
@@ -627,20 +645,6 @@
 		padding: clamp(1rem, 2.8vw, 2.5rem) clamp(0.75rem, 2vw, 2rem) 3rem;
 		max-width: 100%;
 	}
-
-	.program-editor__btn {
-		font-size: 0.76rem;
-		font-weight: 500;
-		padding: 0.4rem 0.85rem;
-		border-radius: 0.5rem;
-		border: 1px solid var(--border-s);
-		background: var(--surface);
-		color: var(--text-2);
-		cursor: pointer;
-	}
-	.program-editor__btn:hover { background: color-mix(in srgb, var(--text) 4%, transparent); color: var(--text); }
-	.program-editor__btn--save { background: var(--text); border-color: var(--text); color: var(--bg); font-weight: 600; }
-	.program-editor__btn--save:hover { opacity: 0.9; background: var(--text); color: var(--bg); }
 
 	.program-editor__canvas {
 		width: min(100%, 860px);
@@ -855,13 +859,13 @@
 	.program-editor__arrow:hover { background: color-mix(in srgb, #e8dbff 82%, var(--bg) 18%); color: color-mix(in srgb, #5b3ee6 84%, var(--text) 16%); }
 	.program-editor__weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 0.55rem; }
 	.program-editor__weekdays span {
-		text-align: center;
+		text-align: right;
 		font-size: 0.72rem;
 		font-weight: 600;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
 		color: var(--text-3);
-		padding: 0.35rem 0;
+		padding: 0.35rem 0.5rem 0.35rem 0;
 		font-family: var(--font-ui-sans, var(--font-sans));
 	}
 	.program-editor__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; }
@@ -869,23 +873,36 @@
 		position: relative;
 		aspect-ratio: 1;
 		border-radius: 1rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		display: block;
 		cursor: pointer;
 		border: 1.5px solid transparent;
 		background: transparent;
 		padding: 0;
-		flex-direction: column;
-		gap: 0.35rem;
+		appearance: none;
+		-webkit-appearance: none;
 	}
 	.program-editor__day:hover:not(.program-editor__day--past) { background: color-mix(in srgb, var(--text) 5%, transparent); }
-	.program-editor__day-num { font-size: 1rem; font-weight: 500; color: var(--text); line-height: 1; font-family: var(--font-ui-sans, var(--font-sans)); }
+	.program-editor__day-num {
+		position: absolute;
+		top: 0.68rem;
+		right: 0.68rem;
+		left: auto;
+		font-size: 1rem;
+		font-weight: 500;
+		color: var(--text);
+		line-height: 1;
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-variant-numeric: tabular-nums;
+	}
 	.program-editor__dots {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.2rem;
 		height: 0.35rem;
+		position: absolute;
+		left: 50%;
+		bottom: 0.35rem;
+		transform: translateX(-50%);
 	}
 	.program-editor__dot {
 		width: 0.28rem;
@@ -902,6 +919,9 @@
 		height: 2rem;
 		border-radius: 999px;
 		background: color-mix(in srgb, #a78bfa 34%, transparent);
+		top: 0.48rem;
+		right: 0.46rem;
+		left: auto;
 	}
 	.program-editor__day--active .program-editor__day-num { color: var(--text); font-weight: 600; }
 	.program-editor__day--selected {
@@ -922,22 +942,70 @@
 	.program-editor__popover {
 		position: fixed;
 		width: 306px;
-		background: linear-gradient(180deg, color-mix(in srgb, #f2e9ff 72%, var(--surface) 28%) 0%, color-mix(in srgb, #faf6ff 82%, var(--surface) 18%) 100%);
-		border: 1px solid color-mix(in srgb, #7a5af8 26%, transparent);
+		--popover-surface: var(--elev-surface-1);
+		--popover-control-bg: var(--elev-control);
+		--popover-control-border: var(--elev-border);
+		--popover-control-text: var(--elev-text);
+		background: linear-gradient(180deg, var(--elev-surface-2) 0%, var(--elev-surface-1) 100%);
+		border: 1px solid var(--elev-border);
 		border-radius: 1rem;
 		box-shadow:
 			0 30px 65px color-mix(in srgb, black 24%, transparent),
 			0 8px 20px color-mix(in srgb, black 14%, transparent);
 		padding: 1rem;
 		z-index: 21;
+		color: var(--elev-text);
+	}
+	.program-editor__popover :global(.admin-ui-input) {
+		background: var(--popover-control-bg);
+		border-color: var(--popover-control-border);
+		color: var(--popover-control-text);
+	}
+	.program-editor__popover :global(.admin-ui-input:focus) {
+		border-color: color-mix(in srgb, #7a5af8 56%, transparent);
+		box-shadow: 0 0 0 2px color-mix(in srgb, #7a5af8 22%, transparent);
+	}
+	.program-editor__popover :global(.admin-select__control) {
+		background: var(--popover-control-bg);
+	}
+	.program-editor__popover :global(.admin-select__chevron) {
+		color: var(--elev-subtext);
+	}
+	.program-editor__popover :global(.admin-stepper__btn) {
+		background: var(--elev-control);
+		border-color: var(--popover-control-border);
+		color: var(--popover-control-text);
+	}
+	.program-editor__popover :global(.admin-stepper__btn:hover) {
+		background: var(--elev-control-hover);
+	}
+	.program-editor__popover :global(.admin-time__period) {
+		border-color: var(--popover-control-border);
+	}
+	.program-editor__popover :global(.admin-time__period-btn) {
+		background: var(--elev-control);
+		color: var(--popover-control-text);
+		border-right-color: var(--popover-control-border);
+	}
+	.program-editor__popover :global(.admin-time__period-btn--on) {
+		background: var(--elev-control-active);
+		color: var(--elev-text);
+	}
+	.program-editor__popover :global(.admin-action-btn--subtle) {
+		background: var(--elev-control);
+		border-color: var(--popover-control-border);
+		color: var(--popover-control-text);
+	}
+	.program-editor__popover :global(.admin-action-btn--subtle:hover:not(:disabled)) {
+		background: var(--elev-control-hover);
 	}
 	.program-editor__popover-arrow {
 		position: absolute;
 		width: 10px;
 		height: 10px;
-		background: color-mix(in srgb, #f5eeff 78%, var(--surface) 22%);
-		border-left: 1px solid color-mix(in srgb, #7a5af8 26%, transparent);
-		border-top: 1px solid color-mix(in srgb, #7a5af8 26%, transparent);
+		background: var(--elev-surface-1);
+		border-left: 1px solid var(--elev-border);
+		border-top: 1px solid var(--elev-border);
 		top: -6px;
 		left: 50%;
 		transform: translateX(-50%) rotate(45deg);
@@ -947,7 +1015,7 @@
 		bottom: -6px;
 		transform: translateX(-50%) rotate(225deg);
 	}
-	.program-editor__popover-title { font-size: 0.82rem; font-weight: 700; color: color-mix(in srgb, #5b3ee6 82%, var(--text) 18%); margin-bottom: 0.8rem; }
+	.program-editor__popover-title { font-size: 0.82rem; font-weight: 700; color: var(--elev-text); margin-bottom: 0.8rem; }
 	.program-editor__opt-row {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -955,21 +1023,21 @@
 		margin-bottom: 0.8rem;
 	}
 	.program-editor__opt {
-		border: 1px solid color-mix(in srgb, #7a5af8 20%, transparent);
-		background: color-mix(in srgb, #efe7ff 60%, transparent);
+		border: 1px solid var(--elev-border);
+		background: var(--elev-control);
 		padding: 0.52rem 0.65rem;
 		border-radius: 0.5rem;
 		text-align: center;
 		font-size: 0.78rem;
 		font-weight: 600;
 		cursor: pointer;
-		color: color-mix(in srgb, var(--text) 72%, transparent);
+		color: var(--elev-text);
 	}
-	.program-editor__opt:hover { background: color-mix(in srgb, #e8dbff 72%, transparent); color: var(--text); }
+	.program-editor__opt:hover { background: var(--elev-control-hover); color: var(--elev-text); }
 	.program-editor__opt--on {
-		background: color-mix(in srgb, #7a5af8 16%, transparent);
-		border-color: color-mix(in srgb, #7a5af8 44%, transparent);
-		color: color-mix(in srgb, #5b3ee6 80%, var(--text) 20%);
+		background: var(--elev-control-active);
+		border-color: color-mix(in srgb, var(--blue) 72%, transparent);
+		color: var(--elev-text);
 	}
 
 	.program-editor__until { display: flex; gap: 0.35rem; margin-bottom: 0.6rem; }
@@ -977,28 +1045,28 @@
 		font-size: 0.7rem;
 		padding: 0.3rem 0.55rem;
 		border-radius: 0.4rem;
-		border: 1px solid color-mix(in srgb, #7a5af8 22%, transparent);
-		background: color-mix(in srgb, #efe7ff 56%, transparent);
-		color: var(--text-2);
+		border: 1px solid var(--elev-border);
+		background: var(--elev-control);
+		color: var(--elev-text);
 		cursor: pointer;
 	}
-	.program-editor__until-btn--on { background: color-mix(in srgb, #6d4df0 88%, transparent); border-color: color-mix(in srgb, #6d4df0 88%, transparent); color: #fff; }
+	.program-editor__until-btn--on { background: var(--elev-control-active); border-color: color-mix(in srgb, var(--blue) 72%, transparent); color: var(--elev-text); }
 
 	.program-editor__fields { display: grid; gap: 0.55rem; margin-bottom: 0.9rem; }
 	.program-editor__fields label { display: grid; gap: 0.2rem; }
-	.program-editor__fields label span { font-size: 0.66rem; font-weight: 700; color: color-mix(in srgb, #5b3ee6 72%, var(--text) 28%); }
+	.program-editor__fields label span { font-size: 0.66rem; font-weight: 700; color: var(--elev-subtext); }
 	.program-editor__input {
 		font-size: 0.8rem;
 		padding: 0.48rem 0.65rem;
 		border-radius: 0.5rem;
-		border: 1px solid var(--border-s);
-		background: var(--surface);
+		border: 1px solid color-mix(in srgb, #7a5af8 24%, transparent);
+		background: color-mix(in srgb, #faf6ff 88%, var(--surface) 12%);
 		color: var(--text);
 		outline: none;
 	}
 	.program-editor__input:focus {
-		border-color: var(--admin-selected-border);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
+		border-color: color-mix(in srgb, #7a5af8 56%, transparent);
+		box-shadow: 0 0 0 2px color-mix(in srgb, #7a5af8 22%, transparent);
 	}
 	.program-editor__override {
 		margin-bottom: 0.8rem;
@@ -1021,16 +1089,6 @@
 
 	.program-editor__actions { display: flex; justify-content: flex-end; gap: 0.45rem; }
 	.program-editor__actions--split { justify-content: space-between; align-items: center; }
-	.program-editor__danger {
-		font-size: 0.72rem;
-		font-weight: 500;
-		color: var(--red);
-		background: transparent;
-		border: none;
-		cursor: pointer;
-	}
-	.program-editor__danger:hover { text-decoration: underline; }
-
 	.program-editor__hint {
 		margin-top: 1rem;
 		display: flex;
@@ -1039,52 +1097,86 @@
 		gap: 0.28rem;
 		text-align: center;
 		font-size: 0.74rem;
+		font-style: italic;
 		color: var(--text-3);
 		width: 100%;
 		font-family: var(--font-ui-sans, var(--font-sans));
 	}
 	:global(.program-editor__hint-icon) {
-		opacity: 0.86;
-		transform: translateY(-0.5px);
+		color: color-mix(in srgb, #f5b700 56%, var(--blue) 44%);
+		opacity: 0.95;
+		transform: translateY(-0.35px);
 		flex-shrink: 0;
 	}
 
+	.program-editor__settings-overlay {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		top: 2.5rem;
+		border: none;
+		background: color-mix(in srgb, var(--text) 68%, transparent);
+		z-index: 39;
+	}
 	.program-editor__settings {
-		border: 1px solid var(--border);
-		border-radius: 1rem;
-		background: var(--surface);
-		height: fit-content;
-		position: sticky;
-		top: 4rem;
-		width: min(100%, 320px);
-		flex: 0 1 320px;
+		position: fixed;
+		top: 2.5rem;
+		right: 0;
+		bottom: 0;
+		width: min(24rem, 94vw);
+		height: calc(100vh - 2.5rem);
+		border-left: 1px solid var(--elev-border);
+		background: linear-gradient(180deg, var(--elev-surface-2) 0%, var(--elev-surface-1) 100%);
+		z-index: 40;
+		display: flex;
+		flex-direction: column;
+		color: var(--elev-text);
 	}
 	.program-editor__settings-head {
-		padding: 0.75rem 0.9rem;
+		padding: 0.8rem 0.95rem;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--elev-border);
 	}
-	.program-editor__settings-head strong { font-size: 0.8rem; }
-	.program-editor__settings-head button { border: none; background: transparent; cursor: pointer; color: var(--text-2); }
-	.program-editor__settings-body { padding: 0.8rem 0.9rem; display: grid; gap: 0.55rem; }
+	.program-editor__settings-head strong { font-size: 0.8rem; color: var(--elev-text); }
+	.program-editor__settings :global(.admin-ui-btn) {
+		background: var(--elev-control);
+		border-color: var(--elev-border);
+		color: var(--elev-text);
+	}
+	.program-editor__settings :global(.admin-ui-btn:hover:not(:disabled)) {
+		background: var(--elev-control-hover);
+	}
+	.program-editor__settings :global(.admin-action-btn--primary),
+	.program-editor__settings :global(.admin-ui-btn--primary) {
+		background: color-mix(in srgb, #6d4df0 90%, transparent);
+		border-color: color-mix(in srgb, #6d4df0 90%, transparent);
+		color: #fff;
+	}
+	.program-editor__settings :global(.admin-action-btn--danger),
+	.program-editor__settings :global(.admin-ui-btn--danger) {
+		background: color-mix(in srgb, #ef4444 86%, transparent);
+		border-color: color-mix(in srgb, #ef4444 58%, transparent);
+		color: #fff;
+	}
+	.program-editor__settings-body {
+		padding: 0.8rem 0.9rem;
+		display: grid;
+		gap: 0.55rem;
+		overflow: auto;
+	}
 	.program-editor__settings-body label { display: grid; gap: 0.2rem; }
-	.program-editor__settings-body label span { font-size: 0.66rem; font-weight: 600; color: var(--text-2); }
-	.program-editor__settings-body input {
-		width: 100%;
-		min-height: 34px;
-		padding: 0.35rem 0.6rem;
-		border-radius: 0.5rem;
-		border: 1px solid var(--border-s);
-		background: var(--bg);
-		color: var(--text);
-		font: inherit;
+	.program-editor__settings-body label span { font-size: 0.66rem; font-weight: 700; color: var(--elev-subtext); }
+	.program-editor__settings-body :global(.admin-ui-input) {
+		background: var(--elev-control);
+		border-color: var(--elev-border);
+		color: var(--elev-text);
 	}
-	.program-editor__settings-body input:focus {
-		outline: none;
-		border-color: var(--admin-selected-border);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
+	.program-editor__settings-body :global(.admin-ui-input:focus) {
+		border-color: color-mix(in srgb, var(--blue) 72%, transparent);
+		box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 28%, transparent);
 	}
 	.program-editor__toggle-row { display: flex; align-items: center; justify-content: space-between; }
 	.program-editor__toggle-row span { font-size: 0.75rem; font-weight: 600; }
@@ -1127,6 +1219,13 @@
 	.program-editor__toast--error { background: color-mix(in srgb, #ef4444 86%, var(--bg) 14%); }
 
 	@media (max-width: 1080px) {
-		.program-editor__settings { position: static; }
+		.program-editor__settings-overlay {
+			top: 2.5rem;
+		}
+		.program-editor__settings {
+			width: min(22rem, 94vw);
+			top: 2.5rem;
+			height: calc(100vh - 2.5rem);
+		}
 	}
 </style>

@@ -3,6 +3,9 @@
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import { AdminEventDetailSheet, AdminLoginCard } from '@calendar/ui'
+	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
+	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
+	import { formatAdminDayLabel, formatAdminTimeLabel } from '$lib/admin/date-format'
 
 	const { data, form } = $props<{ data: { user: unknown | null }; form: unknown }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
@@ -28,19 +31,8 @@
 		dashboard.loadEvents()
 	})
 
-	const activityEmojis: Record<string, string> = {
-		gym: '🏋',
-		circus: '🎪',
-		movie: '🎬',
-		movies: '🎬',
-		hike: '🏔',
-		adventure: '🏔',
-		social: '🍺'
-	}
-
 	function emojiForActivity(label: string, slug?: string) {
-		const key = (slug || label || '').toLowerCase().trim()
-		return activityEmojis[key] || '✨'
+		return getAdminActivityEmoji(label, slug)
 	}
 
 	function statusFor(event: {
@@ -53,12 +45,11 @@
 	}
 
 	function dayLabel(iso: string) {
-		const date = new Date(iso)
-		return date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' }).toUpperCase()
+		return formatAdminDayLabel(iso)
 	}
 
 	function timeLabel(iso: string) {
-		return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }).replace(' ', '').toLowerCase()
+		return formatAdminTimeLabel(iso)
 	}
 
 	function groupedEvents() {
@@ -148,10 +139,13 @@
 {#if !authed}
 	<AdminLoginCard {form} />
 {:else}
-	<div class="social-home">
+	<div class="social-home admin-content">
 		<div class="social-home__main">
-			<h2 class="social-home__title">👋 Hey Admin.</h2>
-			<p class="social-home__subtitle">2 things need your eyes.</p>
+			<AdminPageHero
+				eyebrow="Admin"
+				title="Hey Admin."
+				subtitle="2 things need your eyes."
+			/>
 
 			{#if attentionEvent()}
 				<div class="social-home__alert">
@@ -179,7 +173,7 @@
 				{#each groupedEvents() as [day, dayEvents]}
 					<div class="social-home__day">{day}</div>
 					{#each dayEvents as ev}
-						<button type="button" class="social-home__event-card" onclick={() => openEventDetail(ev.id)}>
+						<button type="button" class="social-home__event-card admin-ui-card" onclick={() => openEventDetail(ev.id)}>
 							<div class="social-home__event-head">
 								<div>
 									<span class="social-home__event-time">{timeLabel(ev.startsAt)} · </span>
@@ -205,7 +199,7 @@
 				<a href="/admin/events/new/">+ Start an Adventure?</a>
 			</div>
 
-			<div class="social-home__memory-lane">
+			<div class="social-home__memory-lane admin-ui-card">
 				<h4>Memory Lane</h4>
 				<p>Past adventures will show up here — coming soon.</p>
 			</div>
@@ -213,7 +207,7 @@
 
 		{#if !isMobile && openedDetailId && dashboard.selectedEventDetail}
 			<div
-				class="social-home__detail-scrim"
+				class="social-home__detail-scrim admin-ui-overlay admin-ui-overlay--end"
 				role="button"
 				tabindex="0"
 				aria-label="Close event detail"
@@ -242,7 +236,7 @@
 
 	{#if showCreate}
 		<div
-			class="social-home__modal-scrim"
+			class="social-home__modal-scrim admin-ui-overlay admin-ui-overlay--center"
 			role="button"
 			tabindex="0"
 			aria-label="Close create modal"
@@ -250,7 +244,7 @@
 			onkeydown={(event) => (event.key === 'Escape' || event.key === 'Enter') && (showCreate = false)}
 		>
 			<div
-				class="social-home__modal"
+				class="social-home__modal admin-ui-dialog"
 				role="dialog"
 				tabindex="-1"
 				aria-label="Create event"
@@ -325,17 +319,6 @@
 		gap: 0.75rem;
 	}
 
-	.social-home__title {
-		margin: 0;
-		font-size: 1.375rem;
-		color: var(--text);
-	}
-
-	.social-home__subtitle {
-		margin: 0 0 0.5rem;
-		color: color-mix(in srgb, var(--text) 62%, transparent);
-	}
-
 	.social-home__alert {
 		border-radius: 14px;
 		padding: 1rem 1.25rem;
@@ -380,10 +363,7 @@
 	.social-home__event-card {
 		width: 100%;
 		min-height: 64px;
-		border-radius: 14px;
 		padding: 0.875rem 1rem;
-		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
-		background: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
 		text-align: left;
 		cursor: pointer;
 		transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
@@ -460,10 +440,8 @@
 
 	.social-home__memory-lane {
 		margin-top: 0.5rem;
-		border-radius: 14px;
 		padding: 1rem 1.25rem;
 		border: 1px dashed color-mix(in srgb, var(--text) 24%, transparent);
-		background: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
 	}
 
 	.social-home__memory-lane h4 {
@@ -480,11 +458,6 @@
 
 	.social-home__detail-scrim,
 	.social-home__modal-scrim {
-		position: fixed;
-		inset: 0;
-		background: color-mix(in srgb, var(--text) 30%, transparent);
-		display: flex;
-		justify-content: flex-end;
 		z-index: 100;
 	}
 
@@ -511,18 +484,11 @@
 		margin-top: 0.75rem;
 	}
 
-	.social-home__modal-scrim {
-		align-items: center;
-		justify-content: center;
-	}
-
 	.social-home__modal {
 		width: 420px;
 		max-width: 90vw;
 		border-radius: 20px;
 		padding: 1.5rem;
-		background: var(--bg);
-		border: 1px solid color-mix(in srgb, var(--text) 15%, transparent);
 	}
 
 	.social-home__modal-head {
