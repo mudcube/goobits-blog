@@ -54,6 +54,7 @@ export type AdminEventUpdateInput =
 	| { action: 'capacity'; capacity: number }
 	| { action: 'attendance'; userId: string; attendanceStatus: 'unknown' | 'attended' | 'flaked' }
 	| { action: 'delete' }
+	| { action: 'event'; title: string; startsAt: string; endsAt: string }
 	| { action: 'memory'; recapText: string | null; heroImageUrl: string | null }
 
 export type AdminSyncQueueActionInput = {
@@ -156,7 +157,7 @@ export function parseAdminCreateEventsBatchInput(input: unknown): AdminCreateEve
 
 export function parseAdminEventUpdateInput(input: unknown): AdminEventUpdateInput {
 	const body = asJsonObject(input)
-	const action = readEnum(body, 'action', ['capacity', 'attendance', 'memory', 'delete'] as const, 'Unknown action')
+	const action = readEnum(body, 'action', ['capacity', 'attendance', 'memory', 'delete', 'event'] as const, 'Unknown action')
 	if (action === 'capacity') {
 		return { action, capacity: readIntInRange(body, 'capacity', { min: 1, max: 50, message: 'Invalid capacity' }) }
 	}
@@ -169,6 +170,21 @@ export function parseAdminEventUpdateInput(input: unknown): AdminEventUpdateInpu
 	}
 	if (action === 'delete') {
 		return { action }
+	}
+	if (action === 'event') {
+		const startsAt = readRequiredString(body, 'startsAt', { trim: true, maxLength: 64, message: 'Invalid event input' })
+		const endsAt = readRequiredString(body, 'endsAt', { trim: true, maxLength: 64, message: 'Invalid event input' })
+		const startsMs = Date.parse(startsAt)
+		const endsMs = Date.parse(endsAt)
+		if (!Number.isFinite(startsMs) || !Number.isFinite(endsMs) || endsMs <= startsMs) {
+			throw new TransportValidationError('Invalid event times')
+		}
+		return {
+			action,
+			title: readRequiredString(body, 'title', { maxLength: 80, message: 'Invalid event title' }),
+			startsAt,
+			endsAt
+		}
 	}
 	return {
 		action,

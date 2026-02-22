@@ -27,6 +27,7 @@ export type AdminEventDetail = {
 		email: string | null
 		status: 'joined' | 'waitlist'
 		waitlistPosition: number | null
+		attendanceStatus: 'unknown' | 'attended' | 'flaked'
 	}>
 }
 
@@ -61,23 +62,35 @@ export async function getAdminEventDetail(
 	if (!row) return null
 
 	const participants = await db.prepare(
-		`SELECT p.id, CAST(p.user_id AS TEXT) AS user_id, p.status, u.name, u.email
+		`SELECT p.id, CAST(p.user_id AS TEXT) AS user_id, p.status, p.attendance_status, u.name, u.email
 		 FROM calendar_event_participants p
 		 LEFT JOIN calendar_users u ON CAST(u.id AS TEXT) = CAST(p.user_id AS TEXT)
 		 WHERE p.event_id = ? AND p.status IN ('joined','waitlist')
 		 ORDER BY p.created_at ASC`
-	).bind(eventId).all<{ id: number; user_id: string; status: 'joined' | 'waitlist'; name: string | null; email: string | null }>()
+	).bind(eventId).all<{
+		id: number
+		user_id: string
+		status: 'joined' | 'waitlist'
+		attendance_status: 'unknown' | 'attended' | 'flaked' | null
+		name: string | null
+		email: string | null
+	}>()
 
 	let waitlistCounter = 0
 	const attendees = (participants?.results ?? []).map((item) => {
 		if (item.status === 'waitlist') waitlistCounter += 1
+		const attendanceStatus: 'unknown' | 'attended' | 'flaked' =
+			item.attendance_status === 'attended' || item.attendance_status === 'flaked'
+				? item.attendance_status
+				: 'unknown'
 		return {
 			entryId: item.id,
 			userId: item.user_id,
 			name: item.name,
 			email: item.email,
 			status: item.status,
-			waitlistPosition: item.status === 'waitlist' ? waitlistCounter : null
+			waitlistPosition: item.status === 'waitlist' ? waitlistCounter : null,
+			attendanceStatus
 		}
 	})
 

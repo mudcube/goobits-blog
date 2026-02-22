@@ -3,8 +3,9 @@
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
-	import { Pencil, Trash2, Users } from '@lucide/svelte'
+	import { ArrowUpRight, Pencil, Trash2 } from '@lucide/svelte'
 	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
+	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
 	import { getAdminActivityColor, getAdminActivityEmoji } from '$lib/admin/activity-display'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 	import { mockDashboardEvents, mockDashboardRecentEvents } from '$lib/admin/mock/admin-mock-data'
@@ -22,23 +23,12 @@
 
 	let loading = $state(false)
 	let attemptedLoad = $state(false)
-	let editMode = $state(false)
-	let saving = $state(false)
 	let toast = $state('')
 	let toastError = $state(false)
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
-	let draftCapacity = $state(1)
-	let draftDescription = $state('')
-	let draftStartsAt = $state('')
-	let draftEndsAt = $state('')
 	const mockEvent = $derived.by(() => {
 		if (!mockMode || !Number.isFinite(eventId) || eventId <= 0) return null
 		return [...mockDashboardEvents, ...mockDashboardRecentEvents].find((event) => event.id === eventId) || null
-	})
-	const allEvents = $derived.by(() => [...dashboard.events, ...dashboard.recentEvents])
-	const eventSource = $derived.by(() => {
-		if (mockMode) return mockEvent
-		return allEvents.find((event) => event.id === eventId) || null
 	})
 	const detail = $derived.by(() => {
 		if (mockMode) {
@@ -46,11 +36,15 @@
 			return {
 				event: {
 					id: mockEvent.id,
+					activitySlug: mockEvent.activitySlug,
+					activityLabel: mockEvent.activityLabel,
 					title: mockEvent.title,
 					startsAt: mockEvent.startsAt,
 					endsAt: mockEvent.endsAt,
 					capacity: mockEvent.capacity,
-					waitlistCount: mockEvent.waitlistCount || 0
+					waitlistCount: mockEvent.waitlistCount || 0,
+					recapText: mockEvent.recapText || '',
+					heroImageUrl: mockEvent.heroImageUrl || null
 				},
 				attendees: (mockEvent.participants || []).map((participant, idx) => ({
 					entryId: idx + 1,
@@ -58,21 +52,20 @@
 					name: participant.name,
 					email: null,
 					status: 'joined' as const,
-					waitlistPosition: null as number | null
+					waitlistPosition: null as number | null,
+					attendanceStatus: idx % 2 === 0 ? 'attended' as const : 'unknown' as const
 				})),
 				weather: null as { summary: string; temperatureF: number } | null
 			}
 		}
 		return dashboard.selectedEventDetail
 	})
-	const activityLabel = $derived(eventSource?.activityLabel || '')
-	const activitySlug = $derived(eventSource?.activitySlug || '')
+	const activityLabel = $derived(detail?.event.activityLabel || '')
+	const activitySlug = $derived(detail?.event.activitySlug || '')
 	const activityEmoji = $derived(getAdminActivityEmoji(activityLabel, activitySlug))
 	const activityColor = $derived(getAdminActivityColor(activityLabel, activitySlug))
-	const hasTimeDraftChanges = $derived.by(() => {
-		if (!detail) return false
-		return draftStartsAt !== detail.event.startsAt || draftEndsAt !== detail.event.endsAt
-	})
+	const joinedCount = $derived.by(() => detail ? detail.attendees.filter((attendee) => attendee.status === 'joined').length : 0)
+	const openSpots = $derived.by(() => detail ? Math.max(0, detail.event.capacity - joinedCount) : 0)
 
 	function flash(message: string, isError = false) {
 		toast = message
@@ -94,66 +87,36 @@
 		})
 	}
 
-	function toLocalDateTimeInputValue(iso: string) {
-		if (!iso) return ''
-		const date = new Date(iso)
-		if (Number.isNaN(date.getTime())) return ''
-		const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-		return local.toISOString().slice(0, 16)
+	function formatDayLabel(iso: string) {
+		return new Date(iso).toLocaleDateString(undefined, {
+			month: 'short',
+			day: 'numeric'
+		})
 	}
 
-	function resetDraftFromDetail() {
-		if (!detail) return
-		draftCapacity = detail.event.capacity
-		draftDescription = eventSource?.recapText || ''
-		draftStartsAt = detail.event.startsAt
-		draftEndsAt = detail.event.endsAt
+	function formatTimeOnly(iso: string) {
+		return new Date(iso).toLocaleTimeString(undefined, {
+			hour: 'numeric',
+			minute: '2-digit'
+		})
 	}
 
-	function beginEditing() {
-		resetDraftFromDetail()
-		editMode = true
+	function formatDuration(startsAt: string, endsAt: string) {
+		const startMs = new Date(startsAt).getTime()
+		const endMs = new Date(endsAt).getTime()
+		if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return '—'
+		const minutes = Math.round((endMs - startMs) / 60000)
+		if (minutes < 60) return `${minutes} min`
+		const hours = Math.floor(minutes / 60)
+		const rem = minutes % 60
+		return rem === 0 ? `${hours} hr${hours === 1 ? '' : 's'}` : `${hours}h ${rem}m`
 	}
 
-	function cancelEditing() {
-		resetDraftFromDetail()
-		editMode = false
-	}
-
-	async function saveChanges() {
-		if (!detail || mockMode) {
-			flash('Mock mode: changes are preview-only')
-			editMode = false
-			return
-		}
-		saving = true
-		try {
-			if (draftCapacity !== detail.event.capacity) {
-				await dashboard.updateEventCapacity(detail.event.id, Math.max(1, Math.min(50, draftCapacity)))
-				if (dashboard.error) {
-					flash(dashboard.error, true)
-					return
-				}
-			}
-			const existingHeroImageUrl = eventSource?.heroImageUrl || ''
-			if (draftDescription !== (eventSource?.recapText || '')) {
-				await dashboard.updateEventMemory(detail.event.id, draftDescription, existingHeroImageUrl)
-				if (dashboard.error) {
-					flash(dashboard.error, true)
-					return
-				}
-			}
-			await dashboard.openEventDetail(detail.event.id)
-			await dashboard.loadEvents()
-			editMode = false
-			if (hasTimeDraftChanges) {
-				flash('Saved description & capacity. Time editing is coming soon.')
-			} else {
-				flash('Event updated')
-			}
-		} finally {
-			saving = false
-		}
+	function attendeeInitials(name: string) {
+		const parts = name.split(/\s+/).filter(Boolean)
+		const first = parts[0]?.[0] || ''
+		const second = parts[1]?.[0] || (parts[0]?.[1] || 'X')
+		return `${first}${second}`.toUpperCase()
 	}
 
 	async function cancelEvent() {
@@ -186,11 +149,6 @@
 			goto(hrefWithMock('/admin/'), { replaceState: true })
 		}
 	})
-
-	$effect(() => {
-		if (!detail || editMode) return
-		resetDraftFromDetail()
-	})
 </script>
 
 {#if authed}
@@ -204,106 +162,104 @@
 		{#if loading}
 			<p class="admin-event-detail__loading">Loading event detail...</p>
 		{:else if detail}
-			<div class="admin-event-detail__card admin-ui-card">
-				<div class="admin-event-detail__head">
+			<div class="admin-event-detail__header">
+				<AdminPageHero
+					eyebrow={activityLabel || 'Event'}
+					title={detail.event.title}
+					subtitle={`${formatDateTime(detail.event.startsAt)} – ${formatDateTime(detail.event.endsAt)}`}
+				/>
+				<div class="admin-event-detail__header-row">
 					<div class="admin-event-detail__activity" style={`--event-color:${activityColor}`}>
 						<span class="admin-event-detail__activity-emoji">{activityEmoji}</span>
 						<span>{activityLabel || 'Activity'}</span>
 					</div>
-					<h2 class="admin-event-detail__title">{detail.event.title}</h2>
-					<p class="admin-event-detail__meta">{formatDateTime(detail.event.startsAt)} – {formatDateTime(detail.event.endsAt)}</p>
-					<a class="admin-event-detail__editor-link" href={hrefWithMock(`/admin/events/${activitySlug || eventSource?.activitySlug || 'events'}/`)}>
-						Open Program Editor
-					</a>
-				</div>
-
-				<div class="admin-event-detail__fields">
-					<label>
-						<span>Description</span>
-						<textarea
-							class="admin-ui-input admin-event-detail__textarea"
-							rows="3"
-							bind:value={draftDescription}
-							disabled={!editMode}
-							placeholder="Add context or notes for attendees"
-						></textarea>
-					</label>
-					<div class="admin-event-detail__field-row">
-						<label>
-							<span>Start time</span>
-							<input
-								class="admin-ui-input"
-								type="datetime-local"
-								value={toLocalDateTimeInputValue(draftStartsAt)}
-								disabled={!editMode}
-								onchange={(event) => {
-									const value = (event.currentTarget as HTMLInputElement).value
-									draftStartsAt = value ? new Date(value).toISOString() : draftStartsAt
-								}}
-							/>
-						</label>
-						<label>
-							<span>End time</span>
-							<input
-								class="admin-ui-input"
-								type="datetime-local"
-								value={toLocalDateTimeInputValue(draftEndsAt)}
-								disabled={!editMode}
-								onchange={(event) => {
-									const value = (event.currentTarget as HTMLInputElement).value
-									draftEndsAt = value ? new Date(value).toISOString() : draftEndsAt
-								}}
-							/>
-						</label>
-						<label>
-							<span>Capacity</span>
-							<input class="admin-ui-input" type="number" min="1" max="50" bind:value={draftCapacity} disabled={!editMode} />
-						</label>
+					<div class="admin-event-detail__capacity">
+						<strong>{joinedCount}</strong> of {detail.event.capacity} spots filled
 					</div>
-					{#if editMode && hasTimeDraftChanges}
-						<p class="admin-event-detail__hint">Time edits are staged in UI; server-side time updates are not enabled yet.</p>
-					{/if}
-				</div>
-
-				<div class="admin-event-detail__actions">
-					{#if editMode}
-						<AdminActionButton variant="subtle" onclick={cancelEditing} disabled={saving}>Discard</AdminActionButton>
-						<AdminActionButton variant="primary" onclick={() => void saveChanges()} disabled={saving}>Save changes</AdminActionButton>
-					{:else}
-						<AdminActionButton variant="primary" icon={Pencil} onclick={beginEditing}>Edit</AdminActionButton>
-						<AdminActionButton variant="danger" icon={Trash2} onclick={() => void cancelEvent()}>Cancel Event</AdminActionButton>
-					{/if}
-				</div>
-
-				<div class="admin-event-detail__attendees">
-					<div class="admin-event-detail__attendees-head">
-						<h3><Users size={14} /> Attendees</h3>
-						<span>{detail.attendees.length} total</span>
-					</div>
-					{#if detail.attendees.length === 0}
-						<p class="admin-event-detail__loading">No attendees yet.</p>
-					{:else}
-						<ul class="admin-event-detail__attendee-list">
-							{#each detail.attendees as attendee}
-								<li>
-									<div class="admin-event-detail__attendee-main">
-										<div class="admin-event-detail__attendee-name">{attendee.name || attendee.email || attendee.userId}</div>
-										{#if attendee.email}
-											<div class="admin-event-detail__attendee-email">{attendee.email}</div>
-										{/if}
-									</div>
-									<div class="admin-event-detail__attendee-status" class:admin-event-detail__attendee-status--waitlist={attendee.status === 'waitlist'}>
-										{attendee.status}
-										{#if attendee.waitlistPosition}
-											· #{attendee.waitlistPosition}
-										{/if}
-									</div>
-								</li>
-							{/each}
-						</ul>
-					{/if}
 				</div>
 			</div>
+
+			<div class="admin-event-detail__actions">
+				<AdminActionButton variant="primary" icon={Pencil} href={hrefWithMock(`/admin/events/${activitySlug || 'events'}/`)}>Edit</AdminActionButton>
+				<AdminActionButton variant="danger" icon={Trash2} onclick={() => void cancelEvent()}>Cancel Event</AdminActionButton>
+			</div>
+
+			<div class="admin-event-detail__card admin-ui-card">
+				<div class="admin-event-detail__section-label">Details</div>
+				<div class="admin-event-detail__detail-grid">
+					<div class="admin-event-detail__detail-card">
+						<div class="admin-event-detail__detail-label">Date</div>
+						<div class="admin-event-detail__detail-value">{formatDayLabel(detail.event.startsAt)}</div>
+					</div>
+					<div class="admin-event-detail__detail-card">
+						<div class="admin-event-detail__detail-label">Time</div>
+						<div class="admin-event-detail__detail-value">{formatTimeOnly(detail.event.startsAt)}</div>
+					</div>
+					<div class="admin-event-detail__detail-card">
+						<div class="admin-event-detail__detail-label">Duration</div>
+						<div class="admin-event-detail__detail-value">{formatDuration(detail.event.startsAt, detail.event.endsAt)}</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="admin-event-detail__card admin-ui-card">
+				<div class="admin-event-detail__section-label">Description</div>
+				{#if detail.event.recapText && detail.event.recapText.trim()}
+					<p class="admin-event-detail__description">{detail.event.recapText}</p>
+				{:else}
+					<p class="admin-event-detail__description-empty">No description added yet</p>
+				{/if}
+			</div>
+
+			<div class="admin-event-detail__card admin-ui-card">
+				<div class="admin-event-detail__attendee-header">
+					<div class="admin-event-detail__section-label">Attendees</div>
+					<span class="admin-event-detail__attendee-count">{joinedCount} / {detail.event.capacity}</span>
+				</div>
+				{#if detail.attendees.length === 0}
+					<p class="admin-event-detail__loading">No attendees yet.</p>
+				{:else}
+					<ul class="admin-event-detail__attendee-list">
+						{#each detail.attendees as attendee}
+							<li class="admin-event-detail__attendee-card">
+								<div class="admin-event-detail__attendee-avatar">
+									{attendeeInitials(attendee.name || attendee.email || attendee.userId)}
+								</div>
+								<div class="admin-event-detail__attendee-main">
+									<div class="admin-event-detail__attendee-name">{attendee.name || attendee.email || attendee.userId}</div>
+									<div class="admin-event-detail__attendee-detail">
+										{#if attendee.waitlistPosition}
+											Waitlist #{attendee.waitlistPosition}
+										{:else if attendee.attendanceStatus === 'attended'}
+											Attended
+										{:else if attendee.attendanceStatus === 'flaked'}
+											Flaked
+										{:else}
+											Joined
+										{/if}
+									</div>
+								</div>
+								<span
+									class="admin-event-detail__attendee-status"
+									class:admin-event-detail__attendee-status--waitlist={attendee.status === 'waitlist'}
+								>
+									{attendee.status === 'waitlist' ? 'Waitlist' : 'Joined'}
+								</span>
+							</li>
+						{/each}
+						{#if openSpots > 0}
+							<li class="admin-event-detail__open-spots">
+								<span>{openSpots} spot{openSpots === 1 ? '' : 's'} open</span>
+							</li>
+						{/if}
+					</ul>
+				{/if}
+			</div>
+
+			<a class="admin-event-detail__editor-link" href={hrefWithMock(`/admin/events/${activitySlug || 'events'}/`)}>
+				<ArrowUpRight size={14} strokeWidth={2} />
+				Open {activityLabel || 'Program'} program page
+			</a>
 		{:else}
 			<p class="admin-event-detail__loading">Event not found.</p>
 		{/if}
@@ -313,7 +269,7 @@
 <style>
 	.admin-event-detail {
 		display: grid;
-		gap: 0.85rem;
+		gap: 1rem;
 	}
 
 	.admin-event-detail__back {
@@ -336,15 +292,9 @@
 		color: color-mix(in srgb, var(--text) 62%, transparent);
 	}
 
-	.admin-event-detail__card {
-		padding: 0.95rem 1rem;
+	.admin-event-detail__header {
 		display: grid;
-		gap: 0.8rem;
-	}
-
-	.admin-event-detail__head {
-		display: grid;
-		gap: 0.3rem;
+		gap: 0.65rem;
 	}
 
 	.admin-event-detail__activity {
@@ -366,66 +316,21 @@
 		line-height: 1;
 	}
 
-	.admin-event-detail__title {
-		margin: 0;
-		font-size: 1.06rem;
-		line-height: 1.2;
-		font-weight: 680;
-		color: var(--text);
+	.admin-event-detail__header-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
 	}
 
-	.admin-event-detail__meta {
-		margin: 0;
-		font-size: 0.8rem;
-		color: color-mix(in srgb, var(--text) 62%, transparent);
-	}
-
-	.admin-event-detail__editor-link {
-		display: inline-flex;
-		width: fit-content;
-		font-size: 0.74rem;
-		font-weight: 600;
-		text-decoration: none;
+	.admin-event-detail__capacity {
+		font-size: 0.82rem;
 		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
 
-	.admin-event-detail__editor-link:hover {
+	.admin-event-detail__capacity strong {
 		color: var(--text);
-	}
-
-	.admin-event-detail__fields {
-		display: grid;
-		gap: 0.55rem;
-	}
-
-	.admin-event-detail__fields label {
-		display: grid;
-		gap: 0.24rem;
-	}
-
-	.admin-event-detail__fields label > span {
-		font-size: 0.7rem;
-		font-weight: 620;
-		color: color-mix(in srgb, var(--text) 58%, transparent);
-	}
-
-	.admin-event-detail__textarea {
-		min-height: 82px;
-		padding-top: 0.45rem;
-		padding-bottom: 0.45rem;
-		resize: vertical;
-	}
-
-	.admin-event-detail__field-row {
-		display: grid;
-		grid-template-columns: 1fr 1fr 120px;
-		gap: 0.5rem;
-	}
-
-	.admin-event-detail__hint {
-		margin: 0;
-		font-size: 0.71rem;
-		color: color-mix(in srgb, var(--text) 52%, transparent);
+		font-weight: 650;
 	}
 
 	.admin-event-detail__actions {
@@ -435,27 +340,71 @@
 		gap: 0.45rem;
 	}
 
-	.admin-event-detail__attendees {
+	.admin-event-detail__card {
+		padding: 0.95rem 1rem;
 		display: grid;
+		gap: 0.8rem;
+	}
+
+	.admin-event-detail__section-label {
+		margin: 0;
+		font-size: 0.66rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--text) 46%, transparent);
+	}
+
+	.admin-event-detail__detail-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 0.5rem;
 	}
 
-	.admin-event-detail__attendees-head {
+	.admin-event-detail__detail-card {
+		padding: 0.72rem;
+		border-radius: 0.72rem;
+		border: 1px solid var(--admin-card-border);
+		background: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
+	}
+
+	.admin-event-detail__detail-label {
+		font-size: 0.625rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--text) 50%, transparent);
+		margin-bottom: 0.2rem;
+	}
+
+	.admin-event-detail__detail-value {
+		font-size: 0.8125rem;
+		font-weight: 620;
+		color: var(--text);
+	}
+
+	.admin-event-detail__description {
+		margin: 0;
+		font-size: 0.82rem;
+		line-height: 1.55;
+		color: color-mix(in srgb, var(--text) 66%, transparent);
+	}
+
+	.admin-event-detail__description-empty {
+		margin: 0;
+		font-size: 0.82rem;
+		font-style: italic;
+		color: color-mix(in srgb, var(--text) 46%, transparent);
+	}
+
+	.admin-event-detail__attendee-header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 0.5rem;
 	}
 
-	.admin-event-detail__attendees-head h3 {
-		margin: 0;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		font-size: 0.82rem;
-		font-weight: 660;
-	}
-
-	.admin-event-detail__attendees-head span {
+	.admin-event-detail__attendee-count {
 		font-size: 0.72rem;
 		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
@@ -468,15 +417,30 @@
 		gap: 0.35rem;
 	}
 
-	.admin-event-detail__attendee-list li {
+	.admin-event-detail__attendee-card {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.6rem;
 		padding: 0.45rem 0.6rem;
 		border-radius: 0.6rem;
-		border: 1px solid var(--admin-card-border);
-		background: color-mix(in srgb, var(--admin-card-bg) 86%, var(--bg) 14%);
+		border: 1px solid color-mix(in srgb, var(--event-color) 12%, transparent);
+		background: color-mix(in srgb, var(--event-color) 3%, var(--bg));
+	}
+
+	.admin-event-detail__attendee-avatar {
+		width: 2rem;
+		height: 2rem;
+		border-radius: 999px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 0.64rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		flex-shrink: 0;
+		background: color-mix(in srgb, var(--event-color) 12%, transparent);
+		color: color-mix(in srgb, var(--event-color) 70%, var(--text) 30%);
 	}
 
 	.admin-event-detail__attendee-main {
@@ -489,8 +453,8 @@
 		color: var(--text);
 	}
 
-	.admin-event-detail__attendee-email {
-		font-size: 0.68rem;
+	.admin-event-detail__attendee-detail {
+		font-size: 0.6875rem;
 		color: color-mix(in srgb, var(--text) 52%, transparent);
 	}
 
@@ -511,13 +475,44 @@
 		color: color-mix(in srgb, #c27800 84%, var(--text) 16%);
 	}
 
+	.admin-event-detail__open-spots {
+		display: flex;
+		align-items: center;
+		padding: 0.5rem 0.75rem;
+		border-radius: 0.72rem;
+		border: 1px dashed color-mix(in srgb, var(--text) 10%, transparent);
+		font-size: 0.75rem;
+		color: color-mix(in srgb, var(--text) 48%, transparent);
+	}
+
+	.admin-event-detail__editor-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		width: fit-content;
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-decoration: none;
+		color: color-mix(in srgb, var(--text) 58%, transparent);
+		margin-top: 0.25rem;
+	}
+
+	.admin-event-detail__editor-link:hover {
+		color: var(--text);
+	}
+
 	.admin-event-detail__toast {
 		bottom: 1rem;
 		z-index: 130;
 	}
 
 	@media (max-width: 760px) {
-		.admin-event-detail__field-row {
+		.admin-event-detail__header-row {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.admin-event-detail__detail-grid {
 			grid-template-columns: 1fr;
 		}
 	}

@@ -300,6 +300,33 @@ export async function updateAdminEventMemory(eventId: number, input: { recapText
 	})
 }
 
+export async function updateAdminEventDetails(eventId: number, input: { title: string; startsAt: string; endsAt: string }) {
+	return requestApi<AdminMutationOk>(withAdminApi(`/events/${eventId}`), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			action: 'event',
+			title: input.title,
+			startsAt: input.startsAt,
+			endsAt: input.endsAt
+		}),
+		parse: (payload) => AdminMutationOkSchema.parse(payload)
+	})
+}
+
+export async function updateAdminEventAttendance(eventId: number, input: { userId: string; attendanceStatus: 'unknown' | 'attended' | 'flaked' }) {
+	return requestApi<AdminMutationOk>(withAdminApi(`/events/${eventId}`), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			action: 'attendance',
+			userId: input.userId,
+			attendanceStatus: input.attendanceStatus
+		}),
+		parse: (payload) => AdminMutationOkSchema.parse(payload)
+	})
+}
+
 export async function deleteAdminEvent(eventId: number) {
 	return requestApi<AdminMutationOk>(withAdminApi(`/events/${eventId}`), {
 		method: 'POST',

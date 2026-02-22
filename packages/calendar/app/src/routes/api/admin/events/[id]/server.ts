@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { cancelEvent, parseAdminEventUpdateInput, setAttendanceStatus, TransportValidationError, updateEventCapacity, updateEventMemory } from '@calendar/core'
+import { cancelEvent, parseAdminEventUpdateInput, setAttendanceStatus, TransportValidationError, updateEventCapacity, updateEventDetails, updateEventMemory } from '@calendar/core'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
 
@@ -29,6 +29,17 @@ export async function POST(event: RequestEvent) {
 		if (input.action === 'attendance') {
 			await setAttendanceStatus(env.DB, { eventId, userId: input.userId, attendanceStatus: input.attendanceStatus })
 			logAdminEvent(event, 'event_attendance_update', { eventId, userId: input.userId, attendanceStatus: input.attendanceStatus })
+			return apiOk({})
+		}
+
+		if (input.action === 'event') {
+			await updateEventDetails(env.DB, {
+				eventId,
+				title: input.title,
+				startsAt: input.startsAt,
+				endsAt: input.endsAt
+			})
+			logAdminEvent(event, 'event_update', { eventId })
 			return apiOk({})
 		}
 

@@ -431,6 +431,17 @@ export async function updateEventCapacity(db: D1DatabaseLike, input: { eventId: 
 	await bumpWaitlist(db, input.eventId)
 }
 
+export async function updateEventDetails(
+	db: D1DatabaseLike,
+	input: { eventId: number; title: string; startsAt: string; endsAt: string }
+) {
+	await db.prepare(
+		`UPDATE calendar_events
+		 SET title = ?, starts_at = ?, ends_at = ?, updated_at = unixepoch()
+		 WHERE id = ?`
+	).bind(input.title, input.startsAt, input.endsAt, input.eventId).run()
+}
+
 export async function setAttendanceStatus(
 	db: D1DatabaseLike,
 	input: { eventId: number; userId: string; attendanceStatus: 'unknown' | 'attended' | 'flaked' }

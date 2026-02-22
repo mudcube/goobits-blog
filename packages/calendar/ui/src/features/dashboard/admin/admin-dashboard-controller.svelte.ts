@@ -22,6 +22,8 @@ import {
 	saveDashboardProgram,
 	saveDashboardRules,
 	updateAdminEventCapacityValue,
+	updateAdminEventDetailsValue,
+	updateAdminEventAttendanceValue,
 	updateAdminEventMemoryValue,
 	deleteAdminEventValue,
 	updateAdminProgram
@@ -185,13 +187,25 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 	let selectedEventDetail = $state<{
 		event: {
 			id: number
+			activitySlug: string
+			activityLabel: string
 			title: string
 			startsAt: string
 			endsAt: string
 			capacity: number
 			waitlistCount: number
+			recapText: string | null
+			heroImageUrl: string | null
 		}
-		attendees: Array<{ entryId: number; userId: string; name: string | null; email: string | null; status: 'joined' | 'waitlist'; waitlistPosition: number | null }>
+		attendees: Array<{
+			entryId: number
+			userId: string
+			name: string | null
+			email: string | null
+			status: 'joined' | 'waitlist'
+			waitlistPosition: number | null
+			attendanceStatus: 'unknown' | 'attended' | 'flaked'
+		}>
 		weather: { summary: string; temperatureF: number } | null
 	} | null>(null)
 
@@ -562,11 +576,15 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 			selectedEventDetail = {
 				event: {
 					id: result.event.id,
+					activitySlug: result.event.activitySlug,
+					activityLabel: result.event.activityLabel,
 					title: result.event.title,
 					startsAt: result.event.startsAt,
 					endsAt: result.event.endsAt,
 					capacity: result.event.capacity,
-					waitlistCount: result.event.waitlistCount
+					waitlistCount: result.event.waitlistCount,
+					recapText: result.event.recapText,
+					heroImageUrl: result.event.heroImageUrl
 				},
 				attendees: result.attendees,
 				weather: result.weather
@@ -606,6 +624,61 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		} catch (err) {
 			if (onUnauthorized?.(err)) return
 			error = err instanceof Error ? err.message : 'Failed to update event capacity'
+		} finally {
+			eventUpdatingId = null
+		}
+	}
+
+	async function updateEventDetails(eventId: number, input: { title: string; startsAt: string; endsAt: string }) {
+		eventUpdatingId = eventId
+		error = ''
+		try {
+			const result = await updateAdminEventDetailsValue(eventId, input)
+			if (!result.ok) {
+				error = result.error
+				return
+			}
+			events = events.map((event) => (event.id === eventId ? { ...event, title: input.title, startsAt: input.startsAt, endsAt: input.endsAt } : event))
+			recentEvents = recentEvents.map((event) => (event.id === eventId ? { ...event, title: input.title, startsAt: input.startsAt, endsAt: input.endsAt } : event))
+			if (selectedEventDetail?.event.id === eventId) {
+				selectedEventDetail = {
+					...selectedEventDetail,
+					event: {
+						...selectedEventDetail.event,
+						title: input.title,
+						startsAt: input.startsAt,
+						endsAt: input.endsAt
+					}
+				}
+			}
+		} catch (err) {
+			if (onUnauthorized?.(err)) return
+			error = err instanceof Error ? err.message : 'Failed to update event details'
+		} finally {
+			eventUpdatingId = null
+		}
+	}
+
+	async function updateEventAttendance(eventId: number, userId: string, attendanceStatus: 'unknown' | 'attended' | 'flaked') {
+		eventUpdatingId = eventId
+		error = ''
+		try {
+			const result = await updateAdminEventAttendanceValue(eventId, { userId, attendanceStatus })
+			if (!result.ok) {
+				error = result.error
+				return
+			}
+			if (selectedEventDetail?.event.id === eventId) {
+				selectedEventDetail = {
+					...selectedEventDetail,
+					attendees: selectedEventDetail.attendees.map((attendee) =>
+						attendee.userId === userId ? { ...attendee, attendanceStatus } : attendee
+					)
+				}
+			}
+		} catch (err) {
+			if (onUnauthorized?.(err)) return
+			error = err instanceof Error ? err.message : 'Failed to update attendance'
 		} finally {
 			eventUpdatingId = null
 		}
@@ -769,6 +842,8 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 		closeEventDetail,
 		promoteWaitlist,
 		updateEventCapacity,
+		updateEventDetails,
+		updateEventAttendance,
 		updateEventMemory,
 		deleteEvent,
 		savePaymentDefaults,

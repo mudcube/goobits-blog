@@ -8,6 +8,8 @@ import {
 	fetchAdminStatus,
 	fetchCalendarMembersData,
 	persistAdminEventCapacity,
+	persistAdminEventDetails,
+	persistAdminEventAttendance,
 	persistAdminEventMemory,
 	removeAdminEvent,
 	persistAdminEvents,
@@ -165,6 +167,14 @@ export async function createAdminEventsBatch(input: {
 
 export async function updateAdminEventCapacityValue(eventId: number, capacity: number) {
 	return runSuccess(() => persistAdminEventCapacity(eventId, capacity))
+}
+
+export async function updateAdminEventDetailsValue(eventId: number, input: { title: string; startsAt: string; endsAt: string }) {
+	return runSuccess(() => persistAdminEventDetails(eventId, input))
+}
+
+export async function updateAdminEventAttendanceValue(eventId: number, input: { userId: string; attendanceStatus: 'unknown' | 'attended' | 'flaked' }) {
+	return runSuccess(() => persistAdminEventAttendance(eventId, input))
 }
 
 export async function updateAdminEventMemoryValue(eventId: number, input: { recapText?: string; heroImageUrl?: string }) {

@@ -11,6 +11,8 @@ import {
 	toggleAdminProgram,
 	mutateAdminSyncQueue,
 	updateAdminEventMemory,
+	updateAdminEventDetails,
+	updateAdminEventAttendance,
 	updateAdminEventCapacity,
 	deleteAdminEvent,
 	type AdminRulesInput
@@ -180,6 +182,8 @@ export async function persistAdminEvents(input: {
 
 export const persistAdminEventCapacity = updateAdminEventCapacity
 export const persistAdminEventMemory = updateAdminEventMemory
+export const persistAdminEventDetails = updateAdminEventDetails
+export const persistAdminEventAttendance = updateAdminEventAttendance
 export const removeAdminEvent = deleteAdminEvent
 
 export async function processAdminSyncQueue(limit = 10) {

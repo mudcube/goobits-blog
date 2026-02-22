@@ -86,7 +86,8 @@ const CalendarAdminEventDetailResponseSchema = z.object({
 		name: z.union([z.string(), z.null()]),
 		email: z.union([z.string(), z.null()]),
 		status: z.union([z.literal('joined'), z.literal('waitlist')]),
-		waitlistPosition: z.union([z.number(), z.null()])
+		waitlistPosition: z.union([z.number(), z.null()]),
+		attendanceStatus: z.union([z.literal('unknown'), z.literal('attended'), z.literal('flaked')])
 	})),
 	weather: z.union([
 		z.object({
