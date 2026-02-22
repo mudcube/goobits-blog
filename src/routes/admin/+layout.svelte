@@ -4,7 +4,7 @@
 	import { page } from '$app/stores'
 	import { enhance } from '$app/forms'
 	import { getCalendarUiConfig } from '@calendar/ui/config'
-	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut, CalendarPlus, UserPlus, ArrowLeft } from '@lucide/svelte'
+	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut, CalendarPlus, UserPlus, ArrowLeft, Pencil, Trash2 } from '@lucide/svelte'
 	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 
@@ -99,6 +99,10 @@
 		return normalizePath(pathname) === '/admin'
 	}
 
+	function isEventDetailRoute(pathname: string) {
+		return /^\/admin\/events\/\d+$/.test(normalizePath(pathname))
+	}
+
 	function triggerProgramEditorSettings() {
 		window.dispatchEvent(new CustomEvent('admin-program-editor-toggle-settings'))
 	}
@@ -122,6 +126,14 @@
 					: {}
 			})
 		)
+	}
+
+	function triggerEventDetailEdit() {
+		window.dispatchEvent(new CustomEvent('admin-event-detail-edit'))
+	}
+
+	function triggerEventDetailCancel() {
+		window.dispatchEvent(new CustomEvent('admin-event-detail-cancel'))
 	}
 </script>
 
@@ -153,7 +165,8 @@
 							isDashboardRoute($page.url.pathname) ||
 							isEventsIndexRoute($page.url.pathname) ||
 							isEventsNewRoute($page.url.pathname) ||
-							isCrewRoute($page.url.pathname)
+							isCrewRoute($page.url.pathname) ||
+							isEventDetailRoute($page.url.pathname)
 						)
 					}
 				>
@@ -169,6 +182,9 @@
 						>Back to Events</AdminActionButton>
 					{:else if isCrewRoute($page.url.pathname)}
 						<AdminActionButton variant="primary" icon={UserPlus} onclick={triggerCrewInvite}>Invite</AdminActionButton>
+					{:else if isEventDetailRoute($page.url.pathname)}
+						<AdminActionButton variant="primary" icon={Pencil} onclick={triggerEventDetailEdit}>Edit</AdminActionButton>
+						<AdminActionButton variant="danger" icon={Trash2} onclick={triggerEventDetailCancel}>Cancel Event</AdminActionButton>
 					{:else}
 						<span aria-hidden="true"></span>
 					{/if}

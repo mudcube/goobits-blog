@@ -3,8 +3,7 @@
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
-	import { ArrowUpRight, Pencil, Trash2 } from '@lucide/svelte'
-	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
+	import { ArrowUpRight } from '@lucide/svelte'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
 	import { getAdminActivityColor, getAdminActivityEmoji } from '$lib/admin/activity-display'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
@@ -119,6 +118,11 @@
 		return `${first}${second}`.toUpperCase()
 	}
 
+	function openEditor() {
+		if (!detail) return
+		void goto(hrefWithMock(`/admin/events/${detail.event.activitySlug || 'events'}/`))
+	}
+
 	async function cancelEvent() {
 		if (!detail) return
 		if (!confirm('Cancel this event? This action cannot be undone.')) return
@@ -132,6 +136,14 @@
 			return
 		}
 		void goto(hrefWithMock('/admin/events/'))
+	}
+
+	function handleEditRequest() {
+		openEditor()
+	}
+
+	function handleCancelRequest() {
+		void cancelEvent()
 	}
 
 	$effect(() => {
@@ -149,11 +161,19 @@
 			goto(hrefWithMock('/admin/'), { replaceState: true })
 		}
 	})
+
+	$effect(() => {
+		window.addEventListener('admin-event-detail-edit', handleEditRequest)
+		window.addEventListener('admin-event-detail-cancel', handleCancelRequest)
+		return () => {
+			window.removeEventListener('admin-event-detail-edit', handleEditRequest)
+			window.removeEventListener('admin-event-detail-cancel', handleCancelRequest)
+		}
+	})
 </script>
 
 {#if authed}
 	<div class="admin-event-detail admin-content">
-		<a class="admin-event-detail__back" href={hrefWithMock('/admin/events/')}>Back to Events</a>
 		{#if toast}
 			<div class="admin-ui-toast admin-event-detail__toast" class:admin-ui-toast--error={toastError} role="status">
 				{#if !toastError}✓ {/if}{toast}
@@ -177,11 +197,6 @@
 						<strong>{joinedCount}</strong> of {detail.event.capacity} spots filled
 					</div>
 				</div>
-			</div>
-
-			<div class="admin-event-detail__actions">
-				<AdminActionButton variant="primary" icon={Pencil} href={hrefWithMock(`/admin/events/${activitySlug || 'events'}/`)}>Edit</AdminActionButton>
-				<AdminActionButton variant="danger" icon={Trash2} onclick={() => void cancelEvent()}>Cancel Event</AdminActionButton>
 			</div>
 
 			<div class="admin-event-detail__card admin-ui-card">
@@ -272,21 +287,6 @@
 		gap: 1rem;
 	}
 
-	.admin-event-detail__back {
-		display: inline-flex;
-		align-items: center;
-		width: fit-content;
-		font-size: 0.9rem;
-		font-weight: 600;
-		padding: 0.32rem 0.6rem;
-		border-radius: var(--admin-control-radius);
-		text-decoration: none;
-		color: var(--text);
-	}
-	.admin-event-detail__back:hover {
-		background: var(--admin-control-bg);
-	}
-
 	.admin-event-detail__loading {
 		margin: 0;
 		color: color-mix(in srgb, var(--text) 62%, transparent);
@@ -331,13 +331,6 @@
 	.admin-event-detail__capacity strong {
 		color: var(--text);
 		font-weight: 650;
-	}
-
-	.admin-event-detail__actions {
-		display: flex;
-		align-items: center;
-		justify-content: flex-end;
-		gap: 0.45rem;
 	}
 
 	.admin-event-detail__card {
