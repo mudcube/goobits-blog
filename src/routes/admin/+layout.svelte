@@ -473,6 +473,8 @@
 	.social-admin__sidebar {
 		grid-row: 1 / span 2;
 		grid-column: 1;
+		position: relative;
+		z-index: 20;
 		display: flex;
 		flex-direction: column;
 		gap: 0.25rem;
@@ -545,7 +547,7 @@
 	.social-admin__nav-item--active {
 		background: var(--admin-active-bg);
 		color: var(--admin-active-fg);
-		font-weight: 600;
+		font-weight: 400;
 	}
 
 	/* --- Logout --- */
@@ -583,6 +585,8 @@
 	.social-admin__breadcrumbs {
 		grid-column: 2;
 		grid-row: 1;
+		position: relative;
+		z-index: 15;
 		display: block;
 		padding: 0.5rem var(--admin-content-pad-x);
 		min-height: 2.5rem;
@@ -635,6 +639,8 @@
 	.social-admin__main {
 		grid-row: 2;
 		grid-column: 2;
+		position: relative;
+		z-index: 1;
 		width: 100%;
 		max-width: none;
 		margin: 0;

@@ -79,6 +79,10 @@
 		}
 	}
 
+	function sameSyncConnections(a: SyncConnections, b: SyncConnections) {
+		return a.google === b.google && a.apple === b.apple && a.outlook === b.outlook
+	}
+
 	const paymentProviders = [
 		{ value: 'venmo' as const, label: 'Venmo', icon: HandCoins, placeholder: 'e.g. @yourname' },
 		{ value: 'zelle' as const, label: 'Zelle', icon: Landmark, placeholder: 'Email or phone' },
@@ -108,7 +112,6 @@
 	$effect(() => {
 		if (!authed) return
 		if (mockMode) {
-			syncConnections = { ...syncConnections, google: syncConnections.google }
 			const next = hydratePaymentMethods(mockPaymentDefaults.provider, mockPaymentDefaults.handle)
 			paymentMethods = next
 			initialPaymentMethods = {
@@ -131,7 +134,10 @@
 			syncOptionsExpanded = false
 			return
 		}
-		syncConnections = singleSyncConnection(syncConnections)
+		const normalized = singleSyncConnection(syncConnections)
+		if (!sameSyncConnections(syncConnections, normalized)) {
+			syncConnections = normalized
+		}
 	})
 
 	$effect(() => {
@@ -158,7 +164,9 @@
 					outlook: !!parsed.outlook
 				})
 			}
-		} catch {}
+		} catch {
+			// ignore invalid local settings payload
+		}
 		suspendWeekStartAutosave = false
 		return () => {
 			if (toastTimer) clearTimeout(toastTimer)
@@ -173,7 +181,9 @@
 				'admin_sync_connections',
 				JSON.stringify(singleSyncConnection(syncConnections))
 			)
-		} catch {}
+		} catch {
+			// ignore storage write errors
+		}
 	})
 
 	function showToast(message: string, isError = false) {
@@ -524,15 +534,35 @@
 	}
 
 	.admin-settings__section {
+		position: relative;
 		display: grid;
 		gap: 0.85rem;
-		padding: 1.35rem 0 0;
-		border-top: 1px solid var(--admin-card-border);
+		padding: 1.35rem 0.75rem 0;
+		border-top: none;
+	}
+
+	.admin-settings__section::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0.75rem;
+		right: 0.75rem;
+		height: 0.7rem;
+		background: linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--admin-card-border) 85%, transparent) 0%,
+			color-mix(in srgb, var(--admin-card-border) 35%, transparent) 45%,
+			transparent 100%
+		);
+		pointer-events: none;
 	}
 
 	.admin-settings__section:first-of-type {
-		border-top: none;
 		padding-top: 0;
+	}
+
+	.admin-settings__section:first-of-type::before {
+		display: none;
 	}
 
 	.admin-settings__section-head {

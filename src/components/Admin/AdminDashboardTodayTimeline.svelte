@@ -115,7 +115,7 @@
 						</div>
 						<div class="admin-dashboard-today__people">
 							<span class="admin-dashboard-today__avatar admin-dashboard-today__avatar--you">You</span>
-							{#each Array.from({ length: Math.min(event.seatsTaken || 0, 5) }) as _, i (i)}
+							{#each Array.from({ length: Math.min(event.seatsTaken || 0, 5) }, (_value, idx) => idx) as i (i)}
 								<span class="admin-dashboard-today__avatar">{initials(event, i)}</span>
 							{/each}
 							<span class="admin-dashboard-today__people-text">
