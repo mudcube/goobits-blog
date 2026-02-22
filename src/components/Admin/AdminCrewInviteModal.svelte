@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { Send, Copy } from '@lucide/svelte'
+	import { onMount } from 'svelte'
 
 	const {
 		open = false,
 		step = 1,
 		inviteName = '',
 		inviteUrl = '',
+		anchorRect = null,
 		onClose,
 		onNameChange,
 		onCreate,
@@ -17,6 +19,7 @@
 		step?: 1 | 2
 		inviteName?: string
 		inviteUrl?: string
+		anchorRect?: { left: number; top: number; right: number; bottom: number; width: number; height: number } | null
 		onClose: () => void
 		onNameChange: (value: string) => void
 		onCreate: () => void
@@ -24,11 +27,55 @@
 		onText: () => void
 		onCancelInvite: () => void
 	}>()
+
+	let viewportWidth = $state(0)
+	let viewportHeight = $state(0)
+	const popoverWidth = 352
+
+	function updateViewport() {
+		viewportWidth = window.innerWidth
+		viewportHeight = window.innerHeight
+	}
+
+	onMount(() => {
+		updateViewport()
+		window.addEventListener('resize', updateViewport)
+		return () => window.removeEventListener('resize', updateViewport)
+	})
+
+	const placement = $derived.by(() => {
+		const width = Math.min(popoverWidth, Math.max(288, viewportWidth - 16))
+		const estimatedHeight = step === 1 ? 198 : 286
+		if (!anchorRect) {
+			return {
+				width,
+				left: viewportWidth > 0 ? viewportWidth / 2 : 180,
+				top: 92,
+				arrowLeft: width / 2,
+				above: false
+			}
+		}
+		const anchorX = anchorRect.left + anchorRect.width / 2
+		const minLeft = width / 2 + 8
+		const maxLeft = Math.max(minLeft, viewportWidth - width / 2 - 8)
+		const left = Math.min(maxLeft, Math.max(minLeft, anchorX))
+		const showAbove = anchorRect.bottom + estimatedHeight + 16 > viewportHeight && anchorRect.top - estimatedHeight - 16 > 40
+		const top = showAbove ? anchorRect.top - 8 : anchorRect.bottom + 8
+		const arrowLeft = Math.min(width - 18, Math.max(18, anchorX - (left - width / 2)))
+		return { width, left, top, arrowLeft, above: showAbove }
+	})
+
+	const popoverStyle = $derived(
+		`width:${placement.width}px;left:${placement.left}px;top:${placement.top}px;--invite-arrow-left:${placement.arrowLeft}px;`
+	)
 </script>
 
+<svelte:window onkeydown={(event) => open && event.key === 'Escape' && onClose()} />
+
 {#if open}
-	<div class="admin-crew-modal__overlay" role="presentation" onclick={(event) => event.target === event.currentTarget && onClose()}>
-		<div class="admin-crew-modal" role="dialog" aria-modal="true" aria-label="Invite friend">
+	<div class="admin-crew-modal__overlay" role="presentation" tabindex="-1" onpointerdown={onClose} onkeydown={(event) => event.key === 'Escape' && onClose()}>
+		<div class="admin-crew-modal" class:admin-crew-modal--above={placement.above} role="dialog" tabindex="0" aria-modal="true" aria-label="Invite friend" style={popoverStyle} onpointerdown={(event) => event.stopPropagation()}>
+			<div class="admin-crew-modal__arrow" aria-hidden="true"></div>
 			{#if step === 1}
 				<div class="admin-crew-modal__body">
 					<div class="admin-crew-modal__title">Invite a friend</div>
@@ -71,27 +118,39 @@
 <style>
 	.admin-crew-modal__overlay {
 		position: fixed;
-		top: 2.5rem;
-		right: 0;
-		bottom: 0;
-		left: 13.75rem;
-		background: color-mix(in srgb, black 36%, transparent);
-		backdrop-filter: blur(4px);
-		display: grid;
-		place-items: center;
-		padding: 1rem;
-		z-index: 300;
+		inset: 0;
+		background: transparent;
+		z-index: 180;
 	}
 
 	.admin-crew-modal {
-		width: 22rem;
-		max-width: 100%;
+		position: fixed;
+		width: min(22rem, calc(100vw - 16px));
 		border-radius: 1.1rem;
 		border: 1px solid color-mix(in srgb, var(--admin-accent) 18%, transparent);
 		background: var(--bg);
 		box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.1);
 		overflow: hidden;
-		transform: translateY(-1.25rem);
+		transform: translateX(-50%);
+		z-index: 181;
+	}
+
+	.admin-crew-modal__arrow {
+		position: absolute;
+		top: -6px;
+		left: var(--invite-arrow-left, 50%);
+		width: 10px;
+		height: 10px;
+		border-left: 1px solid color-mix(in srgb, var(--admin-accent) 18%, transparent);
+		border-top: 1px solid color-mix(in srgb, var(--admin-accent) 18%, transparent);
+		background: var(--bg);
+		transform: translateX(-50%) rotate(45deg);
+	}
+
+	.admin-crew-modal--above .admin-crew-modal__arrow {
+		top: auto;
+		bottom: -6px;
+		transform: translateX(-50%) rotate(225deg);
 	}
 
 	.admin-crew-modal__body {
@@ -191,12 +250,8 @@
 	}
 
 	@media (max-width: 820px) {
-		.admin-crew-modal__overlay {
-			inset: 0;
-		}
-
 		.admin-crew-modal {
-			transform: none;
+			width: min(22rem, calc(100vw - 12px));
 		}
 	}
 </style>

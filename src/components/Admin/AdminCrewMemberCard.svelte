@@ -30,9 +30,7 @@
 	{/snippet}
 	<div class="admin-crew-member__top">
 		<span class="admin-crew-member__name">{name}</span>
-		{#if isYou}
-			<span class="admin-crew-member__you">you</span>
-		{:else if badge}
+		{#if !isYou && badge}
 			<span class="admin-crew-member__badge">{badge}</span>
 		{/if}
 	</div>
@@ -72,17 +70,6 @@
 		font-size: 0.875rem;
 		font-weight: 650;
 		letter-spacing: -0.005em;
-	}
-
-	.admin-crew-member__you {
-		font-size: 0.56rem;
-		font-weight: 700;
-		letter-spacing: 0.03em;
-		text-transform: uppercase;
-		color: color-mix(in srgb, var(--admin-accent) 86%, var(--text) 14%);
-		background: color-mix(in srgb, var(--admin-accent) 10%, transparent);
-		padding: 0.12rem 0.38rem;
-		border-radius: 0.25rem;
 	}
 
 	.admin-crew-member__badge {

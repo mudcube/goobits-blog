@@ -96,7 +96,7 @@
 				{/if}
 				<button
 					type="button"
-					class="admin-dashboard-today__event admin-ui-card"
+					class="admin-dashboard-today__event admin-ui-card admin-ui-card--interactive"
 					class:admin-dashboard-today__event--past={isPast(event.startsAt)}
 					onclick={() => onOpenEvent(event.id)}
 				>
@@ -175,13 +175,6 @@
 		gap: 0.75rem;
 		padding: 0.85rem 1rem;
 		text-align: left;
-		cursor: pointer;
-		transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
-	}
-
-	.admin-dashboard-today__event:hover {
-		transform: translateY(-1px);
-		box-shadow: 0 6px 20px color-mix(in srgb, var(--admin-accent) 14%, transparent);
 	}
 
 	.admin-dashboard-today__event--past {

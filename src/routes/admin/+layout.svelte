@@ -4,7 +4,7 @@
 	import { page } from '$app/stores'
 	import { enhance } from '$app/forms'
 	import { getCalendarUiConfig } from '@calendar/ui/config'
-	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut, CalendarPlus, UserPlus, ArrowLeft, Save } from '@lucide/svelte'
+	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut, CalendarPlus, UserPlus, ArrowLeft } from '@lucide/svelte'
 	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 
@@ -103,12 +103,25 @@
 		window.dispatchEvent(new CustomEvent('admin-program-editor-toggle-settings'))
 	}
 
-	function triggerProgramEditorSave() {
-		window.dispatchEvent(new CustomEvent('admin-program-editor-save'))
-	}
-
-	function triggerCrewInvite() {
-		window.dispatchEvent(new CustomEvent('admin-crew-create-invite'))
+	function triggerCrewInvite(event?: MouseEvent) {
+		const target = event?.currentTarget as HTMLElement | null
+		const rect = target?.getBoundingClientRect()
+		window.dispatchEvent(
+			new CustomEvent('admin-crew-create-invite', {
+				detail: rect
+					? {
+							anchorRect: {
+								left: rect.left,
+								top: rect.top,
+								right: rect.right,
+								bottom: rect.bottom,
+								width: rect.width,
+								height: rect.height
+							}
+						}
+					: {}
+			})
+		)
 	}
 </script>
 
@@ -146,7 +159,6 @@
 				>
 					{#if isProgramEditorRoute($page.url.pathname)}
 						<AdminActionButton variant="subtle" icon={Settings} onclick={triggerProgramEditorSettings}>Settings</AdminActionButton>
-						<AdminActionButton variant="primary" icon={Save} onclick={triggerProgramEditorSave}>Save</AdminActionButton>
 					{:else if isEventsIndexRoute($page.url.pathname)}
 						<AdminActionButton variant="primary" icon={CalendarPlus} href={hrefWithMock('/admin/events/new/')}>New</AdminActionButton>
 					{:else if isEventsNewRoute($page.url.pathname)}
@@ -212,8 +224,8 @@
 		--admin-muted: var(--muted);
 		--admin-border: var(--border);
 		--admin-panel: var(--panel-bg);
-		--admin-active-bg: color-mix(in srgb, var(--text) 10%, transparent);
-		--admin-active-fg: var(--text);
+		--admin-active-bg: color-mix(in srgb, var(--admin-accent) 14%, transparent);
+		--admin-active-fg: color-mix(in srgb, var(--text) 94%, transparent);
 		--admin-hover-bg: var(--shell-nav-link-hover-bg);
 		--admin-hover-fg: var(--shell-nav-link-hover);
 		--admin-nav-link: var(--shell-nav-link);
@@ -221,14 +233,14 @@
 		--admin-button-hover-bg: var(--shell-nav-button-hover-bg);
 		--admin-button-hover-border: var(--shell-nav-button-hover-border);
 		--admin-control-radius: 0.625rem;
-		--admin-control-border: color-mix(in srgb, var(--text) 18%, transparent);
-		--admin-control-bg: color-mix(in srgb, var(--panel-bg) 88%, var(--text) 12%);
-		--admin-control-bg-hover: color-mix(in srgb, var(--panel-bg) 78%, var(--text) 22%);
+		--admin-control-border: color-mix(in srgb, var(--admin-accent) 34%, transparent);
+		--admin-control-bg: color-mix(in srgb, var(--admin-accent) 10%, transparent);
+		--admin-control-bg-hover: color-mix(in srgb, var(--admin-accent) 15%, transparent);
 		--admin-control-fg: color-mix(in srgb, var(--text) 92%, transparent);
-		--admin-control-primary-bg: color-mix(in srgb, #111 84%, var(--text) 16%);
-		--admin-control-primary-fg: #fff;
-		--admin-control-danger-bg: color-mix(in srgb, #ef4444 86%, var(--bg) 14%);
-		--admin-control-danger-fg: #fff;
+		--admin-control-primary-bg: color-mix(in srgb, var(--admin-accent) 10%, transparent);
+		--admin-control-primary-fg: color-mix(in srgb, var(--text) 92%, transparent);
+		--admin-control-danger-bg: color-mix(in srgb, var(--admin-accent) 10%, transparent);
+		--admin-control-danger-fg: color-mix(in srgb, var(--text) 92%, transparent);
 		--admin-selected-border: color-mix(in srgb, var(--text) 38%, transparent);
 		--admin-selected-bg: color-mix(in srgb, var(--text) 11%, var(--bg) 89%);
 		--admin-focus-ring: color-mix(in srgb, #0a84ff 52%, transparent);
@@ -244,8 +256,12 @@
 		--admin-status-warn-bg: color-mix(in srgb, #ff9500 10%, transparent);
 		--admin-status-warn-fg: color-mix(in srgb, #c27800 88%, var(--text) 12%);
 		--admin-status-warn-dot: #ff9500;
-		--admin-toast-success-bg: color-mix(in srgb, #10b981 88%, var(--bg) 12%);
-		--admin-toast-error-bg: color-mix(in srgb, #ef4444 86%, var(--bg) 14%);
+		--admin-toast-success-bg: color-mix(in srgb, var(--admin-accent) 14%, var(--bg) 86%);
+		--admin-toast-success-border: color-mix(in srgb, var(--admin-accent) 34%, transparent);
+		--admin-toast-success-fg: color-mix(in srgb, var(--text) 94%, transparent);
+		--admin-toast-error-bg: color-mix(in srgb, #ef4444 14%, var(--bg) 86%);
+		--admin-toast-error-border: color-mix(in srgb, #ef4444 34%, transparent);
+		--admin-toast-error-fg: color-mix(in srgb, var(--text) 94%, transparent);
 		--admin-elev-surface-1: color-mix(in srgb, var(--text) 86%, var(--bg) 14%);
 		--admin-elev-surface-2: color-mix(in srgb, var(--text) 82%, var(--bg) 18%);
 		--admin-elev-border: color-mix(in srgb, var(--admin-accent) 52%, transparent);
@@ -296,6 +312,28 @@
 		box-shadow: 0 1px 2px var(--shadow-softest);
 	}
 
+	:global(.social-admin .admin-ui-card--interactive) {
+		cursor: pointer;
+		will-change: transform, box-shadow;
+		transition:
+			border-color 150ms ease,
+			background 150ms ease,
+			box-shadow 170ms cubic-bezier(0.2, 0.8, 0.2, 1),
+			transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	:global(.social-admin .admin-ui-card--interactive:hover) {
+		background: var(--admin-card-bg-hover, var(--admin-card-bg));
+		border-color: color-mix(in srgb, var(--text) 18%, transparent);
+		box-shadow: 0 4px 16px color-mix(in srgb, var(--admin-accent) 8%, transparent);
+		transform: translateY(-1px);
+	}
+
+	:global(.social-admin .admin-ui-card--interactive:focus-visible) {
+		border-color: var(--admin-selected-border);
+		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
+	}
+
 	:global(.social-admin .admin-ui-overlay) {
 		position: fixed;
 		inset: 0;
@@ -322,17 +360,21 @@
 		position: fixed;
 		left: 50%;
 		transform: translateX(-50%);
-		padding: 0.5rem 1rem;
+		padding: 0.5rem 0.9rem;
 		border-radius: 999px;
 		background: var(--admin-toast-success-bg);
-		color: var(--bg);
+		border: 1px solid var(--admin-toast-success-border);
+		color: var(--admin-toast-success-fg);
 		font-size: 0.8rem;
-		font-weight: 700;
+		font-weight: 650;
+		box-shadow: 0 8px 22px color-mix(in srgb, black 10%, transparent);
 		z-index: 140;
 	}
 
 	:global(.social-admin .admin-ui-toast--error) {
 		background: var(--admin-toast-error-bg);
+		border-color: var(--admin-toast-error-border);
+		color: var(--admin-toast-error-fg);
 	}
 
 	:global(.social-admin .admin-ui-drawer-head) {
@@ -398,12 +440,28 @@
 		color: var(--admin-control-fg);
 		font-size: 0.78rem;
 		font-weight: 650;
+		line-height: 1;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.35rem;
+		vertical-align: middle;
+		text-decoration: none;
 		cursor: pointer;
-		transition: background 120ms ease, color 120ms ease, border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+		transition: background 110ms ease, color 110ms ease, border-color 110ms ease, box-shadow 110ms ease, transform 110ms ease;
+	}
+
+	:global(.social-admin .admin-ui-btn svg) {
+		display: block;
+		flex-shrink: 0;
+		vector-effect: non-scaling-stroke;
+		shape-rendering: geometricPrecision;
 	}
 
 	:global(.social-admin .admin-ui-btn:hover:not(:disabled)) {
 		background: var(--admin-control-bg-hover);
+		box-shadow: 0 4px 14px var(--shadow-soft);
+		transform: translateY(-1px);
 	}
 
 	:global(.social-admin .admin-ui-btn:disabled) {
@@ -413,18 +471,18 @@
 
 	:global(.social-admin .admin-ui-btn--primary) {
 		background: var(--admin-control-primary-bg);
-		border-color: var(--admin-control-primary-bg);
-		color: var(--admin-control-primary-fg);
+		border-color: var(--admin-control-border);
+		color: var(--admin-control-fg);
 	}
 
 	:global(.social-admin .admin-ui-btn--primary:hover:not(:disabled)) {
-		opacity: 0.92;
+		background: var(--admin-control-bg-hover);
 	}
 
 	:global(.social-admin .admin-ui-btn--danger) {
 		background: var(--admin-control-danger-bg);
 		color: var(--admin-control-danger-fg);
-		border-color: color-mix(in srgb, #ef4444 65%, transparent);
+		border-color: var(--admin-control-border);
 	}
 
 	:global(.social-admin .admin-ui-input) {
@@ -548,7 +606,7 @@
 		background: var(--admin-active-bg);
 		color: var(--admin-active-fg);
 		font-weight: 400;
-		box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 14%, transparent);
+		box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--admin-accent) 34%, transparent);
 	}
 	.social-admin__nav-item--active:hover {
 		background: var(--admin-active-bg);

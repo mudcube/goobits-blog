@@ -129,7 +129,7 @@
 				<div class="social-events__canvas">
 					<div class="social-events__picker-grid">
 						{#each programsSource as program}
-							<button type="button" class="social-events__picker-card admin-ui-card" class:social-events__picker-card--active={selectedActivitySlug === program.slug} style={`--activity-color: ${colorForActivity(program.label, program.slug)}`} onclick={() => selectCreateActivity(program.slug, program.label)}>
+							<button type="button" class="social-events__picker-card admin-ui-card admin-ui-card--interactive" class:social-events__picker-card--active={selectedActivitySlug === program.slug} style={`--activity-color: ${colorForActivity(program.label, program.slug)}`} onclick={() => selectCreateActivity(program.slug, program.label)}>
 								<span>{emojiForActivity(program.label, program.slug)}</span>
 								<span>{program.label}</span>
 							</button>
@@ -196,12 +196,6 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 0.3rem;
-		cursor: pointer;
-		transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
-	}
-	.social-events__picker-card:hover {
-		border-color: color-mix(in srgb, var(--text) 30%, transparent);
-		transform: translateY(-1px);
 	}
 	.social-events__picker-card--active {
 		border-color: var(--admin-selected-border);

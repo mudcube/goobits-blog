@@ -418,18 +418,12 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 		settingsOpen = !settingsOpen
 	}
 
-	function onTopbarSave() {
-		void saveProgram()
-	}
-
 	onMount(() => {
 		const now = new Date()
 		untilDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-30`
 		window.addEventListener('admin-program-editor-toggle-settings', onTopbarToggleSettings)
-		window.addEventListener('admin-program-editor-save', onTopbarSave)
 		return () => {
 			window.removeEventListener('admin-program-editor-toggle-settings', onTopbarToggleSettings)
-			window.removeEventListener('admin-program-editor-save', onTopbarSave)
 		}
 	})
 </script>
@@ -438,7 +432,7 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 
 {#if authed}
 	{#if toast}
-		<div class="program-editor__toast" class:program-editor__toast--error={toastError} role="status">
+		<div class="program-editor__toast admin-ui-toast" class:admin-ui-toast--error={toastError} role="status">
 			{#if !toastError}✓ {/if}{toast}
 		</div>
 	{/if}
@@ -846,7 +840,7 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 	.program-editor__popover {
 		position: fixed;
 		width: 306px;
-		--popover-surface: var(--bg);
+		--popover-surface: var(--surface);
 		--popover-control-bg: color-mix(in srgb, #faf6ff 88%, var(--surface) 12%);
 		--popover-control-border: var(--border-s);
 		--popover-control-text: var(--text);
@@ -860,6 +854,8 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 		padding: 1rem;
 		z-index: 9991 !important;
 		color: var(--text);
+		opacity: 1;
+		backdrop-filter: none;
 	}
 	.program-editor__popover :global(.admin-ui-input) {
 		background: var(--popover-control-bg);
@@ -896,24 +892,17 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 		background: var(--blue-soft);
 		color: var(--text);
 	}
-	.program-editor__popover :global(.admin-action-btn--subtle) {
-		background: var(--popover-control-bg);
-		border-color: var(--popover-control-border);
-		color: var(--popover-control-text);
-	}
-	.program-editor__popover :global(.admin-action-btn--subtle:hover:not(:disabled)) {
-		background: color-mix(in srgb, var(--text) 6%, var(--popover-control-bg) 94%);
-	}
 	.program-editor__popover-arrow {
 		position: absolute;
 		width: 10px;
 		height: 10px;
 		background: var(--popover-surface);
-		border-left: 1px solid var(--popover-control-border);
-		border-top: 1px solid var(--popover-control-border);
+		border-left: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+		border-top: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
 		top: -6px;
 		left: 50%;
 		transform: translateX(-50%) rotate(45deg);
+		z-index: 1;
 	}
 	.program-editor__popover-arrow--above {
 		top: auto;
@@ -1031,51 +1020,24 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 		bottom: 0;
 		width: min(20rem, 90vw);
 		height: calc(100vh - 2.5rem - 1px);
-		border-left: 1px solid var(--elev-border);
-		background-color: color-mix(in srgb, var(--text) 86%, var(--bg) 14%);
+		border-left: 1px solid var(--border);
+		background-color: var(--surface);
 		background-image: none;
 		z-index: 9994 !important;
 		display: flex;
 		flex-direction: column;
-		color: var(--elev-text);
-	}
-	.program-editor__settings :global(.admin-ui-btn) {
-		background: var(--elev-control);
-		border-color: var(--elev-border);
-		color: var(--elev-text);
-	}
-	.program-editor__settings :global(.admin-ui-btn:hover:not(:disabled)) {
-		background: var(--elev-control-hover);
-	}
-	.program-editor__settings :global(.admin-action-btn--primary),
-	.program-editor__settings :global(.admin-ui-btn--primary) {
-		background: color-mix(in srgb, #6d4df0 90%, transparent);
-		border-color: color-mix(in srgb, #6d4df0 90%, transparent);
-		color: #fff;
-	}
-	.program-editor__settings :global(.admin-action-btn--danger),
-	.program-editor__settings :global(.admin-ui-btn--danger) {
-		background: color-mix(in srgb, #ef4444 86%, transparent);
-		border-color: color-mix(in srgb, #ef4444 58%, transparent);
-		color: #fff;
+		color: var(--text);
+		font-family: var(--font-ui-sans, var(--font-sans));
 	}
 	.program-editor__settings-body {
 		padding: 0.95rem 0.9rem;
 		display: grid;
 		gap: 0.55rem;
 		overflow: auto;
+		font-family: var(--font-ui-sans, var(--font-sans));
 	}
 	.program-editor__settings-body label { display: grid; gap: 0.2rem; }
-	.program-editor__settings-body label span { font-size: 0.66rem; font-weight: 700; color: var(--elev-subtext); }
-	.program-editor__settings-body :global(.admin-ui-input) {
-		background: var(--elev-control);
-		border-color: var(--elev-border);
-		color: var(--elev-text);
-	}
-	.program-editor__settings-body :global(.admin-ui-input:focus) {
-		border-color: color-mix(in srgb, var(--blue) 72%, transparent);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 28%, transparent);
-	}
+	.program-editor__settings-body label span { font-size: 0.66rem; font-weight: 700; color: var(--text-3); }
 	.program-editor__toggle-row { display: flex; align-items: center; justify-content: space-between; }
 	.program-editor__toggle-row span { font-size: 0.75rem; font-weight: 600; }
 	.program-editor__switch {
@@ -1102,19 +1064,9 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 	.program-editor__settings-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
 
 	.program-editor__toast {
-		position: fixed;
-		left: 50%;
 		bottom: 1rem;
-		transform: translateX(-50%);
-		padding: 0.5rem 1rem;
-		border-radius: 999px;
-		background: color-mix(in srgb, #10b981 88%, var(--bg) 12%);
-		color: var(--bg);
-		font-size: 0.8rem;
-		font-weight: 700;
 		z-index: 9995;
 	}
-	.program-editor__toast--error { background: color-mix(in srgb, #ef4444 86%, var(--bg) 14%); }
 
 	@media (max-width: 1080px) {
 		.program-editor__settings-overlay {

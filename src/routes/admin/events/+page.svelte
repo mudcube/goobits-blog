@@ -5,7 +5,7 @@
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
 	import AdminChevronRowCard from '@components/Admin/AdminChevronRowCard.svelte'
-	import { getAdminActivityColor, getAdminActivityEmoji } from '$lib/admin/activity-display'
+	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
 	import { formatAdminDayLabel, formatAdminTimeLabel } from '$lib/admin/date-format'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 	import { mockDashboardEvents, mockDashboardRecentEvents, mockPrograms } from '$lib/admin/mock/admin-mock-data'
@@ -30,10 +30,6 @@
 
 	function emojiForActivity(label: string, slug?: string) {
 		return getAdminActivityEmoji(label, slug)
-	}
-
-	function colorForActivity(label: string, slug?: string) {
-		return getAdminActivityColor(label, slug)
 	}
 
 	function dayLabel(iso: string) {
@@ -71,8 +67,7 @@
 			{#each programsSource as program}
 				<button
 					type="button"
-					class="social-events__program-card admin-ui-card"
-					style={`--activity-color: ${colorForActivity(program.label, program.slug)}`}
+					class="social-events__program-card admin-ui-card admin-ui-card--interactive"
 					onclick={() => goto(hrefWithMock(`/admin/events/${program.slug}/`))}
 				>
 					<div class="social-events__program-icon">{program.icon || emojiForActivity(program.label, program.slug)}</div>
@@ -93,7 +88,7 @@
 		{:else}
 			<div class="social-events__upcoming-grid">
 				{#each eventsSource as ev}
-					<button type="button" class="social-events__upcoming-card admin-ui-card" onclick={() => goto(hrefWithMock(eventRoute(ev)))}>
+					<button type="button" class="social-events__upcoming-card admin-ui-card admin-ui-card--interactive" onclick={() => goto(hrefWithMock(eventRoute(ev)))}>
 						<div class="social-events__upcoming-top">
 							<span class="social-events__event-emoji">{emojiForActivity(ev.activityLabel, ev.activitySlug)}</span>
 							<div class="social-events__event-title">{ev.title}</div>
@@ -153,19 +148,7 @@
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 0.5rem;
-		cursor: pointer;
-		transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 		text-align: left;
-	}
-
-	.social-events__program-card:hover {
-		border-color: color-mix(in srgb, var(--activity-color) 42%, transparent);
-		box-shadow: 0 4px 14px color-mix(in srgb, var(--activity-color) 22%, transparent);
-		transform: translateY(-2px);
-	}
-	.social-events__program-card:focus-visible {
-		border-color: var(--admin-selected-border);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
 	}
 
 	.social-events__program-icon {
@@ -211,18 +194,7 @@
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 0.625rem;
-		cursor: pointer;
 		text-align: left;
-		transition: border-color 120ms ease, box-shadow 120ms ease;
-	}
-
-	.social-events__upcoming-card:hover {
-		border-color: color-mix(in srgb, var(--text) 22%, transparent);
-		box-shadow: 0 4px 14px var(--shadow-soft);
-	}
-	.social-events__upcoming-card:focus-visible {
-		border-color: var(--admin-selected-border);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
 	}
 
 	.social-events__upcoming-top {

@@ -13,7 +13,7 @@
 
 {#if href}
 	<a
-		class={`admin-action-btn admin-action-btn--${variant} ${disabled ? 'admin-action-btn--disabled' : ''}`}
+		class={`admin-ui-btn admin-ui-btn--${variant} admin-action-btn admin-action-btn--${variant} ${disabled ? 'admin-action-btn--disabled' : ''}`}
 		aria-label={ariaLabel}
 		aria-disabled={disabled}
 		href={disabled ? undefined : href}
@@ -26,7 +26,7 @@
 		<slot />
 	</a>
 {:else}
-	<button class={`admin-action-btn admin-action-btn--${variant}`} {type} {disabled} aria-label={ariaLabel} {onclick}>
+	<button class={`admin-ui-btn admin-ui-btn--${variant} admin-action-btn admin-action-btn--${variant}`} {type} {disabled} aria-label={ariaLabel} {onclick}>
 		{#if icon}<svelte:component this={icon} size={iconSize} strokeWidth={2} />{/if}
 		<slot />
 	</button>
@@ -34,59 +34,22 @@
 
 <style lang="scss">
 	.admin-action-btn {
-		min-height: 32px;
-		padding: 0 0.92rem;
-		border-radius: 0.52rem;
-		border: 1px solid var(--admin-control-border, color-mix(in srgb, var(--text) 14%, transparent));
-		font-size: 0.76rem;
-		font-weight: 650;
-		font-family: var(--font-ui-sans, var(--font-sans));
-		cursor: pointer;
-		transition: background 120ms ease, color 120ms ease, opacity 120ms ease;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		gap: 0.35rem;
-		text-decoration: none;
+		font-family: var(--font-ui-sans, var(--font-sans));
 
-		&:disabled {
-			opacity: 0.45;
-			cursor: not-allowed;
+		:global(svg) {
+			display: block;
+			flex-shrink: 0;
+			vector-effect: non-scaling-stroke;
+			shape-rendering: geometricPrecision;
 		}
 
 		&.admin-action-btn--disabled {
 			opacity: 0.45;
 			pointer-events: none;
-		}
-
-		&.admin-action-btn--subtle {
-			background: var(--admin-control-primary-bg, var(--text));
-			border-color: var(--admin-control-primary-bg, var(--text));
-			color: var(--admin-control-primary-fg, var(--bg));
-
-			&:hover:not(:disabled) {
-				opacity: 0.9;
-			}
-		}
-
-		&.admin-action-btn--primary {
-			background: var(--admin-control-primary-bg, var(--text));
-			border-color: var(--admin-control-primary-bg, var(--text));
-			color: var(--admin-control-primary-fg, var(--bg));
-
-			&:hover:not(:disabled) {
-				opacity: 0.9;
-			}
-		}
-
-		&.admin-action-btn--danger {
-			background: var(--admin-control-danger-bg, color-mix(in srgb, #ff3b30 88%, var(--panel-bg) 12%));
-			border-color: color-mix(in srgb, #ff3b30 70%, transparent);
-			color: var(--admin-control-danger-fg, #fff);
-
-			&:hover:not(:disabled) {
-				opacity: 0.9;
-			}
 		}
 	}
 </style>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
-	import { HandCoins, Landmark, Wallet } from '@lucide/svelte'
+	import { HandCoins, Landmark, Wallet, Plus, X } from '@lucide/svelte'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
@@ -431,15 +431,37 @@
 						</div>
 						<button
 							type="button"
-							class="admin-ui-btn"
+							class="admin-ui-btn admin-settings__sync-action"
 							class:admin-ui-btn--danger={providerConnected(provider.value)}
 							onclick={() => void toggleSyncProvider(provider.value)}
 							disabled={syncBusy[provider.value] || (provider.value === 'google' ? dashboard.disconnecting : false)}
+							aria-label={
+								syncBusy[provider.value] || (provider.value === 'google' && dashboard.disconnecting)
+									? providerConnected(provider.value)
+										? `Disconnecting ${provider.label}`
+										: `Connecting ${provider.label}`
+									: providerConnected(provider.value)
+										? `Disconnect ${provider.label}`
+										: `Connect ${provider.label}`
+							}
+							title={
+								syncBusy[provider.value] || (provider.value === 'google' && dashboard.disconnecting)
+									? providerConnected(provider.value)
+										? `Disconnecting ${provider.label}`
+										: `Connecting ${provider.label}`
+									: providerConnected(provider.value)
+										? `Disconnect ${provider.label}`
+										: `Connect ${provider.label}`
+							}
 						>
 							{#if syncBusy[provider.value] || (provider.value === 'google' && dashboard.disconnecting)}
-								{providerConnected(provider.value) ? 'Disconnecting…' : 'Connecting…'}
+								<span aria-hidden="true">…</span>
 							{:else}
-								{providerConnected(provider.value) ? 'Disconnect' : 'Connect'}
+								{#if providerConnected(provider.value)}
+									<X size={14} strokeWidth={2} />
+								{:else}
+									<Plus size={14} strokeWidth={2} />
+								{/if}
 							{/if}
 						</button>
 					</div>
@@ -534,60 +556,13 @@
 	}
 
 	.admin-settings__section {
-		position: relative;
 		display: grid;
 		gap: 0.85rem;
-		padding: 1.55rem 1rem 0;
-		border-top: none;
+		padding: 0;
 	}
 
 	.admin-settings__section + .admin-settings__section {
 		margin-top: 1rem;
-	}
-
-	.admin-settings__section::before {
-		content: '';
-		position: absolute;
-		top: 0.2rem;
-		left: 0;
-		right: 0;
-		height: 10rem;
-		border-radius: 0.7rem 0.7rem 0 0;
-		background: linear-gradient(
-			180deg,
-			color-mix(in srgb, var(--admin-card-border) 18%, transparent) 0%,
-			color-mix(in srgb, var(--admin-card-border) 6%, transparent) 42%,
-			transparent 100%
-		);
-		pointer-events: none;
-	}
-
-	.admin-settings__section::after {
-		content: '';
-		position: absolute;
-		top: 0.2rem;
-		left: 0;
-		right: 0;
-		height: 10rem;
-		border: 1px solid var(--admin-card-border);
-		border-bottom: none;
-		border-radius: 0.7rem 0.7rem 0 0;
-		box-sizing: border-box;
-		-webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.34) 42%, transparent 100%);
-		mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.34) 42%, transparent 100%);
-		pointer-events: none;
-	}
-
-	.admin-settings__section:first-of-type {
-		padding-top: 0;
-	}
-
-	.admin-settings__section:first-of-type::before {
-		display: none;
-	}
-
-	.admin-settings__section:first-of-type::after {
-		display: none;
 	}
 
 	.admin-settings__section-head {
@@ -677,6 +652,15 @@
 		border: 1px solid var(--admin-card-border);
 		background: color-mix(in srgb, var(--admin-card-bg) 88%, var(--bg) 12%);
 		border-radius: 0.64rem;
+	}
+
+	.admin-settings__sync-action {
+		width: 32px;
+		min-width: 32px;
+		padding: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.admin-settings__sync-main {

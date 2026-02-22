@@ -42,6 +42,7 @@
 	let inviteNameDraft = $state('')
 	let createdInviteId = $state('')
 	let createdInviteCode = $state('')
+	let inviteAnchorRect = $state<{ left: number; top: number; right: number; bottom: number; width: number; height: number } | null>(null)
 
 	$effect(() => {
 		if (!authed) return
@@ -371,7 +372,9 @@
 		showToast('Invite deleted')
 	}
 
-	function onTopbarCreateInvite() {
+	function onTopbarCreateInvite(event: Event) {
+		const custom = event as CustomEvent<{ anchorRect?: { left: number; top: number; right: number; bottom: number; width: number; height: number } }>
+		inviteAnchorRect = custom.detail?.anchorRect ?? null
 		void openInviteModal()
 	}
 
@@ -465,8 +468,9 @@
 		step={inviteModalStep}
 		inviteName={inviteNameDraft}
 		inviteUrl={createdInviteUrl()}
+		anchorRect={inviteAnchorRect}
 		onClose={() => (inviteModalOpen = false)}
-		onNameChange={(value) => (inviteNameDraft = value)}
+		onNameChange={(value: string) => (inviteNameDraft = value)}
 		onCreate={() => void createInviteFromModal()}
 		onCopy={() => void copyInviteWithToast(createdInviteCode)}
 		onText={textCreatedInvite}
@@ -474,7 +478,7 @@
 	/>
 
 	{#if toastVisible}
-		<div class="social-crew__toast" role="status">
+		<div class="social-crew__toast admin-ui-toast" role="status">
 			<span>{toastMessage}</span>
 			{#if undoAction}
 				<button type="button" class="admin-ui-btn" onclick={handleUndoClick}>Undo</button>
@@ -526,18 +530,10 @@
 	}
 
 	.social-crew__toast {
-		position: fixed;
-		left: 50%;
 		bottom: 5.5rem;
-		transform: translateX(-50%);
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-		padding: 0.625rem 0.875rem;
-		border-radius: 10px;
-		border: 1px solid color-mix(in srgb, var(--text) 24%, transparent);
-		background: color-mix(in srgb, var(--bg) 88%, var(--text) 12%);
-		color: var(--text);
 		z-index: 120;
 	}
 </style>

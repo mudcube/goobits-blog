@@ -19,7 +19,7 @@
 	}>()
 </script>
 
-<button type="button" class="admin-chevron-row-card" class:admin-chevron-row-card--compact={compact} aria-label={ariaLabel} onclick={onclick}>
+<button type="button" class="admin-chevron-row-card admin-ui-card admin-ui-card--interactive" class:admin-chevron-row-card--compact={compact} aria-label={ariaLabel} onclick={onclick}>
 	<div class="admin-chevron-row-card__start">
 		{@render start?.()}
 	</div>
@@ -42,31 +42,16 @@
 		align-items: center;
 		gap: 0.875rem;
 		padding: 0.75rem 0.875rem;
-		border-radius: 0.875rem;
-		border: 1px solid var(--admin-card-border);
-		background: var(--admin-card-bg);
 		text-align: left;
-		cursor: pointer;
 		color: inherit;
 		font: inherit;
-		transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 	}
 
 	.admin-chevron-row-card--compact {
 		padding: 0.625rem 0.875rem;
 	}
 
-	.admin-chevron-row-card:hover {
-		background: var(--admin-card-bg-hover, var(--admin-card-bg));
-		box-shadow: 0 4px 16px color-mix(in srgb, var(--admin-accent) 8%, transparent);
-		transform: translateY(-1px);
-	}
-
-	.admin-chevron-row-card:focus-visible {
-		border-color: var(--admin-selected-border);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
-		outline: none;
-	}
+	.admin-chevron-row-card:focus-visible { outline: none; }
 
 	.admin-chevron-row-card__start {
 		flex-shrink: 0;
