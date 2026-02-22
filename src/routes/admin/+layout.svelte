@@ -123,33 +123,38 @@
 					{/if}
 				{/each}
 			</div>
-			{#if isProgramEditorRoute($page.url.pathname)}
-				<div class="social-admin__breadcrumbs-actions">
+			<div
+				class="social-admin__breadcrumbs-actions"
+				class:social-admin__breadcrumbs-actions--empty={
+					!(
+						isProgramEditorRoute($page.url.pathname) ||
+						isDashboardRoute($page.url.pathname) ||
+						isEventsIndexRoute($page.url.pathname) ||
+						isEventsNewRoute($page.url.pathname) ||
+						isCrewRoute($page.url.pathname)
+					)
+				}
+			>
+				{#if isProgramEditorRoute($page.url.pathname)}
 					<button type="button" class="admin-ui-btn" onclick={triggerProgramEditorSettings}>Settings</button>
 					<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={triggerProgramEditorSave}>Save</button>
-				</div>
-			{:else if isDashboardRoute($page.url.pathname)}
-				<div class="social-admin__breadcrumbs-actions">
+				{:else if isDashboardRoute($page.url.pathname)}
 					<a class="admin-ui-btn admin-ui-btn--primary social-admin__breadcrumbs-btn-link" href="/admin/events/new/">+ New</a>
-				</div>
-			{:else if isEventsIndexRoute($page.url.pathname)}
-				<div class="social-admin__breadcrumbs-actions">
+				{:else if isEventsIndexRoute($page.url.pathname)}
 					<a class="admin-ui-btn admin-ui-btn--primary social-admin__breadcrumbs-btn-link" href="/admin/events/new/">+ New Event</a>
-				</div>
-			{:else if isEventsNewRoute($page.url.pathname)}
-				<div class="social-admin__breadcrumbs-actions">
+				{:else if isEventsNewRoute($page.url.pathname)}
 					<a class="admin-ui-btn social-admin__breadcrumbs-btn-link" href="/admin/events/">Back to Events</a>
-				</div>
-			{:else if isCrewRoute($page.url.pathname)}
-				<div class="social-admin__breadcrumbs-actions">
+				{:else if isCrewRoute($page.url.pathname)}
 					<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={triggerCrewInvite}>Invite Friend</button>
-				</div>
-			{/if}
+				{:else}
+					<span aria-hidden="true"></span>
+				{/if}
+			</div>
 		</nav>
 	{/if}
 
 	<aside class="social-admin__sidebar">
-		<a class="social-admin__brand" href="/admin/events/">Rainbow Gym</a>
+		<a class="social-admin__brand" href="/admin/events/">Calendar</a>
 		<nav class="social-admin__nav" aria-label="Admin">
 			{#each primaryNav as item}
 				<a class="social-admin__nav-item" class:social-admin__nav-item--active={active(item.href)} href={item.href}>
@@ -206,7 +211,7 @@
 		--admin-selected-bg: color-mix(in srgb, var(--text) 11%, var(--bg) 89%);
 		--admin-focus-ring: color-mix(in srgb, #0a84ff 52%, transparent);
 		--admin-accent: color-mix(in srgb, var(--link) 72%, #7a5af8 28%);
-		--admin-content-max: 96rem;
+		--admin-content-max: 72rem;
 		--admin-card-bg: color-mix(in srgb, var(--bg) 95%, var(--text) 5%);
 		--admin-card-border: color-mix(in srgb, var(--text) 12%, transparent);
 		--admin-status-success-bg: color-mix(in srgb, #34c759 12%, transparent);
@@ -225,6 +230,26 @@
 		--admin-elev-control: color-mix(in srgb, var(--text) 76%, var(--bg) 24%);
 		--admin-elev-control-hover: color-mix(in srgb, var(--text) 72%, var(--bg) 28%);
 		--admin-elev-control-active: color-mix(in srgb, var(--admin-accent) 44%, var(--text) 56%);
+		--admin-calendar-surface: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
+		--admin-calendar-border: color-mix(in srgb, var(--text) 14%, transparent);
+		--admin-calendar-arrow-border: color-mix(in srgb, var(--text) 22%, transparent);
+		--admin-calendar-arrow-bg: color-mix(in srgb, var(--panel-bg) 84%, var(--text) 16%);
+		--admin-calendar-arrow-ring: color-mix(in srgb, var(--bg) 38%, transparent);
+		--admin-calendar-arrow-fg: color-mix(in srgb, var(--text) 60%, transparent);
+		--admin-calendar-arrow-hover-bg: color-mix(in srgb, var(--admin-accent) 14%, var(--panel-bg) 86%);
+		--admin-calendar-arrow-hover-fg: color-mix(in srgb, var(--admin-accent) 80%, var(--text) 20%);
+		--admin-calendar-weekday: color-mix(in srgb, var(--text) 40%, transparent);
+		--admin-calendar-weekday-row-bg: #1f1f23;
+		--admin-calendar-weekday-row-fg: #f7f7fb;
+		--admin-calendar-weekday-divider: rgba(255, 255, 255, 0.18);
+		--admin-calendar-grid-border: color-mix(in srgb, var(--text) 12%, transparent);
+		--admin-calendar-cell-border: color-mix(in srgb, var(--text) 10%, transparent);
+		--admin-calendar-day-hover: color-mix(in srgb, var(--text) 5%, transparent);
+		--admin-calendar-today-bg: color-mix(in srgb, var(--admin-accent) 25%, transparent);
+		--admin-calendar-selected-border: color-mix(in srgb, var(--admin-accent) 62%, transparent);
+		--admin-calendar-selected-bg: color-mix(in srgb, var(--admin-accent) 11%, transparent);
+		--admin-calendar-selected-ring: color-mix(in srgb, var(--admin-accent) 16%, transparent);
+		--admin-calendar-dot: color-mix(in srgb, var(--admin-accent) 76%, var(--text) 24%);
 		min-height: 100vh;
 		min-width: 0;
 		display: grid;
@@ -557,6 +582,13 @@
 		align-items: center;
 		gap: 0.5rem;
 		flex-shrink: 0;
+		min-height: 32px;
+		min-width: 8.5rem;
+		justify-content: flex-end;
+	}
+	.social-admin__breadcrumbs-actions--empty {
+		pointer-events: none;
+		visibility: hidden;
 	}
 	.social-admin__breadcrumbs-btn-link {
 		display: inline-flex;
@@ -576,7 +608,10 @@
 		width: 100%;
 		padding: 1.1rem 1rem 1.6rem 0.85rem;
 		min-width: 0;
-		overflow-x: clip;
+		overflow: visible;
+		background:
+			radial-gradient(ellipse 520px 360px at 52% 68px, color-mix(in srgb, #a78bfa 16%, transparent) 0%, transparent 72%),
+			var(--bg);
 	}
 
 	/* --- Mobile: collapse sidebar to horizontal strip --- */

@@ -36,7 +36,7 @@
 {#if authed}
 	<div class="social-events admin-content">
 		<AdminPageHero
-			eyebrow="Admin"
+			eyebrow="Programs"
 			title="Events"
 			subtitle="Manage program pages and upcoming sessions."
 		/>

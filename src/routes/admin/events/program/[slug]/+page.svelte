@@ -1,12 +1,15 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
-	import { onMount } from 'svelte'
-	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
-	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
-	import { ChevronLeft, ChevronRight, Lightbulb } from '@lucide/svelte'
+import { goto } from '$app/navigation'
+import { page } from '$app/stores'
+import { onMount } from 'svelte'
+import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
+import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
+	import { Lightbulb } from '@lucide/svelte'
 	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
-	import AdminTimeSelector from '@components/Admin/AdminTimeSelector.svelte'
-	import AdminNumberStepper from '@components/Admin/AdminNumberStepper.svelte'
+import AdminTimeSelector from '@components/Admin/AdminTimeSelector.svelte'
+import AdminNumberStepper from '@components/Admin/AdminNumberStepper.svelte'
+import AdminCalendarWidget from '@components/Admin/AdminCalendarWidget.svelte'
+import { mockDashboardEvents, mockPrograms } from '$lib/admin/mock/admin-mock-data'
 
 	type ActiveDay = {
 		time: string
@@ -16,9 +19,10 @@
 	}
 
 	const { data } = $props<{ data: { user: unknown | null; slug: string } }>()
-	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
-	const authed = $derived(!!data.user)
-	const slug = $derived(data.slug)
+const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
+const authed = $derived(!!data.user)
+const slug = $derived(data.slug)
+const mockMode = $derived($page.url.searchParams.get('mock') === '1')
 
 	let preview = $state(false)
 	let settingsOpen = $state(false)
@@ -29,7 +33,6 @@
 
 	let emojiPickerOpen = $state(false)
 	let currentMonth = $state(new Date())
-	let selectedDay = $state<number | null>(null)
 	let selectedDayDate = $state<Date | null>(null)
 	let popOpen = $state(false)
 	let popTop = $state(0)
@@ -45,10 +48,11 @@
 	let popTime = $state('10:30')
 	let popCap = $state(8)
 
-	let activeDays = $state<Record<number, ActiveDay>>({})
+let activeDays = $state<Record<string, ActiveDay>>({})
+const eventsSource = $derived((mockMode ? mockDashboardEvents : dashboard.events))
+const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 
 	const emojiOptions = ['💪', '🏋️', '🎪', '🧘', '🤸', '🌈', '✨', '🎯', '🔥', '🎶']
-	const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 	function emojiToTwemojiUrl(emoji: string) {
 		const code = Array.from(emoji.replace(/\uFE0F/g, ''))
@@ -59,41 +63,62 @@
 	}
 
 	$effect(() => {
-		if (!authed) return
+		if (!authed || mockMode) return
 		void dashboard.loadPrograms()
 		void dashboard.loadEvents()
 	})
 
 	$effect(() => {
-		if (!authed || initialized || dashboard.programs.length === 0) return
-		const found = dashboard.programs.find((program) => program.slug === slug)
+		if (!authed || initialized || programsSource.length === 0) return
+		const found = programsSource.find((program) => program.slug === slug)
 		if (!found) {
-			void goto('/admin/events/')
+			void goto(mockMode ? '/admin/events/?mock=1' : '/admin/events/')
 			return
 		}
-		dashboard.selectProgram(found.slug)
-		if (!dashboard.programDraft.icon) {
-			dashboard.programDraft = { ...dashboard.programDraft, icon: '💪' }
+		if (!mockMode) {
+			dashboard.selectProgram(found.slug)
+			if (!dashboard.programDraft.icon) {
+				dashboard.programDraft = { ...dashboard.programDraft, icon: '💪' }
+			}
+		} else {
+			dashboard.programDraft = {
+				...dashboard.programDraft,
+				slug: found.slug,
+				label: found.label,
+				activityName: found.activityName || found.label,
+				pageTitle: found.pageTitle || found.label,
+				eyebrow: found.eyebrow || found.label,
+				heroTitleLine1: found.heroTitleLines[0] || dashboard.programDraft.heroTitleLine1,
+				heroTitleLine2: found.heroTitleLines[1] || dashboard.programDraft.heroTitleLine2,
+				heroSubtitle: found.heroSubtitle || dashboard.programDraft.heroSubtitle,
+				icon: found.icon || dashboard.programDraft.icon,
+				enabled: found.enabled,
+				sortOrder: found.sortOrder,
+				serviceStatusNote: found.serviceStatusNote || '',
+				eyebrowClass: found.eyebrowClass || '',
+				glowClass: found.glowClass || '',
+				formGlowClass: found.formGlowClass || ''
+			}
 		}
 		initialized = true
 	})
 
 	$effect(() => {
 		if (!authed || !initialized) return
-		const map: Record<number, ActiveDay> = {}
-		for (const ev of dashboard.events) {
+		const map: Record<string, ActiveDay> = {}
+		for (const ev of eventsSource) {
 			if (ev.activitySlug !== slug) continue
 			const d = new Date(ev.startsAt)
 			if (d.getFullYear() !== currentMonth.getFullYear() || d.getMonth() !== currentMonth.getMonth()) continue
-			const day = d.getDate()
-			if (map[day]) {
-				map[day] = {
-					...map[day],
-					count: (map[day]?.count || 1) + 1
+			const dayKey = isoDay(d)
+			if (map[dayKey]) {
+				map[dayKey] = {
+					...map[dayKey],
+					count: (map[dayKey]?.count || 1) + 1
 				}
 				continue
 			}
-			map[day] = {
+			map[dayKey] = {
 				time: d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false }),
 				capacity: ev.capacity,
 				repeatLabel: `Every ${d.toLocaleDateString(undefined, { weekday: 'long' })}`,
@@ -104,12 +129,14 @@
 	})
 
 	$effect(() => {
-		if (!popOpen || !selectedDay || !activeDays[selectedDay]) return
-		const current = activeDays[selectedDay] as ActiveDay
+		if (!popOpen || !selectedDayDate) return
+		const dayKey = isoDay(selectedDayDate)
+		if (!activeDays[dayKey]) return
+		const current = activeDays[dayKey] as ActiveDay
 		if (current.time === popTime && current.capacity === popCap) return
 		activeDays = {
 			...activeDays,
-			[selectedDay]: {
+			[dayKey]: {
 				...current,
 				time: popTime,
 				capacity: popCap
@@ -146,34 +173,11 @@
 		return two ? `${one}\n${two}` : one
 	}
 
-	function monthLabel() {
-		return currentMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
-	}
-
-	function getCalendarDays() {
-		const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
-		const end = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0)
-		const days: Array<{ date: Date; current: boolean }> = []
-
-		const startDay = start.getDay()
-		for (let i = 0; i < startDay; i += 1) {
-			const d = new Date(start)
-			d.setDate(d.getDate() - (startDay - i))
-			days.push({ date: d, current: false })
-		}
-
-		for (let d = 1; d <= end.getDate(); d += 1) {
-			days.push({ date: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d), current: true })
-		}
-
-		const endDay = end.getDay()
-		for (let i = 1; i < 7 - endDay; i += 1) {
-			const d = new Date(end)
-			d.setDate(d.getDate() + i)
-			days.push({ date: d, current: false })
-		}
-
-		return days
+	function isoDay(date: Date) {
+		const y = date.getFullYear()
+		const m = `${date.getMonth() + 1}`.padStart(2, '0')
+		const d = `${date.getDate()}`.padStart(2, '0')
+		return `${y}-${m}-${d}`
 	}
 
 	function isPast(date: Date) {
@@ -204,15 +208,14 @@
 	function openDay(dayDate: Date, dayEl: HTMLButtonElement) {
 		if (isPast(dayDate)) return
 		emojiPickerOpen = false
-		selectedDay = dayDate.getDate()
 		selectedDayDate = dayDate
-		const existing = activeDays[selectedDay]
+		const existing = activeDays[isoDay(dayDate)]
 		popTime = existing?.time ?? '10:30'
 		popCap = existing?.capacity ?? 8
 		newMode = existing ? (existing.repeatLabel ? 'repeat' : 'once') : 'once'
 		originalPopTime = popTime
 		originalPopCap = popCap
-		const eventForDay = dashboard.events.find((ev) => {
+		const eventForDay = eventsSource.find((ev) => {
 			if (ev.activitySlug !== slug) return false
 			const d = new Date(ev.startsAt)
 			return (
@@ -238,7 +241,6 @@
 
 	function closePop() {
 		popOpen = false
-		selectedDay = null
 		selectedDayDate = null
 		selectedEventId = null
 	}
@@ -255,6 +257,24 @@
 
 	async function persistDaySchedule() {
 		if (!selectedDayDate) return
+		if (mockMode) {
+			const dayKey = isoDay(selectedDayDate)
+			const nextDay: ActiveDay = {
+				time: popTime,
+				capacity: popCap,
+				count: activeDays[dayKey]?.count || 1,
+				...(newMode === 'repeat'
+					? { repeatLabel: `Every ${selectedDayDate.toLocaleDateString(undefined, { weekday: 'long' })}` }
+					: {})
+			}
+			activeDays = {
+				...activeDays,
+				[dayKey]: nextDay
+			}
+			flash('Mock mode: schedule preview updated')
+			closePop()
+			return
+		}
 		const [hours, minutes] = popTime.split(':').map((part) => Number.parseInt(part, 10))
 		const safeHours = Number.isFinite(hours) ? (hours as number) : 10
 		const safeMinutes = Number.isFinite(minutes) ? (minutes as number) : 30
@@ -293,6 +313,15 @@
 	}
 
 	async function removeDay() {
+		if (mockMode) {
+			if (!selectedDayDate) return
+			const next = { ...activeDays }
+			delete next[isoDay(selectedDayDate)]
+			activeDays = next
+			flash('Mock mode: removed from preview')
+			closePop()
+			return
+		}
 		if (selectedEventId) {
 			await dashboard.deleteEvent(selectedEventId)
 			if (dashboard.error) {
@@ -303,14 +332,19 @@
 			closePop()
 			return
 		}
-		if (!selectedDay) return
+		if (!selectedDayDate) return
 		const next = { ...activeDays }
-		delete next[selectedDay]
+		delete next[isoDay(selectedDayDate)]
 		activeDays = next
 		closePop()
 	}
 
 	async function persistExistingDayEdits() {
+		if (mockMode) {
+			flash('Mock mode: edits are preview-only')
+			closePop()
+			return
+		}
 		if (!selectedEventId) {
 			closePop()
 			return
@@ -334,6 +368,10 @@
 	}
 
 	async function saveProgram() {
+		if (mockMode) {
+			flash('Mock mode: program save skipped')
+			return
+		}
 		await dashboard.saveProgram()
 		if (dashboard.error) {
 			flash(dashboard.error, true)
@@ -343,18 +381,29 @@
 	}
 
 	async function deleteProgram() {
+		if (mockMode) {
+			flash('Mock mode: delete skipped')
+			return
+		}
 		await dashboard.deleteProgram()
 		if (dashboard.error) {
 			flash(dashboard.error, true)
 			return
 		}
-		void goto('/admin/events/')
+		void goto(mockMode ? '/admin/events/?mock=1' : '/admin/events/')
 	}
 
 	function onGlobalClick(event: MouseEvent) {
 		const target = event.target as HTMLElement
 		if (!target.closest('.program-editor__emoji-wrap')) {
 			emojiPickerOpen = false
+		}
+		if (
+			popOpen &&
+			!target.closest('.program-editor__popover') &&
+			!target.closest('.admin-calendar__day')
+		) {
+			closePop()
 		}
 	}
 
@@ -440,52 +489,22 @@
 						>{dashboard.programDraft.heroSubtitle || "Grab a time slot and let's do something fun together."}</div>
 					</section>
 
-					<div class="program-editor__calendar">
-						<div class="program-editor__calendar-head">
-							<div class="program-editor__calendar-nav">
-								<button type="button" class="program-editor__arrow" onclick={prevMonth} aria-label="Previous month">
-									<ChevronLeft size={18} strokeWidth={2} />
-								</button>
-							</div>
-							<span class="program-editor__calendar-title">{monthLabel()}</span>
-							<div class="program-editor__calendar-nav">
-								<button type="button" class="program-editor__arrow" onclick={nextMonth} aria-label="Next month">
-									<ChevronRight size={18} strokeWidth={2} />
-								</button>
-							</div>
-						</div>
-						<div class="program-editor__weekdays">
-							{#each weekDays as wd}<span>{wd}</span>{/each}
-						</div>
-						<div class="program-editor__grid">
-							{#each getCalendarDays() as day}
-								{@const dayNum = day.date.getDate()}
-								<button
-									type="button"
-									class="program-editor__day"
-									class:program-editor__day--past={isPast(day.date)}
-									class:program-editor__day--today={isToday(day.date)}
-									class:program-editor__day--active={!!activeDays[dayNum] && day.current && !isPast(day.date)}
-									class:program-editor__day--selected={selectedDay === dayNum}
-									disabled={!day.current || isPast(day.date)}
-									onclick={(event) => openDay(day.date, event.currentTarget as HTMLButtonElement)}
-								>
-									<span class="program-editor__day-num">{dayNum}</span>
-									{#if activeDays[dayNum] && day.current && !isPast(day.date)}
-										<span class="program-editor__dots">
-											{#each Array.from({ length: Math.min(activeDays[dayNum]?.count || 1, 3) }) as _, i (i)}
-												<span class="program-editor__dot"></span>
-											{/each}
-										</span>
-									{/if}
-								</button>
-							{/each}
-						</div>
-					</div>
+					<AdminCalendarWidget
+						currentMonth={currentMonth}
+						selectedDateIso={selectedDayDate ? isoDay(selectedDayDate) : null}
+						onPrev={prevMonth}
+						onNext={nextMonth}
+						onSelect={(date, element) => openDay(date, element)}
+						isPast={isPast}
+						isToday={isToday}
+						isActive={(date) => !!activeDays[isoDay(date)]}
+						eventCount={(date) => activeDays[isoDay(date)]?.count || 0}
+						eventTone={() => slug}
+						compact={true}
+					/>
 				</div>
 
 				{#if popOpen}
-					<button class="program-editor__overlay" type="button" onclick={closePop} aria-label="Close"></button>
 					<div
 						class="program-editor__popover"
 						style={`left:${popLeft}px; ${popAbove ? `bottom:${popBottom}px` : `top:${popTop}px`}; transform:translateX(-50%);`}
@@ -495,7 +514,7 @@
 							{#if selectedDayDate}{selectedDayDate.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}{/if}
 						</div>
 
-						{#if selectedDay && !activeDays[selectedDay]}
+						{#if selectedDayDate && !activeDays[isoDay(selectedDayDate)]}
 							<div class="program-editor__opt-row">
 								<button type="button" class="program-editor__opt" class:program-editor__opt--on={newMode === 'once'} onclick={() => (newMode = 'once')}>Just this day</button>
 								<button type="button" class="program-editor__opt" class:program-editor__opt--on={newMode === 'repeat'} onclick={() => (newMode = 'repeat')}>Repeat weekly</button>
@@ -536,7 +555,7 @@
 									<AdminNumberStepper bind:value={popCap} min={1} max={50} />
 								</label>
 							</div>
-							{#if selectedDay && activeDays[selectedDay]?.repeatLabel}
+							{#if selectedDayDate && activeDays[isoDay(selectedDayDate)]?.repeatLabel}
 								<div class="program-editor__override">
 									<div class="program-editor__override-label">Part of repeating schedule</div>
 									<div class="program-editor__override-text">Changes here apply to this day preview only. Save a new schedule to persist.</div>
@@ -754,9 +773,10 @@
 		width: 100%;
 		position: relative;
 		z-index: 1;
+		background-color: transparent;
 	}
-	.program-editor__editable:hover { background: color-mix(in srgb, var(--text) 3.5%, transparent); }
-	.program-editor__editable:focus { background: color-mix(in srgb, var(--text) 5%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 18%, transparent); }
+	.program-editor__editable:hover { background-color: color-mix(in srgb, var(--text) 3.5%, transparent); }
+	.program-editor__editable:focus { background-color: color-mix(in srgb, var(--text) 5%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 18%, transparent); }
 
 	.program-editor__eyebrow {
 		font-size: 0.82rem;
@@ -823,135 +843,23 @@
 		white-space: pre-wrap;
 	}
 
-	.program-editor__calendar {
-		width: min(100%, 900px);
-		margin: 0 auto;
-		border: 1px solid color-mix(in srgb, #7a5af8 22%, transparent);
-		border-radius: 1.3rem;
-		background:
-			linear-gradient(
-				180deg,
-				color-mix(in srgb, #f4ecff 74%, var(--bg) 26%) 0%,
-				color-mix(in srgb, #f9f5ff 86%, var(--bg) 14%) 100%
-			);
-		padding: 1.25rem 1.15rem 1rem;
-	}
-	.program-editor__calendar-head { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.2rem; }
-	.program-editor__calendar-title { font-size: clamp(1.2rem, 2.1vw, 1.65rem); font-weight: 650; color: var(--text); min-width: 12rem; text-align: center; }
-	.program-editor__calendar-nav { display: flex; gap: 0.25rem; }
-	.program-editor__arrow {
-		width: 40px;
-		height: 40px;
-		border-radius: 999px;
-		border: 1px solid var(--border);
-		background: color-mix(in srgb, #efe7ff 74%, var(--bg) 26%);
-		cursor: pointer;
-		color: var(--text-2);
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0;
-	}
-	.program-editor__arrow:hover { background: color-mix(in srgb, #e8dbff 82%, var(--bg) 18%); color: color-mix(in srgb, #5b3ee6 84%, var(--text) 16%); }
-	.program-editor__weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 0.55rem; }
-	.program-editor__weekdays span {
-		text-align: right;
-		font-size: 0.72rem;
-		font-weight: 600;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-		color: var(--text-3);
-		padding: 0.35rem 0.5rem 0.35rem 0;
-		font-family: var(--font-ui-sans, var(--font-sans));
-	}
-	.program-editor__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; }
-	.program-editor__day {
-		position: relative;
-		aspect-ratio: 1;
-		border-radius: 1rem;
-		display: block;
-		cursor: pointer;
-		border: 1.5px solid transparent;
-		background: transparent;
-		padding: 0;
-		appearance: none;
-		-webkit-appearance: none;
-	}
-	.program-editor__day:hover:not(.program-editor__day--past) { background: color-mix(in srgb, var(--text) 5%, transparent); }
-	.program-editor__day-num {
-		position: absolute;
-		top: 0.68rem;
-		right: 0.68rem;
-		left: auto;
-		font-size: 1rem;
-		font-weight: 500;
-		color: var(--text);
-		line-height: 1;
-		font-family: var(--font-ui-sans, var(--font-sans));
-		font-variant-numeric: tabular-nums;
-	}
-	.program-editor__dots {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.2rem;
-		height: 0.35rem;
-		position: absolute;
-		left: 50%;
-		bottom: 0.35rem;
-		transform: translateX(-50%);
-	}
-	.program-editor__dot {
-		width: 0.28rem;
-		height: 0.28rem;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--blue) 75%, var(--text) 25%);
-	}
-	.program-editor__day--past { opacity: 0.25; pointer-events: none; }
-	.program-editor__day--today .program-editor__day-num {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 2rem;
-		height: 2rem;
-		border-radius: 999px;
-		background: color-mix(in srgb, #a78bfa 34%, transparent);
-		top: 0.48rem;
-		right: 0.46rem;
-		left: auto;
-	}
-	.program-editor__day--active .program-editor__day-num { color: var(--text); font-weight: 600; }
-	.program-editor__day--selected {
-		border-color: color-mix(in srgb, #7a5af8 58%, transparent);
-		background: color-mix(in srgb, #7a5af8 18%, transparent);
-		box-shadow: 0 0 0 2px color-mix(in srgb, #7a5af8 20%, transparent);
-	}
-	.program-editor__day--selected .program-editor__day-num { color: color-mix(in srgb, #5b3ee6 86%, var(--text) 14%); font-weight: 700; }
-	.program-editor__day--selected .program-editor__dot { background: color-mix(in srgb, #6d4df0 86%, var(--text) 14%); }
-
-	.program-editor__overlay {
-		position: fixed;
-		inset: 0;
-		border: none;
-		background: transparent;
-		z-index: 9990 !important;
-	}
 	.program-editor__popover {
 		position: fixed;
 		width: 306px;
-		--popover-surface: var(--elev-surface-1);
-		--popover-control-bg: var(--elev-control);
-		--popover-control-border: var(--elev-border);
-		--popover-control-text: var(--elev-text);
-		background-color: color-mix(in srgb, var(--text) 88%, var(--bg) 12%);
+		--popover-surface: var(--bg);
+		--popover-control-bg: color-mix(in srgb, #faf6ff 88%, var(--surface) 12%);
+		--popover-control-border: var(--border-s);
+		--popover-control-text: var(--text);
 		background-image: none;
-		border: 1px solid var(--elev-border);
+		background-color: var(--popover-surface);
+		border: 1px solid var(--popover-control-border);
 		border-radius: 1rem;
 		box-shadow:
 			0 30px 65px color-mix(in srgb, black 24%, transparent),
 			0 8px 20px color-mix(in srgb, black 14%, transparent);
 		padding: 1rem;
 		z-index: 9991 !important;
-		color: var(--elev-text);
+		color: var(--text);
 	}
 	.program-editor__popover :global(.admin-ui-input) {
 		background: var(--popover-control-bg);
@@ -966,43 +874,43 @@
 		background: var(--popover-control-bg);
 	}
 	.program-editor__popover :global(.admin-select__chevron) {
-		color: var(--elev-subtext);
+		color: var(--text-3);
 	}
 	.program-editor__popover :global(.admin-stepper__btn) {
-		background: var(--elev-control);
+		background: var(--popover-control-bg);
 		border-color: var(--popover-control-border);
 		color: var(--popover-control-text);
 	}
 	.program-editor__popover :global(.admin-stepper__btn:hover) {
-		background: var(--elev-control-hover);
+		background: color-mix(in srgb, var(--text) 6%, var(--popover-control-bg) 94%);
 	}
 	.program-editor__popover :global(.admin-time__period) {
 		border-color: var(--popover-control-border);
 	}
 	.program-editor__popover :global(.admin-time__period-btn) {
-		background: var(--elev-control);
+		background: var(--popover-control-bg);
 		color: var(--popover-control-text);
 		border-right-color: var(--popover-control-border);
 	}
 	.program-editor__popover :global(.admin-time__period-btn--on) {
-		background: var(--elev-control-active);
-		color: var(--elev-text);
+		background: var(--blue-soft);
+		color: var(--text);
 	}
 	.program-editor__popover :global(.admin-action-btn--subtle) {
-		background: var(--elev-control);
+		background: var(--popover-control-bg);
 		border-color: var(--popover-control-border);
 		color: var(--popover-control-text);
 	}
 	.program-editor__popover :global(.admin-action-btn--subtle:hover:not(:disabled)) {
-		background: var(--elev-control-hover);
+		background: color-mix(in srgb, var(--text) 6%, var(--popover-control-bg) 94%);
 	}
 	.program-editor__popover-arrow {
 		position: absolute;
 		width: 10px;
 		height: 10px;
-		background: color-mix(in srgb, var(--text) 88%, var(--bg) 12%);
-		border-left: 1px solid var(--elev-border);
-		border-top: 1px solid var(--elev-border);
+		background: var(--popover-surface);
+		border-left: 1px solid var(--popover-control-border);
+		border-top: 1px solid var(--popover-control-border);
 		top: -6px;
 		left: 50%;
 		transform: translateX(-50%) rotate(45deg);
@@ -1012,7 +920,7 @@
 		bottom: -6px;
 		transform: translateX(-50%) rotate(225deg);
 	}
-	.program-editor__popover-title { font-size: 0.82rem; font-weight: 700; color: var(--elev-text); margin-bottom: 0.8rem; }
+	.program-editor__popover-title { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 0.8rem; }
 	.program-editor__opt-row {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1020,21 +928,21 @@
 		margin-bottom: 0.8rem;
 	}
 	.program-editor__opt {
-		border: 1px solid var(--elev-border);
-		background: var(--elev-control);
+		border: 1px solid var(--popover-control-border);
+		background: var(--popover-control-bg);
 		padding: 0.52rem 0.65rem;
 		border-radius: 0.5rem;
 		text-align: center;
 		font-size: 0.78rem;
 		font-weight: 600;
 		cursor: pointer;
-		color: var(--elev-text);
+		color: var(--text);
 	}
-	.program-editor__opt:hover { background: var(--elev-control-hover); color: var(--elev-text); }
+	.program-editor__opt:hover { background: color-mix(in srgb, var(--text) 6%, var(--popover-control-bg) 94%); color: var(--text); }
 	.program-editor__opt--on {
-		background: var(--elev-control-active);
+		background: var(--blue-soft);
 		border-color: color-mix(in srgb, var(--blue) 72%, transparent);
-		color: var(--elev-text);
+		color: var(--text);
 	}
 
 	.program-editor__until { display: flex; gap: 0.35rem; margin-bottom: 0.6rem; }
@@ -1042,16 +950,16 @@
 		font-size: 0.7rem;
 		padding: 0.3rem 0.55rem;
 		border-radius: 0.4rem;
-		border: 1px solid var(--elev-border);
-		background: var(--elev-control);
-		color: var(--elev-text);
+		border: 1px solid var(--popover-control-border);
+		background: var(--popover-control-bg);
+		color: var(--text);
 		cursor: pointer;
 	}
-	.program-editor__until-btn--on { background: var(--elev-control-active); border-color: color-mix(in srgb, var(--blue) 72%, transparent); color: var(--elev-text); }
+	.program-editor__until-btn--on { background: var(--blue-soft); border-color: color-mix(in srgb, var(--blue) 72%, transparent); color: var(--text); }
 
 	.program-editor__fields { display: grid; gap: 0.55rem; margin-bottom: 0.9rem; }
 	.program-editor__fields label { display: grid; gap: 0.2rem; }
-	.program-editor__fields label span { font-size: 0.66rem; font-weight: 700; color: var(--elev-subtext); }
+	.program-editor__fields label span { font-size: 0.66rem; font-weight: 700; color: var(--text-3); }
 	.program-editor__input {
 		font-size: 0.8rem;
 		padding: 0.48rem 0.65rem;

@@ -1,29 +1,23 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
-	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
-	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
-	import { AdminEventDetailSheet, AdminLoginCard } from '@calendar/ui'
-	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
-	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
-	import { formatAdminDayLabel, formatAdminTimeLabel } from '$lib/admin/date-format'
+import { goto } from '$app/navigation'
+import { page } from '$app/stores'
+import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
+import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
+import { AdminEventDetailSheet, AdminLoginCard } from '@calendar/ui'
+import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
+import AdminDashboardContent from '@components/Admin/AdminDashboardContent.svelte'
+import { mockDashboardEvents, mockDashboardRecentEvents } from '$lib/admin/mock/admin-mock-data'
 
 	const { data, form } = $props<{ data: { user: unknown | null }; form: unknown }>()
-	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
-	const authed = $derived(!!data.user)
-	const isMobile = $derived(typeof window !== 'undefined' && window.matchMedia('(max-width: 820px)').matches)
+const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
+const authed = $derived(!!data.user)
+const isMobile = $derived(typeof window !== 'undefined' && window.matchMedia('(max-width: 820px)').matches)
+const mockMode = $derived($page.url.searchParams.get('mock') === '1')
 
-	let showCreate = $state(false)
-	let selectedActivitySlug = $state('')
-	let createTitle = $state('')
-	let createStartsAt = $state('')
-	let createEndsAt = $state('')
-	let createCapacity = $state(6)
-	let createCostDollars = $state(0)
 	let openedDetailId = $state<number | null>(null)
-	let ignoredAlertEventId = $state<number | null>(null)
 
 	$effect(() => {
-		if (!authed) return
+		if (!authed || mockMode) return
 		dashboard.loadStatus()
 		dashboard.loadBookings()
 		dashboard.loadPaymentDefaults()
@@ -31,47 +25,14 @@
 		dashboard.loadEvents()
 	})
 
-	function emojiForActivity(label: string, slug?: string) {
-		return getAdminActivityEmoji(label, slug)
-	}
-
-	function statusFor(event: {
-		seatsTaken: number
-		capacity: number
-		waitlistCount: number
-	}) {
-		if (event.waitlistCount > 0 || event.seatsTaken >= event.capacity) return 'full'
-		return 'open'
-	}
-
-	function dayLabel(iso: string) {
-		return formatAdminDayLabel(iso)
-	}
-
-	function timeLabel(iso: string) {
-		return formatAdminTimeLabel(iso)
-	}
-
-	function groupedEvents() {
-		const byDay = new Map<string, Array<typeof dashboard.events[number]>>()
-		for (const ev of dashboard.events) {
-			const key = dayLabel(ev.startsAt)
-			const list = byDay.get(key) || []
-			list.push(ev)
-			byDay.set(key, list)
-		}
-		return [...byDay.entries()]
-	}
-
-	function attentionEvent() {
-		return dashboard.events.find(
-			(ev) =>
-				(ev.waitlistCount > 0 || ev.seatsTaken >= ev.capacity) &&
-				ev.id !== ignoredAlertEventId
-		)
-	}
-
 	function openEventDetail(eventId: number) {
+		if (mockMode) {
+			const mockEvent = mockDashboardEvents.find((event) => event.id === eventId)
+			if (mockEvent?.activitySlug) {
+				void goto(`/admin/events/${mockEvent.activitySlug}/?mock=1`)
+			}
+			return
+		}
 		if (isMobile) {
 			goto(`/admin/events/${eventId}`)
 			return
@@ -80,59 +41,13 @@
 		void dashboard.openEventDetail(eventId)
 	}
 
-	async function expandSpotsForAttention() {
-		const event = attentionEvent()
-		if (!event) return
-		await dashboard.updateEventCapacity(event.id, event.capacity + 2)
-		await dashboard.loadEvents()
-		if (openedDetailId === event.id) {
-			void dashboard.openEventDetail(event.id)
-		}
-	}
-
-	function openWaitlistForAttention() {
-		const event = attentionEvent()
-		if (!event) return
-		openEventDetail(event.id)
-	}
-
-	function ignoreAttention() {
-		const event = attentionEvent()
-		if (!event) return
-		ignoredAlertEventId = event.id
-	}
-
 	function closeEventDetail() {
 		openedDetailId = null
 		dashboard.closeEventDetail()
 	}
 
-	function selectActivity(slug: string, label: string) {
-		selectedActivitySlug = slug
-		createTitle = label === 'Gym'
-			? 'Leg Day Crew'
-			: label === 'Movies'
-				? 'Movie Night'
-				: label === 'Adventure'
-					? 'Trail Run'
-					: label === 'Circus'
-						? 'Open Gym'
-						: `${label} Hangout`
-	}
-
-	async function submitCreate() {
-		if (!selectedActivitySlug || !createTitle || !createStartsAt || !createEndsAt) return
-		dashboard.eventDraft = {
-			...dashboard.eventDraft,
-			activitySlug: selectedActivitySlug,
-			title: createTitle,
-			startsAt: new Date(createStartsAt).toISOString(),
-			endsAt: new Date(createEndsAt).toISOString(),
-			capacity: createCapacity,
-			costCents: Math.max(0, Math.round(createCostDollars * 100))
-		}
-		await dashboard.createEvents()
-		if (!dashboard.error) showCreate = false
+	function todayTitle() {
+		return new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })
 	}
 </script>
 
@@ -142,70 +57,23 @@
 	<div class="social-home admin-content">
 		<div class="social-home__main">
 			<AdminPageHero
-				eyebrow="Admin"
-				title="Hey Admin."
-				subtitle="2 things need your eyes."
+				eyebrow="Overview"
+				title={todayTitle()}
+				subtitle=""
 			/>
 
-			{#if attentionEvent()}
-				<div class="social-home__alert">
-					<div class="social-home__alert-head">
-						<span>⚠️</span>
-						<span>{attentionEvent()?.title} needs attention</span>
-					</div>
-					<div class="social-home__alert-actions">
-						<button type="button" class="admin-ui-btn" onclick={expandSpotsForAttention}>Expand Spots</button>
-						<button type="button" class="admin-ui-btn" onclick={openWaitlistForAttention}>Open Waitlist</button>
-						<button type="button" class="admin-ui-btn" onclick={ignoreAttention}>Ignore</button>
-					</div>
-				</div>
-			{/if}
-
-			<div class="social-home__section-head">
-				<h3>THIS WEEK</h3>
-			</div>
-
-			{#if dashboard.eventsLoading}
-				<p class="social-home__empty">Loading events...</p>
-			{:else if dashboard.events.length === 0}
-				<p class="social-home__empty">No sessions yet.</p>
+			{#if !mockMode && dashboard.eventsLoading}
+				<p class="social-home__loading">Loading dashboard…</p>
 			{:else}
-				{#each groupedEvents() as [day, dayEvents]}
-					<div class="social-home__day">{day}</div>
-					{#each dayEvents as ev}
-						<button type="button" class="social-home__event-card admin-ui-card" onclick={() => openEventDetail(ev.id)}>
-							<div class="social-home__event-head">
-								<div>
-									<span class="social-home__event-time">{timeLabel(ev.startsAt)} · </span>
-									<span class="social-home__event-title">{ev.title}</span>
-								</div>
-								<span class="social-home__event-arrow">›</span>
-							</div>
-							<div class="social-home__event-meta">
-								<span>{emojiForActivity(ev.activityLabel, ev.activitySlug)}</span>
-								<span>{ev.activityLabel}</span>
-								<span class="social-home__event-capacity" class:social-home__event-capacity--full={statusFor(ev) === 'full'}>
-									{ev.seatsTaken}/{ev.capacity} {statusFor(ev) === 'full' ? 'Full ⚠' : 'going'}
-								</span>
-							</div>
-						</button>
-					{/each}
-				{/each}
+				<AdminDashboardContent
+					events={mockMode ? mockDashboardEvents : dashboard.events}
+					recentEvents={mockMode ? mockDashboardRecentEvents : dashboard.recentEvents}
+					onOpenEvent={openEventDetail}
+				/>
 			{/if}
-
-			<div class="social-home__day">SAT — SUN</div>
-			<div class="social-home__empty-weekend">
-				<p>Nothing planned yet.</p>
-				<a href="/admin/events/new/">+ Start an Adventure?</a>
-			</div>
-
-			<div class="social-home__memory-lane admin-ui-card">
-				<h4>Memory Lane</h4>
-				<p>Past adventures will show up here — coming soon.</p>
-			</div>
 		</div>
 
-		{#if !isMobile && openedDetailId && dashboard.selectedEventDetail}
+		{#if !mockMode && !isMobile && openedDetailId && dashboard.selectedEventDetail}
 			<div
 				class="social-home__detail-scrim admin-ui-overlay admin-ui-overlay--end"
 				role="button"
@@ -224,89 +92,15 @@
 				>
 					<button type="button" class="social-home__back" onclick={closeEventDetail}>← Back</button>
 					<AdminEventDetailSheet {dashboard} detail={dashboard.selectedEventDetail} />
-						<div class="social-home__detail-actions">
-							<button type="button" class="admin-ui-btn" onclick={() => dashboard.selectedEventDetail && goto(`/admin/events/${dashboard.selectedEventDetail.event.id}`)}>
-								Edit Event
-							</button>
-						</div>
+					<div class="social-home__detail-actions">
+						<button type="button" class="admin-ui-btn" onclick={() => dashboard.selectedEventDetail && goto(`/admin/events/${dashboard.selectedEventDetail.event.id}`)}>
+							Edit Event
+						</button>
+					</div>
 				</div>
 			</div>
 		{/if}
 	</div>
-
-	{#if showCreate}
-		<div
-			class="social-home__modal-scrim admin-ui-overlay admin-ui-overlay--center"
-			role="button"
-			tabindex="0"
-			aria-label="Close create modal"
-			onclick={() => (showCreate = false)}
-			onkeydown={(event) => (event.key === 'Escape' || event.key === 'Enter') && (showCreate = false)}
-		>
-			<div
-				class="social-home__modal admin-ui-dialog"
-				role="dialog"
-				tabindex="-1"
-				aria-label="Create event"
-				onclick={(event) => event.stopPropagation()}
-				onkeydown={(event) => event.key === 'Escape' && (showCreate = false)}
-			>
-				<div class="social-home__modal-head">
-					<h3>What's the plan?</h3>
-					<button type="button" onclick={() => (showCreate = false)}>✕</button>
-				</div>
-				<div class="social-home__activity-grid">
-					{#each dashboard.enabledPrograms as program}
-						<button
-							type="button"
-							class="social-home__activity"
-							class:social-home__activity--active={selectedActivitySlug === program.slug}
-							onclick={() => selectActivity(program.slug, program.label)}
-						>
-							<span>{emojiForActivity(program.label, program.slug)}</span>
-							<span>{program.label}</span>
-						</button>
-					{/each}
-				</div>
-
-				{#if selectedActivitySlug}
-					<div class="social-home__create-form">
-						<label for="social-create-title">Title</label>
-						<input id="social-create-title" class="admin-ui-input" type="text" bind:value={createTitle} />
-
-						<div class="social-home__grid-2">
-							<div>
-								<label for="social-create-starts">Starts</label>
-								<input id="social-create-starts" class="admin-ui-input" type="datetime-local" bind:value={createStartsAt} />
-							</div>
-							<div>
-								<label for="social-create-ends">Ends</label>
-								<input id="social-create-ends" class="admin-ui-input" type="datetime-local" bind:value={createEndsAt} />
-							</div>
-						</div>
-
-						<div class="social-home__grid-2">
-							<div>
-								<label for="social-create-spots">Spots</label>
-								<input id="social-create-spots" class="admin-ui-input" type="number" min="2" max="20" bind:value={createCapacity} />
-							</div>
-							<div>
-								<label for="social-create-cost">Cost ($)</label>
-								<input id="social-create-cost" class="admin-ui-input" type="number" min="0" step="1" bind:value={createCostDollars} />
-							</div>
-						</div>
-
-						<div class="social-home__create-actions">
-							<button type="button" class="admin-ui-btn social-home__secondary" onclick={() => (showCreate = false)}>Cancel</button>
-							<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={submitCreate} disabled={dashboard.eventsCreating}>
-								{dashboard.eventsCreating ? 'Creating…' : "Let's Go"}
-							</button>
-						</div>
-					</div>
-				{/if}
-			</div>
-		</div>
-	{/if}
 {/if}
 
 <style>
@@ -319,145 +113,14 @@
 		gap: 0.75rem;
 	}
 
-	.social-home__alert {
-		border-radius: 14px;
-		padding: 1rem 1.25rem;
-		border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
-		background: color-mix(in srgb, var(--color-warning) 15%, var(--bg));
-	}
-
-	.social-home__alert-head {
-		display: flex;
-		gap: 0.5rem;
-		font-weight: 600;
-	}
-
-	.social-home__alert-actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		margin-top: 0.75rem;
-	}
-
-	.social-home__section-head {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-top: 1rem;
-	}
-
-	.social-home__section-head h3 {
+	.social-home__loading {
 		margin: 0;
-		font-size: 0.75rem;
-		letter-spacing: 0.1em;
-		color: color-mix(in srgb, var(--text) 50%, transparent);
+		padding: 0.8rem 0;
+		font-size: 0.9rem;
+		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
 
-	.social-home__day {
-		margin-top: 0.5rem;
-		font-size: 0.6875rem;
-		letter-spacing: 0.08em;
-		color: color-mix(in srgb, var(--text) 50%, transparent);
-	}
-
-	.social-home__event-card {
-		width: 100%;
-		min-height: 64px;
-		padding: 0.875rem 1rem;
-		text-align: left;
-		cursor: pointer;
-		transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
-	}
-	.social-home__event-card:hover {
-		border-color: color-mix(in srgb, var(--text) 22%, transparent);
-		box-shadow: 0 6px 16px var(--shadow-soft);
-		transform: translateY(-1px);
-	}
-
-	.social-home__event-head,
-	.social-home__event-meta {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.social-home__event-head {
-		justify-content: space-between;
-	}
-
-	.social-home__event-time,
-	.social-home__event-meta {
-		color: color-mix(in srgb, var(--text) 62%, transparent);
-		font-size: 0.8125rem;
-	}
-
-	.social-home__event-title {
-		font-size: 0.875rem;
-		font-weight: 700;
-		color: var(--text);
-	}
-
-	.social-home__event-arrow {
-		color: color-mix(in srgb, var(--text) 55%, transparent);
-		font-size: 1.125rem;
-	}
-
-	.social-home__event-capacity {
-		margin-left: auto;
-		font-weight: 700;
-		color: var(--status-success-text);
-	}
-
-	.social-home__event-capacity--full {
-		color: var(--status-error-text);
-	}
-
-	.social-home__empty,
-	.social-home__empty-weekend p {
-		color: color-mix(in srgb, var(--text) 62%, transparent);
-	}
-
-	.social-home__empty-weekend {
-		border-radius: 14px;
-		padding: 1rem;
-		border: 1px dashed color-mix(in srgb, var(--text) 24%, transparent);
-		text-align: center;
-	}
-
-	.social-home__empty-weekend a {
-		min-height: 32px;
-		padding: 0 1rem;
-		border-radius: var(--admin-control-radius);
-		border: 1px dashed color-mix(in srgb, var(--text) 35%, transparent);
-		background: transparent;
-		color: var(--text);
-		font-weight: 700;
-		cursor: pointer;
-		text-decoration: none;
-		display: inline-flex;
-		align-items: center;
-	}
-
-	.social-home__memory-lane {
-		margin-top: 0.5rem;
-		padding: 1rem 1.25rem;
-		border: 1px dashed color-mix(in srgb, var(--text) 24%, transparent);
-	}
-
-	.social-home__memory-lane h4 {
-		margin: 0 0 0.25rem;
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		color: color-mix(in srgb, var(--text) 62%, transparent);
-	}
-
-	.social-home__memory-lane p {
-		margin: 0;
-		color: color-mix(in srgb, var(--text) 62%, transparent);
-	}
-
-	.social-home__detail-scrim,
-	.social-home__modal-scrim {
+	.social-home__detail-scrim {
 		z-index: 100;
 	}
 
@@ -484,90 +147,6 @@
 		margin-top: 0.75rem;
 	}
 
-	.social-home__modal {
-		width: 420px;
-		max-width: 90vw;
-		border-radius: 20px;
-		padding: 1.5rem;
-	}
-
-	.social-home__modal-head {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 1rem;
-	}
-
-	.social-home__modal-head h3 {
-		margin: 0;
-		font-size: 1.125rem;
-	}
-
-	.social-home__modal-head button {
-		border: none;
-		background: none;
-		color: color-mix(in srgb, var(--text) 62%, transparent);
-		cursor: pointer;
-	}
-
-	.social-home__activity-grid {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 0.5rem;
-	}
-
-	.social-home__activity {
-		min-height: 72px;
-		border-radius: 12px;
-		border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
-		background: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
-		display: grid;
-		place-items: center;
-		gap: 0.125rem;
-		cursor: pointer;
-		transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
-	}
-	.social-home__activity:hover {
-		border-color: color-mix(in srgb, var(--text) 28%, transparent);
-		transform: translateY(-1px);
-	}
-
-	.social-home__activity--active {
-		border-color: var(--admin-selected-border);
-		background: var(--admin-selected-bg);
-	}
-
-	.social-home__create-form {
-		margin-top: 1rem;
-		padding-top: 1rem;
-		border-top: 1px solid color-mix(in srgb, var(--text) 15%, transparent);
-		display: grid;
-		gap: 0.5rem;
-	}
-
-	.social-home__create-form label {
-		font-size: 0.75rem;
-		color: color-mix(in srgb, var(--text) 62%, transparent);
-	}
-
-	.social-home__grid-2 {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.625rem;
-	}
-
-	.social-home__create-actions {
-		display: flex;
-		gap: 0.625rem;
-		margin-top: 0.5rem;
-	}
-
-	.social-home__create-actions .social-home__secondary {
-		background: var(--admin-control-bg);
-		color: var(--admin-control-fg);
-		border-color: var(--admin-control-border);
-	}
-
 	@keyframes social-home-sheet-in {
 		from {
 			transform: translateX(24px);
@@ -578,5 +157,4 @@
 			opacity: 1;
 		}
 	}
-
 </style>

@@ -1,8 +1,14 @@
 <script lang="ts">
+	import { onMount } from 'svelte'
+	import { Ban, HandCoins, Landmark, Wallet } from '@lucide/svelte'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
-	import AdminSelect from '@components/Admin/AdminSelect.svelte'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
+	import {
+		getAdminCalendarWeekStart,
+		setAdminCalendarWeekStart,
+		type AdminCalendarWeekStart
+	} from '$lib/admin/calendar-preferences'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
@@ -17,18 +23,24 @@
 		provider: 'none',
 		handle: ''
 	})
+	let calendarWeekStart = $state<AdminCalendarWeekStart>('monday')
 
 	const paymentProviders = [
-		{ value: 'none', label: 'None' },
-		{ value: 'venmo', label: 'Venmo' },
-		{ value: 'zelle', label: 'Zelle' },
-		{ value: 'cashapp', label: 'Cash App' }
+		{ value: 'none', label: 'None', icon: Ban },
+		{ value: 'venmo', label: 'Venmo', icon: HandCoins },
+		{ value: 'zelle', label: 'Zelle', icon: Landmark },
+		{ value: 'cashapp', label: 'Cash App', icon: Wallet }
+	]
+	const weekStartOptions: Array<{ value: AdminCalendarWeekStart; label: string }> = [
+		{ value: 'monday', label: 'Monday' },
+		{ value: 'sunday', label: 'Sunday' }
 	]
 
 	const paymentChanged = $derived(
 		paymentDraft.provider !== (dashboard.paymentDefaults.provider || 'none') ||
 			paymentDraft.handle !== (dashboard.paymentDefaults.handle || '')
 	)
+	const weekStartChanged = $derived(calendarWeekStart !== getAdminCalendarWeekStart())
 
 	$effect(() => {
 		if (!authed) return
@@ -42,6 +54,10 @@
 			provider: dashboard.paymentDefaults.provider || 'none',
 			handle: dashboard.paymentDefaults.handle || ''
 		}
+	})
+
+	onMount(() => {
+		calendarWeekStart = getAdminCalendarWeekStart()
 	})
 
 	function showToast(message: string, isError = false) {
@@ -86,6 +102,11 @@
 		showToast('Payment info saved')
 	}
 
+	function saveCalendarSettings() {
+		setAdminCalendarWeekStart(calendarWeekStart)
+		showToast('Calendar settings saved')
+	}
+
 	function paymentHint() {
 		if (paymentDraft.provider === 'venmo') return 'e.g. @yourname'
 		if (paymentDraft.provider === 'cashapp') return 'e.g. $yourname'
@@ -103,7 +124,7 @@
 		{/if}
 
 		<AdminPageHero
-			eyebrow="Admin"
+			eyebrow="Preferences"
 			title="Settings"
 			subtitle="Configure sync and payment defaults for your space."
 		/>
@@ -156,6 +177,35 @@
 		<section class="admin-settings__section">
 			<div class="admin-settings__section-head">
 				<div>
+					<h3 class="admin-settings__section-label">Calendar view</h3>
+					<p class="admin-settings__section-desc">Choose which day your calendar week starts on.</p>
+				</div>
+			</div>
+
+			<div class="admin-settings__module">
+				<fieldset class="admin-settings__platform-field">
+					<legend>Week starts on</legend>
+					<div class="admin-settings__platform-options" role="radiogroup" aria-label="Week starts on">
+						{#each weekStartOptions as option}
+							<label
+								class="admin-settings__platform-option"
+								class:admin-settings__platform-option--active={calendarWeekStart === option.value}
+							>
+								<input type="radio" name="calendar-week-start" value={option.value} bind:group={calendarWeekStart} />
+								<span class="admin-settings__platform-label">{option.label}</span>
+							</label>
+						{/each}
+					</div>
+				</fieldset>
+				<div class="admin-settings__actions">
+					<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={saveCalendarSettings} disabled={!weekStartChanged}>Save</button>
+				</div>
+			</div>
+		</section>
+
+		<section class="admin-settings__section">
+			<div class="admin-settings__section-head">
+				<div>
 					<h3 class="admin-settings__section-label">Payment info</h3>
 					<p class="admin-settings__section-desc">Show members how to pay you. This appears on booking confirmations as the default. Individual events can override it.</p>
 				</div>
@@ -163,14 +213,23 @@
 
 			<div class="admin-settings__module">
 				<div class="admin-settings__fields-row">
-					<div class="admin-settings__field">
-						<label for="admin-settings-provider">Platform</label>
-						<AdminSelect id="admin-settings-provider" bind:value={paymentDraft.provider}>
+					<fieldset class="admin-settings__platform-field">
+						<legend>Platform</legend>
+						<div class="admin-settings__platform-options" role="radiogroup" aria-label="Payment platform">
 							{#each paymentProviders as provider}
-								<option value={provider.value}>{provider.label}</option>
+								<label
+									class="admin-settings__platform-option"
+									class:admin-settings__platform-option--active={paymentDraft.provider === provider.value}
+								>
+									<input type="radio" name="payment-platform" value={provider.value} bind:group={paymentDraft.provider} />
+									<span class="admin-settings__platform-icon" aria-hidden="true">
+										<provider.icon size={14} strokeWidth={2} />
+									</span>
+									<span class="admin-settings__platform-label">{provider.label}</span>
+								</label>
 							{/each}
-						</AdminSelect>
-					</div>
+						</div>
+					</fieldset>
 					<div class="admin-settings__field">
 						<label for="admin-settings-handle">Handle</label>
 						<input
@@ -327,6 +386,72 @@
 		margin-bottom: 0.32rem;
 	}
 
+	.admin-settings__platform-field {
+		border: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.4rem;
+	}
+
+	.admin-settings__platform-field legend {
+		font-size: 0.74rem;
+		font-weight: 620;
+		color: color-mix(in srgb, var(--text) 60%, transparent);
+		margin-bottom: 0.05rem;
+	}
+
+	.admin-settings__platform-options {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.45rem;
+	}
+
+	.admin-settings__platform-option {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.42rem;
+		min-height: 2.05rem;
+		padding: 0 0.62rem;
+		border-radius: 0.6rem;
+		border: 1px solid var(--admin-control-border);
+		background: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
+		color: color-mix(in srgb, var(--text) 66%, transparent);
+		cursor: pointer;
+		transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+	}
+
+	.admin-settings__platform-option:hover {
+		background: color-mix(in srgb, var(--bg) 92%, var(--text) 8%);
+	}
+
+	.admin-settings__platform-option input {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.admin-settings__platform-option--active {
+		border-color: var(--admin-selected-border);
+		background: var(--admin-selected-bg);
+		color: var(--text);
+	}
+
+	.admin-settings__platform-icon {
+		width: 1.15rem;
+		height: 1.15rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.admin-settings__platform-label {
+		font-size: 0.76rem;
+		font-weight: 620;
+		letter-spacing: -0.005em;
+	}
+
 	.admin-settings__field-hint {
 		margin: 0;
 		font-size: 0.72rem;
@@ -383,6 +508,10 @@
 		}
 
 		.admin-settings__fields-row {
+			grid-template-columns: 1fr;
+		}
+
+		.admin-settings__platform-options {
 			grid-template-columns: 1fr;
 		}
 	}

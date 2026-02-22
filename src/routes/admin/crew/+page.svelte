@@ -173,7 +173,7 @@
 {#if authed}
 	<div class="social-crew admin-content">
 		<AdminPageHero
-			eyebrow="Admin"
+			eyebrow="Members"
 			title="The Crew"
 			subtitle="Manage member access and invites."
 		/>
