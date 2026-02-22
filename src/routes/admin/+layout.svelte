@@ -157,7 +157,7 @@
 						onclick={() => void goto(hrefWithMock('/admin/events/'))}
 					>Back to Events</AdminActionButton>
 				{:else if isCrewRoute($page.url.pathname)}
-					<AdminActionButton variant="primary" icon={UserPlus} onclick={triggerCrewInvite}>Invite Friend</AdminActionButton>
+					<AdminActionButton variant="primary" icon={UserPlus} onclick={triggerCrewInvite}>Invite</AdminActionButton>
 				{:else}
 					<span aria-hidden="true"></span>
 				{/if}
@@ -224,8 +224,9 @@
 		--admin-focus-ring: color-mix(in srgb, #0a84ff 52%, transparent);
 		--admin-accent: color-mix(in srgb, var(--link) 72%, #7a5af8 28%);
 		--admin-content-max: 72rem;
-		--admin-card-bg: color-mix(in srgb, var(--bg) 95%, var(--text) 5%);
-		--admin-card-border: color-mix(in srgb, var(--text) 12%, transparent);
+		--admin-card-bg: color-mix(in srgb, var(--admin-accent) 6%, var(--bg) 94%);
+		--admin-card-border: color-mix(in srgb, var(--admin-accent) 18%, transparent);
+		--admin-card-bg-hover: color-mix(in srgb, var(--admin-accent) 10%, var(--bg) 90%);
 		--admin-status-success-bg: color-mix(in srgb, #34c759 12%, transparent);
 		--admin-status-success-fg: color-mix(in srgb, #248a3d 84%, var(--text) 16%);
 		--admin-status-success-dot: #34c759;

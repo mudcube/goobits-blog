@@ -54,8 +54,8 @@
 		gap: 0.875rem;
 		padding: 0.75rem 0.875rem;
 		border-radius: 0.875rem;
-		border: 1px dashed color-mix(in srgb, var(--admin-accent) 22%, transparent);
-		background: color-mix(in srgb, var(--admin-accent) 4%, var(--bg) 96%);
+		border: 1px dashed var(--admin-card-border);
+		background: var(--admin-card-bg);
 	}
 
 	.admin-crew-invites__icon {

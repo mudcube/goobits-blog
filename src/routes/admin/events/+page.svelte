@@ -42,6 +42,19 @@
 	function timeLabel(iso: string) {
 		return formatAdminTimeLabel(iso)
 	}
+
+	function compactTimeLabel(iso: string) {
+		return timeLabel(iso).replace(/\s+/g, '').toLowerCase()
+	}
+
+	function eventRoute(ev: { id?: number | string | null; activitySlug?: string | null }) {
+		const idNum = Number(ev.id)
+		if (Number.isFinite(idNum) && idNum > 0) {
+			return `/admin/events/${idNum}`
+		}
+		if (ev.activitySlug) return `/admin/events/${ev.activitySlug}/`
+		return '/admin/events/'
+	}
 </script>
 
 {#if authed}
@@ -77,21 +90,20 @@
 		{:else if eventsSource.length === 0}
 			<p class="social-events__meta">No upcoming events.</p>
 		{:else}
-			<div class="social-events__list">
+			<div class="social-events__upcoming-grid">
 				{#each eventsSource as ev}
-					<button type="button" class="social-events__event admin-ui-card" onclick={() => goto(hrefWithMock(mockMode ? `/admin/events/${ev.activitySlug}/` : `/admin/events/${ev.id}`))}>
-						<div class="social-events__event-main">
+					<button type="button" class="social-events__upcoming-card admin-ui-card" onclick={() => goto(hrefWithMock(eventRoute(ev)))}>
+						<div class="social-events__upcoming-top">
 							<span class="social-events__event-emoji">{emojiForActivity(ev.activityLabel, ev.activitySlug)}</span>
-							<div>
-								<div class="social-events__event-title">{ev.title}</div>
-								<div class="social-events__event-sub">{dayLabel(ev.startsAt)} · {timeLabel(ev.startsAt)}</div>
-							</div>
+							<div class="social-events__event-title">{ev.title}</div>
 						</div>
-						<div class="social-events__event-tail">
-							<span class:social-events__event-cap--full={ev.seatsTaken >= ev.capacity || ev.waitlistCount > 0} class="social-events__event-cap">
-								{ev.seatsTaken}/{ev.capacity}
-							</span>
-							<span class="social-events__event-arrow">›</span>
+						<div class="social-events__upcoming-meta">
+							<div class="social-events__event-sub">{dayLabel(ev.startsAt)} · {compactTimeLabel(ev.startsAt)}</div>
+							<div>
+								<span class:social-events__event-cap--full={ev.seatsTaken >= ev.capacity || ev.waitlistCount > 0} class="social-events__event-cap">
+									<span>{ev.seatsTaken}</span><span class="social-events__event-cap-sep">/</span><span>{ev.capacity}</span>
+								</span>
+							</div>
 						</div>
 					</button>
 				{/each}
@@ -99,20 +111,25 @@
 		{/if}
 
 		<h4>PAST</h4>
-		<div class="social-events__list social-events__list--past">
+		<div class="social-events__past-list">
 			{#if recentEventsSource.length === 0}
 				<div class="social-events__past-row social-events__past-row--empty admin-ui-card">
 					<div class="social-events__meta">Past adventures will show up here soon.</div>
 				</div>
 			{:else}
 				{#each recentEventsSource.slice(0, 8) as recent}
-					<div class="social-events__past-row admin-ui-card">
+					<button
+						type="button"
+						class="social-events__past-row admin-ui-card"
+						onclick={() => goto(hrefWithMock(eventRoute(recent)))}
+					>
+						<span class="social-events__past-emoji">{emojiForActivity(recent.activityLabel, recent.activitySlug)}</span>
 						<div>
 							<div class="social-events__past-title">{recent.title}</div>
-							<div class="social-events__event-sub">{dayLabel(recent.startsAt)} · {recent.seatsTaken}/{recent.capacity} attended</div>
+							<div class="social-events__event-sub">{dayLabel(recent.startsAt)} · {recent.seatsTaken} went</div>
 						</div>
-						<button type="button" class="admin-ui-btn" onclick={() => goto(hrefWithMock(mockMode ? `/admin/events/${recent.activitySlug}/` : `/admin/events/${recent.id}`))}>View</button>
-					</div>
+						<span class="social-events__past-view admin-ui-btn">View</span>
+					</button>
 				{/each}
 			{/if}
 		</div>
@@ -127,20 +144,20 @@
 
 	.social-events__program-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-		gap: 0.65rem;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.5rem;
 		margin-bottom: 0.75rem;
 	}
 
 	.social-events__program-card {
-		padding: 0.95rem 0.7rem;
+		padding: 1rem;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: 0.35rem;
+		align-items: flex-start;
+		gap: 0.5rem;
 		cursor: pointer;
 		transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
-		text-align: center;
+		text-align: left;
 	}
 
 	.social-events__program-card:hover {
@@ -154,20 +171,13 @@
 	}
 
 	.social-events__program-icon {
-		width: 44px;
-		height: 44px;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 12px;
-		background: color-mix(in srgb, var(--activity-color) 10%, var(--bg) 90%);
-		border: 1px solid color-mix(in srgb, var(--activity-color) 22%, transparent);
-		font-size: 1.3rem;
+		font-size: 1.5rem;
+		line-height: 1;
 	}
 
 	.social-events__program-label {
-		font-size: 0.82rem;
-		font-weight: 700;
+		font-size: 0.875rem;
+		font-weight: 600;
 		color: var(--text);
 	}
 
@@ -175,8 +185,8 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.3rem;
-		font-size: 0.7rem;
-		color: color-mix(in srgb, var(--text) 56%, transparent);
+		font-size: 0.6875rem;
+		color: var(--text-3);
 	}
 
 	.social-events__dot {
@@ -190,83 +200,118 @@
 		background: var(--status-success-text);
 	}
 
-	.social-events__list {
-		display: flex;
-		flex-direction: column;
+	.social-events__upcoming-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 0.5rem;
 		margin-bottom: 0.75rem;
 	}
 
-	.social-events__event {
-		padding: 0.85rem 1rem;
+	.social-events__upcoming-card {
+		padding: 0.875rem;
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.625rem;
 		cursor: pointer;
 		text-align: left;
 		transition: border-color 120ms ease, box-shadow 120ms ease;
 	}
 
-	.social-events__event:hover {
+	.social-events__upcoming-card:hover {
 		border-color: color-mix(in srgb, var(--text) 22%, transparent);
 		box-shadow: 0 4px 14px var(--shadow-soft);
 	}
-	.social-events__event:focus-visible {
+	.social-events__upcoming-card:focus-visible {
 		border-color: var(--admin-selected-border);
 		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
 	}
 
-	.social-events__event-main {
+	.social-events__upcoming-top {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		justify-content: flex-start;
+		gap: 0.5rem;
+		width: 100%;
+		text-align: left;
+	}
+
+	.social-events__upcoming-meta {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		width: 100%;
+		text-align: left;
 	}
 
 	.social-events__event-emoji {
 		font-size: 1.25rem;
-		width: 28px;
-		text-align: center;
+		line-height: 1;
 	}
 
 	.social-events__event-title {
-		font-size: 0.87rem;
-		font-weight: 700;
+		font-size: 0.8125rem;
+		font-weight: 600;
 		color: var(--text);
 	}
 
 	.social-events__event-sub {
 		font-size: 0.74rem;
+		line-height: 1;
 		color: color-mix(in srgb, var(--text) 64%, transparent);
 		margin-top: 0.1rem;
 	}
 
-	.social-events__event-tail {
-		display: flex;
+	.social-events__event-cap {
+		display: inline-flex;
 		align-items: center;
-		gap: 0.45rem;
+		justify-content: center;
+		font-size: 0.625rem;
+		font-weight: 700;
+		line-height: 1;
+		padding: 0.15rem 0.4rem;
+		border-radius: 0.3rem;
+		background: color-mix(in srgb, var(--accent-color-purple) 10%, transparent);
+		color: var(--accent-color-purple-strong);
 	}
 
-	.social-events__event-cap {
-		font-size: 0.8rem;
-		font-weight: 700;
-		color: var(--status-success-text);
+	.social-events__event-cap-sep {
+		opacity: 0.55;
+		padding: 0 1px;
 	}
 
 	.social-events__event-cap--full {
+		background: color-mix(in srgb, var(--status-error-text) 10%, transparent);
 		color: var(--status-error-text);
 	}
 
-	.social-events__event-arrow {
-		font-size: 1rem;
-		color: color-mix(in srgb, var(--text) 50%, transparent);
+	.social-events__past-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
 	}
 
-	.social-events__list--past .social-events__past-row {
-		padding: 0.85rem 1rem;
+	.social-events__past-row {
+		padding: 0.625rem 0.875rem;
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		gap: 0.8rem;
+		gap: 0.75rem;
+		width: 100%;
+		text-align: left;
+		cursor: pointer;
+		transition: border-color 120ms ease, box-shadow 120ms ease;
+	}
+
+	.social-events__past-row:hover {
+		border-color: color-mix(in srgb, var(--text) 20%, transparent);
+		box-shadow: 0 4px 14px var(--shadow-soft);
+	}
+
+	.social-events__past-row:focus-visible {
+		border-color: var(--admin-selected-border);
+		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
 	}
 
 	.social-events__past-row--empty {
@@ -274,12 +319,18 @@
 	}
 
 	.social-events__past-title {
-		font-size: 0.86rem;
+		font-size: 0.8125rem;
 		font-weight: 600;
 		color: color-mix(in srgb, var(--text) 78%, transparent);
 	}
 
-	.social-events__past-row button {
+	.social-events__past-emoji {
+		font-size: 1rem;
+		line-height: 1;
+		flex-shrink: 0;
+	}
+
+	.social-events__past-view {
 		background: transparent;
 		border-color: var(--admin-control-border);
 		color: color-mix(in srgb, var(--admin-control-fg) 82%, transparent);
@@ -287,8 +338,10 @@
 		min-height: 30px;
 		padding: 0 0.8rem;
 		transition: background 120ms ease, color 120ms ease;
+		margin-left: auto;
+		pointer-events: none;
 	}
-	.social-events__past-row button:hover {
+	.social-events__past-view:hover {
 		background: var(--admin-control-bg-hover);
 		color: var(--admin-control-fg);
 	}
@@ -297,5 +350,12 @@
 		margin: 0;
 		font-size: 0.84rem;
 		color: color-mix(in srgb, var(--text) 58%, transparent);
+	}
+
+	@media (max-width: 720px) {
+		.social-events__program-grid,
+		.social-events__upcoming-grid {
+			grid-template-columns: 1fr;
+		}
 	}
 </style>

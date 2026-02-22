@@ -170,7 +170,7 @@
 				{/if}
 			</div>
 
-			<div class="admin-settings__module">
+			<div class="admin-settings__module admin-ui-card">
 				{#if mockMode ? mockConnected : dashboard.connected && !dashboard.connectionExpired}
 					<div class="admin-settings__connected-row">
 						<span class="admin-settings__connected-label">Google Calendar connected</span>
@@ -210,7 +210,7 @@
 				</div>
 			</div>
 
-			<div class="admin-settings__module">
+			<div class="admin-settings__module admin-ui-card">
 				<fieldset class="admin-settings__platform-field">
 					<legend>Week starts on</legend>
 					<div class="admin-settings__platform-options" role="radiogroup" aria-label="Week starts on">
@@ -239,7 +239,7 @@
 				</div>
 			</div>
 
-			<div class="admin-settings__module">
+			<div class="admin-settings__module admin-ui-card">
 				<div class="admin-settings__fields-row">
 					<fieldset class="admin-settings__platform-field">
 						<legend>Platform</legend>
@@ -362,8 +362,6 @@
 
 	.admin-settings__module {
 		border-radius: 0.9rem;
-		border: 1px solid var(--admin-card-border);
-		background: var(--admin-card-bg);
 		padding: 0.95rem;
 		display: grid;
 		gap: 0.75rem;
@@ -393,7 +391,7 @@
 		font: inherit;
 		font-size: 0.72rem;
 		font-weight: 560;
-		color: color-mix(in srgb, var(--text) 46%, transparent);
+		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
 
 	.admin-settings__connected-action:hover {
@@ -443,15 +441,16 @@
 		min-height: 2.05rem;
 		padding: 0 0.62rem;
 		border-radius: 0.6rem;
-		border: 1px solid var(--admin-control-border);
-		background: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
-		color: color-mix(in srgb, var(--text) 66%, transparent);
+		border: 1px solid var(--admin-card-border);
+		background: color-mix(in srgb, var(--admin-card-bg) 86%, var(--bg) 14%);
+		color: color-mix(in srgb, var(--text) 70%, transparent);
 		cursor: pointer;
 		transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
 	}
 
 	.admin-settings__platform-option:hover {
-		background: color-mix(in srgb, var(--bg) 92%, var(--text) 8%);
+		background: var(--admin-card-bg-hover, var(--admin-card-bg));
+		border-color: color-mix(in srgb, var(--admin-accent) 24%, transparent);
 	}
 
 	.admin-settings__platform-option input {
@@ -461,8 +460,8 @@
 	}
 
 	.admin-settings__platform-option--active {
-		border-color: var(--admin-selected-border);
-		background: var(--admin-selected-bg);
+		border-color: color-mix(in srgb, var(--admin-accent) 34%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 14%, var(--bg) 86%);
 		color: var(--text);
 	}
 
@@ -505,8 +504,8 @@
 		min-height: 2rem;
 		padding: 0 0.85rem;
 		border-radius: 0.55rem;
-		border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
-		background: color-mix(in srgb, var(--bg) 98%, var(--text) 2%);
+		border: 1px solid var(--admin-card-border);
+		background: color-mix(in srgb, var(--admin-card-bg) 84%, var(--bg) 16%);
 		color: var(--text);
 		font: inherit;
 		font-size: 0.76rem;
@@ -515,7 +514,8 @@
 	}
 
 	.admin-settings__google-btn:hover {
-		background: color-mix(in srgb, var(--bg) 92%, var(--text) 8%);
+		background: var(--admin-card-bg-hover, var(--admin-card-bg));
+		border-color: color-mix(in srgb, var(--admin-accent) 24%, transparent);
 	}
 
 	.admin-settings__google-btn svg {

@@ -50,8 +50,8 @@
 		gap: 0.875rem;
 		padding: 0.75rem 0.875rem;
 		border-radius: 0.875rem;
-		border: 1px solid color-mix(in srgb, var(--admin-accent) 14%, transparent);
-		background: color-mix(in srgb, var(--admin-accent) 5%, var(--bg) 95%);
+		border: 1px solid var(--admin-card-border);
+		background: var(--admin-card-bg);
 		text-align: left;
 		cursor: pointer;
 		color: inherit;
@@ -60,7 +60,7 @@
 	}
 
 	.admin-crew-member:hover {
-		background: color-mix(in srgb, var(--admin-accent) 10%, var(--bg) 90%);
+		background: var(--admin-card-bg-hover, var(--admin-card-bg));
 		box-shadow: 0 4px 16px color-mix(in srgb, var(--admin-accent) 8%, transparent);
 		transform: translateY(-1px);
 	}
