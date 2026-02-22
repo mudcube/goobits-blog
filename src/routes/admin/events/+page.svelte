@@ -1,17 +1,28 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
+	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
 	import { getAdminActivityColor, getAdminActivityEmoji } from '$lib/admin/activity-display'
 	import { formatAdminDayLabel, formatAdminTimeLabel } from '$lib/admin/date-format'
+	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
+	import { mockDashboardEvents, mockDashboardRecentEvents, mockPrograms } from '$lib/admin/mock/admin-mock-data'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	const authed = $derived(!!data.user)
+	const mockMode = $derived(isAdminMockMode($page.url))
+	const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
+	const eventsSource = $derived((mockMode ? mockDashboardEvents : dashboard.events))
+	const recentEventsSource = $derived((mockMode ? mockDashboardRecentEvents : dashboard.recentEvents))
+
+	function hrefWithMock(path: string) {
+		return withAdminMock(path, mockMode)
+	}
 
 	$effect(() => {
-		if (!authed) return
+		if (!authed || mockMode) return
 		dashboard.loadPrograms()
 		dashboard.loadEvents()
 	})
@@ -42,13 +53,13 @@
 		/>
 
 		<h4>ACTIVITY PAGES</h4>
-		<div class="social-events__program-grid">
-			{#each dashboard.programs as program}
+			<div class="social-events__program-grid">
+			{#each programsSource as program}
 				<button
 					type="button"
 					class="social-events__program-card admin-ui-card"
 					style={`--activity-color: ${colorForActivity(program.label, program.slug)}`}
-					onclick={() => goto(`/admin/events/${program.slug}/`)}
+					onclick={() => goto(hrefWithMock(`/admin/events/${program.slug}/`))}
 				>
 					<div class="social-events__program-icon">{program.icon || emojiForActivity(program.label, program.slug)}</div>
 					<div class="social-events__program-label">{program.label}</div>
@@ -61,14 +72,14 @@
 		</div>
 
 		<h4>UPCOMING</h4>
-		{#if dashboard.eventsLoading}
+		{#if !mockMode && dashboard.eventsLoading}
 			<p class="social-events__meta">Loading events...</p>
-		{:else if dashboard.events.length === 0}
+		{:else if eventsSource.length === 0}
 			<p class="social-events__meta">No upcoming events.</p>
 		{:else}
 			<div class="social-events__list">
-				{#each dashboard.events as ev}
-					<button type="button" class="social-events__event admin-ui-card" onclick={() => goto(`/admin/events/${ev.id}`)}>
+				{#each eventsSource as ev}
+					<button type="button" class="social-events__event admin-ui-card" onclick={() => goto(hrefWithMock(mockMode ? `/admin/events/${ev.activitySlug}/` : `/admin/events/${ev.id}`))}>
 						<div class="social-events__event-main">
 							<span class="social-events__event-emoji">{emojiForActivity(ev.activityLabel, ev.activitySlug)}</span>
 							<div>
@@ -89,18 +100,18 @@
 
 		<h4>PAST</h4>
 		<div class="social-events__list social-events__list--past">
-			{#if dashboard.recentEvents.length === 0}
+			{#if recentEventsSource.length === 0}
 				<div class="social-events__past-row social-events__past-row--empty admin-ui-card">
 					<div class="social-events__meta">Past adventures will show up here soon.</div>
 				</div>
 			{:else}
-				{#each dashboard.recentEvents.slice(0, 8) as recent}
+				{#each recentEventsSource.slice(0, 8) as recent}
 					<div class="social-events__past-row admin-ui-card">
 						<div>
 							<div class="social-events__past-title">{recent.title}</div>
 							<div class="social-events__event-sub">{dayLabel(recent.startsAt)} · {recent.seatsTaken}/{recent.capacity} attended</div>
 						</div>
-						<button type="button" class="admin-ui-btn" onclick={() => goto(`/admin/events/${recent.id}`)}>View</button>
+						<button type="button" class="admin-ui-btn" onclick={() => goto(hrefWithMock(mockMode ? `/admin/events/${recent.activitySlug}/` : `/admin/events/${recent.id}`))}>View</button>
 					</div>
 				{/each}
 			{/if}

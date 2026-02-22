@@ -470,7 +470,7 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 							contenteditable={!preview}
 							spellcheck={false}
 							onblur={(event) => updateProgramField('eyebrow', event.currentTarget.textContent || '')}
-						>{dashboard.programDraft.eyebrow || 'Rainbow Gym'}</div>
+						>{dashboard.programDraft.eyebrow || 'Program'}</div>
 
 						<div class="program-editor__title-group">
 							<div

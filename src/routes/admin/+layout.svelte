@@ -1,9 +1,12 @@
 <script lang="ts">
 	import '@calendar/theme/admin.scss'
+	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
 	import { enhance } from '$app/forms'
 	import { getCalendarUiConfig } from '@calendar/ui/config'
-	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut } from '@lucide/svelte'
+	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut, Plus, UserPlus, ArrowLeft, Save } from '@lucide/svelte'
+	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
+	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 
 	const { data, children } = $props<{ data: { user: unknown | null }; children: () => unknown }>()
 	const calendarConfig = getCalendarUiConfig()
@@ -15,6 +18,11 @@
 	]
 
 	const footerNav = [{ href: '/admin/settings/', label: 'Settings', icon: Settings }]
+	const mockMode = $derived(isAdminMockMode($page.url))
+
+	function hrefWithMock(path: string) {
+		return withAdminMock(path, mockMode)
+	}
 
 	function active(path: string) {
 		const normalizedPath = path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path
@@ -35,7 +43,7 @@
 
 	function breadcrumbs(pathname: string) {
 		const normalized = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname
-		const items: Array<{ label: string; href?: string }> = [{ label: 'Admin', href: '/admin/' }]
+		const items: Array<{ label: string; href?: string }> = [{ label: 'Admin', href: hrefWithMock('/admin/') }]
 		const eventsSingleSegment = normalized.match(/^\/admin\/events\/([^/]+)$/)
 		const eventLeaf = eventsSingleSegment?.[1] || ''
 		const isEventId = /^\d+$/.test(eventLeaf)
@@ -49,13 +57,13 @@
 		if (normalized.startsWith('/admin/crew')) return [...items, { label: 'Crew' }]
 		if (normalized === '/admin/settings' || normalized.startsWith('/admin/settings/')) return [...items, { label: 'Settings' }]
 		if (normalized === '/admin/events') return [...items, { label: 'Events' }]
-		if (normalized === '/admin/events/new') return [...items, { label: 'Events', href: '/admin/events/' }, { label: 'New Event' }]
+		if (normalized === '/admin/events/new') return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: 'New Event' }]
 		if (normalized.startsWith('/admin/events/program/')) {
 			const legacyLeaf = normalized.split('/').pop() || 'program'
-			return [...items, { label: 'Events', href: '/admin/events/' }, { label: prettyLeaf(legacyLeaf) }]
+			return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: prettyLeaf(legacyLeaf) }]
 		}
-		if (eventsSingleSegment && !isEventId) return [...items, { label: 'Events', href: '/admin/events/' }, { label: prettyLeaf(eventLeaf) }]
-		if (normalized.startsWith('/admin/events/')) return [...items, { label: 'Events', href: '/admin/events/' }, { label: 'Event Detail' }]
+		if (eventsSingleSegment && !isEventId) return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: prettyLeaf(eventLeaf) }]
+		if (normalized.startsWith('/admin/events/')) return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: 'Event Detail' }]
 		return [...items, { label: adminSectionTitle(normalized) }]
 	}
 
@@ -136,16 +144,20 @@
 				}
 			>
 				{#if isProgramEditorRoute($page.url.pathname)}
-					<button type="button" class="admin-ui-btn" onclick={triggerProgramEditorSettings}>Settings</button>
-					<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={triggerProgramEditorSave}>Save</button>
+					<AdminActionButton variant="subtle" icon={Settings} onclick={triggerProgramEditorSettings}>Settings</AdminActionButton>
+					<AdminActionButton variant="primary" icon={Save} onclick={triggerProgramEditorSave}>Save</AdminActionButton>
 				{:else if isDashboardRoute($page.url.pathname)}
-					<a class="admin-ui-btn admin-ui-btn--primary social-admin__breadcrumbs-btn-link" href="/admin/events/new/">+ New</a>
+					<AdminActionButton variant="primary" icon={Plus} href={hrefWithMock('/admin/events/new/')}>New</AdminActionButton>
 				{:else if isEventsIndexRoute($page.url.pathname)}
-					<a class="admin-ui-btn admin-ui-btn--primary social-admin__breadcrumbs-btn-link" href="/admin/events/new/">+ New Event</a>
+					<AdminActionButton variant="primary" icon={Plus} href={hrefWithMock('/admin/events/new/')}>New Event</AdminActionButton>
 				{:else if isEventsNewRoute($page.url.pathname)}
-					<a class="admin-ui-btn social-admin__breadcrumbs-btn-link" href="/admin/events/">Back to Events</a>
+					<AdminActionButton
+						variant="subtle"
+						icon={ArrowLeft}
+						onclick={() => void goto(hrefWithMock('/admin/events/'))}
+					>Back to Events</AdminActionButton>
 				{:else if isCrewRoute($page.url.pathname)}
-					<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={triggerCrewInvite}>Invite Friend</button>
+					<AdminActionButton variant="primary" icon={UserPlus} onclick={triggerCrewInvite}>Invite Friend</AdminActionButton>
 				{:else}
 					<span aria-hidden="true"></span>
 				{/if}
@@ -154,10 +166,10 @@
 	{/if}
 
 	<aside class="social-admin__sidebar">
-		<a class="social-admin__brand" href="/admin/events/">Calendar</a>
+		<a class="social-admin__brand" href={hrefWithMock('/admin/events/')}>Calendar</a>
 		<nav class="social-admin__nav" aria-label="Admin">
 			{#each primaryNav as item}
-				<a class="social-admin__nav-item" class:social-admin__nav-item--active={active(item.href)} href={item.href}>
+				<a class="social-admin__nav-item" class:social-admin__nav-item--active={active(item.href)} href={hrefWithMock(item.href)}>
 					<item.icon size={16} strokeWidth={1.8} />
 					<span>{item.label}</span>
 				</a>
@@ -165,7 +177,7 @@
 		</nav>
 		<div class="social-admin__sidebar-spacer"></div>
 		{#each footerNav as item}
-			<a class="social-admin__nav-item" class:social-admin__nav-item--active={active(item.href)} href={item.href}>
+			<a class="social-admin__nav-item" class:social-admin__nav-item--active={active(item.href)} href={hrefWithMock(item.href)}>
 				<item.icon size={16} strokeWidth={1.8} />
 				<span>{item.label}</span>
 			</a>
@@ -465,12 +477,17 @@
 		align-items: center;
 		padding: 0 0.5rem;
 		margin-bottom: 1.2rem;
-		color: var(--text);
+		color: color-mix(in srgb, var(--text) 48%, transparent);
 		text-decoration: none;
-		font-size: 0.81rem;
-		font-weight: 600;
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: 0.71rem;
+		font-weight: 650;
 		line-height: 1.2;
-		letter-spacing: -0.01em;
+		letter-spacing: 0.07em;
+		text-transform: uppercase;
+	}
+	.social-admin__brand:hover {
+		color: color-mix(in srgb, var(--text) 62%, transparent);
 	}
 
 	.social-admin__nav {
@@ -590,17 +607,6 @@
 		pointer-events: none;
 		visibility: hidden;
 	}
-	.social-admin__breadcrumbs-btn-link {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		text-decoration: none;
-		white-space: nowrap;
-	}
-	.social-admin__breadcrumbs-btn-link:hover {
-		text-decoration: none;
-	}
-
 	/* --- Main content (left-aligned, no centering) --- */
 	.social-admin__main {
 		grid-row: 2;

@@ -1,4 +1,5 @@
 import type { AdminEventsResponse, AdminProgramsResponse } from '@calendar/ui/api/admin'
+import type { CalendarPaymentDefaultsResponse } from '@calendar/ui/api/calendar'
 
 type MockParticipant = AdminEventsResponse['upcoming'][number]['participants'][number]
 
@@ -265,3 +266,54 @@ export const mockPrograms: AdminProgramsResponse['programs'] = [
 		formGlowClass: 'form-glow-circus'
 	}
 ]
+
+export type MockCrewUser = {
+	id: string
+	name: string
+	email: string
+	role?: string
+	isSelf?: boolean
+	created_at?: number
+}
+
+export type MockCrewInvite = {
+	id: string
+	code: string
+	email: string
+	created_at: number
+	expires_in_days?: number
+}
+
+const nowUnix = Math.floor(Date.now() / 1000)
+
+export const mockCrewUsers: MockCrewUser[] = [
+	{ id: 'u-miko', name: 'Miko', email: 'miko@example.com', role: 'owner', isSelf: true, created_at: nowUnix - 220 * 24 * 60 * 60 },
+	{ id: 'u-sarah', name: 'Sarah', email: 'sarah@example.com', created_at: nowUnix - 120 * 24 * 60 * 60 },
+	{ id: 'u-alex', name: 'Alex', email: 'alex@example.com', created_at: nowUnix - 90 * 24 * 60 * 60 },
+	{ id: 'u-jamie', name: 'Jamie', email: 'jamie@example.com', created_at: nowUnix - 60 * 24 * 60 * 60 },
+	{ id: 'u-morgan', name: 'Morgan', email: 'morgan@example.com', created_at: nowUnix - 40 * 24 * 60 * 60 },
+	{ id: 'u-marco', name: 'Marco', email: 'marco@example.com', created_at: nowUnix - 30 * 24 * 60 * 60 },
+	{ id: 'u-jen', name: 'Jen', email: 'jen@example.com', created_at: nowUnix - 20 * 24 * 60 * 60 }
+]
+
+export const mockCrewInvites: MockCrewInvite[] = [
+	{
+		id: 'inv-sarah',
+		code: 'a3x8f',
+		email: 'sarah@example.com',
+		created_at: nowUnix - 3 * 24 * 60 * 60,
+		expires_in_days: 4
+	},
+	{
+		id: 'inv-dev',
+		code: 'z9q2r',
+		email: 'dev@example.com',
+		created_at: nowUnix - 1 * 60 * 60,
+		expires_in_days: 7
+	}
+]
+
+export const mockPaymentDefaults: CalendarPaymentDefaultsResponse['payment'] = {
+	provider: 'venmo',
+	handle: '@rainbowgym'
+}

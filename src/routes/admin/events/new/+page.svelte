@@ -1,13 +1,22 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
+	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import AdminWysiwygWorkspace from '$lib/admin/AdminWysiwygWorkspace.svelte'
 	import { getAdminActivityColor, getAdminActivityEmoji } from '$lib/admin/activity-display'
+	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
+	import { mockPrograms } from '$lib/admin/mock/admin-mock-data'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	const authed = $derived(!!data.user)
+	const mockMode = $derived(isAdminMockMode($page.url))
+	const programsSource = $derived((mockMode ? mockPrograms.filter((program) => program.enabled) : dashboard.enabledPrograms))
+
+	function hrefWithMock(path: string) {
+		return withAdminMock(path, mockMode)
+	}
 
 	let selectedActivitySlug = $state('')
 	let createTitle = $state('')
@@ -23,7 +32,7 @@
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
 
 	$effect(() => {
-		if (!authed) return
+		if (!authed || mockMode) return
 		dashboard.loadPrograms()
 		dashboard.loadEvents()
 	})
@@ -57,15 +66,7 @@
 
 	function selectCreateActivity(slug: string, label: string) {
 		selectedActivitySlug = slug
-		createTitle = label === 'Gym'
-			? 'Leg Day Crew'
-			: label === 'Movies'
-				? 'Movie Night'
-				: label === 'Adventure'
-					? 'Trail Run'
-					: label === 'Circus'
-						? 'Open Gym'
-						: `${label} Hangout`
+		createTitle = `${label} Session`
 		createSubtitle = `${label} session`
 		const starts = new Date()
 		starts.setDate(starts.getDate() + 1)
@@ -79,6 +80,11 @@
 
 	async function submitCreate() {
 		if (!selectedActivitySlug || !createTitle || !createStartsAt || !createEndsAt) return
+		if (mockMode) {
+			flash('Mock mode: event created in preview')
+			void goto(hrefWithMock(`/admin/events/${selectedActivitySlug}/`))
+			return
+		}
 		dashboard.eventDraft = {
 			...dashboard.eventDraft,
 			activitySlug: selectedActivitySlug,
@@ -94,7 +100,7 @@
 			flash(dashboard.error, true)
 			return
 		}
-		void goto('/admin/events/')
+		void goto(hrefWithMock('/admin/events/'))
 	}
 </script>
 
@@ -111,9 +117,9 @@
 			modeLabel={preview ? 'Preview' : 'Editing'}
 			preview={preview}
 			primaryLabel={dashboard.eventsCreating ? 'Creating…' : 'Create'}
-			primaryDisabled={dashboard.eventsCreating}
+			primaryDisabled={!mockMode && dashboard.eventsCreating}
 			drawerOpen={!!selectedActivitySlug && drawerOpen}
-			onBack={() => goto('/admin/events/')}
+			onBack={() => goto(hrefWithMock('/admin/events/'))}
 			onToggleSettings={() => (drawerOpen = !drawerOpen)}
 			onTogglePreview={() => (preview = !preview)}
 			onPrimary={() => { void submitCreate() }}
@@ -122,7 +128,7 @@
 			{#snippet canvas()}
 				<div class="social-events__canvas">
 					<div class="social-events__picker-grid">
-						{#each dashboard.enabledPrograms as program}
+						{#each programsSource as program}
 							<button type="button" class="social-events__picker-card admin-ui-card" class:social-events__picker-card--active={selectedActivitySlug === program.slug} style={`--activity-color: ${colorForActivity(program.label, program.slug)}`} onclick={() => selectCreateActivity(program.slug, program.label)}>
 								<span>{emojiForActivity(program.label, program.slug)}</span>
 								<span>{program.label}</span>

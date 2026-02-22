@@ -1,30 +1,113 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
+	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminMembersController } from '@calendar/ui/features/members/admin/admin-members.svelte'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
+	import { createInviteShareLink } from '@calendar/ui/features/dashboard/admin/admin-dashboard'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
+	import AdminCrewMemberCard from '@components/Admin/AdminCrewMemberCard.svelte'
+	import AdminCrewInviteCards from '@components/Admin/AdminCrewInviteCards.svelte'
+	import AdminCrewInviteModal from '@components/Admin/AdminCrewInviteModal.svelte'
 	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
+	import { isAdminMockMode } from '$lib/admin/mock/mock-mode'
+	import {
+		mockCrewInvites,
+		mockCrewUsers,
+		mockDashboardEvents,
+		mockDashboardRecentEvents
+	} from '$lib/admin/mock/admin-mock-data'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const members = createAdminMembersController({ onUnauthorized: handleUnauthorizedSessionError })
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	const authed = $derived(!!data.user)
+	const mockMode = $derived(isAdminMockMode($page.url))
 	type MemberUser = Record<string, unknown>
 	type InviteRow = Record<string, unknown>
-	const users = $derived((members.users as MemberUser[]))
-	const invites = $derived((members.invites as InviteRow[]))
+	let mockInvitesState = $state([...mockCrewInvites])
+	const users = $derived((mockMode ? (mockCrewUsers as unknown as MemberUser[]) : (members.users as MemberUser[])))
+	const invites = $derived((mockMode ? (mockInvitesState as unknown as InviteRow[]) : (members.invites as InviteRow[])))
+	const eventsSource = $derived((mockMode ? mockDashboardEvents : dashboard.events))
+	const recentEventsSource = $derived((mockMode ? mockDashboardRecentEvents : dashboard.recentEvents))
+
 	let expandedUserId = $state<string | null>(null)
 	let toastMessage = $state('')
 	let toastVisible = $state(false)
 	let undoAction = $state<null | (() => Promise<void>)>(null)
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
 
+	let inviteModalOpen = $state(false)
+	let inviteModalStep = $state<1 | 2>(1)
+	let inviteNameDraft = $state('')
+	let createdInviteCode = $state('')
+
 	$effect(() => {
 		if (!authed) return
+		if (mockMode) return
 		members.load()
 		dashboard.loadEvents()
 		dashboard.loadPrograms()
+	})
+
+	function normalizeName(value: unknown) {
+		return String(value || '').trim()
+	}
+
+	function fallbackNameFromEmail(email: string) {
+		const local = email.split('@')[0] || email
+		const clean = local.replace(/[._-]+/g, ' ').trim()
+		if (!clean) return 'Member'
+		return clean
+			.split(/\s+/)
+			.filter(Boolean)
+			.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+			.join(' ')
+	}
+
+	function isTokenLikeName(value: string) {
+		const compact = value.replace(/\s+/g, '').toLowerCase()
+		if (!compact) return true
+		if (compact.length >= 10 && /^[a-f0-9]+$/.test(compact)) return true
+		if (compact.length >= 10 && /^[a-z0-9]+$/.test(compact) && /\d/.test(compact)) return true
+		return false
+	}
+
+	function safeInviteNameFromEmail(email: string) {
+		const name = fallbackNameFromEmail(email)
+		return isTokenLikeName(name) ? '' : name
+	}
+
+	function initials(name: string) {
+		const parts = name.split(/\s+/).filter(Boolean)
+		const a = parts[0]?.[0] ?? ''
+		let b = parts[1]?.[0] ?? ''
+		if (!b) {
+			const first = (parts[0] || name || '').trim()
+			b = first.length > 1 ? (first[1] || 'X') : 'X'
+		}
+		return `${a}${b}`.toUpperCase()
+	}
+
+	function isYou(user: MemberUser) {
+		return !!user['isSelf'] || String(user['role'] || '').toLowerCase() === 'owner'
+	}
+
+	function displayName(user: MemberUser) {
+		const byName = normalizeName(user['name'])
+		if (byName) return byName
+		const byEmail = normalizeName(user['email'])
+		if (byEmail) return fallbackNameFromEmail(byEmail)
+		return String(user['id'] || 'Member')
+	}
+
+	const sortedUsers = $derived.by(() => {
+		return [...users].sort((a, b) => {
+			const aYou = isYou(a) ? 1 : 0
+			const bYou = isYou(b) ? 1 : 0
+			if (aYou !== bYou) return bYou - aYou
+			return displayName(a).localeCompare(displayName(b))
+		})
 	})
 
 	function categoryBadgeText(label: string) {
@@ -38,7 +121,7 @@
 	}
 
 	function calculateStreak(userId: string) {
-		const userEvents = dashboard.recentEvents
+		const userEvents = recentEventsSource
 			.filter((event) => event.participants.some((participant) => participant.userId === userId))
 			.sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime())
 		if (userEvents.length === 0) return 0
@@ -73,7 +156,7 @@
 		const now = Date.now()
 		const days30 = 30 * 24 * 60 * 60 * 1000
 		const activityCount = new Map<string, number>()
-		for (const event of dashboard.recentEvents) {
+		for (const event of recentEventsSource) {
 			const startsAt = new Date(event.startsAt).getTime()
 			if (now - startsAt > days30) continue
 			if (!event.participants.some((participant) => participant.userId === userId)) continue
@@ -88,24 +171,58 @@
 				topActivity = label
 			}
 		}
-		if (topActivity) {
-			return `${emojiForActivity(topActivity)} ${categoryBadgeText(topActivity)}`
-		}
-
-		const created = Number(user['created_at'] || user['createdAt'] || 0)
-		if (created > 0) {
-			const createdMs = created > 10_000_000_000 ? created : created * 1000
-			const daysSince = (Date.now() - createdMs) / (24 * 60 * 60 * 1000)
-			if (daysSince <= 14) return '🆕 New Member'
-		}
+		if (topActivity) return `${getAdminActivityEmoji(topActivity)} ${categoryBadgeText(topActivity)}`
 		return ''
 	}
 
-	function emojiForActivity(label: string) {
-		return getAdminActivityEmoji(label)
+	function memberDetail(user: MemberUser) {
+		const userId = String(user['id'] || '')
+		const upcoming = eventsSource
+			.filter((event) => event.participants.some((participant) => participant.userId === userId))
+			.sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())[0]
+		if (upcoming) {
+			const start = new Date(upcoming.startsAt)
+			const now = new Date()
+			const sameDay = start.toDateString() === now.toDateString()
+			if (sameDay) {
+				const label = start.getHours() >= 17 ? 'tonight' : 'today'
+				return `Signed up for ${upcoming.title} · ${label}`
+			}
+			return `Signed up for ${upcoming.title} · ${start.toLocaleDateString(undefined, { weekday: 'short' })}`
+		}
+		const recent = recentEventsSource
+			.filter((event) => event.participants.some((participant) => participant.userId === userId))
+			.sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime())[0]
+		if (recent) {
+			const start = new Date(recent.startsAt)
+			const sameDay = start.toDateString() === new Date().toDateString()
+			return `Last went to ${recent.title} · ${sameDay ? 'today' : start.toLocaleDateString(undefined, { weekday: 'short' })}`
+		}
+		return "Hasn't been in a while"
 	}
 
+	const inviteItems = $derived.by(() => {
+		return invites.map((invite) => {
+			const id = String(invite['id'] || invite['code'] || crypto.randomUUID())
+			const code = String(invite['code'] || '')
+			const email = normalizeName(invite['email'])
+			const inviteName = email ? safeInviteNameFromEmail(email) : ''
+			const createdAtRaw = Number(invite['created_at'] || invite['createdAt'] || 0)
+			const createdAt = createdAtRaw > 10_000_000_000 ? createdAtRaw : createdAtRaw * 1000
+			const daysAgo = createdAt ? Math.max(0, Math.floor((Date.now() - createdAt) / (24 * 60 * 60 * 1000))) : 0
+			const expiresInDays = Number(invite['expires_in_days'] || members.inviteExpires || 7)
+			const possessive = inviteName.endsWith('s') ? `${inviteName}' invite` : `${inviteName}'s invite`
+			return {
+				id,
+				code,
+				label: inviteName ? possessive : 'Pending invite',
+				detail: `Sent ${daysAgo === 0 ? 'today' : `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago`} · expires in ${expiresInDays} days`
+			}
+		})
+	})
+
 	async function toggleEdit(userId: string) {
+		if (mockMode) return
 		if (expandedUserId === userId) {
 			expandedUserId = null
 			return
@@ -126,26 +243,25 @@
 	}
 
 	async function toggleAccessWithSave(programSlug: string) {
+		if (mockMode) {
+			showToast('Mock mode: access changes are preview-only')
+			return
+		}
 		const before = members.accessRows.map((row) => ({ ...row }))
 		members.toggleAccess(programSlug)
 		await members.saveAccess(false)
 		if (members.error) {
-			// Revert on failure
 			for (const row of before) {
 				const current = members.accessRows.find((item) => item.programSlug === row.programSlug)
-				if (current && current.allowed !== row.allowed) {
-					members.toggleAccess(row.programSlug)
-				}
+				if (current && current.allowed !== row.allowed) members.toggleAccess(row.programSlug)
 			}
 			showToast("Couldn't save — try again")
 			return
 		}
-		showToast(`Updated access`, async () => {
+		showToast('Updated access', async () => {
 			for (const row of before) {
 				const current = members.accessRows.find((item) => item.programSlug === row.programSlug)
-				if (current && current.allowed !== row.allowed) {
-					members.toggleAccess(row.programSlug)
-				}
+				if (current && current.allowed !== row.allowed) members.toggleAccess(row.programSlug)
 			}
 			await members.saveAccess(false)
 		})
@@ -158,93 +274,145 @@
 		})
 	}
 
+	function openInviteModal() {
+		inviteModalOpen = true
+		inviteModalStep = 1
+		inviteNameDraft = ''
+		createdInviteCode = ''
+	}
+
+	async function createInviteFromModal() {
+		if (mockMode) {
+			const code = Math.random().toString(36).slice(2, 7)
+			const id = `inv-${Date.now()}`
+			mockInvitesState = [
+				{
+					id,
+					code,
+					email: inviteNameDraft.trim() ? `${inviteNameDraft.trim()}@example.com` : '',
+					created_at: Math.floor(Date.now() / 1000),
+					expires_in_days: 7
+				},
+				...mockInvitesState
+			]
+			createdInviteCode = code
+			inviteModalStep = 2
+			return
+		}
+		const beforeIds = new Set(invites.map((invite) => String(invite['id'] || invite['code'] || '')))
+		members.inviteEmail = inviteNameDraft.trim() ? `${inviteNameDraft.trim()}@invite.local` : ''
+		await members.createInvite()
+		if (members.error) {
+			showToast(members.error)
+			return
+		}
+		const created = (members.invites as InviteRow[]).find((invite) => {
+			const key = String(invite['id'] || invite['code'] || '')
+			return key && !beforeIds.has(key)
+		})
+		if (!created) {
+			inviteModalOpen = false
+			showToast('Invite created')
+			return
+		}
+		createdInviteCode = String(created['code'] || '')
+		inviteModalStep = 2
+	}
+
+	function createdInviteUrl() {
+		if (!createdInviteCode) return ''
+		return createInviteShareLink(window.location.origin, createdInviteCode)
+	}
+
+	function textCreatedInvite() {
+		const url = createdInviteUrl()
+		if (!url) return
+		const smsUrl = `sms:?&body=${encodeURIComponent(url)}`
+		window.open(smsUrl, '_self')
+	}
+
 	function onTopbarCreateInvite() {
-		void members.createInvite()
+		openInviteModal()
 	}
 
 	onMount(() => {
 		window.addEventListener('admin-crew-create-invite', onTopbarCreateInvite)
-		return () => {
-			window.removeEventListener('admin-crew-create-invite', onTopbarCreateInvite)
-		}
+		return () => window.removeEventListener('admin-crew-create-invite', onTopbarCreateInvite)
 	})
 </script>
 
 {#if authed}
 	<div class="social-crew admin-content">
-		<AdminPageHero
-			eyebrow="Members"
-			title="The Crew"
-			subtitle="Manage member access and invites."
-		/>
+		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Manage member access and invites." />
 
 		<h4>ACTIVE MEMBERS ({users.length})</h4>
-		<div class="social-crew__list admin-ui-card">
-			{#each users as user, i}
-				<div class="social-crew__row">
-					<div class="social-crew__row-head">
-						<div>
-							<span class="social-crew__name">{String(user['name'] || user['email'] || user['id'])}</span>
-							{#if deriveBadge(user)}
-								<span class="social-crew__badge">{deriveBadge(user)}</span>
-							{/if}
-						</div>
-						<button type="button" class="social-crew__edit admin-ui-btn" onclick={() => toggleEdit(String(user['id']))}>Edit</button>
-					</div>
-
-					{#if expandedUserId === String(user['id'])}
-						<div class="social-crew__access">
-							<div class="social-crew__access-label">Program Access</div>
-							<div class="social-crew__tags">
-								{#if members.accessLoading}
-									<span class="social-crew__meta">Loading access...</span>
-								{:else}
-									{#each members.accessRows as row}
-										<button
-											type="button"
-											class="social-crew__tag admin-ui-chip"
-											class:admin-ui-chip--active={row.allowed}
-											class:social-crew__tag--on={row.allowed}
-											onclick={() => toggleAccessWithSave(row.programSlug)}
-										>
-											{emojiForActivity(row.programSlug)} {row.programSlug}
-										</button>
-									{/each}
-								{/if}
-							</div>
-						</div>
-					{/if}
-				</div>
-				{#if i < members.users.length - 1}<div class="social-crew__divider"></div>{/if}
+		<div class="social-crew__list">
+			{#each sortedUsers as user (String(user['id'] || user['email'] || user['name']))}
+				<AdminCrewMemberCard
+					name={displayName(user)}
+					detail={memberDetail(user)}
+					badge={deriveBadge(user)}
+					initials={initials(displayName(user))}
+					isYou={isYou(user)}
+					onclick={() => void toggleEdit(String(user['id']))}
+				/>
 			{/each}
 		</div>
 
-		<h4>PENDING INVITES ({invites.length})</h4>
-		<div class="social-crew__pending admin-ui-card">
-			{#if invites.length === 0}
-				<p class="social-crew__meta">No pending invites.</p>
-			{:else}
-				{#each invites as invite, i}
-					<div class="social-crew__pending-row">
-						<div>
-							<span class="social-crew__name">{String(invite['email'] || invite['code'])}</span>
-							<span class="social-crew__meta">({String(invite['code'] || '')})</span>
-						</div>
-						<button type="button" class="social-crew__edit admin-ui-btn" onclick={() => members.copyInvite(String(invite['code'] || ''))}>Resend</button>
-					</div>
-					{#if i < invites.length - 1}<div class="social-crew__divider"></div>{/if}
-				{/each}
-			{/if}
-		</div>
+		<h4>PENDING INVITES ({inviteItems.length})</h4>
+		<AdminCrewInviteCards
+			invites={inviteItems}
+			onCopy={(code) => members.copyInvite(code)}
+			onDelete={(id) => {
+				if (mockMode) {
+					mockInvitesState = mockInvitesState.filter((invite) => invite.id !== id)
+					return
+				}
+				void members.deleteInvite(id)
+			}}
+		/>
+
+		{#if expandedUserId}
+			<h4>MEMBER ACCESS</h4>
+			<div class="social-crew__access admin-ui-card">
+				<div class="social-crew__access-label">Program access</div>
+				<div class="social-crew__tags">
+					{#if members.accessLoading}
+						<span class="social-crew__meta">Loading access...</span>
+					{:else}
+						{#each members.accessRows as row}
+							<button
+								type="button"
+								class="social-crew__tag admin-ui-chip"
+								class:admin-ui-chip--active={row.allowed}
+								onclick={() => void toggleAccessWithSave(row.programSlug)}
+							>
+								{getAdminActivityEmoji(row.programSlug)} {row.programSlug}
+							</button>
+						{/each}
+					{/if}
+				</div>
+			</div>
+		{/if}
 	</div>
+
+	<AdminCrewInviteModal
+		open={inviteModalOpen}
+		step={inviteModalStep}
+		inviteName={inviteNameDraft}
+		inviteUrl={createdInviteUrl()}
+		onClose={() => (inviteModalOpen = false)}
+		onNameChange={(value) => (inviteNameDraft = value)}
+		onCreate={() => void createInviteFromModal()}
+		onCopy={() => members.copyInvite(createdInviteCode)}
+		onText={textCreatedInvite}
+	/>
 
 	{#if toastVisible}
 		<div class="social-crew__toast" role="status">
 			<span>{toastMessage}</span>
 			{#if undoAction}
-				<button type="button" class="admin-ui-btn" onclick={handleUndoClick}>
-					Undo
-				</button>
+				<button type="button" class="admin-ui-btn" onclick={handleUndoClick}>Undo</button>
 			{/if}
 		</div>
 	{/if}
@@ -256,53 +424,21 @@
 		gap: 1rem;
 	}
 
-	.social-crew__edit,
-	.social-crew__toast button {
-		font-weight: 600;
-	}
-
-	.social-crew__list,
-	.social-crew__pending {
-		padding: 0.25rem 0.875rem;
-	}
-
-	.social-crew__row {
-		min-height: 56px;
-		padding: 0.75rem 0;
-	}
-
-	.social-crew__row-head,
-	.social-crew__pending-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem;
-	}
-
-	.social-crew__name {
-		font-size: 0.875rem;
-		font-weight: 700;
-		color: var(--text);
-	}
-
-	.social-crew__badge,
-	.social-crew__meta {
-		margin-left: 0.5rem;
-		font-size: 0.75rem;
-		color: color-mix(in srgb, var(--text) 62%, transparent);
+	.social-crew__list {
+		display: grid;
+		gap: 0.5rem;
 	}
 
 	.social-crew__access {
-		margin-top: 0.75rem;
 		padding: 0.75rem;
-		border-radius: 10px;
-		background: color-mix(in srgb, var(--bg) 90%, var(--text) 10%);
+		border-radius: 0.875rem;
+		background: color-mix(in srgb, var(--bg) 92%, var(--text) 8%);
 	}
 
 	.social-crew__access-label {
 		font-size: 0.75rem;
-		font-weight: 600;
-		color: color-mix(in srgb, var(--text) 70%, transparent);
+		font-weight: 620;
+		color: color-mix(in srgb, var(--text) 64%, transparent);
 		margin-bottom: 0.5rem;
 	}
 
@@ -319,13 +455,9 @@
 		font-weight: 600;
 	}
 
-	.social-crew__tag--on {
-		font-weight: 700;
-	}
-
-	.social-crew__divider {
-		height: 1px;
-		background: color-mix(in srgb, var(--text) 10%, transparent);
+	.social-crew__meta {
+		font-size: 0.75rem;
+		color: color-mix(in srgb, var(--text) 62%, transparent);
 	}
 
 	.social-crew__toast {

@@ -1,20 +1,32 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
+	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import { AdminEventDetailSheet } from '@calendar/ui'
+	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 
 	const { data } = $props<{ data: { user: unknown | null; eventId: string } }>()
 
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	const authed = $derived(!!data.user)
 	const eventId = $derived(Number(data.eventId))
+	const mockMode = $derived(isAdminMockMode($page.url))
+
+	function hrefWithMock(path: string) {
+		return withAdminMock(path, mockMode)
+	}
 
 	let loading = $state(false)
 	let attemptedLoad = $state(false)
 
 	$effect(() => {
-		if (!authed || !Number.isFinite(eventId) || eventId <= 0) return
+		if (!authed || !mockMode) return
+		void goto(hrefWithMock('/admin/events/'), { replaceState: true })
+	})
+
+	$effect(() => {
+		if (!authed || mockMode || !Number.isFinite(eventId) || eventId <= 0) return
 		attemptedLoad = true
 		loading = true
 		void dashboard.openEventDetail(eventId).finally(() => {
@@ -23,16 +35,16 @@
 	})
 
 	$effect(() => {
-		if (!authed || !attemptedLoad || loading) return
+		if (!authed || mockMode || !attemptedLoad || loading) return
 		if (!dashboard.selectedEventDetail) {
-			goto('/admin/', { replaceState: true })
+			goto(hrefWithMock('/admin/'), { replaceState: true })
 		}
 	})
 </script>
 
 {#if authed}
 	<div class="admin-event-detail admin-content">
-		<a class="admin-event-detail__back" href="/admin/events/">Back to Events</a>
+		<a class="admin-event-detail__back" href={hrefWithMock('/admin/events/')}>Back to Events</a>
 		{#if loading}
 			<p class="admin-event-detail__loading">Loading event detail...</p>
 		{:else if dashboard.selectedEventDetail}

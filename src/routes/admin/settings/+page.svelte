@@ -1,18 +1,23 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { Ban, HandCoins, Landmark, Wallet } from '@lucide/svelte'
+	import { page } from '$app/stores'
+	import { Ban, HandCoins, Landmark, Wallet, Save } from '@lucide/svelte'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
+	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
 	import {
 		getAdminCalendarWeekStart,
 		setAdminCalendarWeekStart,
 		type AdminCalendarWeekStart
 	} from '$lib/admin/calendar-preferences'
+	import { isAdminMockMode } from '$lib/admin/mock/mock-mode'
+	import { mockPaymentDefaults } from '$lib/admin/mock/admin-mock-data'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	const authed = $derived(!!data.user)
+	const mockMode = $derived(isAdminMockMode($page.url))
 
 	let disconnectConfirm = $state(false)
 	let toastMessage = $state('')
@@ -23,6 +28,7 @@
 		provider: 'none',
 		handle: ''
 	})
+	let mockConnected = $state(false)
 	let calendarWeekStart = $state<AdminCalendarWeekStart>('monday')
 
 	const paymentProviders = [
@@ -44,12 +50,19 @@
 
 	$effect(() => {
 		if (!authed) return
+		if (mockMode) {
+			paymentDraft = {
+				provider: mockPaymentDefaults.provider || 'none',
+				handle: mockPaymentDefaults.handle || ''
+			}
+			return
+		}
 		void dashboard.loadStatus()
 		void dashboard.loadPaymentDefaults()
 	})
 
 	$effect(() => {
-		if (!authed) return
+		if (!authed || mockMode) return
 		paymentDraft = {
 			provider: dashboard.paymentDefaults.provider || 'none',
 			handle: dashboard.paymentDefaults.handle || ''
@@ -71,6 +84,11 @@
 	}
 
 	async function connectCalendar() {
+		if (mockMode) {
+			mockConnected = true
+			showToast('Mock mode: calendar connected')
+			return
+		}
 		await dashboard.reconnect()
 		if (dashboard.error) {
 			showToast(dashboard.error, true)
@@ -80,6 +98,12 @@
 	}
 
 	async function disconnectCalendar() {
+		if (mockMode) {
+			mockConnected = false
+			disconnectConfirm = false
+			showToast('Mock mode: calendar disconnected')
+			return
+		}
 		await dashboard.disconnect()
 		if (dashboard.error) {
 			showToast(dashboard.error, true)
@@ -90,6 +114,10 @@
 	}
 
 	async function savePayments() {
+		if (mockMode) {
+			showToast('Mock mode: payment info saved')
+			return
+		}
 		dashboard.paymentDefaults = {
 			provider: paymentDraft.provider === 'none' ? '' : paymentDraft.provider,
 			handle: paymentDraft.handle.trim()
@@ -135,7 +163,7 @@
 					<h3 class="admin-settings__section-label">Calendar sync</h3>
 					<p class="admin-settings__section-desc">Events sync to Google Calendar for you and your crew automatically.</p>
 				</div>
-				{#if dashboard.connected && !dashboard.connectionExpired}
+				{#if mockMode ? mockConnected : dashboard.connected && !dashboard.connectionExpired}
 					<span class="admin-settings__status admin-settings__status--ok"><span class="admin-settings__status-dot"></span>Connected</span>
 				{:else}
 					<span class="admin-settings__status admin-settings__status--warn"><span class="admin-settings__status-dot"></span>Not connected</span>
@@ -143,7 +171,7 @@
 			</div>
 
 			<div class="admin-settings__module">
-				{#if dashboard.connected && !dashboard.connectionExpired}
+				{#if mockMode ? mockConnected : dashboard.connected && !dashboard.connectionExpired}
 					<div class="admin-settings__connected-row">
 						<span class="admin-settings__connected-label">Google Calendar connected</span>
 						{#if !disconnectConfirm}
@@ -198,7 +226,7 @@
 					</div>
 				</fieldset>
 				<div class="admin-settings__actions">
-					<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={saveCalendarSettings} disabled={!weekStartChanged}>Save</button>
+					<AdminActionButton variant="primary" icon={Save} onclick={saveCalendarSettings} disabled={!weekStartChanged}>Save</AdminActionButton>
 				</div>
 			</div>
 		</section>
@@ -244,7 +272,7 @@
 				</div>
 				<p class="admin-settings__field-hint">Members see this after booking so they know where to send payment.</p>
 				<div class="admin-settings__actions">
-					<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={savePayments} disabled={!paymentChanged}>Save</button>
+					<AdminActionButton variant="primary" icon={Save} onclick={savePayments} disabled={!paymentChanged}>Save</AdminActionButton>
 				</div>
 			</div>
 		</section>
