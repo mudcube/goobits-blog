@@ -564,10 +564,6 @@
 						onclick={() => (settingsOpen = false)}
 					></button>
 					<aside class="program-editor__settings">
-						<div class="program-editor__settings-head">
-							<strong>Program settings</strong>
-							<button type="button" class="admin-ui-btn" onclick={() => (settingsOpen = false)}>Close</button>
-						</div>
 						<div class="program-editor__settings-body">
 							<div class="program-editor__toggle-row">
 								<span>Accepting bookings</span>
@@ -730,7 +726,7 @@
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
 		gap: 0.25rem;
-		z-index: 24;
+		z-index: 9992;
 	}
 	.program-editor__emoji-option {
 		width: 34px;
@@ -937,7 +933,7 @@
 		inset: 0;
 		border: none;
 		background: transparent;
-		z-index: 20;
+		z-index: 9990 !important;
 	}
 	.program-editor__popover {
 		position: fixed;
@@ -946,14 +942,15 @@
 		--popover-control-bg: var(--elev-control);
 		--popover-control-border: var(--elev-border);
 		--popover-control-text: var(--elev-text);
-		background: linear-gradient(180deg, var(--elev-surface-2) 0%, var(--elev-surface-1) 100%);
+		background-color: color-mix(in srgb, var(--text) 88%, var(--bg) 12%);
+		background-image: none;
 		border: 1px solid var(--elev-border);
 		border-radius: 1rem;
 		box-shadow:
 			0 30px 65px color-mix(in srgb, black 24%, transparent),
 			0 8px 20px color-mix(in srgb, black 14%, transparent);
 		padding: 1rem;
-		z-index: 21;
+		z-index: 9991 !important;
 		color: var(--elev-text);
 	}
 	.program-editor__popover :global(.admin-ui-input) {
@@ -1003,7 +1000,7 @@
 		position: absolute;
 		width: 10px;
 		height: 10px;
-		background: var(--elev-surface-1);
+		background: color-mix(in srgb, var(--text) 88%, var(--bg) 12%);
 		border-left: 1px solid var(--elev-border);
 		border-top: 1px solid var(--elev-border);
 		top: -6px;
@@ -1114,33 +1111,26 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		top: 2.5rem;
+		top: calc(2.5rem + 1px);
 		border: none;
 		background: color-mix(in srgb, var(--text) 68%, transparent);
-		z-index: 39;
+		z-index: 9993 !important;
 	}
 	.program-editor__settings {
 		position: fixed;
-		top: 2.5rem;
+		top: calc(2.5rem + 1px);
 		right: 0;
 		bottom: 0;
-		width: min(24rem, 94vw);
-		height: calc(100vh - 2.5rem);
+		width: min(20rem, 90vw);
+		height: calc(100vh - 2.5rem - 1px);
 		border-left: 1px solid var(--elev-border);
-		background: linear-gradient(180deg, var(--elev-surface-2) 0%, var(--elev-surface-1) 100%);
-		z-index: 40;
+		background-color: color-mix(in srgb, var(--text) 86%, var(--bg) 14%);
+		background-image: none;
+		z-index: 9994 !important;
 		display: flex;
 		flex-direction: column;
 		color: var(--elev-text);
 	}
-	.program-editor__settings-head {
-		padding: 0.8rem 0.95rem;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		border-bottom: 1px solid var(--elev-border);
-	}
-	.program-editor__settings-head strong { font-size: 0.8rem; color: var(--elev-text); }
 	.program-editor__settings :global(.admin-ui-btn) {
 		background: var(--elev-control);
 		border-color: var(--elev-border);
@@ -1162,7 +1152,7 @@
 		color: #fff;
 	}
 	.program-editor__settings-body {
-		padding: 0.8rem 0.9rem;
+		padding: 0.95rem 0.9rem;
 		display: grid;
 		gap: 0.55rem;
 		overflow: auto;
@@ -1214,18 +1204,18 @@
 		color: var(--bg);
 		font-size: 0.8rem;
 		font-weight: 700;
-		z-index: 120;
+		z-index: 9995;
 	}
 	.program-editor__toast--error { background: color-mix(in srgb, #ef4444 86%, var(--bg) 14%); }
 
 	@media (max-width: 1080px) {
 		.program-editor__settings-overlay {
-			top: 2.5rem;
+			top: calc(2.5rem + 1px);
 		}
 		.program-editor__settings {
-			width: min(22rem, 94vw);
-			top: 2.5rem;
-			height: calc(100vh - 2.5rem);
+			width: min(20rem, 90vw);
+			top: calc(2.5rem + 1px);
+			height: calc(100vh - 2.5rem - 1px);
 		}
 	}
 </style>
