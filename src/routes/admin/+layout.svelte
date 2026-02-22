@@ -212,8 +212,8 @@
 		--admin-muted: var(--muted);
 		--admin-border: var(--border);
 		--admin-panel: var(--panel-bg);
-		--admin-active-bg: var(--shell-nav-link-active-bg);
-		--admin-active-fg: var(--shell-nav-link-active);
+		--admin-active-bg: color-mix(in srgb, var(--text) 10%, transparent);
+		--admin-active-fg: var(--text);
 		--admin-hover-bg: var(--shell-nav-link-hover-bg);
 		--admin-hover-fg: var(--shell-nav-link-hover);
 		--admin-nav-link: var(--shell-nav-link);
@@ -548,6 +548,11 @@
 		background: var(--admin-active-bg);
 		color: var(--admin-active-fg);
 		font-weight: 400;
+		box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 14%, transparent);
+	}
+	.social-admin__nav-item--active:hover {
+		background: var(--admin-active-bg);
+		color: var(--admin-active-fg);
 	}
 
 	/* --- Logout --- */

@@ -27,10 +27,7 @@ const mockMode = $derived($page.url.searchParams.get('mock') === '1')
 
 	function openEventDetail(eventId: number) {
 		if (mockMode) {
-			const mockEvent = mockDashboardEvents.find((event) => event.id === eventId)
-			if (mockEvent?.activitySlug) {
-				void goto(`/admin/events/${mockEvent.activitySlug}/?mock=1`)
-			}
+			void goto(`/admin/events/${eventId}/?mock=1`)
 			return
 		}
 		if (isMobile) {
