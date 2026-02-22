@@ -458,9 +458,9 @@
 								<span aria-hidden="true">…</span>
 							{:else}
 								{#if providerConnected(provider.value)}
-									<X size={14} strokeWidth={2} />
+									<X size={16} strokeWidth={2} />
 								{:else}
-									<Plus size={14} strokeWidth={2} />
+									<Plus size={16} strokeWidth={2} />
 								{/if}
 							{/if}
 						</button>
@@ -520,7 +520,7 @@
 							aria-pressed={paymentMethods[provider.value].enabled}
 						>
 							<span class="admin-settings__platform-icon" aria-hidden="true">
-								<provider.icon size={14} strokeWidth={2} />
+								<provider.icon size={16} strokeWidth={2} />
 							</span>
 							<span class="admin-settings__platform-label">{provider.label}</span>
 							<span class="admin-settings__payment-state" class:admin-settings__payment-state--on={paymentMethods[provider.value].enabled} class:admin-settings__payment-state--off={!paymentMethods[provider.value].enabled}>
@@ -663,6 +663,11 @@
 		justify-content: center;
 	}
 
+	.admin-settings__sync-action:hover:not(:disabled) {
+		transform: none;
+		box-shadow: none;
+	}
+
 	.admin-settings__sync-main {
 		display: flex;
 		align-items: center;
@@ -680,8 +685,8 @@
 	}
 
 	.admin-settings__sync-icon svg {
-		width: 1.1rem;
-		height: 1.1rem;
+		width: 1rem;
+		height: 1rem;
 		display: block;
 	}
 
@@ -750,11 +755,17 @@
 	}
 
 	.admin-settings__platform-icon {
-		width: 1.15rem;
-		height: 1.15rem;
+		width: 1.35rem;
+		height: 1.35rem;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.admin-settings__platform-icon :global(svg) {
+		width: 1rem;
+		height: 1rem;
+		display: block;
 	}
 
 	.admin-settings__platform-label {
