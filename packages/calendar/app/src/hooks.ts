@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit'
 import type { Handle } from '@sveltejs/kit'
+import { dev } from '$app/environment'
 import { getAdminAuth, getCalendarAuth } from '@calendar/kit'
 import { getCalendarConfig, type CalendarConfigInput } from '@calendar/core'
 import { buildEnv } from '@calendar/kit'
@@ -8,14 +9,17 @@ import { D1SessionAdapter } from '@goobits/auth/adapters'
 type CalendarUserRow = { id: string | number }
 
 async function tryBootstrapDevCalendarSession(event: Parameters<Handle>[0]['event']) {
-	const previewFlag = event.url.searchParams.get('preview')
+	if (!dev) return false
+
+	const requestUrl = new URL(event.request.url)
+	const previewFlag = requestUrl.searchParams.get('preview')
 	if (previewFlag !== '1') return false
 
 	const env = await buildEnv(event.platform)
 	if (env['NODE_ENV'] !== 'development') return false
 
-	const email = (event.url.searchParams.get('previewEmail') || 'preview-user@local.dev').trim().toLowerCase()
-	const name = (event.url.searchParams.get('previewName') || 'Preview User').trim()
+	const email = (requestUrl.searchParams.get('previewEmail') || 'preview-user@local.dev').trim().toLowerCase()
+	const name = (requestUrl.searchParams.get('previewName') || 'Preview User').trim()
 
 	const existing = await env.DB.prepare(
 		`SELECT id FROM calendar_users WHERE lower(email) = lower(?) LIMIT 1`

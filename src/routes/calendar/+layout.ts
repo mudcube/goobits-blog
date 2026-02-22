@@ -1,1 +1,1 @@
-export { prerender } from '@calendar/app/routes/calendar/layout'
+export const prerender = false

@@ -99,7 +99,7 @@ export async function runCalendarEventsFlow() {
 
 		await page.goto(`${BASE_URL}/admin/`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 		if (await page.locator('input[name="password"]').count()) throw new Error('admin auth failed')
-		await page.locator('.admin-page__title').first().waitFor({ timeout: 30000 })
+		await page.locator('.admin-page-hero__title, .social-home__main').first().waitFor({ timeout: 30000 })
 
 		const title = `E2E Calendar Event ${Date.now()}`
 		const waitlistTitle = `E2E Waitlist Event ${Date.now()}`

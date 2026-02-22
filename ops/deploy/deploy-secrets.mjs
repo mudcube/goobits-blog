@@ -4,11 +4,11 @@
  *
  * Reads key names from .env.production, takes their decrypted values
  * from process.env (injected by dotenvx run), and pipes them to
- * `wrangler secret bulk`.
+ * `wrangler pages secret bulk`.
  */
 
-import { execSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { readFileSync, rmSync, writeFileSync } from 'node:fs'
 
 const envFile = readFileSync('config/env/.env.production', 'utf8')
 const keys = envFile
@@ -21,6 +21,8 @@ const secrets = {}
 for (const key of keys) {
 	if (process.env[key]) secrets[key] = process.env[key]
 }
+const projectName = process.env.CF_PAGES_PROJECT || 'miko-art'
+const tempSecretsFile = '.wrangler-pages-secrets.json'
 
 const count = Object.keys(secrets).length
 if (count === 0) {
@@ -29,7 +31,15 @@ if (count === 0) {
 }
 
 console.log(`Pushing ${count} secrets to Cloudflare: ${Object.keys(secrets).join(', ')}`)
-execSync('wrangler secret bulk', {
-	input: JSON.stringify(secrets),
-	stdio: ['pipe', 'inherit', 'inherit']
-})
+writeFileSync(tempSecretsFile, JSON.stringify(secrets, null, 2))
+
+try {
+	const result = spawnSync('wrangler', ['pages', 'secret', 'bulk', tempSecretsFile, '--project-name', projectName], {
+		stdio: 'inherit'
+	})
+	if (result.status !== 0) {
+		process.exit(result.status ?? 1)
+	}
+} finally {
+	rmSync(tempSecretsFile, { force: true })
+}

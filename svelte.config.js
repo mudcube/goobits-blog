@@ -8,8 +8,16 @@ export default {
 	kit: {
 		adapter: adapterCloudflare({
 			routes: {
-				include: ['/api/*'],
-				exclude: ['<build>', '<files>', '<prerendered>']
+				include: [
+					'/api/*',
+					'/auth/*',
+					'/admin/*',
+					'/calendar/*',
+					'/register',
+					'/register/*',
+					'/verify-email',
+					'/verify-email/*'
+				]
 			}
 		}),
 		prerender: {
