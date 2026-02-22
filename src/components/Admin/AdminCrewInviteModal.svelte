@@ -10,7 +10,8 @@
 		onNameChange,
 		onCreate,
 		onCopy,
-		onText
+		onText,
+		onCancelInvite
 	} = $props<{
 		open?: boolean
 		step?: 1 | 2
@@ -21,6 +22,7 @@
 		onCreate: () => void
 		onCopy: () => void
 		onText: () => void
+		onCancelInvite: () => void
 	}>()
 </script>
 
@@ -33,7 +35,6 @@
 					<div class="admin-crew-modal__field">
 						<label for="crew-invite-name">Who's this for?</label>
 						<input id="crew-invite-name" class="admin-ui-input" type="text" placeholder="e.g. Sarah" value={inviteName} oninput={(event) => onNameChange((event.currentTarget as HTMLInputElement).value)} />
-						<p>Just a label so you remember who you sent it to.</p>
 					</div>
 					<div class="admin-crew-modal__actions">
 						<button type="button" class="admin-ui-btn" onclick={onClose}>Cancel</button>
@@ -44,22 +45,21 @@
 				<div class="admin-crew-modal__body">
 					<div class="admin-crew-modal__icon">🎉</div>
 					<div class="admin-crew-modal__title admin-crew-modal__title--center">Invite for {inviteName || 'friend'}</div>
-					<div class="admin-crew-modal__url-box">
-						<span class="admin-crew-modal__url-text">{inviteUrl}</span>
-						<button type="button" class="admin-ui-btn" onclick={onCopy}>Copy</button>
-					</div>
+						<div class="admin-crew-modal__url-box">
+							<span class="admin-crew-modal__url-text">{inviteUrl}</span>
+							<button type="button" class="admin-ui-btn admin-crew-modal__url-copy" aria-label="Copy invite link" title="Copy invite link" onclick={onCopy}>
+								<Copy size={14} strokeWidth={2} />
+							</button>
+						</div>
 					<div class="admin-crew-modal__share-row">
 						<button type="button" class="admin-ui-btn" onclick={onText}>
 							<Send size={14} strokeWidth={2} />
 							<span>Text it</span>
 						</button>
-						<button type="button" class="admin-ui-btn" onclick={onCopy}>
-							<Copy size={14} strokeWidth={2} />
-							<span>Copy</span>
-						</button>
 					</div>
 					<p class="admin-crew-modal__hint">Link expires in 7 days · single use</p>
-					<div class="admin-crew-modal__actions admin-crew-modal__actions--center">
+					<div class="admin-crew-modal__actions">
+						<button type="button" class="admin-ui-btn admin-ui-btn--danger" onclick={onCancelInvite}>Cancel invite</button>
 						<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={onClose}>Done</button>
 					</div>
 				</div>
@@ -84,11 +84,14 @@
 	}
 
 	.admin-crew-modal {
-		width: min(100%, 22rem);
+		width: 22rem;
+		max-width: 100%;
 		border-radius: 1.1rem;
 		border: 1px solid color-mix(in srgb, var(--admin-accent) 18%, transparent);
 		background: var(--bg);
 		box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.1);
+		overflow: hidden;
+		transform: translateY(-1.25rem);
 	}
 
 	.admin-crew-modal__body {
@@ -128,7 +131,6 @@
 		font-weight: 600;
 	}
 
-	.admin-crew-modal__field p,
 	.admin-crew-modal__hint {
 		margin: 0;
 		font-size: 0.69rem;
@@ -139,6 +141,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
+		min-width: 0;
 		padding: 0.55rem 0.7rem;
 		border-radius: 0.5rem;
 		border: 1px solid color-mix(in srgb, var(--admin-accent) 18%, transparent);
@@ -146,14 +149,26 @@
 	}
 
 	.admin-crew-modal__url-text {
+		display: block;
 		flex: 1;
 		min-width: 0;
+		max-width: 100%;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		font-size: 0.78rem;
 		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 		color: color-mix(in srgb, var(--admin-accent) 86%, var(--text) 14%);
+	}
+
+	.admin-crew-modal__url-copy {
+		min-width: 32px;
+		width: 32px;
+		padding: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
 	}
 
 	.admin-crew-modal__share-row {
@@ -175,13 +190,13 @@
 		gap: 0.4rem;
 	}
 
-	.admin-crew-modal__actions--center {
-		justify-content: center;
-	}
-
 	@media (max-width: 820px) {
 		.admin-crew-modal__overlay {
 			inset: 0;
+		}
+
+		.admin-crew-modal {
+			transform: none;
 		}
 	}
 </style>

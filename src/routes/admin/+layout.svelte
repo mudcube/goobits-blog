@@ -4,7 +4,7 @@
 	import { page } from '$app/stores'
 	import { enhance } from '$app/forms'
 	import { getCalendarUiConfig } from '@calendar/ui/config'
-	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut, Plus, UserPlus, ArrowLeft, Save } from '@lucide/svelte'
+	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut, CalendarPlus, UserPlus, ArrowLeft, Save } from '@lucide/svelte'
 	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 
@@ -119,48 +119,48 @@
 <div class="social-admin">
 	{#if showBreadcrumbs($page.url.pathname)}
 		<nav class="social-admin__breadcrumbs" aria-label="Breadcrumbs">
-			<div class="social-admin__breadcrumbs-body">
-				{#each breadcrumbs($page.url.pathname) as item, i}
-					{#if item.href && i < breadcrumbs($page.url.pathname).length - 1}
-						<a href={item.href}>{item.label}</a>
+			<div class="social-admin__breadcrumbs-inner">
+				<div class="social-admin__breadcrumbs-body">
+					{#each breadcrumbs($page.url.pathname) as item, i}
+						{#if item.href && i < breadcrumbs($page.url.pathname).length - 1}
+							<a href={item.href}>{item.label}</a>
+						{:else}
+							<span>{item.label}</span>
+						{/if}
+						{#if i < breadcrumbs($page.url.pathname).length - 1}
+							<span class="social-admin__crumb-sep">&rsaquo;</span>
+						{/if}
+						{/each}
+					</div>
+				<div
+					class="social-admin__breadcrumbs-actions"
+					class:social-admin__breadcrumbs-actions--empty={
+						!(
+							isProgramEditorRoute($page.url.pathname) ||
+							isDashboardRoute($page.url.pathname) ||
+							isEventsIndexRoute($page.url.pathname) ||
+							isEventsNewRoute($page.url.pathname) ||
+							isCrewRoute($page.url.pathname)
+						)
+					}
+				>
+					{#if isProgramEditorRoute($page.url.pathname)}
+						<AdminActionButton variant="subtle" icon={Settings} onclick={triggerProgramEditorSettings}>Settings</AdminActionButton>
+						<AdminActionButton variant="primary" icon={Save} onclick={triggerProgramEditorSave}>Save</AdminActionButton>
+					{:else if isEventsIndexRoute($page.url.pathname)}
+						<AdminActionButton variant="primary" icon={CalendarPlus} href={hrefWithMock('/admin/events/new/')}>New</AdminActionButton>
+					{:else if isEventsNewRoute($page.url.pathname)}
+						<AdminActionButton
+							variant="subtle"
+							icon={ArrowLeft}
+							onclick={() => void goto(hrefWithMock('/admin/events/'))}
+						>Back to Events</AdminActionButton>
+					{:else if isCrewRoute($page.url.pathname)}
+						<AdminActionButton variant="primary" icon={UserPlus} onclick={triggerCrewInvite}>Invite</AdminActionButton>
 					{:else}
-						<span>{item.label}</span>
+						<span aria-hidden="true"></span>
 					{/if}
-					{#if i < breadcrumbs($page.url.pathname).length - 1}
-						<span class="social-admin__crumb-sep">&rsaquo;</span>
-					{/if}
-				{/each}
-			</div>
-			<div
-				class="social-admin__breadcrumbs-actions"
-				class:social-admin__breadcrumbs-actions--empty={
-					!(
-						isProgramEditorRoute($page.url.pathname) ||
-						isDashboardRoute($page.url.pathname) ||
-						isEventsIndexRoute($page.url.pathname) ||
-						isEventsNewRoute($page.url.pathname) ||
-						isCrewRoute($page.url.pathname)
-					)
-				}
-			>
-				{#if isProgramEditorRoute($page.url.pathname)}
-					<AdminActionButton variant="subtle" icon={Settings} onclick={triggerProgramEditorSettings}>Settings</AdminActionButton>
-					<AdminActionButton variant="primary" icon={Save} onclick={triggerProgramEditorSave}>Save</AdminActionButton>
-				{:else if isDashboardRoute($page.url.pathname)}
-					<AdminActionButton variant="primary" icon={Plus} href={hrefWithMock('/admin/events/new/')}>New</AdminActionButton>
-				{:else if isEventsIndexRoute($page.url.pathname)}
-					<AdminActionButton variant="primary" icon={Plus} href={hrefWithMock('/admin/events/new/')}>New Event</AdminActionButton>
-				{:else if isEventsNewRoute($page.url.pathname)}
-					<AdminActionButton
-						variant="subtle"
-						icon={ArrowLeft}
-						onclick={() => void goto(hrefWithMock('/admin/events/'))}
-					>Back to Events</AdminActionButton>
-				{:else if isCrewRoute($page.url.pathname)}
-					<AdminActionButton variant="primary" icon={UserPlus} onclick={triggerCrewInvite}>Invite</AdminActionButton>
-				{:else}
-					<span aria-hidden="true"></span>
-				{/if}
+				</div>
 			</div>
 		</nav>
 	{/if}
@@ -169,7 +169,12 @@
 		<a class="social-admin__brand" href={hrefWithMock('/admin/events/')}>Calendar</a>
 		<nav class="social-admin__nav" aria-label="Admin">
 			{#each primaryNav as item}
-				<a class="social-admin__nav-item" class:social-admin__nav-item--active={active(item.href)} href={hrefWithMock(item.href)}>
+				<a
+					class="social-admin__nav-item"
+					class:social-admin__nav-item--active={active(item.href)}
+					aria-current={active(item.href) ? 'page' : undefined}
+					href={hrefWithMock(item.href)}
+				>
 					<item.icon size={16} strokeWidth={1.8} />
 					<span>{item.label}</span>
 				</a>
@@ -177,7 +182,12 @@
 		</nav>
 		<div class="social-admin__sidebar-spacer"></div>
 		{#each footerNav as item}
-			<a class="social-admin__nav-item" class:social-admin__nav-item--active={active(item.href)} href={hrefWithMock(item.href)}>
+			<a
+				class="social-admin__nav-item"
+				class:social-admin__nav-item--active={active(item.href)}
+				aria-current={active(item.href) ? 'page' : undefined}
+				href={hrefWithMock(item.href)}
+			>
 				<item.icon size={16} strokeWidth={1.8} />
 				<span>{item.label}</span>
 			</a>
@@ -223,7 +233,8 @@
 		--admin-selected-bg: color-mix(in srgb, var(--text) 11%, var(--bg) 89%);
 		--admin-focus-ring: color-mix(in srgb, #0a84ff 52%, transparent);
 		--admin-accent: color-mix(in srgb, var(--link) 72%, #7a5af8 28%);
-		--admin-content-max: 72rem;
+		--admin-content-max: 720px;
+		--admin-content-pad-x: clamp(1.5rem, 2.2vw, 2rem);
 		--admin-card-bg: color-mix(in srgb, var(--admin-accent) 6%, var(--bg) 94%);
 		--admin-card-border: color-mix(in srgb, var(--admin-accent) 18%, transparent);
 		--admin-card-bg-hover: color-mix(in srgb, var(--admin-accent) 10%, var(--bg) 90%);
@@ -503,6 +514,7 @@
 	}
 
 	.social-admin__nav-item {
+		position: relative;
 		display: flex;
 		align-items: center;
 		gap: 0.625rem;
@@ -517,6 +529,11 @@
 		cursor: pointer;
 		transition: background 0.15s, color 0.15s;
 	}
+	.social-admin__nav-item :global(svg) {
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+	}
 	.social-admin__nav-item:hover {
 		background: var(--admin-hover-bg);
 		color: var(--admin-hover-fg);
@@ -528,7 +545,7 @@
 	.social-admin__nav-item--active {
 		background: var(--admin-active-bg);
 		color: var(--admin-active-fg);
-		font-weight: 500;
+		font-weight: 600;
 	}
 
 	/* --- Logout --- */
@@ -566,15 +583,21 @@
 	.social-admin__breadcrumbs {
 		grid-column: 2;
 		grid-row: 1;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem;
-		padding: 0.5rem 1.25rem;
+		display: block;
+		padding: 0.5rem var(--admin-content-pad-x);
 		min-height: 2.5rem;
 		border-bottom: 1px solid color-mix(in srgb, var(--admin-border) 60%, transparent);
 		font-size: 0.76rem;
 		box-sizing: border-box;
+	}
+	.social-admin__breadcrumbs-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		width: 100%;
+		max-width: var(--admin-content-max);
+		min-height: 1.5rem;
 	}
 	.social-admin__breadcrumbs-body {
 		display: flex;
@@ -613,7 +636,10 @@
 		grid-row: 2;
 		grid-column: 2;
 		width: 100%;
-		padding: 1.1rem 1rem 1.6rem 0.85rem;
+		max-width: none;
+		margin: 0;
+		flex: initial;
+		padding: 1.1rem var(--admin-content-pad-x) 1.6rem;
 		min-width: 0;
 		overflow: visible;
 		background:

@@ -40,6 +40,7 @@
 	let inviteModalOpen = $state(false)
 	let inviteModalStep = $state<1 | 2>(1)
 	let inviteNameDraft = $state('')
+	let createdInviteId = $state('')
 	let createdInviteCode = $state('')
 
 	$effect(() => {
@@ -274,14 +275,16 @@
 		})
 	}
 
-	function openInviteModal() {
+	async function openInviteModal() {
+		inviteNameDraft = ''
+		createdInviteId = ''
+		createdInviteCode = ''
 		inviteModalOpen = true
 		inviteModalStep = 1
-		inviteNameDraft = ''
-		createdInviteCode = ''
 	}
 
 	async function createInviteFromModal() {
+		const inviteName = inviteNameDraft.trim() || 'friend'
 		if (mockMode) {
 			const code = Math.random().toString(36).slice(2, 7)
 			const id = `inv-${Date.now()}`
@@ -289,18 +292,19 @@
 				{
 					id,
 					code,
-					email: inviteNameDraft.trim() ? `${inviteNameDraft.trim()}@example.com` : '',
+					email: `${inviteName}@example.com`,
 					created_at: Math.floor(Date.now() / 1000),
 					expires_in_days: 7
 				},
 				...mockInvitesState
 			]
+			createdInviteId = id
 			createdInviteCode = code
 			inviteModalStep = 2
 			return
 		}
 		const beforeIds = new Set(invites.map((invite) => String(invite['id'] || invite['code'] || '')))
-		members.inviteEmail = inviteNameDraft.trim() ? `${inviteNameDraft.trim()}@invite.local` : ''
+		members.inviteEmail = `${inviteName}@invite.local`
 		await members.createInvite()
 		if (members.error) {
 			showToast(members.error)
@@ -315,6 +319,7 @@
 			showToast('Invite created')
 			return
 		}
+		createdInviteId = String(created['id'] || '')
 		createdInviteCode = String(created['code'] || '')
 		inviteModalStep = 2
 	}
@@ -326,13 +331,78 @@
 
 	function textCreatedInvite() {
 		const url = createdInviteUrl()
-		if (!url) return
+		if (!url) {
+			showToast("Couldn't create invite link")
+			return
+		}
+		showToast('Opening Messages…')
 		const smsUrl = `sms:?&body=${encodeURIComponent(url)}`
 		window.open(smsUrl, '_self')
 	}
 
+	async function copyInviteWithToast(code: string) {
+		if (!code) {
+			showToast("Couldn't copy link")
+			return
+		}
+		try {
+			await Promise.resolve(members.copyInvite(code))
+			if (members.error) {
+				showToast(members.error)
+				return
+			}
+			showToast('Invite link copied')
+		} catch {
+			showToast("Couldn't copy link")
+		}
+	}
+
+	async function deleteInviteWithToast(id: string) {
+		if (mockMode) {
+			mockInvitesState = mockInvitesState.filter((invite) => invite.id !== id)
+			showToast('Invite deleted')
+			return
+		}
+		await members.deleteInvite(id)
+		if (members.error) {
+			showToast(members.error)
+			return
+		}
+		showToast('Invite deleted')
+	}
+
 	function onTopbarCreateInvite() {
-		openInviteModal()
+		void openInviteModal()
+	}
+
+	async function cancelCreatedInvite() {
+		if (!createdInviteCode) {
+			inviteModalOpen = false
+			return
+		}
+		if (mockMode) {
+			if (createdInviteId) {
+				mockInvitesState = mockInvitesState.filter((invite) => invite.id !== createdInviteId)
+			}
+			inviteModalOpen = false
+			showToast('Invite canceled')
+			return
+		}
+
+		let inviteId = createdInviteId
+		if (!inviteId) {
+			const found = (members.invites as InviteRow[]).find((invite) => String(invite['code'] || '') === createdInviteCode)
+			inviteId = found ? String(found['id'] || '') : ''
+		}
+		if (inviteId) {
+			await members.deleteInvite(inviteId)
+			if (members.error) {
+				showToast(members.error)
+				return
+			}
+		}
+		inviteModalOpen = false
+		showToast('Invite canceled')
 	}
 
 	onMount(() => {
@@ -343,7 +413,7 @@
 
 {#if authed}
 	<div class="social-crew admin-content">
-		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Manage member access and invites." />
+		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Manage member access & invites." />
 
 		<h4>ACTIVE MEMBERS ({users.length})</h4>
 		<div class="social-crew__list">
@@ -362,14 +432,8 @@
 		<h4>PENDING INVITES ({inviteItems.length})</h4>
 		<AdminCrewInviteCards
 			invites={inviteItems}
-			onCopy={(code) => members.copyInvite(code)}
-			onDelete={(id) => {
-				if (mockMode) {
-					mockInvitesState = mockInvitesState.filter((invite) => invite.id !== id)
-					return
-				}
-				void members.deleteInvite(id)
-			}}
+			onCopy={(code) => void copyInviteWithToast(code)}
+			onDelete={(id) => void deleteInviteWithToast(id)}
 		/>
 
 		{#if expandedUserId}
@@ -404,8 +468,9 @@
 		onClose={() => (inviteModalOpen = false)}
 		onNameChange={(value) => (inviteNameDraft = value)}
 		onCreate={() => void createInviteFromModal()}
-		onCopy={() => members.copyInvite(createdInviteCode)}
+		onCopy={() => void copyInviteWithToast(createdInviteCode)}
 		onText={textCreatedInvite}
+		onCancelInvite={() => void cancelCreatedInvite()}
 	/>
 
 	{#if toastVisible}

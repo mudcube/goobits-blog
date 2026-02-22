@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ChevronRight } from '@lucide/svelte'
+	import AdminChevronRowCard from '@components/Admin/AdminChevronRowCard.svelte'
 
 	const {
 		name,
@@ -18,53 +18,28 @@
 	}>()
 </script>
 
-<button type="button" class="admin-crew-member" onclick={onclick}>
-	<div class="admin-crew-member__avatar" class:admin-crew-member__avatar--you={isYou}>
+<AdminChevronRowCard {onclick} ariaLabel={`Open ${name}`}>
+	{#snippet start()}
+		<span class="admin-crew-member__avatar" class:admin-crew-member__avatar--you={isYou}>
+			{#if isYou}
+				You
+			{:else}
+				{initials}
+			{/if}
+		</span>
+	{/snippet}
+	<div class="admin-crew-member__top">
+		<span class="admin-crew-member__name">{name}</span>
 		{#if isYou}
-			You
-		{:else}
-			{initials}
+			<span class="admin-crew-member__you">you</span>
+		{:else if badge}
+			<span class="admin-crew-member__badge">{badge}</span>
 		{/if}
 	</div>
-	<div class="admin-crew-member__body">
-		<div class="admin-crew-member__top">
-			<span class="admin-crew-member__name">{name}</span>
-			{#if isYou}
-				<span class="admin-crew-member__you">you</span>
-			{:else if badge}
-				<span class="admin-crew-member__badge">{badge}</span>
-			{/if}
-		</div>
-		<div class="admin-crew-member__detail">{detail}</div>
-	</div>
-	<div class="admin-crew-member__right" aria-hidden="true">
-		<ChevronRight size={16} strokeWidth={2} />
-	</div>
-</button>
+	<div class="admin-crew-member__detail">{detail}</div>
+</AdminChevronRowCard>
 
 <style>
-	.admin-crew-member {
-		width: 100%;
-		display: flex;
-		align-items: center;
-		gap: 0.875rem;
-		padding: 0.75rem 0.875rem;
-		border-radius: 0.875rem;
-		border: 1px solid var(--admin-card-border);
-		background: var(--admin-card-bg);
-		text-align: left;
-		cursor: pointer;
-		color: inherit;
-		font: inherit;
-		transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
-	}
-
-	.admin-crew-member:hover {
-		background: var(--admin-card-bg-hover, var(--admin-card-bg));
-		box-shadow: 0 4px 16px color-mix(in srgb, var(--admin-accent) 8%, transparent);
-		transform: translateY(-1px);
-	}
-
 	.admin-crew-member__avatar {
 		width: 2.5rem;
 		height: 2.5rem;
@@ -84,11 +59,6 @@
 		background: color-mix(in srgb, var(--admin-accent) 22%, transparent);
 		border: 1.5px solid color-mix(in srgb, var(--admin-accent) 30%, transparent);
 		font-size: 0.68rem;
-	}
-
-	.admin-crew-member__body {
-		flex: 1;
-		min-width: 0;
 	}
 
 	.admin-crew-member__top {
@@ -128,12 +98,4 @@
 		margin-top: 0.1rem;
 	}
 
-	.admin-crew-member__right {
-		color: color-mix(in srgb, var(--text) 36%, transparent);
-		flex-shrink: 0;
-	}
-
-	.admin-crew-member:hover .admin-crew-member__right {
-		color: color-mix(in srgb, var(--text) 52%, transparent);
-	}
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Copy, Trash2 } from '@lucide/svelte'
+	import { Copy, Trash2, Mail } from '@lucide/svelte'
 	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
 
 	type InviteItem = {
@@ -22,14 +22,16 @@
 	{:else}
 		{#each invites as invite (invite.id)}
 			<div class="admin-crew-invites__card">
-				<div class="admin-crew-invites__icon">✉️</div>
+				<div class="admin-crew-invites__icon" aria-hidden="true">
+					<Mail size={16} strokeWidth={2} />
+				</div>
 				<div class="admin-crew-invites__body">
 					<div class="admin-crew-invites__label">{invite.label}</div>
 					<div class="admin-crew-invites__detail">{invite.detail}</div>
 				</div>
 				<div class="admin-crew-invites__actions">
-					<AdminActionButton variant="subtle" icon={Copy} onclick={() => onCopy(invite.code)}>Copy</AdminActionButton>
-					<AdminActionButton variant="danger" icon={Trash2} onclick={() => onDelete(invite.id)}>Delete</AdminActionButton>
+					<AdminActionButton variant="subtle" icon={Copy} ariaLabel="Copy invite link" onclick={() => onCopy(invite.code)} />
+					<AdminActionButton variant="danger" icon={Trash2} ariaLabel="Delete invite" onclick={() => onDelete(invite.id)} />
 				</div>
 			</div>
 		{/each}
@@ -64,9 +66,9 @@
 		border-radius: 999px;
 		display: grid;
 		place-items: center;
-		font-size: 1.1rem;
 		flex-shrink: 0;
 		background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
+		color: color-mix(in srgb, var(--admin-accent) 76%, var(--text) 24%);
 	}
 
 	.admin-crew-invites__body {

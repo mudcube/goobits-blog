@@ -4,6 +4,7 @@
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
+	import AdminChevronRowCard from '@components/Admin/AdminChevronRowCard.svelte'
 	import { getAdminActivityColor, getAdminActivityEmoji } from '$lib/admin/activity-display'
 	import { formatAdminDayLabel, formatAdminTimeLabel } from '$lib/admin/date-format'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
@@ -62,7 +63,7 @@
 		<AdminPageHero
 			eyebrow="Programs"
 			title="Events"
-			subtitle="Manage program pages and upcoming sessions."
+			subtitle="Manage program pages & upcoming sessions."
 		/>
 
 		<h4>ACTIVITY PAGES</h4>
@@ -118,18 +119,15 @@
 				</div>
 			{:else}
 				{#each recentEventsSource.slice(0, 8) as recent}
-					<button
-						type="button"
-						class="social-events__past-row admin-ui-card"
-						onclick={() => goto(hrefWithMock(eventRoute(recent)))}
-					>
-						<span class="social-events__past-emoji">{emojiForActivity(recent.activityLabel, recent.activitySlug)}</span>
+					<AdminChevronRowCard compact={true} onclick={() => goto(hrefWithMock(eventRoute(recent)))} ariaLabel={`Open ${recent.title}`}>
+						{#snippet start()}
+							<span class="social-events__past-emoji">{emojiForActivity(recent.activityLabel, recent.activitySlug)}</span>
+						{/snippet}
 						<div>
 							<div class="social-events__past-title">{recent.title}</div>
 							<div class="social-events__event-sub">{dayLabel(recent.startsAt)} · {recent.seatsTaken} went</div>
 						</div>
-						<span class="social-events__past-view admin-ui-btn">View</span>
-					</button>
+					</AdminChevronRowCard>
 				{/each}
 			{/if}
 		</div>
@@ -269,7 +267,7 @@
 		align-items: center;
 		justify-content: center;
 		font-size: 0.625rem;
-		font-weight: 700;
+		font-weight: 500;
 		line-height: 1;
 		padding: 0.15rem 0.4rem;
 		border-radius: 0.3rem;
@@ -293,27 +291,6 @@
 		gap: 0.375rem;
 	}
 
-	.social-events__past-row {
-		padding: 0.625rem 0.875rem;
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		width: 100%;
-		text-align: left;
-		cursor: pointer;
-		transition: border-color 120ms ease, box-shadow 120ms ease;
-	}
-
-	.social-events__past-row:hover {
-		border-color: color-mix(in srgb, var(--text) 20%, transparent);
-		box-shadow: 0 4px 14px var(--shadow-soft);
-	}
-
-	.social-events__past-row:focus-visible {
-		border-color: var(--admin-selected-border);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
-	}
-
 	.social-events__past-row--empty {
 		justify-content: flex-start;
 	}
@@ -328,22 +305,6 @@
 		font-size: 1rem;
 		line-height: 1;
 		flex-shrink: 0;
-	}
-
-	.social-events__past-view {
-		background: transparent;
-		border-color: var(--admin-control-border);
-		color: color-mix(in srgb, var(--admin-control-fg) 82%, transparent);
-		font-size: 0.72rem;
-		min-height: 30px;
-		padding: 0 0.8rem;
-		transition: background 120ms ease, color 120ms ease;
-		margin-left: auto;
-		pointer-events: none;
-	}
-	.social-events__past-view:hover {
-		background: var(--admin-control-bg-hover);
-		color: var(--admin-control-fg);
 	}
 
 	.social-events__meta {
