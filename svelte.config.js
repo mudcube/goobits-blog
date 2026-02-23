@@ -11,12 +11,34 @@ export default {
 				include: [
 					'/api/*',
 					'/auth/*',
+					'/admin',
 					'/admin/*',
+					'/calendar',
 					'/calendar/*',
 					'/register',
 					'/register/*',
 					'/verify-email',
 					'/verify-email/*'
+				],
+				exclude: [
+					'/_app/*',
+					'/fonts/*',
+					'/media/*',
+					'/journal/*',
+					'/labs/*',
+					'/*.css',
+					'/*.js',
+					'/*.json',
+					'/*.map',
+					'/*.png',
+					'/*.jpg',
+					'/*.jpeg',
+					'/*.svg',
+					'/*.txt',
+					'/*.xml',
+					'/*.ico',
+					'/*.webp',
+					'/*.avif'
 				]
 			}
 		}),
