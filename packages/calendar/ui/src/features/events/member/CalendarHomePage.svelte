@@ -4,11 +4,11 @@
 	import { formatWhen } from './formatWhen'
 	import { getCalendarUiConfig } from '../../../config'
 	import PillButton from '../../../primitives/PillButton.svelte'
-import Hero from '../../../primitives/Hero.svelte'
+	import Hero from '../../../primitives/Hero.svelte'
 	import MonthEventCalendar from './MonthEventCalendar.svelte'
 	let { data } = $props()
-	let upcoming = $state(data.upcoming ?? [])
-	let recent = $state(data.recent ?? [])
+	let upcoming = $state([])
+	let recent = $state([])
 	let pendingEventId = $state(null)
 	let feedError = $state('')
 	const calendarConfig = getCalendarUiConfig()

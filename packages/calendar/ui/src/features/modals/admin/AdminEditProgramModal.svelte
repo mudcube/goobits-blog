@@ -120,9 +120,10 @@
 						type="button"
 						class="admin-page__program-modal-toggle {dashboard.programDraft.enabled ? 'admin-page__program-modal-toggle--on' : ''}"
 						aria-pressed={dashboard.programDraft.enabled}
+						aria-label={dashboard.programDraft.enabled ? 'Disable bookings' : 'Enable bookings'}
 						onclick={() => updateProgramDraft({ enabled: !dashboard.programDraft.enabled })}
 					>
-						<span class="admin-page__program-modal-toggle-thumb" />
+						<span class="admin-page__program-modal-toggle-thumb"></span>
 					</button>
 				</div>
 				<div class="admin-page__field">
