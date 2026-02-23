@@ -8,8 +8,8 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "miko-art-db"
-database_id = "your-database-id-here"  # Replace after running: wrangler d1 create miko-art-db
+database_name = "miko-art-calendar-db"
+database_id = "cc86b2fc-459d-462f-bff3-e188e6650398"
 migrations_dir = "packages/calendar/migrations/sql"
 
 [vars]
