@@ -32,6 +32,7 @@
 	const recentEventsSource = $derived((mockMode ? mockDashboardRecentEvents : dashboard.recentEvents))
 
 	let expandedUserId = $state<string | null>(null)
+	let mockAccessRows = $state<Array<{ programSlug: string; allowed: boolean }>>([])
 	let toastMessage = $state('')
 	let toastVisible = $state(false)
 	let undoAction = $state<null | (() => Promise<void>)>(null)
@@ -224,7 +225,20 @@
 	})
 
 	async function toggleEdit(userId: string) {
-		if (mockMode) return
+		if (mockMode) {
+			if (expandedUserId === userId) {
+				expandedUserId = null
+				return
+			}
+			expandedUserId = userId
+			if (mockAccessRows.length === 0) {
+				mockAccessRows = [
+					{ programSlug: 'gym', allowed: true },
+					{ programSlug: 'circus', allowed: true }
+				]
+			}
+			return
+		}
 		if (expandedUserId === userId) {
 			expandedUserId = null
 			return
@@ -246,7 +260,10 @@
 
 	async function toggleAccessWithSave(programSlug: string) {
 		if (mockMode) {
-			showToast('Mock mode: access changes are preview-only')
+			mockAccessRows = mockAccessRows.map((row) =>
+				row.programSlug === programSlug ? { ...row, allowed: !row.allowed } : row
+			)
+			showToast('Mock mode: access updated (preview only)')
 			return
 		}
 		const before = members.accessRows.map((row) => ({ ...row }))
@@ -444,10 +461,10 @@
 			<div class="social-crew__access admin-ui-card">
 				<div class="social-crew__access-label">Program access</div>
 				<div class="social-crew__tags">
-					{#if members.accessLoading}
+					{#if accessLoading}
 						<span class="social-crew__meta">Loading access...</span>
 					{:else}
-						{#each members.accessRows as row}
+						{#each accessRows as row}
 							<button
 								type="button"
 								class="social-crew__tag admin-ui-chip"
@@ -537,3 +554,5 @@
 		z-index: 120;
 	}
 </style>
+	const accessRows = $derived((mockMode ? mockAccessRows : members.accessRows))
+	const accessLoading = $derived((mockMode ? false : members.accessLoading))
