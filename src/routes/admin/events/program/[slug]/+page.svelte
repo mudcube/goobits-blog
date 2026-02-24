@@ -30,6 +30,9 @@ const mockMode = $derived($page.url.searchParams.get('mock') === '1')
 	let toast = $state('')
 	let toastError = $state(false)
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
+	let autosaveTimer: ReturnType<typeof setTimeout> | null = null
+	let autosaveReady = $state(false)
+	let lastSavedSignature = $state('')
 
 	let emojiPickerOpen = $state(false)
 	let currentMonth = $state(new Date())
@@ -152,6 +155,28 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 			toast = ''
 			toastError = false
 		}, 2200)
+	}
+
+	function programSignature() {
+		const draft = dashboard.programDraft
+		return JSON.stringify({
+			slug: draft.slug.trim(),
+			label: draft.label.trim(),
+			activityName: draft.activityName.trim(),
+			pageTitle: draft.pageTitle.trim(),
+			eyebrow: draft.eyebrow.trim(),
+			heroTitleLine1: draft.heroTitleLine1.trim(),
+			heroTitleLine2: draft.heroTitleLine2.trim(),
+			heroSubtitle: draft.heroSubtitle.trim(),
+			description: draft.description.trim(),
+			icon: draft.icon.trim(),
+			eyebrowClass: draft.eyebrowClass.trim(),
+			glowClass: draft.glowClass.trim(),
+			formGlowClass: draft.formGlowClass.trim(),
+			serviceStatusNote: draft.serviceStatusNote.trim(),
+			enabled: draft.enabled,
+			sortOrder: Number(draft.sortOrder) || 0
+		})
 	}
 
 	function updateProgramField(field: keyof typeof dashboard.programDraft, value: string) {
@@ -377,6 +402,7 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 			flash(dashboard.error, true)
 			return
 		}
+		lastSavedSignature = programSignature()
 		flash('Program saved')
 	}
 
@@ -423,8 +449,24 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 		untilDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-30`
 		window.addEventListener('admin-program-editor-toggle-settings', onTopbarToggleSettings)
 		return () => {
+			if (autosaveTimer) clearTimeout(autosaveTimer)
 			window.removeEventListener('admin-program-editor-toggle-settings', onTopbarToggleSettings)
 		}
+	})
+
+	$effect(() => {
+		if (!authed || !initialized || mockMode) return
+		const signature = programSignature()
+		if (!autosaveReady) {
+			lastSavedSignature = signature
+			autosaveReady = true
+			return
+		}
+		if (signature === lastSavedSignature) return
+		if (autosaveTimer) clearTimeout(autosaveTimer)
+		autosaveTimer = setTimeout(() => {
+			void saveProgram()
+		}, 700)
 	})
 </script>
 
@@ -437,7 +479,7 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 		</div>
 	{/if}
 
-	<div class="program-editor">
+	<div class="program-editor admin-content">
 		<div class="program-editor__canvas-wrap">
 			<div class="program-editor__canvas">
 				<div class="program-editor__panel admin-ui-card">
@@ -614,6 +656,7 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 		font-family: var(--font-sans);
 		--bg: var(--bg);
 		--surface: color-mix(in srgb, var(--panel-bg) 88%, var(--text) 12%);
+		--popover-surface: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
 		--text: var(--text);
 		--text-2: color-mix(in srgb, var(--text) 55%, transparent);
 		--text-3: color-mix(in srgb, var(--text) 36%, transparent);
@@ -639,6 +682,7 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 			var(--bg);
 		min-height: calc(100vh - 2.25rem);
 		width: 100%;
+		max-width: var(--admin-content-max, 720px);
 		overflow-x: clip;
 		border-radius: 0.9rem;
 		border: 1px solid var(--border);
@@ -650,16 +694,16 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 		flex-wrap: wrap;
 		justify-content: flex-start;
 		align-items: flex-start;
-		gap: 1.25rem;
-		padding: clamp(1rem, 2.8vw, 2.5rem) clamp(0.75rem, 2vw, 2rem) 3rem;
+		gap: 1rem;
+		padding: 0 0 2rem 0;
 		max-width: 100%;
 	}
 
 	.program-editor__canvas {
-		width: min(100%, 860px);
-		max-width: 860px;
+		width: 100%;
+		max-width: 100%;
 		position: relative;
-		flex: 1 1 860px;
+		flex: 1 1 auto;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
@@ -840,8 +884,8 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 	.program-editor__popover {
 		position: fixed;
 		width: 306px;
-		--popover-surface: var(--surface);
-		--popover-control-bg: color-mix(in srgb, #faf6ff 88%, var(--surface) 12%);
+		--popover-surface: var(--popover-surface, color-mix(in srgb, var(--bg) 94%, var(--text) 6%));
+		--popover-control-bg: color-mix(in srgb, #faf6ff 88%, var(--popover-surface) 12%);
 		--popover-control-border: var(--border-s);
 		--popover-control-text: var(--text);
 		background-image: none;
