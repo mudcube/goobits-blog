@@ -7,6 +7,7 @@
 	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut, CalendarPlus, UserPlus, ArrowLeft, Pencil, Trash2 } from '@lucide/svelte'
 	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
+	import { adminEventDetailBreadcrumb } from '$lib/admin/breadcrumbs'
 
 	const { data, children } = $props<{ data: { user: unknown | null }; children: () => unknown }>()
 	const calendarConfig = getCalendarUiConfig()
@@ -43,9 +44,11 @@
 
 	function breadcrumbs(pathname: string) {
 		const normalized = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname
-		const items: Array<{ label: string; href?: string }> = [{ label: 'Admin', href: hrefWithMock('/admin/') }]
+		const items: Array<{ label: string; href?: string }> = [{ label: 'Dashboard', href: hrefWithMock('/admin/') }]
 		const eventsSingleSegment = normalized.match(/^\/admin\/events\/([^/]+)$/)
+		const crewSingleSegment = normalized.match(/^\/admin\/crew\/([^/]+)$/)
 		const eventLeaf = eventsSingleSegment?.[1] || ''
+		const crewLeaf = crewSingleSegment?.[1] || ''
 		const isEventId = /^\d+$/.test(eventLeaf)
 		const prettyLeaf = (value: string) =>
 			value
@@ -54,6 +57,7 @@
 				.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
 				.join(' ')
 		if (normalized === '/admin') return items
+		if (crewSingleSegment) return [...items, { label: 'Crew', href: hrefWithMock('/admin/crew/') }, { label: prettyLeaf(crewLeaf) }]
 		if (normalized.startsWith('/admin/crew')) return [...items, { label: 'Crew' }]
 		if (normalized === '/admin/settings' || normalized.startsWith('/admin/settings/')) return [...items, { label: 'Settings' }]
 		if (normalized === '/admin/events') return [...items, { label: 'Events' }]
@@ -63,7 +67,10 @@
 			return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: prettyLeaf(legacyLeaf) }]
 		}
 		if (eventsSingleSegment && !isEventId) return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: prettyLeaf(eventLeaf) }]
-		if (normalized.startsWith('/admin/events/')) return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: 'Event Detail' }]
+		if (normalized.startsWith('/admin/events/')) {
+			const detailLabel = $adminEventDetailBreadcrumb || 'Event Detail'
+			return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: detailLabel }]
+		}
 		return [...items, { label: adminSectionTitle(normalized) }]
 	}
 
@@ -194,7 +201,7 @@
 	{/if}
 
 	<aside class="social-admin__sidebar">
-		<a class="social-admin__brand" href={hrefWithMock('/admin/events/')}>Calendar</a>
+		<a class="social-admin__brand" href={hrefWithMock('/admin/events/')}>Admin</a>
 		<nav class="social-admin__nav" aria-label="Admin">
 			{#each primaryNav as item}
 				<a

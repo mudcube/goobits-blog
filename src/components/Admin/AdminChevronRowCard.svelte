@@ -4,6 +4,7 @@
 
 	const {
 		compact = false,
+		href = null,
 		onclick,
 		ariaLabel = undefined,
 		start,
@@ -11,6 +12,7 @@
 		end
 	} = $props<{
 		compact?: boolean
+		href?: string | null
 		onclick?: () => void
 		ariaLabel?: string
 		start?: Snippet
@@ -19,21 +21,39 @@
 	}>()
 </script>
 
-<button type="button" class="admin-chevron-row-card admin-ui-card admin-ui-card--interactive" class:admin-chevron-row-card--compact={compact} aria-label={ariaLabel} onclick={onclick}>
-	<div class="admin-chevron-row-card__start">
-		{@render start?.()}
-	</div>
-	<div class="admin-chevron-row-card__body">
-		{@render children()}
-	</div>
-	<div class="admin-chevron-row-card__end" aria-hidden="true">
-		{#if end}
-			{@render end()}
-		{:else}
-			<ChevronRight size={16} strokeWidth={2} />
-		{/if}
-	</div>
-</button>
+{#if href}
+	<a class="admin-chevron-row-card admin-ui-card admin-ui-card--interactive" class:admin-chevron-row-card--compact={compact} aria-label={ariaLabel} href={href} onclick={onclick}>
+		<div class="admin-chevron-row-card__start">
+			{@render start?.()}
+		</div>
+		<div class="admin-chevron-row-card__body">
+			{@render children()}
+		</div>
+		<div class="admin-chevron-row-card__end" aria-hidden="true">
+			{#if end}
+				{@render end()}
+			{:else}
+				<ChevronRight size={16} strokeWidth={2} />
+			{/if}
+		</div>
+	</a>
+{:else}
+	<button type="button" class="admin-chevron-row-card admin-ui-card admin-ui-card--interactive" class:admin-chevron-row-card--compact={compact} aria-label={ariaLabel} onclick={onclick}>
+		<div class="admin-chevron-row-card__start">
+			{@render start?.()}
+		</div>
+		<div class="admin-chevron-row-card__body">
+			{@render children()}
+		</div>
+		<div class="admin-chevron-row-card__end" aria-hidden="true">
+			{#if end}
+				{@render end()}
+			{:else}
+				<ChevronRight size={16} strokeWidth={2} />
+			{/if}
+		</div>
+	</button>
+{/if}
 
 <style>
 	.admin-chevron-row-card {
@@ -45,6 +65,7 @@
 		text-align: left;
 		color: inherit;
 		font: inherit;
+		text-decoration: none;
 	}
 
 	.admin-chevron-row-card--compact {

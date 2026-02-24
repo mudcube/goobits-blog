@@ -65,6 +65,7 @@ const mockMode = $derived($page.url.searchParams.get('mock') === '1')
 				<AdminDashboardContent
 					events={mockMode ? mockDashboardEvents : dashboard.events}
 					recentEvents={mockMode ? mockDashboardRecentEvents : dashboard.recentEvents}
+					{mockMode}
 					onOpenEvent={openEventDetail}
 				/>
 			{/if}

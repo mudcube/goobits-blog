@@ -2,6 +2,9 @@
 	import AdminCalendarWidget from '@components/Admin/AdminCalendarWidget.svelte'
 	import AdminDashboardTodayTimeline from '@components/Admin/AdminDashboardTodayTimeline.svelte'
 	import AdminDashboardRecentFeed from '@components/Admin/AdminDashboardRecentFeed.svelte'
+	import AdminChevronRowCard from '@components/Admin/AdminChevronRowCard.svelte'
+	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
+	import { formatAdminDayLabel, formatAdminTimeLabel } from '$lib/admin/date-format'
 
 	type Participant = {
 		name?: string | null
@@ -20,10 +23,11 @@
 		participants?: Participant[]
 	}
 
-	const { events, recentEvents, onOpenEvent } = $props<{
+	const { events, recentEvents, onOpenEvent, mockMode = false } = $props<{
 		events: DashboardEvent[]
 		recentEvents: DashboardEvent[]
 		onOpenEvent: (eventId: number) => void
+		mockMode?: boolean
 	}>()
 
 	let currentMonth = $state(new Date())
@@ -70,11 +74,29 @@
 		now.setHours(0, 0, 0, 0)
 		return d < now
 	}
+
+	const selectedDateEvents = $derived.by(() => {
+		if (!selectedDateIso) return []
+		return [...events]
+			.filter((event) => isoDay(new Date(event.startsAt)) === selectedDateIso)
+			.sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
+	})
+
+	const selectedDateLabel = $derived.by(() => {
+		if (!selectedDateIso) return ''
+		const [year, month, day] = selectedDateIso.split('-').map((part) => Number(part))
+		const date = new Date(year || 0, (month || 1) - 1, day || 1)
+		return date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
+	})
+
+	function timeLabel(iso: string) {
+		return formatAdminTimeLabel(iso)
+	}
 </script>
 
 <section class="admin-dashboard">
 	<AdminDashboardTodayTimeline {events} {onOpenEvent} />
-	<AdminDashboardRecentFeed {recentEvents} />
+	<AdminDashboardRecentFeed {recentEvents} {mockMode} />
 
 	<AdminCalendarWidget
 		currentMonth={currentMonth}
@@ -89,11 +111,59 @@
 		eventTone={eventToneFor}
 		compact={true}
 	/>
+
+	{#if selectedDateIso && selectedDateEvents.length > 0}
+		<div class="admin-dashboard__selected-day">
+			<h4>{selectedDateLabel}</h4>
+			<div class="admin-dashboard__selected-day-list">
+				{#each selectedDateEvents as event}
+					<AdminChevronRowCard compact={true} onclick={() => onOpenEvent(event.id)} ariaLabel={`Open ${event.title}`}>
+						{#snippet start()}
+							<span class="admin-dashboard__selected-day-emoji">{getAdminActivityEmoji(event.activityLabel, event.activitySlug || undefined)}</span>
+						{/snippet}
+						<div>
+							<div class="admin-dashboard__selected-day-title">{event.title}</div>
+							<div class="admin-dashboard__selected-day-sub">{formatAdminDayLabel(event.startsAt)} · {timeLabel(event.startsAt)}</div>
+						</div>
+					</AdminChevronRowCard>
+				{/each}
+			</div>
+		</div>
+	{/if}
 </section>
 
 <style>
 	.admin-dashboard {
 		display: grid;
 		gap: 1rem;
+	}
+
+	.admin-dashboard__selected-day {
+		display: grid;
+		gap: 0.4rem;
+	}
+
+	.admin-dashboard__selected-day-list {
+		display: grid;
+		gap: 0.375rem;
+	}
+
+	.admin-dashboard__selected-day-emoji {
+		font-size: 1rem;
+		line-height: 1;
+		flex-shrink: 0;
+	}
+
+	.admin-dashboard__selected-day-title {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: color-mix(in srgb, var(--text) 78%, transparent);
+	}
+
+	.admin-dashboard__selected-day-sub {
+		font-size: 0.74rem;
+		line-height: 1;
+		color: color-mix(in srgb, var(--text) 64%, transparent);
+		margin-top: 0.1rem;
 	}
 </style>

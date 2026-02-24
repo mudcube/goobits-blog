@@ -1,16 +1,18 @@
 <script lang="ts">
+	import { goto } from '$app/navigation'
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminMembersController } from '@calendar/ui/features/members/admin/admin-members.svelte'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import { createInviteShareLink } from '@calendar/ui/features/dashboard/admin/admin-dashboard'
+	import { Copy, Trash2, Mail } from '@lucide/svelte'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
 	import AdminCrewMemberCard from '@components/Admin/AdminCrewMemberCard.svelte'
-	import AdminCrewInviteCards from '@components/Admin/AdminCrewInviteCards.svelte'
+	import AdminMetaCards from '@components/Admin/AdminMetaCards.svelte'
 	import AdminCrewInviteModal from '@components/Admin/AdminCrewInviteModal.svelte'
 	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
-	import { isAdminMockMode } from '$lib/admin/mock/mock-mode'
+	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 	import {
 		mockCrewInvites,
 		mockCrewUsers,
@@ -33,6 +35,8 @@
 
 	let expandedUserId = $state<string | null>(null)
 	let mockAccessRows = $state<Array<{ programSlug: string; allowed: boolean }>>([])
+	const accessRows = $derived((mockMode ? mockAccessRows : members.accessRows))
+	const accessLoading = $derived((mockMode ? false : members.accessLoading))
 	let toastMessage = $state('')
 	let toastVisible = $state(false)
 	let undoAction = $state<null | (() => Promise<void>)>(null)
@@ -55,6 +59,10 @@
 
 	function normalizeName(value: unknown) {
 		return String(value || '').trim()
+	}
+
+	function hrefWithMock(path: string) {
+		return withAdminMock(path, mockMode)
 	}
 
 	function fallbackNameFromEmail(email: string) {
@@ -223,29 +231,6 @@
 			}
 		})
 	})
-
-	async function toggleEdit(userId: string) {
-		if (mockMode) {
-			if (expandedUserId === userId) {
-				expandedUserId = null
-				return
-			}
-			expandedUserId = userId
-			if (mockAccessRows.length === 0) {
-				mockAccessRows = [
-					{ programSlug: 'gym', allowed: true },
-					{ programSlug: 'circus', allowed: true }
-				]
-			}
-			return
-		}
-		if (expandedUserId === userId) {
-			expandedUserId = null
-			return
-		}
-		expandedUserId = userId
-		await members.openAccess(userId)
-	}
 
 	function showToast(message: string, undo: null | (() => Promise<void>) = null) {
 		toastMessage = message
@@ -444,16 +429,39 @@
 					badge={deriveBadge(user)}
 					initials={initials(displayName(user))}
 					isYou={isYou(user)}
-					onclick={() => void toggleEdit(String(user['id']))}
+					href={hrefWithMock(`/admin/crew/${String(user['id'] || '').trim()}/`)}
+					onclick={() => {
+						const id = String(user['id'] || '').trim()
+						if (!id) return
+						void goto(hrefWithMock(`/admin/crew/${id}/`))
+					}}
 				/>
 			{/each}
 		</div>
 
 		<h4>PENDING INVITES ({inviteItems.length})</h4>
-		<AdminCrewInviteCards
-			invites={inviteItems}
-			onCopy={(code) => void copyInviteWithToast(code)}
-			onDelete={(id) => void deleteInviteWithToast(id)}
+		<AdminMetaCards
+			items={inviteItems.map((invite) => ({
+				id: invite.id,
+				label: invite.label,
+				detail: invite.detail,
+				icon: Mail,
+				actions: [
+					{
+						variant: 'subtle' as const,
+						icon: Copy,
+						ariaLabel: 'Copy invite link',
+						onclick: () => void copyInviteWithToast(invite.code)
+					},
+					{
+						variant: 'danger' as const,
+						icon: Trash2,
+						ariaLabel: 'Delete invite',
+						onclick: () => void deleteInviteWithToast(invite.id)
+					}
+				]
+			}))}
+			emptyText="No pending invites."
 		/>
 
 		{#if expandedUserId}
@@ -554,5 +562,3 @@
 		z-index: 120;
 	}
 </style>
-	const accessRows = $derived((mockMode ? mockAccessRows : members.accessRows))
-	const accessLoading = $derived((mockMode ? false : members.accessLoading))

@@ -5,8 +5,9 @@
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
 	import AdminChevronRowCard from '@components/Admin/AdminChevronRowCard.svelte'
+	import AdminEventSessionCard from '@components/Admin/AdminEventSessionCard.svelte'
 	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
-	import { formatAdminDayLabel, formatAdminTimeLabel } from '$lib/admin/date-format'
+	import { formatAdminDayLabel } from '$lib/admin/date-format'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 	import { mockDashboardEvents, mockDashboardRecentEvents, mockPrograms } from '$lib/admin/mock/admin-mock-data'
 
@@ -34,14 +35,6 @@
 
 	function dayLabel(iso: string) {
 		return formatAdminDayLabel(iso)
-	}
-
-	function timeLabel(iso: string) {
-		return formatAdminTimeLabel(iso)
-	}
-
-	function compactTimeLabel(iso: string) {
-		return timeLabel(iso).replace(/\s+/g, '').toLowerCase()
 	}
 
 	function eventRoute(ev: { id?: number | string | null; activitySlug?: string | null }) {
@@ -88,20 +81,7 @@
 		{:else}
 			<div class="social-events__upcoming-grid">
 				{#each eventsSource as ev}
-					<button type="button" class="social-events__upcoming-card admin-ui-card admin-ui-card--interactive" onclick={() => goto(hrefWithMock(eventRoute(ev)))}>
-						<div class="social-events__upcoming-top">
-							<span class="social-events__event-emoji">{emojiForActivity(ev.activityLabel, ev.activitySlug)}</span>
-							<div class="social-events__event-title">{ev.title}</div>
-						</div>
-						<div class="social-events__upcoming-meta">
-							<div class="social-events__event-sub">{dayLabel(ev.startsAt)} · {compactTimeLabel(ev.startsAt)}</div>
-							<div>
-								<span class:social-events__event-cap--full={ev.seatsTaken >= ev.capacity || ev.waitlistCount > 0} class="social-events__event-cap">
-									<span>{ev.seatsTaken}</span><span class="social-events__event-cap-sep">/</span><span>{ev.capacity}</span>
-								</span>
-							</div>
-						</div>
-					</button>
+					<AdminEventSessionCard event={ev} onOpenEvent={(_id) => goto(hrefWithMock(eventRoute(ev)))} />
 				{/each}
 			</div>
 		{/if}
@@ -188,73 +168,11 @@
 		margin-bottom: 0.75rem;
 	}
 
-	.social-events__upcoming-card {
-		padding: 0.875rem;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.625rem;
-		text-align: left;
-	}
-
-	.social-events__upcoming-top {
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		gap: 0.5rem;
-		width: 100%;
-		text-align: left;
-	}
-
-	.social-events__upcoming-meta {
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-		width: 100%;
-		text-align: left;
-	}
-
-	.social-events__event-emoji {
-		font-size: 1.25rem;
-		line-height: 1;
-	}
-
-	.social-events__event-title {
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--text);
-	}
-
 	.social-events__event-sub {
 		font-size: 0.74rem;
 		line-height: 1;
 		color: color-mix(in srgb, var(--text) 64%, transparent);
 		margin-top: 0.1rem;
-	}
-
-	.social-events__event-cap {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.625rem;
-		font-weight: 500;
-		line-height: 1;
-		padding: 0.15rem 0.4rem;
-		border-radius: 0.3rem;
-		background: color-mix(in srgb, var(--accent-color-purple) 10%, transparent);
-		color: var(--accent-color-purple-strong);
-	}
-
-	.social-events__event-cap-sep {
-		opacity: 0.55;
-		padding: 0 1px;
-	}
-
-	.social-events__event-cap--full {
-		background: color-mix(in srgb, var(--status-error-text) 10%, transparent);
-		color: var(--status-error-text);
 	}
 
 	.social-events__past-list {

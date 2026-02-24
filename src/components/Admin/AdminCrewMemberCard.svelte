@@ -7,6 +7,7 @@
 		badge = '',
 		initials,
 		isYou = false,
+		href = null,
 		onclick
 	} = $props<{
 		name: string
@@ -14,11 +15,12 @@
 		badge?: string
 		initials: string
 		isYou?: boolean
+		href?: string | null
 		onclick?: () => void
 	}>()
 </script>
 
-<AdminChevronRowCard {onclick} ariaLabel={`Open ${name}`}>
+<AdminChevronRowCard {href} {onclick} ariaLabel={`Open ${name}`}>
 	{#snippet start()}
 		<span class="admin-crew-member__avatar" class:admin-crew-member__avatar--you={isYou}>
 			{#if isYou}

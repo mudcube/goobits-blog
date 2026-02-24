@@ -3,11 +3,14 @@
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
+	import { Users } from '@lucide/svelte'
 	import { ArrowUpRight } from '@lucide/svelte'
 	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
-	import { getAdminActivityColor, getAdminActivityEmoji } from '$lib/admin/activity-display'
+	import AdminCrewMemberCard from '@components/Admin/AdminCrewMemberCard.svelte'
+	import AdminMetaCards from '@components/Admin/AdminMetaCards.svelte'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 	import { mockDashboardEvents, mockDashboardRecentEvents } from '$lib/admin/mock/admin-mock-data'
+	import { adminEventDetailBreadcrumb } from '$lib/admin/breadcrumbs'
 
 	const { data } = $props<{ data: { user: unknown | null; eventId: string } }>()
 
@@ -61,10 +64,13 @@
 	})
 	const activityLabel = $derived(detail?.event.activityLabel || '')
 	const activitySlug = $derived(detail?.event.activitySlug || '')
-	const activityEmoji = $derived(getAdminActivityEmoji(activityLabel, activitySlug))
-	const activityColor = $derived(getAdminActivityColor(activityLabel, activitySlug))
 	const joinedCount = $derived.by(() => detail ? detail.attendees.filter((attendee) => attendee.status === 'joined').length : 0)
 	const openSpots = $derived.by(() => detail ? Math.max(0, detail.event.capacity - joinedCount) : 0)
+	const eventEnded = $derived.by(() => {
+		if (!detail) return false
+		const end = new Date(detail.event.endsAt).getTime()
+		return Number.isFinite(end) && end <= Date.now()
+	})
 
 	function flash(message: string, isError = false) {
 		toast = message
@@ -76,14 +82,24 @@
 		}, 2400)
 	}
 
-	function formatDateTime(iso: string) {
-		return new Date(iso).toLocaleString(undefined, {
+	function formatEventRange(startsAt: string, endsAt: string) {
+		const start = new Date(startsAt)
+		const end = new Date(endsAt)
+		const sameDay = start.toDateString() === end.toDateString()
+		const dayLabel = start.toLocaleDateString(undefined, {
 			weekday: 'short',
 			month: 'short',
-			day: 'numeric',
-			hour: 'numeric',
-			minute: '2-digit'
+			day: 'numeric'
 		})
+		const startTime = start.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+		const endTime = end.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+		if (sameDay) return `${dayLabel} at ${startTime} – ${endTime}`
+		const endLabel = end.toLocaleDateString(undefined, {
+			weekday: 'short',
+			month: 'short',
+			day: 'numeric'
+		})
+		return `${dayLabel} at ${startTime} – ${endLabel} at ${endTime}`
 	}
 
 	function formatDayLabel(iso: string) {
@@ -116,6 +132,28 @@
 		const first = parts[0]?.[0] || ''
 		const second = parts[1]?.[0] || (parts[0]?.[1] || 'X')
 		return `${first}${second}`.toUpperCase()
+	}
+
+	function crewMemberHref(userId: string) {
+		return hrefWithMock(`/admin/crew/${userId}/`)
+	}
+
+	function attendeeBadge(attendee: { status: string; waitlistPosition: number | null; attendanceStatus: string }) {
+		if (attendee.status === 'waitlist' || attendee.waitlistPosition) return 'Waitlist'
+		if (!eventEnded) return 'Joined'
+		if (attendee.attendanceStatus === 'attended') return 'Attended'
+		if (attendee.attendanceStatus === 'flaked') return 'Flaked'
+		return 'Joined'
+	}
+
+	function attendeeDetail(attendee: { status: string; waitlistPosition: number | null; attendanceStatus: string }) {
+		if (attendee.status === 'waitlist' || attendee.waitlistPosition) {
+			return attendee.waitlistPosition ? `Position #${attendee.waitlistPosition}` : 'Pending opening'
+		}
+		if (!eventEnded) return 'Booking confirmed'
+		if (attendee.attendanceStatus === 'attended') return 'Marked attended'
+		if (attendee.attendanceStatus === 'flaked') return 'Marked no-show'
+		return 'Booking confirmed'
 	}
 
 	function openEditor() {
@@ -170,6 +208,12 @@
 			window.removeEventListener('admin-event-detail-cancel', handleCancelRequest)
 		}
 	})
+
+	$effect(() => {
+		const label = detail?.event.title?.trim() || null
+		adminEventDetailBreadcrumb.set(label)
+		return () => adminEventDetailBreadcrumb.set(null)
+	})
 </script>
 
 {#if authed}
@@ -186,20 +230,12 @@
 				<AdminPageHero
 					eyebrow={activityLabel || 'Event'}
 					title={detail.event.title}
-					subtitle={`${formatDateTime(detail.event.startsAt)} – ${formatDateTime(detail.event.endsAt)}`}
+					subtitle={formatEventRange(detail.event.startsAt, detail.event.endsAt)}
 				/>
-				<div class="admin-event-detail__header-row">
-					<div class="admin-event-detail__activity" style={`--event-color:${activityColor}`}>
-						<span class="admin-event-detail__activity-emoji">{activityEmoji}</span>
-						<span>{activityLabel || 'Activity'}</span>
-					</div>
-					<div class="admin-event-detail__capacity">
-						<strong>{joinedCount}</strong> of {detail.event.capacity} spots filled
-					</div>
-				</div>
+				<div class="admin-event-detail__capacity"><strong>{joinedCount}</strong> of {detail.event.capacity} spots filled</div>
 			</div>
 
-			<div class="admin-event-detail__card admin-ui-card">
+			<section class="admin-event-detail__section">
 				<div class="admin-event-detail__section-label">Details</div>
 				<div class="admin-event-detail__detail-grid">
 					<div class="admin-event-detail__detail-card">
@@ -215,61 +251,52 @@
 						<div class="admin-event-detail__detail-value">{formatDuration(detail.event.startsAt, detail.event.endsAt)}</div>
 					</div>
 				</div>
-			</div>
+			</section>
 
-			<div class="admin-event-detail__card admin-ui-card">
+			<section class="admin-event-detail__section">
 				<div class="admin-event-detail__section-label">Description</div>
 				{#if detail.event.recapText && detail.event.recapText.trim()}
 					<p class="admin-event-detail__description">{detail.event.recapText}</p>
 				{:else}
 					<p class="admin-event-detail__description-empty">No description added yet</p>
 				{/if}
-			</div>
+			</section>
 
-			<div class="admin-event-detail__card admin-ui-card">
+			<section class="admin-event-detail__section">
 				<div class="admin-event-detail__attendee-header">
 					<div class="admin-event-detail__section-label">Attendees</div>
-					<span class="admin-event-detail__attendee-count">{joinedCount} / {detail.event.capacity}</span>
 				</div>
 				{#if detail.attendees.length === 0}
 					<p class="admin-event-detail__loading">No attendees yet.</p>
 				{:else}
 					<ul class="admin-event-detail__attendee-list">
 						{#each detail.attendees as attendee}
-							<li class="admin-event-detail__attendee-card">
-								<div class="admin-event-detail__attendee-avatar">
-									{attendeeInitials(attendee.name || attendee.email || attendee.userId)}
-								</div>
-								<div class="admin-event-detail__attendee-main">
-									<div class="admin-event-detail__attendee-name">{attendee.name || attendee.email || attendee.userId}</div>
-									<div class="admin-event-detail__attendee-detail">
-										{#if attendee.waitlistPosition}
-											Waitlist #{attendee.waitlistPosition}
-										{:else if attendee.attendanceStatus === 'attended'}
-											Attended
-										{:else if attendee.attendanceStatus === 'flaked'}
-											Flaked
-										{:else}
-											Joined
-										{/if}
-									</div>
-								</div>
-								<span
-									class="admin-event-detail__attendee-status"
-									class:admin-event-detail__attendee-status--waitlist={attendee.status === 'waitlist'}
-								>
-									{attendee.status === 'waitlist' ? 'Waitlist' : 'Joined'}
-								</span>
+							<li class="admin-event-detail__attendee-item">
+								<AdminCrewMemberCard
+									name={attendee.name || attendee.email || attendee.userId}
+									initials={attendeeInitials(attendee.name || attendee.email || attendee.userId)}
+									badge={attendeeBadge(attendee)}
+									detail={attendeeDetail(attendee)}
+									href={crewMemberHref(attendee.userId)}
+								/>
 							</li>
 						{/each}
-						{#if openSpots > 0}
-							<li class="admin-event-detail__open-spots">
-								<span>{openSpots} spot{openSpots === 1 ? '' : 's'} open</span>
-							</li>
-						{/if}
 					</ul>
 				{/if}
-			</div>
+				{#if openSpots > 0}
+					<AdminMetaCards
+						items={[
+							{
+								id: 'open-spots',
+								label: `${openSpots} spot${openSpots === 1 ? '' : 's'} open`,
+								detail: '',
+								icon: Users
+							}
+						]}
+						singleLine={true}
+					/>
+				{/if}
+			</section>
 
 			<a class="admin-event-detail__editor-link" href={hrefWithMock(`/admin/events/${activitySlug || 'events'}/`)}>
 				<ArrowUpRight size={14} strokeWidth={2} />
@@ -294,38 +321,13 @@
 
 	.admin-event-detail__header {
 		display: grid;
-		gap: 0.65rem;
-	}
-
-	.admin-event-detail__activity {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		width: fit-content;
-		padding: 0.2rem 0.52rem;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--event-color) 12%, transparent);
-		border: 1px solid color-mix(in srgb, var(--event-color) 28%, transparent);
-		color: color-mix(in srgb, var(--event-color) 68%, var(--text) 32%);
-		font-size: 0.7rem;
-		font-weight: 650;
-	}
-
-	.admin-event-detail__activity-emoji {
-		font-size: 0.92rem;
-		line-height: 1;
-	}
-
-	.admin-event-detail__header-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem;
+		gap: 0.2rem;
 	}
 
 	.admin-event-detail__capacity {
 		font-size: 0.82rem;
 		color: color-mix(in srgb, var(--text) 58%, transparent);
+		margin-top: -0.1rem;
 	}
 
 	.admin-event-detail__capacity strong {
@@ -333,10 +335,16 @@
 		font-weight: 650;
 	}
 
-	.admin-event-detail__card {
-		padding: 0.95rem 1rem;
+	.admin-event-detail__section {
 		display: grid;
-		gap: 0.8rem;
+		gap: 0.5rem;
+		padding-top: 1rem;
+		border-top: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+	}
+
+	.admin-event-detail__header + .admin-event-detail__section {
+		padding-top: 0.2rem;
+		border-top: none;
 	}
 
 	.admin-event-detail__section-label {
@@ -355,10 +363,10 @@
 	}
 
 	.admin-event-detail__detail-card {
-		padding: 0.72rem;
-		border-radius: 0.72rem;
-		border: 1px solid var(--admin-card-border);
-		background: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
+		padding: 0.75rem;
+		border-radius: 0.75rem;
+		border: 1px solid color-mix(in srgb, var(--text) 9%, transparent);
+		background: var(--bg);
 	}
 
 	.admin-event-detail__detail-label {
@@ -378,28 +386,22 @@
 
 	.admin-event-detail__description {
 		margin: 0;
-		font-size: 0.82rem;
+		font-size: 0.8125rem;
 		line-height: 1.55;
-		color: color-mix(in srgb, var(--text) 66%, transparent);
+		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
 
 	.admin-event-detail__description-empty {
 		margin: 0;
-		font-size: 0.82rem;
+		font-size: 0.8125rem;
 		font-style: italic;
-		color: color-mix(in srgb, var(--text) 46%, transparent);
+		color: color-mix(in srgb, var(--text) 40%, transparent);
 	}
 
 	.admin-event-detail__attendee-header {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
 		gap: 0.5rem;
-	}
-
-	.admin-event-detail__attendee-count {
-		font-size: 0.72rem;
-		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
 
 	.admin-event-detail__attendee-list {
@@ -410,72 +412,8 @@
 		gap: 0.35rem;
 	}
 
-	.admin-event-detail__attendee-card {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.6rem;
-		padding: 0.45rem 0.6rem;
-		border-radius: 0.6rem;
-		border: 1px solid color-mix(in srgb, var(--event-color) 12%, transparent);
-		background: color-mix(in srgb, var(--event-color) 3%, var(--bg));
-	}
-
-	.admin-event-detail__attendee-avatar {
-		width: 2rem;
-		height: 2rem;
-		border-radius: 999px;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.64rem;
-		font-weight: 700;
-		letter-spacing: 0.02em;
-		flex-shrink: 0;
-		background: color-mix(in srgb, var(--event-color) 12%, transparent);
-		color: color-mix(in srgb, var(--event-color) 70%, var(--text) 30%);
-	}
-
-	.admin-event-detail__attendee-main {
-		min-width: 0;
-	}
-
-	.admin-event-detail__attendee-name {
-		font-size: 0.78rem;
-		font-weight: 620;
-		color: var(--text);
-	}
-
-	.admin-event-detail__attendee-detail {
-		font-size: 0.6875rem;
-		color: color-mix(in srgb, var(--text) 52%, transparent);
-	}
-
-	.admin-event-detail__attendee-status {
-		flex-shrink: 0;
-		font-size: 0.67rem;
-		font-weight: 650;
-		text-transform: uppercase;
-		letter-spacing: 0.03em;
-		padding: 0.16rem 0.42rem;
-		border-radius: 999px;
-		background: color-mix(in srgb, #34c759 12%, transparent);
-		color: color-mix(in srgb, #248a3d 84%, var(--text) 16%);
-	}
-
-	.admin-event-detail__attendee-status--waitlist {
-		background: color-mix(in srgb, #ff9500 12%, transparent);
-		color: color-mix(in srgb, #c27800 84%, var(--text) 16%);
-	}
-
-	.admin-event-detail__open-spots {
-		display: flex;
-		align-items: center;
-		padding: 0.5rem 0.75rem;
-		border-radius: 0.72rem;
-		border: 1px dashed color-mix(in srgb, var(--text) 10%, transparent);
-		font-size: 0.75rem;
-		color: color-mix(in srgb, var(--text) 48%, transparent);
+	.admin-event-detail__attendee-item {
+		list-style: none;
 	}
 
 	.admin-event-detail__editor-link {
@@ -500,11 +438,6 @@
 	}
 
 	@media (max-width: 760px) {
-		.admin-event-detail__header-row {
-			flex-direction: column;
-			align-items: flex-start;
-		}
-
 		.admin-event-detail__detail-grid {
 			grid-template-columns: 1fr;
 		}

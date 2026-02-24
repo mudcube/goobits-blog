@@ -2,6 +2,7 @@
 	type Participant = {
 		name?: string | null
 		displayName?: string | null
+		userId?: string | null
 	}
 
 	type DashboardEvent = {
@@ -15,8 +16,9 @@
 		participants?: Participant[]
 	}
 
-	const { recentEvents } = $props<{
+	const { recentEvents, mockMode = false } = $props<{
 		recentEvents: DashboardEvent[]
+		mockMode?: boolean
 	}>()
 
 	type FeedItem = {
@@ -26,6 +28,7 @@
 		verb: string
 		target: string
 		when: string
+		userId: string | null
 	}
 
 	function relativeWhen(iso: string) {
@@ -59,6 +62,7 @@
 				event.participants?.[0]?.displayName ||
 				event.participants?.[0]?.name ||
 				''
+			const participantUserId = event.participants?.[0]?.userId || null
 			if (participantName) {
 				items.push({
 					id: `${event.id}-joined`,
@@ -66,7 +70,8 @@
 					initials: initials(participantName),
 					verb: 'joined',
 					target: event.title,
-					when: relativeWhen(event.startsAt)
+					when: relativeWhen(event.startsAt),
+					userId: participantUserId
 				})
 			} else {
 				items.push({
@@ -75,7 +80,8 @@
 					initials: initials(event.activityLabel || 'M'),
 					verb: 'attended',
 					target: event.title,
-					when: relativeWhen(event.startsAt)
+					when: relativeWhen(event.startsAt),
+					userId: null
 				})
 			}
 			if (items.length >= 6) break
@@ -96,7 +102,13 @@
 				<div class="admin-dashboard-recent__row">
 					<div class="admin-dashboard-recent__avatar">{item.initials}</div>
 					<div class="admin-dashboard-recent__text">
-						<strong>{item.name}</strong>
+						{#if item.userId}
+							<a class="admin-dashboard-recent__name-link" href={`/admin/crew/${item.userId}/${mockMode ? '?mock=1' : ''}`}>
+								<strong>{item.name}</strong>
+							</a>
+						{:else}
+							<strong>{item.name}</strong>
+						{/if}
 						<span> {item.verb} {item.target}</span>
 					</div>
 					<div class="admin-dashboard-recent__when">{item.when}</div>
@@ -166,6 +178,16 @@
 	.admin-dashboard-recent__text strong {
 		color: var(--text);
 		font-weight: 640;
+	}
+
+	.admin-dashboard-recent__name-link {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.admin-dashboard-recent__name-link:hover strong {
+		text-decoration: underline;
+		text-underline-offset: 2px;
 	}
 
 	.admin-dashboard-recent__when {
