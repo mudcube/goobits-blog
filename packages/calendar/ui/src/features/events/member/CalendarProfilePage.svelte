@@ -3,7 +3,6 @@
 	import { getCalendarUiConfig } from '../../../config'
 	import PillButton from '../../../primitives/PillButton.svelte'
 import Hero from '../../../primitives/Hero.svelte'
-	import MonthEventCalendar from './MonthEventCalendar.svelte'
 	let { data } = $props()
 	let emergencyContact = $derived(data.profile?.emergencyContact ?? '')
 	let dietaryRestrictions = $derived(data.profile?.dietaryRestrictions ?? '')
@@ -29,15 +28,6 @@ import Hero from '../../../primitives/Hero.svelte'
 		}
 	}
 
-	function formatWhen(startIso) {
-		return new Date(startIso).toLocaleString(undefined, {
-			weekday: 'short',
-			month: 'short',
-			day: 'numeric',
-			hour: 'numeric',
-			minute: '2-digit'
-		})
-	}
 </script>
 
 <svelte:head>
@@ -94,27 +84,6 @@ import Hero from '../../../primitives/Hero.svelte'
 		</div>
 	</section>
 
-	<MonthEventCalendar title="My calendar" events={data.events} />
-
-	<section class="calendar-page__section calendar-home__section">
-		<h2 class="calendar-home__feed-title">My upcoming events</h2>
-		{#if data.events.length === 0}
-			<p class="calendar-page__subtitle calendar-home__sub">No upcoming joins yet.</p>
-		{:else}
-			<div class="calendar-home__feed-list">
-				{#each data.events as event}
-					<article class="calendar-home__event-card">
-						<div class="calendar-home__event-meta">
-							<p class="calendar-home__event-label">{event.activityLabel}</p>
-							<h3>{event.title}</h3>
-							<p>{formatWhen(event.startsAt)}</p>
-							<p>{event.userStatus === 'waitlist' ? 'Waitlist' : 'Joined'} · {event.seatsTaken}/{event.capacity} seats</p>
-						</div>
-					</article>
-				{/each}
-			</div>
-		{/if}
-	</section>
 </div>
 
 <style>

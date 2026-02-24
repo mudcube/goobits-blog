@@ -52,6 +52,17 @@ import ShellNav from '../primitives/ShellNav.svelte'
 					<PillButton onClick={logout} variant="secondary" size="sm" className="calendar-shell__nav-button">
 						Logout
 					</PillButton>
+					{#if data.isAdmin}
+						<PillButton
+							href={calendarConfig.routes.adminBase}
+							variant="primary"
+							size="sm"
+							className="calendar-shell__nav-button calendar-shell__nav-button--link"
+							ariaLabel="Admin"
+						>
+							Admin
+						</PillButton>
+					{/if}
 				{/if}
 			</div>
 		{/snippet}

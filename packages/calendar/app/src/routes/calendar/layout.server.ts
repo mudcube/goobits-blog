@@ -1,13 +1,20 @@
 import { buildEnv } from '@calendar/kit'
-import { loadCalendarMemberShellData } from '@calendar/core'
+import { getCalendarConfig, loadCalendarMemberShellData } from '@calendar/core'
 
 type CalendarUser = {
 	avatarUrl?: string
 	avatar?: string
+	email?: string
 	[key: string]: unknown
 }
 
 export async function load({ locals, platform }: { locals: { user?: CalendarUser }; platform: App.Platform }) {
 	const env = await buildEnv(platform)
-	return loadCalendarMemberShellData(env.DB, locals.user ? { user: locals.user } : {})
+	const shellData = await loadCalendarMemberShellData(env.DB, locals.user ? { user: locals.user } : {})
+	const adminEmail = getCalendarConfig().brand.adminEmail.toLowerCase()
+	const currentEmail = typeof locals.user?.email === 'string' ? locals.user.email.toLowerCase() : ''
+	return {
+		...shellData,
+		isAdmin: currentEmail === adminEmail
+	}
 }

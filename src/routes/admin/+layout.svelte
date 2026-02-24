@@ -4,7 +4,7 @@
 	import { page } from '$app/stores'
 	import { enhance } from '$app/forms'
 	import { getCalendarUiConfig } from '@calendar/ui/config'
-	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut, CalendarPlus, UserPlus, ArrowLeft, Pencil, Trash2 } from '@lucide/svelte'
+	import { LayoutDashboard, Users, CalendarDays, Settings, LogOut, CalendarPlus, UserPlus, ArrowLeft, Pencil, Trash2, Eye } from '@lucide/svelte'
 	import AdminActionButton from '@components/Admin/AdminActionButton.svelte'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 	import { adminEventDetailBreadcrumb } from '$lib/admin/breadcrumbs'
@@ -88,6 +88,14 @@
 		const eventLeaf = eventsSingleSegment?.[1] || ''
 		const isEventId = /^\d+$/.test(eventLeaf)
 		return !!(eventsSingleSegment && !isEventId)
+	}
+
+	function programEditorSlug(pathname: string) {
+		const normalized = normalizePath(pathname)
+		const eventsSingleSegment = normalized.match(/^\/admin\/events\/([^/]+)$/)
+		const eventLeaf = eventsSingleSegment?.[1] || ''
+		if (!eventLeaf || /^\d+$/.test(eventLeaf)) return null
+		return eventLeaf
 	}
 
 	function isEventsIndexRoute(pathname: string) {
@@ -178,6 +186,13 @@
 					}
 				>
 					{#if isProgramEditorRoute($page.url.pathname)}
+						{#if programEditorSlug($page.url.pathname)}
+							<AdminActionButton
+								variant="subtle"
+								icon={Eye}
+								href={`/calendar/${programEditorSlug($page.url.pathname)}/`}
+							>View</AdminActionButton>
+						{/if}
 						<AdminActionButton variant="subtle" icon={Settings} onclick={triggerProgramEditorSettings}>Settings</AdminActionButton>
 					{:else if isEventsIndexRoute($page.url.pathname)}
 						<AdminActionButton variant="primary" icon={CalendarPlus} href={hrefWithMock('/admin/events/new/')}>New</AdminActionButton>
@@ -189,6 +204,8 @@
 						>Back to Events</AdminActionButton>
 					{:else if isCrewRoute($page.url.pathname)}
 						<AdminActionButton variant="primary" icon={UserPlus} onclick={triggerCrewInvite}>Invite</AdminActionButton>
+					{:else if isDashboardRoute($page.url.pathname)}
+						<AdminActionButton variant="subtle" icon={CalendarDays} href="/calendar/">Calendar</AdminActionButton>
 					{:else if isEventDetailRoute($page.url.pathname)}
 						<AdminActionButton variant="primary" icon={Pencil} onclick={triggerEventDetailEdit}>Edit</AdminActionButton>
 						<AdminActionButton variant="danger" icon={Trash2} onclick={triggerEventDetailCancel}>Cancel Event</AdminActionButton>
