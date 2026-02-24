@@ -6,12 +6,10 @@
 
 	const {
 		activity,
-		upcoming = [],
-		recent = []
+		upcoming = []
 	} = $props<{
 		activity: CalendarActivityConfig
 		upcoming?: CalendarEventsResponse['upcoming']
-		recent?: CalendarEventsResponse['recent']
 	}>()
 </script>
 
@@ -34,7 +32,7 @@
 		<p class="calendar-activity__service-note">{activity.serviceStatusNote}</p>
 	{/if}
 
-	<BookingCalendar activitySlug={activity.slug} initialUpcoming={upcoming} initialRecent={recent} />
+	<BookingCalendar initialUpcoming={upcoming} />
 </div>
 
 <style lang="scss">

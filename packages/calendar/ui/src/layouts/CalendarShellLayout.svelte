@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores'
-	import { Bell, UserRound } from '@lucide/svelte'
+	import { Bell, UserRound, LogOut } from '@lucide/svelte'
 	import { logoutCalendarSession } from '../api/calendar'
 	import { getCalendarUiConfig } from '../config'
 	import PillButton from '../primitives/PillButton.svelte'
@@ -50,7 +50,8 @@ import ShellNav from '../primitives/ShellNav.svelte'
 						<img src={data.user.avatarUrl} alt="" class="calendar-shell__nav-avatar" />
 					{/if}
 					<PillButton onClick={logout} variant="secondary" size="sm" className="calendar-shell__nav-button">
-						Logout
+						<LogOut size={13} />
+						Log out
 					</PillButton>
 					{#if data.isAdmin}
 						<PillButton
