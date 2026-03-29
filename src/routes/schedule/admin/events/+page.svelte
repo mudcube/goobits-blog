@@ -40,10 +40,10 @@
 	function eventRoute(ev: { id?: number | string | null; activitySlug?: string | null }) {
 		const idNum = Number(ev.id)
 		if (Number.isFinite(idNum) && idNum > 0) {
-			return `/admin/events/${idNum}`
+			return `/schedule/admin/events/${idNum}`
 		}
-		if (ev.activitySlug) return `/admin/events/${ev.activitySlug}/`
-		return '/admin/events/'
+		if (ev.activitySlug) return `/schedule/admin/events/${ev.activitySlug}/`
+		return '/schedule/admin/events/'
 	}
 </script>
 
@@ -61,7 +61,7 @@
 				<button
 					type="button"
 					class="social-events__program-card admin-ui-card admin-ui-card--interactive"
-					onclick={() => goto(hrefWithMock(`/admin/events/${program.slug}/`))}
+					onclick={() => goto(hrefWithMock(`/schedule/admin/events/${program.slug}/`))}
 				>
 					<div class="social-events__program-icon">{program.icon || emojiForActivity(program.label, program.slug)}</div>
 					<div class="social-events__program-label">{program.label}</div>
@@ -81,7 +81,7 @@
 		{:else}
 			<div class="social-events__upcoming-grid">
 				{#each eventsSource as ev}
-					<AdminEventSessionCard event={ev} onOpenEvent={(_id) => goto(hrefWithMock(eventRoute(ev)))} />
+					<AdminEventSessionCard event={ev} onOpenEvent={() => goto(hrefWithMock(eventRoute(ev)))} />
 				{/each}
 			</div>
 		{/if}

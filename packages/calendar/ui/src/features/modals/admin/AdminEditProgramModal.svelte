@@ -37,7 +37,7 @@
 		<div class="admin-page__program-modal-preview">
 			<div class="admin-page__program-modal-icon">{dashboard.programDraft.icon || '✨'}</div>
 			<div class="admin-page__program-modal-name">{dashboard.programDraft.label || 'Program name'}</div>
-			<div class="admin-page__program-modal-url">/calendar/{dashboard.programDraft.slug || 'program-slug'}</div>
+			<div class="admin-page__program-modal-url">/schedule/{dashboard.programDraft.slug || 'program-slug'}</div>
 		</div>
 
 		<div class="admin-page__program-modal-body">

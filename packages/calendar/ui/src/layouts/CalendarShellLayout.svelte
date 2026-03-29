@@ -18,9 +18,10 @@ import ShellNav from '../primitives/ShellNav.svelte'
 
 <div class="calendar-shell">
 	<ShellNav
-		brandLabel="Members"
-		brandHref={calendarConfig.routes.calendarBase}
+		homeHref="/"
+		showLogo={true}
 		links={headerLinks}
+		linksAlign="right"
 		currentPath={$page.url.pathname}
 	>
 		{#snippet right()}

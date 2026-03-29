@@ -30,6 +30,7 @@
     "dev:restart": "dotenvx run -f config/env/.env -- bash scripts/dev/dev-server.sh restart",
     "dev:stop": "bash scripts/dev/dev-server.sh stop",
     "dev:wrangler": "NODE_OPTIONS='--dns-result-order=ipv4first' dotenvx run -f config/env/.env -- wrangler dev --local",
+    "e2e:oauth:google": "node scripts/e2e/check-google-oauth.mjs",
     "e2e": "pnpm run e2e:run -- full",
     "e2e:admin": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 packages/calendar/core/__tests__/e2e/admin-login-smoke.test.ts",
     "e2e:admin:people": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 packages/calendar/core/__tests__/e2e/admin-people-access.test.ts",

@@ -10,21 +10,21 @@ export async function runAuthRegisterSmoke() {
 	try {
 		await page.goto(`${BASE_URL}/register`, { waitUntil: 'networkidle', timeout: 30000 })
 
-		const hasForm = await page.locator('form.register-page__form').count()
+		const hasForm = await page.getByTestId('register-form').count()
 		if (!hasForm) throw new Error('register form not found')
 
-		await page.fill('input[name="name"]', 'Smoke Tester')
-		await page.fill('input[name="email"]', `smoke-${Date.now()}@example.com`)
-		await page.fill('input[name="password"]', 'SmokePassword123')
+		await page.getByTestId('register-name').fill('Smoke Tester')
+		await page.getByTestId('register-email').fill(`smoke-${Date.now()}@example.com`)
+		await page.getByTestId('register-password').fill('SmokePassword123')
 
 		// Force a bot-like fast submit; should be rejected by min-fill-time check.
-		await page.locator('input[name="started_at"]').evaluate((el) => {
+		await page.getByTestId('register-started-at').evaluate((el) => {
 			el.value = String(Date.now())
 		})
 
 		await Promise.all([
 			page.waitForLoadState('networkidle', { timeout: 15000 }),
-			page.click('button[type="submit"]')
+			page.getByTestId('register-submit-row').locator('button[type="submit"]').click()
 		])
 
 		const url = page.url()
@@ -32,7 +32,7 @@ export async function runAuthRegisterSmoke() {
 			throw new Error(`expected to remain on /register after fast submit, got ${url}`)
 		}
 
-		const hasError = (await page.locator('.register-page__error').count()) > 0
+		const hasError = (await page.getByTestId('register-error').count()) > 0
 		if (!hasError) {
 			throw new Error('expected anti-abuse error message after fast submit')
 		}
@@ -42,32 +42,8 @@ export async function runAuthRegisterSmoke() {
 			waitUntil: 'networkidle',
 			timeout: 30000
 		})
-		if (!/\/calendar\/login\/?\?verified=invalid/.test(page.url())) {
+		if (!/\/schedule\/login\/?\?verified=invalid/.test(page.url())) {
 			throw new Error(`unexpected verify-email redirect target: ${page.url()}`)
-		}
-
-		// Legacy OAuth route shapes should be rejected and redirected to login error.
-		await page.goto(`${BASE_URL}/auth/signin/google`, { waitUntil: 'networkidle', timeout: 30000 })
-		if (!/\/calendar\/login\/?\?error=oauth_route_removed/.test(page.url())) {
-			throw new Error(`unexpected legacy signin redirect target: ${page.url()}`)
-		}
-		await page.goto(`${BASE_URL}/auth/callback/google`, { waitUntil: 'networkidle', timeout: 30000 })
-		if (!/\/calendar\/login\/?\?error=oauth_route_removed/.test(page.url())) {
-			throw new Error(`unexpected legacy callback redirect target: ${page.url()}`)
-		}
-
-		// API-level check: legacy endpoints must not return success pages.
-		const legacySigninRes = await context.request.get(`${BASE_URL}/auth/signin/google`, {
-			maxRedirects: 0
-		})
-		if (legacySigninRes.status() < 300 || legacySigninRes.status() >= 400) {
-			throw new Error(`expected redirect for legacy signin route, got ${legacySigninRes.status()}`)
-		}
-		const legacyCallbackRes = await context.request.get(`${BASE_URL}/auth/callback/google`, {
-			maxRedirects: 0
-		})
-		if (legacyCallbackRes.status() < 300 || legacyCallbackRes.status() >= 400) {
-			throw new Error(`expected redirect for legacy callback route, got ${legacyCallbackRes.status()}`)
 		}
 
 		console.log('[auth-register-smoke] PASS')

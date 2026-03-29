@@ -135,7 +135,7 @@
 	}
 
 	function crewMemberHref(userId: string) {
-		return hrefWithMock(`/admin/crew/${userId}/`)
+		return hrefWithMock(`/schedule/admin/crew/${userId}/`)
 	}
 
 	function attendeeBadge(attendee: { status: string; waitlistPosition: number | null; attendanceStatus: string }) {
@@ -158,7 +158,7 @@
 
 	function openEditor() {
 		if (!detail) return
-		void goto(hrefWithMock(`/admin/events/${detail.event.activitySlug || 'events'}/`))
+		void goto(hrefWithMock(`/schedule/admin/events/${detail.event.activitySlug || 'events'}/`))
 	}
 
 	async function cancelEvent() {
@@ -173,7 +173,7 @@
 			flash(dashboard.error, true)
 			return
 		}
-		void goto(hrefWithMock('/admin/events/'))
+		void goto(hrefWithMock('/schedule/admin/events/'))
 	}
 
 	function handleEditRequest() {
@@ -196,7 +196,7 @@
 	$effect(() => {
 		if (!authed || mockMode || !attemptedLoad || loading) return
 		if (!dashboard.selectedEventDetail) {
-			goto(hrefWithMock('/admin/'), { replaceState: true })
+			goto(hrefWithMock('/schedule/admin/'), { replaceState: true })
 		}
 	})
 
@@ -298,7 +298,7 @@
 				{/if}
 			</section>
 
-			<a class="admin-event-detail__editor-link" href={hrefWithMock(`/admin/events/${activitySlug || 'events'}/`)}>
+			<a class="admin-event-detail__editor-link" href={hrefWithMock(`/schedule/admin/events/${activitySlug || 'events'}/`)}>
 				<ArrowUpRight size={14} strokeWidth={2} />
 				Open {activityLabel || 'Program'} program page
 			</a>

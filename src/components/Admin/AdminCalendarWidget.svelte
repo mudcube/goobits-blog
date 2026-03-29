@@ -16,6 +16,8 @@
 		currentMonth,
 		selectedDateIso = null,
 		title = '',
+		initialWeekStart = 'monday',
+		syncWeekStartPreference = true,
 		onPrev,
 		onNext,
 		onSelect,
@@ -29,6 +31,8 @@
 		currentMonth: Date
 		selectedDateIso?: string | null
 		title?: string
+		initialWeekStart?: AdminCalendarWeekStart
+		syncWeekStartPreference?: boolean
 		onPrev: () => void
 		onNext: () => void
 		onSelect: (date: Date, element: HTMLButtonElement) => void
@@ -50,6 +54,11 @@
 
 	const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 	let weekStart = $state<AdminCalendarWeekStart>('monday')
+
+	$effect(() => {
+		if (syncWeekStartPreference) return
+		weekStart = initialWeekStart === 'sunday' ? 'sunday' : 'monday'
+	})
 
 	const orderedWeekdays = $derived.by(() => {
 		if (weekStart === 'sunday') return weekdays
@@ -99,6 +108,7 @@
 	}
 
 	onMount(() => {
+		if (!syncWeekStartPreference) return
 		weekStart = getAdminCalendarWeekStart()
 		const onWeekStartChanged = (event: Event) => {
 			const value = (event as CustomEvent<AdminCalendarWeekStart>).detail
@@ -296,14 +306,14 @@
 	}
 
 	.admin-calendar__day--off .admin-calendar__day-num {
-		opacity: 0.25;
+		opacity: 1;
 	}
 
 	.admin-calendar__day--past {
 		pointer-events: none;
 	}
 
-	.admin-calendar__day--past:not(.admin-calendar__day--off) .admin-calendar__day-num {
+	.admin-calendar__day--past .admin-calendar__day-num {
 		opacity: 0.5;
 	}
 

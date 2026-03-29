@@ -1,5 +1,5 @@
 import type { AdminEventsResponse, AdminProgramsResponse } from '@calendar/ui/api/admin'
-import type { CalendarPaymentDefaultsResponse } from '@calendar/ui/api/calendar'
+import type { CalendarEventsResponse, CalendarPaymentDefaultsResponse } from '@calendar/ui/api/calendar'
 
 type MockParticipant = AdminEventsResponse['upcoming'][number]['participants'][number]
 
@@ -10,38 +10,24 @@ function isoWithTimeOffset(daysOffset: number, hour: number, minute: number) {
 	return d.toISOString()
 }
 
-function isoTodayAtMinuteOfDay(minuteOfDay: number) {
-	const d = new Date()
-	const clamped = Math.max(0, Math.min(23 * 60 + 59, minuteOfDay))
-	const hours = Math.floor(clamped / 60)
-	const minutes = clamped % 60
-	d.setHours(hours, minutes, 0, 0)
-	return d.toISOString()
-}
-
-function isoFromDateWithMinutes(base: Date, minutesFromMidnight: number) {
-	const d = new Date(base)
-	const clamped = Math.max(0, Math.min(23 * 60 + 59, minutesFromMidnight))
-	const hours = Math.floor(clamped / 60)
-	const minutes = clamped % 60
-	d.setHours(hours, minutes, 0, 0)
-	return d.toISOString()
-}
-
 function addMinutes(iso: string, minutes: number) {
 	return new Date(new Date(iso).getTime() + minutes * 60_000).toISOString()
 }
 
-function todayPastAndFutureSlots() {
+function nextWeekdayDate(weekday: number, weeksAhead = 0) {
 	const now = new Date()
-	const nowMinute = now.getHours() * 60 + now.getMinutes()
-	// Keep one mock item clearly before "now" and one after "now" for same-day timeline previews.
-	const pastMinute = Math.max(0, nowMinute - 120)
-	const futureMinute = Math.min(23 * 60 + 59, nowMinute + 180)
-	return {
-		pastIso: isoTodayAtMinuteOfDay(pastMinute),
-		futureIso: isoTodayAtMinuteOfDay(futureMinute)
-	}
+	const currentWeekday = now.getDay()
+	const delta = (weekday - currentWeekday + 7) % 7
+	const d = new Date(now)
+	d.setHours(0, 0, 0, 0)
+	d.setDate(d.getDate() + delta + weeksAhead * 7)
+	return d
+}
+
+function isoFromWeekdayAt(weekday: number, hour: number, minute = 0, weeksAhead = 0) {
+	const d = nextWeekdayDate(weekday, weeksAhead)
+	d.setHours(hour, minute, 0, 0)
+	return d.toISOString()
 }
 
 const mockParticipants: MockParticipant[] = [
@@ -54,22 +40,16 @@ const jen = mockParticipants[0]!
 const marco = mockParticipants[1]!
 const ava = mockParticipants[2]!
 const tyler = mockParticipants[3]!
-const todaySlots = todayPastAndFutureSlots()
-const now = new Date()
-const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-const tomorrowStart = new Date(todayStart)
-tomorrowStart.setDate(todayStart.getDate() + 1)
-const dayAfterTomorrowStart = new Date(todayStart)
-dayAfterTomorrowStart.setDate(todayStart.getDate() + 2)
 
 export const mockDashboardEvents: AdminEventsResponse['upcoming'] = [
+	// Gym: Monday/Wednesday/Friday between 12 PM and 6 PM
 	{
 		id: 9001,
 		title: 'Morning Flow',
 		activityLabel: 'Yoga',
 		activitySlug: 'gym',
-		startsAt: todaySlots.pastIso,
-		endsAt: addMinutes(todaySlots.pastIso, 90),
+		startsAt: isoFromWeekdayAt(1, 12, 0),
+		endsAt: addMinutes(isoFromWeekdayAt(1, 12, 0), 90),
 		seatsTaken: 5,
 		capacity: 8,
 		seatsLeft: 3,
@@ -85,13 +65,13 @@ export const mockDashboardEvents: AdminEventsResponse['upcoming'] = [
 	},
 	{
 		id: 9002,
-		title: 'Studio Ghibli Night',
-		activityLabel: 'Movies',
+		title: 'Open Gym',
+		activityLabel: 'Gym',
 		activitySlug: 'gym',
-		startsAt: todaySlots.futureIso,
-		endsAt: addMinutes(todaySlots.futureIso, 120),
-		seatsTaken: 4,
-		capacity: 8,
+		startsAt: isoFromWeekdayAt(3, 15, 0),
+		endsAt: addMinutes(isoFromWeekdayAt(3, 15, 0), 120),
+		seatsTaken: 6,
+		capacity: 10,
 		seatsLeft: 4,
 		waitlistCount: 0,
 		costCents: 0,
@@ -105,11 +85,32 @@ export const mockDashboardEvents: AdminEventsResponse['upcoming'] = [
 	},
 	{
 		id: 9003,
+		title: 'Leg Day Crew',
+		activityLabel: 'Gym',
+		activitySlug: 'gym',
+		startsAt: isoFromWeekdayAt(5, 17, 0),
+		endsAt: addMinutes(isoFromWeekdayAt(5, 17, 0), 90),
+		seatsTaken: 4,
+		capacity: 8,
+		seatsLeft: 4,
+		waitlistCount: 0,
+		costCents: 0,
+		currency: 'USD',
+		paymentProvider: 'venmo',
+		paymentHandle: '@rainbowgym',
+		paymentNoteTemplate: 'Rainbow Gym {{title}}',
+		recapText: null,
+		heroImageUrl: null,
+		participants: [jen, marco, ava]
+	},
+	// Circus: Monday/Wednesday/Friday between 12 PM and 6 PM
+	{
+		id: 9004,
 		title: 'Aerial Fundamentals',
 		activityLabel: 'Circus',
 		activitySlug: 'circus',
-		startsAt: isoFromDateWithMinutes(tomorrowStart, 10 * 60 + 30),
-		endsAt: isoFromDateWithMinutes(tomorrowStart, 12 * 60 + 30),
+		startsAt: isoFromWeekdayAt(1, 13, 30),
+		endsAt: addMinutes(isoFromWeekdayAt(1, 13, 30), 120),
 		seatsTaken: 4,
 		capacity: 5,
 		seatsLeft: 1,
@@ -124,12 +125,114 @@ export const mockDashboardEvents: AdminEventsResponse['upcoming'] = [
 		participants: [jen, marco, ava]
 	},
 	{
-		id: 9004,
-		title: 'Open Gym',
-		activityLabel: 'Gym',
-		activitySlug: 'gym',
-		startsAt: isoFromDateWithMinutes(dayAfterTomorrowStart, 18 * 60),
-		endsAt: isoFromDateWithMinutes(dayAfterTomorrowStart, 20 * 60),
+		id: 9005,
+		title: 'Silks Conditioning',
+		activityLabel: 'Circus',
+		activitySlug: 'circus',
+		startsAt: isoFromWeekdayAt(3, 16, 0),
+		endsAt: addMinutes(isoFromWeekdayAt(3, 16, 0), 90),
+		seatsTaken: 3,
+		capacity: 6,
+		seatsLeft: 3,
+		waitlistCount: 0,
+		costCents: 0,
+		currency: 'USD',
+		paymentProvider: 'venmo',
+		paymentHandle: '@rainbowgym',
+		paymentNoteTemplate: 'Rainbow Circus {{title}}',
+		recapText: null,
+		heroImageUrl: null,
+		participants: [jen, tyler]
+	},
+	{
+		id: 9006,
+		title: 'Trapeze Basics',
+		activityLabel: 'Circus',
+		activitySlug: 'circus',
+		startsAt: isoFromWeekdayAt(5, 12, 30),
+		endsAt: addMinutes(isoFromWeekdayAt(5, 12, 30), 90),
+		seatsTaken: 5,
+		capacity: 8,
+		seatsLeft: 3,
+		waitlistCount: 0,
+		costCents: 0,
+		currency: 'USD',
+		paymentProvider: 'venmo',
+		paymentHandle: '@rainbowgym',
+		paymentNoteTemplate: 'Rainbow Circus {{title}}',
+		recapText: null,
+		heroImageUrl: null,
+		participants: [marco, ava, tyler]
+	},
+	// Adventure: weekends, all day blocks
+	{
+		id: 9007,
+		title: 'Trail Hike',
+		activityLabel: 'Adventure',
+		activitySlug: 'adventure',
+		startsAt: isoFromWeekdayAt(6, 9, 0),
+		endsAt: addMinutes(isoFromWeekdayAt(6, 9, 0), 180),
+		seatsTaken: 3,
+		capacity: 6,
+		seatsLeft: 3,
+		waitlistCount: 0,
+		costCents: 0,
+		currency: 'USD',
+		paymentProvider: 'venmo',
+		paymentHandle: '@rainbowadventure',
+		paymentNoteTemplate: 'Rainbow Adventure {{title}}',
+		recapText: null,
+		heroImageUrl: null,
+		participants: [jen, tyler]
+	},
+	{
+		id: 9008,
+		title: 'Forest Ridge Day Trip',
+		activityLabel: 'Adventure',
+		activitySlug: 'adventure',
+		startsAt: isoFromWeekdayAt(0, 13, 0),
+		endsAt: addMinutes(isoFromWeekdayAt(0, 13, 0), 240),
+		seatsTaken: 4,
+		capacity: 8,
+		seatsLeft: 4,
+		waitlistCount: 0,
+		costCents: 0,
+		currency: 'USD',
+		paymentProvider: 'venmo',
+		paymentHandle: '@rainbowadventure',
+		paymentNoteTemplate: 'Rainbow Adventure {{title}}',
+		recapText: null,
+		heroImageUrl: null,
+		participants: [jen, marco, ava]
+	},
+	// Movies: weekends only
+	{
+		id: 9009,
+		title: 'Studio Ghibli Night',
+		activityLabel: 'Movies',
+		activitySlug: 'movie-night',
+		startsAt: isoFromWeekdayAt(6, 19, 0),
+		endsAt: addMinutes(isoFromWeekdayAt(6, 19, 0), 120),
+		seatsTaken: 4,
+		capacity: 8,
+		seatsLeft: 4,
+		waitlistCount: 0,
+		costCents: 0,
+		currency: 'USD',
+		paymentProvider: 'venmo',
+		paymentHandle: '@rainbowmovies',
+		paymentNoteTemplate: 'Rainbow Movies {{title}}',
+		recapText: null,
+		heroImageUrl: null,
+		participants: mockParticipants
+	},
+	{
+		id: 9010,
+		title: 'Movie Matinee',
+		activityLabel: 'Movies',
+		activitySlug: 'movie-night',
+		startsAt: isoFromWeekdayAt(0, 14, 0),
+		endsAt: addMinutes(isoFromWeekdayAt(0, 14, 0), 120),
 		seatsTaken: 6,
 		capacity: 10,
 		seatsLeft: 4,
@@ -137,8 +240,8 @@ export const mockDashboardEvents: AdminEventsResponse['upcoming'] = [
 		costCents: 0,
 		currency: 'USD',
 		paymentProvider: 'venmo',
-		paymentHandle: '@rainbowgym',
-		paymentNoteTemplate: 'Rainbow Gym {{title}}',
+		paymentHandle: '@rainbowmovies',
+		paymentNoteTemplate: 'Rainbow Movies {{title}}',
 		recapText: null,
 		heroImageUrl: null,
 		participants: mockParticipants
@@ -150,7 +253,7 @@ export const mockDashboardRecentEvents: AdminEventsResponse['recent'] = [
 		id: 9101,
 		title: 'Ghibli Night',
 		activityLabel: 'Movies',
-		activitySlug: 'gym',
+		activitySlug: 'movie-night',
 		startsAt: isoWithTimeOffset(-1, 20, 0),
 		endsAt: isoWithTimeOffset(-1, 22, 0),
 		seatsTaken: 6,
@@ -161,7 +264,7 @@ export const mockDashboardRecentEvents: AdminEventsResponse['recent'] = [
 		currency: 'USD',
 		paymentProvider: 'venmo',
 		paymentHandle: '@rainbowgym',
-		paymentNoteTemplate: 'Rainbow Gym {{title}}',
+		paymentNoteTemplate: 'Rainbow Movies {{title}}',
 		recapText: 'Great turnout and cozy vibes.',
 		heroImageUrl: null,
 		participants: [jen]
@@ -225,13 +328,69 @@ export const mockDashboardRecentEvents: AdminEventsResponse['recent'] = [
 		recapText: 'Busy session with mixed circuits.',
 		heroImageUrl: null,
 		participants: [tyler]
+	},
+	{
+		id: 9105,
+		title: 'Forest Ridge Day Trip',
+		activityLabel: 'Adventure',
+		activitySlug: 'adventure',
+		startsAt: isoWithTimeOffset(-3, 11, 0),
+		endsAt: isoWithTimeOffset(-3, 15, 0),
+		seatsTaken: 5,
+		capacity: 8,
+		seatsLeft: 3,
+		waitlistCount: 0,
+		costCents: 0,
+		currency: 'USD',
+		paymentProvider: 'venmo',
+		paymentHandle: '@rainbowadventure',
+		paymentNoteTemplate: 'Rainbow Adventure {{title}}',
+		recapText: 'Sunny trails and great vibes.',
+		heroImageUrl: null,
+		participants: [jen, ava]
 	}
 ]
+
+function toMemberFeedEvent(
+	event: AdminEventsResponse['upcoming'][number]
+): CalendarEventsResponse['upcoming'][number] {
+	return {
+		id: event.id,
+		activitySlug: event.activitySlug || '',
+		activityLabel: event.activityLabel,
+		title: event.title,
+		startsAt: event.startsAt,
+		endsAt: event.endsAt,
+		capacity: event.capacity,
+		seatsTaken: event.seatsTaken,
+		seatsLeft: event.seatsLeft,
+		waitlistCount: event.waitlistCount,
+		userStatus: null,
+		userGuestCount: 0,
+		location: null,
+		note: null,
+		costCents: event.costCents,
+		currency: event.currency,
+		paymentProvider: event.paymentProvider,
+		paymentHandle: event.paymentHandle,
+		paymentNoteTemplate: event.paymentNoteTemplate,
+		recapText: event.recapText,
+		heroImageUrl: event.heroImageUrl,
+		participants: event.participants.map((participant) => ({
+			userId: participant.userId || '',
+			name: participant.name || null,
+			avatarUrl: participant.avatarUrl || null
+		}))
+	}
+}
+
+export const mockCalendarUpcoming: CalendarEventsResponse['upcoming'] = mockDashboardEvents.map(toMemberFeedEvent)
+export const mockCalendarRecent: CalendarEventsResponse['recent'] = mockDashboardRecentEvents.map(toMemberFeedEvent)
 
 export const mockPrograms: AdminProgramsResponse['programs'] = [
 	{
 		slug: 'gym',
-		href: '/calendar/gym',
+		href: '/schedule/gym',
 		label: 'Rainbow Gym',
 		icon: '💪',
 		eyebrow: 'Rainbow Gym',
@@ -249,7 +408,7 @@ export const mockPrograms: AdminProgramsResponse['programs'] = [
 	},
 	{
 		slug: 'circus',
-		href: '/calendar/circus',
+		href: '/schedule/circus',
 		label: 'Rainbow Circus',
 		icon: '🎪',
 		eyebrow: 'Rainbow Circus',
@@ -264,6 +423,42 @@ export const mockPrograms: AdminProgramsResponse['programs'] = [
 		eyebrowClass: 'eyebrow-circus',
 		glowClass: 'glow-circus',
 		formGlowClass: 'form-glow-circus'
+	},
+	{
+		slug: 'adventure',
+		href: '/schedule/adventure',
+		label: 'Rainbow Adventure',
+		icon: '🏔️',
+		eyebrow: 'Rainbow Adventure',
+		heroTitleLines: ['Explore more.', 'Get outside.'],
+		heroSubtitle: 'Weekend adventures, hikes, and trips with the crew.',
+		description: 'Weekend adventures, hikes, and trips with the crew.',
+		enabled: true,
+		sortOrder: 3,
+		pageTitle: 'Rainbow Adventure',
+		activityName: 'Adventure',
+		serviceStatusNote: 'Open for bookings',
+		eyebrowClass: 'eyebrow-adventure',
+		glowClass: 'glow-adventure',
+		formGlowClass: 'form-glow-adventure'
+	},
+	{
+		slug: 'movie-night',
+		href: '/schedule/movie-night',
+		label: 'Rainbow Movies',
+		icon: '🎬',
+		eyebrow: 'Rainbow Movies',
+		heroTitleLines: ['Bring snacks.', 'Cue the projector.'],
+		heroSubtitle: 'Weekend movie nights with the community.',
+		description: 'Weekend movie nights with the community.',
+		enabled: true,
+		sortOrder: 4,
+		pageTitle: 'Rainbow Movies',
+		activityName: 'Movies',
+		serviceStatusNote: 'Open for bookings',
+		eyebrowClass: 'eyebrow-movie',
+		glowClass: 'glow-movie',
+		formGlowClass: 'form-glow-movie'
 	}
 ]
 

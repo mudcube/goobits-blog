@@ -137,11 +137,11 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 				next.searchParams.delete('preview')
 				next.searchParams.delete('previewEmail')
 				next.searchParams.delete('previewName')
-				redirect(302, `${next.pathname}${next.search}`)
+				throw redirect(302, `${next.pathname}${next.search}`)
 			}
 
 			const redirectTo = encodeURIComponent(pathname)
-			redirect(302, `${calendarLoginPath}?redirect=${redirectTo}`)
+			throw redirect(302, `${calendarLoginPath}?redirect=${redirectTo}`)
 		}
 
 		return resolve(event)

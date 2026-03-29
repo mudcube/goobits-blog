@@ -47,8 +47,8 @@
 />
 
 <section class="register-page ui-surface-card">
-	<form method="POST" class="register-page__form" novalidate>
-		<input type="hidden" name="started_at" value={startedAt} />
+	<form method="POST" class="register-page__form" novalidate data-testid="register-form">
+		<input type="hidden" name="started_at" value={startedAt} data-testid="register-started-at" />
 		<input type="hidden" name="device_id" value={deviceId} />
 		<label class="register-page__hp" aria-hidden="true">
 			<span>Website</span>
@@ -57,15 +57,15 @@
 
 		<label class="register-page__field">
 			<span class="register-page__field-label">Name</span>
-			<input class="register-page__field-input" name="name" type="text" required value={form?.name || ''} autocomplete="name" />
+			<input class="register-page__field-input" name="name" type="text" required value={form?.name || ''} autocomplete="name" data-testid="register-name" />
 		</label>
 		<label class="register-page__field">
 			<span class="register-page__field-label">Email</span>
-			<input class="register-page__field-input" name="email" type="email" required value={form?.email || ''} autocomplete="email" />
+			<input class="register-page__field-input" name="email" type="email" required value={form?.email || ''} autocomplete="email" data-testid="register-email" />
 		</label>
 		<label class="register-page__field">
 			<span class="register-page__field-label">Password</span>
-			<input class="register-page__field-input" name="password" type="password" required minlength="10" autocomplete="new-password" />
+			<input class="register-page__field-input" name="password" type="password" required minlength="10" autocomplete="new-password" data-testid="register-password" />
 		</label>
 
 		{#if data.turnstileSiteKey}
@@ -73,10 +73,10 @@
 		{/if}
 
 		{#if form?.error}
-			<p class="register-page__error">{form.error}</p>
+			<p class="register-page__error" data-testid="register-error">{form.error}</p>
 		{/if}
 
-		<div class="register-page__submit-row">
+		<div class="register-page__submit-row" data-testid="register-submit-row">
 			<PillButton type="submit" className="register-page__submit" variant="primary" size="md">
 				Create account
 			</PillButton>

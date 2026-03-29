@@ -153,7 +153,7 @@ function getRouteName(routePath: string) {
 
 function categorizeRoute(routePath: string) {
 	if (routePath === '/') return 'Main Pages'
-	if (routePath.startsWith('/admin')) return 'Admin Pages'
+	if (routePath.startsWith('/schedule/admin')) return 'Admin Pages'
 	if (routePath.startsWith('/api')) return 'API Routes'
 	if (routePath.startsWith('/journal')) return 'Journal Pages'
 	if (routePath === '/health' || routePath === '/sitemap') return 'Utility Pages'

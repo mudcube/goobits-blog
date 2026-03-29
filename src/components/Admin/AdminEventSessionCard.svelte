@@ -53,6 +53,8 @@
 	type="button"
 	class="admin-event-session-card admin-ui-card admin-ui-card--interactive"
 	class:admin-event-session-card--past={isPast(event.startsAt)}
+	data-testid="member-event-card"
+	data-event-id={String(event.id)}
 	onclick={() => onOpenEvent(event.id)}
 >
 	<div class="admin-event-session-card__icon">{getAdminActivityEmoji(event.activityLabel, event.activitySlug || undefined)}</div>
@@ -73,7 +75,7 @@
 			{#each Array.from({ length: Math.min(event.seatsTaken || 0, 5) }, (_value, idx) => idx) as i (i)}
 				<span class="admin-event-session-card__avatar">{initials(i)}</span>
 			{/each}
-			<span class="admin-event-session-card__people-text">
+			<span class="admin-event-session-card__people-text" data-testid="member-event-attendance">
 				{event.seatsTaken}
 				{#if isPast(event.startsAt)}went{:else}going{/if}
 			</span>

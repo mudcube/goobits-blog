@@ -75,7 +75,7 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 		if (!authed || initialized || programsSource.length === 0) return
 		const found = programsSource.find((program) => program.slug === slug)
 		if (!found) {
-			void goto(mockMode ? '/admin/events/?mock=1' : '/admin/events/')
+			void goto(mockMode ? '/schedule/admin/events/?mock=1' : '/schedule/admin/events/')
 			return
 		}
 		if (!mockMode) {
@@ -416,7 +416,7 @@ const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
 			flash(dashboard.error, true)
 			return
 		}
-		void goto(mockMode ? '/admin/events/?mock=1' : '/admin/events/')
+		void goto(mockMode ? '/schedule/admin/events/?mock=1' : '/schedule/admin/events/')
 	}
 
 	function onGlobalClick(event: MouseEvent) {

@@ -16,7 +16,7 @@ const ROUTES = [
 	'/privacy',
 	'/terms',
 	'/cookies',
-	'/calendar/login'
+	'/schedule/login'
 ]
 const THEMES = ['default', 'dark', 'magic']
 const VIEWPORTS = [

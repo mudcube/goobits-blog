@@ -43,14 +43,14 @@ const DEFAULT_CALENDAR_CONFIG: CalendarConfig = {
 		inviteBypassDomain: ''
 	},
 	routes: {
-		calendarBase: '/calendar',
-		adminBase: '/admin',
+		calendarBase: '/schedule',
+		adminBase: '/schedule/admin',
 		authBase: '/auth',
 		apiCalendarBase: '/api/calendar',
 		apiAdminBase: '/api/admin',
 		apiCalendarAdminBase: '/api/calendar/admin',
-		calendarLoginPath: '/calendar/login',
-		calendarLoginRedirectPath: '/calendar/login/redirect'
+		calendarLoginPath: '/schedule/login',
+		calendarLoginRedirectPath: '/schedule/login/redirect'
 	},
 	ics: {
 		productId: '-//CALENDAR//Social Calendar//EN',

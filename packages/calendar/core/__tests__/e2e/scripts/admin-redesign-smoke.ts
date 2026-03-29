@@ -1,25 +1,10 @@
 import { chromium } from 'playwright'
-import { BASE_URL, getAdminPasscode } from './_helpers'
+import { BASE_URL, bootstrapAdminSession } from './_helpers'
 
 async function loginAdminContext(page: import('playwright').Page) {
-	const passcode = getAdminPasscode()
-	if (!passcode) throw new Error('ADMIN_PASSCODE not available')
-
 	const context = page.context()
-	await page.goto(`${BASE_URL}/admin/`, { waitUntil: 'domcontentloaded', timeout: 30000 })
-	if (await page.locator('input[name="password"]').count()) {
-		await page.fill('input[name="password"]', passcode)
-		await page.click('button[type="submit"]')
-		for (let attempt = 0; attempt < 20; attempt += 1) {
-			const cookies = await context.cookies(`${BASE_URL}/admin/`)
-			if (cookies.some((cookie) => cookie.name === 'admin_session')) break
-			await page.waitForTimeout(150)
-		}
-	}
-	await page.goto(`${BASE_URL}/admin/`, { waitUntil: 'domcontentloaded', timeout: 30000 })
-
-	const hasLogin = (await page.locator('input[name="password"]').count()) > 0
-	if (hasLogin) throw new Error('admin auth failed')
+	await bootstrapAdminSession(context.request)
+	await page.goto(`${BASE_URL}/schedule/admin/?preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 }
 
 export async function runAdminPaymentDefaultsSmoke() {

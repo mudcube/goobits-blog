@@ -289,10 +289,14 @@ export async function promoteCalendarWaitlistEntry(eventId: number, entryId: num
 
 export async function logoutCalendarSession() {
 	const authBase = getCalendarUiConfig().routes.authBase
-	return requestApi(`${authBase}/logout`, {
+	const response = await fetch(`${authBase}/logout`, {
 		method: 'POST',
-		expectOk: false
+		redirect: 'follow'
 	})
+
+	if (response.status >= 500) {
+		throw new Error(`Logout failed (${response.status})`)
+	}
 }
 
 export async function getCalendarEvents(input: { mine?: boolean } = {}) {

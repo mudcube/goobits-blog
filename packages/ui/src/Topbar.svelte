@@ -24,7 +24,7 @@
 
 	function shouldDisablePrefetch(href: string) {
 		// Calendar/Admin pages load large route-level styling; avoid "hover prefetch" injecting it on other pages.
-		return href.startsWith('/calendar') || href.startsWith('/admin')
+		return href.startsWith('/schedule') || href.startsWith('/admin')
 	}
 
 	function isSeparator(item: NavItem) {

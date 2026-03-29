@@ -5,5 +5,5 @@ import type { RequestHandler } from '@sveltejs/kit'
 
 export const GET: RequestHandler = ({ cookies }) => {
 	const redirectTo = getCalendarRedirect(cookies) || getCalendarConfig().routes.calendarBase
-	redirect(302, redirectTo)
+	throw redirect(302, redirectTo)
 }

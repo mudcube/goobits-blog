@@ -5,5 +5,5 @@ import { actions as parentActions } from '@calendar/app/routes/admin/page.server
 export const actions = parentActions
 
 export function load(event: RequestEvent) {
-	redirect(308, `/admin/events/${event.params.slug}/`)
+	redirect(308, `/schedule/admin/events/${event.params.slug}/`)
 }

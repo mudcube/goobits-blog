@@ -28,3 +28,16 @@ export function getE2ETestToken() {
 		return getAdminPasscode()
 	}
 }
+
+export async function bootstrapAdminSession(request: import('playwright').APIRequestContext) {
+	const token = getE2ETestToken() || getAdminPasscode()
+	if (!token) throw new Error('E2E test token not available')
+
+	const response = await request.post(`${BASE_URL}/api/test/admin-session`, {
+		headers: { authorization: `Bearer ${token}` }
+	})
+
+	if (!response.ok()) {
+		throw new Error(`admin session bootstrap failed: ${response.status()}`)
+	}
+}

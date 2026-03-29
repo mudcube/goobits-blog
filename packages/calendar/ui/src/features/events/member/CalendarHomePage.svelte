@@ -1,17 +1,66 @@
 <script>
+	import { goto } from '$app/navigation'
 	import { joinCalendarEvent, leaveCalendarEvent } from '../../../api/calendar'
 	import { applyEventMutationState } from './feed-state'
-	import { formatWhen } from './formatWhen'
 	import { getCalendarUiConfig } from '../../../config'
 	import PillButton from '../../../primitives/PillButton.svelte'
 	import Hero from '../../../primitives/Hero.svelte'
 	import MonthEventCalendar from './MonthEventCalendar.svelte'
+	import AdminEventSessionCard from '@components/Admin/AdminEventSessionCard.svelte'
+	import AdminChevronRowCard from '@components/Admin/AdminChevronRowCard.svelte'
+	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
+	import { formatAdminDayLabel } from '$lib/admin/date-format'
 	let { data } = $props()
 	let upcoming = $state([])
 	let recent = $state([])
 	let pendingEventId = $state(null)
 	let feedError = $state('')
 	const calendarConfig = getCalendarUiConfig()
+	const mockMode = $derived(data?.mockMode === true)
+
+	function applyMockJoin(eventId, guestCount = 0) {
+		upcoming = upcoming.map((event) => {
+			if (event.id !== eventId) return event
+			const requested = 1 + Math.max(0, guestCount)
+			const canJoin = event.seatsLeft >= requested
+			const nextSeatsTaken = canJoin ? Math.min(event.capacity, event.seatsTaken + requested) : event.seatsTaken
+			const nextSeatsLeft = Math.max(0, event.capacity - nextSeatsTaken)
+			const nextWaitlist = canJoin ? event.waitlistCount : event.waitlistCount + requested
+			return {
+				...event,
+				seatsTaken: nextSeatsTaken,
+				seatsLeft: nextSeatsLeft,
+				waitlistCount: nextWaitlist,
+				userStatus: canJoin ? 'joined' : 'waitlist',
+				userGuestCount: Math.max(0, guestCount)
+			}
+		})
+	}
+
+	function applyMockLeave(eventId) {
+		upcoming = upcoming.map((event) => {
+			if (event.id !== eventId) return event
+			if (!event.userStatus) return event
+			if (event.userStatus === 'waitlist') {
+				const waitlistDrop = 1 + Math.max(0, event.userGuestCount || 0)
+				return {
+					...event,
+					waitlistCount: Math.max(0, event.waitlistCount - waitlistDrop),
+					userStatus: null,
+					userGuestCount: 0
+				}
+			}
+			const seatDrop = 1 + Math.max(0, event.userGuestCount || 0)
+			const nextSeatsTaken = Math.max(0, event.seatsTaken - seatDrop)
+			return {
+				...event,
+				seatsTaken: nextSeatsTaken,
+				seatsLeft: Math.max(0, event.capacity - nextSeatsTaken),
+				userStatus: null,
+				userGuestCount: 0
+			}
+		})
+	}
 
 	$effect(() => {
 		// During hydration/navigations, SvelteKit can transiently provide partial data.
@@ -24,6 +73,10 @@
 		pendingEventId = eventId
 		feedError = ''
 		try {
+			if (mockMode) {
+				applyMockJoin(eventId, guestCount)
+				return
+			}
 			const result = await joinCalendarEvent(eventId, { guestCount })
 			upcoming = applyEventMutationState(upcoming, eventId, result.state)
 		} catch (error) {
@@ -37,6 +90,10 @@
 		pendingEventId = eventId
 		feedError = ''
 		try {
+			if (mockMode) {
+				applyMockLeave(eventId)
+				return
+			}
 			const result = await leaveCalendarEvent(eventId)
 			upcoming = applyEventMutationState(upcoming, eventId, result.state)
 		} catch (error) {
@@ -49,6 +106,19 @@
 
 	const firstName = $derived(data.user?.name?.split(' ')[0] || '')
 	const homeTitleLines = $derived(firstName ? [`Hey, ${firstName}.`, "What's the move?"] : ['Hey.', "What's the move?"])
+
+	function eventRoute(event) {
+		if (event?.activitySlug) return `${calendarConfig.routes.calendarBase}/${event.activitySlug}/`
+		return calendarConfig.routes.calendarBase
+	}
+
+	function dayLabel(iso) {
+		return formatAdminDayLabel(iso)
+	}
+
+	function emojiForActivity(label, slug) {
+		return getAdminActivityEmoji(label, slug)
+	}
 </script>
 
 <svelte:head>
@@ -92,67 +162,9 @@
 		{#if upcoming.length === 0}
 			<p class="calendar-page__subtitle calendar-home__sub">No events are scheduled yet.</p>
 		{:else}
-			<div class="calendar-home__feed-list">
+			<div class="social-events__upcoming-grid">
 				{#each upcoming as event}
-					<article class="calendar-home__event-card">
-						<div class="calendar-home__event-meta">
-							<p class="calendar-home__event-label">{event.activityLabel}</p>
-							<h3>{event.title}</h3>
-							<p>{formatWhen(event.startsAt, event.endsAt)}</p>
-							<p>{event.seatsTaken}/{event.capacity} seats · {event.seatsLeft} left{event.waitlistCount > 0 ? ` · waitlist ${event.waitlistCount}` : ''}</p>
-							{#if event.costCents > 0}
-								<p class="calendar-home__event-cost">
-									${(event.costCents / 100).toFixed(2)} {event.currency}
-									{#if event.payUrl}
-										· <a href={event.payUrl} target="_blank" rel="noopener noreferrer">Pay now</a>
-									{/if}
-								</p>
-							{/if}
-						</div>
-						<div class="calendar-home__event-side">
-							<div class="calendar-home__facepile">
-								{#each event.participants as participant}
-									{#if participant.avatarUrl}
-										<img src={participant.avatarUrl} alt={participant.name || ''} />
-									{:else}
-										<span>{(participant.name || '?').slice(0, 1).toUpperCase()}</span>
-									{/if}
-								{/each}
-							</div>
-							{#if event.userStatus}
-									<PillButton
-										className="calendar-page__ghost-button"
-										variant="ghost"
-										size="md"
-										onClick={() => leave(event.id)}
-										disabled={pendingEventId === event.id}
-									>
-										{pendingEventId === event.id ? '...' : 'Leave'}
-									</PillButton>
-							{:else}
-									<PillButton
-										className="calendar-page__primary-button"
-										variant="primary"
-										size="lg"
-										onClick={() => join(event.id, 0)}
-										disabled={pendingEventId === event.id}
-									>
-										{pendingEventId === event.id ? '...' : event.seatsLeft > 0 ? 'Join' : 'Join waitlist'}
-									</PillButton>
-									{#if event.seatsLeft >= 2}
-										<PillButton
-											className="calendar-page__ghost-button"
-											variant="ghost"
-											size="md"
-											onClick={() => join(event.id, 1)}
-											disabled={pendingEventId === event.id}
-										>
-											{pendingEventId === event.id ? '...' : 'Join +1'}
-										</PillButton>
-									{/if}
-							{/if}
-						</div>
-					</article>
+					<AdminEventSessionCard event={event} onOpenEvent={() => goto(eventRoute(event))} />
 				{/each}
 			</div>
 		{/if}
@@ -163,41 +175,81 @@
 		{#if recent.length === 0}
 			<p class="calendar-page__subtitle calendar-home__sub">No completed events yet.</p>
 		{:else}
-			<div class="calendar-home__feed-list">
+			<div class="social-events__past-list">
 				{#each recent as event}
-					<article class="calendar-home__event-card calendar-home__event-card--memory">
-						{#if event.heroImageUrl}
-							<img src={event.heroImageUrl} alt="" class="calendar-home__memory-image" />
-						{/if}
-						<div class="calendar-home__event-meta">
-							<p class="calendar-home__event-label">{event.activityLabel}</p>
-							<h3>{event.title}</h3>
-							<p>{formatWhen(event.startsAt, event.endsAt)}</p>
-							<p>{event.seatsTaken}/{event.capacity} joined</p>
-							{#if event.recapText}
-								<p class="calendar-home__memory-recap">{event.recapText}</p>
-							{/if}
+					<AdminChevronRowCard compact={true} href={eventRoute(event)} ariaLabel={`Open ${event.title}`}>
+						{#snippet start()}
+							<span class="social-events__past-emoji">{emojiForActivity(event.activityLabel, event.activitySlug)}</span>
+						{/snippet}
+						<div>
+							<div class="social-events__past-title">{event.title}</div>
+							<div class="social-events__event-sub">{dayLabel(event.startsAt)} · {event.seatsTaken} went</div>
 						</div>
-					</article>
+					</AdminChevronRowCard>
 				{/each}
 			</div>
 		{/if}
 	</section>
 
-	<section class="calendar-page__section calendar-home__section">
-		<h2 class="calendar-home__feed-title">Browse Activities</h2>
-		{#if data.activities.length === 0}
-			<p class="calendar-page__subtitle calendar-home__sub">No programs are open right now. Check back soon.</p>
-		{:else}
-			<div class="calendar-page__activity-grid calendar-home__grid">
-				{#each data.activities as activity}
-					<a href={activity.href} class="calendar-page__activity-card calendar-home__card">
-						<span class="calendar-page__activity-icon calendar-home__icon">{activity.icon}</span>
-						<h2>{activity.label}</h2>
-						<p>{activity.description}</p>
-					</a>
-				{/each}
-			</div>
-		{/if}
-	</section>
 </div>
+
+<style>
+	.calendar-home :global(.admin-ui-card) {
+		border-radius: 14px;
+		border: 1px solid color-mix(in srgb, var(--calendar-shell-text) 10%, transparent);
+		background: color-mix(in srgb, var(--calendar-panel-bg) 84%, transparent);
+		box-shadow: 0 1px 2px color-mix(in srgb, black 8%, transparent);
+	}
+
+	.calendar-home :global(.admin-ui-card--interactive) {
+		transition:
+			border-color 150ms ease,
+			background 150ms ease,
+			box-shadow 170ms cubic-bezier(0.2, 0.8, 0.2, 1),
+			transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.calendar-home :global(.admin-ui-card--interactive:hover) {
+		background: color-mix(in srgb, var(--calendar-panel-bg) 92%, transparent);
+		border-color: color-mix(in srgb, var(--calendar-shell-text) 16%, transparent);
+		box-shadow: 0 4px 16px color-mix(in srgb, var(--calendar-shell-text) 8%, transparent);
+		transform: translateY(-1px);
+	}
+
+	.social-events__upcoming-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.5rem;
+	}
+
+	.social-events__past-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+
+	.social-events__past-title {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: color-mix(in srgb, var(--calendar-shell-text) 84%, transparent);
+	}
+
+	.social-events__past-emoji {
+		font-size: 1rem;
+		line-height: 1;
+		flex-shrink: 0;
+	}
+
+	.social-events__event-sub {
+		font-size: 0.74rem;
+		line-height: 1;
+		color: color-mix(in srgb, var(--calendar-shell-text) 60%, transparent);
+		margin-top: 0.1rem;
+	}
+
+	@media (max-width: 720px) {
+		.social-events__upcoming-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

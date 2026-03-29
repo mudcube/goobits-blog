@@ -11,8 +11,8 @@ const ROUTES = [
 	'/privacy',
 	'/terms',
 	'/cookies',
-	'/calendar/login',
-	'/admin'
+	'/schedule/login',
+	'/schedule/admin'
 ]
 
 const MAX_DELTA_PX = Number.parseFloat(process.env.E2E_DRIFT_MAX_PX || '1.0')

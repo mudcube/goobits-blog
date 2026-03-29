@@ -20,12 +20,7 @@
 	)
 	const topbarItems = $derived(
 		dev
-			? [
-				...headerNavItems,
-				{ href: '', label: '|' },
-				{ href: calendarConfig.routes.calendarBase, label: 'CALENDAR', matchPrefix: true },
-				{ href: calendarConfig.routes.adminBase, label: 'ADMIN', matchPrefix: true }
-			]
+			? [...headerNavItems]
 			: headerNavItems
 	)
 

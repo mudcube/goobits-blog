@@ -1,7 +1,7 @@
 import { chromium } from 'playwright'
-import { BASE_URL, getAdminPasscode, getE2ETestToken } from './_helpers'
+import { BASE_URL, bootstrapAdminSession, getAdminPasscode, getE2ETestToken } from './_helpers'
 
-const ADMIN_URL = `${BASE_URL}/admin/`
+const ADMIN_URL = `${BASE_URL}/schedule/admin/`
 
 async function waitForFeedEvent(
 	request: import('playwright').APIRequestContext,
@@ -65,9 +65,8 @@ async function createAdminEvent(
 }
 
 export async function runCalendarEventsFlow() {
-	const passcode = getAdminPasscode()
-	if (!passcode) throw new Error('ADMIN_PASSCODE not available')
-	const e2eToken = getE2ETestToken() || passcode
+	const e2eToken = getE2ETestToken() || getAdminPasscode()
+	if (!e2eToken) throw new Error('E2E test token not available')
 
 	const browser = await chromium.launch({ headless: true })
 	const context = await browser.newContext()
@@ -75,18 +74,8 @@ export async function runCalendarEventsFlow() {
 	const page = await context.newPage()
 
 	try {
-		await page.goto(ADMIN_URL, { waitUntil: 'domcontentloaded', timeout: 30000 })
-
-			if ((await page.locator('.admin-login').count()) > 0) {
-				await page.fill('input[name="password"]', passcode)
-				await page.click('button[type="submit"]')
-				// Some runtimes/forms can complete without a full navigation; wait for the cookie instead.
-				for (let attempt = 0; attempt < 20; attempt += 1) {
-					const cookies = await context.cookies(ADMIN_URL)
-					if (cookies.some((cookie) => cookie.name === 'admin_session')) break
-					await page.waitForTimeout(150)
-				}
-			}
+		await bootstrapAdminSession(context.request)
+		await page.goto(`${ADMIN_URL}?preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 
 			const cookies = await context.cookies(ADMIN_URL)
 			const hasSessionCookie = cookies.some((cookie) => cookie.name === 'admin_session')
@@ -97,9 +86,8 @@ export async function runCalendarEventsFlow() {
 			.post(`${BASE_URL}/api/admin/dev/cleanup-e2e`, { headers: { origin: BASE_URL } })
 			.catch(() => null)
 
-		await page.goto(`${BASE_URL}/admin/`, { waitUntil: 'domcontentloaded', timeout: 30000 })
-		if (await page.locator('input[name="password"]').count()) throw new Error('admin auth failed')
-		await page.locator('.admin-page-hero__title, .social-home__main').first().waitFor({ timeout: 30000 })
+		await page.goto(`${BASE_URL}/schedule/admin/?preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
+		await page.getByTestId('admin-dashboard-main').waitFor({ timeout: 30000 })
 
 		const title = `E2E Calendar Event ${Date.now()}`
 		const waitlistTitle = `E2E Waitlist Event ${Date.now()}`
@@ -154,23 +142,23 @@ export async function runCalendarEventsFlow() {
 			// Verify member session is actually recognized by the calendar APIs before loading UI.
 			const mainEvent = await requireFeedEvent(context.request, BASE_URL, title)
 
-			const calendarRes = await page.goto(`${BASE_URL}/calendar`, { waitUntil: 'domcontentloaded', timeout: 30000 })
+			const calendarRes = await page.goto(`${BASE_URL}/schedule`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 			if (!calendarRes || !calendarRes.ok()) {
 				throw new Error(`calendar home failed to load: status=${calendarRes?.status() ?? 'no_response'}`)
 			}
-			if (page.url().includes('/calendar/login')) throw new Error('calendar member session bootstrap did not stick')
+			if (page.url().includes('/schedule/login')) throw new Error('calendar member session bootstrap did not stick')
 
-			const mainCard = page.locator('.calendar-home__event-card', { hasText: title }).first()
+			const mainCard = page.getByTestId('member-event-card').filter({ hasText: title }).first()
 			try {
 				await mainCard.waitFor({ timeout: 30000 })
 			} catch {
-				const cards = page.locator('.calendar-home__event-card')
+				const cards = page.getByTestId('member-event-card')
 				const count = await cards.count()
 				const texts = (await cards.allInnerTexts().catch(() => [] as string[])).slice(0, 8)
-				const htmlRes = await context.request.get(`${BASE_URL}/calendar`)
+				const htmlRes = await context.request.get(`${BASE_URL}/schedule`)
 				const html = await htmlRes.text().catch(() => '')
 				const ssrHasTitle = html.includes(title)
-				const ssrHasCardClass = html.includes('calendar-home__event-card')
+				const ssrHasCardClass = html.includes('data-testid="member-event-card"')
 				const clientUrl = page.url()
 				throw new Error(
 					`calendar home did not render event card: count=${count}; ssrHasTitle=${ssrHasTitle}; ssrHasCardClass=${ssrHasCardClass}; url=${clientUrl}; sample=${JSON.stringify(texts)}`
@@ -182,12 +170,16 @@ export async function runCalendarEventsFlow() {
 			})
 			if (!joinApi.ok()) throw new Error(`join API failed: ${joinApi.status()}`)
 			await page.reload({ waitUntil: 'domcontentloaded' })
-			await page.locator('.calendar-home__event-card', { hasText: title }).first().locator('p', { hasText: '2/4 seats' }).first().waitFor({ timeout: 30000 })
+			await page
+				.locator('[data-testid="member-event-card"][data-event-id="' + mainEvent.id + '"] [data-testid="member-event-attendance"]', { hasText: '2' })
+				.waitFor({ timeout: 30000 })
 
 			const leaveApi = await context.request.post(`${BASE_URL}/api/calendar/events/${mainEvent.id}/leave`)
 			if (!leaveApi.ok()) throw new Error(`leave API failed: ${leaveApi.status()}`)
 			await page.reload({ waitUntil: 'domcontentloaded' })
-			await page.locator('.calendar-home__event-card', { hasText: title }).first().locator('p', { hasText: '0/4 seats' }).first().waitFor({ timeout: 30000 })
+			await page
+				.locator('[data-testid="member-event-card"][data-event-id="' + mainEvent.id + '"] [data-testid="member-event-attendance"]', { hasText: '0' })
+				.waitFor({ timeout: 30000 })
 
 		const feedRes = await context.request.get(`${BASE_URL}/api/calendar/events`)
 		if (!feedRes.ok()) throw new Error(`failed to load calendar events feed: ${feedRes.status()}`)

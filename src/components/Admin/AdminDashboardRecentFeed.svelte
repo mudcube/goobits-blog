@@ -103,7 +103,7 @@
 					<div class="admin-dashboard-recent__avatar">{item.initials}</div>
 					<div class="admin-dashboard-recent__text">
 						{#if item.userId}
-							<a class="admin-dashboard-recent__name-link" href={`/admin/crew/${item.userId}/${mockMode ? '?mock=1' : ''}`}>
+							<a class="admin-dashboard-recent__name-link" href={`/schedule/admin/crew/${item.userId}/${mockMode ? '?mock=1' : ''}`}>
 								<strong>{item.name}</strong>
 							</a>
 						{:else}

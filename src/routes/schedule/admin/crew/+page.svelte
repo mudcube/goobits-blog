@@ -429,11 +429,11 @@
 					badge={deriveBadge(user)}
 					initials={initials(displayName(user))}
 					isYou={isYou(user)}
-					href={hrefWithMock(`/admin/crew/${String(user['id'] || '').trim()}/`)}
+					href={hrefWithMock(`/schedule/admin/crew/${String(user['id'] || '').trim()}/`)}
 					onclick={() => {
 						const id = String(user['id'] || '').trim()
 						if (!id) return
-						void goto(hrefWithMock(`/admin/crew/${id}/`))
+						void goto(hrefWithMock(`/schedule/admin/crew/${id}/`))
 					}}
 				/>
 			{/each}

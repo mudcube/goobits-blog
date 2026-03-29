@@ -11,8 +11,8 @@ const ROUTES = [
 	'/privacy',
 	'/terms',
 	'/cookies',
-	'/calendar/login',
-	'/admin'
+	'/schedule/login',
+	'/schedule/admin'
 ]
 
 // Strict by default; allow overrides for tuning.

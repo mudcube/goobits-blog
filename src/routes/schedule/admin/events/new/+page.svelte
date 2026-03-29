@@ -82,7 +82,7 @@
 		if (!selectedActivitySlug || !createTitle || !createStartsAt || !createEndsAt) return
 		if (mockMode) {
 			flash('Mock mode: event created in preview')
-			void goto(hrefWithMock(`/admin/events/${selectedActivitySlug}/`))
+			void goto(hrefWithMock(`/schedule/admin/events/${selectedActivitySlug}/`))
 			return
 		}
 		dashboard.eventDraft = {
@@ -100,7 +100,7 @@
 			flash(dashboard.error, true)
 			return
 		}
-		void goto(hrefWithMock('/admin/events/'))
+		void goto(hrefWithMock('/schedule/admin/events/'))
 	}
 </script>
 
@@ -119,7 +119,7 @@
 			primaryLabel={dashboard.eventsCreating ? 'Creating…' : 'Create'}
 			primaryDisabled={!mockMode && dashboard.eventsCreating}
 			drawerOpen={!!selectedActivitySlug && drawerOpen}
-			onBack={() => goto(hrefWithMock('/admin/events/'))}
+			onBack={() => goto(hrefWithMock('/schedule/admin/events/'))}
 			onToggleSettings={() => (drawerOpen = !drawerOpen)}
 			onTogglePreview={() => (preview = !preview)}
 			onPrimary={() => { void submitCreate() }}

@@ -13,12 +13,12 @@
 	const calendarConfig = getCalendarUiConfig()
 
 	const primaryNav = [
-		{ href: '/admin/', label: 'Dashboard', icon: LayoutDashboard },
-		{ href: '/admin/crew/', label: 'Crew', icon: Users },
-		{ href: '/admin/events/', label: 'Events', icon: CalendarDays }
+		{ href: '/schedule/admin/', label: 'Dashboard', icon: LayoutDashboard },
+		{ href: '/schedule/admin/crew/', label: 'Crew', icon: Users },
+		{ href: '/schedule/admin/events/', label: 'Events', icon: CalendarDays }
 	]
 
-	const footerNav = [{ href: '/admin/settings/', label: 'Settings', icon: Settings }]
+	const footerNav = [{ href: '/schedule/admin/settings/', label: 'Settings', icon: Settings }]
 	const mockMode = $derived(isAdminMockMode($page.url))
 
 	function hrefWithMock(path: string) {
@@ -30,23 +30,23 @@
 		const current = $page.url.pathname.endsWith('/') && $page.url.pathname.length > 1
 			? $page.url.pathname.slice(0, -1)
 			: $page.url.pathname
-		if (normalizedPath === '/admin') return current === '/admin'
+		if (normalizedPath === '/schedule/admin') return current === '/schedule/admin'
 		return current === normalizedPath || current.startsWith(`${normalizedPath}/`)
 	}
 
 	function adminSectionTitle(pathname: string) {
-		if (pathname === '/admin/crew' || pathname.startsWith('/admin/crew/')) return 'Crew'
-		if (pathname === '/admin/events' || pathname.startsWith('/admin/events/')) return 'Events'
-		if (pathname === '/admin/settings' || pathname.startsWith('/admin/settings/')) return 'Settings'
-		if (pathname === '/admin/config' || pathname.startsWith('/admin/config/')) return 'Settings'
+		if (pathname === '/schedule/admin/crew' || pathname.startsWith('/schedule/admin/crew/')) return 'Crew'
+		if (pathname === '/schedule/admin/events' || pathname.startsWith('/schedule/admin/events/')) return 'Events'
+		if (pathname === '/schedule/admin/settings' || pathname.startsWith('/schedule/admin/settings/')) return 'Settings'
+		if (pathname === '/schedule/admin/config' || pathname.startsWith('/schedule/admin/config/')) return 'Settings'
 		return 'Dashboard'
 	}
 
 	function breadcrumbs(pathname: string) {
 		const normalized = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname
-		const items: Array<{ label: string; href?: string }> = [{ label: 'Dashboard', href: hrefWithMock('/admin/') }]
-		const eventsSingleSegment = normalized.match(/^\/admin\/events\/([^/]+)$/)
-		const crewSingleSegment = normalized.match(/^\/admin\/crew\/([^/]+)$/)
+		const items: Array<{ label: string; href?: string }> = [{ label: 'Dashboard', href: hrefWithMock('/schedule/admin/') }]
+		const eventsSingleSegment = normalized.match(/^\/schedule\/admin\/events\/([^/]+)$/)
+		const crewSingleSegment = normalized.match(/^\/schedule\/admin\/crew\/([^/]+)$/)
 		const eventLeaf = eventsSingleSegment?.[1] || ''
 		const crewLeaf = crewSingleSegment?.[1] || ''
 		const isEventId = /^\d+$/.test(eventLeaf)
@@ -56,26 +56,26 @@
 				.filter(Boolean)
 				.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
 				.join(' ')
-		if (normalized === '/admin') return items
-		if (crewSingleSegment) return [...items, { label: 'Crew', href: hrefWithMock('/admin/crew/') }, { label: prettyLeaf(crewLeaf) }]
-		if (normalized.startsWith('/admin/crew')) return [...items, { label: 'Crew' }]
-		if (normalized === '/admin/settings' || normalized.startsWith('/admin/settings/')) return [...items, { label: 'Settings' }]
-		if (normalized === '/admin/events') return [...items, { label: 'Events' }]
-		if (normalized === '/admin/events/new') return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: 'New Event' }]
-		if (normalized.startsWith('/admin/events/program/')) {
+		if (normalized === '/schedule/admin') return items
+		if (crewSingleSegment) return [...items, { label: 'Crew', href: hrefWithMock('/schedule/admin/crew/') }, { label: prettyLeaf(crewLeaf) }]
+		if (normalized.startsWith('/schedule/admin/crew')) return [...items, { label: 'Crew' }]
+		if (normalized === '/schedule/admin/settings' || normalized.startsWith('/schedule/admin/settings/')) return [...items, { label: 'Settings' }]
+		if (normalized === '/schedule/admin/events') return [...items, { label: 'Events' }]
+		if (normalized === '/schedule/admin/events/new') return [...items, { label: 'Events', href: hrefWithMock('/schedule/admin/events/') }, { label: 'New Event' }]
+		if (normalized.startsWith('/schedule/admin/events/program/')) {
 			const legacyLeaf = normalized.split('/').pop() || 'program'
-			return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: prettyLeaf(legacyLeaf) }]
+			return [...items, { label: 'Events', href: hrefWithMock('/schedule/admin/events/') }, { label: prettyLeaf(legacyLeaf) }]
 		}
-		if (eventsSingleSegment && !isEventId) return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: prettyLeaf(eventLeaf) }]
-		if (normalized.startsWith('/admin/events/')) {
+		if (eventsSingleSegment && !isEventId) return [...items, { label: 'Events', href: hrefWithMock('/schedule/admin/events/') }, { label: prettyLeaf(eventLeaf) }]
+		if (normalized.startsWith('/schedule/admin/events/')) {
 			const detailLabel = $adminEventDetailBreadcrumb || 'Event Detail'
-			return [...items, { label: 'Events', href: hrefWithMock('/admin/events/') }, { label: detailLabel }]
+			return [...items, { label: 'Events', href: hrefWithMock('/schedule/admin/events/') }, { label: detailLabel }]
 		}
 		return [...items, { label: adminSectionTitle(normalized) }]
 	}
 
 	function showBreadcrumbs(pathname: string) {
-		return pathname.startsWith('/admin')
+		return pathname.startsWith('/schedule/admin')
 	}
 
 	function normalizePath(pathname: string) {
@@ -84,7 +84,7 @@
 
 	function isProgramEditorRoute(pathname: string) {
 		const normalized = normalizePath(pathname)
-		const eventsSingleSegment = normalized.match(/^\/admin\/events\/([^/]+)$/)
+		const eventsSingleSegment = normalized.match(/^\/schedule\/admin\/events\/([^/]+)$/)
 		const eventLeaf = eventsSingleSegment?.[1] || ''
 		const isEventId = /^\d+$/.test(eventLeaf)
 		return !!(eventsSingleSegment && !isEventId)
@@ -92,30 +92,30 @@
 
 	function programEditorSlug(pathname: string) {
 		const normalized = normalizePath(pathname)
-		const eventsSingleSegment = normalized.match(/^\/admin\/events\/([^/]+)$/)
+		const eventsSingleSegment = normalized.match(/^\/schedule\/admin\/events\/([^/]+)$/)
 		const eventLeaf = eventsSingleSegment?.[1] || ''
 		if (!eventLeaf || /^\d+$/.test(eventLeaf)) return null
 		return eventLeaf
 	}
 
 	function isEventsIndexRoute(pathname: string) {
-		return normalizePath(pathname) === '/admin/events'
+		return normalizePath(pathname) === '/schedule/admin/events'
 	}
 
 	function isEventsNewRoute(pathname: string) {
-		return normalizePath(pathname) === '/admin/events/new'
+		return normalizePath(pathname) === '/schedule/admin/events/new'
 	}
 
 	function isCrewRoute(pathname: string) {
-		return normalizePath(pathname) === '/admin/crew'
+		return normalizePath(pathname) === '/schedule/admin/crew'
 	}
 
 	function isDashboardRoute(pathname: string) {
-		return normalizePath(pathname) === '/admin'
+		return normalizePath(pathname) === '/schedule/admin'
 	}
 
 	function isEventDetailRoute(pathname: string) {
-		return /^\/admin\/events\/\d+$/.test(normalizePath(pathname))
+		return /^\/schedule\/admin\/events\/\d+$/.test(normalizePath(pathname))
 	}
 
 	function triggerProgramEditorSettings() {
@@ -190,22 +190,22 @@
 							<AdminActionButton
 								variant="subtle"
 								icon={Eye}
-								href={`/calendar/${programEditorSlug($page.url.pathname)}/`}
+								href={`/schedule/${programEditorSlug($page.url.pathname)}/`}
 							>View</AdminActionButton>
 						{/if}
 						<AdminActionButton variant="subtle" icon={Settings} onclick={triggerProgramEditorSettings}>Settings</AdminActionButton>
 					{:else if isEventsIndexRoute($page.url.pathname)}
-						<AdminActionButton variant="primary" icon={CalendarPlus} href={hrefWithMock('/admin/events/new/')}>New</AdminActionButton>
+						<AdminActionButton variant="primary" icon={CalendarPlus} href={hrefWithMock('/schedule/admin/events/new/')}>New</AdminActionButton>
 					{:else if isEventsNewRoute($page.url.pathname)}
 						<AdminActionButton
 							variant="subtle"
 							icon={ArrowLeft}
-							onclick={() => void goto(hrefWithMock('/admin/events/'))}
+							onclick={() => void goto(hrefWithMock('/schedule/admin/events/'))}
 						>Back to Events</AdminActionButton>
 					{:else if isCrewRoute($page.url.pathname)}
 						<AdminActionButton variant="primary" icon={UserPlus} onclick={triggerCrewInvite}>Invite</AdminActionButton>
 					{:else if isDashboardRoute($page.url.pathname)}
-						<AdminActionButton variant="subtle" icon={CalendarDays} href="/calendar/">Calendar</AdminActionButton>
+						<AdminActionButton variant="subtle" icon={CalendarDays} href="/schedule/">Calendar</AdminActionButton>
 					{:else if isEventDetailRoute($page.url.pathname)}
 						<AdminActionButton variant="primary" icon={Pencil} onclick={triggerEventDetailEdit}>Edit</AdminActionButton>
 						<AdminActionButton variant="danger" icon={Trash2} onclick={triggerEventDetailCancel}>Cancel Event</AdminActionButton>
@@ -218,7 +218,7 @@
 	{/if}
 
 	<aside class="social-admin__sidebar">
-		<a class="social-admin__brand" href={hrefWithMock('/admin/events/')}>Admin</a>
+		<a class="social-admin__brand" href={hrefWithMock('/schedule/admin/events/')}>Admin</a>
 		<nav class="social-admin__nav" aria-label="Admin">
 			{#each primaryNav as item}
 				<a
@@ -245,7 +245,7 @@
 			</a>
 		{/each}
 		{#if data.user}
-			<form class="social-admin__logout" method="POST" action="/admin?/logout" use:enhance>
+			<form class="social-admin__logout" method="POST" action="/schedule/admin?/logout" use:enhance>
 				<button type="submit">
 					<LogOut size={16} strokeWidth={1.8} />
 					<span>Log out</span>
@@ -751,8 +751,11 @@
 		padding: 1.1rem var(--admin-content-pad-x) 1.6rem;
 		min-width: 0;
 		overflow: visible;
+		--admin-content-center-x: calc(
+			var(--admin-content-pad-x) + (min(var(--admin-content-max), calc(100% - (var(--admin-content-pad-x) * 2))) / 2)
+		);
 		background:
-			radial-gradient(ellipse 520px 360px at 52% 68px, color-mix(in srgb, #a78bfa 16%, transparent) 0%, transparent 72%),
+			radial-gradient(circle 420px at var(--admin-content-center-x) calc(68px + 4rem), color-mix(in srgb, #a78bfa 16%, transparent) 0%, transparent 72%),
 			var(--bg);
 	}
 

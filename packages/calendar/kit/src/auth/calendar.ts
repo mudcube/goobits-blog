@@ -173,14 +173,14 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 					if (!hasRedeemed) {
 						if (!canBypassInvite) {
 							if (!invite) {
-								redirect(302, `${config.routes.calendarLoginPath}?error=invite_required`)
+								throw redirect(302, `${config.routes.calendarLoginPath}?error=invite_required`)
 							}
 							const result = await validateInvite({ db, code: invite, email: profile.email })
 							if (!result.valid) {
-								redirect(302, `${config.routes.calendarLoginPath}?error=invite_${result.reason}`)
+								throw redirect(302, `${config.routes.calendarLoginPath}?error=invite_${result.reason}`)
 							}
 							if (!result.invite || typeof result.invite.id !== 'number') {
-								redirect(302, `${config.routes.calendarLoginPath}?error=invite_invalid`)
+								throw redirect(302, `${config.routes.calendarLoginPath}?error=invite_invalid`)
 							}
 
 							await consumeInvite({ db, inviteId: result.invite.id, userId: user.id })
@@ -193,7 +193,7 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 				}
 
 				if (!user) {
-					redirect(302, `${config.routes.calendarLoginPath}?error=signin_failed`)
+					throw redirect(302, `${config.routes.calendarLoginPath}?error=signin_failed`)
 				}
 				const session = await sessionAdapter.createSession(user.id)
 				sessionAdapter.setSessionCookie(evt.cookies, session)

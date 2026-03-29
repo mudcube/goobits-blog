@@ -4,12 +4,12 @@
 	export let subtitle = ''
 </script>
 
-<section class="admin-page-hero">
+<section class="admin-page-hero" data-testid="admin-page-hero">
 	<div class="admin-page-hero__content">
 		{#if eyebrow}
 			<p class="admin-page-hero__eyebrow">{eyebrow}</p>
 		{/if}
-		<h1 class="admin-page-hero__title">{title}</h1>
+		<h1 class="admin-page-hero__title" data-testid="admin-page-hero-title">{title}</h1>
 		{#if subtitle}
 			<p class="admin-page-hero__subtitle">{subtitle}</p>
 		{/if}
