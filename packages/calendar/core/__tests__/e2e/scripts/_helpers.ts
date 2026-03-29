@@ -41,3 +41,23 @@ export async function bootstrapAdminSession(request: import('playwright').APIReq
 		throw new Error(`admin session bootstrap failed: ${response.status()}`)
 	}
 }
+
+export async function bootstrapCalendarSession(
+	request: import('playwright').APIRequestContext,
+	input: { email?: string; name?: string } = {}
+) {
+	const token = getE2ETestToken() || getAdminPasscode()
+	if (!token) throw new Error('E2E test token not available')
+
+	const response = await request.post(`${BASE_URL}/api/test/calendar-session`, {
+		headers: { authorization: `Bearer ${token}` },
+		data: {
+			email: input.email || `e2e-calendar-${Date.now()}@example.com`,
+			name: input.name || 'E2E Calendar User'
+		}
+	})
+
+	if (!response.ok()) {
+		throw new Error(`calendar session bootstrap failed: ${response.status()}`)
+	}
+}

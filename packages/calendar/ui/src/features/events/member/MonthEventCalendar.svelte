@@ -78,6 +78,7 @@
 	function selectDateFromCalendar(date: Date) {
 		if (isPast(date)) return
 		if (getEventsForDate(date).length === 0) return
+		currentMonth = new Date(date.getFullYear(), date.getMonth(), 1)
 		selectedDate = date
 	}
 

@@ -8,6 +8,8 @@ export function getViteRuntimeConfig(
 ): Pick<UserConfig, 'define' | 'resolve' | 'server'> {
 	const runtime = getRuntimeEnv(env)
 	const server: NonNullable<UserConfig['server']> = {
+		// Permit requests forwarded through a specific local hostname without broadening host checks.
+		allowedHosts: [ 'studio.local' ],
 		host: runtime.host,
 		open: false,
 		port: runtime.port,

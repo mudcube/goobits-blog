@@ -12,6 +12,11 @@
 		currentMonth: boolean
 	}
 
+	type CalendarSnapshot = {
+		days: CalendarCell[]
+		selectedDateIso: string | null
+	}
+
 	const {
 		currentMonth,
 		selectedDateIso = null,
@@ -53,7 +58,12 @@
 	}
 
 	const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+	const MONTH_SLIDE_MS = 180
 	let weekStart = $state<AdminCalendarWeekStart>('monday')
+	let renderedMonth = $state(new Date(0))
+	let renderedSelectedDateIso = $state<string | null>(null)
+	let transitionSnapshot = $state<CalendarSnapshot | null>(null)
+	let isMonthAnimating = $state(false)
 
 	$effect(() => {
 		if (syncWeekStartPreference) return
@@ -65,17 +75,19 @@
 		return [...weekdays.slice(1), weekdays[0]]
 	})
 
+	let monthDirection = $state(0)
+
 	const monthLabel = $derived(
 		title || currentMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
 	)
 
-	const days = $derived.by(() => {
-		const first = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
-		const last = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0)
+	function buildDays(month: Date, start: AdminCalendarWeekStart) {
+		const first = new Date(month.getFullYear(), month.getMonth(), 1)
+		const last = new Date(month.getFullYear(), month.getMonth() + 1, 0)
 		const grid: CalendarCell[] = []
 
 		const firstWeekday = first.getDay()
-		const firstWeekdayOffset = weekStart === 'monday' ? (firstWeekday + 6) % 7 : firstWeekday
+		const firstWeekdayOffset = start === 'monday' ? (firstWeekday + 6) % 7 : firstWeekday
 		for (let i = 0; i < firstWeekdayOffset; i += 1) {
 			const d = new Date(first)
 			d.setDate(d.getDate() - (firstWeekdayOffset - i))
@@ -84,7 +96,7 @@
 
 		for (let day = 1; day <= last.getDate(); day += 1) {
 			grid.push({
-				date: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day),
+				date: new Date(month.getFullYear(), month.getMonth(), day),
 				currentMonth: true
 			})
 		}
@@ -98,7 +110,9 @@
 		}
 
 		return grid
-	})
+	}
+
+	const days = $derived.by(() => buildDays(currentMonth, weekStart))
 
 	function isoDay(date: Date) {
 		const y = date.getFullYear()
@@ -106,6 +120,44 @@
 		const d = `${date.getDate()}`.padStart(2, '0')
 		return `${y}-${m}-${d}`
 	}
+
+	function clearAnimation() {
+		isMonthAnimating = false
+		transitionSnapshot = null
+	}
+
+	let clearAnimationTimer: number | null = null
+
+	$effect(() => {
+		const nextMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
+		const previousMonthMs = renderedMonth.getTime()
+		const nextMonthMs = nextMonth.getTime()
+
+		if (previousMonthMs === 0) {
+			renderedMonth = nextMonth
+			renderedSelectedDateIso = selectedDateIso
+			return
+		}
+
+		if (nextMonthMs === previousMonthMs) {
+			renderedSelectedDateIso = selectedDateIso
+			return
+		}
+
+		monthDirection = nextMonthMs > previousMonthMs ? 1 : -1
+		transitionSnapshot = {
+			days: buildDays(renderedMonth, weekStart),
+			selectedDateIso: renderedSelectedDateIso
+		}
+		renderedMonth = nextMonth
+		renderedSelectedDateIso = selectedDateIso
+		isMonthAnimating = true
+
+		if (typeof window !== 'undefined') {
+			if (clearAnimationTimer) clearTimeout(clearAnimationTimer)
+			clearAnimationTimer = window.setTimeout(clearAnimation, MONTH_SLIDE_MS)
+		}
+	})
 
 	onMount(() => {
 		if (!syncWeekStartPreference) return
@@ -115,9 +167,52 @@
 			weekStart = value === 'sunday' ? 'sunday' : 'monday'
 		}
 		window.addEventListener(CALENDAR_WEEK_START_CHANGED_EVENT, onWeekStartChanged as EventListener)
-		return () => window.removeEventListener(CALENDAR_WEEK_START_CHANGED_EVENT, onWeekStartChanged as EventListener)
+		return () => {
+			if (clearAnimationTimer) clearTimeout(clearAnimationTimer)
+			window.removeEventListener(
+				CALENDAR_WEEK_START_CHANGED_EVENT,
+				onWeekStartChanged as EventListener
+			)
+		}
 	})
 </script>
+
+{#snippet calendarGrid(daysToRender: CalendarCell[], selectedIso: string | null)}
+	<div class="admin-calendar__grid">
+		{#each daysToRender as day}
+			{@const isDayPast = isPast(day.date)}
+			{@const isDayToday = isToday(day.date)}
+			{@const isDayActive = isActive(day.date)}
+			{@const dayEventCount = Math.max(0, eventCount(day.date) || 0)}
+			{@const dayTone = eventTone(day.date)}
+			<button
+				type="button"
+				class="admin-calendar__day"
+				class:admin-calendar__day--off={!day.currentMonth}
+				class:admin-calendar__day--past={isDayPast}
+				class:admin-calendar__day--today={isDayToday}
+				class:admin-calendar__day--active={isDayActive}
+				class:admin-calendar__day--selected={selectedIso === isoDay(day.date)}
+				disabled={isDayPast || (!day.currentMonth && !isDayActive)}
+				onclick={(event) => onSelect(day.date, event.currentTarget as HTMLButtonElement)}
+			>
+				<span class="admin-calendar__day-num">{day.date.getDate()}</span>
+				{#if dayEventCount > 0}
+					<span
+						class="admin-calendar__event-dots"
+						style={`--admin-calendar-dot-override: ${dotColorForTone(dayTone) || 'var(--admin-calendar-dot)'}`}
+						aria-hidden="true"
+					>
+						<span class="admin-calendar__event-dot"></span>
+						{#if dayEventCount > 1}
+							<span class="admin-calendar__event-dot"></span>
+						{/if}
+					</span>
+				{/if}
+			</button>
+		{/each}
+	</div>
+{/snippet}
 
 <section
 	class="admin-calendar"
@@ -144,39 +239,25 @@
 			{/each}
 		</div>
 
-		<div class="admin-calendar__grid">
-			{#each days as day}
-				{@const isDayPast = isPast(day.date)}
-				{@const isDayToday = isToday(day.date)}
-				{@const isDayActive = isActive(day.date)}
-				{@const dayEventCount = Math.max(0, eventCount(day.date) || 0)}
-				{@const dayTone = eventTone(day.date)}
-				<button
-					type="button"
-					class="admin-calendar__day"
-					class:admin-calendar__day--off={!day.currentMonth}
-					class:admin-calendar__day--past={isDayPast}
-					class:admin-calendar__day--today={isDayToday}
-					class:admin-calendar__day--active={isDayActive}
-					class:admin-calendar__day--selected={selectedDateIso === isoDay(day.date)}
-					disabled={!day.currentMonth || isDayPast}
-					onclick={(event) => onSelect(day.date, event.currentTarget as HTMLButtonElement)}
+		<div class="admin-calendar__grid-frame">
+			{#if transitionSnapshot}
+				<div
+					class="admin-calendar__grid-layer admin-calendar__grid-layer--previous"
+					class:admin-calendar__grid-layer--slide-out-left={isMonthAnimating && monthDirection > 0}
+					class:admin-calendar__grid-layer--slide-out-right={isMonthAnimating && monthDirection < 0}
+					aria-hidden="true"
 				>
-					<span class="admin-calendar__day-num">{day.date.getDate()}</span>
-					{#if dayEventCount > 0}
-						<span
-							class="admin-calendar__event-dots"
-							style={`--admin-calendar-dot-override: ${dotColorForTone(dayTone) || 'var(--admin-calendar-dot)'}`}
-							aria-hidden="true"
-						>
-							<span class="admin-calendar__event-dot"></span>
-							{#if dayEventCount > 1}
-								<span class="admin-calendar__event-dot"></span>
-							{/if}
-						</span>
-					{/if}
-				</button>
-			{/each}
+					{@render calendarGrid(transitionSnapshot.days, transitionSnapshot.selectedDateIso)}
+				</div>
+			{/if}
+
+			<div
+				class="admin-calendar__grid-layer admin-calendar__grid-layer--current"
+				class:admin-calendar__grid-layer--slide-in-right={isMonthAnimating && monthDirection > 0}
+				class:admin-calendar__grid-layer--slide-in-left={isMonthAnimating && monthDirection < 0}
+			>
+				{@render calendarGrid(days, selectedDateIso)}
+			</div>
 		</div>
 	</div>
 </section>
@@ -211,6 +292,7 @@
 		border: 1px solid var(--admin-calendar-border-uniform);
 		border-radius: 0.5rem 0.5rem 1rem 1rem;
 		overflow: hidden;
+		background: transparent;
 	}
 
 	.admin-calendar__title {
@@ -275,6 +357,25 @@
 		display: grid;
 		grid-template-columns: repeat(7, 1fr);
 		gap: 0;
+	}
+
+	.admin-calendar__grid-frame {
+		display: grid;
+		overflow: clip;
+	}
+
+	.admin-calendar__grid-layer {
+		grid-area: 1 / 1;
+		min-width: 0;
+	}
+
+	.admin-calendar__grid-layer--current {
+		z-index: 1;
+	}
+
+	.admin-calendar__grid-layer--previous {
+		z-index: 2;
+		pointer-events: none;
 	}
 
 	.admin-calendar__day {
@@ -364,6 +465,79 @@
 			0 0 0 2px var(--admin-calendar-selected-ring);
 		border-radius: 0.7rem;
 		z-index: 1;
+	}
+
+	.admin-calendar__grid-layer--slide-in-right {
+		animation: admin-calendar-slide-in-right 180ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.admin-calendar__grid-layer--slide-in-left {
+		animation: admin-calendar-slide-in-left 180ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.admin-calendar__grid-layer--slide-out-left {
+		animation: admin-calendar-slide-out-left 180ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+	}
+
+	.admin-calendar__grid-layer--slide-out-right {
+		animation: admin-calendar-slide-out-right 180ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+	}
+
+	@keyframes admin-calendar-slide-in-right {
+		from {
+			transform: translateX(16px);
+			opacity: 0.16;
+		}
+
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
+	}
+
+	@keyframes admin-calendar-slide-in-left {
+		from {
+			transform: translateX(-16px);
+			opacity: 0.16;
+		}
+
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
+	}
+
+	@keyframes admin-calendar-slide-out-left {
+		from {
+			transform: translateX(0);
+			opacity: 1;
+		}
+
+		to {
+			transform: translateX(-16px);
+			opacity: 0;
+		}
+	}
+
+	@keyframes admin-calendar-slide-out-right {
+		from {
+			transform: translateX(0);
+			opacity: 1;
+		}
+
+		to {
+			transform: translateX(16px);
+			opacity: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.admin-calendar__grid-layer--slide-in-right,
+		.admin-calendar__grid-layer--slide-in-left,
+		.admin-calendar__grid-layer--slide-out-left,
+		.admin-calendar__grid-layer--slide-out-right {
+			animation: none;
+		}
 	}
 
 	@media (max-width: 720px) {
