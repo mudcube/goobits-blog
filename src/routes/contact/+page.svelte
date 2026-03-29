@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { onMount } from 'svelte'
 	import { goto } from '$app/navigation'
 	import { ChevronRight } from '@lucide/svelte'
 	import { Hero, PageShell, PillButton } from '@miko/ui'
+	import { initializeAntiAbuseFields } from '$lib/client/antiabuse'
 	import { submitContact, toContactPayload } from '$lib/client/forms/contact'
 
-	let { data } = $props()
+	let { data } = $props<{ data: { contextFrom?: string; contextTopic?: string; turnstileSiteKey?: string } }>()
 
 	type ContactErrors = {
 		name?: string
@@ -16,9 +18,12 @@
 	let submitError = $state('')
 	let values = $state({ name: '', email: '', message: '' })
 	let errors = $state<ContactErrors>({})
+	let startedAt = $state('')
+	let deviceId = $state('')
 
 	const contextFrom = $derived((data?.contextFrom || '').trim())
 	const contextTopic = $derived((data?.contextTopic || '').trim())
+	const turnstileSiteKey = $derived((data?.turnstileSiteKey || '').trim())
 	const contextLabel = $derived.by(() => {
 		const parts = [contextFrom, contextTopic].filter(Boolean)
 		return parts.length ? parts.join(' / ') : ''
@@ -28,6 +33,12 @@
 		if (contextFrom === 'art') return 'Tell me about the piece, timeline, and any reference links...'
 		if (contextFrom === 'about' && contextTopic) return 'Tell me a bit about your project and what you are looking for...'
 		return 'Tell me about your project…'
+	})
+
+	onMount(() => {
+		const fields = initializeAntiAbuseFields('miko_contact_device_id')
+		startedAt = fields.startedAt
+		deviceId = fields.deviceId
 	})
 
 	function validate() {
@@ -62,6 +73,9 @@
 
 <svelte:head>
 	<title>Contact - MIKO.ART</title>
+	{#if turnstileSiteKey}
+		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+	{/if}
 </svelte:head>
 
 <PageShell className="contact-page">
@@ -81,6 +95,12 @@
 			<form class="contact-page__form" onsubmit={onSubmit} novalidate>
 				<input type="hidden" name="from" value={contextFrom} />
 				<input type="hidden" name="topic" value={contextTopic} />
+				<input type="hidden" name="started_at" value={startedAt} />
+				<input type="hidden" name="device_id" value={deviceId} />
+				<label class="contact-page__hp" aria-hidden="true">
+					<span>Website</span>
+					<input type="text" name="website" tabindex="-1" autocomplete="off" />
+				</label>
 				{#if contextLabel}
 					<p class="contact-page__context">Context: {contextLabel}</p>
 				{/if}
@@ -116,6 +136,10 @@
 
 				{#if submitError}
 					<p class="contact-page__submit-error">{submitError}</p>
+				{/if}
+
+				{#if turnstileSiteKey}
+					<div class="cf-turnstile" data-sitekey={turnstileSiteKey}></div>
 				{/if}
 
 				<PillButton className="contact-page__submit" type="submit" variant="primary" size="lg" disabled={submitting}>
@@ -158,3 +182,14 @@
 		</aside>
 	</section>
 </PageShell>
+
+<style lang="scss">
+	.contact-page__hp {
+		position: absolute;
+		left: -100vw;
+		top: auto;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+	}
+</style>

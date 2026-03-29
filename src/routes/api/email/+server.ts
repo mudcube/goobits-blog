@@ -1,5 +1,8 @@
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
+import { mergeRuntimeEnv } from '$lib/server/runtime'
+import { runContactAntiAbuse } from '$lib/server/antiabuse'
+import { getAsn, getClientIp } from '$lib/server/request-meta'
 
 type ContactBody = {
 	name: string
@@ -7,6 +10,10 @@ type ContactBody = {
 	message: string
 	from?: string
 	topic?: string
+	device_id?: string
+	started_at?: string
+	website?: string
+	['cf-turnstile-response']?: string
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -19,7 +26,15 @@ function isContactBody(input: unknown): input is ContactBody {
 		typeof record['email'] === 'string' &&
 		typeof record['message'] === 'string' &&
 		(!('from' in record) || typeof record['from'] === 'string' || record['from'] === undefined) &&
-		(!('topic' in record) || typeof record['topic'] === 'string' || record['topic'] === undefined)
+		(!('topic' in record) || typeof record['topic'] === 'string' || record['topic'] === undefined) &&
+		(!('device_id' in record) || typeof record['device_id'] === 'string' || record['device_id'] === undefined) &&
+		(!('started_at' in record) || typeof record['started_at'] === 'string' || record['started_at'] === undefined) &&
+		(!('website' in record) || typeof record['website'] === 'string' || record['website'] === undefined) &&
+		(
+			!('cf-turnstile-response' in record) ||
+			typeof record['cf-turnstile-response'] === 'string' ||
+			record['cf-turnstile-response'] === undefined
+		)
 	)
 }
 
@@ -33,16 +48,24 @@ function sanitizeContextValue(raw: unknown, maxLength: number) {
 function sanitize(body: ContactBody): ContactBody {
 	const from = sanitizeContextValue(body.from, 64)
 	const topic = sanitizeContextValue(body.topic, 64)
+	const deviceId = sanitizeContextValue(body.device_id, 128)
+	const honeypot = sanitizeContextValue(body.website, 256)
+	const turnstileToken = sanitizeContextValue(body['cf-turnstile-response'], 4096)
+	const startedAt = sanitizeContextValue(body.started_at, 32)
 	return {
 		name: body.name.trim(),
 		email: body.email.trim(),
 		message: body.message.trim(),
 		...(from ? { from } : {}),
-		...(topic ? { topic } : {})
+		...(topic ? { topic } : {}),
+		...(deviceId ? { device_id: deviceId } : {}),
+		...(honeypot ? { website: honeypot } : {}),
+		...(turnstileToken ? { 'cf-turnstile-response': turnstileToken } : {}),
+		...(startedAt ? { started_at: startedAt } : {})
 	}
 }
 
-export const POST: RequestHandler = async ({ request, platform }) => {
+export const POST: RequestHandler = async ({ request, platform, getClientAddress }) => {
 	let payload: unknown
 	try {
 		payload = await request.json()
@@ -57,6 +80,29 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	const body = sanitize(payload)
 	if (!body.name || !body.message || !EMAIL_RE.test(body.email)) {
 		return json({ ok: false, error: 'Please provide a valid name, email, and message.' }, { status: 400 })
+	}
+
+	const env = mergeRuntimeEnv(platform?.env)
+	const antiAbuse = await runContactAntiAbuse({
+		email: body.email,
+		ip: getClientIp(request, { env, getClientAddress }),
+		asn: getAsn(request),
+		deviceId: body.device_id?.trim() || '',
+		honeypot: body.website?.trim() || '',
+		startedAtMs: Number.parseInt(body.started_at || '0', 10),
+		turnstileToken: body['cf-turnstile-response']?.trim() || '',
+		env
+	})
+
+	if (!antiAbuse.ok) {
+		return json(
+			{
+				ok: false,
+				error: antiAbuse.message || 'We could not complete that request. Please try again later.',
+				requiresChallenge: antiAbuse.requiresChallenge
+			},
+			{ status: 400 }
+		)
 	}
 
 	const envWebhook = platform?.env?.['CONTACT_WEBHOOK_URL']

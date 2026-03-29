@@ -3,37 +3,8 @@ import type { Actions, PageServerLoad } from './$types'
 import { mergeRuntimeEnv, resolveBaseUrl, resolveRuntimeDb } from '$lib/server/runtime'
 import { runRegisterAntiAbuse } from '$lib/server/antiabuse'
 import { registerUser } from '$lib/server/auth/register'
+import { getAsn, getClientIp } from '$lib/server/request-meta'
 import { dev } from '$app/environment'
-
-function getClientIp(
-	request: Request,
-	{
-		env,
-		getClientAddress
-	}: {
-		env: Record<string, string | undefined>
-		getClientAddress?: () => string
-	}
-) {
-	const cloudflareIp = request.headers.get('cf-connecting-ip')?.trim()
-	if (cloudflareIp) return cloudflareIp
-
-	// Only trust XFF when explicitly enabled (for non-Cloudflare deployments).
-	if (env['RATE_LIMIT_TRUST_XFF'] === 'true') {
-		const forwarded = request.headers.get('x-forwarded-for')
-		const firstForwarded = forwarded?.split(',')[0]?.trim()
-		if (firstForwarded) return firstForwarded
-	}
-
-	if (getClientAddress) return getClientAddress()
-	return 'unknown'
-}
-
-function getAsn(request: Request) {
-	const cfRequest = request as Request & { cf?: { asn?: number } }
-	const asn = cfRequest.cf?.asn
-	return typeof asn === 'number' ? String(asn) : 'unknown'
-}
 
 export const load: PageServerLoad = async ({ platform }) => {
 	const env = mergeRuntimeEnv(platform?.env)

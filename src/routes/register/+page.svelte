@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import { Hero, PillButton } from '@miko/ui'
+	import { initializeAntiAbuseFields } from '$lib/client/antiabuse'
 
 	type ActionData = {
 		error?: string
@@ -14,21 +15,10 @@
 	let startedAt = $state('')
 	let deviceId = $state('')
 
-	function ensureDeviceId() {
-		const key = 'miko_register_device_id'
-		const existing = window.localStorage.getItem(key)
-		if (existing) {
-			deviceId = existing
-			return
-		}
-		const created = crypto.randomUUID()
-		window.localStorage.setItem(key, created)
-		deviceId = created
-	}
-
 	onMount(() => {
-		startedAt = String(Date.now())
-		ensureDeviceId()
+		const fields = initializeAntiAbuseFields('miko_register_device_id')
+		startedAt = fields.startedAt
+		deviceId = fields.deviceId
 	})
 </script>
 
