@@ -1,6 +1,9 @@
 <script lang="ts">
-	import AdminCalendarWidget from '@components/Admin/AdminCalendarWidget.svelte'
+	import VirtualMonthStack from './VirtualMonthStack.svelte'
+	import { isSameDay, isoDay, startOfDay, type CalendarTone } from './month-stack'
 	import type { CalendarEventsResponse } from '../../../api/calendar'
+
+	type FeedEvent = CalendarEventsResponse['upcoming'][number]
 
 	let {
 		events = [],
@@ -16,35 +19,32 @@
 		onLeave?: (eventId: number) => void | Promise<void>
 	}>()
 
-	let currentMonth = $state(new Date())
 	let selectedDate = $state<Date | null>(null)
 
-	function isSameDay(a: Date, b: Date) {
-		return (
-			a.getFullYear() === b.getFullYear() &&
-			a.getMonth() === b.getMonth() &&
-			a.getDate() === b.getDate()
-		)
-	}
-
 	function isPast(date: Date) {
-		const today = new Date()
-		today.setHours(0, 0, 0, 0)
-		return date < today
+		return date < startOfDay(new Date())
 	}
 
 	function isToday(date: Date) {
 		return isSameDay(date, new Date())
 	}
 
-	function getEventsForDate(date: Date) {
-		return events.filter((event: CalendarEventsResponse['upcoming'][number]) =>
-			isSameDay(new Date(event.startsAt), date)
-		)
-	}
+	const eventsByDate = $derived.by(() => {
+		const grouped = new Map<string, FeedEvent[]>()
+		for (const event of events) {
+			const key = isoDay(new Date(event.startsAt))
+			const dayEvents = grouped.get(key) || []
+			dayEvents.push(event)
+			grouped.set(key, dayEvents)
+		}
+		for (const dayEvents of grouped.values()) {
+			dayEvents.sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
+		}
+		return grouped
+	})
 
-	function getMonthLabel(date: Date) {
-		return date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+	function getEventsForDate(date: Date) {
+		return eventsByDate.get(isoDay(date)) || []
 	}
 
 	function formatDayLabel(date: Date) {
@@ -63,55 +63,23 @@
 		return `${startText}-${endText}`
 	}
 
-	function prevMonth() {
-		if (!isPreviousMonthAllowed) return
-		currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
-		selectedDate = null
-	}
-
-	function nextMonth() {
-		if (!isNextMonthAllowed) return
-		currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
-		selectedDate = null
-	}
-
 	function selectDateFromCalendar(date: Date) {
 		if (isPast(date)) return
 		if (getEventsForDate(date).length === 0) return
-		currentMonth = new Date(date.getFullYear(), date.getMonth(), 1)
 		selectedDate = date
 	}
 
-	function eventTone(event: CalendarEventsResponse['upcoming'][number] | undefined) {
+	function eventTone(event: FeedEvent | undefined): CalendarTone {
 		const slug = (event as { activitySlug?: string } | undefined)?.activitySlug || ''
 		if (slug === 'circus') return 'circus'
-		if (slug === 'movies') return 'movies'
+		if (slug === 'movies' || slug === 'movie-night') return 'movies'
 		if (slug === 'adventure') return 'outdoors'
 		if (slug === 'gym') return 'gym'
 		return ''
 	}
 
-	const monthLabel = $derived(getMonthLabel(currentMonth))
-	const selectedDateIso = $derived.by(() => {
-		if (!selectedDate) return null
-		const y = selectedDate.getFullYear()
-		const m = `${selectedDate.getMonth() + 1}`.padStart(2, '0')
-		const d = `${selectedDate.getDate()}`.padStart(2, '0')
-		return `${y}-${m}-${d}`
-	})
+	const selectedDateIso = $derived.by(() => (selectedDate ? isoDay(selectedDate) : null))
 	const selectedDateEvents = $derived(selectedDate ? getEventsForDate(selectedDate) : [])
-	const isPreviousMonthAllowed = $derived.by(() => {
-		const now = new Date()
-		const prev = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
-		return prev.getFullYear() > now.getFullYear() || (prev.getFullYear() === now.getFullYear() && prev.getMonth() >= now.getMonth())
-	})
-	const isNextMonthAllowed = $derived.by(() => {
-		const maxMonth = new Date()
-		maxMonth.setMonth(maxMonth.getMonth() + 3)
-		const next = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
-		return next <= maxMonth
-	})
-
 </script>
 
 <section class="calendar-page__section calendar-home__section">
@@ -121,14 +89,8 @@
 		</div>
 	{/if}
 
-	<AdminCalendarWidget
-		{currentMonth}
+	<VirtualMonthStack
 		selectedDateIso={selectedDateIso}
-		title={monthLabel}
-		initialWeekStart="monday"
-		syncWeekStartPreference={false}
-		onPrev={prevMonth}
-		onNext={nextMonth}
 		onSelect={(date) => selectDateFromCalendar(date)}
 		{isPast}
 		{isToday}
@@ -150,8 +112,7 @@
 						class:calendar-page__slot-button--active={event.userStatus !== null}
 						class:calendar-page__slot-button--full={event.seatsLeft <= 0}
 						disabled={pendingEventId === event.id || (!onJoin && !onLeave)}
-						onclick={() =>
-							event.userStatus ? onLeave?.(event.id) : onJoin?.(event.id, 0)}
+						onclick={() => (event.userStatus ? onLeave?.(event.id) : onJoin?.(event.id, 0))}
 					>
 						<span class="calendar-page__slot-time">{formatTimeRange(event.startsAt, event.endsAt)}</span>
 						{#if event.seatsLeft > 0}
@@ -174,9 +135,3 @@
 		</div>
 	{/if}
 </section>
-
-<style>
-	:global(.calendar-home__section .admin-calendar__day:not(.admin-calendar__day--active)) {
-		opacity: 1;
-	}
-</style>
