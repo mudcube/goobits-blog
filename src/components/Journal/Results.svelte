@@ -1,5 +1,6 @@
 <script>
 	import MetadataValues from '@components/Journal/MetadataValues.svelte'
+	import PublicBreadcrumbs from '@components/PublicBreadcrumbs.svelte'
 
 	/** @type {[]} */
 	export let posts = []
@@ -20,9 +21,13 @@
 </svelte:head>
 
 {#if showBackButton}
-    <nav class="journal-results__nav">
-        <a href="/journal" class="journal-results__back-link">← Back</a>
-    </nav>
+	<PublicBreadcrumbs
+		items={[
+			{ label: 'Home', href: '/' },
+			{ label: 'Journal', href: '/journal' },
+			{ label: formatValue(category) }
+		]}
+	/>
 {/if}
 
 <div class="journal-results">
@@ -52,21 +57,6 @@
 </div>
 
 <style lang="scss">
-	.journal-results__nav {
-		max-width: var(--max-width);
-		margin: 0 auto 1rem;
-	}
-
-	.journal-results__back-link {
-		color: var(--muted);
-		text-decoration: none;
-		font-family: var(--font-serif);
-
-		&:hover {
-			text-decoration: underline;
-		}
-	}
-
 	.journal-results {
 		max-width: var(--max-width);
 		margin: 0 auto;

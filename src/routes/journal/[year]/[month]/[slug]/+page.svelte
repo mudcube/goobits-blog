@@ -1,6 +1,7 @@
 <script>
 	import { BookOpen, Clock3 } from '@lucide/svelte'
 	import MetadataValues from '@components/Journal/MetadataValues.svelte'
+	import PublicBreadcrumbs from '@components/PublicBreadcrumbs.svelte'
 
 	const { data } = $props()
 	const coverImage = $derived.by(() => {
@@ -14,9 +15,13 @@
 </svelte:head>
 
 <div class="journal-entry">
-	<nav class="journal-entry__nav">
-		<a href="/journal" class="journal-entry__back-btn">← Back to Journal</a>
-	</nav>
+	<PublicBreadcrumbs
+		items={[
+			{ label: 'Home', href: '/' },
+			{ label: 'Journal', href: '/journal' },
+			{ label: data.post.metadata.fm.title }
+		]}
+	/>
 
 	<article class="journal-entry__article">
 		<header class="journal-entry__header">
@@ -63,30 +68,6 @@
 	.journal-entry {
 		max-width: var(--max-width);
 		margin: 0 auto;
-	}
-
-	.journal-entry__nav {
-		margin: 0 auto 1rem;
-	}
-
-	.journal-entry__back-btn {
-		display: inline-block;
-		background: var(--card-bg);
-		border: 1px solid var(--card-border);
-		border-radius: 999px;
-		color: var(--muted);
-		text-decoration: none;
-		font-family: var(--font-sans);
-		font-size: 0.82rem;
-		font-weight: 500;
-		letter-spacing: 0.02em;
-		padding: 0.38rem 0.75rem;
-		transition: all 0.15s ease;
-
-		&:hover {
-			border-color: var(--link);
-			color: var(--text);
-		}
 	}
 
 	.journal-entry__article {

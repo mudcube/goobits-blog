@@ -77,11 +77,39 @@
 		background: var(--text);
 		color: var(--bg);
 	}
-	
+
+	@media (max-width: 56em) {
+		.release-switcher {
+			right: 0.85rem;
+			bottom: 0.85rem;
+			padding: 0.55rem;
+			gap: 0.35rem;
+		}
+
+		.release-switcher__label {
+			font-size: 0.64rem;
+		}
+
+		.release-switcher__options {
+			gap: 0.3rem;
+		}
+
+		.release-switcher__button {
+			min-width: 2.5rem;
+			padding: 0.35rem 0.55rem;
+			font-size: 0.72rem;
+		}
+	}
+
+	@media (max-width: 48em) {
+		.release-switcher {
+			display: none;
+		}
+	}
+
 	@media (max-width: 40em) {
 		.release-switcher {
-			right: 0.75rem;
-			bottom: 0.75rem;
+			display: none;
 		}
 	}
 </style>

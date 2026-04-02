@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { NavItem } from './types/nav'
-	import ThemeSelect from './ThemeSelect.svelte'
 
 	type TopbarProps = {
 		items: NavItem[]
@@ -57,9 +56,6 @@
 					{/if}
 				{/each}
 			</nav>
-		</div>
-		<div class="layout-header__theme">
-			<ThemeSelect />
 		</div>
 	</div>
 </header>

@@ -1,8 +1,6 @@
 import { error, redirect } from '@sveltejs/kit'
 import { redirects } from '@src/redirects.ts'
 import { sequence } from '@sveltejs/kit/hooks'
-import { createThemeHooks } from '@goobits/themes/server'
-import { themeConfig } from '$lib/config/theme.ts'
 import { createCalendarAuthHandles } from '@calendar/app'
 import { getCalendarConfig } from '@calendar/core'
 import { applyMikoCalendarPreset } from '@calendar/preset-miko'
@@ -11,6 +9,10 @@ import { dev } from '$app/environment'
 import type { Handle } from '@sveltejs/kit'
 applyMikoCalendarPreset()
 const calendarConfig = getCalendarConfig()
+const forcedThemePreferences = {
+	theme: 'dark',
+	themeScheme: 'default'
+} as const
 
 /**
  * Processes redirects based on configured rules
@@ -61,9 +63,20 @@ async function handleRedirects({ event, resolve }: Parameters<Handle>[0]) {
 	redirect(matchingRedirect.status, redirectTo)
 }
 
-const themeHandle = createThemeHooks(themeConfig, {
-	blockingScript: true
-}).transform
+const themeHandle: Handle = async ({ event, resolve }) => {
+	const locals = event.locals as Record<string, unknown>
+	locals['themePreferences'] = forcedThemePreferences
+
+	return resolve(event, {
+		transformPageChunk: ({ html }) => {
+			const withThemeClass = html.replace('%sveltekit.theme%', 'theme-dark scheme-default')
+			return withThemeClass.replace(
+				/<html([\s\S]*?)>/i,
+				'<html$1 data-theme="dark">'
+			)
+		}
+	})
+}
 
 const releaseVisibilityHandle: Handle = async ({ event, resolve }) => {
 	const isLocalPreviewHost =

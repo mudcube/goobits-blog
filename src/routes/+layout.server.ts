@@ -1,6 +1,11 @@
 import { dev } from '$app/environment'
 import { getActiveReleaseStage } from '$lib/release'
 
+const fixedThemePreferences = {
+	theme: 'dark',
+	themeScheme: 'default'
+} as const
+
 export function load({
 	cookies,
 	locals,
@@ -14,7 +19,7 @@ export function load({
 		dev && ['localhost', '127.0.0.1'].includes(url.hostname)
 
 	return {
-		preferences: locals['themePreferences'],
+		preferences: locals['themePreferences'] ?? fixedThemePreferences,
 		activeStage: getActiveReleaseStage({
 			cookies,
 			enablePreview: isLocalPreviewHost
