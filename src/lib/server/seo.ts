@@ -30,11 +30,22 @@ export function resolveSiteOrigin({ baseUrl, requestUrl }: { baseUrl?: string; r
 }
 
 export function getPlatformEnv(platform: unknown): Record<string, string | undefined> | undefined {
-	return (platform as { env?: Record<string, string | undefined> } | undefined)?.env
+	try {
+		return (platform as { env?: Record<string, string | undefined> } | undefined)?.env
+	} catch {
+		return undefined
+	}
 }
 
 export function getBaseUrl(platformEnv: Record<string, string | undefined> | undefined) {
-	return platformEnv?.['PUBLIC_BASE_URL'] || platformEnv?.['BASE_URL'] || process.env['PUBLIC_BASE_URL'] || process.env['BASE_URL']
+	const processBaseUrl = process.env['PUBLIC_BASE_URL'] || process.env['BASE_URL']
+	if (processBaseUrl) return processBaseUrl
+
+	try {
+		return platformEnv?.['PUBLIC_BASE_URL'] || platformEnv?.['BASE_URL']
+	} catch {
+		return undefined
+	}
 }
 
 export function formatSitemapLastMod(isoString: string) {

@@ -14,6 +14,9 @@ migrations_dir = "packages/calendar/migrations/sql"
 
 [vars]
 # Non-sensitive environment variables
+PUBLIC_BASE_URL = "https://miko.art"
+PUBLIC_TURNSTILE_SITE_KEY = "0x4AAAAAACcov9RbE21ayWD0"
+CONTACT_WEBHOOK_URL = "https://email-handler.pufflewiggins.workers.dev"
 # BOOKING_CAPACITY = "8"
 # BOOKING_SLOT_MINUTES = "30"
 
