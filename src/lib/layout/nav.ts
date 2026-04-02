@@ -1,3 +1,5 @@
+import { isNavItemVisibleInStage, releasedHeaderNavItems, type ReleaseStage } from '$lib/release'
+
 export type NavItem = {
 	href: string
 	label: string
@@ -5,12 +7,11 @@ export type NavItem = {
 	external?: boolean
 }
 
-export const headerNavItems: NavItem[] = [
-	{ href: '/art', label: 'Art', matchPrefix: true },
-	{ href: '/music', label: 'Music', matchPrefix: true },
-	{ href: '/about', label: 'About' },
-	{ href: '/contact?from=topbar', label: 'Contact', matchPrefix: true }
-]
+export function getHeaderNavItems(activeStage: ReleaseStage): NavItem[] {
+	return releasedHeaderNavItems
+		.filter((item) => isNavItemVisibleInStage(item, activeStage))
+		.map(({ stages: _stages, ...item }) => item)
+}
 
 export const footerPrimaryItems: NavItem[] = [
 	{ href: '/journal', label: 'Journal' },

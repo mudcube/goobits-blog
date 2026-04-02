@@ -1,13 +1,19 @@
 import type { RequestHandler } from './$types'
+import { getActiveReleaseStage } from '$lib/release'
 import { getPublicSitemapRoutes } from '$lib/server/route-index'
 import { escapeXml, formatSitemapLastMod, getBaseUrl, getPlatformEnv, resolveSiteOrigin, toAbsoluteUrl } from '$lib/server/seo'
 
 export const prerender = true
 
-export const GET: RequestHandler = async ({ platform, url }) => {
+export const GET: RequestHandler = async ({ cookies, platform, url }) => {
 	const baseUrl = getBaseUrl(getPlatformEnv(platform))
 	const origin = resolveSiteOrigin(baseUrl ? { baseUrl, requestUrl: url } : { requestUrl: url })
-	const routes = await getPublicSitemapRoutes()
+	const isLocalPreviewHost = ['localhost', '127.0.0.1'].includes(url.hostname)
+	const activeStage = getActiveReleaseStage({
+		cookies,
+		enablePreview: isLocalPreviewHost
+	})
+	const routes = await getPublicSitemapRoutes(activeStage)
 
 	const urlEntries = routes.map(route => {
 		const loc = escapeXml(toAbsoluteUrl(origin, route.path))

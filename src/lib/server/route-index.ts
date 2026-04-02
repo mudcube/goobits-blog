@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { getJournalPosts } from '$lib/posts'
+import { getConfiguredReleaseStage, isRouteReleased, type ReleaseStage } from '$lib/release'
 
 const ROUTES_DIR = 'src/routes'
 
@@ -47,6 +48,7 @@ type RouteInventory = {
 
 type RouteInventoryOptions = {
 	includeDevOnlyCategories?: boolean
+	activeStage?: ReleaseStage
 }
 
 type SitemapRoute = {
@@ -162,6 +164,7 @@ function categorizeRoute(routePath: string) {
 
 export async function getRouteInventory(options: RouteInventoryOptions = {}): Promise<RouteInventory> {
 	const includeDevOnlyCategories = options.includeDevOnlyCategories ?? true
+	const activeStage = options.activeStage ?? getConfiguredReleaseStage()
 
 	const routes = scanRoutes(ROUTES_DIR)
 	const posts = await getJournalPosts()
@@ -188,6 +191,7 @@ export async function getRouteInventory(options: RouteInventoryOptions = {}): Pr
 	if (!includeDevOnlyCategories) {
 		allRoutes = allRoutes.filter(route => !DEV_ONLY_CATEGORIES.includes(route.category))
 	}
+	allRoutes = allRoutes.filter((route) => route.type !== 'page' || isRouteReleased(route.path, activeStage))
 
 	const pageRoutes = allRoutes.filter((route): route is PageRoute => route.type === 'page')
 	const apiRoutes = allRoutes.filter((route): route is ApiRoute => route.type === 'api')
@@ -224,8 +228,17 @@ export async function getRouteInventory(options: RouteInventoryOptions = {}): Pr
 	}
 }
 
-export async function getPublicSitemapRoutes() {
-	const inventory = await getRouteInventory({ includeDevOnlyCategories: false })
+export async function getPublicSitemapRoutes(activeStage?: ReleaseStage) {
+	const inventory = await getRouteInventory(
+		activeStage
+			? {
+				includeDevOnlyCategories: false,
+				activeStage
+			}
+			: {
+				includeDevOnlyCategories: false
+			}
+	)
 	const publicPages = inventory.routes.filter((route): route is PageRoute => {
 		if (route.type !== 'page') return false
 		if (route.path.includes('[')) return false

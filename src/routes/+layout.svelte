@@ -4,11 +4,12 @@
 	import { ThemeProvider } from '@goobits/themes/svelte'
 	import { themeConfig } from '$lib/config/theme.js'
 	import { page } from '$app/stores'
-	import { browser, dev } from '$app/environment'
+	import { browser } from '$app/environment'
 	import { onMount } from 'svelte'
 	import { Topbar, FooterNav } from '@miko/ui'
 	import { getCalendarConfig } from '@calendar/core'
-	import { footerElsewhereItems, footerLegalItems, footerPrimaryItems, headerNavItems } from '$lib/layout/nav'
+	import DevReleaseSwitcher from '@components/DevReleaseSwitcher.svelte'
+	import { footerElsewhereItems, footerLegalItems, footerPrimaryItems, getHeaderNavItems } from '$lib/layout/nav'
 	import { enableLayoutShiftDebug } from '$lib/client/debug/layoutShift'
 
 	const { data, children } = $props()
@@ -18,11 +19,7 @@
 		$page.url.pathname.startsWith(calendarConfig.routes.calendarBase) ||
 			$page.url.pathname.startsWith(calendarConfig.routes.adminBase)
 	)
-	const topbarItems = $derived(
-		dev
-			? [...headerNavItems]
-			: headerNavItems
-	)
+	const topbarItems = $derived(getHeaderNavItems(data.activeStage))
 
 	onMount(() => {
 		if (!browser) return
@@ -47,6 +44,10 @@
 				elsewhereItems={footerElsewhereItems}
 				legalItems={footerLegalItems}
 			/>
+
+			{#if data.showVersionSwitcher}
+				<DevReleaseSwitcher activeStage={data.activeStage} />
+			{/if}
 		{/if}
 	</div>
 </ThemeProvider>

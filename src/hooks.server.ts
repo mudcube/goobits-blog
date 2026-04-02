@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit'
+import { error, redirect } from '@sveltejs/kit'
 import { redirects } from '@src/redirects.ts'
 import { sequence } from '@sveltejs/kit/hooks'
 import { createThemeHooks } from '@goobits/themes/server'
@@ -6,6 +6,7 @@ import { themeConfig } from '$lib/config/theme.ts'
 import { createCalendarAuthHandles } from '@calendar/app'
 import { getCalendarConfig } from '@calendar/core'
 import { applyMikoCalendarPreset } from '@calendar/preset-miko'
+import { getActiveReleaseStage, isRouteReleased } from '$lib/release'
 import { dev } from '$app/environment'
 import type { Handle } from '@sveltejs/kit'
 applyMikoCalendarPreset()
@@ -63,6 +64,21 @@ async function handleRedirects({ event, resolve }: Parameters<Handle>[0]) {
 const themeHandle = createThemeHooks(themeConfig, {
 	blockingScript: true
 }).transform
+
+const releaseVisibilityHandle: Handle = async ({ event, resolve }) => {
+	const isLocalPreviewHost =
+		dev && ['localhost', '127.0.0.1'].includes(event.url.hostname)
+	const activeStage = getActiveReleaseStage({
+		cookies: event.cookies,
+		enablePreview: isLocalPreviewHost
+	})
+
+	if (!isRouteReleased(event.url.pathname, activeStage)) {
+		throw error(404, 'Not found')
+	}
+
+	return resolve(event)
+}
 
 const { handleAdminAuth, handleCalendarAuth, requireCalendarUser } = createCalendarAuthHandles({
 	adminBase: calendarConfig.routes.adminBase,
@@ -127,6 +143,7 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 export const handle = sequence(
 	themeHandle,
 	handleRedirects,
+	releaseVisibilityHandle,
 	handleAdminAuth,
 	handleCalendarAuth,
 	requireCalendarUser,
