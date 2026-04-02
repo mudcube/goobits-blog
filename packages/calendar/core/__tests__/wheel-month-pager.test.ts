@@ -89,4 +89,26 @@ describe('createWheelMonthPager', () => {
 
 		expect(pages).toEqual([1, -1])
 	})
+
+	it('treats strong same-direction reacceleration as a new page', () => {
+		const pages: Array<1 | -1> = []
+		let lastDirection: 1 | -1 | 0 = 0
+		const pager = createWheelMonthPager({
+			triggerDelta: 48,
+			sameDirectionRearmGapMs: 700,
+			gestureIdleMs: 200,
+			getLastPageDirection: () => lastDirection,
+			onPage: (direction) => {
+				lastDirection = direction
+				pages.push(direction)
+			}
+		})
+
+		pager.handle(wheelEvent({ timeStamp: 1_000, deltaY: 120 }))
+		pager.handle(wheelEvent({ timeStamp: 1_060, deltaY: 72 }))
+		pager.handle(wheelEvent({ timeStamp: 1_120, deltaY: 40 }))
+		pager.handle(wheelEvent({ timeStamp: 1_180, deltaY: 96 }))
+
+		expect(pages).toEqual([1, 1])
+	})
 })

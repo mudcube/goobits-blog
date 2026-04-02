@@ -32,6 +32,8 @@ export function createWheelMonthPager({
 	let currentGestureStartGap = Number.POSITIVE_INFINITY
 	let gestureDirection: Direction | 0 = 0
 	let gestureDelta = 0
+	let sameDirectionSuppressionBypass = false
+	let postTriggerFloorAbsMovement = Number.POSITIVE_INFINITY
 	let wheelGestureConsumed = false
 
 	function emitState() {
@@ -41,12 +43,41 @@ export function createWheelMonthPager({
 		})
 	}
 
+	function startGesture(
+		event: Pick<WheelLikeEvent, 'timeStamp'>,
+		direction: Direction,
+		{ bypassSameDirectionSuppression = false, reason = 'start' } = {}
+	) {
+		currentGestureStartGap = lastWheelGestureStartAt
+			? event.timeStamp - lastWheelGestureStartAt
+			: Number.POSITIVE_INFINITY
+		lastWheelGestureStartAt = event.timeStamp
+		gestureDirection = direction
+		gestureDelta = 0
+		sameDirectionSuppressionBypass = bypassSameDirectionSuppression
+		postTriggerFloorAbsMovement = Number.POSITIVE_INFINITY
+		wheelGestureConsumed = false
+		onDebug?.(`wheel ${reason} gap=${Math.round(currentGestureStartGap)}`)
+		emitState()
+	}
+
 	function resetGesture() {
 		gestureDirection = 0
 		gestureDelta = 0
+		sameDirectionSuppressionBypass = false
+		postTriggerFloorAbsMovement = Number.POSITIVE_INFINITY
 		wheelGestureConsumed = false
 		currentGestureStartGap = Number.POSITIVE_INFINITY
 		emitState()
+	}
+
+	function shouldRestartFromReacceleration(absMovement: number) {
+		if (!Number.isFinite(postTriggerFloorAbsMovement)) return false
+		const increase = absMovement - postTriggerFloorAbsMovement
+		return (
+			absMovement >= postTriggerFloorAbsMovement * 1.35 &&
+			increase >= triggerDelta * 0.5
+		)
 	}
 
 	function handle(event: WheelLikeEvent) {
@@ -54,6 +85,7 @@ export function createWheelMonthPager({
 
 		const primaryMovement = dominantAxisValue([event.deltaX || 0, event.deltaY || 0, 0])
 		if (!primaryMovement) return
+		const absMovement = Math.abs(primaryMovement)
 		const direction: Direction = primaryMovement > 0 ? 1 : -1
 		const isNewGesture =
 			!lastWheelEventAt ||
@@ -61,15 +93,23 @@ export function createWheelMonthPager({
 			(gestureDirection !== 0 && direction !== gestureDirection)
 
 		if (isNewGesture) {
-			currentGestureStartGap = lastWheelGestureStartAt
-				? event.timeStamp - lastWheelGestureStartAt
-				: Number.POSITIVE_INFINITY
-			lastWheelGestureStartAt = event.timeStamp
-			gestureDirection = direction
-			gestureDelta = 0
-			wheelGestureConsumed = false
-			onDebug?.(`wheel start gap=${Math.round(currentGestureStartGap)}`)
-			emitState()
+			startGesture(event, direction)
+		} else if (wheelGestureConsumed && direction === gestureDirection) {
+			if (shouldRestartFromReacceleration(absMovement)) {
+				onDebug?.(
+					`wheel reaccelerate floor=${Math.round(postTriggerFloorAbsMovement)} movement=${Math.round(absMovement)}`
+				)
+				startGesture(event, direction, {
+					bypassSameDirectionSuppression: true,
+					reason: 'restart'
+				})
+			} else {
+				postTriggerFloorAbsMovement = Number.isFinite(postTriggerFloorAbsMovement)
+					? Math.min(postTriggerFloorAbsMovement, absMovement)
+					: absMovement
+				lastWheelEventAt = event.timeStamp
+				return
+			}
 		}
 
 		lastWheelEventAt = event.timeStamp
@@ -82,7 +122,8 @@ export function createWheelMonthPager({
 
 		if (
 			getLastPageDirection() === direction &&
-			currentGestureStartGap < sameDirectionRearmGapMs
+			currentGestureStartGap < sameDirectionRearmGapMs &&
+			!sameDirectionSuppressionBypass
 		) {
 			onDebug?.(`wheel suppress direction=${direction} gap=${Math.round(currentGestureStartGap)}`)
 			return
