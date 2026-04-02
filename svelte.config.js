@@ -15,6 +15,8 @@ export default {
 					'/admin/*',
 					'/calendar',
 					'/calendar/*',
+					'/contact',
+					'/contact/*',
 					'/register',
 					'/register/*',
 					'/verify-email',
