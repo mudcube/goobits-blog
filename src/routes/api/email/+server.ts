@@ -1,3 +1,4 @@
+import { dev } from '$app/environment'
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 import { mergeRuntimeEnv } from '$lib/server/runtime'
@@ -110,6 +111,11 @@ export const POST: RequestHandler = async ({ request, platform, getClientAddress
 	const webhook = typeof envWebhook === 'string' ? envWebhook : typeof processWebhook === 'string' ? processWebhook : ''
 
 	if (!webhook) {
+		if (!dev) {
+			console.error('[contact] CONTACT_WEBHOOK_URL missing in non-dev environment')
+			return json({ ok: false, error: 'Contact delivery is not configured.' }, { status: 503 })
+		}
+
 		console.info('[contact] message accepted (no CONTACT_WEBHOOK_URL configured)', {
 			from: body.email,
 			name: body.name,

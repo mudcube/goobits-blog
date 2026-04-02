@@ -30,7 +30,11 @@ packages/**/.tsbuildinfo
 .wrangler/
 tasks/
 temp/
+tmp/
 test-results/
 vm.yaml
 .artifacts/
 .llm/scratch/
+
+# Local Playwright probes
+tmp_playwright_*.mjs
