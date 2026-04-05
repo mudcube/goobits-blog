@@ -116,7 +116,7 @@ export async function runRegisterAntiAbuse(input: RegisterAntiAbuseInput): Promi
 		if (disposableMode === 'score') riskScore += 2
 	}
 
-	const alwaysRequireTurnstile = enabled(input.env['TURNSTILE_REQUIRED'], false)
+	const alwaysRequireTurnstile = enabled(input.env['TURNSTILE_REQUIRED'], true)
 	const shouldRequireChallenge = alwaysRequireTurnstile || riskScore >= 2
 	if (!shouldRequireChallenge) {
 		return { ok: true, reason: 'allow', requiresChallenge: false }
@@ -209,7 +209,7 @@ export async function runContactAntiAbuse(input: ContactAntiAbuseInput): Promise
 		riskScore += 1
 	}
 
-	const alwaysRequireTurnstile = enabled(input.env['TURNSTILE_REQUIRED'], false)
+	const alwaysRequireTurnstile = enabled(input.env['TURNSTILE_REQUIRED'], true)
 	const shouldRequireChallenge = alwaysRequireTurnstile || riskScore >= 2
 	if (!shouldRequireChallenge) {
 		return { ok: true, reason: 'allow', requiresChallenge: false }

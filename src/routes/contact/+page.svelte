@@ -6,7 +6,7 @@
 	import { initializeAntiAbuseFields } from '$lib/client/antiabuse'
 	import { submitContact, toContactPayload } from '$lib/client/forms/contact'
 
-	let { data } = $props<{ data: { contextFrom?: string; contextTopic?: string; turnstileSiteKey?: string } }>()
+	let { data } = $props<{ data: { contextFrom?: string; contextTopic?: string; formStartedAt?: string; submitError?: string; turnstileSiteKey?: string } }>()
 
 	type ContactErrors = {
 		name?: string
@@ -23,6 +23,7 @@
 
 	const contextFrom = $derived((data?.contextFrom || '').trim())
 	const contextTopic = $derived((data?.contextTopic || '').trim())
+	const formStartedAt = $derived((data?.formStartedAt || '').trim())
 	const turnstileSiteKey = $derived((data?.turnstileSiteKey || '').trim())
 	const contextLabel = $derived.by(() => {
 		const parts = [contextFrom, contextTopic].filter(Boolean)
@@ -33,6 +34,11 @@
 		if (contextFrom === 'art') return 'Tell me about the piece, timeline, and any reference links...'
 		if (contextFrom === 'about' && contextTopic) return 'Tell me a bit about your project and what you are looking for...'
 		return 'Tell me about your project…'
+	})
+
+	$effect(() => {
+		submitError = (data?.submitError || '').trim()
+		if (!startedAt) startedAt = formStartedAt
 	})
 
 	onMount(() => {
@@ -92,7 +98,7 @@
 
 	<section class="contact-page__layout">
 		<div class="contact-page__form-section">
-			<form class="contact-page__form" onsubmit={onSubmit} novalidate>
+			<form class="contact-page__form" method="POST" action="/api/email" onsubmit={onSubmit} novalidate>
 				<input type="hidden" name="from" value={contextFrom} />
 				<input type="hidden" name="topic" value={contextTopic} />
 				<input type="hidden" name="started_at" value={startedAt} />

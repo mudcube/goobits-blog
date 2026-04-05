@@ -18,6 +18,8 @@ type ContactBody = {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const MIN_MESSAGE_LENGTH = 12
+const MIN_MESSAGE_WORDS = 3
 
 function isContactBody(input: unknown): input is ContactBody {
 	if (typeof input !== 'object' || input === null) return false
@@ -66,21 +68,69 @@ function sanitize(body: ContactBody): ContactBody {
 	}
 }
 
+function hasSubstantiveMessage(message: string) {
+	const cleaned = message.replace(/\s+/g, ' ').trim()
+	if (cleaned.length < MIN_MESSAGE_LENGTH) return false
+	const wordCount = cleaned
+		.split(' ')
+		.filter((word) => /[a-z0-9]/i.test(word)).length
+	return wordCount >= MIN_MESSAGE_WORDS
+}
+
+function getContactRedirectUrl(requestUrl: string, error?: string) {
+	const url = new URL('/contact/', requestUrl)
+	if (error) url.searchParams.set('error', error)
+	return url
+}
+
+function redirectForForm(location: URL | string) {
+	return new Response(null, {
+		status: 303,
+		headers: {
+			location: typeof location === 'string' ? location : location.toString()
+		}
+	})
+}
+
 export const POST: RequestHandler = async ({ request, platform, getClientAddress }) => {
+	const contentType = request.headers.get('content-type') || ''
+	const expectsJson = contentType.includes('application/json')
 	let payload: unknown
 	try {
-		payload = await request.json()
+		if (expectsJson) {
+			payload = await request.json()
+		} else {
+			const formData = await request.formData()
+			payload = Object.fromEntries(formData.entries())
+		}
 	} catch {
-		return json({ ok: false, error: 'Invalid request body.' }, { status: 400 })
+		if (expectsJson) {
+			return json({ ok: false, error: 'Invalid request body.' }, { status: 400 })
+		}
+		return redirectForForm(getContactRedirectUrl(request.url, 'Invalid request body.'))
 	}
 
 	if (!isContactBody(payload)) {
-		return json({ ok: false, error: 'Missing required fields.' }, { status: 400 })
+		if (expectsJson) {
+			return json({ ok: false, error: 'Missing required fields.' }, { status: 400 })
+		}
+		return redirectForForm(getContactRedirectUrl(request.url, 'Missing required fields.'))
 	}
 
 	const body = sanitize(payload)
 	if (!body.name || !body.message || !EMAIL_RE.test(body.email)) {
-		return json({ ok: false, error: 'Please provide a valid name, email, and message.' }, { status: 400 })
+		if (expectsJson) {
+			return json({ ok: false, error: 'Please provide a valid name, email, and message.' }, { status: 400 })
+		}
+		return redirectForForm(getContactRedirectUrl(request.url, 'Please provide a valid name, email, and message.'))
+	}
+
+	if (!hasSubstantiveMessage(body.message)) {
+		const error = 'Please include a more substantive message with at least a few words.'
+		if (expectsJson) {
+			return json({ ok: false, error }, { status: 400 })
+		}
+		return redirectForForm(getContactRedirectUrl(request.url, error))
 	}
 
 	const env = mergeRuntimeEnv(platform?.env)
@@ -96,14 +146,18 @@ export const POST: RequestHandler = async ({ request, platform, getClientAddress
 	})
 
 	if (!antiAbuse.ok) {
-		return json(
-			{
-				ok: false,
-				error: antiAbuse.message || 'We could not complete that request. Please try again later.',
-				requiresChallenge: antiAbuse.requiresChallenge
-			},
-			{ status: 400 }
-		)
+		const error = antiAbuse.message || 'We could not complete that request. Please try again later.'
+		if (expectsJson) {
+			return json(
+				{
+					ok: false,
+					error,
+					requiresChallenge: antiAbuse.requiresChallenge
+				},
+				{ status: 400 }
+			)
+		}
+		return redirectForForm(getContactRedirectUrl(request.url, error))
 	}
 
 	const envWebhook = platform?.env?.['CONTACT_WEBHOOK_URL']
@@ -113,7 +167,10 @@ export const POST: RequestHandler = async ({ request, platform, getClientAddress
 	if (!webhook) {
 		if (!dev) {
 			console.error('[contact] CONTACT_WEBHOOK_URL missing in non-dev environment')
-			return json({ ok: false, error: 'Contact delivery is not configured.' }, { status: 503 })
+			if (expectsJson) {
+				return json({ ok: false, error: 'Contact delivery is not configured.' }, { status: 503 })
+			}
+			return redirectForForm(getContactRedirectUrl(request.url, 'Contact delivery is not configured.'))
 		}
 
 		console.info('[contact] message accepted (no CONTACT_WEBHOOK_URL configured)', {
@@ -121,7 +178,10 @@ export const POST: RequestHandler = async ({ request, platform, getClientAddress
 			name: body.name,
 			length: body.message.length
 		})
-		return json({ ok: true }, { status: 202 })
+		if (expectsJson) {
+			return json({ ok: true }, { status: 202 })
+		}
+		return redirectForForm(new URL('/contact/thank-you/', request.url))
 	}
 
 	const response = await fetch(String(webhook), {
@@ -136,8 +196,15 @@ export const POST: RequestHandler = async ({ request, platform, getClientAddress
 	})
 
 	if (!response.ok) {
-		return json({ ok: false, error: 'Contact delivery failed.' }, { status: 502 })
+		if (expectsJson) {
+			return json({ ok: false, error: 'Contact delivery failed.' }, { status: 502 })
+		}
+		return redirectForForm(getContactRedirectUrl(request.url, 'Contact delivery failed.'))
 	}
 
-	return json({ ok: true }, { status: 200 })
+	if (expectsJson) {
+		return json({ ok: true }, { status: 200 })
+	}
+
+	return redirectForForm(new URL('/contact/thank-you/', request.url))
 }
