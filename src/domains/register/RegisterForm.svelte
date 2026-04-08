@@ -5,6 +5,7 @@
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters'
 	import { initializeAntiAbuseFields } from '$lib/client/antiabuse'
 	import type { SuperValidated } from 'sveltekit-superforms'
+	import VerificationField from '@src/domains/shared/VerificationField.svelte'
 	import { registerSchema, type RegisterFormData } from './schema'
 
 	const props = $props<{ form: SuperValidated<RegisterFormData>; turnstileSiteKey?: string }>()
@@ -95,7 +96,11 @@
 		</FormField>
 
 		{#if props.turnstileSiteKey}
-			<div class="cf-turnstile" data-sitekey={props.turnstileSiteKey}></div>
+			<VerificationField
+				className="register-page__verification"
+				siteKey={props.turnstileSiteKey}
+				copy="Complete the security check to finish account creation."
+			/>
 		{/if}
 
 		{#if $errors._errors?.length}

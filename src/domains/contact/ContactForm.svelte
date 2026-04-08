@@ -5,6 +5,7 @@
 	import { superForm } from 'sveltekit-superforms'
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters'
 	import { initializeAntiAbuseFields } from '$lib/client/antiabuse'
+	import VerificationField from '@src/domains/shared/VerificationField.svelte'
 	import { contactSchema, getContactMessagePlaceholder, type ContactFormData } from './schema'
 	import type { SuperValidated } from 'sveltekit-superforms'
 
@@ -115,7 +116,11 @@
 				{/if}
 
 				{#if props.turnstileSiteKey}
-					<div class="cf-turnstile" data-sitekey={props.turnstileSiteKey}></div>
+					<VerificationField
+						className="contact-page__verification"
+						siteKey={props.turnstileSiteKey}
+						copy="Complete the security check before sending."
+					/>
 				{/if}
 
 				<PillButton className="contact-page__submit" type="submit" variant="primary" size="lg" disabled={$submitting}>
