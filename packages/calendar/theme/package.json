@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./calendar.scss": "./calendar.scss",
+    "./member.scss": "./member.scss",
     "./admin.scss": "./admin.scss"
   }
 }

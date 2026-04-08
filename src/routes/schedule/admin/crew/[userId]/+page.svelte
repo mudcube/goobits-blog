@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
-	import { createAdminMembersController } from '@calendar/ui/features/members/admin/admin-members.svelte'
-	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
-	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
-	import AdminChevronRowCard from '@components/Admin/AdminChevronRowCard.svelte'
+	import { createAdminMembersController } from '@calendar/ui/admin/members/admin-members.svelte'
+	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
+	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
+	import AdminChevronRowCard from '@calendar/ui/admin/shared/AdminChevronRowCard.svelte'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 	import { mockCrewUsers, mockDashboardEvents, mockDashboardRecentEvents } from '$lib/admin/mock/admin-mock-data'
 

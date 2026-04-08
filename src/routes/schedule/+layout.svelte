@@ -1,5 +1,5 @@
 <script>
-	import '@calendar/theme/calendar.scss'
+	import '@calendar/theme/member.scss'
 	import { page } from '$app/stores'
 	import { CalendarShellLayout } from '@calendar/ui'
 

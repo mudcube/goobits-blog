@@ -3,8 +3,8 @@
   import { page } from "$app/stores";
   import { HandCoins, Landmark, Wallet, Plus, X } from "@lucide/svelte";
   import { handleUnauthorizedSessionError } from "@calendar/ui/routing/auth";
-  import { createAdminDashboardController } from "@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte";
-  import AdminPageHero from "@components/Admin/AdminPageHero.svelte";
+  import { createAdminDashboardController } from "@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte";
+  import AdminPageHero from "@calendar/ui/admin/shared/AdminPageHero.svelte";
   import {
     getAdminCalendarWeekStart,
     setAdminCalendarWeekStart,

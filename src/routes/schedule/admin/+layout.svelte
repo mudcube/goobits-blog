@@ -17,7 +17,7 @@
     Trash2,
     Eye,
   } from "@lucide/svelte";
-  import AdminActionButton from "@components/Admin/AdminActionButton.svelte";
+  import AdminActionButton from "@calendar/ui/admin/shared/AdminActionButton.svelte";
   import { isAdminMockMode, withAdminMock } from "$lib/admin/mock/mock-mode";
   import { adminEventDetailBreadcrumb } from "$lib/admin/breadcrumbs";
 

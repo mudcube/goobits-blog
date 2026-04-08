@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createWheelMonthPager } from '../../ui/src/features/events/member/wheel-month-pager'
+import { createWheelMonthPager } from '../../ui/src/member/booking/wheel-month-pager'
 
 function wheelEvent({
 	timeStamp,
@@ -27,7 +27,7 @@ describe('createWheelMonthPager', () => {
 			sameDirectionRearmGapMs: 700,
 			gestureIdleMs: 200,
 			getLastPageDirection: () => lastDirection,
-			onPage: (direction) => {
+			onPage: (direction: 1 | -1) => {
 				lastDirection = direction
 				pages.push(direction)
 			}
@@ -49,7 +49,7 @@ describe('createWheelMonthPager', () => {
 			sameDirectionRearmGapMs: 700,
 			gestureIdleMs: 200,
 			getLastPageDirection: () => lastDirection,
-			onPage: (direction) => {
+			onPage: (direction: 1 | -1) => {
 				lastDirection = direction
 				pages.push(direction)
 			}
@@ -75,7 +75,7 @@ describe('createWheelMonthPager', () => {
 			sameDirectionRearmGapMs: 700,
 			gestureIdleMs: 200,
 			getLastPageDirection: () => lastDirection,
-			onPage: (direction) => {
+			onPage: (direction: 1 | -1) => {
 				lastDirection = direction
 				pages.push(direction)
 			}
@@ -98,7 +98,7 @@ describe('createWheelMonthPager', () => {
 			sameDirectionRearmGapMs: 700,
 			gestureIdleMs: 200,
 			getLastPageDirection: () => lastDirection,
-			onPage: (direction) => {
+			onPage: (direction: 1 | -1) => {
 				lastDirection = direction
 				pages.push(direction)
 			}

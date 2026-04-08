@@ -3,14 +3,14 @@
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
-	import { createAdminMembersController } from '@calendar/ui/features/members/admin/admin-members.svelte'
-	import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
-	import { createInviteShareLink } from '@calendar/ui/features/dashboard/admin/admin-dashboard'
+	import { createAdminMembersController } from '@calendar/ui/admin/members/admin-members.svelte'
+	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
+	import { createInviteShareLink } from '@calendar/ui/admin/dashboard/admin-dashboard'
 	import { Copy, Trash2, Mail } from '@lucide/svelte'
-	import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
-	import AdminCrewMemberCard from '@components/Admin/AdminCrewMemberCard.svelte'
-	import AdminMetaCards from '@components/Admin/AdminMetaCards.svelte'
-	import AdminCrewInviteModal from '@components/Admin/AdminCrewInviteModal.svelte'
+	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
+	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
+	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
+	import AdminCrewInviteModal from '@calendar/ui/admin/members/AdminCrewInviteModal.svelte'
 	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
 	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
 	import {
@@ -451,13 +451,13 @@
 						variant: 'subtle' as const,
 						icon: Copy,
 						ariaLabel: 'Copy invite link',
-						onclick: () => void copyInviteWithToast(invite.code)
+						onclick: (): void => void copyInviteWithToast(invite.code)
 					},
 					{
 						variant: 'danger' as const,
 						icon: Trash2,
 						ariaLabel: 'Delete invite',
-						onclick: () => void deleteInviteWithToast(invite.id)
+						onclick: (): void => void deleteInviteWithToast(invite.id)
 					}
 				]
 			}))}

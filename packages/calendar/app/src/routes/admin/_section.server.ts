@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import type { AdminTabId } from '@calendar/ui/features/admin/admin'
+import type { AdminTabId } from '@calendar/ui/admin/shared/admin'
 
 export function createAdminSectionLoad(initialTab: AdminTabId) {
 	return async (event: RequestEvent) => {

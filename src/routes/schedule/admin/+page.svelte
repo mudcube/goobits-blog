@@ -2,10 +2,10 @@
 import { goto } from '$app/navigation'
 import { page } from '$app/stores'
 import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
-import { createAdminDashboardController } from '@calendar/ui/features/dashboard/admin/admin-dashboard-controller.svelte'
+import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 import { AdminEventDetailSheet, AdminLoginCard } from '@calendar/ui'
-import AdminPageHero from '@components/Admin/AdminPageHero.svelte'
-import AdminDashboardContent from '@components/Admin/AdminDashboardContent.svelte'
+import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
+import AdminDashboardContent from '@calendar/ui/admin/dashboard/AdminDashboardContent.svelte'
 import { mockDashboardEvents, mockDashboardRecentEvents } from '$lib/admin/mock/admin-mock-data'
 
 	const { data, form } = $props<{ data: { user: unknown | null }; form: unknown }>()

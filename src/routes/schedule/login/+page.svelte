@@ -10,7 +10,7 @@
   import {
     resolveCalendarLoginTargetActivity,
     resolveFirstAvailableProvider,
-  } from "@calendar/ui/features/auth/member/calendar-login";
+  } from "@calendar/ui/member/auth/calendar-login";
 
   const { data } = $props<{
     data: {
