@@ -72,40 +72,49 @@
 					<p class="contact-page__context">Context: {getContactContextLabel($formData)}</p>
 				{/if}
 
-				<FormField className="contact-page__field" label="Name" forId="contact-name" error={Array.isArray($errors['name']) ? $errors['name'][0] : undefined} required>
-					<input
-						id="contact-name"
-						class="ui-form-control ui-form-control--quiet"
-						type="text"
-						name="name"
-						value={$formData.name}
-						autocomplete="name"
-						placeholder="What should I call you?"
-						oninput={(event) => updateField('name', event.currentTarget.value)}
-					/>
+				<FormField className="contact-page__field" forId="contact-name" error={Array.isArray($errors['name']) ? $errors['name'][0] : undefined} required>
+					<div class:contact-page__control--active={$formData.name.trim().length > 0} class="contact-page__control">
+						<input
+							id="contact-name"
+							class="ui-form-control ui-form-control--quiet"
+							type="text"
+							name="name"
+							value={$formData.name}
+							autocomplete="name"
+							placeholder=" "
+							oninput={(event) => updateField('name', event.currentTarget.value)}
+						/>
+						<label class="contact-page__floating-label" for="contact-name">Name</label>
+					</div>
 				</FormField>
 
-				<FormField className="contact-page__field" label="Email" forId="contact-email" error={Array.isArray($errors['email']) ? $errors['email'][0] : undefined} required>
-					<input
-						id="contact-email"
-						class="ui-form-control ui-form-control--quiet"
-						type="email"
-						name="email"
-						value={$formData.email}
-						autocomplete="email"
-						placeholder="you@email.com"
-						oninput={(event) => updateField('email', event.currentTarget.value)}
-					/>
+				<FormField className="contact-page__field" forId="contact-email" error={Array.isArray($errors['email']) ? $errors['email'][0] : undefined} required>
+					<div class:contact-page__control--active={$formData.email.trim().length > 0} class="contact-page__control">
+						<input
+							id="contact-email"
+							class="ui-form-control ui-form-control--quiet"
+							type="email"
+							name="email"
+							value={$formData.email}
+							autocomplete="email"
+							placeholder=" "
+							oninput={(event) => updateField('email', event.currentTarget.value)}
+						/>
+						<label class="contact-page__floating-label" for="contact-email">Email</label>
+					</div>
 				</FormField>
 
-				<FormField className="contact-page__field" label="Message" forId="contact-message" error={Array.isArray($errors['message']) ? $errors['message'][0] : undefined} required>
-					<textarea
-						id="contact-message"
-						class="ui-form-control ui-form-control--quiet ui-form-control--textarea"
-						name="message"
-						placeholder={getContactMessagePlaceholder($formData)}
-						oninput={(event) => updateField('message', event.currentTarget.value)}
-					>{$formData.message}</textarea>
+				<FormField className="contact-page__field" forId="contact-message" error={Array.isArray($errors['message']) ? $errors['message'][0] : undefined} required>
+					<div class:contact-page__control--active={$formData.message.trim().length > 0} class="contact-page__control contact-page__control--textarea">
+						<textarea
+							id="contact-message"
+							class="ui-form-control ui-form-control--quiet ui-form-control--textarea"
+							name="message"
+							placeholder={getContactMessagePlaceholder($formData)}
+							oninput={(event) => updateField('message', event.currentTarget.value)}
+						>{$formData.message}</textarea>
+						<label class="contact-page__floating-label" for="contact-message">Message</label>
+					</div>
 				</FormField>
 
 				{#if $errors._errors?.length}

@@ -38,12 +38,42 @@
   margin-bottom: 2rem;
 }
 
-.contact-page__field .ui-form-label {
+.contact-page__control {
+  position: relative;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--card-bg) 42%, transparent);
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.contact-page__control:focus-within,
+.contact-page__control--active {
+  background: color-mix(in srgb, var(--card-bg) 78%, var(--bg));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.contact-page__floating-label {
+  position: absolute;
+  left: 0.95rem;
+  top: 0.95rem;
   font-size: 0.8125rem;
   font-weight: var(--font-weight-medium);
   letter-spacing: -0.005em;
-  color: var(--text);
-  margin-bottom: 0.35rem;
+  color: color-mix(in srgb, var(--muted) 88%, var(--text));
+  pointer-events: none;
+  transform-origin: left top;
+  transition:
+    transform 0.18s ease,
+    color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.contact-page__control:focus-within .contact-page__floating-label,
+.contact-page__control--active .contact-page__floating-label {
+  transform: translateY(-0.5rem) scale(0.82);
+  color: color-mix(in srgb, var(--text) 82%, var(--muted));
 }
 
 .contact-page__field .ui-form-message--error {
@@ -57,13 +87,29 @@
   font-size: 0.9375rem;
   line-height: 1.5;
   color: var(--text);
-  padding: 0.65rem 0;
+  padding: 1.45rem 0.95rem 0.7rem;
+  border-bottom-width: 1px;
+  border-color: color-mix(in srgb, var(--border) 84%, transparent);
 }
 
 .contact-page__field .ui-form-control--textarea {
   resize: vertical;
-  min-height: 7.5rem;
+  min-height: 10rem;
   line-height: 1.6;
+}
+
+.contact-page__control--textarea .contact-page__floating-label {
+  top: 0.9rem;
+}
+
+.contact-page__control--textarea .ui-form-control--textarea::placeholder {
+  color: transparent;
+  transition: color 0.18s ease;
+}
+
+.contact-page__control--textarea:focus-within .ui-form-control--textarea::placeholder,
+.contact-page__control--textarea.contact-page__control--active .ui-form-control--textarea::placeholder {
+  color: color-mix(in srgb, var(--muted) 88%, transparent);
 }
 
 .contact-page__submit {
