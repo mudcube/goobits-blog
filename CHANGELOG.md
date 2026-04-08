@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0-rc.1] - 2026-04-08
+
+### Added
+- Hardened public contact and registration flows with anti-abuse controls, verification support, and Cloudflare Turnstile launch configuration.
+- Added live/preview release gating for app navigation and route visibility.
+
+### Changed
+- Standardized user-facing form controls across public, admin, calendar, and auth surfaces.
+- Reorganized calendar UI into explicit `admin/` and `member/` domains, extracting reusable editor surfaces out of route files.
+- Reduced `src/lib` catchall ownership by moving app concerns into `src/lib/app/*` and content/page-specific logic into explicit domains.
+
+### Fixed
+- Restored green typecheck/test coverage after the path and ownership refactors.
+
 ## [1.2.0] - 2026-02-17
 
 ### Added
