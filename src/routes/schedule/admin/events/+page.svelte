@@ -6,10 +6,10 @@
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminChevronRowCard from '@calendar/ui/admin/shared/AdminChevronRowCard.svelte'
 	import AdminEventSessionCard from '@calendar/ui/admin/events/AdminEventSessionCard.svelte'
-	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
-	import { formatAdminDayLabel } from '$lib/admin/date-format'
-	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
-	import { mockDashboardEvents, mockDashboardRecentEvents, mockPrograms } from '$lib/admin/mock/admin-mock-data'
+	import { getAdminActivityEmoji } from '@calendar/ui/admin/shared/activity-display'
+	import { formatAdminDayLabel } from '@calendar/ui/admin/shared/date-format'
+	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
+	import { mockDashboardEvents, mockDashboardRecentEvents, mockPrograms } from '@calendar/ui/admin/mock/admin-mock-data'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })

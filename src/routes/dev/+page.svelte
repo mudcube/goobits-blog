@@ -1,5 +1,5 @@
 <script lang="ts">
-	import DirectoryCatalogPage from '$lib/components/DirectoryCatalogPage.svelte'
+	import DirectoryCatalogPage from '$lib/app/directory/DirectoryCatalogPage.svelte'
 
 	let { data } = $props<{ data: { items: { href: string; title: string; vibe: string; date?: string }[] } }>()
 </script>

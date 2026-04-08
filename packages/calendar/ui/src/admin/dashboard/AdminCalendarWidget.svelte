@@ -5,7 +5,7 @@
 		CALENDAR_WEEK_START_CHANGED_EVENT,
 		getAdminCalendarWeekStart,
 		type AdminCalendarWeekStart
-	} from '$lib/admin/calendar-preferences'
+	} from '../shared/calendar-preferences'
 
 	type CalendarCell = {
 		date: Date

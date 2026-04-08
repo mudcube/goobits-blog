@@ -5,7 +5,7 @@
     filterAndSortDirectoryItems,
     type DirectoryItem,
     type DirectorySort,
-  } from "$lib/viewmodels/directory";
+  } from "$lib/app/directory/viewmodel";
 
   let {
     eyebrow,

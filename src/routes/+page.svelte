@@ -1,6 +1,6 @@
 <script>
 	import { apps } from './_projects.ts'
-	import '$lib/theme/home.css'
+	import '$lib/app/theme/home.css'
 </script>
 
 <svelte:head>

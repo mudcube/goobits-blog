@@ -1,4 +1,4 @@
-import type { DirectoryItem, DirectorySort } from '$lib/viewmodels/directory'
+import type { DirectoryItem, DirectorySort } from '$lib/app/directory/viewmodel'
 
 export type LabItem = DirectoryItem
 export type LabSort = DirectorySort

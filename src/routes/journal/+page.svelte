@@ -8,7 +8,7 @@
     getJournalCategories,
     getJournalYearOrder,
     groupJournalPostsByYear,
-  } from "$lib/viewmodels/journal";
+  } from "@src/domains/journal/viewmodel";
 
   let { data } = $props();
 

@@ -1,7 +1,7 @@
 import { compile } from 'mdsvex'
 import { join } from 'path'
 import { readdirSync, readFileSync } from 'fs'
-import { remarkTableOfContents } from '@lib/remarkTableOfContents.ts'
+import { remarkTableOfContents } from './remark-table-of-contents'
 
 const POSTS_PATH = join(process.cwd(), 'static/journal')
 

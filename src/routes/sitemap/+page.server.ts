@@ -1,5 +1,5 @@
 import { dev } from '$app/environment'
-import { getActiveReleaseStage } from '$lib/release'
+import { getActiveReleaseStage } from '$lib/app/release'
 import { getRouteInventory } from '$lib/server/route-index'
 
 export const prerender = true

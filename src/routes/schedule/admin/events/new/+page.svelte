@@ -3,7 +3,7 @@
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminNewEventEditor from '@calendar/ui/admin/events/editor/AdminNewEventEditor.svelte'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
-	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
+	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({

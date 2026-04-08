@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-import { getJournalPosts } from '$lib/posts'
-import { getConfiguredReleaseStage, isRouteReleased, type ReleaseStage } from '$lib/release'
+import { getJournalPosts } from '@src/domains/journal/server/posts'
+import { getConfiguredReleaseStage, isRouteReleased, type ReleaseStage } from '$lib/app/release'
 
 const ROUTES_DIR = 'src/routes'
 

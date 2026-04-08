@@ -8,9 +8,9 @@
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
-	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
-	import { mockDashboardEvents, mockDashboardRecentEvents } from '$lib/admin/mock/admin-mock-data'
-	import { adminEventDetailBreadcrumb } from '$lib/admin/breadcrumbs'
+	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
+	import { mockDashboardEvents, mockDashboardRecentEvents } from '@calendar/ui/admin/mock/admin-mock-data'
+	import { adminEventDetailBreadcrumb } from '$lib/app/schedule/admin/breadcrumbs'
 
 	const { data } = $props<{ data: { user: unknown | null; eventId: string } }>()
 

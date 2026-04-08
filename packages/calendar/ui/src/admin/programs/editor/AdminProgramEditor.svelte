@@ -6,7 +6,7 @@
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import AdminCalendarWidget from '../../dashboard/AdminCalendarWidget.svelte'
 	import AdminActionButton from '../../shared/AdminActionButton.svelte'
-	import { mockDashboardEvents, mockPrograms } from '$lib/admin/mock/admin-mock-data'
+	import { mockDashboardEvents, mockPrograms } from '../../mock/admin-mock-data'
 
 	type DashboardController = ReturnType<typeof createAdminDashboardController>
 

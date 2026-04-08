@@ -1,6 +1,6 @@
 <script lang="ts">
-	import DirectoryCatalogPage from '$lib/components/DirectoryCatalogPage.svelte'
-	import { labsCatalog } from '$lib/viewmodels/labs'
+	import DirectoryCatalogPage from '$lib/app/directory/DirectoryCatalogPage.svelte'
+	import { labsCatalog } from '@src/domains/labs/viewmodel'
 </script>
 
 <svelte:head>

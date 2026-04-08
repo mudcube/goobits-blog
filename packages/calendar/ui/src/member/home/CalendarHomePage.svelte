@@ -8,8 +8,8 @@
 	import MonthEventCalendar from './MonthEventCalendar.svelte'
 	import AdminEventSessionCard from '@calendar/ui/admin/events/AdminEventSessionCard.svelte'
 	import AdminChevronRowCard from '@calendar/ui/admin/shared/AdminChevronRowCard.svelte'
-	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
-	import { formatAdminDayLabel } from '$lib/admin/date-format'
+	import { getAdminActivityEmoji } from '../../admin/shared/activity-display'
+	import { formatAdminDayLabel } from '../../admin/shared/date-format'
 	let { data } = $props()
 	let upcoming = $state([])
 	let recent = $state([])

@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { buildPaymentLink, getCalendarProgramBySlug, listEventsFeed } from '@calendar/core'
-import { mockCalendarRecent, mockCalendarUpcoming, mockPrograms } from '$lib/admin/mock/admin-mock-data'
+import { mockCalendarRecent, mockCalendarUpcoming, mockPrograms } from '@calendar/ui/admin/mock/admin-mock-data'
 import type { RequestEvent } from './$types'
 
 export async function load(event: RequestEvent) {

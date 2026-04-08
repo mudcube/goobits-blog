@@ -1,4 +1,4 @@
-import type { JournalPost } from '$lib/posts'
+import type { JournalPost } from '@src/domains/journal/server/posts'
 import { localeSort, matchesQuery, normalizeQuery } from '$lib/utils/collections'
 import { formatDateYear } from '$lib/utils/date'
 

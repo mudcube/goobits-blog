@@ -1,4 +1,4 @@
-import { getJournalPosts } from '$lib/posts'
+import { getJournalPosts } from '@src/domains/journal/server/posts'
 
 type MusicPost = {
 	title: string

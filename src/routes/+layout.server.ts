@@ -1,5 +1,5 @@
 import { dev } from '$app/environment'
-import { getActiveReleaseStage } from '$lib/release'
+import { getActiveReleaseStage } from '$lib/app/release'
 
 const fixedThemePreferences = {
 	theme: 'dark',

@@ -9,9 +9,9 @@
     getAdminCalendarWeekStart,
     setAdminCalendarWeekStart,
     type AdminCalendarWeekStart,
-  } from "$lib/admin/calendar-preferences";
-  import { isAdminMockMode } from "$lib/admin/mock/mock-mode";
-  import { mockPaymentDefaults } from "$lib/admin/mock/admin-mock-data";
+  } from "@calendar/ui/admin/shared/calendar-preferences";
+  import { isAdminMockMode } from "@calendar/ui/admin/mock/mock-mode";
+  import { mockPaymentDefaults } from "@calendar/ui/admin/mock/admin-mock-data";
 
   const { data } = $props<{ data: { user: unknown | null } }>();
   const dashboard = createAdminDashboardController({

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { RELEASE_STAGE_COOKIE, type ReleaseStage } from '$lib/release'
+	import { RELEASE_STAGE_COOKIE, type ReleaseStage } from '$lib/app/release'
 
 	type Props = {
 		activeStage: ReleaseStage

@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import type { DirectoryItem } from '$lib/viewmodels/directory'
+import type { DirectoryItem } from '$lib/app/directory/viewmodel'
 
 const DEV_ROUTES_DIR = path.join(process.cwd(), 'src/routes/dev')
 

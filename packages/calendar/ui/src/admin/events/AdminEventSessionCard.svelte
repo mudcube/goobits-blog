@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
+	import { getAdminActivityEmoji } from '../shared/activity-display'
 
 	type Participant = {
 		name?: string | null

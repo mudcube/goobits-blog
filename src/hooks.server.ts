@@ -4,7 +4,7 @@ import { sequence } from '@sveltejs/kit/hooks'
 import { createCalendarAuthHandles } from '@calendar/app'
 import { getCalendarConfig } from '@calendar/core'
 import { applyMikoCalendarPreset } from '@calendar/preset-miko'
-import { getActiveReleaseStage, isRouteReleased } from '$lib/release'
+import { getActiveReleaseStage, isRouteReleased } from '$lib/app/release'
 import { dev } from '$app/environment'
 import type { Handle } from '@sveltejs/kit'
 applyMikoCalendarPreset()

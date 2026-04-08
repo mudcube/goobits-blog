@@ -1,8 +1,8 @@
 import 'dotenv/config'
 import adapterCloudflare from '@sveltejs/adapter-cloudflare'
 import { mdsvex } from 'mdsvex'
-import { handlePrerenderHttpError } from './src/lib/config/runtime/sveltekit.runtime.js'
-import { remarkTableOfContents } from './src/lib/remarkTableOfContents.js'
+import { handlePrerenderHttpError } from './src/lib/app/config/runtime/sveltekit.runtime.js'
+import { remarkTableOfContents } from './src/domains/journal/server/remark-table-of-contents.js'
 
 export default {
 	kit: {

@@ -3,8 +3,8 @@
 	import AdminDashboardTodayTimeline from '@calendar/ui/admin/dashboard/AdminDashboardTodayTimeline.svelte'
 	import AdminDashboardRecentFeed from '@calendar/ui/admin/dashboard/AdminDashboardRecentFeed.svelte'
 	import AdminChevronRowCard from '@calendar/ui/admin/shared/AdminChevronRowCard.svelte'
-	import { getAdminActivityEmoji } from '$lib/admin/activity-display'
-	import { formatAdminDayLabel, formatAdminTimeLabel } from '$lib/admin/date-format'
+	import { getAdminActivityEmoji } from '../shared/activity-display'
+	import { formatAdminDayLabel, formatAdminTimeLabel } from '../shared/date-format'
 
 	type Participant = {
 		name?: string | null

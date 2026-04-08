@@ -1,4 +1,4 @@
-import { isNavItemVisibleInStage, releasedHeaderNavItems, type ReleaseStage } from '$lib/release'
+import { isNavItemVisibleInStage, releasedHeaderNavItems, type ReleaseStage } from '$lib/app/release'
 
 export type NavItem = {
 	href: string

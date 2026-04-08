@@ -16,7 +16,7 @@
 		getFilteredSitemapGroups,
 		getRouteTags,
 		getSitemapAvailableTags
-	} from '$lib/viewmodels/sitemap'
+	} from '@src/domains/sitemap/viewmodel'
 
 	const { data } = $props()
 

@@ -1,4 +1,4 @@
-import { getJournalPosts } from '$lib/posts'
+import { getJournalPosts } from '@src/domains/journal/server/posts'
 
 export const prerender = true
 export const trailingSlash = 'always'

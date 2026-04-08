@@ -5,8 +5,8 @@
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminChevronRowCard from '@calendar/ui/admin/shared/AdminChevronRowCard.svelte'
-	import { isAdminMockMode, withAdminMock } from '$lib/admin/mock/mock-mode'
-	import { mockCrewUsers, mockDashboardEvents, mockDashboardRecentEvents } from '$lib/admin/mock/admin-mock-data'
+	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
+	import { mockCrewUsers, mockDashboardEvents, mockDashboardRecentEvents } from '@calendar/ui/admin/mock/admin-mock-data'
 
 	const { data } = $props<{ data: { user: unknown | null; userId: string } }>()
 

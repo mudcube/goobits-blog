@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types'
-import { getActiveReleaseStage } from '$lib/release'
+import { getActiveReleaseStage } from '$lib/app/release'
 import { getPublicSitemapRoutes } from '$lib/server/route-index'
 import { escapeXml, formatSitemapLastMod, getBaseUrl, getPlatformEnv, resolveSiteOrigin, toAbsoluteUrl } from '$lib/server/seo'
 
