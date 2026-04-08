@@ -1,3 +1,8 @@
+@use './styles/mixins';
+@use './styles/components/button';
+@use './styles/components/card';
+@use './styles/components/modal';
+
 @import url('components/prism.scss');
 @import './lib/theme/tokens.css';
 @import './lib/theme/modes.css';
@@ -12,7 +17,6 @@
 @import './lib/theme/contact.css';
 @import './lib/theme/journal-entry.css';
 /* New BEM component library consumes existing site tokens; no duplicate token system. */
-@import './styles/main.scss';
 
 @font-face {
 	font-family: 'Canela Deck';
