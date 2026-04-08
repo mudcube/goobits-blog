@@ -18,8 +18,8 @@
     Eye,
   } from "@lucide/svelte";
   import AdminActionButton from "@calendar/ui/admin/shared/AdminActionButton.svelte";
-  import { isAdminMockMode, withAdminMock } from "$lib/admin/mock/mock-mode";
-  import { adminEventDetailBreadcrumb } from "$lib/admin/breadcrumbs";
+  import { isAdminMockMode, withAdminMock } from "@calendar/ui/admin/mock/mock-mode";
+  import { adminEventDetailBreadcrumb } from "$lib/app/schedule/admin/breadcrumbs";
 
   const { data, children } = $props<{
     data: { user: unknown | null };
@@ -125,14 +125,6 @@
         { label: "Events", href: hrefWithMock("/schedule/admin/events/") },
         { label: "New Event" },
       ];
-    if (normalized.startsWith("/schedule/admin/events/program/")) {
-      const legacyLeaf = normalized.split("/").pop() || "program";
-      return [
-        ...items,
-        { label: "Events", href: hrefWithMock("/schedule/admin/events/") },
-        { label: prettyLeaf(legacyLeaf) },
-      ];
-    }
     if (eventsSingleSegment && !isEventId)
       return [
         ...items,
