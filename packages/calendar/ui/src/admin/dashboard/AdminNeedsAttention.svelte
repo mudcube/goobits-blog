@@ -1,6 +1,6 @@
 <script>
 	import { AlertTriangle, RefreshCw, RotateCcw, Trash2 } from '@lucide/svelte'
-	import PillButton from '../../../primitives/PillButton.svelte'
+	import PillButton from '../../primitives/PillButton.svelte'
 	const { dashboard } = $props()
 	const needsCalendarAttention = $derived(dashboard.connectionExpired || !dashboard.connected)
 	const needsQueueAttention = $derived(

@@ -1,7 +1,7 @@
 <script>
-	import PillButton from '../../../primitives/PillButton.svelte'
-	import AdminEditProgramModal from '../../modals/admin/AdminEditProgramModal.svelte'
-	import { getCalendarUiConfig } from '../../../config'
+	import PillButton from '../../primitives/PillButton.svelte'
+	import AdminEditProgramModal from './AdminEditProgramModal.svelte'
+	import { getCalendarUiConfig } from '../../config'
 	const { dashboard } = $props()
 	const calendarConfig = getCalendarUiConfig()
 	let showProgramModal = $state(false)

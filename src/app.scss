@@ -4,18 +4,18 @@
 @use './styles/components/modal';
 
 @import url('components/prism.scss');
-@import './lib/theme/tokens.css';
-@import './lib/theme/modes.css';
-@import './lib/theme/typography.css';
-@import './lib/theme/layout.css';
-@import './lib/theme/ui-components.css';
-@import './lib/theme/legal.css';
-@import './lib/theme/showcase.css';
-@import './lib/theme/sitemap.css';
-@import './lib/theme/admin.css';
-@import './lib/theme/about.css';
-@import './lib/theme/contact.css';
-@import './lib/theme/journal-entry.css';
+@import './lib/app/theme/tokens.css';
+@import './lib/app/theme/modes.css';
+@import './lib/app/theme/typography.css';
+@import './lib/app/theme/layout.css';
+@import './lib/app/theme/ui-components.css';
+@import './lib/app/theme/legal.css';
+@import './lib/app/theme/showcase.css';
+@import './lib/app/theme/sitemap.css';
+@import './lib/app/theme/admin.css';
+@import './lib/app/theme/about.css';
+@import './lib/app/theme/contact.css';
+@import './lib/app/theme/journal-entry.css';
 /* New BEM component library consumes existing site tokens; no duplicate token system. */
 
 @font-face {

@@ -1,6 +1,6 @@
 <script>
-  import PillButton from "../../../primitives/PillButton.svelte";
-  import AdminNewEventModal from "../../modals/admin/AdminNewEventModal.svelte";
+  import PillButton from "../../primitives/PillButton.svelte";
+  import AdminNewEventModal from "./AdminNewEventModal.svelte";
   import AdminEventDetailSheet from "./AdminEventDetailSheet.svelte";
   const { dashboard } = $props();
   let memoryDrafts = $state({});

@@ -3,7 +3,7 @@ import packageJson from './package.json'
 import { defineConfig } from 'vite'
 import { enhancedImages } from '@sveltejs/enhanced-img'
 import { sveltekit } from '@sveltejs/kit/vite'
-import { getViteRuntimeConfig } from './src/lib/config/runtime/vite.runtime.ts'
+import { getViteRuntimeConfig } from './src/lib/app/config/runtime/vite.runtime.ts'
 
 dotenv.config({
 	path: './config/env/.env'

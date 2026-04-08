@@ -1,8 +1,8 @@
 <script>
-  import { saveCalendarProfile } from "../../../api/calendar";
-  import { getCalendarUiConfig } from "../../../config";
-  import PillButton from "../../../primitives/PillButton.svelte";
-  import Hero from "../../../primitives/Hero.svelte";
+  import { saveCalendarProfile } from "../../api/calendar";
+  import { getCalendarUiConfig } from "../../config";
+  import PillButton from "../../primitives/PillButton.svelte";
+  import Hero from "../../primitives/Hero.svelte";
   let { data } = $props();
   let emergencyContact = $derived(data.profile?.emergencyContact ?? "");
   let dietaryRestrictions = $derived(data.profile?.dietaryRestrictions ?? "");

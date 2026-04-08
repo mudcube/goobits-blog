@@ -1,5 +1,5 @@
 <script>
-	import PillButton from '../../../primitives/PillButton.svelte'
+	import PillButton from '../../primitives/PillButton.svelte'
 	const { dashboard, detail } = $props()
 
 	function formatDateTime(iso) {

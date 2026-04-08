@@ -1,6 +1,6 @@
 <script>
-  import Button from "../../../primitives/Button.svelte";
-  import { getCalendarUiConfig } from "../../../config";
+  import Button from "../../primitives/Button.svelte";
+  import { getCalendarUiConfig } from "../../config";
   const { form } = $props();
   const calendarConfig = getCalendarUiConfig();
 </script>
