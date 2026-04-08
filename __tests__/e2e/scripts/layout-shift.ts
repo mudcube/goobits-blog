@@ -1,33 +1,15 @@
 #!/usr/bin/env node
-import { chromium } from 'playwright'
-
-const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:3610'
-const ROUTES = [
-	'/',
-	'/about',
-	'/labs',
-	'/journal',
-	'/contact',
-	'/privacy',
-	'/terms',
-	'/cookies',
-	'/schedule/login',
-	'/schedule/admin'
-]
+import { BASE_URL, SHARED_LAYOUT_ROUTES } from './_config'
+import { withBrowserContext } from './_helpers'
 
 // Strict by default; allow overrides for tuning.
 const CLS_MAX = Number.parseFloat(process.env.E2E_CLS_MAX || '0.02')
 const POST_LOAD_SETTLE_MS = Number.parseInt(process.env.E2E_CLS_SETTLE_MS || '800', 10)
 
 export async function runLayoutShift() {
-	const browser = await chromium.launch({ headless: true })
-	const context = await browser.newContext({
-		viewport: { width: 1440, height: 900 }
-	})
-
-	try {
+	await withBrowserContext(async (context) => {
 		let failed = 0
-		for (const route of ROUTES) {
+		for (const route of SHARED_LAYOUT_ROUTES) {
 			const page = await context.newPage()
 
 			// Capture CLS from the earliest possible moment.
@@ -129,8 +111,5 @@ export async function runLayoutShift() {
 
 		// eslint-disable-next-line no-console
 		console.log(`[cls] OK: all routes <= ${CLS_MAX}`)
-	} finally {
-		await context.close()
-		await browser.close()
-	}
+	}, { viewport: { width: 1440, height: 900 } })
 }

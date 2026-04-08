@@ -1,6 +1,8 @@
+import { chromium, type BrowserContext, type Page } from 'playwright'
 import { execSync } from 'node:child_process'
 
 export const BASE_URL = process.env['E2E_BASE_URL'] || 'http://localhost:3610'
+export const ADMIN_URL = `${BASE_URL}/schedule/admin/`
 
 export function getAdminPasscode() {
 	if (process.env['ADMIN_PASSCODE']) return process.env['ADMIN_PASSCODE']
@@ -40,6 +42,32 @@ export async function bootstrapAdminSession(request: import('playwright').APIReq
 	if (!response.ok()) {
 		throw new Error(`admin session bootstrap failed: ${response.status()}`)
 	}
+}
+
+export async function withBrowserContext<T>(run: (context: BrowserContext) => Promise<T>) {
+	const browser = await chromium.launch({ headless: true })
+	const context = await browser.newContext()
+
+	try {
+		return await run(context)
+	} finally {
+		await context.close()
+		await browser.close()
+	}
+}
+
+export async function withAdminPage<T>(run: (page: Page, context: BrowserContext) => Promise<T>) {
+	return withBrowserContext(async (context) => {
+		const page = await context.newPage()
+
+		try {
+			await bootstrapAdminSession(context.request)
+			await page.goto(`${ADMIN_URL}?preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
+			return await run(page, context)
+		} finally {
+			await page.close()
+		}
+	})
 }
 
 export async function bootstrapCalendarSession(

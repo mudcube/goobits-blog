@@ -1,5 +1,5 @@
 import { test } from 'vitest'
-import { runAdminEventTemplatesSmoke } from './scripts/admin-redesign-smoke'
+import { runAdminEventTemplatesSmoke } from './scripts/admin-event-templates-smoke'
 
 test('admin event templates smoke', async () => {
 	await runAdminEventTemplatesSmoke()

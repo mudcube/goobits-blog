@@ -1,8 +1,7 @@
-import { chromium } from 'playwright';
+import { BASE_URL, NAV_TIMEOUT_MS } from './_config';
+import { withBrowserContext } from './_helpers';
 
-const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:3610';
 const SITEMAP_URL = `${BASE_URL}/sitemap.xml`;
-const NAV_TIMEOUT_MS = Number(process.env.E2E_NAV_TIMEOUT_MS || 20000);
 
 function unique(values) {
 	return [...new Set(values)];
@@ -50,60 +49,55 @@ export async function runSitemapSmoke() {
 	const urls = await fetchSitemapUrls();
 	console.log(`[sitemap-smoke] Checking ${urls.length} URL(s) from ${SITEMAP_URL}`);
 
-	const browser = await chromium.launch({ headless: true });
-	const context = await browser.newContext();
-
 	const failures = [];
+	await withBrowserContext(async (context) => {
+		for (const url of urls) {
+			const page = await context.newPage();
+			const pageIssues = [];
 
-	for (const url of urls) {
-		const page = await context.newPage();
-		const pageIssues = [];
+			page.on('console', (msg) => {
+				if (msg.type() !== 'error') return;
+				const text = msg.text();
+				if (shouldIgnoreConsoleError(text)) return;
+				if (shouldIgnoreTurnstileNoise(url, text)) return;
+				pageIssues.push({ type: 'console-error', detail: text });
+			});
 
-		page.on('console', (msg) => {
-			if (msg.type() !== 'error') return;
-			const text = msg.text();
-			if (shouldIgnoreConsoleError(text)) return;
-			if (shouldIgnoreTurnstileNoise(url, text)) return;
-			pageIssues.push({ type: 'console-error', detail: text });
-		});
+			page.on('pageerror', (err) => {
+				const detail = err?.message || String(err);
+				if (shouldIgnoreTurnstileNoise(url, detail)) return;
+				pageIssues.push({ type: 'page-error', detail });
+			});
 
-		page.on('pageerror', (err) => {
-			const detail = err?.message || String(err);
-			if (shouldIgnoreTurnstileNoise(url, detail)) return;
-			pageIssues.push({ type: 'page-error', detail });
-		});
-
-		page.on('response', (res) => {
-			const status = res.status();
-			if (status >= 500) {
-				pageIssues.push({ type: 'response-5xx', detail: `${status} ${res.url()}` });
-			}
-		});
-
-		try {
-			const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: NAV_TIMEOUT_MS });
-			if (!response) {
-				pageIssues.push({ type: 'navigation', detail: 'No response from page.goto()' });
-			} else {
-				const status = response.status();
+			page.on('response', (res) => {
+				const status = res.status();
 				if (status >= 500) {
-					pageIssues.push({ type: 'navigation-5xx', detail: `${status} ${url}` });
+					pageIssues.push({ type: 'response-5xx', detail: `${status} ${res.url()}` });
 				}
+			});
+
+			try {
+				const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: NAV_TIMEOUT_MS });
+				if (!response) {
+					pageIssues.push({ type: 'navigation', detail: 'No response from page.goto()' });
+				} else {
+					const status = response.status();
+					if (status >= 500) {
+						pageIssues.push({ type: 'navigation-5xx', detail: `${status} ${url}` });
+					}
+				}
+				await page.waitForLoadState('networkidle', { timeout: 2_000 }).catch(() => {});
+			} catch (error) {
+				pageIssues.push({ type: 'navigation-exception', detail: error?.message || String(error) });
 			}
-			await page.waitForLoadState('networkidle', { timeout: 2_000 }).catch(() => {});
-		} catch (error) {
-			pageIssues.push({ type: 'navigation-exception', detail: error?.message || String(error) });
+
+			await page.close();
+
+			if (pageIssues.length > 0) {
+				failures.push({ url, issues: pageIssues });
+			}
 		}
-
-		await page.close();
-
-		if (pageIssues.length > 0) {
-			failures.push({ url, issues: pageIssues });
-		}
-	}
-
-	await context.close();
-	await browser.close();
+	});
 
 	if (failures.length > 0) {
 		console.error(`\n[sitemap-smoke] FAIL: ${failures.length} URL(s) reported issues.`);
@@ -113,7 +107,7 @@ export async function runSitemapSmoke() {
 				console.error(`  [${issue.type}] ${issue.detail}`);
 			}
 		}
-		process.exit(1);
+		throw new Error(`[sitemap-smoke] ${failures.length} URL(s) reported issues.`);
 	}
 
 	console.log('[sitemap-smoke] PASS: no console errors, page errors, or 5xx responses detected.');

@@ -1,13 +1,8 @@
-import { chromium } from 'playwright'
-
-const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:3610'
+import { BASE_URL } from './_config'
+import { withPage } from './_helpers'
 
 export async function runAuthRegisterSmoke() {
-	const browser = await chromium.launch({ headless: true })
-	const context = await browser.newContext()
-	const page = await context.newPage()
-
-	try {
+	await withPage(async (page) => {
 		await page.goto(`${BASE_URL}/register`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 		await page.getByTestId('register-form').waitFor({ state: 'visible', timeout: 30000 })
 
@@ -47,8 +42,5 @@ export async function runAuthRegisterSmoke() {
 		}
 
 		console.log('[auth-register-smoke] PASS')
-	} finally {
-		await context.close()
-		await browser.close()
-	}
+	})
 }

@@ -1,17 +1,7 @@
-import { chromium } from 'playwright'
-import { BASE_URL, bootstrapAdminSession } from './_helpers'
-
-const ADMIN_URL = `${BASE_URL}/schedule/admin/`
+import { BASE_URL, withAdminPage } from './_helpers'
 
 export async function runAdminSyncQueueSmoke() {
-	const browser = await chromium.launch({ headless: true })
-	const context = await browser.newContext()
-	const page = await context.newPage()
-
-	try {
-		await bootstrapAdminSession(context.request)
-		await page.goto(`${ADMIN_URL}?preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
-
+	await withAdminPage(async (_page, context) => {
 		const statusRes = await context.request.get(`${BASE_URL}/api/admin/status`)
 		if (!statusRes.ok()) throw new Error(`admin status failed: ${statusRes.status()}`)
 		const statusPayload = await statusRes.json() as { syncQueue?: { deadLetter?: number } }
@@ -54,8 +44,5 @@ export async function runAdminSyncQueueSmoke() {
 		}
 
 		console.log('[admin-sync-queue-smoke] PASS')
-	} finally {
-		await context.close()
-		await browser.close()
-	}
+	})
 }
