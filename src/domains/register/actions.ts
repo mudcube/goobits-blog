@@ -66,7 +66,7 @@ export async function submitRegisterData(
 
 export const load = async ({ platform }: RegisterLoadEvent) => {
 	const env = mergeRuntimeEnv(platform?.env)
-	const form = await superValidate(getRegisterFormDefaults(), zod(registerSchema))
+	const form = await superValidate(getRegisterFormDefaults(), zod(registerSchema), { errors: false })
 	return {
 		form,
 		turnstileSiteKey: getTurnstileSiteKey(env)

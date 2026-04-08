@@ -57,7 +57,8 @@ export const load = async ({ url, platform }: ContactLoadEvent) => {
 			topic: url.searchParams.get('topic')?.trim() || '',
 			started_at: String(Date.now())
 		}),
-		zod(contactSchema)
+		zod(contactSchema),
+		{ errors: false }
 	)
 
 	return {
