@@ -96,11 +96,7 @@
 		</FormField>
 
 		{#if props.turnstileSiteKey}
-			<VerificationField
-				className="register-page__verification"
-				siteKey={props.turnstileSiteKey}
-				copy="Complete the security check to finish account creation."
-			/>
+			<VerificationField className="register-page__verification" siteKey={props.turnstileSiteKey} />
 		{/if}
 
 		{#if $errors._errors?.length}

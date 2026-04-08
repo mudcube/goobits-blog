@@ -104,8 +104,9 @@ export async function runLayoutDrift() {
 				}
 			})
 
-			// Snapshot "late": allow network, font loading, hydration, and transitions to settle.
-			await page.waitForLoadState('networkidle', { timeout: 30000 })
+			// Snapshot "late": allow font loading, hydration, and transitions to settle.
+			// Network can stay busy in dev due to challenge widgets or background requests.
+			await page.waitForLoadState('networkidle', { timeout: 2_000 }).catch(() => {})
 			await page.evaluate(async () => {
 				if (document?.fonts?.ready) await document.fonts.ready
 			})

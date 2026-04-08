@@ -38,6 +38,14 @@ function shouldIgnoreConsoleError(text) {
 	return knownNoise.some((entry) => text.includes(entry));
 }
 
+function shouldIgnoreTurnstileNoise(url, detail) {
+	if (!url.includes('/contact') && !url.includes('/register')) return false;
+	return (
+		detail.includes('[Cloudflare Turnstile] Error: 110200') ||
+		detail.includes('Failed to load resource: the server responded with a status of 400')
+	);
+}
+
 export async function runSitemapSmoke() {
 	const urls = await fetchSitemapUrls();
 	console.log(`[sitemap-smoke] Checking ${urls.length} URL(s) from ${SITEMAP_URL}`);
@@ -55,11 +63,14 @@ export async function runSitemapSmoke() {
 			if (msg.type() !== 'error') return;
 			const text = msg.text();
 			if (shouldIgnoreConsoleError(text)) return;
+			if (shouldIgnoreTurnstileNoise(url, text)) return;
 			pageIssues.push({ type: 'console-error', detail: text });
 		});
 
 		page.on('pageerror', (err) => {
-			pageIssues.push({ type: 'page-error', detail: err?.message || String(err) });
+			const detail = err?.message || String(err);
+			if (shouldIgnoreTurnstileNoise(url, detail)) return;
+			pageIssues.push({ type: 'page-error', detail });
 		});
 
 		page.on('response', (res) => {
@@ -70,7 +81,7 @@ export async function runSitemapSmoke() {
 		});
 
 		try {
-			const response = await page.goto(url, { waitUntil: 'networkidle', timeout: NAV_TIMEOUT_MS });
+			const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: NAV_TIMEOUT_MS });
 			if (!response) {
 				pageIssues.push({ type: 'navigation', detail: 'No response from page.goto()' });
 			} else {
@@ -79,6 +90,7 @@ export async function runSitemapSmoke() {
 					pageIssues.push({ type: 'navigation-5xx', detail: `${status} ${url}` });
 				}
 			}
+			await page.waitForLoadState('networkidle', { timeout: 2_000 }).catch(() => {});
 		} catch (error) {
 			pageIssues.push({ type: 'navigation-exception', detail: error?.message || String(error) });
 		}

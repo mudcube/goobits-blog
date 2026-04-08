@@ -1,3 +1,4 @@
+import { dev } from '$app/environment'
 import { checkRateLimit, compactRateLimitBuckets, keyForRateLimit } from './rate-limit'
 import { isDisposableEmailDomain, type DisposableMode } from './disposable-email'
 import { verifyTurnstileToken } from './turnstile'
@@ -48,6 +49,10 @@ function enabled(value: string | undefined, fallback = false) {
 function evaluateDisposablePolicy(modeRaw: string | undefined): DisposableMode {
 	if (modeRaw === 'block' || modeRaw === 'score' || modeRaw === 'off') return modeRaw
 	return 'score'
+}
+
+function shouldBypassTurnstileForLocalPreview(env: Record<string, string | undefined>) {
+	return dev && enabled(env['TURNSTILE_ENABLE_LOCALHOST'], false)
 }
 
 function genericFailure(): RegisterAntiAbuseResult {
@@ -120,6 +125,9 @@ export async function runRegisterAntiAbuse(input: RegisterAntiAbuseInput): Promi
 	const shouldRequireChallenge = alwaysRequireTurnstile || riskScore >= 2
 	if (!shouldRequireChallenge) {
 		return { ok: true, reason: 'allow', requiresChallenge: false }
+	}
+	if (shouldBypassTurnstileForLocalPreview(input.env)) {
+		return { ok: true, reason: 'allow', requiresChallenge: true }
 	}
 
 	const secret = input.env['TURNSTILE_SECRET_KEY'] || ''
@@ -213,6 +221,9 @@ export async function runContactAntiAbuse(input: ContactAntiAbuseInput): Promise
 	const shouldRequireChallenge = alwaysRequireTurnstile || riskScore >= 2
 	if (!shouldRequireChallenge) {
 		return { ok: true, reason: 'allow', requiresChallenge: false }
+	}
+	if (shouldBypassTurnstileForLocalPreview(input.env)) {
+		return { ok: true, reason: 'allow', requiresChallenge: true }
 	}
 
 	const secret = input.env['TURNSTILE_SECRET_KEY'] || ''

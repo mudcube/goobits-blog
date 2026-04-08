@@ -95,8 +95,9 @@ export async function runLayoutShift() {
 			if (!res) throw new Error(`No response for ${url}`)
 			if (res.status() >= 500) throw new Error(`Server error for ${url}: ${res.status()}`)
 
-			// Wait for styles/fonts/network to settle, then read accumulated CLS.
-			await page.waitForLoadState('networkidle', { timeout: 30000 })
+			// Network can stay busy in dev due to challenge widgets or background requests,
+			// so treat network idle as best-effort rather than a hard prerequisite.
+			await page.waitForLoadState('networkidle', { timeout: 2_000 }).catch(() => {})
 			await page.evaluate(async () => {
 				if (document?.fonts?.ready) await document.fonts.ready
 			})

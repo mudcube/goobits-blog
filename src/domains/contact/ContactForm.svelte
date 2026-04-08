@@ -116,11 +116,7 @@
 				{/if}
 
 				{#if props.turnstileSiteKey}
-					<VerificationField
-						className="contact-page__verification"
-						siteKey={props.turnstileSiteKey}
-						copy="Complete the security check before sending."
-					/>
+					<VerificationField className="contact-page__verification" siteKey={props.turnstileSiteKey} />
 				{/if}
 
 				<PillButton className="contact-page__submit" type="submit" variant="primary" size="lg" disabled={$submitting}>

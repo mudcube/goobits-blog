@@ -19,7 +19,9 @@ test('contact submit smoke', async () => {
 			}
 		})
 
-		await page.goto(`${BASE_URL}/contact`, { waitUntil: 'networkidle', timeout: 30_000 })
+		await page.goto(`${BASE_URL}/contact`, { waitUntil: 'domcontentloaded', timeout: 30_000 })
+		await page.waitForSelector('form.contact-page__form', { timeout: 30_000 })
+		await page.waitForSelector('input[name="name"]', { timeout: 30_000 })
 
 		await page.fill('input[name="name"]', 'E2E Contact User')
 		await page.fill('input[name="email"]', `e2e-contact-${Date.now()}@example.com`)

@@ -8,7 +8,8 @@ export async function runAuthRegisterSmoke() {
 	const page = await context.newPage()
 
 	try {
-		await page.goto(`${BASE_URL}/register`, { waitUntil: 'networkidle', timeout: 30000 })
+		await page.goto(`${BASE_URL}/register`, { waitUntil: 'domcontentloaded', timeout: 30000 })
+		await page.getByTestId('register-form').waitFor({ state: 'visible', timeout: 30000 })
 
 		const hasForm = await page.getByTestId('register-form').count()
 		if (!hasForm) throw new Error('register form not found')
@@ -22,10 +23,7 @@ export async function runAuthRegisterSmoke() {
 			el.value = String(Date.now())
 		})
 
-		await Promise.all([
-			page.waitForLoadState('networkidle', { timeout: 15000 }),
-			page.getByTestId('register-submit-row').locator('button[type="submit"]').click()
-		])
+		await page.getByTestId('register-submit-row').locator('button[type="submit"]').click()
 
 		const url = page.url()
 		if (!url.includes('/register')) {
@@ -40,9 +38,10 @@ export async function runAuthRegisterSmoke() {
 
 		// Verify invalid token path redirects to login with invalid marker.
 		await page.goto(`${BASE_URL}/verify-email?token=invalid&email=test@example.com`, {
-			waitUntil: 'networkidle',
+			waitUntil: 'domcontentloaded',
 			timeout: 30000
 		})
+		await page.waitForURL(/\/schedule\/login\/?\?verified=invalid/, { timeout: 30000 })
 		if (!/\/schedule\/login\/?\?verified=invalid/.test(page.url())) {
 			throw new Error(`unexpected verify-email redirect target: ${page.url()}`)
 		}
