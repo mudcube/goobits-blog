@@ -32,6 +32,7 @@ export async function runAuthRegisterSmoke() {
 			throw new Error(`expected to remain on /register after fast submit, got ${url}`)
 		}
 
+		await page.getByTestId('register-error').waitFor({ state: 'visible', timeout: 5000 })
 		const hasError = (await page.getByTestId('register-error').count()) > 0
 		if (!hasError) {
 			throw new Error('expected anti-abuse error message after fast submit')
