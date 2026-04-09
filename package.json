@@ -52,7 +52,7 @@
     "preview": "vite preview --port 3000",
     "seed:calendar": "node scripts/seed/calendar-social.mjs",
     "serve:prod": "NODE_ENV=production dotenvx run -f config/env/.env -- node build",
-    "task:nano-banana": "node tasks/nano-banana/nano_banana_cli.js",
+    "task:nano-banana": "node tasks/nano-banana/cli.js",
     "test": "pnpm run e2e",
     "version:major": "npm version major --no-git-tag-version",
     "version:minor": "npm version minor --no-git-tag-version",

@@ -1,9 +1,10 @@
 /**
- * @fileoverview Centralized configuration for Nano Banana image generation.
- * @module nano-banana/config
+ * Repo defaults for Google Gemini 2.5 Flash Image, commonly called Nano Banana.
  */
 
 const ANTI_FRAME = ' IMPORTANT: No border, no frame, no vignette, no margin, edge-to-edge composition filling the entire canvas.'
+
+export const NANO_BANANA_MODEL = 'gemini-2.5-flash-image'
 
 export const STYLE_PRESETS = Object.freeze({
 	storybook: ` Digital illustration in warm storybook style. Painterly brushstrokes with visible texture. Muted earth tones (ochre, sage, amber, cream) and warm golden highlights. Soft diffused lighting like a cozy afternoon. Whimsical, friendly, slightly stylized proportions. No photorealism, no 3D rendering.${ ANTI_FRAME }`,
@@ -22,6 +23,18 @@ export const VALID_ASPECT_RATIOS = Object.freeze([ '1:1', '2:3', '3:2', '3:4', '
 export const VALID_RESOLUTIONS = Object.freeze([ '1K', '2K', '4K' ])
 
 export const VALID_STYLES = Object.freeze(Object.keys(STYLE_PRESETS))
+
+export const VALID_OUTPUT_MODES = Object.freeze([ 'file', 'base64' ])
+
+export const STYLE_DESCRIPTIONS = Object.freeze({
+	storybook: 'Warm storybook illustration for whimsical and mythic content',
+	product: 'Professional product photography for catalog and commercial shots',
+	photo: 'Natural lifestyle photography for events, landscapes, and documentation',
+	hero: 'Wide cinematic storybook illustration optimized for page headers',
+	whimsy: 'Legacy alias for storybook',
+	realistic: 'Legacy alias for product',
+	minimal: 'Legacy alias for photo'
+})
 
 export const DIMENSION_TO_ASPECT_RATIO = Object.freeze({
 	'600x600': '1:1',
@@ -59,15 +72,17 @@ export const DIMENSION_TO_ASPECT_RATIO = Object.freeze({
 	'1080x1350': '4:5'
 })
 
-export const DEFAULT_CONFIG = Object.freeze({
-	model: 'gemini-2.5-flash-image',
+export const DEFAULT_GENERATION_OPTIONS = Object.freeze({
+	model: NANO_BANANA_MODEL,
 	aspectRatio: '1:1',
 	resolution: '1K',
 	style: 'whimsy',
-	outputDir: 'static/images/nano-banana',
-	maxConcurrent: 3,
+	output: 'file',
+	outputDir: 'static/media/generated/nano-banana',
 	retryAttempts: 3,
-	retryBaseDelay: 1000
+	retryBaseDelay: 1000,
+	timeoutMs: 60000,
+	appendStylePrompt: true
 })
 
 function parseDimensions(dimensionStr) {
@@ -91,11 +106,11 @@ function parseDimensions(dimensionStr) {
 export function getAspectRatioFromUrl(url) {
 	try {
 		if (!url || typeof url !== 'string') {
-			return DEFAULT_CONFIG.aspectRatio
+			return DEFAULT_GENERATION_OPTIONS.aspectRatio
 		}
 
 		const match = url.match(/placehold\.co\/(\d+x\d+)/)
-		if (!match) return DEFAULT_CONFIG.aspectRatio
+		if (!match) return DEFAULT_GENERATION_OPTIONS.aspectRatio
 
 		const dimensionStr = match[1]
 		if (DIMENSION_TO_ASPECT_RATIO[dimensionStr]) {
@@ -104,7 +119,7 @@ export function getAspectRatioFromUrl(url) {
 
 		const dims = parseDimensions(dimensionStr)
 		if (!dims) {
-			return DEFAULT_CONFIG.aspectRatio
+			return DEFAULT_GENERATION_OPTIONS.aspectRatio
 		}
 
 		const ratio = dims.width / dims.height
@@ -118,7 +133,7 @@ export function getAspectRatioFromUrl(url) {
 		if (ratio > 0.55) return '2:3'
 		return '9:16'
 	} catch {
-		return DEFAULT_CONFIG.aspectRatio
+		return DEFAULT_GENERATION_OPTIONS.aspectRatio
 	}
 }
 
@@ -127,7 +142,7 @@ export function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, delay))
 }
 
-export function getBackoffDelay(attempt, baseDelay = DEFAULT_CONFIG.retryBaseDelay) {
+export function getBackoffDelay(attempt, baseDelay = DEFAULT_GENERATION_OPTIONS.retryBaseDelay) {
 	const safeAttempt = Math.max(0, Math.min(attempt, 10))
 	const safeBaseDelay = Math.max(100, Math.min(baseDelay, 10000))
 	const exponentialDelay = safeBaseDelay * Math.pow(2, safeAttempt)

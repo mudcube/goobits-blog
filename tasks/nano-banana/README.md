@@ -1,100 +1,74 @@
-# Nano Banana Image Generation
+# Nano Banana Image Task
 
-Google Gemini 2.5 Flash Image integration for project image generation.
+Repo-local tooling for generating public image assets with Google Gemini 2.5 Flash Image.
+
+Use this when a page needs a bespoke image and a hand-built SVG or existing asset is not the right fit. The task writes PNGs under `static/media/generated/nano-banana` by default, which keeps generated assets in the same public asset tree as the rest of this app.
 
 ## Setup
 
-Get an API key from Google AI Studio and add one of these to your local environment:
+Provide an API key at runtime. Do not commit keys.
 
 ```bash
-GOOGLE_API_KEY=your_actual_api_key_here
+export GOOGLE_API_KEY='...'
 # or
-GEMINI_API_KEY=your_actual_api_key_here
+export GEMINI_API_KEY='...'
 ```
 
-## Command Line
+The task also reads `config/env/.env` and `.env` when present.
+
+## CLI
 
 ```bash
 pnpm task:nano-banana "A jar of honey in sunlight"
-pnpm task:nano-banana --aspect-ratio 16:9 "A wide landscape with mountains"
-pnpm task:nano-banana -o ./static/images/generated "A realistic honeycomb"
-pnpm task:nano-banana --no-style "A minimalist honey jar"
-pnpm task:nano-banana --prompt-file prompts.txt
-pnpm task:nano-banana --capabilities
-pnpm task:nano-banana "Test prompt" --dry-run --json
+pnpm task:nano-banana --style hero --aspect-ratio 16:9 "A wide storybook header"
+pnpm task:nano-banana --style product --resolution 2K "A clean product shot of a honey jar"
+pnpm task:nano-banana --prompt-file tasks/nano-banana/prompts/home-hero.txt
+pnpm task:nano-banana "A test prompt" --dry-run --json
 ```
 
-Generated files default to `static/images/nano-banana`.
+Useful options:
 
-## Programmatic Usage
+| Option | Default | Notes |
+|--------|---------|-------|
+| `--style` | `whimsy` | `storybook`, `product`, `photo`, `hero`, plus legacy aliases |
+| `--aspect-ratio` | `1:1` | Supports `1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, `21:9` |
+| `--resolution` | `1K` | Supports `1K`, `2K`, `4K` |
+| `--output-dir` | `static/media/generated/nano-banana` | Must stay inside the repo |
+| `--filename` | generated from prompt | Writes a `.png` |
+| `--no-style` | off | Sends only the raw prompt |
+| `--output base64` | `file` | Returns base64 instead of writing a file |
+| `--capabilities` | off | Prints supported settings without requiring an API key |
+
+`--url-only` is kept as an alias for `--output base64` for compatibility with the first version of this task. Gemini returns base64 image data, not a hosted URL.
+
+## Programmatic Use
 
 ```js
-import NanoBananaClient from './tasks/nano-banana/nano_banana_client.js'
+import { NanoBananaClient } from './tasks/nano-banana/index.js'
 
 const client = new NanoBananaClient()
 
-const result = await client.generateImage({
-	prompt: 'A jar of honey in sunlight',
-	aspectRatio: '1:1',
-	outputDir: './static/images/generated'
+const image = await client.generateImage({
+	prompt: 'A wide storybook illustration of a honey harvest',
+	style: 'hero',
+	aspectRatio: '16:9',
+	filename: 'honey-harvest-hero'
 })
 
-console.log(`Image saved to: ${ result.path }`)
+console.log(image.relativePath)
 ```
 
-## Options
+## Repo Notes
 
-| Option | Short | Type | Default | Description |
-|--------|-------|------|---------|-------------|
-| `--prompt` | `-p` | string | - | The image prompt |
-| `--prompt-file` | `-f` | string | - | Path to file with prompt |
-| `--output-dir` | `-o` | string | `static/images/nano-banana` | Output directory |
-| `--aspect-ratio` | `-a` | string | `1:1` | Aspect ratio |
-| `--resolution` | `-r` | string | `1K` | Resolution |
-| `--style` | `-s` | string | `whimsy` | Style preset |
-| `--no-style` | - | boolean | `false` | Skip style prompt |
-| `--url-only` | `-u` | boolean | `false` | Return base64 only |
-| `--dry-run` | `-d` | boolean | `false` | Preview settings without generating |
-| `--json` | `-j` | boolean | `false` | Output JSON |
-| `--capabilities` | `-c` | boolean | `false` | Show capabilities |
-| `--help` | `-h` | boolean | `false` | Show help |
+Generated files are public SvelteKit static assets. Review the output before committing it, and move final assets closer to their page or feature if a more specific asset directory exists.
 
-## Styles
+The style presets include anti-frame instructions so Gemini does not bake borders, frames, vignettes, or margins into images. Framing should stay in CSS.
 
-Core presets:
+Current files:
 
-- `storybook`
-- `product`
-- `photo`
-- `hero`
-
-Legacy aliases:
-
-- `whimsy` maps to `storybook`
-- `realistic` maps to `product`
-- `minimal` maps to `photo`
-
-Each style includes anti-frame instructions so borders, frames, vignettes, and margins are not baked into generated images.
-
-## Aspect Ratios
-
-Supported aspect ratios:
-
-- `1:1`
-- `2:3`
-- `3:2`
-- `3:4`
-- `4:3`
-- `4:5`
-- `5:4`
-- `9:16`
-- `16:9`
-- `21:9`
-
-## Files
-
-- `nano_banana_provider.js` - MCP-style provider implementation
-- `nano_banana_client.js` - Client wrapper
-- `nano_banana_cli.js` - CLI tool
-- `config.js` - Style and generation settings
-- `shared/utils.js` - MCP response and filename helpers
+- `cli.js` - command-line entrypoint used by `pnpm task:nano-banana`
+- `client.js` - small public API for scripts
+- `provider.js` - Gemini API integration, retry handling, and file writing
+- `config.js` - model, style, aspect ratio, and output defaults
+- `utils.js` - path, filename, prompt-file, and response helpers
+- `index.js` - exports for programmatic use
