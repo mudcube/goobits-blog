@@ -1,38 +1,8 @@
 import { chromium } from 'playwright'
 import { BASE_URL, bootstrapAdminSession, getAdminPasscode, getE2ETestToken } from './_helpers'
+import { requireFeedEvent, waitForAttendanceCount } from './_ui-waits'
 
 const ADMIN_URL = `${BASE_URL}/schedule/admin/`
-
-async function waitForFeedEvent(
-	request: import('playwright').APIRequestContext,
-	baseUrl: string,
-	title: string
-) {
-	for (let attempt = 0; attempt < 10; attempt += 1) {
-		const res = await request.get(`${baseUrl}/api/calendar/events`)
-		if (res.ok()) {
-			const json = await res.json() as { upcoming?: Array<{ id: number; title: string; activitySlug?: string }> }
-			const found = (json.upcoming ?? []).find((event) => event.title === title)
-			if (found) return found
-		}
-		await new Promise((resolve) => setTimeout(resolve, 300))
-	}
-	return null
-}
-
-async function requireFeedEvent(
-	request: import('playwright').APIRequestContext,
-	baseUrl: string,
-	title: string
-) {
-	const found = await waitForFeedEvent(request, baseUrl, title)
-	if (found) return found
-
-	const res = await request.get(`${baseUrl}/api/calendar/events`)
-	const status = res.status()
-	const body = await res.text().catch(() => '')
-	throw new Error(`calendar feed event not found (${title}); status=${status}; body=${body.slice(0, 500)}`)
-}
 
 async function createAdminEvent(
 	request: import('playwright').APIRequestContext,
@@ -61,6 +31,144 @@ async function createAdminEvent(
 	})
 	if (!response.ok()) {
 		throw new Error(`admin event create failed (${input.title}): ${response.status()}`)
+	}
+}
+
+async function createMemberCalendarSession(
+	request: import('playwright').APIRequestContext,
+	token: string,
+	emailPrefix: string,
+	name: string
+) {
+	const response = await request.post(`${BASE_URL}/api/test/calendar-session`, {
+		headers: { authorization: `Bearer ${token}` },
+		data: { email: `${emailPrefix}-${Date.now()}@example.com`, name }
+	})
+	if (!response.ok()) {
+		throw new Error(`calendar member bootstrap failed (${name}): ${response.status()}`)
+	}
+}
+
+async function assertJoinLeaveFlow(
+	page: import('playwright').Page,
+	request: import('playwright').APIRequestContext,
+	title: string
+) {
+	const mainEvent = await requireFeedEvent(request, title)
+	const mainEventId = Number(mainEvent['id'])
+	if (!Number.isFinite(mainEventId)) throw new Error(`main event missing numeric id: ${JSON.stringify(mainEvent)}`)
+	const calendarRes = await page.goto(`${BASE_URL}/schedule`, { waitUntil: 'domcontentloaded', timeout: 30000 })
+	if (!calendarRes || !calendarRes.ok()) {
+		throw new Error(`calendar home failed to load: status=${calendarRes?.status() ?? 'no_response'}`)
+	}
+	if (page.url().includes('/schedule/login')) throw new Error('calendar member session bootstrap did not stick')
+
+	const mainCard = page.getByTestId('member-event-card').filter({ hasText: title }).first()
+	try {
+		await mainCard.waitFor({ timeout: 30000 })
+	} catch {
+		const cards = page.getByTestId('member-event-card')
+		const count = await cards.count()
+		const texts = (await cards.allInnerTexts().catch(() => [] as string[])).slice(0, 8)
+		const htmlRes = await request.get(`${BASE_URL}/schedule`)
+		const html = await htmlRes.text().catch(() => '')
+		const ssrHasTitle = html.includes(title)
+		const ssrHasCardClass = html.includes('data-testid="member-event-card"')
+		const clientUrl = page.url()
+		throw new Error(
+			`calendar home did not render event card: count=${count}; ssrHasTitle=${ssrHasTitle}; ssrHasCardClass=${ssrHasCardClass}; url=${clientUrl}; sample=${JSON.stringify(texts)}`
+		)
+	}
+
+	const joinApi = await request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/join`, {
+		data: { guestCount: 1 }
+	})
+	if (!joinApi.ok()) throw new Error(`join API failed: ${joinApi.status()}`)
+	await page.reload({ waitUntil: 'domcontentloaded' })
+	await waitForAttendanceCount(page, mainEventId, '2')
+
+	const leaveApi = await request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/leave`)
+	if (!leaveApi.ok()) throw new Error(`leave API failed: ${leaveApi.status()}`)
+	await page.reload({ waitUntil: 'domcontentloaded' })
+	await waitForAttendanceCount(page, mainEventId, '0')
+}
+
+async function assertWaitlistFlow(
+	request: import('playwright').APIRequestContext,
+	title: string
+) {
+	const waitlistEvent = await requireFeedEvent(request, title)
+	const waitlistEventId = Number(waitlistEvent['id'])
+	if (!Number.isFinite(waitlistEventId)) {
+		throw new Error(`waitlist event missing numeric id: ${JSON.stringify(waitlistEvent)}`)
+	}
+	const waitlistJoinRes = await request.post(`${BASE_URL}/api/calendar/events/${waitlistEventId}/join`, {
+		data: { guestCount: 1 }
+	})
+	if (!waitlistJoinRes.ok()) throw new Error(`waitlist join failed: ${waitlistJoinRes.status()}`)
+
+	await requireFeedEvent(
+		request,
+		title,
+		(event) => Number(event['seatsTaken'] ?? 0) >= 1
+	)
+
+	const waitlistLeaveRes = await request.post(`${BASE_URL}/api/calendar/events/${waitlistEventId}/leave`)
+	if (!waitlistLeaveRes.ok()) throw new Error(`waitlist leave failed: ${waitlistLeaveRes.status()}`)
+
+	const waitlistAfterLeave = await requireFeedEvent(
+		request,
+		title,
+		(event) => Number(event['seatsTaken'] ?? 0) === 0 && Number(event['waitlistCount'] ?? 0) === 0
+	)
+	if (
+		Number(waitlistAfterLeave['seatsTaken'] ?? 0) !== 0 ||
+		Number(waitlistAfterLeave['waitlistCount'] ?? 0) !== 0
+	) {
+		throw new Error('waitlist leave counters did not reset as expected')
+	}
+}
+
+async function assertContentionFlow(
+	requestA: import('playwright').APIRequestContext,
+	requestB: import('playwright').APIRequestContext,
+	title: string
+) {
+	const contentionEvent = await requireFeedEvent(requestA, title)
+	const contentionEventId = Number(contentionEvent['id'])
+	if (!Number.isFinite(contentionEventId)) {
+		throw new Error(`contention event missing numeric id: ${JSON.stringify(contentionEvent)}`)
+	}
+
+	const [joinARes, joinBRes] = await Promise.all([
+		requestA.post(`${BASE_URL}/api/calendar/events/${contentionEventId}/join`, { data: { guestCount: 0 } }),
+		requestB.post(`${BASE_URL}/api/calendar/events/${contentionEventId}/join`, { data: { guestCount: 0 } })
+	])
+	if (!joinARes.ok()) throw new Error(`contention join A failed: ${joinARes.status()}`)
+	if (!joinBRes.ok()) throw new Error(`contention join B failed: ${joinBRes.status()}`)
+	const joinA = await joinARes.json() as { status?: string }
+	const joinB = await joinBRes.json() as { status?: string }
+	const statuses = [joinA.status, joinB.status].sort().join(',')
+	if (statuses !== 'joined,waitlist') {
+		throw new Error(`unexpected contention statuses: ${statuses}`)
+	}
+
+	const verifyEvent = await requireFeedEvent(
+		requestA,
+		title,
+		(event) =>
+			Number(event['seatsTaken'] ?? 0) === 1 &&
+			Number(event['capacity'] ?? 0) === 1 &&
+			Number(event['waitlistCount'] ?? 0) === 1
+	)
+	if (
+		Number(verifyEvent['seatsTaken'] ?? 0) !== 1 ||
+		Number(verifyEvent['capacity'] ?? 0) !== 1 ||
+		Number(verifyEvent['waitlistCount'] ?? 0) !== 1
+	) {
+		throw new Error(
+			`unexpected contention counters: seats=${verifyEvent['seatsTaken']}/${verifyEvent['capacity']}, waitlist=${verifyEvent['waitlistCount']}`
+		)
 	}
 }
 
@@ -124,112 +232,12 @@ export async function runCalendarEventsFlow() {
 			capacity: 1
 		})
 
-		const bootstrapRes = await context.request.post(`${BASE_URL}/api/test/calendar-session`, {
-			headers: { authorization: `Bearer ${e2eToken}` },
-			data: { email: `e2e-calendar-${Date.now()}@example.com`, name: 'E2E Calendar User' }
-		})
-		if (!bootstrapRes.ok()) {
-			throw new Error(`calendar member bootstrap failed: ${bootstrapRes.status()}`)
-		}
-			const bootstrapResB = await contextB.request.post(`${BASE_URL}/api/test/calendar-session`, {
-				headers: { authorization: `Bearer ${e2eToken}` },
-				data: { email: `e2e-calendar-b-${Date.now()}@example.com`, name: 'E2E Calendar User B' }
-			})
-			if (!bootstrapResB.ok()) {
-				throw new Error(`calendar member bootstrap B failed: ${bootstrapResB.status()}`)
-			}
+		await createMemberCalendarSession(context.request, e2eToken, 'e2e-calendar', 'E2E Calendar User')
+		await createMemberCalendarSession(contextB.request, e2eToken, 'e2e-calendar-b', 'E2E Calendar User B')
 
-			// Verify member session is actually recognized by the calendar APIs before loading UI.
-			const mainEvent = await requireFeedEvent(context.request, BASE_URL, title)
-
-			const calendarRes = await page.goto(`${BASE_URL}/schedule`, { waitUntil: 'domcontentloaded', timeout: 30000 })
-			if (!calendarRes || !calendarRes.ok()) {
-				throw new Error(`calendar home failed to load: status=${calendarRes?.status() ?? 'no_response'}`)
-			}
-			if (page.url().includes('/schedule/login')) throw new Error('calendar member session bootstrap did not stick')
-
-			const mainCard = page.getByTestId('member-event-card').filter({ hasText: title }).first()
-			try {
-				await mainCard.waitFor({ timeout: 30000 })
-			} catch {
-				const cards = page.getByTestId('member-event-card')
-				const count = await cards.count()
-				const texts = (await cards.allInnerTexts().catch(() => [] as string[])).slice(0, 8)
-				const htmlRes = await context.request.get(`${BASE_URL}/schedule`)
-				const html = await htmlRes.text().catch(() => '')
-				const ssrHasTitle = html.includes(title)
-				const ssrHasCardClass = html.includes('data-testid="member-event-card"')
-				const clientUrl = page.url()
-				throw new Error(
-					`calendar home did not render event card: count=${count}; ssrHasTitle=${ssrHasTitle}; ssrHasCardClass=${ssrHasCardClass}; url=${clientUrl}; sample=${JSON.stringify(texts)}`
-				)
-			}
-			// Use API for the join/leave mutation (removes UI flake while still asserting UI reflects the mutation).
-			const joinApi = await context.request.post(`${BASE_URL}/api/calendar/events/${mainEvent.id}/join`, {
-				data: { guestCount: 1 }
-			})
-			if (!joinApi.ok()) throw new Error(`join API failed: ${joinApi.status()}`)
-			await page.reload({ waitUntil: 'domcontentloaded' })
-			await page
-				.locator('[data-testid="member-event-card"][data-event-id="' + mainEvent.id + '"] [data-testid="member-event-attendance"]', { hasText: '2' })
-				.waitFor({ timeout: 30000 })
-
-			const leaveApi = await context.request.post(`${BASE_URL}/api/calendar/events/${mainEvent.id}/leave`)
-			if (!leaveApi.ok()) throw new Error(`leave API failed: ${leaveApi.status()}`)
-			await page.reload({ waitUntil: 'domcontentloaded' })
-			await page
-				.locator('[data-testid="member-event-card"][data-event-id="' + mainEvent.id + '"] [data-testid="member-event-attendance"]', { hasText: '0' })
-				.waitFor({ timeout: 30000 })
-
-		const feedRes = await context.request.get(`${BASE_URL}/api/calendar/events`)
-		if (!feedRes.ok()) throw new Error(`failed to load calendar events feed: ${feedRes.status()}`)
-		const feedJson = await feedRes.json() as { upcoming?: Array<{ id: number; title: string }> }
-		const waitlistEvent = (feedJson.upcoming ?? []).find((event) => event.title === waitlistTitle)
-		if (!waitlistEvent) throw new Error('waitlist event not found in feed')
-		const waitlistJoinRes = await context.request.post(`${BASE_URL}/api/calendar/events/${waitlistEvent.id}/join`, {
-			data: { guestCount: 1 }
-		})
-		if (!waitlistJoinRes.ok()) throw new Error(`waitlist join failed: ${waitlistJoinRes.status()}`)
-		const waitlistFeedAfterJoin = await waitForFeedEvent(context.request, BASE_URL, waitlistTitle)
-		if (!waitlistFeedAfterJoin) throw new Error('waitlist event disappeared after join')
-		const waitlistLeaveRes = await context.request.post(`${BASE_URL}/api/calendar/events/${waitlistEvent.id}/leave`)
-		if (!waitlistLeaveRes.ok()) throw new Error(`waitlist leave failed: ${waitlistLeaveRes.status()}`)
-		const waitlistFeedAfterLeaveRes = await context.request.get(`${BASE_URL}/api/calendar/events`)
-		if (!waitlistFeedAfterLeaveRes.ok()) throw new Error(`failed to verify waitlist leave feed: ${waitlistFeedAfterLeaveRes.status()}`)
-		const waitlistFeedAfterLeave = await waitlistFeedAfterLeaveRes.json() as {
-			upcoming?: Array<{ title: string; seatsTaken: number; waitlistCount: number }>
-		}
-		const waitlistAfterLeave = (waitlistFeedAfterLeave.upcoming ?? []).find((event) => event.title === waitlistTitle)
-		if (!waitlistAfterLeave || waitlistAfterLeave.seatsTaken !== 0 || waitlistAfterLeave.waitlistCount !== 0) {
-			throw new Error('waitlist leave counters did not reset as expected')
-		}
-
-		const contentionEvent = await waitForFeedEvent(context.request, BASE_URL, contentionTitle)
-		if (!contentionEvent) throw new Error('contention event not found in feed')
-
-		const [joinARes, joinBRes] = await Promise.all([
-			context.request.post(`${BASE_URL}/api/calendar/events/${contentionEvent.id}/join`, { data: { guestCount: 0 } }),
-			contextB.request.post(`${BASE_URL}/api/calendar/events/${contentionEvent.id}/join`, { data: { guestCount: 0 } })
-		])
-		if (!joinARes.ok()) throw new Error(`contention join A failed: ${joinARes.status()}`)
-		if (!joinBRes.ok()) throw new Error(`contention join B failed: ${joinBRes.status()}`)
-		const joinA = await joinARes.json() as { status?: string }
-		const joinB = await joinBRes.json() as { status?: string }
-		const statuses = [joinA.status, joinB.status].sort().join(',')
-		if (statuses !== 'joined,waitlist') {
-			throw new Error(`unexpected contention statuses: ${statuses}`)
-		}
-
-		const verifyFeedRes = await context.request.get(`${BASE_URL}/api/calendar/events`)
-		if (!verifyFeedRes.ok()) throw new Error(`failed to verify contention feed: ${verifyFeedRes.status()}`)
-		const verifyFeed = await verifyFeedRes.json() as {
-			upcoming?: Array<{ title: string; seatsTaken: number; capacity: number; waitlistCount: number }>
-		}
-		const verifyEvent = (verifyFeed.upcoming ?? []).find((event) => event.title === contentionTitle)
-		if (!verifyEvent) throw new Error('contention event missing in verify feed')
-		if (verifyEvent.seatsTaken !== 1 || verifyEvent.capacity !== 1 || verifyEvent.waitlistCount !== 1) {
-			throw new Error(`unexpected contention counters: seats=${verifyEvent.seatsTaken}/${verifyEvent.capacity}, waitlist=${verifyEvent.waitlistCount}`)
-		}
+		await assertJoinLeaveFlow(page, context.request, title)
+		await assertWaitlistFlow(context.request, waitlistTitle)
+		await assertContentionFlow(context.request, contextB.request, contentionTitle)
 
 		console.log('[calendar-events-flow] PASS')
 	} finally {

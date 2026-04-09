@@ -1,5 +1,6 @@
 import { chromium, type Page } from 'playwright'
 import { BASE_URL } from './_helpers'
+import { waitForAvailableDays, waitForMonthChange, waitForMonthLabel, waitForSlotButtons } from './_ui-waits'
 
 async function expectWheelBurstToAdvanceExactlyOneMonth(page: Page) {
 	const monthTitle = page.locator('.member-calendar__month-banner-title')
@@ -8,17 +9,15 @@ async function expectWheelBurstToAdvanceExactlyOneMonth(page: Page) {
 		await page.locator('.member-calendar__viewport').hover()
 		for (const delta of [120, 72, 40, 22, 12, 6, 3]) {
 			await page.mouse.wheel(0, delta)
-			await page.waitForTimeout(280)
 		}
-		await page.waitForTimeout(900)
 	}
 	const before = await readMonthTitle()
 
 	await runBurst()
-	let after = await readMonthTitle()
+	let after = await waitForMonthChange(page, before).catch(async () => readMonthTitle())
 	if (before === after) {
 		await runBurst()
-		after = await readMonthTitle()
+		after = await waitForMonthChange(page, before).catch(async () => readMonthTitle())
 	}
 
 	if (before === after) {
@@ -50,12 +49,9 @@ async function expectSecondWheelGestureToAdvanceOneMoreMonth(page: Page) {
 	const readMonthTitle = async () => ((await monthTitle.textContent()) || '').trim()
 	const before = await readMonthTitle()
 
-	await page.waitForTimeout(700)
 	await page.locator('.member-calendar__viewport').hover()
 	await page.mouse.wheel(0, 120)
-	await page.waitForTimeout(700)
-
-	const after = await readMonthTitle()
+	const after = await waitForMonthChange(page, before)
 	if (before === after) {
 		throw new Error(`separate wheel gesture did not advance the visible month: ${before}`)
 	}
@@ -95,13 +91,12 @@ async function expectBackwardWheelPagingToRemainMonthAccurate(page: Page) {
 		return (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth())
 	}
 
-	const labels: string[] = []
+	const labels: string[] = [((await monthTitle.textContent()) || '').trim()]
 	for (let i = 0; i < 4; i += 1) {
-		labels.push(((await monthTitle.textContent()) || '').trim())
+		const before = ((await monthTitle.textContent()) || '').trim()
 		await page.mouse.wheel(0, -120)
-		await page.waitForTimeout(900)
+		labels.push(await waitForMonthChange(page, before))
 	}
-	labels.push(((await monthTitle.textContent()) || '').trim())
 
 	for (let i = 1; i < labels.length; i += 1) {
 		const previousLabel = labels[i - 1]
@@ -127,9 +122,9 @@ async function assertCanSelectFromALaterMonth(page: Page) {
 
 	await page.locator('.member-calendar__viewport').hover()
 	for (let attempt = 0; attempt < 12; attempt += 1) {
+		const before = ((await monthTitle.textContent()) || '').trim()
 		await page.mouse.wheel(0, 120)
-		await page.waitForTimeout(900)
-		laterLabel = ((await monthTitle.textContent()) || '').trim()
+		laterLabel = await waitForMonthChange(page, before)
 		if (laterLabel !== startLabel && (await page.locator(enabledAvailableDaySelector).count()) > 0) {
 			foundAvailableDay = true
 			break
@@ -181,17 +176,8 @@ export async function runCalendarBookingCalendarSmoke() {
 		}
 
 		await page.locator('.member-calendar__viewport').waitFor({ timeout: 10000 })
-		await page.waitForFunction(
-			() => document.querySelectorAll('.member-calendar__day--available').length > 0,
-			undefined,
-			{ timeout: 5000 }
-		)
-		await page.waitForFunction(
-			() => (document.querySelector('.member-calendar__month-banner-title')?.textContent || '').trim().length > 0,
-			undefined,
-			{ timeout: 5000 }
-		)
-		await page.waitForTimeout(500)
+		await waitForAvailableDays(page)
+		await waitForMonthLabel(page)
 		await page.locator('.member-calendar__viewport').hover()
 		await expectWheelBurstToAdvanceExactlyOneMonth(page)
 		await expectSecondWheelGestureToAdvanceOneMoreMonth(page)
@@ -200,12 +186,7 @@ export async function runCalendarBookingCalendarSmoke() {
 			timeout: 30000
 		})
 		await page.locator('.member-calendar__viewport').waitFor({ timeout: 10000 })
-		await page.waitForFunction(
-			() => (document.querySelector('.member-calendar__month-banner-title')?.textContent || '').trim().length > 0,
-			undefined,
-			{ timeout: 5000 }
-		)
-		await page.waitForTimeout(500)
+		await waitForMonthLabel(page)
 		await page.locator('.member-calendar__viewport').hover()
 		await expectBackwardWheelPagingToRemainMonthAccurate(page)
 
@@ -214,12 +195,7 @@ export async function runCalendarBookingCalendarSmoke() {
 			timeout: 30000
 		})
 		await page.locator('.member-calendar__viewport').waitFor({ timeout: 10000 })
-		await page.waitForFunction(
-			() => document.querySelectorAll('.member-calendar__day--available').length > 0,
-			undefined,
-			{ timeout: 5000 }
-		)
-		await page.waitForTimeout(500)
+		await waitForAvailableDays(page)
 
 		const activeDays = page.locator('.member-calendar__day--available')
 		const activeCount = await activeDays.count()
@@ -230,12 +206,7 @@ export async function runCalendarBookingCalendarSmoke() {
 		await clickVisibleAvailableDay(page)
 
 		const slotButtons = page.locator('.calendar-page__slot-button')
-		await page.waitForTimeout(500)
-		await page.waitForFunction(
-			() => document.querySelectorAll('.calendar-page__slot-button').length > 0,
-			undefined,
-			{ timeout: 10000 }
-		)
+		await waitForSlotButtons(page)
 		const slotCount = await slotButtons.count()
 		if (slotCount === 0) {
 			throw new Error('clicking an active day did not reveal any slot buttons')
@@ -252,7 +223,14 @@ export async function runCalendarBookingCalendarSmoke() {
 		}
 
 		await firstSlot.click()
-		await page.waitForTimeout(150)
+		await page.waitForFunction(
+			(before) => {
+				const button = document.querySelector('.calendar-page__slot-button')
+				return (button?.textContent || '') !== before
+			},
+			firstSlotTextBefore,
+			{ timeout: 3_000 }
+		)
 
 		const firstSlotTextAfterJoin = (await firstSlot.textContent()) || ''
 		if (!firstSlotTextAfterJoin.includes('Leave')) {
@@ -260,7 +238,14 @@ export async function runCalendarBookingCalendarSmoke() {
 		}
 
 		await firstSlot.click()
-		await page.waitForTimeout(150)
+		await page.waitForFunction(
+			(before) => {
+				const button = document.querySelector('.calendar-page__slot-button')
+				return (button?.textContent || '') !== before
+			},
+			firstSlotTextAfterJoin,
+			{ timeout: 3_000 }
+		)
 
 		const firstSlotTextAfterLeave = (await firstSlot.textContent()) || ''
 		if (firstSlotTextAfterLeave.includes('Leave')) {

@@ -1,5 +1,6 @@
 import { BASE_URL, NAV_TIMEOUT_MS } from './_config';
 import { withBrowserContext } from './_helpers';
+import { shouldIgnoreKnownConsoleError, shouldIgnoreTurnstileNoise } from './_noise';
 
 const SITEMAP_URL = `${BASE_URL}/sitemap.xml`;
 
@@ -25,26 +26,6 @@ async function fetchSitemapUrls() {
 	return urls;
 }
 
-function shouldIgnoreConsoleError(text) {
-	const knownNoise = [
-		'Failed to load resource: the server responded with a status of 404',
-		'favicon.ico',
-		// Dev-only module fetch noise can happen during redirect races (e.g. /schedule -> /schedule/login)
-		// when Vite invalidates a just-referenced generated node.
-		'Failed to fetch dynamically imported module: http://localhost:3610/.svelte-kit/generated/client/nodes/',
-		'Failed to load resource: the server responded with a status of 403 (Forbidden)'
-	];
-	return knownNoise.some((entry) => text.includes(entry));
-}
-
-function shouldIgnoreTurnstileNoise(url, detail) {
-	if (!url.includes('/contact') && !url.includes('/register')) return false;
-	return (
-		detail.includes('[Cloudflare Turnstile] Error: 110200') ||
-		detail.includes('Failed to load resource: the server responded with a status of 400')
-	);
-}
-
 export async function runSitemapSmoke() {
 	const urls = await fetchSitemapUrls();
 	console.log(`[sitemap-smoke] Checking ${urls.length} URL(s) from ${SITEMAP_URL}`);
@@ -58,7 +39,7 @@ export async function runSitemapSmoke() {
 			page.on('console', (msg) => {
 				if (msg.type() !== 'error') return;
 				const text = msg.text();
-				if (shouldIgnoreConsoleError(text)) return;
+				if (shouldIgnoreKnownConsoleError(text)) return;
 				if (shouldIgnoreTurnstileNoise(url, text)) return;
 				pageIssues.push({ type: 'console-error', detail: text });
 			});
