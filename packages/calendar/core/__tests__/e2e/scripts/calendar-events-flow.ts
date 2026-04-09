@@ -1,6 +1,6 @@
 import { chromium } from 'playwright'
 import { BASE_URL, bootstrapAdminSession, getAdminPasscode, getE2ETestToken } from './_helpers'
-import { requireFeedEvent, waitForAttendanceCount } from './_ui-waits'
+import { requireFeedEvent, requireFeedEventById, waitForAttendanceCount } from './_ui-waits'
 
 const ADMIN_URL = `${BASE_URL}/schedule/admin/`
 
@@ -14,7 +14,7 @@ async function createAdminEvent(
 		endsAt: string
 		capacity: number
 	}
-) {
+): Promise<number> {
 	const response = await request.post(`${baseUrl}/api/admin/events`, {
 		headers: { origin: baseUrl },
 		data: {
@@ -32,6 +32,12 @@ async function createAdminEvent(
 	if (!response.ok()) {
 		throw new Error(`admin event create failed (${input.title}): ${response.status()}`)
 	}
+	const json = await response.json() as { ids?: number[] }
+	const id = json.ids?.[0]
+	if (typeof id !== 'number' || !Number.isFinite(id)) {
+		throw new Error(`admin event create did not return an id (${input.title}): ${JSON.stringify(json)}`)
+	}
+	return id
 }
 
 async function createMemberCalendarSession(
@@ -95,30 +101,29 @@ async function assertJoinLeaveFlow(
 
 async function assertWaitlistFlow(
 	request: import('playwright').APIRequestContext,
-	title: string
+	eventId: number
 ) {
-	const waitlistEvent = await requireFeedEvent(request, title)
-	const waitlistEventId = Number(waitlistEvent['id'])
-	if (!Number.isFinite(waitlistEventId)) {
-		throw new Error(`waitlist event missing numeric id: ${JSON.stringify(waitlistEvent)}`)
-	}
-	const waitlistJoinRes = await request.post(`${BASE_URL}/api/calendar/events/${waitlistEventId}/join`, {
+	await requireFeedEventById(request, eventId)
+	const waitlistJoinRes = await request.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, {
 		data: { guestCount: 1 }
 	})
 	if (!waitlistJoinRes.ok()) throw new Error(`waitlist join failed: ${waitlistJoinRes.status()}`)
 
-	await requireFeedEvent(
+	await requireFeedEventById(
 		request,
-		title,
-		(event) => Number(event['seatsTaken'] ?? 0) >= 1
+		eventId,
+		(event) =>
+			Number(event['seatsTaken'] ?? 0) === 0 &&
+			Number(event['waitlistCount'] ?? 0) === 1 &&
+			event['userStatus'] === 'waitlist'
 	)
 
-	const waitlistLeaveRes = await request.post(`${BASE_URL}/api/calendar/events/${waitlistEventId}/leave`)
+	const waitlistLeaveRes = await request.post(`${BASE_URL}/api/calendar/events/${eventId}/leave`)
 	if (!waitlistLeaveRes.ok()) throw new Error(`waitlist leave failed: ${waitlistLeaveRes.status()}`)
 
-	const waitlistAfterLeave = await requireFeedEvent(
+	const waitlistAfterLeave = await requireFeedEventById(
 		request,
-		title,
+		eventId,
 		(event) => Number(event['seatsTaken'] ?? 0) === 0 && Number(event['waitlistCount'] ?? 0) === 0
 	)
 	if (
@@ -132,17 +137,11 @@ async function assertWaitlistFlow(
 async function assertContentionFlow(
 	requestA: import('playwright').APIRequestContext,
 	requestB: import('playwright').APIRequestContext,
-	title: string
+	eventId: number
 ) {
-	const contentionEvent = await requireFeedEvent(requestA, title)
-	const contentionEventId = Number(contentionEvent['id'])
-	if (!Number.isFinite(contentionEventId)) {
-		throw new Error(`contention event missing numeric id: ${JSON.stringify(contentionEvent)}`)
-	}
-
 	const [joinARes, joinBRes] = await Promise.all([
-		requestA.post(`${BASE_URL}/api/calendar/events/${contentionEventId}/join`, { data: { guestCount: 0 } }),
-		requestB.post(`${BASE_URL}/api/calendar/events/${contentionEventId}/join`, { data: { guestCount: 0 } })
+		requestA.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, { data: { guestCount: 0 } }),
+		requestB.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, { data: { guestCount: 0 } })
 	])
 	if (!joinARes.ok()) throw new Error(`contention join A failed: ${joinARes.status()}`)
 	if (!joinBRes.ok()) throw new Error(`contention join B failed: ${joinBRes.status()}`)
@@ -153,9 +152,9 @@ async function assertContentionFlow(
 		throw new Error(`unexpected contention statuses: ${statuses}`)
 	}
 
-	const verifyEvent = await requireFeedEvent(
+	const verifyEvent = await requireFeedEventById(
 		requestA,
-		title,
+		eventId,
 		(event) =>
 			Number(event['seatsTaken'] ?? 0) === 1 &&
 			Number(event['capacity'] ?? 0) === 1 &&
@@ -185,8 +184,8 @@ export async function runCalendarEventsFlow() {
 		await bootstrapAdminSession(context.request)
 		await page.goto(`${ADMIN_URL}?preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 
-			const cookies = await context.cookies(ADMIN_URL)
-			const hasSessionCookie = cookies.some((cookie) => cookie.name === 'admin_session')
+		const cookies = await context.cookies(ADMIN_URL)
+		const hasSessionCookie = cookies.some((cookie) => cookie.name === 'admin_session')
 		if (!hasSessionCookie) throw new Error('admin session cookie missing after login')
 
 		// Clean prior E2E spam using the real admin session (dev-only endpoint).
@@ -214,7 +213,7 @@ export async function runCalendarEventsFlow() {
 			endsAt: endDate.toISOString(),
 			capacity: 4
 		})
-		await createAdminEvent(context.request, BASE_URL, {
+		const waitlistEventId = await createAdminEvent(context.request, BASE_URL, {
 			activitySlug,
 			title: waitlistTitle,
 			startsAt: new Date(startDate.getTime() + 2 * 60 * 60 * 1000).toISOString(),
@@ -224,7 +223,7 @@ export async function runCalendarEventsFlow() {
 
 		const contentionStart = new Date(startDate.getTime() + 4 * 60 * 60 * 1000)
 		const contentionEnd = new Date(endDate.getTime() + 4 * 60 * 60 * 1000)
-		await createAdminEvent(context.request, BASE_URL, {
+		const contentionEventId = await createAdminEvent(context.request, BASE_URL, {
 			activitySlug,
 			title: contentionTitle,
 			startsAt: contentionStart.toISOString(),
@@ -236,8 +235,8 @@ export async function runCalendarEventsFlow() {
 		await createMemberCalendarSession(contextB.request, e2eToken, 'e2e-calendar-b', 'E2E Calendar User B')
 
 		await assertJoinLeaveFlow(page, context.request, title)
-		await assertWaitlistFlow(context.request, waitlistTitle)
-		await assertContentionFlow(context.request, contextB.request, contentionTitle)
+		await assertWaitlistFlow(context.request, waitlistEventId)
+		await assertContentionFlow(context.request, contextB.request, contentionEventId)
 
 		console.log('[calendar-events-flow] PASS')
 	} finally {

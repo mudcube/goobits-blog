@@ -62,6 +62,27 @@ export async function waitForFeedEvent(
 	return null
 }
 
+export async function waitForFeedEventById(
+	request: APIRequestContext,
+	eventId: number,
+	predicate?: (event: Record<string, unknown>) => boolean,
+	attempts = 15,
+	delayMs = 300
+) {
+	for (let attempt = 0; attempt < attempts; attempt += 1) {
+		const res = await request.get(`${BASE_URL}/api/calendar/events`)
+		if (res.ok()) {
+			const json = await res.json() as { upcoming?: Array<Record<string, unknown>> }
+			const found = (json.upcoming ?? []).find(
+				(event) => Number(event['id']) === eventId && (!predicate || predicate(event))
+			)
+			if (found) return found
+		}
+		await new Promise((resolve) => setTimeout(resolve, delayMs))
+	}
+	return null
+}
+
 export async function requireFeedEvent(
 	request: APIRequestContext,
 	title: string,
@@ -74,6 +95,20 @@ export async function requireFeedEvent(
 	const status = res.status()
 	const body = await res.text().catch(() => '')
 	throw new Error(`calendar feed event not found (${title}); status=${status}; body=${body.slice(0, 500)}`)
+}
+
+export async function requireFeedEventById(
+	request: APIRequestContext,
+	eventId: number,
+	predicate?: (event: Record<string, unknown>) => boolean
+) {
+	const found = await waitForFeedEventById(request, eventId, predicate)
+	if (found) return found
+
+	const res = await request.get(`${BASE_URL}/api/calendar/events`)
+	const status = res.status()
+	const body = await res.text().catch(() => '')
+	throw new Error(`calendar feed event not found (id=${eventId}); status=${status}; body=${body.slice(0, 1000)}`)
 }
 
 export async function waitForAttendanceCount(page: Page, eventId: number | string, expectedText: string, timeout = 30_000) {

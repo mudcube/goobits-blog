@@ -187,6 +187,8 @@
 .sitemap-page__tag--noindex { background: var(--muted); color: var(--color-white); }
 .sitemap-page__tag--api { background: var(--button-bg); color: var(--color-white); }
 .sitemap-page__tag--layout { background: var(--color-cyan); color: var(--color-white); }
+.sitemap-page__tag--internal { background: var(--color-teal); color: var(--color-white); }
+.sitemap-page__tag--hidden { background: var(--form-error); color: var(--color-white); }
 
 .sitemap-page__modified {
 	font-size: 0.75rem;

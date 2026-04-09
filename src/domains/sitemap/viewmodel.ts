@@ -4,7 +4,7 @@ import { localeSort, matchesQuery, normalizeQuery } from '$lib/utils/collections
 export type SitemapSort = 'path' | 'name' | 'modified'
 
 export const baseSitemapTags = ['SSR', 'CSR', 'Dynamic', 'Layout'] as const
-export const devSitemapTags = ['SSR', 'CSR', 'Dynamic', 'Auth', 'NoIndex', 'API', 'Layout'] as const
+export const devSitemapTags = ['SSR', 'CSR', 'Dynamic', 'Auth', 'NoIndex', 'API', 'Layout', 'Internal', 'Hidden'] as const
 
 export function getSitemapAvailableTags(showDevDiagnostics: boolean) {
 	return showDevDiagnostics ? [...devSitemapTags] : [...baseSitemapTags]
@@ -19,6 +19,8 @@ export function getRouteTags(route: RouteEntry) {
 	if (route.type === 'page' && route.hasAuth) tags.push('Auth')
 	if (route.type === 'page' && route.isNoIndex) tags.push('NoIndex')
 	if (route.type === 'page' && route.hasLayout) tags.push('Layout')
+	if (route.sitemap === 'internal') tags.push('Internal')
+	if (route.sitemap === 'hidden') tags.push('Hidden')
 	return tags
 }
 

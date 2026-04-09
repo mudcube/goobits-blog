@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { getJournalPosts } from '@src/domains/journal/server/posts'
 import { getConfiguredReleaseStage, isRouteReleased, type ReleaseStage } from '$lib/app/release'
+import type { SitemapAudience } from '$lib/app/routes/meta'
 
 const ROUTES_DIR = 'src/routes'
 
@@ -17,6 +18,7 @@ export type PageRoute = {
 	isDynamic: boolean
 	hasAuth: boolean
 	isNoIndex: boolean
+	sitemap: SitemapAudience
 	lastModified: string
 	category: string
 }
@@ -27,6 +29,7 @@ export type ApiRoute = {
 	type: 'api'
 	httpMethods: string[]
 	isDynamic: boolean
+	sitemap: SitemapAudience
 	lastModified: string
 	category: string
 }
@@ -54,6 +57,44 @@ type RouteInventoryOptions = {
 type SitemapRoute = {
 	path: string
 	lastModified: string
+}
+
+const SITEMAP_AUDIENCE_MATCHERS: Array<{ path: string; sitemap: SitemapAudience; matchPrefix?: boolean }> = [
+	{ path: '/api/admin/dev', sitemap: 'hidden', matchPrefix: true },
+	{ path: '/api/internal', sitemap: 'hidden', matchPrefix: true },
+	{ path: '/api/test', sitemap: 'hidden', matchPrefix: true },
+	{ path: '/api/calendar/oauth-callback', sitemap: 'hidden' },
+	{ path: '/api/calendar/webhook/discord', sitemap: 'hidden' },
+	{ path: '/auth', sitemap: 'hidden', matchPrefix: true },
+	{ path: '/dev', sitemap: 'internal', matchPrefix: true },
+	{ path: '/schedule/admin', sitemap: 'internal', matchPrefix: true }
+]
+
+function readRouteMeta(dir: string) {
+	const metaFile = path.join(dir, 'route-meta.ts')
+	if (!fs.existsSync(metaFile)) return {}
+
+	const content = fs.readFileSync(metaFile, 'utf-8')
+	const sitemap = content.match(/sitemap\s*:\s*['"](?<value>public|internal|hidden)['"]/)?.groups?.['value']
+
+	return {
+		sitemap: sitemap as SitemapAudience | undefined
+	}
+}
+
+function getFamilySitemapAudience(routePath: string, type: RouteEntry['type'], isDynamic: boolean): SitemapAudience {
+	const matcher = SITEMAP_AUDIENCE_MATCHERS.find((entry) => {
+		if (entry.matchPrefix) return routePath === entry.path || routePath.startsWith(`${entry.path}/`)
+		return routePath === entry.path
+	})
+	if (matcher) return matcher.sitemap
+	if (type === 'api') return 'internal'
+	if (isDynamic) return 'internal'
+	return 'public'
+}
+
+function getSitemapAudience(dir: string, routePath: string, type: RouteEntry['type'], isDynamic: boolean) {
+	return readRouteMeta(dir).sitemap ?? getFamilySitemapAudience(routePath, type, isDynamic)
 }
 
 function scanRoutes(dir: string, basePath = '') {
@@ -90,6 +131,7 @@ function scanRoutes(dir: string, basePath = '') {
 			const isNoIndex = pageContent.includes('noindex') || pageContent.includes('robots')
 			const isDynamic = routePath.includes('[')
 			const hasAuth = routePath.includes('admin') || pageContent.includes('auth') || pageContent.includes('session')
+			const sitemap = getSitemapAudience(dir, routePath, 'page', isDynamic)
 
 			const pageRoute: PageRoute = {
 				path: routePath,
@@ -101,6 +143,7 @@ function scanRoutes(dir: string, basePath = '') {
 				isDynamic,
 				hasAuth,
 				isNoIndex,
+				sitemap,
 				lastModified: stat.mtime.toISOString(),
 				category: categorizeRoute(routePath)
 			}
@@ -125,6 +168,7 @@ function scanRoutes(dir: string, basePath = '') {
 				type: 'api',
 				httpMethods: methods,
 				isDynamic: routePath.includes('['),
+				sitemap: getSitemapAudience(dir, routePath, 'api', routePath.includes('[')),
 				lastModified: stat.mtime.toISOString(),
 				category: 'API Routes'
 			}
@@ -182,6 +226,7 @@ export async function getRouteInventory(options: RouteInventoryOptions = {}): Pr
 			isDynamic: true,
 			hasAuth: false,
 			isNoIndex: false,
+			sitemap: 'public',
 			lastModified: post.date.toISOString(),
 			category: 'Journal Posts'
 		}
@@ -228,24 +273,97 @@ export async function getRouteInventory(options: RouteInventoryOptions = {}): Pr
 	}
 }
 
-export async function getPublicSitemapRoutes(activeStage?: ReleaseStage) {
+export function filterRouteInventoryBySitemapAudiences(
+	inventory: RouteInventory,
+	audiences: SitemapAudience[]
+): RouteInventory {
+	const allowed = new Set(audiences)
+	const routes = inventory.routes.filter((route) => allowed.has(route.sitemap))
+	const pageRoutes = routes.filter((route): route is PageRoute => route.type === 'page')
+	const apiRoutes = routes.filter((route): route is ApiRoute => route.type === 'api')
+	const grouped: Record<string, RouteEntry[]> = {}
+
+	for (const route of routes) {
+		const existing = grouped[route.category]
+		if (existing) {
+			existing.push(route)
+		} else {
+			grouped[route.category] = [route]
+		}
+	}
+
+	for (const category of Object.keys(grouped)) {
+		grouped[category]?.sort((a, b) => a.path.localeCompare(b.path))
+	}
+
+	return {
+		routes,
+		grouped,
+		stats: {
+			total: routes.length,
+			pages: pageRoutes.length,
+			api: apiRoutes.length,
+			dynamic: routes.filter((route) => route.isDynamic).length,
+			ssr: pageRoutes.filter((route) => route.hasServerLoad).length,
+			protected: pageRoutes.filter((route) => route.hasAuth).length
+		}
+	}
+}
+
+function isPublicHumanSitemapRoute(route: RouteEntry) {
+	if (route.type !== 'page') return false
+	if (route.path.includes('[')) return false
+	if (route.isNoIndex) return false
+	return route.sitemap === 'public'
+}
+
+export async function getPublicHumanSitemapInventory(activeStage?: ReleaseStage): Promise<RouteInventory> {
 	const inventory = await getRouteInventory(
 		activeStage
 			? {
-				includeDevOnlyCategories: false,
+				includeDevOnlyCategories: true,
 				activeStage
 			}
 			: {
-				includeDevOnlyCategories: false
+				includeDevOnlyCategories: true
 			}
 	)
-	const publicPages = inventory.routes.filter((route): route is PageRoute => {
-		if (route.type !== 'page') return false
-		if (route.path.includes('[')) return false
-		if (route.hasAuth) return false
-		if (route.isNoIndex) return false
-		return true
-	})
+
+	const routes = inventory.routes.filter(isPublicHumanSitemapRoute)
+	const pageRoutes = routes.filter((route): route is PageRoute => route.type === 'page')
+	const apiRoutes = routes.filter((route): route is ApiRoute => route.type === 'api')
+	const grouped: Record<string, RouteEntry[]> = {}
+
+	for (const route of routes) {
+		const existing = grouped[route.category]
+		if (existing) {
+			existing.push(route)
+		} else {
+			grouped[route.category] = [route]
+		}
+	}
+
+	for (const category of Object.keys(grouped)) {
+		grouped[category]?.sort((a, b) => a.path.localeCompare(b.path))
+	}
+
+	return {
+		routes,
+		grouped,
+		stats: {
+			total: routes.length,
+			pages: pageRoutes.length,
+			api: apiRoutes.length,
+			dynamic: routes.filter((route) => route.isDynamic).length,
+			ssr: pageRoutes.filter((route) => route.hasServerLoad).length,
+			protected: pageRoutes.filter((route) => route.hasAuth).length
+		}
+	}
+}
+
+export async function getPublicSitemapRoutes(activeStage?: ReleaseStage) {
+	const inventory = await getPublicHumanSitemapInventory(activeStage)
+	const publicPages = inventory.routes.filter((route): route is PageRoute => route.type === 'page')
 
 	const deduped = new Map<string, SitemapRoute>()
 	for (const route of publicPages) {
