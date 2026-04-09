@@ -1,5 +1,9 @@
 <script>
 	import { Hero, PageClosing, PageShell } from '@miko/ui'
+	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
+
+	const description =
+		'Selected visual experiments, product concepts, merch ideas, packaging directions, and interactive art by Miko Meow.'
 
 	const works = [
 		{
@@ -59,10 +63,20 @@
 	]
 </script>
 
-<svelte:head>
-	<title>Art - MIKO.ART</title>
-	<meta name="description" content="Art by Miko: visual experiments, color systems, and interactive works." />
-</svelte:head>
+<Seo
+	title="Art, Product Concepts & Visual Experiments"
+	{description}
+	path="/art/"
+	image="/media/art-rainbow-imagination.png"
+	jsonLd={[
+		buildWebPageJsonLd({
+			path: '/art/',
+			title: 'Art, Product Concepts & Visual Experiments',
+			description,
+			type: 'CollectionPage'
+		})
+	]}
+/>
 
 <PageShell className="art-page">
 	<div class="art-page__inner">

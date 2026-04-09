@@ -1,8 +1,11 @@
 <script>
 	import { Hero, PageClosing, PageShell, SectionLabel } from '@miko/ui'
 	import { formatDateMonthDayYearShort } from '$lib/utils/date'
+	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 
 	const { data } = $props()
+	const description =
+		'Songs, demos, generative audio experiments, and music-related process notes from Miko Meow.'
 
 	const platforms = [
 		{ label: 'Spotify', href: '/contact?from=music&topic=spotify', icon: 'S' },
@@ -33,10 +36,20 @@
 	}
 </script>
 
-<svelte:head>
-	<title>Music - MIKO.ART</title>
-	<meta name="description" content="Music by Miko: songs, audio experiments, and listening links." />
-</svelte:head>
+<Seo
+	title="Music, Demos & Sound Experiments"
+	{description}
+	path="/music/"
+	image="/media/music-notes-flow.png"
+	jsonLd={[
+		buildWebPageJsonLd({
+			path: '/music/',
+			title: 'Music, Demos & Sound Experiments',
+			description,
+			type: 'CollectionPage'
+		})
+	]}
+/>
 
 <PageShell className="music-page">
 	<div class="music-page">

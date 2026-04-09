@@ -1,11 +1,11 @@
 <script>
+	import { Seo } from '$lib/app/seo'
+
 	const status = 'OK'
 	const version = import.meta.env.PACKAGE_VERSION
 </script>
 
-<svelte:head>
-	<title>Health Check - MIKO.ART</title>
-</svelte:head>
+<Seo title="Health Check" description="Runtime health check for MIKO.ART." path="/health/" noindex />
 
 <div class="health-check">
 	<div class="health-check__row">

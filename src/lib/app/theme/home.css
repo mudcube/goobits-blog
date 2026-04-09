@@ -27,16 +27,16 @@
 
 .home__projects {
 	display: grid;
-	grid-gap: 0 1em;
-	grid-template-columns: repeat(auto-fit, var(--project-card-width));
-	justify-content: center;
+	gap: 2.5em 1em;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .home__project {
 	background: transparent;
 	color: var(--project-text);
 	cursor: pointer;
-	margin: 0 var(--space-5) 2.5em 0;
+	margin: 0;
+	min-width: 0;
 	position: relative;
 	text-decoration: none;
 }
@@ -59,17 +59,14 @@
 	text-decoration: underline;
 }
 
-.home__project:nth-child(3n) {
-	margin-right: 0;
-}
-
 .home__project-image {
 	background: var(--project-image-bg);
 	background-repeat: no-repeat;
 	background-size: cover;
 	border-radius: var(--radius-sm);
 	display: block;
-	height: var(--project-image-height);
+	aspect-ratio: 4 / 3;
+	height: auto;
 	box-shadow: var(--shadow-mid) 0px 4px 8px -2px, var(--shadow-softest) 0px 0px 0px 1px;
 	width: 100%;
 	transition: all 0.15s ease-in-out;
@@ -112,5 +109,23 @@
 
 	.home__hero-subtitle {
 		font-size: 5vw;
+	}
+
+	.home__projects {
+		gap: 2em 0.5em;
+	}
+
+	.home__project-description {
+		font-size: 0.82rem;
+		line-height: 1.35;
+		padding: 0.45em 0.25em;
+	}
+
+	.home__project-title {
+		font-size: 0.78rem;
+	}
+
+	.home__project-title-text {
+		padding: 0 0.5em;
 	}
 }

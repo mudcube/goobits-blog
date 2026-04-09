@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
+	import { Seo } from '$lib/app/seo'
 	import { FormField, Hero, PillButton } from '@miko/ui'
 	import { superForm } from 'sveltekit-superforms'
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters'
@@ -31,8 +32,9 @@
 	})
 </script>
 
+<Seo title="Register" description="Account registration for MIKO.ART calendar features." path="/register/" noindex />
+
 <svelte:head>
-	<title>Register - MIKO.ART</title>
 	{#if props.turnstileSiteKey}
 		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 	{/if}

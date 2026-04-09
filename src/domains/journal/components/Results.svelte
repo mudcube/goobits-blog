@@ -16,10 +16,6 @@
 	}
 </script>
 
-<svelte:head>
-    <title>{formatValue(category)} - MIKO.ART</title>
-</svelte:head>
-
 {#if showBackButton}
 	<PublicBreadcrumbs
 		items={[

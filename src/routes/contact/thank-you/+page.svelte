@@ -1,10 +1,14 @@
 <script lang="ts">
+	import { Seo } from '$lib/app/seo'
 	import { SuccessPage } from '@miko/ui'
 </script>
 
-<svelte:head>
-	<title>Thank You - MIKO.ART</title>
-</svelte:head>
+<Seo
+	title="Thank You"
+	description="Confirmation page for submitted MIKO.ART contact messages."
+	path="/contact/thank-you/"
+	noindex
+/>
 
 <SuccessPage
 	className="contact-page thank-you-page"

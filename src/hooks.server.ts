@@ -113,6 +113,17 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 
 	const url = event.url
 	const isHttps = url?.protocol === 'https:'
+	const noindexPrefixes = [
+		'/api',
+		'/auth',
+		'/contact/thank-you',
+		'/dev',
+		'/health',
+		'/register',
+		'/schedule',
+		'/verify-email'
+	]
+	const shouldNoindex = noindexPrefixes.some(prefix => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`))
 
 	const csp = [
 		"default-src 'self'",
@@ -133,6 +144,9 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 		setIfMissing(target.headers, 'X-Content-Type-Options', 'nosniff')
 		setIfMissing(target.headers, 'X-Frame-Options', 'DENY')
 		setIfMissing(target.headers, 'Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+		if (shouldNoindex) {
+			setIfMissing(target.headers, 'X-Robots-Tag', 'noindex, nofollow, noarchive')
+		}
 		if (isHttps) {
 			setIfMissing(target.headers, 'Strict-Transport-Security', 'max-age=15552000; includeSubDomains')
 		}

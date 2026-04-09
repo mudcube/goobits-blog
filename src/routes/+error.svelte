@@ -1,6 +1,8 @@
-<svelte:head>
-    <title>404 - MIKO.ART</title>
-</svelte:head>
+<script>
+	import { Seo } from '$lib/app/seo'
+</script>
+
+<Seo title="Not Found" description="The requested MIKO.ART page could not be found." path="/" noindex />
 
 <div class="error-page__container">
     <a href="/">

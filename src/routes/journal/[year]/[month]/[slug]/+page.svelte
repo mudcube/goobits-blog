@@ -1,18 +1,53 @@
 <script>
 	import { BookOpen, Clock3 } from '@lucide/svelte'
+	import {
+		Seo,
+		buildArticleJsonLd,
+		buildBreadcrumbJsonLd,
+		toPlainTextExcerpt
+	} from '$lib/app/seo'
 	import MetadataValues from '@src/domains/journal/components/MetadataValues.svelte'
 	import PublicBreadcrumbs from '$lib/app/shell/PublicBreadcrumbs.svelte'
 
 	const { data } = $props()
+	const title = $derived(data.post.metadata.fm.title)
+	const path = $derived(`/${data.post.urlPath}/`)
+	const description = $derived(toPlainTextExcerpt(data.post.content))
 	const coverImage = $derived.by(() => {
 		const rawImage = data.post.metadata.fm.coverImage || ''
 		return rawImage.startsWith('http') || rawImage.startsWith('/') ? rawImage : `images/${rawImage}`
 	})
+	const seoImage = $derived.by(() => {
+		const rawImage = data.post.metadata.fm.coverImage || ''
+		if (!rawImage) return '/media/journal-journaling.png'
+		if (rawImage.startsWith('http') || rawImage.startsWith('/')) return rawImage
+		return `/${data.post.urlPath}/${rawImage}`
+	})
 </script>
 
-<svelte:head>
-    <title>{data.post.metadata.fm.title} - MIKO.ART</title>
-</svelte:head>
+<Seo
+	{title}
+	{description}
+	{path}
+	image={seoImage}
+	type="article"
+	publishedTime={data.post.date.toISOString()}
+	modifiedTime={data.post.date.toISOString()}
+	jsonLd={[
+		buildArticleJsonLd({
+			path,
+			title,
+			description,
+			datePublished: data.post.date.toISOString(),
+			image: seoImage
+		}),
+		buildBreadcrumbJsonLd([
+			{ name: 'Home', path: '/' },
+			{ name: 'Journal', path: '/journal/' },
+			{ name: title, path }
+		])
+	]}
+/>
 
 <div class="journal-entry">
 	<PublicBreadcrumbs

@@ -1,11 +1,24 @@
 <script>
+	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 	import { LegalPage } from '@miko/ui'
+
+	const description =
+		'Privacy policy for MIKO.ART, including contact forms, calendar bookings, account sessions, cookies, and data retention.'
 </script>
 
-<svelte:head>
-	<title>Privacy Policy - MIKO.ART</title>
-	<meta name="description" content="Privacy policy for MIKO.ART" />
-</svelte:head>
+<Seo
+	title="Privacy Policy"
+	{description}
+	path="/privacy/"
+	image="/media/privacy-shield.png"
+	jsonLd={[
+		buildWebPageJsonLd({
+			path: '/privacy/',
+			title: 'Privacy Policy',
+			description
+		})
+	]}
+/>
 
 <LegalPage
 	title="Privacy Policy"

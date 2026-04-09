@@ -17,6 +17,7 @@
 		getRouteTags,
 		getSitemapAvailableTags
 	} from '@src/domains/sitemap/viewmodel'
+	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 
 	const { data } = $props()
 
@@ -24,6 +25,7 @@
 	let selectedTags = $state([])
 	let sortBy = $state('path')
 	let collapsedCategories = $state({})
+	const description = 'A human-readable sitemap for MIKO.ART with public pages and journal entries.'
 	const sortOptions = [
 		{ value: 'path', label: 'Path' },
 		{ value: 'name', label: 'Name' },
@@ -70,10 +72,19 @@
 	const filteredCount = $derived(getFilteredSitemapCount(filteredGrouped))
 </script>
 
-<svelte:head>
-	<title>Sitemap - MIKO.ART</title>
-	<meta name="description" content="Human-readable sitemap for MIKO.ART with public pages and journal posts." />
-</svelte:head>
+<Seo
+	title="Sitemap"
+	{description}
+	path="/sitemap/"
+	image="/media/sitemap-compass.png"
+	jsonLd={[
+		buildWebPageJsonLd({
+			path: '/sitemap/',
+			title: 'Sitemap',
+			description
+		})
+	]}
+/>
 
 <PageShell className="sitemap-page">
 	<div class="sitemap-page__inner">

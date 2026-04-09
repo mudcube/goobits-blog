@@ -1,11 +1,27 @@
 <script>
 	import { apps } from './_projects.ts'
 	import '$lib/app/theme/home.css'
+	import { Seo, buildPersonJsonLd, buildWebPageJsonLd, buildWebsiteJsonLd } from '$lib/app/seo'
+
+	const description =
+		'Creative software, playful design tools, music experiments, and process notes from Miko Meow.'
 </script>
 
-<svelte:head>
-    <title>Code & Design - MIKO.ART</title>
-</svelte:head>
+<Seo
+	title="Creative Software, Design Tools & Music Experiments"
+	{description}
+	path="/"
+	image="/media/project-sketchpad.png"
+	jsonLd={[
+		buildWebsiteJsonLd(),
+		buildPersonJsonLd(),
+		buildWebPageJsonLd({
+			path: '/',
+			title: 'Creative Software, Design Tools & Music Experiments',
+			description
+		})
+	]}
+/>
 
 <div class="home home__hero">
     <h1 class="home__hero-title">MAKE, LEARN&hellip; PLAY!</h1>

@@ -9,8 +9,11 @@
     getJournalYearOrder,
     groupJournalPostsByYear,
   } from "@src/domains/journal/viewmodel";
+  import { Seo, buildWebPageJsonLd } from "$lib/app/seo";
 
   let { data } = $props();
+  const description =
+    "Journal entries from Miko Meow about creative coding, design tools, music experiments, product work, and web development.";
 
   let searchQuery = $state("");
   let selectedCategory = $state("all");
@@ -34,9 +37,20 @@
   const yearOrder = $derived(getJournalYearOrder(groupedByYear));
 </script>
 
-<svelte:head>
-  <title>Journal - MIKO.ART</title>
-</svelte:head>
+<Seo
+  title="Creative Coding Journal"
+  {description}
+  path="/journal/"
+  image="/media/journal-journaling.png"
+  jsonLd={[
+    buildWebPageJsonLd({
+      path: "/journal/",
+      title: "Creative Coding Journal",
+      description,
+      type: "CollectionPage",
+    }),
+  ]}
+/>
 
 <PageShell className="journal-page">
   <div class="journal-page__inner">

@@ -1,11 +1,24 @@
 <script>
+	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 	import { LegalPage } from '@miko/ui'
+
+	const description =
+		'Terms of use for MIKO.ART, including site usage, bookings, accounts, intellectual property, third-party services, and liability.'
 </script>
 
-<svelte:head>
-	<title>Terms of Use - MIKO.ART</title>
-	<meta name="description" content="Terms of use for MIKO.ART" />
-</svelte:head>
+<Seo
+	title="Terms of Use"
+	{description}
+	path="/terms/"
+	image="/media/terms-justice.png"
+	jsonLd={[
+		buildWebPageJsonLd({
+			path: '/terms/',
+			title: 'Terms of Use',
+			description
+		})
+	]}
+/>
 
 <LegalPage
 	title="Terms of Use"

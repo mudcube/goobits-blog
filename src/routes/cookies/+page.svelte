@@ -1,11 +1,24 @@
 <script>
+	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 	import { LegalPage } from '@miko/ui'
+
+	const description =
+		'Cookie policy for MIKO.ART, including essential cookies, authentication sessions, theme preferences, and browser storage.'
 </script>
 
-<svelte:head>
-	<title>Cookie Policy - MIKO.ART</title>
-	<meta name="description" content="Cookie policy for MIKO.ART" />
-</svelte:head>
+<Seo
+	title="Cookie Policy"
+	{description}
+	path="/cookies/"
+	image="/media/cookies-cookie.png"
+	jsonLd={[
+		buildWebPageJsonLd({
+			path: '/cookies/',
+			title: 'Cookie Policy',
+			description
+		})
+	]}
+/>
 
 <LegalPage
 	title="Cookie Policy"

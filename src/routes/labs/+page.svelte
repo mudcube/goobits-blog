@@ -1,11 +1,26 @@
 <script lang="ts">
 	import DirectoryCatalogPage from '$lib/app/directory/DirectoryCatalogPage.svelte'
+	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 	import { labsCatalog } from '@src/domains/labs/viewmodel'
+
+	const description =
+		'Browse playful web experiments, prototypes, and creative coding labs from Miko Meow.'
 </script>
 
-<svelte:head>
-	<title>Labs - MIKO.ART</title>
-</svelte:head>
+<Seo
+	title="Creative Coding Labs"
+	{description}
+	path="/labs/"
+	image="/media/labs-flask.png"
+	jsonLd={[
+		buildWebPageJsonLd({
+			path: '/labs/',
+			title: 'Creative Coding Labs',
+			description,
+			type: 'CollectionPage'
+		})
+	]}
+/>
 
 <DirectoryCatalogPage
 	eyebrow="Labs"

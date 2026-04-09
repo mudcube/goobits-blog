@@ -64,5 +64,11 @@ export function escapeXml(value: string) {
 
 export function toAbsoluteUrl(origin: string, path: string) {
 	const normalizedPath = path.startsWith('/') ? path : `/${path}`
-	return `${trimTrailingSlash(origin)}${normalizedPath}`
+	const lastSegment = normalizedPath.split('/').pop() ?? ''
+	const hasFileExtension = /\.[a-z0-9]+$/i.test(lastSegment)
+	const canonicalPath =
+		normalizedPath === '/' || hasFileExtension || normalizedPath.endsWith('/')
+			? normalizedPath
+			: `${normalizedPath}/`
+	return `${trimTrailingSlash(origin)}${canonicalPath}`
 }

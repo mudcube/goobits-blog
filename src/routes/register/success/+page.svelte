@@ -1,12 +1,16 @@
 <script lang="ts">
+	import { Seo } from '$lib/app/seo'
 	import { SuccessPage } from '@miko/ui'
 	import { getCalendarConfig } from '@calendar/core'
 	const calendarConfig = getCalendarConfig()
 </script>
 
-<svelte:head>
-	<title>Check Your Email - MIKO.ART</title>
-</svelte:head>
+<Seo
+	title="Check Your Email"
+	description="Confirmation page for account registration on MIKO.ART."
+	path="/register/success/"
+	noindex
+/>
 
 <SuccessPage
 	className="register-page register-success-page"

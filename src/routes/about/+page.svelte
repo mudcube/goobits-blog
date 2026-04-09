@@ -1,5 +1,9 @@
 <script>
 	import { Hero, PageShell } from '@miko/ui'
+	import { Seo, buildPersonJsonLd, buildWebPageJsonLd } from '$lib/app/seo'
+
+	const description =
+		'Meet Miko Meow, a creative developer, designer, and musician building colorful educational software, design tools, and interactive experiences.'
 
 	const exhibits = [
 		'Art Gallery Of Ontario: Illusions Exhibition',
@@ -56,14 +60,21 @@
 	]
 </script>
 
-<svelte:head>
-	<title>About - MIKO.ART</title>
-	<meta
-		name="description"
-		content="Developer, designer, and musician building colorful, creative, and educational applications."
-	/>
-	<link rel="canonical" href="https://miko.art/about" />
-</svelte:head>
+<Seo
+	title="About Miko Meow"
+	{description}
+	path="/about/"
+	image="/media/miko.jpg"
+	jsonLd={[
+		buildPersonJsonLd(),
+		buildWebPageJsonLd({
+			path: '/about/',
+			title: 'About Miko Meow',
+			description,
+			type: 'AboutPage'
+		})
+	]}
+/>
 
 <PageShell className="about-page">
 	<Hero

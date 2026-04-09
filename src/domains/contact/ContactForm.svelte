@@ -33,7 +33,6 @@
 </script>
 
 <svelte:head>
-	<title>Contact - MIKO.ART</title>
 	{#if props.turnstileSiteKey}
 		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 	{/if}
