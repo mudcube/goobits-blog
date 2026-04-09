@@ -28,13 +28,13 @@ function getRuntimeEnv() {
 
 export const releasedRoutes: ReleasedRoute[] = [
 	{ path: '/art', stage: 'preview' },
-	{ path: '/music', stage: 'preview' }
+	{ path: '/music', stage: 'live' }
 ]
 
 export const releasedHeaderNavItems: ReleasedNavItem[] = [
 	{ href: '/', label: 'Home', stages: ['live'] },
 	{ href: '/art', label: 'Art', matchPrefix: true, stages: ['preview'] },
-	{ href: '/music', label: 'Music', matchPrefix: true, stages: ['preview'] },
+	{ href: '/music', label: 'Music', matchPrefix: true, stages: ['live', 'preview'] },
 	{ href: '/about', label: 'About', stages: ['live', 'preview'] },
 	{ href: '/contact?from=topbar', label: 'Contact', matchPrefix: true, stages: ['live', 'preview'] }
 ]

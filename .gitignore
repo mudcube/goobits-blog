@@ -28,7 +28,9 @@ packages/**/.tsbuildinfo
 .dev/
 .pnpm-store/
 .wrangler/
-tasks/
+tasks/*
+!tasks/nano-banana/
+!tasks/nano-banana/**
 temp/
 tmp/
 test-results/
