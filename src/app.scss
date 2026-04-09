@@ -1,8 +1,3 @@
-@use './styles/mixins';
-@use './styles/components/button';
-@use './styles/components/card';
-@use './styles/components/modal';
-
 @import './domains/journal/prism.scss';
 @import './lib/app/theme/tokens.css';
 @import './lib/app/theme/modes.css';
