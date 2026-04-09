@@ -1,5 +1,5 @@
 <script>
-  import PillButton from "../../primitives/PillButton.svelte";
+  import PillButton from "../../primitives/CalendarPillButton.svelte";
   const { dashboard, onClose } = $props();
   let advancedOpen = $state(false);
 

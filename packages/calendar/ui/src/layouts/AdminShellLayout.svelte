@@ -1,6 +1,6 @@
 <script>
-	import ShellNav from '../primitives/ShellNav.svelte'
-import PillButton from '../primitives/PillButton.svelte'
+	import ShellNav from '../primitives/CalendarShellNav.svelte'
+import PillButton from '../primitives/CalendarPillButton.svelte'
 	import { enhance } from '$app/forms'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'

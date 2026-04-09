@@ -1,5 +1,5 @@
 <script>
-  import PillButton from "../../primitives/PillButton.svelte";
+  import PillButton from "../../primitives/CalendarPillButton.svelte";
   import AdminNewEventModal from "./AdminNewEventModal.svelte";
   import AdminEventDetailSheet from "./AdminEventDetailSheet.svelte";
   const { dashboard } = $props();

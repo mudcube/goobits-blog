@@ -3,8 +3,8 @@
 	import { Bell, UserRound, LogOut } from '@lucide/svelte'
 	import { logoutCalendarSession } from '../api/calendar'
 	import { getCalendarUiConfig } from '../config'
-	import PillButton from '../primitives/PillButton.svelte'
-import ShellNav from '../primitives/ShellNav.svelte'
+	import PillButton from '../primitives/CalendarPillButton.svelte'
+import ShellNav from '../primitives/CalendarShellNav.svelte'
 	const { data, children } = $props()
 	const headerLinks = $derived([...(data.activities ?? [])].sort((a, b) => a.label.localeCompare(b.label)))
 	const calendarConfig = getCalendarUiConfig()

@@ -20,10 +20,10 @@ import AdminMembersPanel from './admin/members/AdminMembersPanel.svelte'
 import AdminIntegrationsPanel from './admin/integrations/google/AdminIntegrationsPanel.svelte'
 import AdminNewEventModal from './admin/events/AdminNewEventModal.svelte'
 import AdminEditProgramModal from './admin/programs/AdminEditProgramModal.svelte'
-import PillButton from './primitives/PillButton.svelte'
-import Button from './primitives/Button.svelte'
-import Hero from './primitives/Hero.svelte'
-import ShellNav from './primitives/ShellNav.svelte'
+import PillButton from './primitives/CalendarPillButton.svelte'
+import Button from './primitives/CalendarButton.svelte'
+import Hero from './primitives/CalendarHero.svelte'
+import ShellNav from './primitives/CalendarShellNav.svelte'
 
 export {
 	CalendarShellLayout,
@@ -49,5 +49,9 @@ export {
 	PillButton,
 	Button,
 	Hero,
-	ShellNav
+	ShellNav,
+	PillButton as CalendarPillButton,
+	Button as CalendarButton,
+	Hero as CalendarHero,
+	ShellNav as CalendarShellNav
 }

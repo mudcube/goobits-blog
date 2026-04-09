@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { House, LogIn } from '@lucide/svelte'
-	import PageShell from './PageShell.svelte'
-	import PillButton from './buttons/PillButton.svelte'
+	import PageShell from '../layout/PageShell.svelte'
+	import PillButton from '../buttons/PillButton.svelte'
 
 	type SuccessPageProps = {
 		title: string

@@ -1,5 +1,5 @@
 <script>
-	import Button from './buttons/Button.svelte'
+	import Button from '../buttons/Button.svelte'
 
 	const {
 		category,

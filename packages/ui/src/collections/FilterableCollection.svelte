@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
-	import ResultsEmpty from './ResultsEmpty.svelte'
+	import ResultsEmpty from '../feedback/ResultsEmpty.svelte'
 
 	type FilterableCollectionProps = {
 		count: number

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
 	import Hero from './Hero.svelte'
-	import PageShell from './PageShell.svelte'
+	import PageShell from '../layout/PageShell.svelte'
 	import Prose from './Prose.svelte'
 
 	type LegalPageProps = {

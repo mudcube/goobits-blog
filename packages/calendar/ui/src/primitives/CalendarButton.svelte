@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
-	import PillButton from './PillButton.svelte'
+	import PillButton from './CalendarPillButton.svelte'
 
 	let {
 		href,

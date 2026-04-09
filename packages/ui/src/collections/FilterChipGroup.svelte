@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PillButton from './buttons/PillButton.svelte'
+	import PillButton from '../buttons/PillButton.svelte'
 
 	type FilterChipItem = string | { value: string; label: string }
 

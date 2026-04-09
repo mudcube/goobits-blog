@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import SearchField from "./forms/SearchField.svelte";
+  import SearchField from "../forms/SearchField.svelte";
 
   type SearchToolbarProps = {
     query?: string;
