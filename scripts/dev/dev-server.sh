@@ -59,6 +59,8 @@ start_server() {
 	if [[ "${DEV_DB_FILE+x}" == "x" ]]; then env_overrides+=("DEV_DB_FILE=${DEV_DB_FILE}"); fi
 	if [[ "${CALENDAR_SYNC_MODE+x}" == "x" ]]; then env_overrides+=("CALENDAR_SYNC_MODE=${CALENDAR_SYNC_MODE}"); fi
 	if [[ "${CONTACT_WEBHOOK_URL+x}" == "x" ]]; then env_overrides+=("CONTACT_WEBHOOK_URL=${CONTACT_WEBHOOK_URL}"); fi
+	if [[ "${PUBLIC_BASE_URL+x}" == "x" ]]; then env_overrides+=("PUBLIC_BASE_URL=${PUBLIC_BASE_URL}"); fi
+	if [[ "${BASE_URL+x}" == "x" ]]; then env_overrides+=("BASE_URL=${BASE_URL}"); fi
 	if [[ "${TURNSTILE_SECRET_KEY+x}" == "x" ]]; then env_overrides+=("TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}"); fi
 	if [[ "${PUBLIC_TURNSTILE_SITE_KEY+x}" == "x" ]]; then env_overrides+=("PUBLIC_TURNSTILE_SITE_KEY=${PUBLIC_TURNSTILE_SITE_KEY}"); fi
 	if [[ "${ANTIABUSE_ENABLED+x}" == "x" ]]; then env_overrides+=("ANTIABUSE_ENABLED=${ANTIABUSE_ENABLED}"); fi
