@@ -8,6 +8,7 @@
 	},
 	"dependencies": {
 		"@calendar/core": "workspace:*",
+		"@miko/ui": "workspace:*",
 		"@lucide/svelte": "^0.564.0",
 		"zod": "^4.3.6"
 	}

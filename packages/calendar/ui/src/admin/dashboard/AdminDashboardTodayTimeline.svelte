@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AdminEventSessionCard from '@calendar/ui/admin/events/AdminEventSessionCard.svelte'
+	import EventSessionCard from '@calendar/ui/shared/events/EventSessionCard.svelte'
 
 	type Participant = {
 		name?: string | null
@@ -79,7 +79,7 @@
 						<span class="admin-dashboard-today__now-time">{timeLabel(new Date().toISOString())}</span>
 					</div>
 				{/if}
-				<AdminEventSessionCard {event} {onOpenEvent} />
+				<EventSessionCard {event} {onOpenEvent} />
 				{#if index === todayEvents.length - 1 && nowDividerIndex === todayEvents.length}
 					<div class="admin-dashboard-today__now">
 						<div class="admin-dashboard-today__now-dot"></div>

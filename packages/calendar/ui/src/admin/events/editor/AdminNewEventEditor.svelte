@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import AdminWysiwygWorkspace from './AdminWysiwygWorkspace.svelte'
-	import { getAdminActivityColor, getAdminActivityEmoji } from '../../shared/activity-display'
+	import { getAdminActivityColor, getAdminActivityEmoji } from '../../../shared/activity-display'
 	import { mockPrograms } from '../../mock/admin-mock-data'
 
 	type DashboardController = ReturnType<typeof createAdminDashboardController>

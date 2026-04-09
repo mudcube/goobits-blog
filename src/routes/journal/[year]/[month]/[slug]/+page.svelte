@@ -1,7 +1,7 @@
 <script>
 	import { BookOpen, Clock3 } from '@lucide/svelte'
-	import MetadataValues from '@components/Journal/MetadataValues.svelte'
-	import PublicBreadcrumbs from '@components/PublicBreadcrumbs.svelte'
+	import MetadataValues from '@src/domains/journal/components/MetadataValues.svelte'
+	import PublicBreadcrumbs from '$lib/app/shell/PublicBreadcrumbs.svelte'
 
 	const { data } = $props()
 	const coverImage = $derived.by(() => {

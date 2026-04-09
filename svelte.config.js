@@ -50,8 +50,7 @@ export default {
 			}
 		},
 		alias: {
-			'@components': './src/components',
-			'@config': './src/config',
+				'@config': './src/config',
 			'@lib': './src/lib',
 			'@media': './src/media',
 			'@routes': './src/routes',

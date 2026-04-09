@@ -4,7 +4,7 @@
 	import { createAdminMembersController } from '@calendar/ui/admin/members/admin-members.svelte'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
-	import AdminChevronRowCard from '@calendar/ui/admin/shared/AdminChevronRowCard.svelte'
+	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { mockCrewUsers, mockDashboardEvents, mockDashboardRecentEvents } from '@calendar/ui/admin/mock/admin-mock-data'
 
@@ -129,10 +129,10 @@
 						<div class="admin-crew-member-page__empty admin-ui-card">No upcoming sessions.</div>
 					{:else}
 						{#each memberUpcoming as event (event.id)}
-							<AdminChevronRowCard href={hrefWithMock(`/schedule/admin/events/${event.id}/`)}>
+							<ChevronRowCard href={hrefWithMock(`/schedule/admin/events/${event.id}/`)}>
 								<div class="admin-crew-member-page__event-title">{event.title}</div>
 								<div class="admin-crew-member-page__event-detail">{formatWhen(event.startsAt)}</div>
-							</AdminChevronRowCard>
+							</ChevronRowCard>
 						{/each}
 					{/if}
 				</div>
@@ -145,10 +145,10 @@
 						<div class="admin-crew-member-page__empty admin-ui-card">No recent sessions.</div>
 					{:else}
 						{#each memberRecent as event (event.id)}
-							<AdminChevronRowCard href={hrefWithMock(`/schedule/admin/events/${event.id}/`)}>
+							<ChevronRowCard href={hrefWithMock(`/schedule/admin/events/${event.id}/`)}>
 								<div class="admin-crew-member-page__event-title">{event.title}</div>
 								<div class="admin-crew-member-page__event-detail">{formatWhen(event.startsAt)}</div>
-							</AdminChevronRowCard>
+							</ChevronRowCard>
 						{/each}
 					{/if}
 				</div>

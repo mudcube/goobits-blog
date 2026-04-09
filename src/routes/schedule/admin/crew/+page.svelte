@@ -11,7 +11,7 @@
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import AdminCrewInviteModal from '@calendar/ui/admin/members/AdminCrewInviteModal.svelte'
-	import { getAdminActivityEmoji } from '@calendar/ui/admin/shared/activity-display'
+	import { getAdminActivityEmoji } from '@calendar/ui/shared/activity-display'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import {
 		mockCrewInvites,

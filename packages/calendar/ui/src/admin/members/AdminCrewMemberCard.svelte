@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AdminChevronRowCard from '@calendar/ui/admin/shared/AdminChevronRowCard.svelte'
+	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
 
 	const {
 		name,
@@ -20,7 +20,7 @@
 	}>()
 </script>
 
-<AdminChevronRowCard {href} {onclick} ariaLabel={`Open ${name}`}>
+<ChevronRowCard {href} {onclick} ariaLabel={`Open ${name}`}>
 	{#snippet start()}
 		<span class="admin-crew-member__avatar" class:admin-crew-member__avatar--you={isYou}>
 			{#if isYou}
@@ -37,7 +37,7 @@
 		{/if}
 	</div>
 	<div class="admin-crew-member__detail">{detail}</div>
-</AdminChevronRowCard>
+</ChevronRowCard>
 
 <style>
 	.admin-crew-member__avatar {

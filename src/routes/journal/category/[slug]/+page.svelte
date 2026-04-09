@@ -1,5 +1,5 @@
 <script>
-	import Results from '@components/Journal/Results.svelte'
+	import Results from '@src/domains/journal/components/Results.svelte'
 	let { data } = $props()
 </script>
 

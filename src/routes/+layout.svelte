@@ -8,7 +8,7 @@
 	import { onMount } from 'svelte'
 	import { Topbar, FooterNav } from '@miko/ui'
 	import { getCalendarConfig } from '@calendar/core'
-	import DevReleaseSwitcher from '@components/DevReleaseSwitcher.svelte'
+	import DevReleaseSwitcher from '$lib/app/release/DevReleaseSwitcher.svelte'
 	import { footerElsewhereItems, footerLegalItems, footerPrimaryItems, getHeaderNavItems } from '$lib/app/shell/nav'
 	import { enableLayoutShiftDebug } from '$lib/client/debug/layoutShift'
 

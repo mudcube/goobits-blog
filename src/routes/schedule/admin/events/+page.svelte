@@ -4,10 +4,10 @@
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
-	import AdminChevronRowCard from '@calendar/ui/admin/shared/AdminChevronRowCard.svelte'
-	import AdminEventSessionCard from '@calendar/ui/admin/events/AdminEventSessionCard.svelte'
-	import { getAdminActivityEmoji } from '@calendar/ui/admin/shared/activity-display'
-	import { formatAdminDayLabel } from '@calendar/ui/admin/shared/date-format'
+	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
+	import EventSessionCard from '@calendar/ui/shared/events/EventSessionCard.svelte'
+	import { getAdminActivityEmoji } from '@calendar/ui/shared/activity-display'
+	import { formatAdminDayLabel } from '@calendar/ui/shared/date-format'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { mockDashboardEvents, mockDashboardRecentEvents, mockPrograms } from '@calendar/ui/admin/mock/admin-mock-data'
 
@@ -81,7 +81,7 @@
 		{:else}
 			<div class="social-events__upcoming-grid">
 				{#each eventsSource as ev}
-					<AdminEventSessionCard event={ev} onOpenEvent={() => goto(hrefWithMock(eventRoute(ev)))} />
+					<EventSessionCard event={ev} onOpenEvent={() => goto(hrefWithMock(eventRoute(ev)))} />
 				{/each}
 			</div>
 		{/if}
@@ -94,7 +94,7 @@
 				</div>
 			{:else}
 				{#each recentEventsSource.slice(0, 8) as recent}
-					<AdminChevronRowCard compact={true} onclick={() => goto(hrefWithMock(eventRoute(recent)))} ariaLabel={`Open ${recent.title}`}>
+					<ChevronRowCard compact={true} onclick={() => goto(hrefWithMock(eventRoute(recent)))} ariaLabel={`Open ${recent.title}`}>
 						{#snippet start()}
 							<span class="social-events__past-emoji">{emojiForActivity(recent.activityLabel, recent.activitySlug)}</span>
 						{/snippet}
@@ -102,7 +102,7 @@
 							<div class="social-events__past-title">{recent.title}</div>
 							<div class="social-events__event-sub">{dayLabel(recent.startsAt)} · {recent.seatsTaken} went</div>
 						</div>
-					</AdminChevronRowCard>
+					</ChevronRowCard>
 				{/each}
 			{/if}
 		</div>

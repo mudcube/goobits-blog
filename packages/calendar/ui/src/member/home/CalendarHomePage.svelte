@@ -6,10 +6,10 @@
 	import PillButton from '../../primitives/PillButton.svelte'
 	import Hero from '../../primitives/Hero.svelte'
 	import MonthEventCalendar from '../booking/MonthEventCalendar.svelte'
-	import AdminEventSessionCard from '@calendar/ui/admin/events/AdminEventSessionCard.svelte'
-	import AdminChevronRowCard from '@calendar/ui/admin/shared/AdminChevronRowCard.svelte'
-	import { getAdminActivityEmoji } from '../../admin/shared/activity-display'
-	import { formatAdminDayLabel } from '../../admin/shared/date-format'
+	import EventSessionCard from '@calendar/ui/shared/events/EventSessionCard.svelte'
+	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
+	import { getAdminActivityEmoji } from '../../shared/activity-display'
+	import { formatAdminDayLabel } from '../../shared/date-format'
 	let { data } = $props()
 	let upcoming = $state([])
 	let recent = $state([])
@@ -164,7 +164,7 @@
 		{:else}
 			<div class="social-events__upcoming-grid">
 				{#each upcoming as event}
-					<AdminEventSessionCard event={event} onOpenEvent={() => goto(eventRoute(event))} />
+					<EventSessionCard event={event} onOpenEvent={() => goto(eventRoute(event))} />
 				{/each}
 			</div>
 		{/if}
@@ -177,7 +177,7 @@
 		{:else}
 			<div class="social-events__past-list">
 				{#each recent as event}
-					<AdminChevronRowCard compact={true} href={eventRoute(event)} ariaLabel={`Open ${event.title}`}>
+					<ChevronRowCard compact={true} href={eventRoute(event)} ariaLabel={`Open ${event.title}`}>
 						{#snippet start()}
 							<span class="social-events__past-emoji">{emojiForActivity(event.activityLabel, event.activitySlug)}</span>
 						{/snippet}
@@ -185,7 +185,7 @@
 							<div class="social-events__past-title">{event.title}</div>
 							<div class="social-events__event-sub">{dayLabel(event.startsAt)} · {event.seatsTaken} went</div>
 						</div>
-					</AdminChevronRowCard>
+					</ChevronRowCard>
 				{/each}
 			</div>
 		{/if}
