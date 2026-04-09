@@ -1,4 +1,5 @@
 import { dev } from '$app/environment'
+import { getDevSurface } from '$lib/app/dev-surface'
 import { getActiveReleaseStage } from '$lib/app/release'
 
 const fixedThemePreferences = {
@@ -17,6 +18,7 @@ export function load({
 }) {
 	const isLocalPreviewHost =
 		dev && ['localhost', '127.0.0.1'].includes(url.hostname)
+	const activeSurface = getDevSurface(cookies)
 
 	return {
 		preferences: locals['themePreferences'] ?? fixedThemePreferences,
@@ -24,6 +26,7 @@ export function load({
 			cookies,
 			enablePreview: isLocalPreviewHost
 		}),
+		activeSurface,
 		showVersionSwitcher: isLocalPreviewHost
 	}
 }

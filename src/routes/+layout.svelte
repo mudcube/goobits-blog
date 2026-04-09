@@ -46,7 +46,7 @@
 			/>
 
 			{#if data.showVersionSwitcher}
-				<DevReleaseSwitcher activeStage={data.activeStage} />
+				<DevReleaseSwitcher activeStage={data.activeStage} activeSurface={data.activeSurface} />
 			{/if}
 		{/if}
 	</div>
