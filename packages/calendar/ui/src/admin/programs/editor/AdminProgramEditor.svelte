@@ -598,7 +598,7 @@
 	<div class="program-editor admin-content">
 		<div class="program-editor__canvas-wrap">
 			<div class="program-editor__canvas">
-				<div class="program-editor__panel admin-ui-card">
+				<div class="program-editor__panel calendar-ui-card">
 					<section class="program-editor__hero">
 						<div class="program-editor__hero-glow" aria-hidden="true"></div>
 

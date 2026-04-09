@@ -69,7 +69,7 @@
 
 	<div class="admin-dashboard-today__stack">
 		{#if todayEvents.length === 0}
-			<div class="admin-dashboard-today__empty admin-ui-card">No sessions scheduled for today.</div>
+			<div class="admin-dashboard-today__empty calendar-ui-card">No sessions scheduled for today.</div>
 		{:else}
 			{#each todayEvents as event, index}
 				{#if nowDividerIndex === index}

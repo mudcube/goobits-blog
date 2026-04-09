@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import AdminWysiwygWorkspace from './AdminWysiwygWorkspace.svelte'
-	import { getAdminActivityColor, getAdminActivityEmoji } from '../../../shared/activity-display'
+	import { getActivityColor, getActivityEmoji } from '../../../shared/activity-display'
 	import { mockPrograms } from '../../mock/admin-mock-data'
 
 	type DashboardController = ReturnType<typeof createAdminDashboardController>
@@ -53,11 +53,11 @@
 	}
 
 	function emojiForActivity(label: string, slug?: string) {
-		return getAdminActivityEmoji(label, slug)
+		return getActivityEmoji(label, slug)
 	}
 
 	function colorForActivity(label: string, slug?: string) {
-		return getAdminActivityColor(label, slug)
+		return getActivityColor(label, slug)
 	}
 
 	function toLocalDateTimeInput(date: Date) {
@@ -142,7 +142,7 @@
 						{#each programsSource as program}
 							<button
 								type="button"
-								class="social-events__picker-card admin-ui-card admin-ui-card--interactive"
+								class="social-events__picker-card calendar-ui-card calendar-ui-card--interactive"
 								class:social-events__picker-card--active={selectedActivitySlug === program.slug}
 								style={`--activity-color: ${colorForActivity(program.label, program.slug)}`}
 								onclick={() => selectCreateActivity(program.slug, program.label)}

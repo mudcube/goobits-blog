@@ -22,14 +22,14 @@
 </script>
 
 {#if href}
-	<a class="admin-chevron-row-card admin-ui-card admin-ui-card--interactive" class:admin-chevron-row-card--compact={compact} aria-label={ariaLabel} href={href} onclick={onclick}>
-		<div class="admin-chevron-row-card__start">
+	<a class="chevron-row-card calendar-ui-card calendar-ui-card--interactive" class:chevron-row-card--compact={compact} aria-label={ariaLabel} href={href} onclick={onclick}>
+		<div class="chevron-row-card__start">
 			{@render start?.()}
 		</div>
-		<div class="admin-chevron-row-card__body">
+		<div class="chevron-row-card__body">
 			{@render children()}
 		</div>
-		<div class="admin-chevron-row-card__end" aria-hidden="true">
+		<div class="chevron-row-card__end" aria-hidden="true">
 			{#if end}
 				{@render end()}
 			{:else}
@@ -38,14 +38,14 @@
 		</div>
 	</a>
 {:else}
-	<button type="button" class="admin-chevron-row-card admin-ui-card admin-ui-card--interactive" class:admin-chevron-row-card--compact={compact} aria-label={ariaLabel} onclick={onclick}>
-		<div class="admin-chevron-row-card__start">
+	<button type="button" class="chevron-row-card calendar-ui-card calendar-ui-card--interactive" class:chevron-row-card--compact={compact} aria-label={ariaLabel} onclick={onclick}>
+		<div class="chevron-row-card__start">
 			{@render start?.()}
 		</div>
-		<div class="admin-chevron-row-card__body">
+		<div class="chevron-row-card__body">
 			{@render children()}
 		</div>
-		<div class="admin-chevron-row-card__end" aria-hidden="true">
+		<div class="chevron-row-card__end" aria-hidden="true">
 			{#if end}
 				{@render end()}
 			{:else}
@@ -56,7 +56,7 @@
 {/if}
 
 <style>
-	.admin-chevron-row-card {
+	.chevron-row-card {
 		width: 100%;
 		display: flex;
 		align-items: center;
@@ -68,24 +68,24 @@
 		text-decoration: none;
 	}
 
-	.admin-chevron-row-card--compact {
+	.chevron-row-card--compact {
 		padding: 0.625rem 0.875rem;
 	}
 
-	.admin-chevron-row-card:focus-visible { outline: none; }
+	.chevron-row-card:focus-visible { outline: none; }
 
-	.admin-chevron-row-card__start {
+	.chevron-row-card__start {
 		flex-shrink: 0;
 		display: inline-flex;
 		align-items: center;
 	}
 
-	.admin-chevron-row-card__body {
+	.chevron-row-card__body {
 		flex: 1;
 		min-width: 0;
 	}
 
-	.admin-chevron-row-card__end {
+	.chevron-row-card__end {
 		color: color-mix(in srgb, var(--text) 36%, transparent);
 		flex-shrink: 0;
 		display: inline-flex;
@@ -93,7 +93,7 @@
 		justify-content: center;
 	}
 
-	.admin-chevron-row-card:hover .admin-chevron-row-card__end {
+	.chevron-row-card:hover .chevron-row-card__end {
 		color: color-mix(in srgb, var(--text) 52%, transparent);
 	}
 </style>

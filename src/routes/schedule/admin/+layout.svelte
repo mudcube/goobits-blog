@@ -553,14 +553,14 @@
     outline-offset: 2px;
   }
 
-  :global(.social-admin .admin-ui-card) {
+  :global(.social-admin .calendar-ui-card) {
     border-radius: 14px;
     border: 1px solid var(--admin-card-border);
     background: var(--admin-card-bg);
     box-shadow: 0 1px 2px var(--shadow-softest);
   }
 
-  :global(.social-admin .admin-ui-card--interactive) {
+  :global(.social-admin .calendar-ui-card--interactive) {
     cursor: pointer;
     will-change: transform, box-shadow;
     transition:
@@ -570,7 +570,7 @@
       transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  :global(.social-admin .admin-ui-card--interactive:hover) {
+  :global(.social-admin .calendar-ui-card--interactive:hover) {
     background: var(--admin-card-bg-hover, var(--admin-card-bg));
     border-color: color-mix(in srgb, var(--text) 18%, transparent);
     box-shadow: 0 4px 16px
@@ -578,7 +578,7 @@
     transform: translateY(-1px);
   }
 
-  :global(.social-admin .admin-ui-card--interactive:focus-visible) {
+  :global(.social-admin .calendar-ui-card--interactive:focus-visible) {
     border-color: var(--admin-selected-border);
     box-shadow: 0 0 0 2px
       color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);

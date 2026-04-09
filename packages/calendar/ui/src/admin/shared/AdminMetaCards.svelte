@@ -28,7 +28,7 @@
 
 <div class="admin-meta-cards" class:admin-meta-cards--single-line={singleLine}>
 	{#if items.length === 0}
-		<div class="admin-meta-cards__empty admin-ui-card">{emptyText}</div>
+		<div class="admin-meta-cards__empty calendar-ui-card">{emptyText}</div>
 	{:else}
 		{#each items as item (item.id)}
 			<div class="admin-meta-cards__card">

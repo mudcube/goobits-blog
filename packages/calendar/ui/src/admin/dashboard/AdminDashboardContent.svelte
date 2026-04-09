@@ -3,8 +3,8 @@
 	import AdminDashboardTodayTimeline from '@calendar/ui/admin/dashboard/AdminDashboardTodayTimeline.svelte'
 	import AdminDashboardRecentFeed from '@calendar/ui/admin/dashboard/AdminDashboardRecentFeed.svelte'
 	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
-	import { getAdminActivityEmoji } from '../../shared/activity-display'
-	import { formatAdminDayLabel, formatAdminTimeLabel } from '../../shared/date-format'
+	import { getActivityEmoji } from '../../shared/activity-display'
+	import { formatEventDayLabel, formatEventTimeLabel } from '../../shared/date-format'
 
 	type Participant = {
 		name?: string | null
@@ -90,7 +90,7 @@
 	})
 
 	function timeLabel(iso: string) {
-		return formatAdminTimeLabel(iso)
+		return formatEventTimeLabel(iso)
 	}
 </script>
 
@@ -119,11 +119,11 @@
 				{#each selectedDateEvents as event}
 					<ChevronRowCard compact={true} onclick={() => onOpenEvent(event.id)} ariaLabel={`Open ${event.title}`}>
 						{#snippet start()}
-							<span class="admin-dashboard__selected-day-emoji">{getAdminActivityEmoji(event.activityLabel, event.activitySlug || undefined)}</span>
+							<span class="admin-dashboard__selected-day-emoji">{getActivityEmoji(event.activityLabel, event.activitySlug || undefined)}</span>
 						{/snippet}
 						<div>
 							<div class="admin-dashboard__selected-day-title">{event.title}</div>
-							<div class="admin-dashboard__selected-day-sub">{formatAdminDayLabel(event.startsAt)} · {timeLabel(event.startsAt)}</div>
+							<div class="admin-dashboard__selected-day-sub">{formatEventDayLabel(event.startsAt)} · {timeLabel(event.startsAt)}</div>
 						</div>
 					</ChevronRowCard>
 				{/each}

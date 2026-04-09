@@ -11,7 +11,7 @@
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import AdminCrewInviteModal from '@calendar/ui/admin/members/AdminCrewInviteModal.svelte'
-	import { getAdminActivityEmoji } from '@calendar/ui/shared/activity-display'
+	import { getActivityEmoji } from '@calendar/ui/shared/activity-display'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import {
 		mockCrewInvites,
@@ -182,7 +182,7 @@
 				topActivity = label
 			}
 		}
-		if (topActivity) return `${getAdminActivityEmoji(topActivity)} ${categoryBadgeText(topActivity)}`
+		if (topActivity) return `${getActivityEmoji(topActivity)} ${categoryBadgeText(topActivity)}`
 		return ''
 	}
 
@@ -466,7 +466,7 @@
 
 		{#if expandedUserId}
 			<h4>MEMBER ACCESS</h4>
-			<div class="social-crew__access admin-ui-card">
+			<div class="social-crew__access calendar-ui-card">
 				<div class="social-crew__access-label">Program access</div>
 				<div class="social-crew__tags">
 					{#if accessLoading}
@@ -479,7 +479,7 @@
 								class:admin-ui-chip--active={row.allowed}
 								onclick={() => void toggleAccessWithSave(row.programSlug)}
 							>
-								{getAdminActivityEmoji(row.programSlug)} {row.programSlug}
+								{getActivityEmoji(row.programSlug)} {row.programSlug}
 							</button>
 						{/each}
 					{/if}

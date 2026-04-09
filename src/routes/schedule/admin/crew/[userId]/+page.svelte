@@ -126,7 +126,7 @@
 				<h4>UPCOMING ({memberUpcoming.length})</h4>
 				<div class="admin-crew-member-page__list">
 					{#if memberUpcoming.length === 0}
-						<div class="admin-crew-member-page__empty admin-ui-card">No upcoming sessions.</div>
+						<div class="admin-crew-member-page__empty calendar-ui-card">No upcoming sessions.</div>
 					{:else}
 						{#each memberUpcoming as event (event.id)}
 							<ChevronRowCard href={hrefWithMock(`/schedule/admin/events/${event.id}/`)}>
@@ -142,7 +142,7 @@
 				<h4>RECENT ({memberRecent.length})</h4>
 				<div class="admin-crew-member-page__list">
 					{#if memberRecent.length === 0}
-						<div class="admin-crew-member-page__empty admin-ui-card">No recent sessions.</div>
+						<div class="admin-crew-member-page__empty calendar-ui-card">No recent sessions.</div>
 					{:else}
 						{#each memberRecent as event (event.id)}
 							<ChevronRowCard href={hrefWithMock(`/schedule/admin/events/${event.id}/`)}>
@@ -154,7 +154,7 @@
 				</div>
 			</section>
 		{:else}
-			<div class="admin-crew-member-page__empty admin-ui-card">Member not found.</div>
+			<div class="admin-crew-member-page__empty calendar-ui-card">Member not found.</div>
 		{/if}
 	</div>
 {/if}

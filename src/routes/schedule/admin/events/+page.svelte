@@ -6,8 +6,8 @@
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
 	import EventSessionCard from '@calendar/ui/shared/events/EventSessionCard.svelte'
-	import { getAdminActivityEmoji } from '@calendar/ui/shared/activity-display'
-	import { formatAdminDayLabel } from '@calendar/ui/shared/date-format'
+	import { getActivityEmoji } from '@calendar/ui/shared/activity-display'
+	import { formatEventDayLabel } from '@calendar/ui/shared/date-format'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { mockDashboardEvents, mockDashboardRecentEvents, mockPrograms } from '@calendar/ui/admin/mock/admin-mock-data'
 
@@ -30,11 +30,11 @@
 	})
 
 	function emojiForActivity(label: string, slug?: string) {
-		return getAdminActivityEmoji(label, slug)
+		return getActivityEmoji(label, slug)
 	}
 
 	function dayLabel(iso: string) {
-		return formatAdminDayLabel(iso)
+		return formatEventDayLabel(iso)
 	}
 
 	function eventRoute(ev: { id?: number | string | null; activitySlug?: string | null }) {
@@ -60,7 +60,7 @@
 			{#each programsSource as program}
 				<button
 					type="button"
-					class="social-events__program-card admin-ui-card admin-ui-card--interactive"
+					class="social-events__program-card calendar-ui-card calendar-ui-card--interactive"
 					onclick={() => goto(hrefWithMock(`/schedule/admin/events/${program.slug}/`))}
 				>
 					<div class="social-events__program-icon">{program.icon || emojiForActivity(program.label, program.slug)}</div>
@@ -89,7 +89,7 @@
 		<h4>PAST</h4>
 		<div class="social-events__past-list">
 			{#if recentEventsSource.length === 0}
-				<div class="social-events__past-row social-events__past-row--empty admin-ui-card">
+				<div class="social-events__past-row social-events__past-row--empty calendar-ui-card">
 					<div class="social-events__meta">Past adventures will show up here soon.</div>
 				</div>
 			{:else}

@@ -8,8 +8,8 @@
 	import MonthEventCalendar from '../booking/MonthEventCalendar.svelte'
 	import EventSessionCard from '@calendar/ui/shared/events/EventSessionCard.svelte'
 	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
-	import { getAdminActivityEmoji } from '../../shared/activity-display'
-	import { formatAdminDayLabel } from '../../shared/date-format'
+	import { getActivityEmoji } from '../../shared/activity-display'
+	import { formatEventDayLabel } from '../../shared/date-format'
 	let { data } = $props()
 	let upcoming = $state([])
 	let recent = $state([])
@@ -113,11 +113,11 @@
 	}
 
 	function dayLabel(iso) {
-		return formatAdminDayLabel(iso)
+		return formatEventDayLabel(iso)
 	}
 
 	function emojiForActivity(label, slug) {
-		return getAdminActivityEmoji(label, slug)
+		return getActivityEmoji(label, slug)
 	}
 </script>
 
@@ -194,14 +194,14 @@
 </div>
 
 <style>
-	.calendar-home :global(.admin-ui-card) {
+	.calendar-home :global(.calendar-ui-card) {
 		border-radius: 14px;
 		border: 1px solid color-mix(in srgb, var(--calendar-shell-text) 10%, transparent);
 		background: color-mix(in srgb, var(--calendar-panel-bg) 84%, transparent);
 		box-shadow: 0 1px 2px color-mix(in srgb, black 8%, transparent);
 	}
 
-	.calendar-home :global(.admin-ui-card--interactive) {
+	.calendar-home :global(.calendar-ui-card--interactive) {
 		transition:
 			border-color 150ms ease,
 			background 150ms ease,
@@ -209,7 +209,7 @@
 			transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1);
 	}
 
-	.calendar-home :global(.admin-ui-card--interactive:hover) {
+	.calendar-home :global(.calendar-ui-card--interactive:hover) {
 		background: color-mix(in srgb, var(--calendar-panel-bg) 92%, transparent);
 		border-color: color-mix(in srgb, var(--calendar-shell-text) 16%, transparent);
 		box-shadow: 0 4px 16px color-mix(in srgb, var(--calendar-shell-text) 8%, transparent);

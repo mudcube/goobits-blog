@@ -26,12 +26,12 @@ function resolveActivityKey(label = '', slug = '') {
 	return normalize(slug || label)
 }
 
-export function getAdminActivityEmoji(label = '', slug = '') {
+export function getActivityEmoji(label = '', slug = '') {
 	const key = resolveActivityKey(label, slug)
 	return activityEmojiMap[key] || '✨'
 }
 
-export function getAdminActivityColor(label = '', slug = '') {
+export function getActivityColor(label = '', slug = '') {
 	const key = resolveActivityKey(label, slug)
 	return activityColorMap[key] || '#64748b'
 }
