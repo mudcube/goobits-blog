@@ -42,6 +42,7 @@
 
 	--border-width: 1px;
 	--max-width-readable: 980px;
+	--layout-inline-gutter: clamp(var(--space-4), 4vw, var(--space-6));
 	--layout-logo-width: 150px;
 	--layout-logo-height: 4rem;
 	--layout-logo-padding-y: 1rem;

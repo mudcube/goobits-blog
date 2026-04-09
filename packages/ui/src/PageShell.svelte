@@ -19,11 +19,20 @@
 		--page-shell-space-bottom: 5.25rem;
 		--page-shell-space-top-mobile: 2.4rem;
 
-		max-width: var(--max-width-readable);
-		margin-inline: auto;
-		padding-inline: 0;
+		display: grid;
+		grid-template-columns:
+			minmax(var(--layout-inline-gutter), 1fr)
+			minmax(0, var(--max-width-readable))
+			minmax(var(--layout-inline-gutter), 1fr);
+		width: 100%;
+		box-sizing: border-box;
 		padding-top: var(--page-shell-space-top);
 		padding-bottom: var(--page-shell-space-bottom);
+	}
+
+	.ui-page-shell > :global(*) {
+		grid-column: 2;
+		min-width: 0;
 	}
 
 	@media (max-width: 760px) {
