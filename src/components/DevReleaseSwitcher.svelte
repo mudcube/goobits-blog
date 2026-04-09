@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { PillButton } from '@miko/ui'
 	import { DEV_SURFACE_COOKIE, type DevSurface } from '$lib/app/dev-surface'
 	import { RELEASE_STAGE_COOKIE, type ReleaseStage } from '$lib/app/release'
 
@@ -8,8 +9,14 @@
 	}
 
 	const { activeStage, activeSurface }: Props = $props()
-	const stages: ReleaseStage[] = ['live', 'preview']
-	const surfaces: DevSurface[] = ['staging', 'dev']
+	const stages = [
+		{ value: 'live', label: 'Live' },
+		{ value: 'preview', label: 'Preview' }
+	]
+	const surfaces = [
+		{ value: 'staging', label: 'Staging' },
+		{ value: 'dev', label: 'Dev' }
+	]
 
 	function setStage(stage: ReleaseStage) {
 		document.cookie = `${RELEASE_STAGE_COOKIE}=${stage}; Path=/; Max-Age=31536000; SameSite=Lax`
@@ -20,41 +27,39 @@
 		document.cookie = `${DEV_SURFACE_COOKIE}=${surface}; Path=/; Max-Age=31536000; SameSite=Lax`
 		window.location.reload()
 	}
+
+	function handleStageChange(stage: string | string[]) {
+		if (typeof stage === 'string') setStage(stage as ReleaseStage)
+	}
+
+	function handleSurfaceChange(surface: string | string[]) {
+		if (typeof surface === 'string') setSurface(surface as DevSurface)
+	}
 </script>
 
 <aside class="release-switcher" aria-label="Site release preview">
 	<div class="release-switcher__row">
 		<span class="release-switcher__label">Release</span>
-		<div class="release-switcher__toggle" role="group" aria-label="Release stage">
-			{#each stages as stage}
-				<button
-					type="button"
-					class="release-switcher__button"
-					class:release-switcher__button--active={stage === activeStage}
-					onclick={() => setStage(stage)}
-					aria-pressed={stage === activeStage}
-				>
-					{stage === 'live' ? 'Live' : 'Preview'}
-				</button>
-			{/each}
-		</div>
+		<PillButton
+			options={stages}
+			value={activeStage}
+			grouped
+			className="release-switcher__toggle"
+			ariaLabel="Release stage"
+			onChange={handleStageChange}
+		/>
 	</div>
 
 	<div class="release-switcher__row">
 		<span class="release-switcher__label">Surface</span>
-		<div class="release-switcher__toggle" role="group" aria-label="Local surface">
-			{#each surfaces as surface}
-				<button
-					type="button"
-					class="release-switcher__button"
-					class:release-switcher__button--active={surface === activeSurface}
-					onclick={() => setSurface(surface)}
-					aria-pressed={surface === activeSurface}
-				>
-					{surface === 'staging' ? 'Staging' : 'Dev'}
-				</button>
-			{/each}
-		</div>
+		<PillButton
+			options={surfaces}
+			value={activeSurface}
+			grouped
+			className="release-switcher__toggle"
+			ariaLabel="Local surface"
+			onChange={handleSurfaceChange}
+		/>
 	</div>
 </aside>
 
@@ -91,33 +96,26 @@
 		color: var(--muted);
 	}
 
-	.release-switcher__toggle {
+	:global(.release-switcher__toggle.ui-segmented) {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+		width: 100%;
 		padding: 0.15rem;
-		border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-		border-radius: 999px;
 		background: color-mix(in srgb, var(--card-bg) 88%, var(--bg));
 	}
 
-	.release-switcher__button {
+	:global(.release-switcher__toggle .ui-segmented__button) {
 		display: grid;
 		place-items: center;
-		min-width: 0;
 		width: 100%;
 		padding: 0.26rem 0.45rem;
-		border: 0;
-		border-radius: 999px;
-		background: transparent;
-		color: var(--text);
 		font-size: 0.68rem;
 		font-weight: 700;
-		text-align: center;
-		cursor: pointer;
 		line-height: 1.1;
+		text-align: center;
 	}
 
-	.release-switcher__button--active {
+	:global(.release-switcher__toggle .ui-segmented__button--active) {
 		background: var(--text);
 		color: var(--bg);
 	}
@@ -139,7 +137,7 @@
 			gap: 0.35rem;
 		}
 
-		.release-switcher__button {
+		:global(.release-switcher__toggle .ui-segmented__button) {
 			padding: 0.22rem 0.35rem;
 			font-size: 0.62rem;
 		}

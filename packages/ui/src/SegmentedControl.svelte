@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from './buttons/Button.svelte'
+	import PillButton from './buttons/PillButton.svelte'
 
 	export type SegmentedOption = {
 		value: string
@@ -21,19 +21,4 @@
 	}: SegmentedControlProps = $props()
 </script>
 
-<div class={`ui-segmented ${className}`.trim()} role="tablist" aria-label={ariaLabel}>
-	{#each options as option}
-			<Button
-				type="button"
-				role="tab"
-				className={`ui-segmented__button ${value === option.value ? 'ui-segmented__button--active' : ''}`}
-				variant="ghost"
-				size="sm"
-				ariaSelected={value === option.value}
-				ariaLabel={option.label}
-				onClick={() => (value = option.value)}
-			>
-				{option.label}
-			</Button>
-		{/each}
-	</div>
+<PillButton bind:value {options} grouped className={className} ariaLabel={ariaLabel} />

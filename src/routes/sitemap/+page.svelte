@@ -86,12 +86,6 @@
 		/>
 
 		<PageContainer className="sitemap-page__content">
-			<header class="sitemap-page__header">
-				{#if data.showDevDiagnostics}
-					<span class="sitemap-page__dev-badge">DEV MODE</span>
-				{/if}
-			</header>
-
 			<FilterableCollection
 				count={filteredCount}
 				countLabel={`of ${data.stats.total} routes`}
@@ -150,32 +144,12 @@
 
 <style>
 	.sitemap-page__inner {
-		--sitemap-dev-badge-padding: 0.2rem 0.6rem;
-		--sitemap-dev-badge-size: 0.7rem;
-		--sitemap-dev-badge-radius: 3px;
 		--sitemap-controls-gap: 0.7rem;
 		--sitemap-filters-gap: 0.6rem;
 		--sitemap-tag-gap: 0.35rem;
 		--sitemap-filter-label-gap: 0.3rem;
 		--sitemap-filter-label-size: 0.78rem;
 		--sitemap-sort-gap: 0.35rem;
-	}
-
-	.sitemap-page__header {
-		text-align: center;
-		margin-bottom: 1.5rem;
-	}
-
-	.sitemap-page__dev-badge {
-		display: inline-block;
-		margin-top: 0.5rem;
-		padding: var(--sitemap-dev-badge-padding);
-		font-size: var(--sitemap-dev-badge-size);
-		font-weight: 600;
-		background: var(--form-error);
-		color: var(--color-white);
-		border-radius: var(--sitemap-dev-badge-radius);
-		letter-spacing: 0.05em;
 	}
 
 	.sitemap-page__controls {
@@ -189,6 +163,7 @@
 		grid-template-columns: minmax(0, 1fr) auto;
 		gap: var(--sitemap-filters-gap);
 		align-items: center;
+		margin-top: 0.5rem;
 	}
 
 	.sitemap-page__tag-filters {

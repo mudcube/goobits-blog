@@ -209,7 +209,7 @@
   display: inline-flex;
   align-items: center;
   border: var(--border-width) solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-pill);
   background: var(--card-bg);
   overflow: hidden;
 }
@@ -217,14 +217,20 @@
 .ui-segmented__button {
   border: none;
   border-right: var(--border-width) solid var(--border);
+  border-radius: 0;
   background: transparent;
   color: var(--muted);
   font-size: var(--font-size-sm);
   padding: var(--space-1) var(--space-3);
 }
 
+.ui-segmented__button:first-child {
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+}
+
 .ui-segmented__button:last-child {
   border-right: none;
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
 }
 
 .ui-segmented__button--active {
