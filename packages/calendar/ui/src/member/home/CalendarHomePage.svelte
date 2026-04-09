@@ -6,10 +6,10 @@
 	import PillButton from '../../primitives/CalendarPillButton.svelte'
 	import Hero from '../../primitives/CalendarHero.svelte'
 	import MonthEventCalendar from '../booking/MonthEventCalendar.svelte'
-	import EventSessionCard from '@calendar/ui/shared/events/EventSessionCard.svelte'
-	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
-	import { getActivityEmoji } from '../../shared/activity-display'
-	import { formatEventDayLabel } from '../../shared/date-format'
+	import { EventSessionCard } from '@calendar/ui/shared'
+	import { ChevronRowCard } from '@calendar/ui/shared'
+	import { getActivityEmoji } from '../../shared'
+	import { formatEventDayLabel } from '../../shared'
 	let { data } = $props()
 	let upcoming = $state([])
 	let recent = $state([])

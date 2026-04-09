@@ -1,5 +1,5 @@
 <script lang="ts">
-	import EventSessionCard from '@calendar/ui/shared/events/EventSessionCard.svelte'
+	import { EventSessionCard } from '@calendar/ui/shared'
 
 	type Participant = {
 		name?: string | null

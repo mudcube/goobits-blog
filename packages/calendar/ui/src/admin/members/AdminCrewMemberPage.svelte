@@ -4,7 +4,7 @@
 	import { createAdminMembersController } from '@calendar/ui/admin/members/admin-members.svelte'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
-	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
+	import { ChevronRowCard } from '@calendar/ui/shared'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { mockCrewUsers, mockDashboardEvents, mockDashboardRecentEvents } from '@calendar/ui/admin/mock/admin-mock-data'
 

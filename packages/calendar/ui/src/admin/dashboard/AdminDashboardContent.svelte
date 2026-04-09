@@ -2,9 +2,9 @@
 	import AdminCalendarWidget from '@calendar/ui/admin/dashboard/AdminCalendarWidget.svelte'
 	import AdminDashboardTodayTimeline from '@calendar/ui/admin/dashboard/AdminDashboardTodayTimeline.svelte'
 	import AdminDashboardRecentFeed from '@calendar/ui/admin/dashboard/AdminDashboardRecentFeed.svelte'
-	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
-	import { getActivityEmoji } from '../../shared/activity-display'
-	import { formatEventDayLabel, formatEventTimeLabel } from '../../shared/date-format'
+	import { ChevronRowCard } from '@calendar/ui/shared'
+	import { getActivityEmoji } from '../../shared'
+	import { formatEventDayLabel, formatEventTimeLabel } from '../../shared'
 
 	type Participant = {
 		name?: string | null

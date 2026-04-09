@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ChevronRowCard from '@calendar/ui/shared/cards/ChevronRowCard.svelte'
+	import { ChevronRowCard } from '@calendar/ui/shared'
 
 	const {
 		name,
