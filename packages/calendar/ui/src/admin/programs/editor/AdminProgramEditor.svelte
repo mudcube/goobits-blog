@@ -7,8 +7,13 @@
 	import AdminCalendarWidget from '../../dashboard/AdminCalendarWidget.svelte'
 	import AdminActionButton from '../../shared/AdminActionButton.svelte'
 	import { mockDashboardEvents, mockPrograms } from '../../mock/admin-mock-data'
+	import { createHistory } from '../../history/create-history'
 
 	type DashboardController = ReturnType<typeof createAdminDashboardController>
+	type ProgramDraft = DashboardController['programDraft']
+	type ProgramEditorSnapshot = {
+		programDraft: ProgramDraft
+	}
 
 	type ActiveDay = {
 		time: string
@@ -40,6 +45,7 @@
 	let autosaveTimer: ReturnType<typeof setTimeout> | null = null
 	let autosaveReady = $state(false)
 	let lastSavedSignature = $state('')
+	let historyReady = false
 
 	let emojiPickerOpen = $state(false)
 	let currentMonth = $state(new Date())
@@ -61,6 +67,10 @@
 	let activeDays = $state<Record<string, ActiveDay>>({})
 	const eventsSource = $derived(mockMode ? mockDashboardEvents : dashboard.events)
 	const programsSource = $derived(mockMode ? mockPrograms : dashboard.programs)
+	const editorHistory = createHistory<ProgramEditorSnapshot>({
+		maxEntries: 100,
+		coalesceMs: 700
+	})
 
 	const emojiOptions = ['💪', '🏋️', '🎪', '🧘', '🤸', '🌈', '✨', '🎯', '🔥', '🎶']
 
@@ -111,6 +121,7 @@
 			}
 		}
 		initialized = true
+		resetEditorHistory()
 	})
 
 	$effect(() => {
@@ -195,11 +206,47 @@
 		})
 	}
 
+	function editorSnapshot(): ProgramEditorSnapshot {
+		return {
+			programDraft: { ...dashboard.programDraft }
+		}
+	}
+
+	function applyEditorSnapshot(snapshot: ProgramEditorSnapshot) {
+		dashboard.programDraft = { ...snapshot.programDraft }
+	}
+
+	function resetEditorHistory() {
+		editorHistory.clear(editorSnapshot())
+		historyReady = true
+	}
+
+	function pushEditorHistory(scope: string) {
+		if (!historyReady) {
+			resetEditorHistory()
+			return
+		}
+		editorHistory.push(editorSnapshot(), { scope })
+	}
+
 	function updateProgramField(field: keyof typeof dashboard.programDraft, value: string) {
 		dashboard.programDraft = {
 			...dashboard.programDraft,
 			[field]: value
 		}
+	}
+
+	function commitProgramField(field: keyof typeof dashboard.programDraft, value: string) {
+		updateProgramField(field, value)
+		pushEditorHistory(String(field))
+	}
+
+	function updateProgramDraft(patch: Partial<ProgramDraft>, scope: string) {
+		dashboard.programDraft = {
+			...dashboard.programDraft,
+			...patch
+		}
+		pushEditorHistory(scope)
 	}
 
 	function updateTitle(value: string) {
@@ -209,6 +256,7 @@
 			.filter(Boolean)
 		updateProgramField('heroTitleLine1', lines[0] || '')
 		updateProgramField('heroTitleLine2', lines[1] || '')
+		pushEditorHistory('heroTitle')
 	}
 
 	function combinedTitle() {
@@ -413,7 +461,7 @@
 	}
 
 	function pickEmoji(emoji: string) {
-		updateProgramField('icon', emoji)
+		commitProgramField('icon', emoji)
 		emojiPickerOpen = false
 	}
 
@@ -462,6 +510,45 @@
 		if (event.key === 'Escape') {
 			closePop()
 			emojiPickerOpen = false
+			return
+		}
+		if (event.isComposing || preview) return
+		if (!isUndoShortcut(event) && !isRedoShortcut(event)) return
+		if (isNativeUndoTarget(event.target)) return
+
+		const snapshot = isRedoShortcut(event)
+			? editorHistory.redo(editorSnapshot())
+			: editorHistory.undo(editorSnapshot())
+		if (!snapshot) return
+
+		event.preventDefault()
+		applyEditorSnapshot(snapshot)
+		flash(isRedoShortcut(event) ? 'Redid change' : 'Undid change')
+	}
+
+	function isUndoShortcut(event: KeyboardEvent) {
+		return (event.metaKey || event.ctrlKey) && !event.shiftKey && event.key.toLowerCase() === 'z'
+	}
+
+	function isRedoShortcut(event: KeyboardEvent) {
+		const key = event.key.toLowerCase()
+		return (
+			(event.metaKey || event.ctrlKey) &&
+			((event.shiftKey && key === 'z') || (!event.metaKey && !event.shiftKey && key === 'y'))
+		)
+	}
+
+	function isNativeUndoTarget(target: EventTarget | null) {
+		if (!(target instanceof HTMLElement)) return false
+		if (target.closest('input, textarea, select')) return true
+		if (target.isContentEditable) return true
+		return !!target.closest('[contenteditable="true"]')
+	}
+
+	function handleSettingInput<K extends keyof ProgramDraft>(field: K, value: ProgramDraft[K]) {
+		dashboard.programDraft = {
+			...dashboard.programDraft,
+			[field]: value
 		}
 	}
 
@@ -558,28 +645,28 @@
 							contenteditable={!preview}
 							spellcheck={false}
 							onblur={(event) =>
-								updateProgramField('eyebrow', event.currentTarget.textContent || '')}
+								commitProgramField('eyebrow', event.currentTarget.textContent || '')}
 						>
 							{dashboard.programDraft.eyebrow || 'Program'}
 						</div>
 
-						<div class="program-editor__title-group">
-							<div
-								class="program-editor__editable program-editor__title"
-								contenteditable={!preview}
-								spellcheck={false}
-								onblur={(event) => updateTitle(event.currentTarget.textContent || '')}
-							>
-								{combinedTitle() || 'Hang out. Work out.\nWhatever.'}
+							<div class="program-editor__title-group">
+								<div
+									class="program-editor__editable program-editor__title"
+									contenteditable={!preview}
+									spellcheck={false}
+									onblur={(event) => updateTitle(event.currentTarget.textContent || '')}
+								>
+									{combinedTitle() || 'Hang out. Work out.\nWhatever.'}
+								</div>
 							</div>
-						</div>
 
 						<div
 							class="program-editor__editable program-editor__subtitle"
 							contenteditable={!preview}
 							spellcheck={false}
 							onblur={(event) =>
-								updateProgramField('heroSubtitle', event.currentTarget.textContent || '')}
+								commitProgramField('heroSubtitle', event.currentTarget.textContent || '')}
 						>
 							{dashboard.programDraft.heroSubtitle ||
 								"Grab a time slot and let's do something fun together."}
@@ -741,10 +828,10 @@
 								class="program-editor__switch"
 								class:program-editor__switch--on={dashboard.programDraft.enabled}
 								onclick={() =>
-									(dashboard.programDraft = {
-										...dashboard.programDraft,
-										enabled: !dashboard.programDraft.enabled
-									})}
+									updateProgramDraft(
+										{ enabled: !dashboard.programDraft.enabled },
+										'enabled'
+									)}
 							>
 								<span></span>
 							</button>
@@ -753,56 +840,79 @@
 							><span>URL path</span><input
 								class="ui-form-control"
 								type="text"
-								bind:value={dashboard.programDraft.slug}
+								value={dashboard.programDraft.slug}
+								oninput={(event) => handleSettingInput('slug', event.currentTarget.value)}
+								onblur={() => pushEditorHistory('slug')}
 							/></label
 						>
 						<label
 							><span>Sort order</span><input
 								class="ui-form-control ui-form-control--number"
 								type="number"
-								bind:value={dashboard.programDraft.sortOrder}
+								value={dashboard.programDraft.sortOrder}
+								oninput={(event) =>
+									handleSettingInput(
+										'sortOrder',
+										Number.isFinite(event.currentTarget.valueAsNumber)
+											? event.currentTarget.valueAsNumber
+											: 0
+									)}
+								onblur={() => pushEditorHistory('sortOrder')}
 							/></label
 						>
 						<label
 							><span>Status note</span><input
 								class="ui-form-control"
 								type="text"
-								bind:value={dashboard.programDraft.serviceStatusNote}
+								value={dashboard.programDraft.serviceStatusNote}
+								oninput={(event) =>
+									handleSettingInput('serviceStatusNote', event.currentTarget.value)}
+								onblur={() => pushEditorHistory('serviceStatusNote')}
 							/></label
 						>
 						<label
 							><span>Page title</span><input
 								class="ui-form-control"
 								type="text"
-								bind:value={dashboard.programDraft.pageTitle}
+								value={dashboard.programDraft.pageTitle}
+								oninput={(event) => handleSettingInput('pageTitle', event.currentTarget.value)}
+								onblur={() => pushEditorHistory('pageTitle')}
 							/></label
 						>
 						<label
 							><span>Activity name</span><input
 								class="ui-form-control"
 								type="text"
-								bind:value={dashboard.programDraft.activityName}
+								value={dashboard.programDraft.activityName}
+								oninput={(event) => handleSettingInput('activityName', event.currentTarget.value)}
+								onblur={() => pushEditorHistory('activityName')}
 							/></label
 						>
 						<label
 							><span>Eyebrow class</span><input
 								class="ui-form-control"
 								type="text"
-								bind:value={dashboard.programDraft.eyebrowClass}
+								value={dashboard.programDraft.eyebrowClass}
+								oninput={(event) => handleSettingInput('eyebrowClass', event.currentTarget.value)}
+								onblur={() => pushEditorHistory('eyebrowClass')}
 							/></label
 						>
 						<label
 							><span>Glow class</span><input
 								class="ui-form-control"
 								type="text"
-								bind:value={dashboard.programDraft.glowClass}
+								value={dashboard.programDraft.glowClass}
+								oninput={(event) => handleSettingInput('glowClass', event.currentTarget.value)}
+								onblur={() => pushEditorHistory('glowClass')}
 							/></label
 						>
 						<label
 							><span>Form glow class</span><input
 								class="ui-form-control"
 								type="text"
-								bind:value={dashboard.programDraft.formGlowClass}
+								value={dashboard.programDraft.formGlowClass}
+								oninput={(event) => handleSettingInput('formGlowClass', event.currentTarget.value)}
+								onblur={() => pushEditorHistory('formGlowClass')}
 							/></label
 						>
 						<div class="program-editor__settings-actions">
