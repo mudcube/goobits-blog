@@ -1,5 +1,5 @@
 <script>
-	import { Hero, PageClosing, PageShell, SectionLabel } from '@miko/ui'
+	import { PageClosing, PageShell, SectionLabel } from '@miko/ui'
 	import { formatDateMonthDayYearShort } from '$lib/utils/date'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 
@@ -13,6 +13,22 @@
 		{ label: 'YouTube Music', href: '/contact?from=music&topic=youtube_music', icon: 'Y' },
 		{ label: 'SoundCloud', href: '/contact?from=music&topic=soundcloud', icon: 'SC' }
 	]
+
+	const localNavItems = [
+		{ label: 'Music', href: '#music', icon: 'M' },
+		{ label: 'Listen', href: '#listen', icon: 'L' },
+		{ label: 'Entries', href: '#entries', icon: 'E' },
+		{ label: 'Collab', href: '#collaborate', icon: 'C' }
+	]
+
+	const featuredTrack = {
+		title: 'Neon Drift',
+		subtitle: 'synth ambient',
+		date: '2025-01-12',
+		tag: 'Track',
+		image: '/media/generated/nano-banana/neon-drift-synth-ambient.png',
+		alt: 'Illustrated night drive with neon reflections and glowing audio waves'
+	}
 
 	const fallbackEntries = [
 		{ title: 'Neon Drift — synth ambient', href: '/music', date: '2025-01-12', tag: 'Track' },
@@ -40,7 +56,7 @@
 	title="Music, Demos & Sound Experiments"
 	{description}
 	path="/music/"
-	image="/media/music-notes-flow.png"
+	image={featuredTrack.image}
 	jsonLd={[
 		buildWebPageJsonLd({
 			path: '/music/',
@@ -52,148 +68,517 @@
 />
 
 <PageShell className="music-page">
-	<div class="music-page">
-		<Hero
-			eyebrow="Music"
-			titleLines={['Songs, sketches, and', 'sound\u00A0experiments']}
-			icon="/media/music-notes-flow.png"
-			iconAlt="Music notes icon"
-			subtitle="Melody has always been part of the build process. Tracks, demos, and music-related experiments from Miko."
-		/>
-
-		<section class="music-page__platforms" aria-label="Listening platforms">
-			<div class="music-page__section-label-wrap">
-				<SectionLabel text="Listen" />
-			</div>
-			<div class="music-page__platform-row ui-chip-row">
-				{#each platforms as item}
-					<a href={item.href} class="music-page__platform-chip ui-chip">
-						<span class="music-page__platform-icon ui-chip__icon" aria-hidden="true">{item.icon}</span>
-						{item.label}
+	<div class="music-page" id="music">
+		<div class="music-page__studio">
+			<nav class="music-page__rail" aria-label="Music page sections">
+				{#each localNavItems as item}
+					<a href={item.href} class="music-page__rail-link">
+						<span class="music-page__rail-icon" aria-hidden="true">{item.icon}</span>
+						<span class="music-page__rail-label">{item.label}</span>
 					</a>
 				{/each}
-			</div>
-		</section>
+			</nav>
 
-		<section class="music-page__entries" aria-label="Music entries">
-			<div class="music-page__section-label-wrap">
-				<SectionLabel text="Entries" />
-			</div>
-			<ol class="ui-entry-list">
-				{#each getEntries() as entry, idx}
-					<li class="ui-entry-list__item">
-						<a href={entry.href} class="music-page__entry-link ui-entry-list__row">
-							<span class="music-page__entry-num ui-entry-list__num">{String(idx + 1).padStart(2, '0')}</span>
-							<span class="music-page__entry-title ui-entry-list__title">{entry.title}</span>
-							<span class="music-page__entry-tag ui-entry-list__tag">{entry.tag}</span>
-							<span class="music-page__entry-date ui-entry-list__date">{formatDateMonthDayYearShort(entry.date)}</span>
-						</a>
-					</li>
-				{/each}
-			</ol>
-		</section>
+			<div class="music-page__workspace">
+				<section class="music-page__hero" aria-labelledby="music-page-title">
+					<p class="music-page__eyebrow">Music</p>
+					<h1 id="music-page-title" class="music-page__title">Songs, sketches, and sound experiments</h1>
+					<p class="music-page__intro">Melody has always been part of the build process. Tracks, demos, and music-related experiments from Miko.</p>
+				</section>
 
-			<div class="music-page__closing-wrap">
-				<PageClosing
-					label="Collaborations"
-					title="Need a custom soundtrack or audio collaboration?"
-					copy="Original music for a product, visual project, or interactive experience. Reach out anytime."
-					href="/contact?from=music&topic=collaboration"
-					linkLabel="Start a conversation"
-					maxWidth="27.5rem"
-				/>
+				<section class="music-page__feature" aria-labelledby="music-feature-title">
+					<div class="music-page__feature-media">
+						<img src={featuredTrack.image} alt={featuredTrack.alt} class="music-page__feature-image" loading="eager" fetchpriority="high" decoding="async" />
+					</div>
+					<div class="music-page__feature-copy">
+						<SectionLabel text="Featured track" />
+						<h2 id="music-feature-title" class="music-page__feature-title">{featuredTrack.title}</h2>
+						<p class="music-page__feature-subtitle">{featuredTrack.subtitle}</p>
+						<div class="music-page__feature-meta" aria-label="Featured track metadata">
+							<span>{featuredTrack.tag}</span>
+							<span>{formatDateMonthDayYearShort(featuredTrack.date)}</span>
+						</div>
+					</div>
+				</section>
+
+				<section id="listen" class="music-page__platforms" aria-label="Listening platforms">
+					<div class="music-page__section-label-wrap">
+						<SectionLabel text="Listen" />
+					</div>
+					<div class="music-page__platform-row">
+						{#each platforms as item}
+							<a href={item.href} class="music-page__platform-chip">
+								<span class="music-page__platform-icon" aria-hidden="true">{item.icon}</span>
+								{item.label}
+							</a>
+						{/each}
+					</div>
+				</section>
+
+				<section id="entries" class="music-page__entries" aria-label="Music entries">
+					<div class="music-page__section-label-wrap">
+						<SectionLabel text="Entries" />
+					</div>
+					<ol class="music-page__entry-list">
+						{#each getEntries() as entry, idx}
+							<li class="music-page__entry-item">
+								<a href={entry.href} class="music-page__entry-link">
+									<span class="music-page__entry-num">{String(idx + 1).padStart(2, '0')}</span>
+									<span class="music-page__entry-title">{entry.title}</span>
+									<span class="music-page__entry-tag">{entry.tag}</span>
+									<span class="music-page__entry-date">{formatDateMonthDayYearShort(entry.date)}</span>
+								</a>
+							</li>
+						{/each}
+					</ol>
+				</section>
+
+				<div id="collaborate" class="music-page__closing-wrap">
+					<PageClosing
+						label="Collaborations"
+						title="Need a custom soundtrack or audio collaboration?"
+						copy="Original music for a product, visual project, or interactive experience. Reach out anytime."
+						href="/contact?from=music&topic=collaboration"
+						linkLabel="Start a conversation"
+						className="music-page__closing"
+						maxWidth="31rem"
+					/>
+				</div>
 			</div>
+		</div>
 	</div>
 </PageShell>
 
 <style lang="scss">
+	:global(.ui-page-shell.music-page) {
+		grid-template-columns: minmax(0, 1fr);
+		padding-top: 0;
+		padding-bottom: 0;
+		background: #191a1f;
+		color: #fff;
+	}
+
+	:global(.ui-page-shell.music-page > *) {
+		grid-column: 1;
+	}
+
 	.music-page {
-		--music-section-label-size: 0.8125rem;
-		--music-platform-gap: var(--space-3);
-		--music-chip-gap: var(--space-2);
-		--music-chip-padding: 0.625rem 1.25rem 0.625rem 1rem;
-		--music-chip-font: var(--font-size-sm);
-		--music-icon-size: 1.15rem;
-		--music-icon-font: 0.67rem;
-		--music-list-row-padding: 0.8125rem 0;
-		--music-list-gap: 0 1rem;
-		--music-title-font: 0.9375rem;
-		--music-tag-font: 0.6875rem;
-		--music-tag-padding: 0.125rem 0.5rem;
-		--music-tag-radius: 0.25rem;
-		--music-date-font: 0.8125rem;
+		--music-app-bg: #191a1f;
+		--music-app-border: #404040;
+		--music-app-text: #fff;
+		--music-app-muted: rgba(255, 255, 255, 0.64);
+		--music-app-soft: rgba(255, 255, 255, 0.08);
+		--music-app-softer: rgba(255, 255, 255, 0.04);
+		--music-app-panel: #202126;
+		--music-app-panel-2: #24252b;
+		--music-rail-size: 80px;
+		width: 100%;
+		background: var(--music-app-bg);
+		color: var(--music-app-text);
+	}
+
+	.music-page__studio {
+		display: flex;
+		flex-direction: row;
+		width: 100%;
+		min-height: calc(100vh - var(--header-height));
+		background: var(--music-app-bg);
+		color: var(--music-app-text);
+	}
+
+	.music-page__rail {
+		width: var(--music-rail-size);
+		min-width: var(--music-rail-size);
+		min-height: calc(100vh - var(--header-height));
+		border-right: 1px solid var(--music-app-border);
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 16px 0;
+		font-size: 12px;
+	}
+
+	.music-page__rail-link {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		width: 100%;
+		min-height: 68px;
+		color: var(--music-app-muted);
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: 12px;
+		font-weight: var(--font-weight-medium);
+		text-decoration: none;
+		transition:
+			color 0.16s ease,
+			background 0.16s ease;
+	}
+
+	.music-page__rail-link:hover {
+		color: var(--music-app-text);
+		background: var(--music-app-softer);
+	}
+
+	.music-page__rail-icon {
+		display: grid;
+		place-items: center;
+		width: 28px;
+		height: 28px;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 8px;
+		color: var(--music-app-text);
+	}
+
+	.music-page__rail-label {
+		max-width: 64px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.music-page__workspace {
+		display: grid;
+		grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+		grid-template-areas:
+			'hero feature'
+			'listen feature'
+			'entries entries'
+			'closing closing';
+		gap: 24px;
+		align-content: start;
+		width: 100%;
+		min-width: 0;
+		min-height: calc(100vh - var(--header-height));
+		box-sizing: border-box;
+		padding: clamp(20px, 3vw, 40px);
+	}
+
+	.music-page__hero {
+		grid-area: hero;
+		max-width: 48rem;
+	}
+
+	.music-page__eyebrow {
+		margin: 0 0 12px;
+		color: var(--music-app-muted);
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: 12px;
+		font-weight: var(--font-weight-semibold);
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+	}
+
+	.music-page__title {
+		margin: 0 0 18px;
+		color: var(--music-app-text);
+		font-family: var(--font-serif);
+		font-size: clamp(44px, 6vw, 88px);
+		font-weight: 400;
+		letter-spacing: 0;
+		line-height: 0.96;
+		text-wrap: balance;
+	}
+
+	.music-page__intro {
+		max-width: 42rem;
+		margin: 0;
+		color: var(--music-app-muted);
+		font-size: 16px;
+		line-height: 1.6;
+		text-wrap: pretty;
+	}
+
+	.music-page__feature {
+		grid-area: feature;
+		display: grid;
+		grid-template-rows: minmax(0, 1fr) auto;
+		min-height: 100%;
+		border: 1px solid var(--music-app-border);
+		background: var(--music-app-panel);
+	}
+
+	.music-page__feature-media {
+		min-height: 320px;
+		background: #101115;
+	}
+
+	.music-page__feature-image {
+		display: block;
+		width: 100%;
+		height: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+	}
+
+	.music-page__feature-copy {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		min-width: 0;
+		padding: 24px;
+		border-top: 1px solid var(--music-app-border);
+		background: var(--music-app-panel-2);
+	}
+
+	.music-page__feature-title {
+		margin: 0;
+		color: var(--music-app-text);
+		font-family: var(--font-serif);
+		font-size: clamp(1.65rem, 3vw, 2.35rem);
+		font-weight: 500;
+		letter-spacing: 0;
+		line-height: 1.05;
+	}
+
+	.music-page__feature-subtitle {
+		margin: 0.45rem 0 1.2rem;
+		color: var(--music-app-muted);
+		font-size: var(--font-size-sm);
+		line-height: 1.45;
+	}
+
+	.music-page__feature-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		color: var(--music-app-muted);
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: var(--font-size-xs);
+	}
+
+	.music-page__feature-meta span {
+		display: inline-flex;
+		align-items: center;
+		min-height: 1.7rem;
+		padding: 0 0.65rem;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.06);
 	}
 
 	.music-page__section-label-wrap {
-		margin-bottom: 1.25rem;
+		margin-bottom: 12px;
 	}
 
 	.music-page__platforms {
-		padding-top: 4rem;
-	}
-
-	.music-page__platform-row { gap: var(--music-platform-gap); }
-
-	.music-page__platform-chip {
-		gap: var(--music-chip-gap);
-		padding: var(--music-chip-padding);
-		font-size: var(--music-chip-font);
-	}
-
-	.music-page__platform-icon {
-		min-width: var(--music-icon-size);
-		height: var(--music-icon-size);
-		font-size: var(--music-icon-font);
+		grid-area: listen;
+		align-self: end;
+		min-width: 0;
 	}
 
 	.music-page__entries {
-		padding-top: 4.5rem;
-	}
-
-	.music-page__entry-link {
-		gap: var(--music-list-gap);
-		padding: var(--music-list-row-padding);
-	}
-
-	.music-page__entry-num {
-		font-size: var(--music-date-font);
-	}
-
-	.music-page__entry-title {
-		font-size: var(--music-title-font);
-	}
-
-	.music-page__entry-tag {
-		font-size: var(--music-tag-font);
-		padding: var(--music-tag-padding);
-		border-radius: var(--music-tag-radius);
-	}
-
-	.music-page__entry-date {
-		font-size: var(--music-date-font);
-		min-width: 6.2rem;
+		grid-area: entries;
+		min-width: 0;
 	}
 
 	.music-page__closing-wrap {
-		padding-top: 5rem;
+		grid-area: closing;
+		min-width: 0;
+		padding: 16px 0 8px;
+		border-top: 1px solid var(--music-app-border);
 	}
 
-	@media (max-width: 43.75em) {
-		.music-page__platform-row {
-			gap: var(--space-2);
+	.music-page__platform-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+
+	.music-page__platform-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		min-height: 42px;
+		padding: 0 16px 0 12px;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.04);
+		color: var(--music-app-text);
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: 13px;
+		font-weight: var(--font-weight-medium);
+		text-decoration: none;
+		transition:
+			background 0.16s ease,
+			border-color 0.16s ease;
+	}
+
+	.music-page__platform-chip:hover {
+		background: var(--music-app-soft);
+		border-color: rgba(255, 255, 255, 0.28);
+	}
+
+	.music-page__platform-icon {
+		display: inline-grid;
+		place-items: center;
+		min-width: 20px;
+		height: 20px;
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.12);
+		color: var(--music-app-text);
+		font-size: 10px;
+		line-height: 1;
+	}
+
+	.music-page__entry-list {
+		display: grid;
+		gap: 0;
+		margin: 0;
+		padding: 0;
+		border: 1px solid var(--music-app-border);
+		background: var(--music-app-panel);
+		list-style: none;
+	}
+
+	.music-page__entry-item {
+		min-width: 0;
+	}
+
+	.music-page__entry-link {
+		display: grid;
+		grid-template-columns: 2.25rem minmax(0, 1fr) auto minmax(6.3rem, auto);
+		align-items: center;
+		gap: 0.9rem;
+		min-height: 50px;
+		padding: 0 14px;
+		border-bottom: 1px solid var(--music-app-border);
+		background: transparent;
+		color: var(--music-app-text);
+		text-decoration: none;
+		transition: background 0.16s ease;
+	}
+
+	.music-page__entry-item:last-child .music-page__entry-link {
+		border-bottom: 0;
+	}
+
+	.music-page__entry-link:hover {
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.music-page__entry-num,
+	.music-page__entry-tag,
+	.music-page__entry-date {
+		color: var(--music-app-muted);
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: 12px;
+	}
+
+	.music-page__entry-title {
+		min-width: 0;
+		color: var(--music-app-text);
+		font-size: 14px;
+		font-weight: var(--font-weight-medium);
+		overflow-wrap: anywhere;
+	}
+
+	.music-page__entry-tag {
+		padding: 0.18rem 0.55rem;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 8px;
+	}
+
+	.music-page__entry-date {
+		text-align: right;
+	}
+
+	:global(.music-page__closing) {
+		max-width: 100%;
+		color: var(--music-app-text);
+	}
+
+	:global(.music-page__closing .ui-page-closing__divider) {
+		display: none;
+	}
+
+	:global(.music-page__closing .ui-page-closing__title),
+	:global(.music-page__closing .ui-page-closing__link) {
+		color: var(--music-app-text);
+	}
+
+	:global(.music-page__closing .ui-page-closing__copy) {
+		color: var(--music-app-muted);
+	}
+
+	@media (max-width: 768px) {
+		.music-page__studio {
+			flex-direction: column;
+		}
+
+		.music-page__rail {
+			width: 100%;
+			min-width: 0;
+			min-height: 48px;
+			height: 48px;
+			flex-direction: row;
+			align-items: center;
+			overflow-x: auto;
+			padding: 0 16px;
+			border-right: 0;
+			border-bottom: 1px solid var(--music-app-border);
+		}
+
+		.music-page__rail-link {
+			flex: 0 0 auto;
+			flex-direction: row;
+			width: auto;
+			min-height: 48px;
+			padding: 0 10px;
+			white-space: nowrap;
+		}
+
+		.music-page__rail-icon {
+			width: 24px;
+			height: 24px;
+		}
+
+		.music-page__workspace {
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-areas:
+				'hero'
+				'feature'
+				'listen'
+				'entries'
+				'closing';
+			min-height: 0;
+			padding: 16px;
+			gap: 18px;
+		}
+
+		.music-page__title {
+			font-size: clamp(36px, 14vw, 56px);
+		}
+
+		.music-page__feature {
+			min-height: 0;
+		}
+
+		.music-page__feature-media {
+			min-height: 0;
 		}
 
 		.music-page__platform-chip {
-			padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3);
-			font-size: var(--music-section-label-size);
+			min-height: 40px;
+			padding-right: 12px;
+			font-size: 12px;
 		}
 
 		.music-page__entry-link {
-			grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+			grid-template-columns: 1.55rem minmax(0, 1fr) auto;
+			gap: 0.6rem;
+			min-height: 54px;
+			padding: 0.55rem 0.65rem;
 		}
 
 		.music-page__entry-tag {
 			display: none;
+		}
+
+		.music-page__entry-date {
+			min-width: 4.8rem;
 		}
 	}
 </style>
