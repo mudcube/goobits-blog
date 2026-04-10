@@ -66,15 +66,6 @@
 		}))
 	}
 
-	function getCardClass(idx) {
-		return [
-			'music-page__card',
-			idx === 1 || idx === 5 ? 'music-page__card--lower' : '',
-			idx === 3 || idx === 7 ? 'music-page__card--lift' : ''
-		]
-			.filter(Boolean)
-			.join(' ')
-	}
 </script>
 
 <Seo
@@ -130,7 +121,7 @@
 
 			<div class="music-page__grid">
 				{#each getPortfolioEntries() as entry, idx}
-					<a href={entry.href} class={getCardClass(idx)}>
+					<a href={entry.href} class="music-page__card">
 						<div class="music-page__card-art">
 							<img src={entry.image} alt={entry.alt} loading={idx === 0 ? 'eager' : 'lazy'} fetchpriority={idx === 0 ? 'high' : 'auto'} decoding="async" />
 							<div class="music-page__card-shade"></div>
@@ -199,29 +190,36 @@
 	}
 
 	.music-page__hero {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		min-height: 716px;
-		padding: 10rem clamp(2rem, 6vw, 5rem) 6rem;
+		display: grid;
+		grid-template-columns:
+			minmax(var(--layout-inline-gutter), 1fr)
+			minmax(0, var(--max-width))
+			minmax(var(--layout-inline-gutter), 1fr);
+		align-content: center;
+		min-height: min(716px, calc(100svh - var(--header-height)));
+		padding: var(--space-12) 0;
 		background:
 			radial-gradient(circle at 80% 20%, rgba(172, 138, 255, 0.15) 0%, rgba(6, 14, 32, 0) 60%),
 			var(--music-surface);
 	}
 
+	.music-page__hero > * {
+		grid-column: 2;
+	}
+
 	.music-page__hero-copy {
-		max-width: 64rem;
+		max-width: var(--hero-max-width);
 	}
 
 	.music-page__title {
-		max-width: 60rem;
-		margin: 0 0 2rem;
+		max-width: var(--hero-max-width);
+		margin: 0 0 var(--hero-title-margin-bottom);
 		color: var(--music-text);
 		font-family: var(--font-serif);
-		font-size: clamp(3rem, 7vw, 6rem);
-		font-weight: 700;
-		letter-spacing: 0;
-		line-height: 1.1;
+		font-size: clamp(2rem, 4.7vw, 3.25rem);
+		font-weight: 400;
+		letter-spacing: -0.024em;
+		line-height: 1.14;
 		text-wrap: balance;
 
 		span {
@@ -231,10 +229,10 @@
 	}
 
 	.music-page__intro {
-		max-width: 42rem;
+		max-width: var(--hero-subtitle-max-width);
 		margin: 0;
 		color: var(--music-muted);
-		font-size: clamp(1.125rem, 2vw, 1.25rem);
+		font-size: var(--font-size-lg);
 		letter-spacing: 0;
 		line-height: 1.7;
 		text-wrap: pretty;
@@ -243,12 +241,12 @@
 	.music-page__signal {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
-		margin-top: 4rem;
+		gap: var(--space-4);
+		margin-top: var(--space-12);
 		color: var(--music-secondary);
-		font-size: 0.75rem;
+		font-size: var(--font-size-xs);
 		font-weight: var(--font-weight-semibold);
-		letter-spacing: 0.3em;
+		letter-spacing: 0.09em;
 		text-transform: uppercase;
 	}
 
@@ -261,21 +259,21 @@
 	.music-page__platforms {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 1rem;
-		margin-top: 2rem;
+		gap: var(--space-3);
+		margin-top: var(--space-6);
 	}
 
 	.music-page__platform-chip {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.6rem;
-		min-height: 2.75rem;
-		padding: 0 1rem 0 0.75rem;
-		border: 1px solid rgba(101, 117, 158, 0.28);
-		border-radius: 0.75rem;
+		min-height: 2.6rem;
+		padding: 0 var(--space-4) 0 var(--space-3);
+		border: var(--border-width) solid rgba(101, 117, 158, 0.28);
+		border-radius: var(--radius-md);
 		background: rgba(23, 43, 84, 0.34);
 		color: var(--music-text);
-		font-size: 0.8rem;
+		font-size: var(--font-size-xs);
 		font-weight: var(--font-weight-semibold);
 		letter-spacing: 0.04em;
 		text-decoration: none;
@@ -298,7 +296,7 @@
 		place-items: center;
 		min-width: 1.5rem;
 		height: 1.5rem;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		background: rgba(172, 138, 255, 0.18);
 		color: var(--music-text);
 		font-size: 0.65rem;
@@ -306,35 +304,41 @@
 	}
 
 	.music-page__portfolio {
-		padding: 6rem clamp(2rem, 6vw, 5rem);
+		display: grid;
+		grid-template-columns:
+			minmax(var(--layout-inline-gutter), 1fr)
+			minmax(0, var(--max-width))
+			minmax(var(--layout-inline-gutter), 1fr);
+		padding: var(--space-12) 0;
 		background: var(--music-surface-low);
 	}
 
 	.music-page__portfolio-head {
+		grid-column: 2;
 		display: flex;
 		align-items: flex-end;
 		justify-content: space-between;
-		gap: 1.5rem;
-		margin-bottom: 4rem;
+		gap: var(--space-6);
+		margin-bottom: var(--space-10);
 	}
 
 	.music-page__section-title {
-		margin: 0 0 0.5rem;
+		margin: 0 0 var(--space-2);
 		color: var(--music-text);
 		font-family: var(--font-serif);
-		font-size: clamp(2.5rem, 4vw, 3.5rem);
-		font-weight: 700;
-		letter-spacing: 0;
-		line-height: 1.05;
+		font-size: clamp(1.45rem, 2.8vw, 1.75rem);
+		font-weight: 400;
+		letter-spacing: -0.015em;
+		line-height: 1.18;
 	}
 
 	.music-page__section-kicker,
 	.music-page__filter {
 		margin: 0;
 		color: var(--music-muted);
-		font-size: 0.75rem;
+		font-size: var(--font-size-xs);
 		font-weight: var(--font-weight-semibold);
-		letter-spacing: 0.18em;
+		letter-spacing: 0.09em;
 		text-transform: uppercase;
 	}
 
@@ -342,18 +346,19 @@
 		display: inline-flex;
 		align-items: center;
 		min-height: 2.25rem;
-		padding: 0 1rem;
-		border: 1px solid rgba(101, 117, 158, 0.2);
-		border-radius: 0.75rem;
+		padding: 0 var(--space-4);
+		border: var(--border-width) solid rgba(101, 117, 158, 0.2);
+		border-radius: var(--radius-md);
 		background: var(--music-surface-high);
 		color: var(--music-text);
 		white-space: nowrap;
 	}
 
 	.music-page__grid {
+		grid-column: 2;
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: clamp(2rem, 3vw, 3rem);
+		gap: var(--space-8);
 	}
 
 	.music-page__card {
@@ -375,19 +380,11 @@
 		}
 	}
 
-	.music-page__card--lower {
-		margin-top: 3rem;
-	}
-
-	.music-page__card--lift {
-		margin-top: -1.5rem;
-	}
-
 	.music-page__card-art {
 		position: relative;
 		aspect-ratio: 1;
 		overflow: hidden;
-		border-radius: 0.5rem;
+		border-radius: var(--radius-md);
 		background: var(--music-surface-highest);
 		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
 
@@ -412,8 +409,8 @@
 		top: 1rem;
 		right: 1rem;
 		padding: 0.25rem 0.75rem;
-		border: 1px solid rgba(76, 215, 246, 0.2);
-		border-radius: 0.75rem;
+		border: var(--border-width) solid rgba(76, 215, 246, 0.2);
+		border-radius: var(--radius-md);
 		background: rgba(0, 42, 51, 0.6);
 		color: var(--music-secondary-on-container);
 		font-size: 0.625rem;
@@ -438,7 +435,7 @@
 		width: 4rem;
 		height: 4rem;
 		border: 1px solid rgba(172, 138, 255, 0.4);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		background: rgba(172, 138, 255, 0.2);
 		box-shadow: 0 0 30px rgba(172, 138, 255, 0.4);
 		color: var(--music-text);
@@ -455,16 +452,16 @@
 	}
 
 	.music-page__card-copy {
-		margin-top: 1.5rem;
+		margin-top: var(--space-5);
 
 		h3 {
-			margin: 0 0 0.5rem;
+			margin: 0 0 var(--space-2);
 			color: var(--music-text);
 			font-family: var(--font-serif);
-			font-size: 1.5rem;
-			font-weight: 700;
-			letter-spacing: 0;
-			line-height: 1.15;
+			font-size: var(--font-size-xl);
+			font-weight: 400;
+			letter-spacing: -0.015em;
+			line-height: 1.2;
 			overflow-wrap: anywhere;
 		}
 
@@ -473,37 +470,40 @@
 			display: block;
 			margin: 0;
 			color: var(--music-tertiary);
-			font-size: 0.625rem;
+			font-size: var(--font-size-xs);
 			font-weight: 700;
-			letter-spacing: 0.2em;
+			letter-spacing: 0.09em;
 			text-transform: uppercase;
 		}
 
 		time {
-			margin-top: 0.45rem;
+			margin-top: var(--space-1);
 			color: var(--music-muted);
 		}
 	}
 
 	.music-page__inquiry {
-		display: flex;
-		justify-content: center;
-		padding: 8rem clamp(2rem, 6vw, 5rem);
+		display: grid;
+		grid-template-columns:
+			minmax(var(--layout-inline-gutter), 1fr)
+			minmax(0, var(--max-width))
+			minmax(var(--layout-inline-gutter), 1fr);
+		padding: var(--space-12) 0;
 		background: var(--music-surface);
 	}
 
 	.music-page__inquiry-panel {
+		grid-column: 2;
 		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 3rem;
+		gap: var(--space-10);
 		width: 100%;
-		max-width: 64rem;
 		overflow: hidden;
-		padding: clamp(3rem, 6vw, 5rem);
-		border: 1px solid rgba(56, 71, 109, 0.1);
-		border-radius: 0.5rem;
+		padding: var(--space-10);
+		border: var(--border-width) solid rgba(56, 71, 109, 0.1);
+		border-radius: var(--radius-md);
 		background: rgba(23, 43, 84, 0.4);
 		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
 
@@ -541,13 +541,13 @@
 
 	.music-page__inquiry-copy {
 		h2 {
-			margin: 0 0 1.5rem;
+			margin: 0 0 var(--space-6);
 			color: var(--music-text);
 			font-family: var(--font-serif);
-			font-size: clamp(2.5rem, 5vw, 4rem);
-			font-weight: 700;
-			letter-spacing: 0;
-			line-height: 1.05;
+			font-size: clamp(1.45rem, 2.8vw, 1.75rem);
+			font-weight: 400;
+			letter-spacing: -0.015em;
+			line-height: 1.18;
 
 			span {
 				color: var(--music-secondary);
@@ -559,7 +559,7 @@
 			max-width: 28rem;
 			margin: 0;
 			color: var(--music-muted);
-			font-size: 1.125rem;
+			font-size: var(--font-size-base);
 			line-height: 1.6;
 		}
 	}
@@ -570,11 +570,11 @@
 		justify-content: center;
 		min-height: 3.75rem;
 		padding: 0 3rem;
-		border-radius: 0.25rem;
+		border-radius: var(--radius-md);
 		background: linear-gradient(90deg, var(--music-primary), var(--music-primary-dim));
 		box-shadow: 0 0 40px -5px rgba(172, 138, 255, 0.4);
 		color: #000;
-		font-size: 0.875rem;
+		font-size: var(--font-size-xs);
 		font-weight: 700;
 		letter-spacing: 0.14em;
 		text-decoration: none;
@@ -597,8 +597,9 @@
 
 	@media (max-width: 768px) {
 		.music-page__hero {
-			min-height: 650px;
-			padding: 8rem 2rem 4rem;
+			min-height: 0;
+			padding-top: var(--space-12);
+			padding-bottom: var(--space-12);
 		}
 
 		.music-page__platforms {
@@ -606,7 +607,8 @@
 		}
 
 		.music-page__portfolio {
-			padding: 5rem 2rem;
+			padding-top: var(--space-12);
+			padding-bottom: var(--space-12);
 		}
 
 		.music-page__portfolio-head,
@@ -619,22 +621,13 @@
 			grid-template-columns: minmax(0, 1fr);
 		}
 
-		.music-page__card--lower,
-		.music-page__card--lift {
-			margin-top: 0;
-		}
-
 		.music-page__inquiry {
-			padding: 6rem 2rem;
+			padding-top: var(--space-12);
+			padding-bottom: var(--space-12);
 		}
 	}
 
 	@media (max-width: 480px) {
-		.music-page__hero {
-			padding-right: 1.25rem;
-			padding-left: 1.25rem;
-		}
-
 		.music-page__signal {
 			align-items: flex-start;
 			flex-direction: column;
@@ -645,14 +638,8 @@
 			justify-content: center;
 		}
 
-		.music-page__portfolio,
-		.music-page__inquiry {
-			padding-right: 1.25rem;
-			padding-left: 1.25rem;
-		}
-
 		.music-page__inquiry-panel {
-			padding: 2rem;
+			padding: var(--space-8);
 		}
 	}
 </style>
