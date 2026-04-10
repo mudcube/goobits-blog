@@ -87,6 +87,7 @@
 	<div class="music-page" id="music">
 		<section class="music-page__hero" aria-labelledby="music-page-title">
 			<div class="music-page__hero-copy">
+				<p class="music-page__eyebrow">Music</p>
 				<h1 id="music-page-title" class="music-page__title">
 					Songs, sketches, and <span>sound experiments</span>
 				</h1>
@@ -153,26 +154,30 @@
 <style lang="scss">
 	:global(.ui-page-shell.music-page) {
 		grid-template-columns: minmax(0, 1fr);
-		padding-top: 0;
+		padding-top: var(--page-shell-space-top);
 		padding-bottom: 0;
-		background: #060e20;
-		color: #dee5ff;
+		background: transparent;
+		color: var(--text);
 	}
 
 	:global(.ui-page-shell.music-page > *) {
 		grid-column: 1;
 	}
 
+	:global(body:has(.ui-page-shell.music-page) .layout-footer) {
+		margin-top: 0;
+	}
+
 	.music-page {
-		--music-background: #060e20;
-		--music-surface: #060e20;
-		--music-surface-low: #081329;
-		--music-surface-container: #0c1934;
-		--music-surface-high: #101e3e;
-		--music-surface-highest: #142449;
-		--music-surface-bright: #172b54;
-		--music-text: #dee5ff;
-		--music-muted: #9baad6;
+		--music-background: var(--bg);
+		--music-surface: color-mix(in srgb, var(--bg) 94%, var(--brand-primary) 6%);
+		--music-surface-low: color-mix(in srgb, var(--bg) 88%, var(--brand-primary) 12%);
+		--music-surface-container: color-mix(in srgb, var(--panel-bg) 82%, var(--brand-primary) 18%);
+		--music-surface-high: color-mix(in srgb, var(--card-bg) 76%, var(--brand-primary) 24%);
+		--music-surface-highest: color-mix(in srgb, var(--card-bg) 64%, var(--brand-primary) 36%);
+		--music-surface-bright: color-mix(in srgb, var(--card-bg) 56%, var(--brand-primary) 44%);
+		--music-text: var(--text);
+		--music-muted: var(--muted);
 		--music-primary: #ac8aff;
 		--music-primary-dim: #8455ef;
 		--music-secondary: #4cd7f6;
@@ -180,8 +185,8 @@
 		--music-secondary-on-container: #00b3d1;
 		--music-tertiary: #fea619;
 		--music-tertiary-on-container: #4f3000;
-		--music-outline: #65759e;
-		--music-outline-variant: #38476d;
+		--music-outline: color-mix(in srgb, var(--border) 80%, var(--text));
+		--music-outline-variant: color-mix(in srgb, var(--border) 68%, transparent);
 		width: 100%;
 		overflow: hidden;
 		background: var(--music-background);
@@ -196,10 +201,15 @@
 			minmax(0, var(--max-width))
 			minmax(var(--layout-inline-gutter), 1fr);
 		align-content: center;
-		min-height: min(716px, calc(100svh - var(--header-height)));
-		padding: var(--space-12) 0;
+		margin-top: calc(var(--page-shell-space-top) * -1);
+		padding: var(--page-shell-space-top) 0 var(--space-8);
 		background:
-			radial-gradient(circle at 80% 20%, rgba(172, 138, 255, 0.15) 0%, rgba(6, 14, 32, 0) 60%),
+			radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--music-primary) 14%, transparent) 0%, transparent 58%),
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--music-surface) 92%, var(--music-surface-low)) 0%,
+				var(--music-surface) 100%
+			),
 			var(--music-surface);
 	}
 
@@ -209,6 +219,15 @@
 
 	.music-page__hero-copy {
 		max-width: var(--hero-max-width);
+	}
+
+	.music-page__eyebrow {
+		margin: 0 0 var(--hero-eyebrow-margin-bottom);
+		color: var(--music-muted);
+		font-size: var(--font-size-xs);
+		font-weight: var(--font-weight-semibold);
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
 	}
 
 	.music-page__title {
@@ -310,7 +329,12 @@
 			minmax(0, var(--max-width))
 			minmax(var(--layout-inline-gutter), 1fr);
 		padding: var(--space-12) 0;
-		background: var(--music-surface-low);
+		background:
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--music-surface-low) 94%, var(--music-surface)) 0%,
+				color-mix(in srgb, var(--music-surface-low) 88%, var(--music-surface-high)) 100%
+			);
 	}
 
 	.music-page__portfolio-head {
@@ -357,7 +381,8 @@
 	.music-page__grid {
 		grid-column: 2;
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(3, minmax(0, var(--project-card-width)));
+		justify-content: space-between;
 		gap: var(--space-8);
 	}
 
@@ -382,10 +407,11 @@
 
 	.music-page__card-art {
 		position: relative;
-		aspect-ratio: 1;
+		aspect-ratio: 4 / 3;
 		overflow: hidden;
 		border-radius: var(--radius-md);
-		background: var(--music-surface-highest);
+		background:
+			linear-gradient(180deg, var(--music-surface-bright) 0%, var(--music-surface-highest) 100%);
 		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
 
 		img {
@@ -488,8 +514,13 @@
 			minmax(var(--layout-inline-gutter), 1fr)
 			minmax(0, var(--max-width))
 			minmax(var(--layout-inline-gutter), 1fr);
-		padding: var(--space-12) 0;
-		background: var(--music-surface);
+		padding: var(--space-10) 0;
+		background:
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--music-surface-high) 82%, var(--music-surface-low)) 0%,
+				var(--music-surface) 100%
+			);
 	}
 
 	.music-page__inquiry-panel {
@@ -591,15 +622,20 @@
 
 	@media (max-width: 1024px) {
 		.music-page__grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-columns: repeat(2, minmax(0, var(--project-card-width)));
+			justify-content: center;
 		}
 	}
 
 	@media (max-width: 768px) {
+		:global(.ui-page-shell.music-page) {
+			padding-top: var(--page-shell-space-top-mobile);
+		}
+
 		.music-page__hero {
-			min-height: 0;
-			padding-top: var(--space-12);
-			padding-bottom: var(--space-12);
+			margin-top: calc(var(--page-shell-space-top-mobile) * -1);
+			padding-top: var(--page-shell-space-top-mobile);
+			padding-bottom: var(--space-8);
 		}
 
 		.music-page__platforms {
@@ -622,8 +658,8 @@
 		}
 
 		.music-page__inquiry {
-			padding-top: var(--space-12);
-			padding-bottom: var(--space-12);
+			padding-top: var(--space-9);
+			padding-bottom: var(--space-9);
 		}
 	}
 
