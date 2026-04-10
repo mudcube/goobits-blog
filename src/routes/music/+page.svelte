@@ -84,6 +84,20 @@
 					<p class="music-page__eyebrow">Music</p>
 					<h1 id="music-page-title" class="music-page__title">Songs, sketches, and sound experiments</h1>
 					<p class="music-page__intro">Melody has always been part of the build process. Tracks, demos, and music-related experiments from Miko.</p>
+
+					<div id="listen" class="music-page__platforms" aria-label="Listening platforms">
+						<div class="music-page__section-label-wrap">
+							<SectionLabel text="Listen" />
+						</div>
+						<div class="music-page__platform-row">
+							{#each platforms as item}
+								<a href={item.href} class="music-page__platform-chip">
+									<span class="music-page__platform-icon" aria-hidden="true">{item.icon}</span>
+									{item.label}
+								</a>
+							{/each}
+						</div>
+					</div>
 				</section>
 
 				<section class="music-page__feature" aria-labelledby="music-feature-title">
@@ -98,20 +112,6 @@
 							<span>{featuredTrack.tag}</span>
 							<span>{formatDateMonthDayYearShort(featuredTrack.date)}</span>
 						</div>
-					</div>
-				</section>
-
-				<section id="listen" class="music-page__platforms" aria-label="Listening platforms">
-					<div class="music-page__section-label-wrap">
-						<SectionLabel text="Listen" />
-					</div>
-					<div class="music-page__platform-row">
-						{#each platforms as item}
-							<a href={item.href} class="music-page__platform-chip">
-								<span class="music-page__platform-icon" aria-hidden="true">{item.icon}</span>
-								{item.label}
-							</a>
-						{/each}
 					</div>
 				</section>
 
@@ -244,7 +244,6 @@
 		grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
 		grid-template-areas:
 			'hero feature'
-			'listen feature'
 			'entries entries'
 			'closing closing';
 		gap: 24px;
@@ -259,6 +258,10 @@
 	.music-page__hero {
 		grid-area: hero;
 		max-width: 48rem;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: 32px;
 	}
 
 	.music-page__eyebrow {
@@ -364,8 +367,6 @@
 	}
 
 	.music-page__platforms {
-		grid-area: listen;
-		align-self: end;
 		min-width: 0;
 	}
 
@@ -540,7 +541,6 @@
 			grid-template-areas:
 				'hero'
 				'feature'
-				'listen'
 				'entries'
 				'closing';
 			min-height: 0;
