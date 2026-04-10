@@ -15,6 +15,7 @@
     "auth:push": "git diff --quiet && git diff --cached --quiet || (echo 'Working tree is dirty; commit or stash before pushing subtree.' && exit 1); git subtree push --prefix=packages/auth goobits-auth main",
     "auth:status": "git log -1 --grep='git-subtree-dir: packages/auth' --pretty=format:'%h %s%n%n%B'",
     "build": "pnpm exec svelte-kit sync && NODE_ENV=production vite build",
+    "build:cf": "git lfs version && git lfs pull && pnpm build",
     "build:patch": "pnpm run version:patch && pnpm run build",
     "calendar:sync": "node ops/cron/calendar-sync.mjs",
     "check": "pnpm run check:types && pnpm run check:svelte && pnpm run check:lint && pnpm run check:circular",
