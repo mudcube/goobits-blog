@@ -1,14 +1,27 @@
 <script lang="ts">
-	import type { Component } from 'svelte'
+	import type { Component, Snippet } from 'svelte'
 
-	export let type: 'button' | 'submit' | 'reset' = 'button'
-	export let variant: 'primary' | 'subtle' | 'danger' = 'subtle'
-	export let disabled = false
-	export let href: string | null = null
-	export let icon: Component | null = null
-	export let iconSize = 14
-	export let ariaLabel: string | undefined = undefined
-	export let onclick: ((event: MouseEvent) => void) | undefined = undefined
+	let {
+		type = 'button',
+		variant = 'subtle',
+		disabled = false,
+		href = null,
+		icon = null,
+		iconSize = 14,
+		ariaLabel = undefined,
+		onclick = undefined,
+		children
+	}: {
+		type?: 'button' | 'submit' | 'reset'
+		variant?: 'primary' | 'subtle' | 'danger'
+		disabled?: boolean
+		href?: string | null
+		icon?: Component | null
+		iconSize?: number
+		ariaLabel?: string | undefined
+		onclick?: ((event: MouseEvent) => void) | undefined
+		children?: Snippet
+	} = $props()
 </script>
 
 {#if href}
@@ -22,13 +35,13 @@
 			onclick?.(event as MouseEvent)
 		}}
 	>
-		{#if icon}<svelte:component this={icon} size={iconSize} strokeWidth={2} />{/if}
-		<slot />
+		{#if icon}<icon size={iconSize} strokeWidth={2}></icon>{/if}
+		{@render children?.()}
 	</a>
 {:else}
 	<button class={`admin-ui-btn admin-ui-btn--${variant} admin-action-btn admin-action-btn--${variant}`} {type} {disabled} aria-label={ariaLabel} {onclick}>
-		{#if icon}<svelte:component this={icon} size={iconSize} strokeWidth={2} />{/if}
-		<slot />
+		{#if icon}<icon size={iconSize} strokeWidth={2}></icon>{/if}
+		{@render children?.()}
 	</button>
 {/if}
 

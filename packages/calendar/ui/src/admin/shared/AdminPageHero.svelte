@@ -1,7 +1,17 @@
 <script lang="ts">
-	export let eyebrow = ''
-	export let title = ''
-	export let subtitle = ''
+	import type { Snippet } from 'svelte'
+
+	let {
+		eyebrow = '',
+		title = '',
+		subtitle = '',
+		actions
+	}: {
+		eyebrow?: string
+		title?: string
+		subtitle?: string
+		actions?: Snippet
+	} = $props()
 </script>
 
 <section class="admin-page-hero" data-testid="admin-page-hero">
@@ -15,7 +25,7 @@
 		{/if}
 	</div>
 	<div class="admin-page-hero__actions">
-		<slot name="actions" />
+		{@render actions?.()}
 	</div>
 </section>
 

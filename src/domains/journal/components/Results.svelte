@@ -1,19 +1,16 @@
 <script>
 	import MetadataValues from '@src/domains/journal/components/MetadataValues.svelte'
+	import { formatJournalLabel } from '@src/domains/journal/viewmodel'
 	import PublicBreadcrumbs from '$lib/app/shell/PublicBreadcrumbs.svelte'
 
-	/** @type {[]} */
-	export let posts = []
-	export let category = ''
-	export let showBackButton = true
-	/** @type {'category' | 'tag'} */
-	export const type = 'category'
+	/** @type {{ posts?: any[]; category?: string; showBackButton?: boolean; type?: 'category' | 'tag' }} */
+	let {
+		posts = [],
+		category = '',
+		showBackButton = true,
+		type = 'category'
+	} = $props()
 
-	const formatValue = (value) => {
-		return value.split('-')
-			.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-			.join(' ')
-	}
 </script>
 
 {#if showBackButton}
@@ -21,14 +18,14 @@
 		items={[
 			{ label: 'Home', href: '/' },
 			{ label: 'Journal', href: '/journal' },
-			{ label: formatValue(category) }
+			{ label: formatJournalLabel(category) }
 		]}
 	/>
 {/if}
 
 <div class="journal-results">
     <h1>
-        {formatValue(category)}
+        {formatJournalLabel(category)}
     </h1>
     {#each posts as post}
         <article>

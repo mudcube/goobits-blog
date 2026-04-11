@@ -1,4 +1,5 @@
 <script>
+	import { Badge, Box, Frame, HandCoins } from '@lucide/svelte'
 	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero } from '@miko/ui'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 
@@ -6,10 +7,10 @@
 		'Selected visual experiments, product concepts, merch ideas, packaging directions, and interactive art by Miko Meow.'
 
 	const workTypes = [
-		{ label: 'Merch', href: '/contact?from=art&topic=merch', icon: 'M' },
-		{ label: 'Packaging', href: '/contact?from=art&topic=packaging', icon: 'P' },
-		{ label: 'Exhibits', href: '/contact?from=art&topic=venue', icon: 'E' },
-		{ label: 'Commissions', href: '/contact?from=art&topic=commissions_exhibits', icon: 'C' }
+		{ label: 'Merch', href: '/contact?from=art&topic=merch', icon: Badge },
+		{ label: 'Packaging', href: '/contact?from=art&topic=packaging', icon: Box },
+		{ label: 'Exhibits', href: '/contact?from=art&topic=venue', icon: Frame },
+		{ label: 'Commissions', href: '/contact?from=art&topic=commissions_exhibits', icon: HandCoins }
 	]
 
 	const works = [

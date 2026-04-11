@@ -1,12 +1,10 @@
 <script>
-	export let values = []
-	export let type = 'category' // 'category' or 'tag'
+	import { formatJournalLabel } from '@src/domains/journal/viewmodel'
 
-	const formatValue = (value) => {
-		return value.split('-')
-			.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-			.join(' ')
-	}
+	let {
+		values = [],
+		type = 'category' // 'category' or 'tag'
+	} = $props()
 
 	const slugifyValue = (value) => {
 		return value.toLowerCase().replace(/\s+/g, '-')
@@ -16,7 +14,7 @@
 <div class="metadata-values">
     {#each values as value}
         <a href={`/journal/${type}/${slugifyValue(value)}`}>
-            <span class="metadata-values__value">{formatValue(value)}</span>
+            <span class="metadata-values__value">{formatJournalLabel(value)}</span>
         </a>
     {/each}
 </div>

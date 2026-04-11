@@ -1,8 +1,10 @@
 <script>
+  import { AppWindow, Palette, Pipette, Wrench } from "@lucide/svelte";
   import { PageShell, ResultsEmpty, SearchField, ShowcaseHero } from "@miko/ui";
   import { slugify } from "$lib/utils/collections";
   import { formatDateMonthDay } from "$lib/utils/date";
   import {
+    formatJournalLabel,
     filterAndSortJournalPosts,
     getFirstCategory,
     getJournalCategories,
@@ -25,6 +27,19 @@
   ];
 
   const availableCategories = $derived(getJournalCategories(data.posts));
+  const categoryIcons = {
+    apps: AppWindow,
+    "code-art": Palette,
+    colrd: Pipette,
+    diy: Wrench,
+  };
+  const heroCategories = $derived(
+    availableCategories.slice(0, 4).map((category) => ({
+      label: formatJournalLabel(category),
+      href: `/journal/category/${slugify(category)}`,
+      icon: categoryIcons[category] ?? AppWindow,
+    })),
+  );
   const filteredPosts = $derived(
     filterAndSortJournalPosts(
       data.posts,
@@ -56,12 +71,13 @@
   <div class="showcase-page__inner journal-page__inner">
     <ShowcaseHero
       eyebrow="Journal"
-      title="Notes, process, and"
-      titleAccent="small breakthroughs"
+      title="Ideas, process, and"
+      titleAccent="notes"
       icon="/media/journal-journaling.png"
       iconAlt="Journal icon"
-      intro="Thoughts on creative coding, design tools, music experiments, product work, and web development."
-      signalLabel="Filed by topic and year"
+      intro="Thoughts on creative coding, design tools, music experiments, product work, and the small breakthroughs that happen while building."
+      signalLabel="Field Notes No. 027"
+      chips={heroCategories}
     />
 
     <section class="journal-page__toolbar" aria-label="Journal filters">
@@ -82,7 +98,7 @@
         >
           <option value="all">All categories</option>
           {#each availableCategories as category}
-            <option value={category}>{category}</option>
+            <option value={category}>{formatJournalLabel(category)}</option>
           {/each}
         </select>
       </label>
@@ -141,7 +157,7 @@
                         class="journal-page__tag"
                         href={`/journal/category/${slugify(getFirstCategory(post))}`}
                       >
-                        {getFirstCategory(post)}
+                        {formatJournalLabel(getFirstCategory(post))}
                       </a>
                     {/if}
                   </div>
@@ -164,12 +180,12 @@
     --showcase-surface-bright: color-mix(in srgb, var(--card-bg) 70%, #e7d7b1 30%);
     --showcase-text: var(--text);
     --showcase-muted: color-mix(in srgb, var(--muted) 92%, var(--text));
-    --showcase-primary: #c87b36;
-    --showcase-primary-dim: #8a5525;
-    --showcase-secondary: #7a8ca5;
+    --showcase-primary: #f2b35b;
+    --showcase-primary-dim: #c87b36;
+    --showcase-secondary: #9ec5f8;
     --showcase-outline-variant: color-mix(in srgb, var(--border) 72%, transparent);
-    --showcase-glow-primary: rgba(200, 123, 54, 0.08);
-    --showcase-glow-secondary: rgba(122, 140, 165, 0.06);
+    --showcase-glow-primary: rgba(242, 179, 91, 0.1);
+    --showcase-glow-secondary: rgba(158, 197, 248, 0.06);
     --showcase-hero-shadow: rgba(18, 14, 10, 0.06);
   }
 
