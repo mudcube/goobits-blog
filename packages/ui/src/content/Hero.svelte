@@ -108,10 +108,23 @@
 		flex-direction: column;
 		position: relative;
 		isolation: isolate;
-		max-width: var(--hero-max-width);
+		width: 100%;
+		max-width: none;
 		margin: 0 0 var(--hero-margin-bottom);
 		padding-top: var(--hero-padding-top, var(--space-8));
 		padding-bottom: var(--hero-padding-bottom, var(--space-8));
+	}
+
+	.ui-hero::after {
+		position: absolute;
+		inset: auto auto 0 50%;
+		z-index: -1;
+		width: 100vw;
+		height: 1px;
+		transform: translateX(-50%);
+		content: '';
+		background: color-mix(in srgb, var(--border) 26%, transparent);
+		pointer-events: none;
 	}
 
 	.ui-hero::before {
@@ -149,6 +162,7 @@
 	.ui-hero > :global(*) {
 		position: relative;
 		z-index: 1;
+		max-width: var(--hero-max-width);
 	}
 
 	.ui-hero--compact {

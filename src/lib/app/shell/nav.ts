@@ -14,7 +14,6 @@ export function getHeaderNavItems(activeStage: ReleaseStage): NavItem[] {
 }
 
 export const footerPrimaryItems: NavItem[] = [
-	{ href: '/journal', label: 'Journal' },
 	{ href: '/labs', label: 'Labs' }
 ]
 

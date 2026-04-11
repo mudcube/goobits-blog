@@ -28,14 +28,15 @@ function getRuntimeEnv() {
 
 export const releasedRoutes: ReleasedRoute[] = [
 	{ path: '/art', stage: 'preview' },
-	{ path: '/music', stage: 'live' }
+	{ path: '/music', stage: 'preview' }
 ]
 
 export const releasedHeaderNavItems: ReleasedNavItem[] = [
 	{ href: '/', label: 'Apps', stages: ['live'] },
 	{ href: '/art', label: 'Art', matchPrefix: true, stages: ['preview'] },
-	{ href: '/music', label: 'Music', matchPrefix: true, stages: ['live', 'preview'] },
-	{ href: '/about', label: 'Me', stages: ['live', 'preview'] }
+	{ href: '/music', label: 'Music', matchPrefix: true, stages: ['preview'] },
+	{ href: '/journal', label: 'Journal', matchPrefix: true, stages: ['live', 'preview'] },
+	{ href: '/about', label: 'Profile', stages: ['live', 'preview'] }
 ]
 
 export function normalizeReleaseStage(value: string | null | undefined): ReleaseStage {
