@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte'
+
 	type HeroProps = {
 		eyebrow?: string
 		title?: string
@@ -13,6 +15,7 @@
 		eyebrowClass?: string
 		titleClass?: string
 		subtitleClass?: string
+		children?: Snippet
 		compact?: boolean
 	}
 
@@ -32,6 +35,7 @@
 		eyebrowClass = '',
 		titleClass = '',
 		subtitleClass = '',
+		children,
 		compact = false
 	}: HeroProps = $props()
 
@@ -95,16 +99,61 @@
 	{#if subtitle}
 		<p class={`ui-hero__subtitle ${subtitleClass}`.trim()}>{subtitle}</p>
 	{/if}
+	{@render children?.()}
 </section>
 
 <style>
 	.ui-hero {
+		display: flex;
+		flex-direction: column;
+		position: relative;
+		isolation: isolate;
 		max-width: var(--hero-max-width);
 		margin: 0 0 var(--hero-margin-bottom);
+		padding-top: var(--hero-padding-top, var(--space-8));
+		padding-bottom: var(--hero-padding-bottom, var(--space-8));
+	}
+
+	.ui-hero::before {
+		position: absolute;
+		inset: 0 auto 0 50%;
+		z-index: -2;
+		width: 100vw;
+		transform: translateX(-50%);
+		content: '';
+		background:
+			radial-gradient(circle at 78% 18%, rgba(172, 138, 255, 0.14) 0%, rgba(172, 138, 255, 0) 36%),
+			radial-gradient(circle at 18% 6%, rgba(76, 215, 246, 0.08) 0%, rgba(76, 215, 246, 0) 28%),
+			linear-gradient(
+				180deg,
+				rgba(6, 14, 32, 0.18) 0%,
+				color-mix(in srgb, var(--panel-bg) 12%, transparent) 42%,
+				transparent 100%
+			);
+		pointer-events: none;
+	}
+
+	.ui-hero__glow {
+		position: absolute;
+		inset: 0 auto auto 50%;
+		z-index: -1;
+		width: 100vw;
+		height: 100%;
+		transform: translateX(-50%);
+		background:
+			radial-gradient(circle at 82% 0, rgba(172, 138, 255, 0.16) 0%, rgba(172, 138, 255, 0) 22rem),
+			radial-gradient(circle at 16% 0, rgba(76, 215, 246, 0.08) 0%, rgba(76, 215, 246, 0) 18rem);
+		pointer-events: none;
+	}
+
+	.ui-hero > :global(*) {
+		position: relative;
+		z-index: 1;
 	}
 
 	.ui-hero--compact {
 		margin-bottom: var(--space-6);
+		padding-bottom: var(--space-6);
 	}
 
 	.ui-hero__eyebrow {
@@ -150,13 +199,15 @@
 		width: var(--hero-icon-size);
 		height: var(--hero-icon-size);
 		display: inline-block;
-		vertical-align: var(--hero-icon-offset-y);
+		vertical-align: var(--hero-icon-offset-y, -0.12em);
 		object-fit: contain;
 	}
 
 	@media (max-width: 760px) {
 		.ui-hero {
 			margin-bottom: var(--space-8);
+			padding-top: var(--hero-padding-top-mobile, var(--space-7));
+			padding-bottom: var(--hero-padding-bottom-mobile, var(--space-7));
 		}
 	}
 </style>

@@ -15,9 +15,9 @@
 
 <style>
 	.ui-page-shell {
-		--page-shell-space-top: 3.1rem;
+		--page-shell-space-top: 0;
 		--page-shell-space-bottom: 5.25rem;
-		--page-shell-space-top-mobile: 2.4rem;
+		--page-shell-space-top-mobile: 0;
 
 		display: grid;
 		grid-template-columns:

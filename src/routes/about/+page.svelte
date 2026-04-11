@@ -84,37 +84,37 @@
 		icon="/media/about-kitty-unicorn.png"
 		iconAlt="Unicorn kitty icon"
 		subtitle="Developer, designer & musician"
-	/>
-
-	<section class="about-page__intro">
-		<figure class="about-page__photo">
-			<img
-				src="/media/miko.jpg"
-				alt="Portrait of Miko"
-				width="160"
-				height="160"
-				loading="eager"
-				decoding="async"
-				fetchpriority="high"
-			/>
-		</figure>
-		<div class="about-page__bio">
-			<p>I'm passionate about creating colorful, creative & educational applications.</p>
-			<p>
-				Founder & CTO of
-				<strong><a href="https://sketch.io" target="_blank" rel="noreferrer noopener nofollow">Sketch.IO</a></strong>,
-				creators of Sketchpad 🎨
-			</p>
-			<p>
-				Co-Founder of <strong>Portlandia Foods</strong>, creators of Portland Ketchup 🪴
-				<span class="about-page__acquired">Acquired 2023</span>
-			</p>
-			<p>
-				Co-Founder of <strong>Lyrics Freak</strong> 🎵
-				<span class="about-page__acquired">Acquired 2010</span>
-			</p>
-		</div>
-	</section>
+	>
+		<section class="about-page__intro">
+			<figure class="about-page__photo">
+				<img
+					src="/media/miko.jpg"
+					alt="Portrait of Miko"
+					width="160"
+					height="160"
+					loading="eager"
+					decoding="async"
+					fetchpriority="high"
+				/>
+			</figure>
+			<div class="about-page__bio">
+				<p>I'm passionate about creating colorful, creative & educational applications.</p>
+				<p>
+					Founder & CTO of
+					<strong><a href="https://sketch.io" target="_blank" rel="noreferrer noopener nofollow">Sketch.IO</a></strong>,
+					creators of Sketchpad 🎨
+				</p>
+				<p>
+					Co-Founder of <strong>Portlandia Foods</strong>, creators of Portland Ketchup 🪴
+					<span class="about-page__acquired">Acquired 2023</span>
+				</p>
+				<p>
+					Co-Founder of <strong>Lyrics Freak</strong> 🎵
+					<span class="about-page__acquired">Acquired 2010</span>
+				</p>
+			</div>
+		</section>
+	</Hero>
 
 	<section class="about-page__columns">
 		<article>

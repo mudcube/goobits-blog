@@ -89,7 +89,19 @@
 			<div class="music-page__hero-copy">
 				<p class="music-page__eyebrow">Music</p>
 				<h1 id="music-page-title" class="music-page__title">
-					Songs, sketches, and <span>sound experiments</span>
+					Songs, sketches, and
+					<span
+						>sound experiments<span class="music-page__title-icon-wrap"
+							><img
+								src="/media/music-notes-flow.png"
+								alt="Music notes icon"
+								class="music-page__title-icon"
+								loading="eager"
+								fetchpriority="high"
+								decoding="async"
+							/></span
+						></span
+					>
 				</h1>
 				<p class="music-page__intro">
 					Exploring the thin membrane between build sessions and sonic textures. Tracks, demos, and music-related experiments from Miko.
@@ -168,13 +180,6 @@
 		margin-top: 0;
 	}
 
-	:global(body:has(.ui-page-shell.music-page) main) {
-		background:
-			radial-gradient(circle at 82% 9rem, rgba(172, 138, 255, 0.34) 0%, rgba(172, 138, 255, 0.16) 18rem, rgba(172, 138, 255, 0) 40rem),
-			radial-gradient(circle at 72% 14rem, rgba(76, 215, 246, 0.12) 0%, rgba(76, 215, 246, 0) 28rem),
-			var(--bg);
-	}
-
 	.music-page {
 		--music-background: var(--bg);
 		--music-surface: color-mix(in srgb, var(--bg) 94%, var(--brand-primary) 6%);
@@ -208,13 +213,15 @@
 			minmax(0, var(--max-width))
 			minmax(var(--layout-inline-gutter), 1fr);
 		align-content: center;
-		margin-top: calc(var(--page-shell-space-top) * -1);
-		padding: var(--page-shell-space-top) 0 var(--space-8);
+		padding: var(--space-8) 0 var(--space-8);
 		background:
+			radial-gradient(circle at 78% 18%, rgba(172, 138, 255, 0.14) 0%, rgba(172, 138, 255, 0) 36%),
+			radial-gradient(circle at 18% 6%, rgba(76, 215, 246, 0.08) 0%, rgba(76, 215, 246, 0) 28%),
 			linear-gradient(
 				180deg,
-				color-mix(in srgb, var(--music-surface) 78%, transparent) 0%,
-				color-mix(in srgb, var(--music-surface-low) 84%, transparent) 100%
+				rgba(6, 14, 32, 0.28) 0%,
+				color-mix(in srgb, var(--music-surface-low) 84%, transparent) 42%,
+				color-mix(in srgb, var(--music-surface-low) 92%, transparent) 100%
 			),
 			transparent;
 	}
@@ -251,6 +258,20 @@
 			color: var(--music-primary);
 			font-style: italic;
 		}
+	}
+
+	.music-page__title-icon-wrap {
+		display: inline-block;
+		margin-left: 0.25em;
+		white-space: nowrap;
+	}
+
+	.music-page__title-icon {
+		display: inline-block;
+		width: clamp(2rem, 4.2vw, 2.6rem);
+		height: clamp(2rem, 4.2vw, 2.6rem);
+		object-fit: contain;
+		vertical-align: -0.12em;
 	}
 
 	.music-page__intro {
@@ -296,7 +317,8 @@
 		padding: 0 var(--space-4) 0 var(--space-3);
 		border: var(--border-width) solid rgba(101, 117, 158, 0.28);
 		border-radius: var(--radius-md);
-		background: rgba(23, 43, 84, 0.34);
+		background: rgba(23, 43, 84, 0.3);
+		backdrop-filter: blur(12px);
 		color: var(--music-text);
 		font-size: var(--font-size-xs);
 		font-weight: var(--font-weight-semibold);
@@ -639,8 +661,7 @@
 		}
 
 		.music-page__hero {
-			margin-top: calc(var(--page-shell-space-top-mobile) * -1);
-			padding-top: var(--page-shell-space-top-mobile);
+			padding-top: var(--space-7);
 			padding-bottom: var(--space-8);
 		}
 

@@ -102,6 +102,17 @@
 	--header-bg: var(--brand-primary);
 	--header-border: var(--brand-dark);
 	--header-shadow: var(--brand-primary);
+	--header-gradient:
+		radial-gradient(circle at 78% 1.5rem, rgba(172, 138, 255, 0.2) 0%, rgba(172, 138, 255, 0.1) 16rem, rgba(172, 138, 255, 0) 34rem),
+		radial-gradient(circle at 16% -4rem, rgba(76, 215, 246, 0.12) 0%, rgba(76, 215, 246, 0) 24rem),
+		linear-gradient(180deg, rgba(6, 14, 32, 0.9) 0%, rgba(6, 14, 32, 0.72) 100%);
+	--header-nav-color: rgba(255, 255, 255, 0.82);
+	--header-nav-hover: #ffffff;
+	--header-nav-accent: #4cd7f6;
+	--site-main-background:
+		radial-gradient(circle at 82% 0, rgba(172, 138, 255, 0.28) 0%, rgba(172, 138, 255, 0.12) 18rem, rgba(172, 138, 255, 0) 42rem),
+		radial-gradient(circle at 18% 0, rgba(76, 215, 246, 0.1) 0%, rgba(76, 215, 246, 0) 24rem),
+		linear-gradient(180deg, #060e20 0%, color-mix(in srgb, var(--bg) 88%, #060e20) 18rem, var(--bg) 40rem);
 	--footer-bg: var(--brand-primary);
 	--footer-gradient:
 		radial-gradient(120% 140% at 12% 0%, color-mix(in srgb, var(--link) 14%, transparent) 0%, transparent 58%),
@@ -516,6 +527,7 @@ button {
 }
 
 main {
+	background: var(--site-main-background, transparent);
 	display: block;
 	flex: 1;
 	font-weight: 300;

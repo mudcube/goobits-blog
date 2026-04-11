@@ -32,11 +32,10 @@ export const releasedRoutes: ReleasedRoute[] = [
 ]
 
 export const releasedHeaderNavItems: ReleasedNavItem[] = [
-	{ href: '/', label: 'Home', stages: ['live'] },
+	{ href: '/', label: 'Apps', stages: ['live'] },
 	{ href: '/art', label: 'Art', matchPrefix: true, stages: ['preview'] },
 	{ href: '/music', label: 'Music', matchPrefix: true, stages: ['live', 'preview'] },
-	{ href: '/about', label: 'About', stages: ['live', 'preview'] },
-	{ href: '/contact?from=topbar', label: 'Contact', matchPrefix: true, stages: ['live', 'preview'] }
+	{ href: '/about', label: 'Me', stages: ['live', 'preview'] }
 ]
 
 export function normalizeReleaseStage(value: string | null | undefined): ReleaseStage {
