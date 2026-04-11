@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte'
+	import type { Component, Snippet } from 'svelte'
 
 	type ShowcaseChip = {
 		href: string
 		label: string
-		icon?: string
+		icon?: string | Component
 	}
 
 	type ShowcaseHeroProps = {
@@ -69,14 +69,20 @@
 
 	{#if chips.length}
 		<div class="showcase-hero__chips" aria-label={`${eyebrow} links`}>
-			{#each chips as chip}
-				<a href={chip.href} class="showcase-hero__chip">
-					{#if chip.icon}
-						<span class="showcase-hero__chip-icon" aria-hidden="true">{chip.icon}</span>
-					{/if}
-					{chip.label}
-				</a>
-			{/each}
+				{#each chips as chip}
+					<a href={chip.href} class="showcase-hero__chip">
+						{#if chip.icon}
+							<span class="showcase-hero__chip-icon" aria-hidden="true">
+								{#if typeof chip.icon === 'string'}
+									{chip.icon}
+								{:else}
+									<chip.icon size={14} strokeWidth={2.2} />
+								{/if}
+							</span>
+						{/if}
+						{chip.label}
+					</a>
+				{/each}
 		</div>
 	{/if}
 
