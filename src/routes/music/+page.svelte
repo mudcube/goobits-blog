@@ -168,6 +168,13 @@
 		margin-top: 0;
 	}
 
+	:global(body:has(.ui-page-shell.music-page) main) {
+		background:
+			radial-gradient(circle at 82% 9rem, rgba(172, 138, 255, 0.34) 0%, rgba(172, 138, 255, 0.16) 18rem, rgba(172, 138, 255, 0) 40rem),
+			radial-gradient(circle at 72% 14rem, rgba(76, 215, 246, 0.12) 0%, rgba(76, 215, 246, 0) 28rem),
+			var(--bg);
+	}
+
 	.music-page {
 		--music-background: var(--bg);
 		--music-surface: color-mix(in srgb, var(--bg) 94%, var(--brand-primary) 6%);
@@ -189,7 +196,7 @@
 		--music-outline-variant: color-mix(in srgb, var(--border) 68%, transparent);
 		width: 100%;
 		overflow: hidden;
-		background: var(--music-background);
+		background: transparent;
 		color: var(--music-text);
 		font-family: var(--font-ui-sans, var(--font-sans));
 	}
@@ -204,13 +211,12 @@
 		margin-top: calc(var(--page-shell-space-top) * -1);
 		padding: var(--page-shell-space-top) 0 var(--space-8);
 		background:
-			radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--music-primary) 14%, transparent) 0%, transparent 58%),
 			linear-gradient(
 				180deg,
-				color-mix(in srgb, var(--music-surface) 92%, var(--music-surface-low)) 0%,
-				var(--music-surface) 100%
+				color-mix(in srgb, var(--music-surface) 78%, transparent) 0%,
+				color-mix(in srgb, var(--music-surface-low) 84%, transparent) 100%
 			),
-			var(--music-surface);
+			transparent;
 	}
 
 	.music-page__hero > * {
