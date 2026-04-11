@@ -32,7 +32,7 @@ export const releasedRoutes: ReleasedRoute[] = [
 ]
 
 export const releasedHeaderNavItems: ReleasedNavItem[] = [
-	{ href: '/', label: 'Apps', stages: ['live'] },
+	{ href: '/', label: 'Apps', stages: ['live', 'preview'] },
 	{ href: '/art', label: 'Art', matchPrefix: true, stages: ['preview'] },
 	{ href: '/music', label: 'Music', matchPrefix: true, stages: ['preview'] },
 	{ href: '/journal', label: 'Journal', matchPrefix: true, stages: ['live', 'preview'] },

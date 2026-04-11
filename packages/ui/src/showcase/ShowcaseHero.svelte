@@ -42,19 +42,19 @@
 			{#if titleAccent}
 				<span>
 					{titleAccent}
-					{#if icon}
-						<span class="showcase-hero__title-icon-wrap"
-							><img
-								src={icon}
-								alt={iconAlt}
-								class="showcase-hero__title-icon"
-								loading="eager"
-								fetchpriority="high"
-								decoding="async"
-							/></span
-						>
-					{/if}
 				</span>
+			{/if}
+			{#if icon}
+				<span class="showcase-hero__title-icon-wrap"
+					><img
+						src={icon}
+						alt={iconAlt}
+						class="showcase-hero__title-icon"
+						loading="eager"
+						fetchpriority="high"
+						decoding="async"
+					/></span
+				>
 			{/if}
 		</h1>
 		<p class="showcase-hero__intro">{intro}</p>
@@ -125,6 +125,18 @@
 				color-mix(in srgb, var(--showcase-surface-low) 92%, transparent) 100%
 			),
 			transparent;
+		pointer-events: none;
+	}
+
+	.showcase-hero::after {
+		position: absolute;
+		inset: auto auto 0 50%;
+		z-index: 0;
+		width: 100vw;
+		height: 1px;
+		transform: translateX(-50%);
+		content: '';
+		background: color-mix(in srgb, var(--border) 26%, transparent);
 		pointer-events: none;
 	}
 

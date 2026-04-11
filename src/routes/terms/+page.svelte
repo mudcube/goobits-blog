@@ -21,7 +21,9 @@
 />
 
 <LegalPage
-	title="Terms of Use"
+	title="Terms of"
+	titleAccent="Use"
+	accentColor="#f9a8d4"
 	icon="/media/terms-justice.png"
 	subtitle="A quick guide to using this site smoothly."
 	updatedAt="February 11, 2026"

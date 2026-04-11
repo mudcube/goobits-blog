@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Hero, PageShell, ResultsEmpty, SearchField } from "@miko/ui";
+  import { PageShell, ResultsEmpty, SearchField, ShowcaseHero } from "@miko/ui";
   import { formatDateMmDdYyyy } from "$lib/utils/date";
   import {
     filterAndSortDirectoryItems,
@@ -64,9 +64,16 @@
   );
 </script>
 
-<PageShell className="directory-page">
-  <div class="directory-page__inner">
-    <Hero {eyebrow} {title} {subtitle} {icon} {iconAlt} />
+<PageShell className="directory-page showcase-page">
+  <div class="showcase-page__inner directory-page__inner">
+    <ShowcaseHero
+      {eyebrow}
+      {title}
+      intro={subtitle}
+      {icon}
+      {iconAlt}
+      signalLabel={`${items.length} ${itemLabel}${items.length === 1 ? "" : "s"} indexed`}
+    />
 
     <section class="directory-page__toolbar" aria-label={`${title} filters`}>
       <SearchField
@@ -145,11 +152,31 @@
 </PageShell>
 
 <style>
+  .directory-page {
+    --showcase-surface: color-mix(in srgb, var(--bg) 95%, #7a8ca5 5%);
+    --showcase-surface-low: color-mix(in srgb, var(--bg) 91%, #7a8ca5 9%);
+    --showcase-surface-high: color-mix(in srgb, var(--card-bg) 82%, #7a8ca5 18%);
+    --showcase-surface-highest: color-mix(in srgb, var(--card-bg) 72%, #e7d7b1 28%);
+    --showcase-surface-bright: color-mix(in srgb, var(--card-bg) 68%, #e7d7b1 32%);
+    --showcase-text: var(--text);
+    --showcase-muted: color-mix(in srgb, var(--muted) 92%, var(--text));
+    --showcase-primary: #5d8c7b;
+    --showcase-primary-dim: #3e675a;
+    --showcase-secondary: #a7b8c9;
+    --showcase-outline-variant: color-mix(in srgb, var(--border) 72%, transparent);
+    --showcase-glow-primary: rgba(93, 140, 123, 0.08);
+    --showcase-glow-secondary: rgba(167, 184, 201, 0.08);
+    --showcase-hero-shadow: rgba(12, 18, 20, 0.08);
+  }
+
   .directory-page__toolbar {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     flex-wrap: wrap;
+    width: 100%;
+    max-width: var(--max-width);
+    justify-self: center;
   }
 
   :global(.directory-page__search) {
@@ -193,6 +220,9 @@
     font-size: var(--font-size-xs);
     color: color-mix(in srgb, var(--muted) 92%, var(--text));
     font-family: var(--font-sans);
+    width: 100%;
+    max-width: var(--max-width);
+    justify-self: center;
   }
 
   .directory-page__grid {
@@ -202,6 +232,9 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.25rem;
+    width: 100%;
+    max-width: var(--max-width);
+    justify-self: center;
   }
 
   .directory-page__item {

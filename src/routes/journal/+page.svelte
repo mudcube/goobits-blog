@@ -1,5 +1,5 @@
 <script>
-  import { Hero, ResultsEmpty, PageShell, SearchField } from "@miko/ui";
+  import { PageShell, ResultsEmpty, SearchField, ShowcaseHero } from "@miko/ui";
   import { slugify } from "$lib/utils/collections";
   import { formatDateMonthDay } from "$lib/utils/date";
   import {
@@ -52,14 +52,16 @@
   ]}
 />
 
-<PageShell className="journal-page">
-  <div class="journal-page__inner">
-    <Hero
+<PageShell className="journal-page showcase-page showcase-page--journal">
+  <div class="showcase-page__inner journal-page__inner">
+    <ShowcaseHero
       eyebrow="Journal"
-      title="Journal"
+      title="Notes, process, and"
+      titleAccent="small breakthroughs"
       icon="/media/journal-journaling.png"
       iconAlt="Journal icon"
-      subtitle="Thoughts, process notes, and little breakthroughs."
+      intro="Thoughts on creative coding, design tools, music experiments, product work, and web development."
+      signalLabel="Filed by topic and year"
     />
 
     <section class="journal-page__toolbar" aria-label="Journal filters">
@@ -154,11 +156,31 @@
 </PageShell>
 
 <style>
+  .journal-page {
+    --showcase-surface: color-mix(in srgb, var(--bg) 96%, #c87b36 4%);
+    --showcase-surface-low: color-mix(in srgb, var(--bg) 92%, #c87b36 8%);
+    --showcase-surface-high: color-mix(in srgb, var(--card-bg) 84%, #e7d7b1 16%);
+    --showcase-surface-highest: color-mix(in srgb, var(--card-bg) 76%, #e7d7b1 24%);
+    --showcase-surface-bright: color-mix(in srgb, var(--card-bg) 70%, #e7d7b1 30%);
+    --showcase-text: var(--text);
+    --showcase-muted: color-mix(in srgb, var(--muted) 92%, var(--text));
+    --showcase-primary: #c87b36;
+    --showcase-primary-dim: #8a5525;
+    --showcase-secondary: #7a8ca5;
+    --showcase-outline-variant: color-mix(in srgb, var(--border) 72%, transparent);
+    --showcase-glow-primary: rgba(200, 123, 54, 0.08);
+    --showcase-glow-secondary: rgba(122, 140, 165, 0.06);
+    --showcase-hero-shadow: rgba(18, 14, 10, 0.06);
+  }
+
   .journal-page__toolbar {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     flex-wrap: wrap;
+    width: 100%;
+    max-width: var(--max-width);
+    justify-self: center;
   }
 
   :global(.journal-page__search) {
@@ -222,10 +244,16 @@
     font-size: var(--font-size-xs);
     color: color-mix(in srgb, var(--muted) 92%, var(--text));
     font-family: var(--font-sans);
+    width: 100%;
+    max-width: var(--max-width);
+    justify-self: center;
   }
 
   .journal-page__year-group {
     margin-bottom: 2rem;
+    width: 100%;
+    max-width: var(--max-width);
+    justify-self: center;
   }
 
   .journal-page__year {

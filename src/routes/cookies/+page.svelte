@@ -21,7 +21,9 @@
 />
 
 <LegalPage
-	title="Cookie Policy"
+	title="Cookie"
+	titleAccent="Policy"
+	accentColor="#fdba74"
 	icon="/media/cookies-cookie.png"
 	subtitle="What cookies do here, and what they don't."
 	updatedAt="February 11, 2026"

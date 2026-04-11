@@ -1,4 +1,4 @@
-.ui-page-shell.showcase-page {
+.ui-page-shell.ui-page-shell.showcase-page {
 	grid-template-columns: minmax(0, 1fr);
 	padding-top: var(--page-shell-space-top);
 	padding-bottom: 0;
@@ -6,16 +6,17 @@
 	color: var(--text);
 }
 
-.ui-page-shell.showcase-page > * {
+.ui-page-shell.ui-page-shell.showcase-page > * {
 	grid-column: 1;
 }
 
-.ui-page-shell.showcase-page .showcase-page__inner {
+.ui-page-shell.ui-page-shell.showcase-page .showcase-page__inner {
 	width: 100%;
 	display: contents;
 }
 
-.ui-page-shell.showcase-page :where(.showcase-hero, .showcase-grid, .showcase-cta) {
+.ui-page-shell.ui-page-shell.showcase-page > :where(.showcase-hero, .showcase-grid, .showcase-cta),
+.ui-page-shell.ui-page-shell.showcase-page :where(.showcase-hero, .showcase-grid, .showcase-cta) {
 	grid-column: 1 / -1;
 }
 

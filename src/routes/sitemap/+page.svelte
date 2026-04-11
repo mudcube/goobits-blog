@@ -3,11 +3,11 @@
 	import {
 		FilterChipGroup,
 		FilterableCollection,
-		Hero,
 		PageContainer,
 		PageShell,
 		SearchToolbar,
 		SegmentedControl,
+		ShowcaseHero,
 		SitemapCategory
 	} from '@miko/ui'
 	import { formatDateMmDdYyyy } from '$lib/utils/date'
@@ -86,14 +86,16 @@
 	]}
 />
 
-<PageShell className="sitemap-page">
-	<div class="sitemap-page__inner">
-		<Hero
+<PageShell className="sitemap-page showcase-page showcase-page--sitemap">
+	<div class="showcase-page__inner sitemap-page__inner">
+		<ShowcaseHero
 			eyebrow="Sitemap"
-			title="Sitemap"
+			title="A friendly map of"
+			titleAccent="everything here"
 			icon="/media/sitemap-compass.png"
 			iconAlt="Compass icon"
-			subtitle="A friendly map of everything on this site."
+			intro="A human-readable map of public pages, journal entries, and the standard routes that shape the site."
+			signalLabel={`${data.stats.total} routes indexed`}
 		/>
 
 		<PageContainer className="sitemap-page__content">
@@ -154,6 +156,23 @@
 </PageShell>
 
 <style>
+	:global(.sitemap-page) {
+		--showcase-surface: color-mix(in srgb, var(--bg) 95%, #5d8c7b 5%);
+		--showcase-surface-low: color-mix(in srgb, var(--bg) 91%, #5d8c7b 9%);
+		--showcase-surface-high: color-mix(in srgb, var(--card-bg) 82%, #a7b8c9 18%);
+		--showcase-surface-highest: color-mix(in srgb, var(--card-bg) 74%, #a7b8c9 26%);
+		--showcase-surface-bright: color-mix(in srgb, var(--card-bg) 68%, #e6c7a1 32%);
+		--showcase-text: var(--text);
+		--showcase-muted: color-mix(in srgb, var(--muted) 92%, var(--text));
+		--showcase-primary: #5d8c7b;
+		--showcase-primary-dim: #3e675a;
+		--showcase-secondary: #a7b8c9;
+		--showcase-outline-variant: color-mix(in srgb, var(--border) 72%, transparent);
+		--showcase-glow-primary: rgba(93, 140, 123, 0.08);
+		--showcase-glow-secondary: rgba(167, 184, 201, 0.08);
+		--showcase-hero-shadow: rgba(12, 18, 20, 0.08);
+	}
+
 	.sitemap-page__inner {
 		--sitemap-controls-gap: 0.7rem;
 		--sitemap-filters-gap: 0.6rem;
@@ -167,6 +186,13 @@
 		display: grid;
 		gap: var(--sitemap-controls-gap);
 		margin-bottom: 1.25rem;
+	}
+
+	:global(.sitemap-page__content) {
+		width: 100%;
+		max-width: var(--max-width);
+		justify-self: center;
+		padding-top: var(--space-6);
 	}
 
 	.sitemap-page__filters {

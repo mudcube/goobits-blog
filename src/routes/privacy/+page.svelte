@@ -21,7 +21,9 @@
 />
 
 <LegalPage
-	title="Privacy Policy"
+	title="Privacy"
+	titleAccent="Policy"
+	accentColor="#67e8f9"
 	icon="/media/privacy-shield.png"
 	subtitle="What I collect, why, and how it is protected."
 	updatedAt="February 11, 2026"
