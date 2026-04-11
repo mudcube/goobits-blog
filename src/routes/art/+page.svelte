@@ -1,64 +1,80 @@
 <script>
-	import { Hero, PageClosing, PageShell } from '@miko/ui'
+	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero } from '@miko/ui'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 
 	const description =
 		'Selected visual experiments, product concepts, merch ideas, packaging directions, and interactive art by Miko Meow.'
+
+	const workTypes = [
+		{ label: 'Merch', href: '/contact?from=art&topic=merch', icon: 'M' },
+		{ label: 'Packaging', href: '/contact?from=art&topic=packaging', icon: 'P' },
+		{ label: 'Exhibits', href: '/contact?from=art&topic=venue', icon: 'E' },
+		{ label: 'Commissions', href: '/contact?from=art&topic=commissions_exhibits', icon: 'C' }
+	]
 
 	const works = [
 		{
 			title: 'Portland Ketchup Summer Tee',
 			category: 'T-shirt design',
 			image: '/media/stubs/product-stub-1.svg',
-			note: 'Playful bottle mascot system and back-print layout for a seasonal apparel drop.'
+			note: 'Playful bottle mascot system and back-print layout for a seasonal apparel drop.',
+			badge: 'Screen Print Ready'
 		},
 		{
 			title: 'Late-Night Fries Club Shirt',
 			category: 'T-shirt design',
 			image: '/media/stubs/product-stub-2.svg',
-			note: 'Bold one-color graphic concept built for high-contrast screen printing.'
+			note: 'Bold one-color graphic concept built for high-contrast screen printing.',
+			badge: 'Merch System'
 		},
 		{
 			title: 'Ketchup & Friends Sticker Set',
 			category: 'Merch',
 			image: '/media/stubs/product-stub-3.svg',
-			note: 'Character-led sticker sheet ideas with alternate expressions and mini slogans.'
+			note: 'Character-led sticker sheet ideas with alternate expressions and mini slogans.',
+			badge: 'Character Pack'
 		},
 		{
 			title: 'Hot Dog Cart Label Refresh',
 			category: 'Packaging',
 			image: '/media/stubs/product-stub-4.svg',
-			note: 'Retro-inspired label direction balancing shelf readability with playful voice.'
+			note: 'Retro-inspired label direction balancing shelf readability with playful voice.',
+			badge: 'Shelf Refresh'
 		},
 		{
 			title: 'Funny Condiment Pin Collection',
 			category: 'Accessories',
 			image: '/media/stubs/product-stub-5.svg',
-			note: 'Enamel pin concepts featuring cheeky micro-copy and icon-forward silhouettes.'
+			note: 'Enamel pin concepts featuring cheeky micro-copy and icon-forward silhouettes.',
+			badge: 'Product Drop'
 		},
 		{
 			title: 'Weekend Market Tote Series',
 			category: 'Soft goods',
 			image: '/media/stubs/product-stub-6.svg',
-			note: 'Reusable tote family with modular lockups for events, popups, and collabs.'
+			note: 'Reusable tote family with modular lockups for events, popups, and collabs.',
+			badge: 'Retail Set'
 		},
 		{
 			title: 'Snackline Poster Pack',
 			category: 'Print',
 			image: '/media/stubs/product-stub-7.svg',
-			note: 'Whimsical promotional posters designed as companion pieces to apparel launches.'
+			note: 'Whimsical promotional posters designed as companion pieces to apparel launches.',
+			badge: 'Campaign Art'
 		},
 		{
 			title: 'Pickle Parade Apron',
 			category: 'Kitchenware',
 			image: '/media/stubs/product-stub-8.svg',
-			note: 'Front-pocket print layout with oversized character art and punchy typography.'
+			note: 'Front-pocket print layout with oversized character art and punchy typography.',
+			badge: 'Kitchen Collab'
 		},
 		{
 			title: 'Festival Booth Sign Kit',
 			category: 'Brand system',
 			image: '/media/stubs/product-stub-9.svg',
-			note: 'Coordinated signage concepts tying merch, menu boards, and giveaway cards together.'
+			note: 'Coordinated signage concepts tying merch, menu boards, and giveaway cards together.',
+			badge: 'Booth System'
 		}
 	]
 </script>
@@ -78,122 +94,112 @@
 	]}
 />
 
-<PageShell className="art-page">
-	<div class="art-page__inner">
-		<Hero
+<PageShell className="showcase-page showcase-page--art">
+	<div class="showcase-page__inner">
+		<ShowcaseHero
 			eyebrow="Art"
-			titleLines={['Product design, playful merch,', 'and weirdly fun ideas']}
+			title="Product concepts, merch, and"
+			titleAccent="visual experiments"
 			icon="/media/art-rainbow-imagination.png"
 			iconAlt="Art rainbow icon"
-			subtitle="A working gallery of t-shirt concepts, Portland Ketchup experiments, packaging directions, and other product-ready visuals."
+			intro="A working gallery of t-shirt concepts, Portland Ketchup experiments, packaging directions, and other product-ready visuals."
+			signalLabel="Studio Board No. 019"
+			chips={workTypes}
 		/>
 
-		<section class="art-page__works" aria-label="Selected works">
-			{#each works as work}
-				<article class="art-page__work">
-					<div class="art-page__image-wrap">
-						<img src={work.image} alt={work.title} loading="lazy" />
-					</div>
-					<p class="art-page__work-type">{work.category}</p>
-					<h2>{work.title}</h2>
-					<p>{work.note}</p>
-				</article>
+		<ShowcaseGrid title="Selected Works" kicker="Objects, visuals, and playful product directions" filterLabel="View // Mixed Media">
+			{#each works as work, idx}
+				<ShowcaseCard
+					href="/contact?from=art&topic=commissions_exhibits"
+					image={work.image}
+					alt={work.title}
+					badge={work.badge}
+					badgeTone={idx % 2 === 0 ? 'warm' : 'cool'}
+					title={work.title}
+					meta={work.category}
+					description={work.note}
+					playLabel="View"
+					loading="lazy"
+					fetchpriority="auto"
+				/>
 			{/each}
-		</section>
+		</ShowcaseGrid>
 
-		<PageClosing
-			className="art-page__closing"
-			label="Commissions & Exhibits"
-			title="Interested in working together?"
-			copy="Custom visual work, installations, or exhibition collaborations. Let&apos;s talk about what you have in mind."
+		<ShowcaseCTA
+			title="Need a custom"
+			titleAccent="visual system?"
+			copy="Custom visual work, installations, product concepts, or exhibition collaborations."
 			href="/contact?from=art&topic=commissions_exhibits"
-			linkLabel="Get in touch"
-			maxWidth="31.25rem"
+			linkLabel="Get in Touch"
 		/>
 	</div>
 </PageShell>
 
 <style lang="scss">
-	.art-page__inner {
-		--art-grid-gap-row: 2.4rem;
-		--art-grid-gap-col: 1.5rem;
-		--art-image-radius: 11px;
-		--art-image-margin: 0.9rem;
-		--art-title-font: 1.03rem;
-		--art-title-margin: 0 0 0.2rem;
-		--art-type-font: 0.7rem;
-		--art-copy-font: 0.9rem;
-		--art-mobile-gap: 2.2rem;
+	:global(.ui-page-shell.showcase-page--art) {
+		--showcase-surface: color-mix(in srgb, var(--bg) 94%, var(--brand-primary) 6%);
+		--showcase-surface-low: color-mix(in srgb, var(--bg) 88%, var(--brand-primary) 12%);
+		--showcase-surface-high: color-mix(in srgb, var(--card-bg) 76%, var(--brand-primary) 24%);
+		--showcase-surface-highest: color-mix(in srgb, var(--card-bg) 64%, #8b5cf6 36%);
+		--showcase-surface-bright: color-mix(in srgb, var(--card-bg) 56%, #a78bfa 44%);
+		--showcase-text: var(--text);
+		--showcase-muted: var(--muted);
+		--showcase-primary: #ac8aff;
+		--showcase-primary-dim: #8455ef;
+		--showcase-secondary: #4cd7f6;
+		--showcase-secondary-on-container: #00b3d1;
+		--showcase-tertiary: #fea619;
+		--showcase-tertiary-on-container: #4f3000;
+		--showcase-outline-variant: color-mix(in srgb, var(--border) 68%, transparent);
+		--showcase-glow-primary: rgba(172, 138, 255, 0.16);
+		--showcase-glow-secondary: rgba(76, 215, 246, 0.08);
+		--showcase-hero-shadow: rgba(6, 14, 32, 0.22);
+		--showcase-chip-border: rgba(101, 117, 158, 0.28);
+		--showcase-chip-bg: rgba(23, 43, 84, 0.28);
+		--showcase-chip-border-hover: rgba(76, 215, 246, 0.5);
+		--showcase-chip-bg-hover: rgba(76, 215, 246, 0.12);
+		--showcase-chip-text-hover: var(--showcase-secondary);
+		--showcase-chip-icon-bg: rgba(172, 138, 255, 0.18);
+		--showcase-filter-border: rgba(101, 117, 158, 0.2);
+		--showcase-filter-bg: var(--showcase-surface-high);
+		--showcase-badge-border: rgba(76, 215, 246, 0.2);
+		--showcase-badge-bg: rgba(0, 42, 51, 0.56);
+		--showcase-badge-text: var(--showcase-secondary-on-container);
+		--showcase-badge-warm-border: rgba(254, 166, 25, 0.2);
+		--showcase-badge-warm-bg: rgba(254, 166, 25, 0.38);
+		--showcase-badge-warm-text: var(--showcase-tertiary-on-container);
+		--showcase-play-border: rgba(172, 138, 255, 0.4);
+		--showcase-play-bg: rgba(172, 138, 255, 0.22);
+		--showcase-play-shadow: 0 0 30px rgba(172, 138, 255, 0.4);
+		--showcase-card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+		--showcase-cta-border: rgba(56, 71, 109, 0.1);
+		--showcase-cta-bg: rgba(23, 43, 84, 0.36);
+		--showcase-cta-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+		--showcase-cta-glow-primary: rgba(172, 138, 255, 0.12);
+		--showcase-cta-glow-secondary: rgba(76, 215, 246, 0.06);
+		--showcase-cta-link-shadow: 0 0 40px -5px rgba(172, 138, 255, 0.4);
+		--showcase-cta-link-shadow-hover: 0 0 60px -5px rgba(172, 138, 255, 0.6);
+		--showcase-link-text: #000;
+		font-family: var(--font-ui-sans, var(--font-sans));
 	}
 
-	.art-page__works {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: var(--art-grid-gap-row) var(--art-grid-gap-col);
-		margin-bottom: 4.25rem;
-	}
-
-	.art-page__work {
-		cursor: default;
-	}
-
-	.art-page__image-wrap {
-		aspect-ratio: 4 / 3;
-		border-radius: var(--art-image-radius);
-		overflow: hidden;
-		margin-bottom: var(--art-image-margin);
-		background: color-mix(in srgb, var(--card-bg) 85%, var(--bg));
-	}
-
-	.art-page__work img {
+	:global(.ui-page-shell.showcase-page--art) {
 		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-		opacity: 0.96;
-		transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease;
+		overflow: hidden;
+		background: transparent;
+		color: var(--showcase-text);
 	}
 
-	.art-page__work:hover img {
-		transform: scale(1.03);
+	:global(.ui-page-shell.showcase-page--art .showcase-hero) {
+		padding-top: var(--space-8);
+		padding-bottom: var(--space-8);
+	}
+
+	:global(.ui-page-shell.showcase-page--art .showcase-card__art img) {
+		opacity: 0.97;
+	}
+
+	:global(.ui-page-shell.showcase-page--art .showcase-card:hover .showcase-card__art img) {
 		opacity: 1;
-	}
-
-	.art-page__work h2 {
-		margin: var(--art-title-margin);
-		font-family: var(--font-display);
-		font-size: var(--art-title-font);
-		font-weight: 600;
-		letter-spacing: -0.01em;
-		color: var(--text);
-	}
-
-	.art-page__work-type {
-		margin: var(--art-title-margin);
-		font-size: var(--art-type-font);
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--muted);
-	}
-
-	.art-page__work p {
-		margin: 0;
-		color: var(--muted);
-		font-size: var(--art-copy-font);
-		line-height: 1.52;
-	}
-
-	@media (max-width: 61.25em) {
-		.art-page__works {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-	}
-
-	@media (max-width: 47.5em) {
-		.art-page__works {
-			grid-template-columns: 1fr;
-			gap: var(--art-mobile-gap);
-		}
 	}
 </style>

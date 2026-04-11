@@ -27,5 +27,11 @@ export {
 	SectionLabel,
 } from "./layout";
 export { FooterNav, ShellNav, ThemeSelect, Topbar } from "./navigation";
+export {
+	ShowcaseCard,
+	ShowcaseCTA,
+	ShowcaseGrid,
+	ShowcaseHero,
+} from "./showcase";
 
 export type { NavItem } from "./types/nav";

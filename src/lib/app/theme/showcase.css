@@ -1,45 +1,24 @@
-.showcase__page {
-	max-width: var(--max-width);
-	margin: 0 auto;
-	display: grid;
-	gap: 1rem;
-}
-
-.showcase__section {
-	border: 1px solid var(--panel-border);
-	border-radius: var(--radius-md);
-	background: var(--card-bg);
-	padding: 1rem;
-}
-
-.showcase__intro p {
-	margin: 0;
-	font-family: var(--font-serif);
-	font-size: 1.03rem;
-	line-height: 1.72;
-}
-
-.showcase__title {
-	margin: 0 0 0.75rem;
-	display: inline-flex;
-	align-items: center;
-	gap: 0.35rem;
-	font-family: var(--font-display);
-	font-size: 1.2rem;
-	font-weight: 500;
-}
-
-.showcase__pill-link {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.28rem;
-	text-decoration: none;
-	padding: 0.42rem 0.72rem;
-	border-radius: var(--radius-pill);
-	border: 1px solid var(--border);
-	background: var(--card-bg);
+.ui-page-shell.showcase-page {
+	grid-template-columns: minmax(0, 1fr);
+	padding-top: var(--page-shell-space-top);
+	padding-bottom: 0;
+	background: transparent;
 	color: var(--text);
-	font-family: var(--font-sans);
-	font-size: 0.82rem;
-	font-weight: 600;
+}
+
+.ui-page-shell.showcase-page > * {
+	grid-column: 1;
+}
+
+.ui-page-shell.showcase-page .showcase-page__inner {
+	width: 100%;
+	display: contents;
+}
+
+.ui-page-shell.showcase-page :where(.showcase-hero, .showcase-grid, .showcase-cta) {
+	grid-column: 1 / -1;
+}
+
+body:has(.ui-page-shell.showcase-page) .layout-footer {
+	margin-top: 0;
 }

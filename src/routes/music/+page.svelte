@@ -1,4 +1,5 @@
 <script>
+	import { Apple, Cloud, Music2, Youtube } from '@lucide/svelte'
 	import { PageShell } from '@miko/ui'
 	import { formatDateMonthDayYearShort } from '$lib/utils/date'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
@@ -8,10 +9,10 @@
 		'Songs, demos, generative audio experiments, and music-related process notes from Miko Meow.'
 
 	const platforms = [
-		{ label: 'Spotify', href: '/contact?from=music&topic=spotify', icon: 'S' },
-		{ label: 'Apple Music', href: '/contact?from=music&topic=apple_music', icon: 'A' },
-		{ label: 'YouTube Music', href: '/contact?from=music&topic=youtube_music', icon: 'Y' },
-		{ label: 'SoundCloud', href: '/contact?from=music&topic=soundcloud', icon: 'SC' }
+		{ label: 'Spotify', href: '/contact?from=music&topic=spotify', icon: Music2 },
+		{ label: 'Apple Music', href: '/contact?from=music&topic=apple_music', icon: Apple },
+		{ label: 'YouTube Music', href: '/contact?from=music&topic=youtube_music', icon: Youtube },
+		{ label: 'SoundCloud', href: '/contact?from=music&topic=soundcloud', icon: Cloud }
 	]
 
 	const featuredTrack = {
@@ -116,7 +117,9 @@
 			<div id="listen" class="music-page__platforms" aria-label="Listening platforms">
 				{#each platforms as item}
 					<a href={item.href} class="music-page__platform-chip">
-						<span class="music-page__platform-icon" aria-hidden="true">{item.icon}</span>
+						<span class="music-page__platform-icon" aria-hidden="true">
+							<item.icon size={14} strokeWidth={2.2} />
+						</span>
 						{item.label}
 					</a>
 				{/each}
