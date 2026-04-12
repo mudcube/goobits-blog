@@ -172,21 +172,18 @@
 </PageShell>
 
 <style>
-  .journal-page {
-    --showcase-surface: color-mix(in srgb, var(--bg) 96%, #c87b36 4%);
-    --showcase-surface-low: color-mix(in srgb, var(--bg) 92%, #c87b36 8%);
-    --showcase-surface-high: color-mix(in srgb, var(--card-bg) 84%, #e7d7b1 16%);
-    --showcase-surface-highest: color-mix(in srgb, var(--card-bg) 76%, #e7d7b1 24%);
-    --showcase-surface-bright: color-mix(in srgb, var(--card-bg) 70%, #e7d7b1 30%);
+  :global(.ui-page-shell.showcase-page--journal) {
+    --showcase-surface: color-mix(in srgb, var(--bg) 94%, var(--brand-primary) 6%);
+    --showcase-surface-low: color-mix(in srgb, var(--bg) 88%, var(--brand-primary) 12%);
+    --showcase-surface-high: color-mix(in srgb, var(--card-bg) 76%, var(--brand-primary) 24%);
+    --showcase-surface-highest: color-mix(in srgb, var(--card-bg) 64%, var(--brand-primary) 36%);
+    --showcase-surface-bright: color-mix(in srgb, var(--card-bg) 56%, var(--brand-primary) 44%);
     --showcase-text: var(--text);
-    --showcase-muted: color-mix(in srgb, var(--muted) 92%, var(--text));
-    --showcase-primary: #f2b35b;
-    --showcase-primary-dim: #c87b36;
-    --showcase-secondary: #9ec5f8;
-    --showcase-outline-variant: color-mix(in srgb, var(--border) 72%, transparent);
-    --showcase-glow-primary: rgba(242, 179, 91, 0.1);
-    --showcase-glow-secondary: rgba(158, 197, 248, 0.06);
-    --showcase-hero-shadow: rgba(18, 14, 10, 0.06);
+    --showcase-muted: var(--muted);
+    --showcase-primary: #ffd084;
+    --showcase-primary-dim: #e49a38;
+    --showcase-secondary: #b8d8ff;
+    --showcase-outline-variant: color-mix(in srgb, var(--border) 68%, transparent);
   }
 
   .journal-page__toolbar {

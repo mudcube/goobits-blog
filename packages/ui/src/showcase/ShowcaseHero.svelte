@@ -209,7 +209,7 @@
 	.showcase-hero__signal-line {
 		width: 6rem;
 		height: 1px;
-		background: var(--showcase-outline-variant);
+		background: var(--showcase-outline-variant, color-mix(in srgb, var(--border) 68%, transparent));
 	}
 
 	.showcase-hero__chips {
