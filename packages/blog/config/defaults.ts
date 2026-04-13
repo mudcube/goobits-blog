@@ -203,7 +203,7 @@ export interface BlogConfig {
 export function getDefaultBlogPostFiles(): GlobImportRecord {
 	// Default pattern for blog posts
 	// Cast to GlobImportRecord since Vite's glob returns a compatible type
-	return import.meta.glob('@blog/**/*.md') as GlobImportRecord
+	return import.meta.glob('/src/content/Blog/**/*.md') as GlobImportRecord
 }
 
 /**
@@ -222,7 +222,7 @@ export const defaultBlogConfig: BlogConfig = {
 
 	// --- Content & Structure ---
 	posts: {
-		contentBasePath: '@blog',
+		contentBasePath: '/src/content/Blog',
 		urlBasePath: '/blog',
 		excerptLength: 160,
 		relatedPostsCount: 3,

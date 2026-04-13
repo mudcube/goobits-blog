@@ -1,4 +1,4 @@
-import { getJournalPosts } from '@miko/blog-legacy/server'
+import { getJournalPosts } from '$lib/blog/server'
 
 export const prerender = true
 export const trailingSlash = 'always'

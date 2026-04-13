@@ -219,6 +219,38 @@ export function formatDate(dateString: string | Date, shortFormat = false): stri
 	return date.toLocaleDateString('en-US', formatOptions)
 }
 
+function resolvePostPathParts(filePath: string): {
+	filename: string
+	slug: string
+	year: string
+	month: string
+} {
+	const parts = filePath.split('/').filter(Boolean)
+	const filenamePart = parts[parts.length - 1] || ''
+	const filename = filenamePart.replace('.md', '')
+	const slug = filename === 'index' ? (parts[parts.length - 2] || '') : filename
+	const year = parts[parts.length - 4] || ''
+	const month = parts[parts.length - 3] || ''
+
+	return { filename, slug, year, month }
+}
+
+function resolveContentImportPath(filePath: string, contentBasePath: string): string {
+	if (contentBasePath === '@blog') {
+		return filePath.replace('@blog/', '/src/content/Blog/')
+	}
+
+	return filePath
+}
+
+function resolveContentDiskPath(filePath: string, contentBasePath: string): string {
+	if (contentBasePath.startsWith('@')) {
+		return filePath.replace(contentBasePath, '/src/content/Blog').replace('//', '/')
+	}
+
+	return filePath
+}
+
 /**
  * Converts a string to a URL-friendly slug (lowercase and dasherized)
  * @param text - The text to convert to a slug
@@ -884,10 +916,7 @@ export async function getMarkdownContent(filePath: string): Promise<string> {
 			}
 
 			const projectRoot = process.cwd()
-			const contentPath = filePath.replace(
-				config.posts.contentBasePath,
-				'/src/content/Blog'
-			).replace('//', '/')
+			const contentPath = resolveContentDiskPath(filePath, config.posts.contentBasePath).replace('//', '/')
 
 			const fullPath = path.join(projectRoot, contentPath)
 			const content = await fs.readFile(fullPath, 'utf-8')
@@ -907,10 +936,7 @@ export async function getMarkdownContent(filePath: string): Promise<string> {
 
 	// Browser environment
 	try {
-		const fetchPath = filePath.replace(
-			config.posts.contentBasePath,
-			'/src/content/Blog'
-		).replace('//', '/')
+		const fetchPath = resolveContentDiskPath(filePath, config.posts.contentBasePath).replace('//', '/')
 
 		const response = await fetch(fetchPath)
 		const content = await response.text()
@@ -960,120 +986,124 @@ export async function getAllPosts(options: GetAllPostsOptions = {}): Promise<Pro
 
 	const processedPosts = await Promise.all(
 		Object.entries(posts).map(async ([ filePath, resolver ]): Promise<ProcessedPost | ProcessedPost[] | null> => {
-			const postModule = await resolver() as PostModule
+			try {
+				const postModule = await resolver() as PostModule
 
-			// Validate basic metadata requirements
-			if (!postModule?.metadata?.date) {
-				if (config.debug) {
-					logger.warn('[BlogUtils] Skipping post due to missing metadata:', filePath)
+				// Validate basic metadata requirements
+				if (!postModule?.metadata?.date) {
+					if (config.debug) {
+						logger.warn('[BlogUtils] Skipping post due to missing metadata:', filePath)
+					}
+					return null
 				}
-				return null
-			}
 
-			// Validate date format
-			const postDate = new Date(postModule.metadata.date)
-			if (isNaN(postDate.getTime())) {
-				if (config.debug) {
-					logger.warn('[BlogUtils] Skipping post due to invalid date:', filePath)
+				// Validate date format
+				const postDate = new Date(postModule.metadata.date)
+				if (isNaN(postDate.getTime())) {
+					if (config.debug) {
+						logger.warn('[BlogUtils] Skipping post due to invalid date:', filePath)
+					}
+					return null
 				}
-				return null
-			}
 
-			// Generate URL path components
-			const year = postDate.getFullYear()
-			const month = (postDate.getMonth() + 1).toString().padStart(2, '0')
-			const filenamePart = filePath.split('/').pop()
-			const filename = filenamePart ? filenamePart.replace('.md', '') : ''
-			const slug = postModule.metadata.slug || filename
-			const urlPath = `/${ year }/${ month }/${ slug }`
+				// Generate URL path components
+				const pathParts = resolvePostPathParts(filePath)
+				const year = pathParts.year || postDate.getFullYear().toString()
+				const month = pathParts.month || (postDate.getMonth() + 1).toString().padStart(2, '0')
+				const slug = postModule.metadata.slug || pathParts.slug
+				const urlPath = `${ config.posts.urlBasePath }/${ year }/${ month }/${ slug }`
 
-			// Get content and calculate file size if needed
-			let content = ''
-			if (includeContent) {
-				content = await getMarkdownContent(filePath)
-			}
+				// Get content and calculate file size if needed
+				let content = ''
+				if (includeContent) {
+					content = await getMarkdownContent(filePath)
+				}
 
-			// Calculate read time with our utility function
-			let readTime = 0
+				// Calculate read time with our utility function
+				let readTime = 0
 
-			// First check if readTime is already set in metadata
-			if (postModule.metadata.readTime) {
-				({ readTime } = postModule.metadata)
-			} else {
-				// Use our utility function to calculate read time
-				// Create a minimal object that satisfies ReadTimePost interface
-				// Use type assertion since PostMetadata is a superset of ReadTimePostMetadata
-				const postForReadTime = {
-					metadata: {
-						fm: {
-							...(postModule.metadata.readTime !== undefined
-								? { readTime: postModule.metadata.readTime }
-								: {}),
-							...(postModule.metadata.excerpt !== undefined
-								? { excerpt: postModule.metadata.excerpt }
-								: {})
+				// First check if readTime is already set in metadata
+				if (postModule.metadata.readTime) {
+					({ readTime } = postModule.metadata)
+				} else {
+					// Use our utility function to calculate read time
+					// Create a minimal object that satisfies ReadTimePost interface
+					// Use type assertion since PostMetadata is a superset of ReadTimePostMetadata
+					const postForReadTime = {
+						metadata: {
+							fm: {
+								...(postModule.metadata.readTime !== undefined
+									? { readTime: postModule.metadata.readTime }
+									: {}),
+								...(postModule.metadata.excerpt !== undefined
+									? { excerpt: postModule.metadata.excerpt }
+									: {})
+							}
+						},
+						...(content ? { content } : {})
+					}
+					readTime = getPostReadTime(postForReadTime)
+				}
+
+				// Update read time in metadata if needed
+				if (!postModule.metadata.readTime) {
+					postModule.metadata.readTime = readTime
+				}
+
+				// Create the base post object
+				// Convert file path to proper import path for dynamic imports
+				const importPath = resolveContentImportPath(filePath, config.posts.contentBasePath)
+
+				const basePost: ProcessedPost = {
+					metadata: { fm: postModule.metadata },
+					date: postModule.metadata.date,
+					urlPath,
+					path: importPath,
+					content: includeContent ? content : '',
+					lang: 'en' // Default language
+				}
+
+				// Handle localization
+				if (includeLocalizedVersions && postModule.metadata.i18n) {
+					// Return array with base post and all localizations
+					const localizedPosts = Object.keys(postModule.metadata.i18n).map((langCode): ProcessedPost => {
+						const i18nData = postModule.metadata.i18n?.[langCode]
+						return {
+							...structuredClone(basePost),
+							metadata: {
+								fm: {
+									...postModule.metadata,
+									...i18nData,
+									i18n: postModule.metadata.i18n // Keep the i18n map
+								}
+							},
+							lang: langCode
 						}
-					},
-					...(content ? { content } : {})
+					})
+
+					return [ basePost, ...localizedPosts ]
 				}
-				readTime = getPostReadTime(postForReadTime)
-			}
-
-			// Update read time in metadata if needed
-			if (!postModule.metadata.readTime) {
-				postModule.metadata.readTime = readTime
-			}
-
-			// Create the base post object
-			// Convert file path to proper import path for dynamic imports
-			const importPath = filePath.replace('@blog/', '/src/content/Blog/')
-
-			const basePost: ProcessedPost = {
-				metadata: { fm: postModule.metadata },
-				date: postModule.metadata.date,
-				urlPath,
-				path: importPath,
-				content: includeContent ? content : '',
-				lang: 'en' // Default language
-			}
-
-			// Handle localization
-			if (includeLocalizedVersions && postModule.metadata.i18n) {
-				// Return array with base post and all localizations
-				const localizedPosts = Object.keys(postModule.metadata.i18n).map((langCode): ProcessedPost => {
-					const i18nData = postModule.metadata.i18n?.[langCode]
+				if (lang !== 'en' && postModule.metadata.i18n?.[lang]) {
+					// Return just the requested localization
+					const i18nData = postModule.metadata.i18n[lang]
 					return {
-						...structuredClone(basePost),
+						...basePost,
 						metadata: {
 							fm: {
 								...postModule.metadata,
 								...i18nData,
-								i18n: postModule.metadata.i18n // Keep the i18n map
+								i18n: postModule.metadata.i18n
 							}
 						},
-						lang: langCode
+						lang
 					}
-				})
-
-				return [ basePost, ...localizedPosts ]
-			}
-			if (lang !== 'en' && postModule.metadata.i18n?.[lang]) {
-				// Return just the requested localization
-				const i18nData = postModule.metadata.i18n[lang]
-				return {
-					...basePost,
-					metadata: {
-						fm: {
-							...postModule.metadata,
-							...i18nData,
-							i18n: postModule.metadata.i18n
-						}
-					},
-					lang
 				}
+				// Return the base post (English or no localization)
+				return basePost
+			} catch (error) {
+				logger.warn('[BlogUtils] Skipping post due to import failure:', filePath, error)
+				return null
 			}
-			// Return the base post (English or no localization)
-			return basePost
 		})
 	)
 

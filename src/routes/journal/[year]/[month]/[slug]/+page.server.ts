@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit'
-import { getPost, getJournalPosts } from '@miko/blog-legacy/server'
+import { getPost, getJournalPosts } from '$lib/blog/server'
+import type { JournalPost } from '$lib/blog/viewmodel'
 import type { EntryGenerator, PageServerLoad } from './$types'
 
 export const prerender = true
@@ -7,7 +8,7 @@ export const trailingSlash = 'always'
 
 export const entries: EntryGenerator = async () => {
 	const posts = await getJournalPosts()
-	return posts.map(post => ({
+	return posts.map((post: JournalPost) => ({
 		year: post.year,
 		month: post.month,
 		slug: post.slug

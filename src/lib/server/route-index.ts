@@ -1,7 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import { execFileSync } from 'child_process'
-import { getJournalPosts } from '@miko/blog-legacy/server'
+import { getJournalPosts } from '$lib/blog/server'
+import type { JournalPost } from '$lib/blog/viewmodel'
 import { getConfiguredReleaseStage, isRouteReleased, type ReleaseStage } from '$lib/app/release'
 import type { RouteMeta, SitemapAudience } from '$lib/app/routes/meta'
 
@@ -281,7 +282,7 @@ export async function getRouteInventory(options: RouteInventoryOptions = {}): Pr
 	const routes = scanRoutes(ROUTES_DIR)
 	const posts = await getJournalPosts()
 
-	const postRoutes: PageRoute[] = posts.map(post => {
+	const postRoutes: PageRoute[] = posts.map((post: JournalPost) => {
 		const fm = post.metadata?.fm
 		const title = fm && typeof fm === 'object' && 'title' in fm ? String((fm as { title?: unknown }).title ?? '') : ''
 		return {

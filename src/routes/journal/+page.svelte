@@ -15,7 +15,7 @@
     getFirstCategory,
     getJournalCategories,
     getJournalCoverImage,
-  } from "@miko/blog-legacy";
+  } from "$lib/blog/viewmodel";
 
   let { data } = $props();
   const description =

@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit'
-import { getJournalPosts, type JournalPost } from '@miko/blog-legacy/server'
+import { getJournalPosts } from '$lib/blog/server'
+import type { JournalPost } from '$lib/blog/viewmodel'
 import type { EntryGenerator, PageServerLoad } from './$types'
 
 export const prerender = true
