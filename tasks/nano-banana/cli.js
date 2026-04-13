@@ -40,6 +40,7 @@ function parseCliArgs() {
 			'output-dir': { type: 'string', short: 'o', default: DEFAULT_GENERATION_OPTIONS.outputDir },
 			'prompt': { type: 'string', short: 'p' },
 			'prompt-file': { type: 'string', short: 'f' },
+			'reference-image': { type: 'string' },
 			'resolution': { type: 'string', short: 'r', default: DEFAULT_GENERATION_OPTIONS.resolution },
 			'style': { type: 'string', short: 's', default: DEFAULT_GENERATION_OPTIONS.style },
 			'url-only': { type: 'boolean', short: 'u', default: false }
@@ -69,6 +70,7 @@ Image:
   -s, --style <style>         ${ VALID_STYLES.join(', ') }
   -a, --aspect-ratio <ratio>  ${ VALID_ASPECT_RATIOS.join(', ') }
   -r, --resolution <size>     ${ VALID_RESOLUTIONS.join(', ') }
+      --reference-image <path> Use a repo-local source image as the visual base
       --no-style              Send only the raw prompt
 
 Output:
@@ -120,6 +122,7 @@ function toGenerationOptions(args, prompt) {
 		aspectRatio: args['aspect-ratio'],
 		resolution: args.resolution,
 		style: args.style,
+		referenceImage: args['reference-image'],
 		appendStylePrompt: !args['no-style'],
 		output: args['url-only'] ? 'base64' : args.output,
 		outputDir: args['output-dir'],
@@ -146,6 +149,9 @@ function printDryRun(options, jsonOutput) {
 	console.log(`Style: ${ payload.style }`)
 	console.log(`Aspect ratio: ${ options.aspectRatio }`)
 	console.log(`Resolution: ${ options.resolution }`)
+	if (options.referenceImage) {
+		console.log(`Reference image: ${ options.referenceImage }`)
+	}
 	console.log(`Output: ${ options.output }`)
 	console.log(`Output dir: ${ payload.outputDir }`)
 }

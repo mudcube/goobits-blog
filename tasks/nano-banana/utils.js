@@ -3,6 +3,13 @@ import fs from 'fs/promises'
 import path from 'path'
 
 const PNG_EXTENSION = '.png'
+const MIME_TYPE_BY_EXTENSION = Object.freeze({
+	'.gif': 'image/gif',
+	'.jpeg': 'image/jpeg',
+	'.jpg': 'image/jpeg',
+	'.png': 'image/png',
+	'.webp': 'image/webp'
+})
 
 export function toSlug(value, fallback = 'image') {
 	const slug = String(value || '')
@@ -55,6 +62,28 @@ export function resolveOutputPath(outputDir, filename) {
 export async function readPromptFile(promptFile) {
 	const resolvedPath = resolveInsideWorkspace(promptFile, 'Prompt file')
 	return (await fs.readFile(resolvedPath, 'utf-8')).trim()
+}
+
+export async function readReferenceImage(referenceImagePath) {
+	const resolvedPath = resolveInsideWorkspace(referenceImagePath, 'Reference image')
+	const extension = path.extname(resolvedPath).toLowerCase()
+	const mimeType = MIME_TYPE_BY_EXTENSION[extension]
+
+	if (!mimeType) {
+		throw new Error(`Unsupported reference image type "${ extension || 'unknown' }". Use PNG, JPG, WEBP, or GIF.`)
+	}
+
+	const buffer = await fs.readFile(resolvedPath)
+
+	if (buffer.length === 0) {
+		throw new Error('Reference image file is empty')
+	}
+
+	return {
+		path: resolvedPath,
+		mimeType,
+		base64Data: buffer.toString('base64')
+	}
 }
 
 export async function writeBase64Png(outputPath, base64Data) {

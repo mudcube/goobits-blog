@@ -18,6 +18,7 @@ import {
 	createImageFilename,
 	describeGenerationError,
 	extractImageResult,
+	readReferenceImage,
 	resolveOutputPath,
 	validateBase64Image,
 	withTimeout,
@@ -64,6 +65,28 @@ function buildPrompt(options) {
 
 	const stylePrompt = STYLE_PRESETS[options.style]
 	return stylePrompt ? `${ options.prompt }${ stylePrompt }` : options.prompt
+}
+
+async function buildContents(options) {
+	const prompt = buildPrompt(options)
+
+	if (!options.referenceImage) {
+		return prompt
+	}
+
+	const referenceImage = await readReferenceImage(options.referenceImage)
+
+	return [
+		{
+			inlineData: {
+				data: referenceImage.base64Data,
+				mimeType: referenceImage.mimeType
+			}
+		},
+		{
+			text: `${ prompt }\n\nIMPORTANT: Use the supplied source image as the primary visual reference. Preserve the core subject, composition, silhouette, and overall visual intent unless the prompt explicitly asks for a change. Improve finish, clarity, and polish without replacing the design wholesale.`
+		}
+	]
 }
 
 function buildGenerateConfig(options) {
@@ -141,11 +164,11 @@ export default class NanoBananaProvider {
 	}
 
 	async generateOnce(options) {
-		const prompt = buildPrompt(options)
+		const contents = await buildContents(options)
 		const response = await withTimeout(
 			this.getClient().models.generateContent({
 				model: options.model,
-				contents: prompt,
+				contents,
 				config: buildGenerateConfig(options)
 			}),
 			options.timeoutMs
@@ -158,6 +181,7 @@ export default class NanoBananaProvider {
 			return {
 				base64Data: imageData,
 				prompt: options.prompt,
+				referenceImage: options.referenceImage || null,
 				model: options.model,
 				aspectRatio: options.aspectRatio,
 				resolution: options.resolution,
@@ -177,6 +201,7 @@ export default class NanoBananaProvider {
 			filename,
 			outputDir: path.relative(process.cwd(), outputDir),
 			prompt: options.prompt,
+			referenceImage: options.referenceImage || null,
 			model: options.model,
 			aspectRatio: options.aspectRatio,
 			resolution: options.resolution,
