@@ -1,0 +1,19 @@
+{
+  "name": "@miko/blog",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "svelte": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server/index.ts",
+    "./components/MetadataValues.svelte": "./src/components/MetadataValues.svelte",
+    "./components/Results.svelte": "./src/components/Results.svelte",
+    "./prism.scss": "./src/prism.scss",
+    "./server/remark-table-of-contents.js": "./src/server/remark-table-of-contents.js"
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  }
+}

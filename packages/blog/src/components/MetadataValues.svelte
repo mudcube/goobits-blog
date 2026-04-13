@@ -1,9 +1,9 @@
 <script>
-	import { formatJournalLabel } from '@src/domains/journal/viewmodel'
+	import { formatJournalLabel } from '../viewmodel'
 
 	let {
 		values = [],
-		type = 'category' // 'category' or 'tag'
+		type = 'category'
 	} = $props()
 
 	const slugifyValue = (value) => {
@@ -12,11 +12,11 @@
 </script>
 
 <div class="metadata-values">
-    {#each values as value}
-        <a href={`/journal/${type}/${slugifyValue(value)}`}>
-            <span class="metadata-values__value">{formatJournalLabel(value)}</span>
-        </a>
-    {/each}
+	{#each values as value}
+		<a href={`/journal/${type}/${slugifyValue(value)}`}>
+			<span class="metadata-values__value">{formatJournalLabel(value)}</span>
+		</a>
+	{/each}
 </div>
 
 <style lang="scss">

@@ -27,9 +27,7 @@ export function remarkTableOfContents() {
 					if (tocMatch[1]) {
 						tocDepth = Math.min(6, Math.max(0, parseInt(tocMatch[1], 10)))
 					}
-					if (tocDepth === 0) {
-						tocDepth = 6
-					}
+					if (tocDepth === 0) tocDepth = 6
 					return
 				}
 
@@ -63,7 +61,7 @@ export function remarkTableOfContents() {
 				type: 'list',
 				ordered: false,
 				children: headings
-					.filter((h) => h.depth <= tocDepth)
+					.filter((heading) => heading.depth <= tocDepth)
 					.map((heading) => ({
 						type: 'listItem',
 						children: [

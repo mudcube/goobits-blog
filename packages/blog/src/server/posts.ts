@@ -41,17 +41,11 @@ function resolvePostDate(value: unknown, fallback: () => Date): Date {
 }
 
 function stripScriptTags(html: string) {
-	// Legacy journal entries can embed script tags that fail in modern CSP/runtime contexts.
-	// Remove them from rendered post HTML to avoid runtime parse errors and unsafe execution.
 	return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
 }
 
 function upgradeInsecureMediaUrls(html: string) {
-	// Legacy posts include http image/media sources; upgrade to https so CSP and modern browsers allow loading.
-	return html.replace(
-		/(<(?:img|source)\b[^>]*\b(?:src|srcset)=["'])http:\/\//gi,
-		'$1https://'
-	)
+	return html.replace(/(<(?:img|source)\b[^>]*\b(?:src|srcset)=["'])http:\/\//gi, '$1https://')
 }
 
 export async function getJournalPosts() {
@@ -67,8 +61,6 @@ export async function getJournalPosts() {
 					const mdContent = readFileSync(join(POSTS_PATH, year, month, postDir, 'index.md'), 'utf-8')
 					const compiled = (await compile(mdContent)) as MdsvexCompileResult
 					const cleanSlug = postDir.replace(/^\d{4}-\d{2}-\d{2}-/, '')
-
-					// Extract date from frontmatter or filename
 					const dateMatch = postDir.match(/^(\d{4})-(\d{2})-(\d{2})/)
 					const fallbackDate = () =>
 						dateMatch ? new Date(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`) : new Date(`${year}-${month}-01`)
@@ -90,6 +82,7 @@ export async function getJournalPosts() {
 			}
 		}
 	}
+
 	return posts.sort((a, b) => b.date.getTime() - a.date.getTime())
 }
 
@@ -115,8 +108,6 @@ export async function getPost({
 		})) as MdsvexCompileResult
 		const renderedContent = (compiled?.code ?? '').replace(/{@html `(.*?)`}/gs, '$1')
 		const strippedContent = stripScriptTags(upgradeInsecureMediaUrls(renderedContent))
-
-		// Extract date same as above
 		const dateMatch = postDir.match(/^(\d{4})-(\d{2})-(\d{2})/)
 		const fallbackDate = () =>
 			dateMatch ? new Date(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`) : new Date(`${year}-${month}-01`)

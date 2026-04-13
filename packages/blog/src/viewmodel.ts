@@ -1,6 +1,4 @@
-import type { JournalPost } from '@src/domains/journal/server/posts'
-import { localeSort, matchesQuery, normalizeQuery } from '$lib/utils/collections'
-import { formatDateYear } from '$lib/utils/date'
+import type { JournalPost } from './server/posts'
 
 export type JournalSort = 'newest' | 'oldest' | 'title'
 
@@ -35,6 +33,13 @@ export function getFirstCategory(post: JournalPost) {
 	return post.metadata.fm?.categories?.[0] || ''
 }
 
+export function getJournalCoverImage(post: JournalPost) {
+	const rawImage = String(post.metadata.fm?.coverImage || '')
+	if (!rawImage) return ''
+	if (rawImage.startsWith('http') || rawImage.startsWith('/')) return rawImage
+	return `/${post.urlPath}/${rawImage}`
+}
+
 export function filterAndSortJournalPosts(
 	posts: JournalPost[],
 	searchQuery: string,
@@ -59,16 +64,15 @@ export function filterAndSortJournalPosts(
 	})
 }
 
-export function groupJournalPostsByYear(posts: JournalPost[]) {
-	const grouped: Record<string, JournalPost[]> = {}
-	for (const post of posts) {
-		const year = formatDateYear(post.date)
-		if (!grouped[year]) grouped[year] = []
-		grouped[year].push(post)
-	}
-	return grouped
+function localeSort(a: string, b: string) {
+	return a.localeCompare(b, 'en', { sensitivity: 'base', numeric: true })
 }
 
-export function getJournalYearOrder(grouped: Record<string, JournalPost[]>) {
-	return Object.keys(grouped).sort((a, b) => Number(b) - Number(a))
+function normalizeQuery(value: string) {
+	return value.trim().toLowerCase()
+}
+
+function matchesQuery(query: string, values: string[]) {
+	if (!query) return true
+	return values.some((value) => String(value || '').toLowerCase().includes(query))
 }

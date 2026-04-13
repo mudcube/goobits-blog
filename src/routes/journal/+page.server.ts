@@ -1,4 +1,4 @@
-import { getJournalPosts } from '@src/domains/journal/server/posts'
+import { getJournalPosts } from '@miko/blog/server'
 
 export const prerender = true
 export const trailingSlash = 'always'

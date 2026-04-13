@@ -1,6 +1,6 @@
 <script>
 	import { Seo, buildWebPageJsonLd, formatSeoLabel } from '$lib/app/seo'
-	import Results from '@src/domains/journal/components/Results.svelte'
+	import { BlogResults } from '@miko/blog'
 	let { data } = $props()
 	const title = $derived(formatSeoLabel(data.category))
 	const description = $derived(`Journal entries in the ${title} category from Miko Meow.`)
@@ -23,6 +23,6 @@
 
 <div class="journal-results journal-results--category">
 	<div class="journal-results__content">
-		<Results {...data} type="category" />
+		<BlogResults {...data} type="category" />
 	</div>
 </div>

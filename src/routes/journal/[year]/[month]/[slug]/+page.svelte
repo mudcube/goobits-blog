@@ -6,7 +6,7 @@
 		buildBreadcrumbJsonLd,
 		toPlainTextExcerpt
 	} from '$lib/app/seo'
-	import MetadataValues from '@src/domains/journal/components/MetadataValues.svelte'
+	import { BlogMetadataValues } from '@miko/blog'
 	import PublicBreadcrumbs from '$lib/app/shell/PublicBreadcrumbs.svelte'
 
 	const { data } = $props()
@@ -76,10 +76,10 @@
 				</time>
 				<div class="journal-entry__chips">
 					{#if data.post.metadata.fm.categories}
-						<MetadataValues values={data.post.metadata.fm.categories} type="category" />
+						<BlogMetadataValues values={data.post.metadata.fm.categories} type="category" />
 					{/if}
 					{#if data.post.metadata.fm.tags}
-						<MetadataValues values={data.post.metadata.fm.tags} type="tag" />
+						<BlogMetadataValues values={data.post.metadata.fm.tags} type="tag" />
 					{/if}
 				</div>
 			</div>

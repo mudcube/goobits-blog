@@ -1,17 +1,21 @@
 <script>
-  import { AppWindow, Palette, Pipette, Wrench } from "@lucide/svelte";
+  import {
+    AppWindow,
+    ArrowUpRight,
+    Palette,
+    Pipette,
+    Wrench,
+  } from "@lucide/svelte";
   import { PageShell, ResultsEmpty, SearchField, ShowcaseHero } from "@miko/ui";
   import { slugify } from "$lib/utils/collections";
-  import { formatDateMonthDay } from "$lib/utils/date";
+  import { Seo, buildWebPageJsonLd } from "$lib/app/seo";
   import {
-    formatJournalLabel,
     filterAndSortJournalPosts,
+    formatJournalLabel,
     getFirstCategory,
     getJournalCategories,
-    getJournalYearOrder,
-    groupJournalPostsByYear,
-  } from "@src/domains/journal/viewmodel";
-  import { Seo, buildWebPageJsonLd } from "$lib/app/seo";
+    getJournalCoverImage,
+  } from "@miko/blog";
 
   let { data } = $props();
   const description =
@@ -48,8 +52,31 @@
       sortBy,
     ),
   );
-  const groupedByYear = $derived(groupJournalPostsByYear(filteredPosts));
-  const yearOrder = $derived(getJournalYearOrder(groupedByYear));
+
+  function formatJournalDate(date) {
+    return new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
+  }
+
+  function getJournalRowTokens(post) {
+    const tokens = [];
+    const categories = Array.isArray(post.metadata.fm?.categories)
+      ? post.metadata.fm.categories
+      : [];
+    const tags = Array.isArray(post.metadata.fm?.tags) ? post.metadata.fm.tags : [];
+
+    for (const category of categories.slice(0, 2)) {
+      tokens.push({ label: formatJournalLabel(category), tone: "accent" });
+    }
+    for (const tag of tags.slice(0, Math.max(0, 2 - tokens.length))) {
+      tokens.push({ label: formatJournalLabel(tag), tone: "muted" });
+    }
+
+    return tokens;
+  }
 </script>
 
 <Seo
@@ -133,40 +160,86 @@
         {filteredPosts.length === 1 ? "entry" : "entries"}
       </p>
 
-      {#each yearOrder as year}
-        <section
-          class="journal-page__year-group"
-          aria-label={`Posts from ${year}`}
-        >
-          <h2 class="journal-page__year">{year}</h2>
-          <ol class="journal-page__list">
-            {#each groupedByYear[year] as post}
-              <li class="journal-page__item">
-                <article class="journal-page__row">
-                  <div class="journal-page__date">
-                    {formatDateMonthDay(post.date)}
-                  </div>
+      <section class="journal-page__archive" aria-label="Journal archive">
+        <div class="journal-page__archive-head">
+          <p class="journal-page__archive-kicker">Field log archive</p>
+          <p class="journal-page__archive-caption">
+            A denser journal index for scanning chronology, topics, and entry trails at a glance.
+          </p>
+        </div>
 
-                  <h3 class="journal-page__post-title">
-                    <a href={`/${post.urlPath}`}>{post.metadata.fm.title}</a>
-                  </h3>
+        <div class="journal-page__table-wrap">
+          <table class="journal-page__table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Entry Detail</th>
+                <th>Taxonomy</th>
+                <th class="journal-page__table-link-head">Link</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each filteredPosts as post}
+                <tr class="journal-page__table-row">
+                  <td class="journal-page__table-date">
+                    <span>{formatJournalDate(post.date)}</span>
+                    <span class="journal-page__table-date-year">{post.year}</span>
+                  </td>
 
-                  <div class="journal-page__meta">
-                    {#if getFirstCategory(post)}
-                      <a
-                        class="journal-page__tag"
-                        href={`/journal/category/${slugify(getFirstCategory(post))}`}
-                      >
-                        {formatJournalLabel(getFirstCategory(post))}
-                      </a>
-                    {/if}
-                  </div>
-                </article>
-              </li>
-            {/each}
-          </ol>
-        </section>
-      {/each}
+                  <td class="journal-page__table-entry">
+                    <a href={`/${post.urlPath}`} class="journal-page__table-entry-link">
+                      <span class="journal-page__table-thumb">
+                        {#if getJournalCoverImage(post)}
+                          <img
+                            src={getJournalCoverImage(post)}
+                            alt={post.metadata.fm.title}
+                            loading="lazy"
+                          />
+                        {:else}
+                          <span class="journal-page__table-thumb-fallback">
+                            {formatJournalLabel(getFirstCategory(post) || "Journal")}
+                          </span>
+                        {/if}
+                      </span>
+
+                      <span class="journal-page__table-entry-copy">
+                        <span class="journal-page__table-entry-title">
+                          {post.metadata.fm.title}
+                        </span>
+                        <span class="journal-page__table-entry-meta">
+                          {#if getFirstCategory(post)}
+                            Filed under {formatJournalLabel(getFirstCategory(post))}
+                          {:else}
+                            Journal entry
+                          {/if}
+                        </span>
+                      </span>
+                    </a>
+                  </td>
+
+                  <td class="journal-page__table-taxonomy">
+                    <div class="journal-page__table-token-list">
+                      {#each getJournalRowTokens(post) as token}
+                        <span
+                          class={`journal-page__table-token journal-page__table-token--${token.tone}`}
+                        >
+                          {token.label}
+                        </span>
+                      {/each}
+                    </div>
+                  </td>
+
+                  <td class="journal-page__table-link">
+                    <a href={`/${post.urlPath}`} aria-label={`Open ${post.metadata.fm.title}`}>
+                      <ArrowUpRight size={18} strokeWidth={2.1} />
+                    </a>
+                  </td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
+      </section>
     {/if}
   </div>
 </PageShell>
@@ -253,131 +326,313 @@
   }
 
   .journal-page__count {
-    margin: 1rem 0 0.5rem;
+    margin: 1.1rem 0 0.1rem;
     font-size: var(--font-size-xs);
     color: color-mix(in srgb, var(--muted) 92%, var(--text));
     font-family: var(--font-sans);
     width: 100%;
     max-width: var(--max-width);
     justify-self: center;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
   }
 
-  .journal-page__year-group {
-    margin-bottom: 2rem;
+  .journal-page__archive {
     width: 100%;
     max-width: var(--max-width);
     justify-self: center;
+    margin-top: 0.5rem;
   }
 
-  .journal-page__year {
+  .journal-page__archive-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.15rem;
+    flex-wrap: wrap;
+  }
+
+  .journal-page__archive-kicker,
+  .journal-page__archive-caption {
     margin: 0;
-    padding-top: 2.5rem;
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: 1.25rem;
-    letter-spacing: -0.015em;
-    color: var(--text);
   }
 
-  .journal-page__list {
-    margin: 0;
-    padding: 0.5rem 0 0;
-    list-style: none;
-  }
-
-  .journal-page__item {
-    margin: 0;
-    padding: 0;
-  }
-
-  .journal-page__row {
-    display: grid;
-    grid-template-columns: 72px minmax(0, 1fr) auto;
-    align-items: baseline;
-    gap: 0 1rem;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-    transition:
-      opacity 0.2s,
-      border-color 0.2s;
-  }
-
-  .journal-page__row:hover {
-    opacity: 0.7;
-    border-bottom-color: color-mix(in srgb, var(--border) 85%, transparent);
-  }
-
-  .journal-page__date {
+  .journal-page__archive-kicker {
     font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--showcase-secondary);
     font-family: var(--font-sans);
-    color: color-mix(in srgb, var(--muted) 92%, var(--text));
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
   }
 
-  .journal-page__post-title {
-    margin: 0;
-    min-width: 0;
-    font-family: var(--font-sans);
-    font-weight: 400;
+  .journal-page__archive-caption {
+    color: color-mix(in srgb, var(--muted) 88%, var(--text));
     font-size: var(--font-size-sm);
-    letter-spacing: -0.005em;
+    max-width: 38rem;
   }
 
-  .journal-page__post-title a {
+  .journal-page__table-wrap {
+    overflow-x: auto;
+  }
+
+  .journal-page__table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.85rem;
+  }
+
+  .journal-page__table th {
+    padding: 0 1.25rem 0.55rem;
+    text-align: left;
+    font-family: var(--font-sans);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, var(--muted) 78%, transparent);
+    font-weight: 600;
+  }
+
+  .journal-page__table-link-head {
+    text-align: right;
+  }
+
+  .journal-page__table-row td {
+    padding: 1.2rem 1.25rem;
+    vertical-align: top;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--showcase-surface-high) 66%, transparent) 0%,
+        color-mix(in srgb, var(--showcase-surface) 88%, transparent) 100%
+      );
+    border-top: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+    transition:
+      transform 0.18s ease,
+      background-color 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  .journal-page__table-row:hover td {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--showcase-primary) 30%, var(--border));
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--showcase-surface-bright) 60%, transparent) 0%,
+        color-mix(in srgb, var(--showcase-surface-high) 86%, transparent) 100%
+      );
+  }
+
+  .journal-page__table-row td:first-child {
+    border-left: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+    border-radius: 1.2rem 0 0 1.2rem;
+  }
+
+  .journal-page__table-row td:last-child {
+    border-right: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+    border-radius: 0 1.2rem 1.2rem 0;
+  }
+
+  .journal-page__table-date {
+    width: 10rem;
+    font-family: var(--font-sans);
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .journal-page__table-date > span:first-child {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--muted) 90%, var(--text));
+  }
+
+  .journal-page__table-date-year {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--muted) 70%, transparent);
+  }
+
+  .journal-page__table-entry {
+    min-width: 0;
+  }
+
+  .journal-page__table-entry-link {
+    display: grid;
+    grid-template-columns: 4.4rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
     text-decoration: none;
-    color: var(--text);
-    display: block;
-    white-space: nowrap;
+    color: inherit;
+  }
+
+  .journal-page__table-thumb {
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: 1rem;
     overflow: hidden;
-    text-overflow: ellipsis;
+    background:
+      radial-gradient(circle at 18% 14%, rgba(184, 216, 255, 0.3) 0%, transparent 35%),
+      linear-gradient(
+        160deg,
+        color-mix(in srgb, var(--showcase-primary) 24%, var(--showcase-surface-highest)) 0%,
+        color-mix(in srgb, var(--showcase-secondary) 18%, var(--showcase-surface-high)) 100%
+      );
+    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    display: grid;
+    place-items: center;
   }
 
-  .journal-page__post-title a:hover {
-    color: var(--link-hover);
+  .journal-page__table-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  .journal-page__meta {
+  .journal-page__table-thumb-fallback {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
+    padding: 0.55rem;
+    text-align: center;
+    font-family: var(--font-sans);
+    font-size: 0.58rem;
+    line-height: 1.35;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--showcase-text) 78%, var(--showcase-secondary));
+  }
+
+  .journal-page__table-entry-copy {
     min-width: 0;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .journal-page__table-entry-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.02rem, 1.35vw, 1.35rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--showcase-text);
+    transition: color 0.18s ease;
+    text-wrap: balance;
+  }
+
+  .journal-page__table-row:hover .journal-page__table-entry-title {
+    color: color-mix(in srgb, var(--showcase-primary) 72%, var(--showcase-text));
+  }
+
+  .journal-page__table-entry-meta {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--muted) 88%, var(--text));
+    line-height: 1.55;
+  }
+
+  .journal-page__table-taxonomy {
+    width: 15rem;
+  }
+
+  .journal-page__table-token-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .journal-page__table-token {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.72rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    font-family: var(--font-sans);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
     white-space: nowrap;
   }
 
-  .journal-page__tag {
+  .journal-page__table-token--accent {
+    background: color-mix(in srgb, var(--showcase-secondary) 16%, transparent);
+    color: color-mix(in srgb, var(--showcase-secondary) 74%, var(--showcase-text));
+  }
+
+  .journal-page__table-token--muted {
+    background: color-mix(in srgb, var(--showcase-surface-highest) 72%, transparent);
+    color: color-mix(in srgb, var(--muted) 88%, var(--showcase-text));
+  }
+
+  .journal-page__table-link {
+    width: 4.5rem;
+    text-align: right;
+    vertical-align: middle;
+  }
+
+  .journal-page__table-link a {
+    color: color-mix(in srgb, var(--muted) 84%, var(--showcase-text));
+    transition:
+      color 0.18s ease,
+      transform 0.18s ease;
     display: inline-flex;
-    align-items: center;
-    font-size: 0.6875rem;
-    font-weight: var(--font-weight-medium);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 0.2rem 0.55rem;
-    border-radius: var(--radius-sm);
-    color: color-mix(in srgb, var(--link) 70%, var(--text));
-    background: color-mix(in srgb, var(--link) 9%, transparent);
-    text-decoration: none;
   }
 
-  .journal-page__tag:hover {
-    background: color-mix(in srgb, var(--link-hover) 10%, transparent);
-    color: color-mix(in srgb, var(--link-hover) 72%, var(--text));
+  .journal-page__table-row:hover .journal-page__table-link a {
+    color: var(--showcase-secondary);
+    transform: translate(2px, -2px);
   }
 
-  @media (max-width: 860px) {
-    .journal-page__row {
-      grid-template-columns: 1fr;
-      gap: 0.45rem;
+  @media (max-width: 760px) {
+    .journal-page__table {
+      border-spacing: 0 0.75rem;
     }
 
-    .journal-page__post-title a {
-      white-space: normal;
-      overflow: visible;
-      text-overflow: initial;
+    .journal-page__table thead {
+      display: none;
     }
 
-    .journal-page__meta {
-      justify-content: space-between;
+    .journal-page__table,
+    .journal-page__table tbody,
+    .journal-page__table tr,
+    .journal-page__table td {
+      display: block;
+      width: 100%;
+    }
+
+    .journal-page__table-row td {
+      border-left: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+      border-right: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+      border-radius: 0;
+      padding: 0.9rem 1rem;
+    }
+
+    .journal-page__table-row td:first-child {
+      border-radius: 1rem 1rem 0 0;
+    }
+
+    .journal-page__table-row td:last-child {
+      border-radius: 0 0 1rem 1rem;
+      text-align: left;
+    }
+
+    .journal-page__table-entry-link {
+      grid-template-columns: 3.5rem minmax(0, 1fr);
+      gap: 0.8rem;
+    }
+
+    .journal-page__table-thumb {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 0.8rem;
+    }
+
+    .journal-page__table-taxonomy,
+    .journal-page__table-date,
+    .journal-page__table-link {
+      width: 100%;
     }
   }
 </style>
