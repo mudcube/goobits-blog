@@ -192,22 +192,31 @@ if (configForDebug.debug) {
  */
 export function formatDate(dateString: string | Date, shortFormat = false): string {
 	const date = new Date(dateString)
+
 	// Check for invalid date
 	if (isNaN(date.getTime())) {
 		return 'Unknown date'
 	}
+
+	const formatOptions: Intl.DateTimeFormatOptions = shortFormat
+		? {
+				month: 'numeric',
+				day: 'numeric',
+				year: 'numeric',
+				timeZone: 'UTC'
+			}
+		: {
+				month: 'long',
+				day: 'numeric',
+				year: 'numeric',
+				timeZone: 'UTC'
+			}
+
 	if (shortFormat) {
-		return date.toLocaleDateString('en-US', {
-			month: 'numeric',
-			day: 'numeric',
-			year: 'numeric'
-		})
+		return date.toLocaleDateString('en-US', formatOptions)
 	}
-	return date.toLocaleDateString('en-US', {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric'
-	})
+
+	return date.toLocaleDateString('en-US', formatOptions)
 }
 
 /**
