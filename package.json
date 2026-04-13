@@ -1,0 +1,128 @@
+{
+  "name": "@goobits/blog",
+  "version": "1.2.0",
+  "description": "Reusable blog components for Svelte 5 projects",
+  "main": "index.ts",
+  "svelte": "./index.ts",
+  "types": "./index.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "svelte": "./index.ts",
+      "default": "./index.ts"
+    },
+    "./ui": {
+      "types": "./ui/index.ts",
+      "svelte": "./ui/index.ts",
+      "default": "./ui/index.ts"
+    },
+    "./ui/*": {
+      "svelte": "./ui/*",
+      "default": "./ui/*"
+    },
+    "./utils": {
+      "types": "./utils/index.ts",
+      "svelte": "./utils/index.ts",
+      "default": "./utils/index.ts"
+    },
+    "./utils/*": {
+      "svelte": "./utils/*",
+      "default": "./utils/*"
+    },
+    "./config": {
+      "types": "./config/index.ts",
+      "svelte": "./config/index.ts",
+      "default": "./config/index.ts"
+    },
+    "./config/*": {
+      "svelte": "./config/*",
+      "default": "./config/*"
+    },
+    "./config/defaults": {
+      "types": "./config/defaults.ts",
+      "svelte": "./config/defaults.ts",
+      "default": "./config/defaults.ts"
+    },
+    "./handlers": {
+      "types": "./handlers/index.ts",
+      "svelte": "./handlers/index.ts",
+      "default": "./handlers/index.ts"
+    },
+    "./handlers/*": {
+      "svelte": "./handlers/*",
+      "default": "./handlers/*"
+    },
+    "./i18n": {
+      "types": "./i18n/index.ts",
+      "svelte": "./i18n/index.ts",
+      "default": "./i18n/index.ts"
+    }
+  },
+  "sideEffects": [
+    "**/*.scss"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit"
+  },
+  "files": [
+    "index.ts",
+    "config.ts",
+    "svelte.d.ts",
+    "tsconfig.json",
+    "ui",
+    "utils",
+    "config",
+    "handlers",
+    "i18n",
+    "LICENSE",
+    "README.md"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "peerDependencies": {
+    "@sveltejs/kit": "^2.0.0",
+    "svelte": "^5.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "svelte",
+    "sveltekit",
+    "blog",
+    "markdown",
+    "cms",
+    "i18n",
+    "internationalization",
+    "typescript"
+  ],
+  "author": "GooBits",
+  "homepage": "https://github.com/goobits/blog#readme",
+  "bugs": {
+    "url": "https://github.com/goobits/blog/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goobits/blog.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
+    "eslint": "^9.39.2",
+    "eslint-plugin-svelte": "^3.14.0",
+    "globals": "^17.2.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.54.0",
+    "vitest": "^4.0.18"
+  }
+}
