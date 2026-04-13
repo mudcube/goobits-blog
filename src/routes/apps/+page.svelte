@@ -283,7 +283,8 @@
 
 	.apps-page__grid {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-columns: repeat(3, minmax(0, var(--project-card-width)));
+		justify-content: space-between;
 		gap: var(--space-8);
 	}
 
@@ -443,7 +444,8 @@
 
 	@media (max-width: 1024px) {
 		.apps-page__grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: repeat(2, minmax(0, var(--project-card-width)));
+			justify-content: center;
 		}
 	}
 
@@ -463,6 +465,10 @@
 		.apps-page__inquiry-panel {
 			align-items: stretch;
 			flex-direction: column;
+		}
+
+		.apps-page__grid {
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 </style>

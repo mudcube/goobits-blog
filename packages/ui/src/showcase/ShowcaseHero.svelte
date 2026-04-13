@@ -11,6 +11,7 @@
 		eyebrow: string
 		title: string
 		titleAccent?: string
+		titleAccentNewLine?: boolean
 		icon?: string
 		iconAlt?: string
 		intro: string
@@ -24,6 +25,7 @@
 		eyebrow,
 		title,
 		titleAccent = '',
+		titleAccentNewLine = false,
 		icon = '',
 		iconAlt = '',
 		intro,
@@ -40,11 +42,22 @@
 		<h1 class="showcase-hero__title">
 			{title}
 			{#if titleAccent}
-				<span>
-					{titleAccent}
+				<span class:showcase-hero__title-accent-line={titleAccentNewLine}>
+					<span>{titleAccent}</span>
+					{#if icon}
+						<span class="showcase-hero__title-icon-wrap"
+							><img
+								src={icon}
+								alt={iconAlt}
+								class="showcase-hero__title-icon"
+								loading="eager"
+								fetchpriority="high"
+								decoding="async"
+							/></span
+						>
+					{/if}
 				</span>
-			{/if}
-			{#if icon}
+			{:else if icon}
 				<span class="showcase-hero__title-icon-wrap"
 					><img
 						src={icon}
@@ -168,6 +181,19 @@
 	.showcase-hero__title span {
 		color: var(--showcase-primary);
 		font-style: italic;
+	}
+
+	.showcase-hero__title-accent-line {
+		display: inline;
+	}
+
+	.showcase-hero__title-accent-line > span {
+		color: var(--showcase-primary);
+		font-style: italic;
+	}
+
+	.showcase-hero__title-accent-line.showcase-hero__title-accent--block {
+		display: block;
 	}
 
 	.showcase-hero__title-icon-wrap {

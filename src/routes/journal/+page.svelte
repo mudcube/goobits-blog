@@ -72,7 +72,7 @@
     <ShowcaseHero
       eyebrow="Journal"
       title="Ideas, process, and"
-      titleAccent="notes"
+      titleAccent="field notes"
       icon="/media/journal-journaling.png"
       iconAlt="Journal icon"
       intro="Thoughts on creative coding, design tools, music experiments, product work, and the small breakthroughs that happen while building."

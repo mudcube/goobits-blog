@@ -85,7 +85,7 @@
 	]}
 />
 
-<PageShell className="showcase-page showcase-page--music">
+<PageShell className="showcase-page showcase-page--portfolio showcase-page--music">
 	<div class="showcase-page__inner" id="music">
 		<ShowcaseHero
 			eyebrow="Music"
@@ -126,27 +126,3 @@
 		/>
 	</div>
 </PageShell>
-
-<style lang="scss">
-	:global(.ui-page-shell.showcase-page--music) {
-		--showcase-surface: color-mix(in srgb, var(--bg) 94%, var(--brand-primary) 6%);
-		--showcase-surface-low: color-mix(in srgb, var(--bg) 88%, var(--brand-primary) 12%);
-		--showcase-surface-high: color-mix(in srgb, var(--card-bg) 76%, var(--brand-primary) 24%);
-		--showcase-surface-highest: color-mix(in srgb, var(--card-bg) 64%, var(--brand-primary) 36%);
-		--showcase-surface-bright: color-mix(in srgb, var(--card-bg) 56%, var(--brand-primary) 44%);
-		--showcase-text: var(--text);
-		--showcase-muted: var(--muted);
-		--showcase-primary: #ac8aff;
-		--showcase-primary-dim: #8455ef;
-		--showcase-secondary: #4cd7f6;
-		--showcase-secondary-on-container: #00b3d1;
-		--showcase-tertiary: #fea619;
-		--showcase-tertiary-on-container: #4f3000;
-		--showcase-outline-variant: color-mix(in srgb, var(--border) 68%, transparent);
-		width: 100%;
-		overflow: hidden;
-		background: transparent;
-		color: var(--showcase-text);
-		font-family: var(--font-ui-sans, var(--font-sans));
-	}
-</style>

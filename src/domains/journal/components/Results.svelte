@@ -7,8 +7,7 @@
 	let {
 		posts = [],
 		category = '',
-		showBackButton = true,
-		type = 'category'
+		showBackButton = true
 	} = $props()
 
 </script>

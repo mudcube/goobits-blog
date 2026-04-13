@@ -1,10 +1,23 @@
 import fs from 'fs'
 import path from 'path'
+import { execFileSync } from 'child_process'
 import { getJournalPosts } from '@src/domains/journal/server/posts'
 import { getConfiguredReleaseStage, isRouteReleased, type ReleaseStage } from '$lib/app/release'
-import type { SitemapAudience } from '$lib/app/routes/meta'
+import type { RouteMeta, SitemapAudience } from '$lib/app/routes/meta'
 
 const ROUTES_DIR = 'src/routes'
+const ROUTES_DIR_ABS = path.resolve(ROUTES_DIR)
+const routeMetaModules = import.meta.glob<{ routeMeta?: RouteMeta }>('/src/routes/**/route-meta.ts', { eager: true })
+const routeMetaByDir = new Map<string, RouteMeta>()
+
+for (const [modulePath, moduleExports] of Object.entries(routeMetaModules)) {
+	const routeMeta = moduleExports?.routeMeta
+	if (!routeMeta) continue
+
+	const filePath = modulePath.replace(/^\/src\/routes/, ROUTES_DIR).replace(/\\/g, '/')
+	const directory = path.resolve(path.dirname(filePath))
+	routeMetaByDir.set(directory, routeMeta)
+}
 
 export const DEV_ONLY_CATEGORIES = ['Admin Pages', 'API Routes', 'Utility Pages']
 
@@ -71,15 +84,54 @@ const SITEMAP_AUDIENCE_MATCHERS: Array<{ path: string; sitemap: SitemapAudience;
 ]
 
 function readRouteMeta(dir: string) {
-	const metaFile = path.join(dir, 'route-meta.ts')
-	if (!fs.existsSync(metaFile)) return {}
+	const meta: RouteMeta = {}
+	const directories: string[] = []
+	let currentDir = path.resolve(dir)
 
-	const content = fs.readFileSync(metaFile, 'utf-8')
-	const sitemap = content.match(/sitemap\s*:\s*['"](?<value>public|internal|hidden)['"]/)?.groups?.['value']
-
-	return {
-		sitemap: sitemap as SitemapAudience | undefined
+	while (currentDir.startsWith(ROUTES_DIR_ABS)) {
+		directories.push(currentDir)
+		if (currentDir === ROUTES_DIR_ABS) break
+		currentDir = path.dirname(currentDir)
 	}
+
+	for (const routeDir of directories.reverse()) {
+		const routeDirMeta = routeMetaByDir.get(routeDir)
+		if (!routeDirMeta) continue
+		Object.assign(meta, routeDirMeta)
+	}
+
+	return meta
+}
+
+const gitLastModifiedCache = new Map<string, string>()
+
+function getGitLastModified(filePath: string) {
+	if (gitLastModifiedCache.has(filePath)) return gitLastModifiedCache.get(filePath)
+
+	try {
+		const value = execFileSync('git', ['log', '-1', '--format=%cI', '--', filePath], {
+			encoding: 'utf-8',
+			cwd: process.cwd()
+		}).trim()
+		const normalized = value || null
+		gitLastModifiedCache.set(filePath, normalized ?? '')
+		return normalized
+	} catch {
+		gitLastModifiedCache.set(filePath, '')
+		return null
+	}
+}
+
+function getContentLastModified(candidatePaths: string[], fallbackIso: string) {
+	const timestamps = candidatePaths
+		.filter(filePath => fs.existsSync(filePath))
+		.map(filePath => getGitLastModified(filePath))
+		.filter((value): value is string => Boolean(value))
+		.map(value => new Date(value).getTime())
+		.filter(value => Number.isFinite(value))
+
+	if (timestamps.length === 0) return fallbackIso
+	return new Date(Math.max(...timestamps)).toISOString()
 }
 
 function getFamilySitemapAudience(routePath: string, type: RouteEntry['type'], isDynamic: boolean): SitemapAudience {
@@ -128,10 +180,26 @@ function scanRoutes(dir: string, basePath = '') {
 			const hasLayout = fs.existsSync(layoutFile)
 
 			const pageContent = fs.readFileSync(fullPath, 'utf-8')
-			const isNoIndex = pageContent.includes('noindex') || pageContent.includes('robots')
+			const routeMeta = readRouteMeta(dir)
+			const isNoIndex =
+				routeMeta.noindex === true ||
+				/\bnoindex\b/.test(pageContent) ||
+				/<meta\s+name=['"]robots['"]/i.test(pageContent)
 			const isDynamic = routePath.includes('[')
 			const hasAuth = routePath.includes('admin') || pageContent.includes('auth') || pageContent.includes('session')
-			const sitemap = getSitemapAudience(dir, routePath, 'page', isDynamic)
+			const sitemap = routeMeta.sitemap ?? getFamilySitemapAudience(routePath, 'page', isDynamic)
+			const lastModified = getContentLastModified(
+				[
+					fullPath,
+					serverFile,
+					serverTsFile,
+					clientFile,
+					clientTsFile,
+					layoutFile,
+					path.join(dir, 'route-meta.ts')
+				],
+				stat.mtime.toISOString()
+			)
 
 			const pageRoute: PageRoute = {
 				path: routePath,
@@ -144,7 +212,7 @@ function scanRoutes(dir: string, basePath = '') {
 				hasAuth,
 				isNoIndex,
 				sitemap,
-				lastModified: stat.mtime.toISOString(),
+				lastModified,
 				category: categorizeRoute(routePath)
 			}
 			routes.push(pageRoute)

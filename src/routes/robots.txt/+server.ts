@@ -11,7 +11,9 @@ export const GET: RequestHandler = ({ platform, url }) => {
 		'User-agent: *',
 		'Allow: /',
 		'Disallow: /admin',
+		'Disallow: /schedule/admin',
 		'Disallow: /api',
+		'Disallow: /dev',
 		'Disallow: /health',
 		`Sitemap: ${origin}/sitemap.xml`
 	].join('\n')
