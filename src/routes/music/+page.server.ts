@@ -1,4 +1,4 @@
-import { getJournalPosts } from '@miko/blog/server'
+import { getJournalPosts } from '@miko/blog-legacy/server'
 
 type MusicPost = {
 	title: string

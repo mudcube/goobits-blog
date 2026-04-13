@@ -2,7 +2,7 @@ import 'dotenv/config'
 import adapterCloudflare from '@sveltejs/adapter-cloudflare'
 import { mdsvex } from 'mdsvex'
 import { handlePrerenderHttpError } from './src/lib/app/config/runtime/sveltekit.runtime.js'
-import { remarkTableOfContents } from './packages/blog/src/server/remark-table-of-contents.js'
+import { remarkTableOfContents } from './packages/blog-legacy/src/server/remark-table-of-contents.js'
 
 export default {
 	kit: {
@@ -57,8 +57,8 @@ export default {
 			'@src': './src',
 			'@static': './static',
 			'@packages': './packages',
-			'@miko/blog': './packages/blog/src',
-			'@miko/blog/server': './packages/blog/src/server/index.ts',
+			'@miko/blog-legacy': './packages/blog-legacy/src',
+			'@miko/blog-legacy/server': './packages/blog-legacy/src/server/index.ts',
 			'@miko/ui': './packages/ui/src',
 			'@calendar/app': './packages/calendar/app/src',
 			'@calendar/ui': './packages/calendar/ui/src'

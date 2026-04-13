@@ -1,6 +1,6 @@
 <script>
 	import { Seo, buildWebPageJsonLd, formatSeoLabel } from '$lib/app/seo'
-	import { BlogResults } from '@miko/blog'
+	import { BlogResults } from '@miko/blog-legacy'
 
 	let { data } = $props()
 	const tag = $derived(data.tag)

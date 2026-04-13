@@ -6,7 +6,7 @@
 		buildBreadcrumbJsonLd,
 		toPlainTextExcerpt
 	} from '$lib/app/seo'
-	import { BlogMetadataValues } from '@miko/blog'
+	import { BlogMetadataValues } from '@miko/blog-legacy'
 	import PublicBreadcrumbs from '$lib/app/shell/PublicBreadcrumbs.svelte'
 
 	const { data } = $props()

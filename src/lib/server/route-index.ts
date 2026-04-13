@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { execFileSync } from 'child_process'
-import { getJournalPosts } from '@miko/blog/server'
+import { getJournalPosts } from '@miko/blog-legacy/server'
 import { getConfiguredReleaseStage, isRouteReleased, type ReleaseStage } from '$lib/app/release'
 import type { RouteMeta, SitemapAudience } from '$lib/app/routes/meta'
 
