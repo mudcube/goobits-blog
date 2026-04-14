@@ -1,7 +1,6 @@
 ---
 title: "MIDI.js"
 date: "2012-02-16"
-coverImage: "hero.png"
 categories: 
   - "open-source"
 tags: 

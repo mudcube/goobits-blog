@@ -1,7 +1,6 @@
 ---
 title: "Color Accessibility in the Browser"
 date: "2011-10-20"
-coverImage: "hero.png"
 categories: 
   - "apps"
 tags: 
@@ -36,7 +35,7 @@ The following highlight some of the options to get around Cross Domain issues wi
 
 7. Base64 proxy from external server.
 
-- Max Novakovic’s function [$.getImageData](http://www.maxnov.com/getimagedata/) using [Google App Engine](http://code.google.com/appengine/).  This is used as a last case scenario due to bandwidth [sertraline anxiety](http://biturlz.com/ba9zKpH). The $.getImageData proxy is used as a last resort, as it produces bandwidth concerns.
+- Max Novakovic’s function [$.getImageData](http://www.maxnov.com/getimagedata/) using [Google App Engine](http://code.google.com/appengine/). This is used as a last-case scenario due to bandwidth concerns. The $.getImageData proxy is used as a last resort, as it produces bandwidth overhead.
 
 [CORS](http://www.w3.org/TR/cors/) is the preferable method to access images from external domains. The problem is knowing whether a server supports it or not—the following snippet is a hack to figure out whether an browser/server combination supports CORS, or not;
 

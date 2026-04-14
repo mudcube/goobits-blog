@@ -6,7 +6,6 @@ categories:
 tags: 
   - "html5"
   - "sketchpad"
-coverImage: "Sketchpad-5-copy.jpg"
 ---
 
 [Sketchpad v3.7](https://sketch.io/sketchpad/) has arrived!

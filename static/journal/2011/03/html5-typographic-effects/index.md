@@ -14,16 +14,16 @@ tags:
 
 … [Neon Rainbow Jitter](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#neon+rainbow+jitter);
 
-[![](images/Screen-shot-2011-05-15-at-10.57.14-PM.png "Screen shot 2011-05-15 at 10.57.14 PM")](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#neon+rainbow+jitter)
+[![Neon Rainbow Jitter example](images/Screen-shot-2011-05-15-at-10.57.14-PM.png "Screen shot 2011-05-15 at 10.57.14 PM")](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#neon+rainbow+jitter "Open Neon Rainbow Jitter example")
 
 … [Sleek Zebra](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#pattern+gradient+reflect) (inspired by [WebDesignerWall](http://www.webdesignerwall.com/demo/css-gradient-text));
 
-[![](images/Screen-shot-2011-05-15-at-10.59.02-PM.png "Screen shot 2011-05-15 at 10.59.02 PM")](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#pattern+gradient+reflect)
+[![Sleek Zebra example](images/Screen-shot-2011-05-15-at-10.59.02-PM.png "Screen shot 2011-05-15 at 10.59.02 PM")](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#pattern+gradient+reflect "Open Sleek Zebra example")
 
 … [Spaceage](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#spaceage);
 
-[![](images/Screen-shot-2011-05-15-at-11.00.49-PM.png "Screen shot 2011-05-15 at 11.00.49 PM")](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#spaceage)
+[![Spaceage example](images/Screen-shot-2011-05-15-at-11.00.49-PM.png "Screen shot 2011-05-15 at 11.00.49 PM")](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#spaceage "Open Spaceage example")
 
 … and many other [fun](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#shadow) [effects](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#innershadow+pattern+gradient).  The following ones are using a CSS->Canvas converter; the CSS used in the converter was sourced from [Line25](http://line25.com/articles/using-css-text-shadow-to-create-cool-text-effects), and [Stereoscopic](http://lab.simurai.com/css/css3d/), and [Shadow 3D](http://pgwebdesign.net/blog/3d-css-shadow-text-tutorial);
 
-[![](images/Screen-shot-2011-05-15-at-11.06.57-PM.png "Screen shot 2011-05-15 at 11.06.57 PM")](/journal/2011/03/html5-typographic-effects/images/Screen-shot-2011-05-15-at-11.06.57-PM.png)
+[![Shadow 3D example](images/Screen-shot-2011-05-15-at-11.06.57-PM.png "Screen shot 2011-05-15 at 11.06.57 PM")](/journal/2011/03/html5-typographic-effects/images/Screen-shot-2011-05-15-at-11.06.57-PM.png "Open full-size Shadow 3D image")

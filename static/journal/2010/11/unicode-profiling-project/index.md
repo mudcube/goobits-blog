@@ -46,7 +46,7 @@ The project fully supports Chrome, Firefox, Safari, and Opera.  Some false posi
 **Results on my Mac:**
 
 - **Safari** 49,493 visible glyphs
-- **Firefox 3.6** 49,428 visible glyphs _NOTE:  Each undefined symbol has a unique hash unless text size is <=11_
+- **Firefox 3.6** 49,428 visible glyphs _NOTE:  Each undefined symbol has a unique hash unless text size is `<=11`_
 - **Google Chrome 7.0** 49,493 visible glyphs
 - **Chromium 8.0** 49,492 visible glyphs
 - **Opera 10.6** 47,672 visible glyphs _NOTE:  Supports different fonts in `<canvas>` than regular DOM_
@@ -54,7 +54,7 @@ The project fully supports Chrome, Firefox, Safari, and Opera.  Some false posi
 **Results on my Windows:**
 
 - **IE 9.0** 50,826 visible glyphs _NOTE:  Some false positives… each range has it’s own undefined symbol._
-- **Firefox 3.6** 51,208 visible glyphs _NOTE:  Each undefined symbol has a unique hash unless text size is <=10_
+- **Firefox 3.6** 51,208 visible glyphs _NOTE:  Each undefined symbol has a unique hash unless text size is `<=10`_
 - **Google Chrome 7.0** 47,267 visible glyphs _NOTE:  Textarea can have different unicode support than Div in some cases.  For instance, on my computer_ _ﰿ works in Textarea, but not in Div._
 - **Opera 10.6** 56,024 visible glyphs _NOTE:  Supports different unicode in Canvas than Div and Textarea.  Also, Opera supports more unicode characters than other browsers by far, possibly included in the package?_
 

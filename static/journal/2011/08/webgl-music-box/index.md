@@ -1,7 +1,6 @@
 ---
 title: "Music Box"
 date: "2011-08-08"
-coverImage: "hero.png"
 categories: 
   - "apps"
 tags: 

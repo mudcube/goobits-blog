@@ -1,7 +1,6 @@
 ---
 title: "Print-ready graphics in Canvas"
 date: "2011-11-09"
-coverImage: "hero.jpeg"
 categories: 
   - "diy"
 tags: 

@@ -1,7 +1,6 @@
 ---
 title: "Portlandia Foods: Uploader"
 date: "2011-10-02"
-coverImage: "hero.jpeg"
 categories: 
   - "portlandia-foods"
 tags: 

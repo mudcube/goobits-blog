@@ -1,7 +1,6 @@
 ---
 title: "ColRD: Gradient Creator"
 date: "2011-10-22"
-coverImage: "hero.png"
 categories: 
   - "apps"
   - "colrd"

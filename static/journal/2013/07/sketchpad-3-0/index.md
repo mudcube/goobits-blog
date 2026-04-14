@@ -6,7 +6,6 @@ categories:
 tags: 
   - "html5"
   - "sketchpad"
-coverImage: "sketch-3-copy-3.png"
 ---
 
 Sketchpad 3 is available in the Chrome Webstore (for free), combining WebGL effects with vector editing, and lots of HTML5 goodness!

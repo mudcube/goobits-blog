@@ -1,14 +1,13 @@
 ---
 title: "Batch Thumbnail Generator"
 date: "2011-11-24"
-coverImage: "hero.png"
 categories: 
   - "apps"
 tags: 
   - "html5"
 ---
 
-Many times, when researching a larger project, I make smaller demos—to break up my workflow, and keep things fresh. The [Batch Thumbnail Generator](/software/Thumbnailer/) (BTG) is one of these offshoots, a sandbox for creating zip packages with the <a href="http://dev.w3 [view website](http://biturlz.com/ICFvXul).org/2009/dap/file-system/file-writer.html”>BlobBuilder API, and Flash based download solutions—I also used BTG to create the thumbnails for the [Software](/software/) page (which didn’t quite justify the time invested).
+Many times, when researching a larger project, I make smaller demos to break up my workflow and keep things fresh. The [Batch Thumbnail Generator](/software/Thumbnailer/) (BTG) is one of these offshoots, a sandbox for creating zip packages with the [BlobBuilder API](http://dev.w3.org/2009/dap/file-system/file-writer.html), and Flash-based download solutions. I also used BTG to create the thumbnails for the [Software](/software/) page, which didn’t quite justify the time invested.
 
 BTG allows you to quickly produce .zip thumbnail packages;
 

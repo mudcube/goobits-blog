@@ -3,7 +3,6 @@ title: "Sketchpad 5.0"
 date: "2018-01-09"
 categories: 
   - "apps"
-coverImage: "Screen-Shot-2017-12-03-at-2.41.55-AM_1200x800.png"
 ---
 
 Hot off the press! Introducing Sketchpad v5.0 (codename Fancy Fox)
@@ -25,4 +24,4 @@ As always feel free to drop us a [message](https://sketch.io/contact.html) and
 
  
 
-[![](images/Screen-Shot-2017-08-14-at-4.31.34-PM_1200x800.png)](http://sketchpad.app)
+[![Sketchpad 5.0 screenshot](images/Screen-Shot-2017-08-14-at-4.31.34-PM_1200x800.png)](http://sketchpad.app "Open Sketchpad website")

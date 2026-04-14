@@ -1,7 +1,6 @@
 ---
 title: "Color Piano 2.0"
 date: "2011-12-28"
-coverImage: "hero.png"
 categories: 
   - "apps"
 tags: 
@@ -68,7 +67,7 @@ _Getting your feet wet with Color Piano (features);_
     - Now displays all 88-keys of a standard piano.
     - Watch notes falling towards the keys before the note plays!
 - 1.1.0–11/27/11
-    - HTML5 <audio> is used for sound-output.
+    - HTML5 `<audio>` is used for sound-output.
     - Color Piano Theory is available on the [Chrome Webstore](https://chrome.google.com/webstore/detail/ihmigmmflfcbhdpdgbkkeojchjhhphnh).
 - 1.0beta
     - MIDI-reading support via [Matt West](http://matt.west.co.tt/)‘s very kindly provided [jasmid](https://github.com/gasman/jasmid) project.

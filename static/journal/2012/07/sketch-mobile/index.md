@@ -1,7 +1,6 @@
 ---
 title: "Sketch Mobile"
 date: "2012-07-18"
-coverImage: "hero.png"
 categories: 
   - "apps"
 tags: 

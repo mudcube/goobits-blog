@@ -1,7 +1,6 @@
 ---
 title: "Color Sphere"
 date: "2011-11-15"
-coverImage: "hero.png"
 categories: 
   - "apps"
 tags: 
