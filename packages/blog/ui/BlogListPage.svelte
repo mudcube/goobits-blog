@@ -2,35 +2,32 @@
 	import './BlogListPage.scss'
 	import PostList from './PostList.svelte'
 	import Sidebar from './Sidebar.svelte'
-	import { blogConfig, defaultMessages } from '@goobits/blog/config/index.js'
-	import { createMessageGetter, slugify } from '@goobits/blog/utils/index.js'
+	import { blogConfig, defaultMessages, buildPostsApiUrl } from '@goobits/blog/config/index.js'
+	import { createMessageGetter } from '@goobits/blog/utils/index.js'
 	import { createLogger } from '@goobits/blog/utils/logger.js'
 	import { onMount } from 'svelte'
 
 	const logger = createLogger('BlogListPage')
 
 	const { data, messages = {}, locale = 'en' } = $props()
-	
-	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
 
 	const POSTS_PER_BATCH = blogConfig.pagination.postsPerBatch
 
 	// State for infinite scroll
-	let allPosts = $state([...data.posts]) // Start with SSR posts
+	let allPosts = $state([])
 	let isLoading = $state(false)
 	let currentPage = $state(1) // Track current page for API calls
-	let hasMorePosts = $state(data.hasMorePosts !== false) // Use server data or default to true
+	let hasMorePosts = $state(true) // Use server data or default to true
 
 	// Use allPosts as the visible posts (no more slicing)
 	const visiblePosts = $derived(allPosts)
 
 	// Initialize posts from server data
 	$effect(() => {
-		if (data.posts && data.posts.length > 0) {
-			allPosts = [...data.posts]
-			hasMorePosts = data.hasMorePosts !== false
-		}
+		allPosts = Array.isArray(data.posts) ? [...data.posts] : []
+		hasMorePosts = data.hasMorePosts !== false
+		currentPage = 1
 	})
 
 	let loadingElement = $state(null)
@@ -60,10 +57,15 @@
 				params.set('tag', data.tag)
 			}
 
-			const response = await fetch(`/api/blog/posts?${params}`)
-			if (!response.ok) {
-				throw new Error(`Failed to fetch posts: ${response.statusText}`)
-			}
+				const response = await fetch(buildPostsApiUrl(params, {
+					pageType: data.pageType,
+					category: data.category,
+					tag: data.tag,
+					lang: data.lang || locale || 'en'
+				}))
+				if (!response.ok) {
+					throw new Error(`Failed to fetch posts: ${response.statusText}`)
+				}
 
 			const result = await response.json()
 			if (result.posts && result.posts.length > 0) {
@@ -79,25 +81,6 @@
 		} finally {
 			isLoading = false
 		}
-	}
-
-	/**
-	 * Formats a number based on the provided locale (reserved for future use).
-	 * @param {number} value - The number to format.
-	 * @returns {string} The formatted number string.
-	 */
-	function _formatNumber(value) {
-		return new Intl.NumberFormat(locale).format(value)
-	}
-
-	/**
-	 * Generates a URL for a blog category or tag (reserved for future use).
-	 * @param {string} value - The category or tag name.
-	 * @param {string} type - The type of link ('category' or 'tag').
-	 * @returns {string} The generated URL.
-	 */
-	function _getLink(value, type) {
-		return `${ blogConfig.uri }/${ type }/${ slugify(value) }`
 	}
 
 	onMount(() => {
@@ -200,4 +183,3 @@
 		/>
 	</div>
 </div>
-

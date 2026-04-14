@@ -98,7 +98,12 @@ vi.mock('../config/index.js', () => ({
 		name: 'Test Blog',
 		description: 'A test blog',
 		uri: '/blog'
-	}
+	},
+	getBlogConfig: () => ({
+		name: 'Test Blog',
+		description: 'A test blog',
+		uri: '/blog'
+	})
 }))
 
 function createEvent(slug: string, locals: Partial<Locals> = {}): ServerLoadEvent {

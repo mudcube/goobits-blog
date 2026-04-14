@@ -28,8 +28,7 @@
 		messages = {}
 	} = $props()
 
-	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
 </script>
 
 <div class="breadcrumbs">
@@ -82,26 +81,26 @@
 		gap: $spacing-small;
 		margin-bottom: $spacing-large;
 		font-size: $font-size-small;
+	}
 
-		&__link {
-			color: var(--color-text-muted);
+	.breadcrumbs__link {
+		color: var(--color-text-muted);
+	}
 
-			&:hover {
-				color: var(--amber-700);
-			}
-		}
+	.breadcrumbs__link:hover {
+		color: var(--amber-700);
+	}
 
-		&__separator {
-			color: var(--color-text-muted);
-		}
+	.breadcrumbs__separator {
+		color: var(--color-text-muted);
+	}
 
-		&__current {
-			color: var(--amber-700);
-			font-weight: $font-weight-medium;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			max-width: 200px;
-		}
+	.breadcrumbs__current {
+		color: var(--amber-700);
+		font-weight: $font-weight-medium;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		max-width: 200px;
 	}
 </style>

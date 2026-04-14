@@ -4,8 +4,7 @@
 
 	const { data, messages = {} } = $props()
 
-	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
 </script>
 
 <svelte:head>

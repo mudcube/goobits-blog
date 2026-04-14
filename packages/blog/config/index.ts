@@ -8,6 +8,7 @@ import { defaultBlogConfig, getDefaultBlogPostFiles } from './defaults.js'
 import type { BlogConfig, GlobImportRecord } from './defaults.js'
 import { secureDeepMerge } from './secureDeepMerge.js'
 import { createLogger } from '../utils/logger.js'
+import { loadCategoryDescriptions as loadDefaultCategoryDescriptions } from '../utils/categoryDescriptions.js'
 export { defaultMessages } from './defaultMessages.js'
 export type { BlogConfig, GlobImportRecord } from './defaults.js'
 
@@ -15,15 +16,28 @@ const logger = createLogger('Config')
 
 /** Function type for getting blog post files */
 export type GetBlogPostFilesFn = () => GlobImportRecord
+/** Function type for building the posts API URL */
+export type BuildPostsApiUrlFn = (
+	params: URLSearchParams,
+	context?: Record<string, unknown>
+) => string
+/** Function type for loading category descriptions from the host app */
+export type LoadCategoryDescriptionsFn<TCategoryData = Record<string, unknown>> = (
+	lang: string
+) => Promise<Record<string, TCategoryData>>
 
 /** Options for initializing blog config */
 export interface InitBlogConfigOptions {
 	getBlogPostFiles?: GetBlogPostFilesFn
+	buildPostsApiUrl?: BuildPostsApiUrlFn
+	loadCategoryDescriptions?: LoadCategoryDescriptionsFn
 }
 
 /** Custom functions store type */
 interface CustomFunctions {
 	getBlogPostFiles: GetBlogPostFilesFn | null
+	buildPostsApiUrl: BuildPostsApiUrlFn | null
+	loadCategoryDescriptions: LoadCategoryDescriptionsFn | null
 }
 
 // Store for the current configuration
@@ -31,7 +45,9 @@ let currentConfig: BlogConfig | null = null
 
 // Store for custom functions that can't be serialized
 const customFunctions: CustomFunctions = {
-	getBlogPostFiles: null
+	getBlogPostFiles: null,
+	buildPostsApiUrl: null,
+	loadCategoryDescriptions: null
 }
 
 /**
@@ -49,6 +65,12 @@ export function initBlogConfig(
 	// Store functions separately
 	if (options.getBlogPostFiles) {
 		customFunctions.getBlogPostFiles = options.getBlogPostFiles
+	}
+	if (options.buildPostsApiUrl) {
+		customFunctions.buildPostsApiUrl = options.buildPostsApiUrl
+	}
+	if (options.loadCategoryDescriptions) {
+		customFunctions.loadCategoryDescriptions = options.loadCategoryDescriptions
 	}
 
 	// Merge configuration securely (excluding functions)
@@ -105,6 +127,36 @@ export function getBlogPostFiles(): GlobImportRecord {
 
 	// Use default glob pattern
 	return getDefaultBlogPostFiles()
+}
+
+/**
+ * Build the posts API URL used by infinite-scroll UIs.
+ * Consumers can override this to support custom route mounts.
+ */
+export function buildPostsApiUrl(
+	params: URLSearchParams,
+	context: Record<string, unknown> = {}
+): string {
+	if (customFunctions.buildPostsApiUrl) {
+		return customFunctions.buildPostsApiUrl(params, context)
+	}
+
+	const { postsApiPath } = getBlogConfig().pagination
+	return `${ postsApiPath }?${ params.toString() }`
+}
+
+/**
+ * Load category description metadata.
+ * Consumers can override this to avoid package assumptions about content paths.
+ */
+export async function loadConfiguredCategoryDescriptions<TCategoryData = Record<string, unknown>>(
+	lang: string
+): Promise<Record<string, TCategoryData>> {
+	if (customFunctions.loadCategoryDescriptions) {
+		return await customFunctions.loadCategoryDescriptions(lang) as Record<string, TCategoryData>
+	}
+
+	return await loadDefaultCategoryDescriptions(lang) as Record<string, TCategoryData>
 }
 
 // Export a proxy to the current config for backward compatibility

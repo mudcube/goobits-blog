@@ -11,6 +11,8 @@ import {
 	formatDate,
 	getPostExcerpt,
 	processImagePath,
+	getPostImageData,
+	getCoverImageUrl,
 	filterPostsByCategory,
 	filterPostsByTag,
 	parseCategoryDescriptions,
@@ -75,6 +77,8 @@ function createPost(overrides: {
 	content?: string
 	urlPath?: string
 	path?: string
+	coverImage?: string
+	imageSrc?: string
 } = {}): ProcessedPost {
 	const fm: ProcessedPost['metadata']['fm'] = {
 		title: overrides.title ?? 'Test Post',
@@ -84,6 +88,8 @@ function createPost(overrides: {
 	if (overrides.category) { fm.category = overrides.category }
 	if (overrides.tags) { fm.tags = overrides.tags }
 	if (overrides.excerpt) { fm.excerpt = overrides.excerpt }
+	if (overrides.coverImage) { fm.coverImage = overrides.coverImage }
+	if (overrides.imageSrc) { fm.image = { src: overrides.imageSrc, alt: overrides.title ?? 'Test Post' } }
 
 	const post: ProcessedPost = {
 		metadata: { fm },
@@ -277,6 +283,31 @@ describe('processImagePath', () => {
 	})
 })
 
+
+
+describe('blog image helpers', () => {
+	it('uses coverImage metadata for stock card images', () => {
+		const post = createPost({
+			title: 'Sketchpad 1.0',
+			urlPath: '/2009/10/sketchpad-beta',
+			coverImage: '/journal/2009/10/sketchpad-beta/images/13.png'
+		})
+
+		expect(getPostImageData(post).src).toBe('/journal/2009/10/sketchpad-beta/images/13.png')
+		expect(getCoverImageUrl(post)).toBe('/journal/2009/10/sketchpad-beta/images/13.png')
+	})
+
+	it('resolves relative post-local images against the post url', () => {
+		const post = createPost({
+			title: 'Dynamic MIDI generation in the browser',
+			urlPath: '/2010/08/dynamic-midi-generation-in-the-browser',
+			imageSrc: 'images/midi-js-demo.png'
+		})
+
+		expect(getPostImageData(post).src).toBe('/blog/2010/08/dynamic-midi-generation-in-the-browser/images/midi-js-demo.png')
+		expect(getCoverImageUrl(post)).toBe('/blog/2010/08/dynamic-midi-generation-in-the-browser/images/midi-js-demo.png')
+	})
+})
 describe('filterPostsByCategory', () => {
 	// These tests catch the complex category/tag disambiguation logic
 

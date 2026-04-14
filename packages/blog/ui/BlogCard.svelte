@@ -45,52 +45,37 @@
 		imageRatio = 'landscape',
 		className = '',
 		currentTag = '',
-		currentCategory = '',
+			currentCategory: _currentCategory = '',
 		messages = {},
 		locale = 'en'
 	} = $props()
-	
-	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
 
-	// Get image data using the utility function
-	const { src: imageSource, alt: imageAlt } = getPostImageData(post)
-
-	// Get emoji for placeholder from post metadata or generate from title,
-	// falling back to configured default emoji
-	const emoji = post?.metadata?.fm?.emoji ||
+	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
+	const imageData = $derived.by(() => getPostImageData(post))
+	const emoji = $derived.by(() => (
+		post?.metadata?.fm?.emoji ||
 		getEmojiFromTitle(post?.metadata?.fm?.title, blogConfig.pageContent.emptyStateEmoji)
-
-	// Get categories using the utility function
-	const categories = getPostCategories(post)
-
-	// Get primary category
-	const primaryCategory = categories[0] || getMessage('uncategorized', 'Uncategorized')
-
-	// Set dynamic classes based on props using BEM conventions
-	const cardModifiers = []
-	if (isCompact) {cardModifiers.push('size-compact')}
-	if (isHighlighted) {cardModifiers.push('highlighted')}
-
-	// Filter out the current tag if it exists
-	const filteredTags = currentTag && post?.metadata?.fm?.tags
-		? post.metadata.fm.tags.filter(tag => tag !== currentTag)
-		: post?.metadata?.fm?.tags || []
-
-	// Get primary category and handle current category (reserved for future use)
-	let _displayCategories = categories || []
-	if (currentCategory && categories.includes(currentCategory)) {
-		_displayCategories = categories.filter(cat => cat !== currentCategory)
-	}
-
-	// Default excerpt text from i18n
-	const defaultExcerpt = getMessage('noPosts', 'No posts available')
-
-	// Read more text from i18n
-	const readMoreText = getMessage('readMore', 'Read more')
-	
-	// Read time for the post
-	const readTime = post?.metadata?.fm?.readTime || blogConfig.posts.readTime.defaultTime
+	))
+	const categories = $derived.by(() => getPostCategories(post))
+	const primaryCategory = $derived.by(() => (
+		categories[0] || getMessage('uncategorized', 'Uncategorized')
+	))
+	const cardModifiers = $derived.by(() => {
+		const modifiers = []
+		if (isCompact) {modifiers.push('size-compact')}
+		if (isHighlighted) {modifiers.push('highlighted')}
+		return modifiers
+	})
+	const filteredTags = $derived.by(() => (
+		currentTag && post?.metadata?.fm?.tags
+			? post.metadata.fm.tags.filter(tag => tag !== currentTag)
+			: post?.metadata?.fm?.tags || []
+	))
+	const defaultExcerpt = $derived.by(() => getMessage('noPosts', 'No posts available'))
+	const readMoreText = $derived.by(() => getMessage('readMore', 'Read more'))
+	const readTime = $derived.by(() => (
+		post?.metadata?.fm?.readTime || blogConfig.posts.readTime.defaultTime
+	))
 </script>
 
 <article class={bemClasses(ClassNames.blogCard, { modifiers: cardModifiers, className })}>
@@ -98,10 +83,10 @@
 		{#if !hideImage}
 			<div class="goo__card-image">
 				<a href={`${blogConfig.uri}${post?.urlPath || ''}`} class="goo__card-image-link">
-					{#if imageSource}
+					{#if imageData.src}
 						<img
-								src={imageSource}
-								alt={imageAlt}
+								src={imageData.src}
+								alt={imageData.alt}
 								data-ratio={imageRatio}
 								loading="lazy"
 								decoding="async"

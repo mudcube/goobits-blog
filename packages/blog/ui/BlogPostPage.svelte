@@ -5,7 +5,6 @@
 	import { blogConfig, defaultMessages } from '@goobits/blog/config/index.js'
 	import { Calendar, Clock, Share2, ChevronLeft } from '@lucide/svelte'
 	import { createLogger } from '@goobits/blog/utils/logger.js'
-	import { onMount } from 'svelte'
 	import {
 		formatDate as utilFormatDate,
 		slugify,
@@ -19,9 +18,7 @@
 	const logger = createLogger('BlogPostPage')
 
 	const { data, messages = {}, locale = 'en' } = $props()
-	
-	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
 
 	/**
 	 * Safely retrieves the read time for the current post.
@@ -29,7 +26,7 @@
 	 */
 	function getReadTime() {
 		try {
-			return data?.post?.metadata?.fm?.readTime || 5
+			return post?.metadata?.fm?.readTime || 5
 		} catch (error) {
 			logger.error('Error accessing readTime:', error)
 			return 5
@@ -44,10 +41,10 @@
 	function getFormattedDate() {
 		try {
 			return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' })
-				.format(new Date(data?.post?.date || Date.now()))
+				.format(new Date(post?.date || Date.now()))
 		} catch (error) {
 			logger.error('Error formatting date with Intl:', error)
-			return utilFormatDate(data?.post?.date || new Date())
+			return utilFormatDate(post?.date || new Date())
 		}
 	}
 
@@ -67,38 +64,16 @@
 	 */
 	function getPrimaryCategory() {
 		try {
-			return data?.post?.metadata?.fm?.category || ''
+			return post?.metadata?.fm?.category || ''
 		} catch (error) {
 			logger.error('Error accessing category:', error)
 			return ''
 		}
 	}
 
-	let postContentComponent = $state(data.postContent || null)
-	let loadingError = $state(null)
-	let isImporting = $state(false)
-	// eslint-disable-next-line svelte/prefer-writable-derived -- Needs to be mutated manually in loadContent function
-	let _contentLoaded = $state(false)
-	let copySuccess = $state(false)
-
-	// Log initial state
-	// Create constant values for the initial state to avoid reactivity warnings
-	// Don't capture reactive values in closures
-	const _hasInitialPostContent = Boolean(data.postContent)
-	const _isContentLoadedInitially = false
-	const _hasInitialComponent = false
-
-	// Initial state:
-	// {
-	//   hasPostContent: hasInitialPostContent,
-	//   contentLoaded: isContentLoadedInitially,
-	//   postContentComponent: hasInitialComponent
-	// }
-
-	// Update contentLoaded when postContentComponent changes
-	$effect(() => {
-		_contentLoaded = postContentComponent !== null
-	})
+		const post = $derived(data.post ?? null)
+		const postContentComponent = $derived(data.postContent || null)
+		let copySuccess = $state(false)
 
 	/**
 	 * Copies the current page URL to the clipboard.
@@ -118,82 +93,27 @@
 		}
 	}
 
-	// Load content when component mounts
-	onMount(() => {
-		// Component mounted:
-		// {
-		//   hasPost: !!data.post,
-		//   hasPostPath: data.post?.path ? true : false,
-		//   hasPostContent: !!data.postContent,
-		//   contentLoaded,
-		//   hasComponent: !!postContentComponent
-		// }
+		const isPostPage = $derived(data.pageType === 'post' && !!post)
+		const readTime = $derived.by(() => (isPostPage ? getReadTime() : undefined))
+		const formattedDate = $derived.by(() => (isPostPage ? getFormattedDate() : undefined))
+		const postTitle = $derived(post?.metadata?.fm?.title)
+		const coverImage = $derived.by(() => (post ? getCoverImageUrl(post) : undefined))
+		const authorAvatar = $derived.by(() => (post ? getAuthorAvatarUrl(post) : undefined))
+		const primaryCategory = $derived.by(() => (isPostPage ? getPrimaryCategory() : undefined))
+		const titleEmoji = $derived.by(() => (
+			post ? getEmojiFromTitle(post.metadata.fm.title || '', '🐝') : undefined
+		))
+		const currentPostId = $derived(post?.path)
+		const currentCategory = $derived(post?.metadata?.fm?.category || (post?.metadata?.fm?.categories?.[0] || null))
+		const currentTags = $derived(post?.metadata?.fm?.tags || [])
+		const similarPosts = $derived.by(() => (
+			isPostPage && Array.isArray(data.allPosts)
+				? getSimilarPosts(data.allPosts, currentPostId, currentCategory, currentTags, 3)
+				: []
+		))
 
-		// Only load content client-side if it wasn't loaded during SSR
-		if (data.post?.path && !postContentComponent) {
-			const loadContent = async () => {
-				loadingError = null
-				isImporting = true
-				_contentLoaded = false
-
-				const contentPath = data.post.path
-
-				try {
-					const module = await import(/* @vite-ignore */ contentPath)
-					if (module && module.default) {
-						postContentComponent = module.default
-						_contentLoaded = true
-					} else {
-						logger.error('Module imported but no default export found for path:', contentPath)
-						loadingError = getMessage('loadingError', 'Error loading content')
-					}
-				} catch (error) {
-					logger.error('Error importing post content from path:', contentPath, error)
-					loadingError = getMessage('loadingError', 'Error loading content')
-				} finally {
-					isImporting = false
-				}
-			}
-			loadContent()
-		}
-	})
-
-	// Initialize metadata values directly (not as reactive state) for SSR
-	const isPostPage = data.pageType === 'post' && data.post
-
-	// Initialize values only once at component creation time, not as reactive state
-	const readTime = isPostPage ? getReadTime() : undefined
-	const formattedDate = isPostPage ? getFormattedDate() : undefined
-	const postTitle = isPostPage ? data.post.metadata.fm.title : undefined
-	const _postExcerpt = isPostPage ? (data.post.metadata.fm.excerpt || '') : ''
-	const _postTags = isPostPage ? (data.post.metadata.fm.tags?.join(',') || '') : ''
-	const coverImage = isPostPage ? getCoverImageUrl(data.post) : undefined
-	const authorAvatar = isPostPage ?
-		getAuthorAvatarUrl(data.post) : undefined
-	const primaryCategory = isPostPage ? getPrimaryCategory() : undefined
-	const titleEmoji = isPostPage ? 
-		getEmojiFromTitle(data.post.metadata.fm.title || '', '🐝') : undefined
-
-	const currentPostId = isPostPage ? data.post.path : undefined
-	const currentCategory = isPostPage ? 
-		(data.post.metadata.fm.category || (data.post.metadata.fm.categories?.[0] || null)) : undefined
-	const currentTags = isPostPage ? (data.post.metadata.fm.tags || []) : []
-
-	const similarPosts = isPostPage && data.allPosts && Array.isArray(data.allPosts) ? 
-		getSimilarPosts(data.allPosts, currentPostId, currentCategory, currentTags, 3) : []
-
-	// Log metadata values
-	if (isPostPage) {
-		// Post metadata:
-		// {
-		//   readTime,
-		//   coverImage,
-		//   postTitle
-		// }
-	}
-
-	/**
-	 * Gets the cover image URL for a related post.
+		/**
+		 * Gets the cover image URL for a related post.
 	 * @param {object} post - The related post object.
 	 * @returns {string} The cover image URL or an empty string.
 	 */
@@ -213,7 +133,7 @@
 			{/if}
 
 			<h1 class="goo__post-title">
-				{data.post.metadata.fm.title}
+					{post.metadata.fm.title}
 			</h1>
 
 			<div class="goo__post-meta">
@@ -237,11 +157,11 @@
 				</button>
 			</div>
 
-			{#if data.post.metadata.fm.image?.src}
-				<div class="goo__featured-image">
-					<img
-						src={coverImage}
-						alt={data.post.metadata.fm.image?.alt || data.post.metadata.fm.title || "Post image"}
+				{#if post.metadata.fm.image?.src}
+					<div class="goo__featured-image">
+						<img
+							src={coverImage}
+							alt={post.metadata.fm.image?.alt || post.metadata.fm.title || "Post image"}
 						class="goo__image"
 						loading="lazy"
 						decoding="async"
@@ -256,8 +176,8 @@
 			<div class="goo__author-section">
 				<div class="goo__author-avatar">
 					<img
-						src={authorAvatar}
-						alt={data.post.metadata.fm.author?.name || blogConfig.name}
+							src={authorAvatar}
+							alt={post.metadata.fm.author?.name || blogConfig.name}
 						width={50}
 						height={50}
 						loading="lazy"
@@ -265,20 +185,13 @@
 					/>
 				</div>
 				<div>
-					<p class="goo__author-name">{data.post.metadata.fm.author?.name || blogConfig.name}</p>
+					<p class="goo__author-name">{post.metadata.fm.author?.name || blogConfig.name}</p>
 					<p class="goo__author-role">{getMessage('author', 'Author')}</p>
 				</div>
 			</div>
 
 			<div class="goo__article-content">
-				{#if isImporting}
-					<div class="goo__loading-content">
-						<div class="goo__loading-spinner"></div>
-						<h2>{getMessage('loading', 'Loading...')}</h2>
-					</div>
-				{:else if loadingError}
-					<p class="goo__error-message">{loadingError}</p>
-				{:else if postContentComponent}
+				{#if postContentComponent}
 					{@const SvelteComponent = postContentComponent}
 					<article class="goo__content">
 						<SvelteComponent />
@@ -288,11 +201,11 @@
 				{/if}
 			</div>
 
-			{#if data.post.metadata.fm.tags?.length}
+			{#if post.metadata.fm.tags?.length}
 				<div class="goo__post-tags">
 					<h3 class="goo__post-tags-heading">{getMessage('tags', 'Tags')}:</h3>
 					<TagCategoryList
-						items={data.post.metadata.fm.tags}
+						items={post.metadata.fm.tags}
 						showHashtag={true}
 						variant="default"
 						gap="medium"

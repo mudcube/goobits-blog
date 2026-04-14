@@ -53,21 +53,18 @@
 		'ja': '日本語'
 	}
 
-	// Merge provided language names with defaults
-	const languages = { ...defaultLanguageNames, ...languageNames }
-
-	// Create language options array
-	const languageOptions = locales.map(code => ({
+	const languages = $derived.by(() => ({ ...defaultLanguageNames, ...languageNames }))
+	const languageOptions = $derived.by(() => locales.map(code => ({
 		code,
 		name: languages[code] || code
-	}))
+	})))
 
 	// State for dropdown
 	let isOpen = $state(false)
 
 	// Current language
 	// eslint-disable-next-line svelte/prefer-writable-derived -- Needs to be mutated in handleLanguageChange
-	let currentLanguage = $state(currentLocale)
+	let currentLanguage = $state('en')
 
 	// Update current language when prop changes
 	$effect(() => {
@@ -106,14 +103,14 @@
 		}
 	}
 
-	// Create modifier classes
-	const switcherModifiers = []
-	if (variant) {switcherModifiers.push(variant)}
-	if (showLabels) {switcherModifiers.push('display-labels')}
-
-	// Get component text from messages or use defaults
-	const switchLanguageLabel = messages.switchLanguage || 'Switch Language'
-	const selectLanguageLabel = messages.selectLanguage || 'Select language'
+	const switcherModifiers = $derived.by(() => {
+		const modifiers = []
+		if (variant) {modifiers.push(variant)}
+		if (showLabels) {modifiers.push('display-labels')}
+		return modifiers
+	})
+	const switchLanguageLabel = $derived(messages.switchLanguage || 'Switch Language')
+	const selectLanguageLabel = $derived(messages.selectLanguage || 'Select language')
 </script>
 
 <div

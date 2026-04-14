@@ -6,6 +6,7 @@
  */
 
 import { getAllPosts, generateRssFeed } from '../utils/index.js'
+import { getBlogConfig } from '../config/index.js'
 import {
 	loadBlogIndex,
 	loadCategory,
@@ -235,7 +236,7 @@ export function createBlogSlugHandler(options: BlogSlugHandlerOptions = {}): Blo
  */
 export function createRSSFeedHandler(options: RSSFeedHandlerOptions = {}): (event: RequestEvent) => Promise<Response> {
 	const {
-		feedPath = '/blog/rss.xml',
+		feedPath = `${ getBlogConfig().uri }/rss.xml`,
 		errorHandler = null
 	} = options
 

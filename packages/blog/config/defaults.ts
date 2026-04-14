@@ -104,6 +104,7 @@ export interface ImagesConfig {
 export interface PaginationConfig {
 	postsPerPage: number
 	postsPerBatch: number
+	postsApiPath: string
 	infiniteScroll: boolean
 	preloadNextPage: boolean
 	enableCategories: boolean
@@ -302,6 +303,7 @@ export const defaultBlogConfig: BlogConfig = {
 	pagination: {
 		postsPerPage: 10,
 		postsPerBatch: 6,
+		postsApiPath: '/api/blog/posts',
 		infiniteScroll: true,
 		preloadNextPage: true,
 		enableCategories: true,

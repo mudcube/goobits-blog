@@ -51,5 +51,6 @@ export {
 	type ServerLoadData,
 	type ClientLoadResult,
 	type ClientLoadParams,
+	type LoadPostContentParams,
 	type Logger as ClientLogger
 } from './handlers/clientLoad.js'

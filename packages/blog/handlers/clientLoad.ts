@@ -18,6 +18,8 @@ export interface Logger {
 export interface BlogPageLoadOptions {
 	/** Custom logger function */
 	logger?: Logger
+	/** Custom post-content resolver for host apps with non-standard content locations */
+	loadPostContent?: (params: LoadPostContentParams) => Promise<unknown>
 }
 
 /**
@@ -51,8 +53,20 @@ export interface ClientLoadParams {
 	data: ServerLoadData
 }
 
+export interface LoadPostContentParams {
+	path: string
+	data: ServerLoadData
+	logger: Logger
+}
+
 // Use console for logging within the package
 const logger: Logger = console
+
+async function defaultLoadPostContent({ path }: LoadPostContentParams): Promise<unknown> {
+	const module: unknown = await import(/* @vite-ignore */ path)
+	const moduleObj = module as { default?: unknown } | null | undefined
+	return moduleObj?.default ?? null
+}
 
 /**
  * Creates a client-side load function for blog pages
@@ -67,27 +81,28 @@ const logger: Logger = console
  * @returns Page load function
  */
 export function createBlogPageLoad(options: BlogPageLoadOptions = {}): (params: ClientLoadParams) => Promise<ClientLoadResult> {
-	const { logger: customLogger } = options
+	const { logger: customLogger, loadPostContent = defaultLoadPostContent } = options
 	const log = customLogger || logger
 
 	return async function load({ data }: ClientLoadParams): Promise<ClientLoadResult> {
 		// If this is a blog post, try to load the content
 		let postContent: unknown = null
 
-		if (data.pageType === 'post' && data.post?.path) {
-			log.log('[ClientLoad] Attempting to load blog post content from path:', data.post.path)
-			try {
-				// Dynamic import of the blog post content
-				const module: unknown = await import(/* @vite-ignore */ data.post.path)
-				const moduleObj = module as { default?: unknown } | null | undefined
-				if (moduleObj?.default !== undefined) {
-					postContent = moduleObj.default
-					log.log('[ClientLoad] Successfully loaded blog post content')
-				} else {
-					log.log('[ClientLoad] Module imported but no default export found')
-				}
-			} catch (error) {
-				log.error('[ClientLoad] Error loading blog post content during prerendering:', error)
+			if (data.pageType === 'post' && data.post?.path) {
+				log.log('[ClientLoad] Attempting to load blog post content from path:', data.post.path)
+				try {
+					postContent = await loadPostContent({
+						path: data.post.path,
+						data,
+						logger: log
+					})
+					if (postContent !== null && postContent !== undefined) {
+						log.log('[ClientLoad] Successfully loaded blog post content')
+					} else {
+						log.log('[ClientLoad] Post content loader returned no content')
+					}
+				} catch (error) {
+					log.error('[ClientLoad] Error loading blog post content during prerendering:', error)
 			}
 		} else {
 			log.log('[ClientLoad] Not a post page or missing path:', {

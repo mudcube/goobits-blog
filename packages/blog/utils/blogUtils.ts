@@ -1,6 +1,11 @@
 import { blogConfig, getBlogVersion, getBlogPostFiles } from '../config/index.js'
 import { getPostReadTime } from './readTimeUtils.js'
 import { createLogger, type Logger } from './logger.js'
+export {
+	parseCategoryDescriptions,
+	loadCategoryDescriptions,
+	type CategoryDescriptionData as CategoryData
+} from './categoryDescriptions.js'
 
 // Declare Node.js globals for environments where @types/node may not be installed
 declare const process: { cwd: () => string } | undefined
@@ -73,6 +78,7 @@ export interface PostMetadata {
 	image?: PostImage | undefined
 	thumbnail?: PostImage | undefined
 	tags?: string[] | undefined
+	coverImage?: string | undefined
 	readTime?: number | undefined
 	updated?: string | undefined
 	i18n?: I18nData | undefined
@@ -94,14 +100,6 @@ export interface ProcessedPost {
 export interface TaxonomyEntry {
 	slug: string
 	lang?: string
-}
-
-// Category data from _categories.md file
-export interface CategoryData {
-	title?: string
-	description?: string
-	image?: string
-	alt?: string
 }
 
 // RSS feed options
@@ -275,6 +273,18 @@ function handlePostImportFailure(filePath: string, error: unknown): null {
 	return null
 }
 
+function extractFirstImageFromMarkdown(markdown: string): string {
+	if (!markdown) { return '' }
+
+	const markdownImageMatch = markdown.match(/!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/)
+	if (markdownImageMatch?.[1]) {
+		return markdownImageMatch[1]
+	}
+
+	const htmlImageMatch = markdown.match(/<img[^>]*\bsrc=["']([^"']+)["']/i)
+	return htmlImageMatch?.[1] || ""
+}
+
 /**
  * Converts a string to a URL-friendly slug (lowercase and dasherized)
  * @param text - The text to convert to a slug
@@ -307,12 +317,32 @@ export function getEmojiFromTitle(title: string | undefined | null, defaultEmoji
  * @param post - The post to extract image data from
  * @returns Image data
  */
+function getPostImagePrefix(post: ProcessedPost | null | undefined): string {
+	const config = blogConfig
+	if (!post?.urlPath) {
+		return config.images.defaults.blogPath
+	}
+
+	const baseUri = config.uri === '/' ? '' : (config.uri || '')
+	const normalizedPath = post.urlPath.startsWith('/') ? post.urlPath : `/${ post.urlPath }`
+	const fullPath = `${ baseUri }${ normalizedPath }`
+	return fullPath.endsWith('/') ? fullPath : `${ fullPath }/`
+}
+
+function getRawPostImageSource(post: ProcessedPost | null | undefined): string {
+	if (!post?.metadata?.fm) { return '' }
+
+	return post.metadata.fm.thumbnail?.src ||
+		post.metadata.fm.image?.src ||
+		post.metadata.fm.coverImage ||
+		''
+}
+
 export function getPostImageData(post: ProcessedPost | null | undefined): PostImage {
 	const config = blogConfig
 	if (!post?.metadata?.fm) { return { src: '', alt: 'Blog post' } }
 
-	const src = post.metadata.fm.thumbnail?.src ||
-		post.metadata.fm.image?.src || ''
+	const src = processImagePath(getRawPostImageSource(post), getPostImagePrefix(post), '')
 
 	const alt = post.metadata.fm.thumbnail?.alt ||
 		post.metadata.fm.image?.alt ||
@@ -526,96 +556,6 @@ export function getOriginalTaxonomyName(
 }
 
 /**
- * Parse the categories description file to get metadata for categories
- * @param fileContent - Content of the _categories.md file
- * @returns Category data keyed by slugified category name
- */
-export function parseCategoryDescriptions(fileContent: string): Record<string, CategoryData> {
-	// Extract the frontmatter content between --- markers
-	const frontmatterMatch = fileContent.match(/^---\n([\s\S]*?)\n---/)
-
-	if (!frontmatterMatch?.[1]) {
-		return {}
-	}
-
-	// Parse the YAML-like structure manually
-	const lines = frontmatterMatch[1].split('\n')
-	const categoryData: Record<string, CategoryData> = {}
-
-	let currentCategory: string | null = null
-
-	for (const line of lines) {
-		// Skip empty lines
-		if (!line.trim()) { continue }
-
-		// Check for main category definition (key:)
-		const categoryMatch = line.match(/^([a-z0-9-]+):\s*$/)
-		if (categoryMatch?.[1]) {
-			currentCategory = categoryMatch[1]
-			categoryData[currentCategory] = {}
-			continue
-		}
-
-		// If we're in a category definition, look for properties
-		if (currentCategory) {
-			const propMatch = line.match(/^\s\s([a-z-]+):\s*"(.+)"$/) || line.match(/^\s\s([a-z-]+):\s*(.+)$/)
-			if (propMatch) {
-				const [ , propName, propValue ] = propMatch
-				if (propName && propValue) {
-					const category = categoryData[currentCategory]
-					if (category) {
-						(category as Record<string, string>)[propName] = propValue.replace(/^"(.*)"$/, '$1')
-					}
-				}
-			}
-		}
-	}
-
-	return categoryData
-}
-
-/**
- * Load category descriptions from the _categories.md file
- * @param lang - Optional language code for localized category files
- * @returns Category data
- */
-export async function loadCategoryDescriptions(lang = 'en'): Promise<Record<string, CategoryData>> {
-	if (typeof process === 'undefined') {
-		logger.warn('loadCategoryDescriptions requires Node.js environment')
-		return {}
-	}
-
-	// Get Node.js modules
-	const fs = await getNodeFs()
-	const path = await getNodePath()
-
-	if (!fs || !path) {
-		logger.warn('Node.js fs or path module not available')
-		return {}
-	}
-
-	// First try to load language-specific category file if it exists
-	let categoriesPath = path.join(process?.cwd() ?? '', `src/content/_categories.${ lang }.md`)
-
-	// Check if language-specific file exists, otherwise fall back to default
-	try {
-		await fs.access(categoriesPath)
-	} catch {
-		// Fallback to default if language-specific file doesn't exist
-		categoriesPath = path.join(process?.cwd() ?? '', 'src/content/_categories.md')
-	}
-
-	try {
-		const fileContent = await fs.readFile(categoriesPath, 'utf-8')
-		return parseCategoryDescriptions(fileContent)
-	} catch (readError) {
-		const errorMessage = readError instanceof Error ? readError.message : String(readError)
-		logger.warn(`Could not read category descriptions file: ${ errorMessage }`)
-		return {}
-	}
-}
-
-/**
  * Add language prefix to URL if i18n is enabled and configured to include language in URL
  * Using Paraglide's localizeHref function for URL localization
  * @param url - The URL to localize
@@ -773,8 +713,7 @@ export function processImagePath(
 export function getCoverImageUrl(post: ProcessedPost | null | undefined, fallbackImage?: string): string {
 	const config = blogConfig
 	const fallback = fallbackImage ?? config.images.defaults.coverImage
-	const rawImage = post?.metadata?.fm?.image?.src || ''
-	return processImagePath(rawImage, config.images.defaults.blogPath, fallback)
+	return processImagePath(getRawPostImageSource(post), getPostImagePrefix(post), fallback)
 }
 
 /**
@@ -1037,10 +976,24 @@ export async function getAllPosts(options: GetAllPostsOptions = {}): Promise<Pro
 				const slug = postModule.metadata.slug || pathParts.slug
 				const urlPath = `${ config.posts.urlBasePath }/${ year }/${ month }/${ slug }`
 
-				// Get content and calculate file size if needed
+				// Get content when needed for rendering, preview extraction, or read-time calculation
 				let content = ''
-				if (includeContent) {
+				const needsImageExtraction = !postModule.metadata.thumbnail?.src &&
+					!postModule.metadata.image?.src &&
+					!postModule.metadata.coverImage
+				if (includeContent || needsImageExtraction || !postModule.metadata.excerpt) {
 					content = await getMarkdownContent(filePath)
+				}
+
+				if (!postModule.metadata.image?.src) {
+					const derivedImage = postModule.metadata.coverImage || extractFirstImageFromMarkdown(content)
+					if (derivedImage) {
+						postModule.metadata.image = {
+							...(postModule.metadata.image || {}),
+							src: derivedImage,
+							alt: postModule.metadata.image?.alt || postModule.metadata.title || 'Blog post'
+						}
+					}
 				}
 
 				// Calculate read time with our utility function

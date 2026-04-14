@@ -42,13 +42,10 @@
 		messages = {},
 		locale = 'en'
 	} = $props()
-	
-	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
 
-	// Extract categories and tags from posts
-	const categories = getAllCategories(posts, maxCategories)
-	const tags = getAllTags(posts, maxTags)
+	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
+	const categories = $derived.by(() => getAllCategories(posts, maxCategories))
+	const tags = $derived.by(() => getAllTags(posts, maxTags))
 
 	// Use the active tag/category directly from props
 	// No need for complex URL parsing since the server already provides the correct values

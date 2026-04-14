@@ -12,12 +12,11 @@ import {
 	getPostCategories,
 	getPostTags,
 	getOriginalTaxonomyName,
-	loadCategoryDescriptions,
 	type ProcessedPost,
 	type PostMetadata,
 	type GetAllPostsOptions
 } from '../utils/blogUtils.js'
-import { getBlogConfig } from '../config/index.js'
+import { getBlogConfig, loadConfiguredCategoryDescriptions } from '../config/index.js'
 
 /**
  * Blog configuration type
@@ -193,7 +192,7 @@ export async function loadCategory(
 
 	const slug = categorySlugParam.replace(/\/$/, '')
 	const allPosts: ProcessedPost[] = await getAllPosts({ lang })
-	const categoryDescriptions: Record<string, CategoryInfo> = await loadCategoryDescriptions(lang)
+	const categoryDescriptions: Record<string, CategoryInfo> = await loadConfiguredCategoryDescriptions<CategoryInfo>(lang)
 	const slugLowerCase = slug.toLowerCase()
 	const categoryInfo: CategoryInfo = categoryDescriptions[slugLowerCase] || {}
 	const posts = filterPostsByCategory(allPosts, slugLowerCase, slugify)

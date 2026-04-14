@@ -49,6 +49,11 @@ export const blogConfig = {
 export function getBlogPostFiles() {
   return import.meta.glob('/src/content/Blog/**/*.md')
 }
+
+// Optional: customize infinite-scroll fetches for non-standard mounts/APIs
+export function buildPostsApiUrl(params) {
+  return `/api/blog/posts?${params.toString()}`
+}
 ```
 
 ### 2. Initialize the Configuration
@@ -59,13 +64,14 @@ import { initBlogConfig } from '@goobits/blog/config'
 import { blogConfig, getBlogPostFiles } from '$lib/blog-config.js'
 
 initBlogConfig(blogConfig, {
-  getBlogPostFiles
+  getBlogPostFiles,
+  buildPostsApiUrl
 })
 ```
 
 ### 3. Create Blog Routes
 
-Create the following route structure in your SvelteKit project:
+Create the following route structure in your SvelteKit project. The route folder name is up to you; `blog` is only an example. The package uses `blogConfig.uri` when generating links.
 
 ```
 src/routes/blog/
@@ -73,12 +79,31 @@ src/routes/blog/
 ├── +page.svelte       # Blog index page
 ├── [...slug]/
 │   ├── +page.server.js  # Load individual post/category/tag
+│   ├── +page.js         # Optional client loader for custom content resolution
 │   └── +page.svelte     # Post display page
 └── rss.xml/
     └── +server.js     # RSS feed endpoint
 ```
 
 Use the route handlers from `@goobits/blog/handlers` to load blog data in your server files.
+
+If your markdown lives outside the package defaults, add a client loader:
+
+```js
+// src/routes/blog/[...slug]/+page.js
+import { createBlogPageLoad } from '@goobits/blog/core'
+
+const modules = import.meta.glob('/src/content/Blog/**/index.md')
+
+export const load = createBlogPageLoad({
+  async loadPostContent({ path }) {
+    const loader = modules[path]
+    if (!loader) return null
+    const module = await loader()
+    return module.default ?? null
+  }
+})
+```
 
 ### 4. Use Components
 
@@ -233,6 +258,13 @@ initBlogConfig({
     enabled: true,
     supportedLanguages: ['en', 'es', 'fr'],
     defaultLanguage: 'en'
+  }
+}, {
+  getBlogPostFiles,
+  buildPostsApiUrl,
+  async loadCategoryDescriptions(lang) {
+    // Optional host-controlled taxonomy metadata loading
+    return {}
   }
 })
 ```

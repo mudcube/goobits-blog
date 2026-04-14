@@ -21,7 +21,6 @@
 	import './TagCategoryList.scss'
 	import { bemClasses, createMessageGetter, slugify } from '@goobits/blog/utils/index.js'
 	import { blogConfig, defaultMessages } from '@goobits/blog/config/index.js'
-	import { page } from '$app/stores'
 
 	/**
 	 * @typedef {Object} Props
@@ -52,29 +51,14 @@
 		type = 'tags',
 		baseUrl = ''
 	} = $props()
-	
-	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
 
-	// Determine the actual URL base path
-	const urlBase = baseUrl || (type === 'categories' ? `${ blogConfig.uri }/category` : `${ blogConfig.uri }/tag`)
+	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
+	const urlBase = $derived.by(() => (
+		baseUrl || (type === 'categories' ? `${ blogConfig.uri }/category` : `${ blogConfig.uri }/tag`)
+	))
+	const selectedItem = $derived(activeItem || currentItem)
 
-	// Use either activeItem or currentItem, with priority given to activeItem if both are provided
-	let selectedItem = $state(activeItem || currentItem)
-
-	// Track URL changes to update selected state
-	$effect(() => {
-		const urlPath = $page.url.pathname
-
-		// Update the selected item based on URL path and type
-		if ((type === 'tags' && urlPath.includes('/tag/')) ||
-			(type === 'categories' && urlPath.includes('/category/'))) {
-			selectedItem = activeItem || currentItem
-		}
-	})
-
-	// Determine component class name based on type
-	const componentClass = type === 'categories' ? 'categories' : 'tags'
+	const componentClass = $derived(type === 'categories' ? 'categories' : 'tags')
 </script>
 
 {#if items?.length}

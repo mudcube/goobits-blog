@@ -39,8 +39,7 @@
 		messages = {}
 	} = $props()
 
-	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
 
 	// State for copy link success
 	let copySuccess = $state(false)
