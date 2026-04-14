@@ -16,6 +16,7 @@
     "auth:status": "git log -1 --grep='git-subtree-dir: packages/auth' --pretty=format:'%h %s%n%n%B'",
     "blog:check": "pnpm --dir packages/blog lint && pnpm --dir packages/blog typecheck && pnpm --dir packages/blog test",
     "blog:pull": "git fetch --no-tags goobits-blog refs/heads/main:refs/remotes/goobits-blog/main && git subtree pull --prefix=packages/blog goobits-blog main --squash",
+    "blog:push:package": "pnpm run blog:push",
     "blog:push": "git diff --quiet && git diff --cached --quiet || (echo 'Working tree is dirty; commit or stash before pushing subtree.' && exit 1); git subtree push --prefix=packages/blog goobits-blog main",
     "blog:status": "git log -1 --grep='git-subtree-dir: packages/blog' --pretty=format:'%h %s%n%n%B'",
     "build": "pnpm exec svelte-kit sync && NODE_ENV=production vite build",
