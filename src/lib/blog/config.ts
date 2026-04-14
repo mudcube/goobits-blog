@@ -8,7 +8,12 @@ const journalBlogConfig = {
 	uri: '/journal',
 	posts: {
 		contentBasePath: '/static/journal',
-		urlBasePath: '/journal'
+		urlBasePath: ''
+	},
+	images: {
+		defaults: {
+			authorAvatar: '/media/miko.jpg'
+		}
 	},
 	pagination: {
 		postsPerPage: 50,

@@ -1,9 +1,6 @@
-import { getJournalPosts } from '$lib/blog/server'
+import { createBlogIndexHandler } from '@goobits/blog/core'
+import { ensureJournalBlogConfig } from '$lib/blog/config'
 
-export const prerender = true
-export const trailingSlash = 'always'
+ensureJournalBlogConfig()
 
-export async function load() {
-	const posts = await getJournalPosts()
-	return { posts }
-}
+export const { load, prerender } = createBlogIndexHandler()

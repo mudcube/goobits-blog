@@ -24,9 +24,9 @@ type MdsvexCompileResult = {
 
 function normalizePost(post: ProcessedPost): JournalPost {
 	const segments = post.urlPath.split('/').filter(Boolean)
-	const year = segments[1] || ''
-	const month = segments[2] || ''
-	const slug = segments[3] || ''
+	const year = segments[0] || ''
+	const month = segments[1] || ''
+	const slug = segments[2] || ''
 
 	return {
 		...post,

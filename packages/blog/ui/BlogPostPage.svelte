@@ -168,8 +168,8 @@
 	const _postExcerpt = isPostPage ? (data.post.metadata.fm.excerpt || '') : ''
 	const _postTags = isPostPage ? (data.post.metadata.fm.tags?.join(',') || '') : ''
 	const coverImage = isPostPage ? getCoverImageUrl(data.post) : undefined
-	const authorAvatar = isPostPage ? 
-		getAuthorAvatarUrl(data.post, '/static/images/authors/marcus-fleming.jpg') : undefined
+	const authorAvatar = isPostPage ?
+		getAuthorAvatarUrl(data.post) : undefined
 	const primaryCategory = isPostPage ? getPrimaryCategory() : undefined
 	const titleEmoji = isPostPage ? 
 		getEmojiFromTitle(data.post.metadata.fm.title || '', '🐝') : undefined
@@ -364,4 +364,3 @@
 			</div>
 	</article>
 </div>
-
