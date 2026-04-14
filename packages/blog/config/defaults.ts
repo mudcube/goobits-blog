@@ -25,6 +25,7 @@ export interface ReadTimeConfig {
 export interface PostsConfig {
 	contentBasePath: string
 	urlBasePath: string
+	importFailureMode: 'throw' | 'warn' | 'silent'
 	excerptLength: number
 	relatedPostsCount: number
 	recentPostsCount: number
@@ -224,6 +225,7 @@ export const defaultBlogConfig: BlogConfig = {
 	posts: {
 		contentBasePath: '/src/content/Blog',
 		urlBasePath: '/blog',
+		importFailureMode: 'warn',
 		excerptLength: 160,
 		relatedPostsCount: 3,
 		recentPostsCount: 5,

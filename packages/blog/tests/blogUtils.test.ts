@@ -22,8 +22,12 @@ import {
 	getPostCategories,
 	getPostTags,
 	getEmojiFromTitle,
+	getAllPosts,
+	clearBlogCache,
 	type ProcessedPost
 } from '../utils/blogUtils.js'
+
+let mockGetBlogPostFiles: () => Record<string, () => Promise<unknown>> = () => ({})
 
 // Mock the blog config to avoid external dependencies
 vi.mock('../config/index.js', () => ({
@@ -33,11 +37,16 @@ vi.mock('../config/index.js', () => ({
 		uri: '/blog',
 		posts: {
 			contentBasePath: '/content/Blog',
+			urlBasePath: '/blog',
+			importFailureMode: 'warn',
 			excerptLength: 150,
 			relatedPostsCount: 3,
 			recentPostsCount: 5,
 			popularTagsCount: 10,
-			popularCategoriesCount: 10
+			popularCategoriesCount: 10,
+		readTime: {
+			defaultTime: 3
+		}
 		},
 		pageContent: {
 			emptyStateEmoji: '📝'
@@ -52,7 +61,7 @@ vi.mock('../config/index.js', () => ({
 		}
 	},
 	getBlogVersion: () => ({ versionString: '1.0.0' }),
-	getBlogPostFiles: () => ({})
+	getBlogPostFiles: () => mockGetBlogPostFiles()
 }))
 
 // Helper to create test posts with clean optional property handling
@@ -84,6 +93,24 @@ function createPost(overrides: {
 		content: overrides.content ?? ''
 	}
 	return post
+}
+
+function createPostModule(overrides: {
+	title?: string
+	date?: string
+	slug?: string
+	categories?: string[]
+	tags?: string[]
+} = {}): { metadata: Record<string, unknown> } {
+	return {
+		metadata: {
+			title: overrides.title ?? 'Test Post',
+			date: overrides.date ?? '2024-01-15',
+			...(overrides.slug ? { slug: overrides.slug } : {}),
+			...(overrides.categories ? { categories: overrides.categories } : {}),
+			...(overrides.tags ? { tags: overrides.tags } : {})
+		}
+	}
 }
 
 describe('slugify', () => {
@@ -563,5 +590,45 @@ describe('getEmojiFromTitle', () => {
 
 	it('uses custom default when provided', () => {
 		expect(getEmojiFromTitle('No emoji', '🔧')).toBe('🔧')
+	})
+})
+
+describe('getAllPosts path handling', () => {
+	it('supports flat year/month/post.md layouts', async () => {
+		clearBlogCache()
+		mockGetBlogPostFiles = () => ({
+			'/content/Blog/2024/01/test-post.md': () => Promise.resolve(createPostModule())
+		})
+
+		const posts = await getAllPosts()
+		expect(posts).toHaveLength(1)
+		expect(posts[0]?.urlPath).toBe('/blog/2024/01/test-post')
+		expect(posts[0]?.path).toBe('/content/Blog/2024/01/test-post.md')
+	})
+
+	it('supports nested year/month/slug/index.md layouts', async () => {
+		clearBlogCache()
+		mockGetBlogPostFiles = () => ({
+			'/content/Blog/2024/01/test-post/index.md': () => Promise.resolve(createPostModule())
+		})
+
+		const posts = await getAllPosts()
+		expect(posts).toHaveLength(1)
+		expect(posts[0]?.urlPath).toBe('/blog/2024/01/test-post')
+		expect(posts[0]?.path).toBe('/content/Blog/2024/01/test-post/index.md')
+	})
+
+	it('throws on bad imports when importFailureMode is set to throw', async () => {
+		clearBlogCache()
+		mockGetBlogPostFiles = () => ({
+			'/content/Blog/2024/01/bad-post.md': () => Promise.reject(new Error('boom'))
+		})
+
+		const { blogConfig } = await import('../config/index.js')
+		blogConfig.posts.importFailureMode = 'throw'
+
+		await expect(getAllPosts()).rejects.toThrow('Failed to import blog post')
+
+		blogConfig.posts.importFailureMode = 'warn'
 	})
 })

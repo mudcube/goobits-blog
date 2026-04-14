@@ -184,6 +184,13 @@ const getMessage = createMessageGetter({
 - `Breadcrumbs` - Navigation breadcrumbs
 - `LanguageSwitcher` - Language selection for i18n
 
+## Import Surfaces
+
+- `@goobits/blog` for UI components
+- `@goobits/blog/core` for config, handlers, utilities, and i18n helpers
+- `@goobits/blog/ui` for direct UI submodule imports
+- `@goobits/blog/config`, `@goobits/blog/utils`, `@goobits/blog/handlers` for focused imports
+
 ## Styling
 
 Import component-specific SCSS files:

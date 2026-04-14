@@ -14,6 +14,10 @@
       "svelte": "./index.ts",
       "default": "./index.ts"
     },
+    "./core": {
+      "types": "./core.ts",
+      "default": "./core.ts"
+    },
     "./ui": {
       "types": "./ui/index.ts",
       "svelte": "./ui/index.ts",
@@ -73,6 +77,7 @@
   },
   "files": [
     "index.ts",
+    "core.ts",
     "config.ts",
     "svelte.d.ts",
     "tsconfig.json",

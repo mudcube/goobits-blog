@@ -228,9 +228,10 @@ function resolvePostPathParts(filePath: string): {
 	const parts = filePath.split('/').filter(Boolean)
 	const filenamePart = parts[parts.length - 1] || ''
 	const filename = filenamePart.replace('.md', '')
-	const slug = filename === 'index' ? (parts[parts.length - 2] || '') : filename
-	const year = parts[parts.length - 4] || ''
-	const month = parts[parts.length - 3] || ''
+	const isNestedIndex = filename === 'index'
+	const slug = isNestedIndex ? (parts[parts.length - 2] || '') : filename
+	const year = isNestedIndex ? (parts[parts.length - 4] || '') : (parts[parts.length - 3] || '')
+	const month = isNestedIndex ? (parts[parts.length - 3] || '') : (parts[parts.length - 2] || '')
 
 	return { filename, slug, year, month }
 }
@@ -249,6 +250,29 @@ function resolveContentDiskPath(filePath: string, contentBasePath: string): stri
 	}
 
 	return filePath
+}
+
+function getImportFailureMode(): 'throw' | 'warn' | 'silent' {
+	const mode = blogConfig.posts.importFailureMode
+	if (mode === 'throw' || mode === 'warn' || mode === 'silent') {
+		return mode
+	}
+
+	return 'warn'
+}
+
+function handlePostImportFailure(filePath: string, error: unknown): null {
+	const mode = getImportFailureMode()
+	if (mode === 'throw') {
+		const message = error instanceof Error ? error.message : String(error)
+		throw new Error(`Failed to import blog post "${filePath}": ${message}`)
+	}
+
+	if (mode === 'warn') {
+		logger.warn('[BlogUtils] Skipping post due to import failure:', filePath, error)
+	}
+
+	return null
 }
 
 /**
@@ -1101,8 +1125,7 @@ export async function getAllPosts(options: GetAllPostsOptions = {}): Promise<Pro
 				// Return the base post (English or no localization)
 				return basePost
 			} catch (error) {
-				logger.warn('[BlogUtils] Skipping post due to import failure:', filePath, error)
-				return null
+				return handlePostImportFailure(filePath, error)
 			}
 		})
 	)
