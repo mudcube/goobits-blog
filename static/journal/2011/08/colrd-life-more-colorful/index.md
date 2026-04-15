@@ -5,7 +5,7 @@ categories:
   - "colrd"
 tags:
   - "color"
-  - "html5"
+  - "color-tools"
 ---
 
 [ColRD](http://colrd.com/) is a new website to help you

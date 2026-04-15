@@ -4,9 +4,11 @@ date: "2011-12-28"
 categories: 
   - "apps"
 tags: 
-  - "html5"
+  - "color"
+  - "midi"
   - "music"
   - "piano"
+  - "web-audio"
 coverImage: "images/hero.png"
 ---
 

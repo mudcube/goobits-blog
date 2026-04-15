@@ -5,7 +5,7 @@ categories:
   - "code-art"
 tags:
   - "canvas"
-  - "html5"
+  - "generative-art"
 ---
 
 [![perlin-noise_19805217380_o](images/perlin-noise_19805217380_o.png)](images/perlin-noise_19805217380_o.png)

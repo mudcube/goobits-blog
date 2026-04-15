@@ -5,6 +5,7 @@ categories:
   - "open-source"
 tags: 
   - "color"
+  - "color-theory"
   - "color-picker"
 ---
 

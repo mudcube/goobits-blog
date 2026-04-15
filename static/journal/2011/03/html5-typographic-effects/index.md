@@ -5,8 +5,7 @@ categories:
   - "open-source"
 tags: 
   - "canvas"
-  - "html5"
-  - "tutorial"
+  - "creative-coding"
   - "typography"
 ---
 

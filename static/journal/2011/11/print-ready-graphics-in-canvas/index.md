@@ -5,7 +5,7 @@ categories:
   - "diy"
 tags: 
   - "canvas"
-  - "html5"
+  - "image-tools"
 coverImage: "images/hero.jpeg"
 ---
 

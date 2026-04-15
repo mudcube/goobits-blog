@@ -5,8 +5,8 @@ categories:
   - "apps"
 tags: 
   - "color"
-  - "color-picker"
-  - "html5"
+  - "color-theory"
+  - "color-tools"
 coverImage: "images/hero.png"
 ---
 

@@ -1,5 +1,5 @@
 import { chromium } from 'playwright'
-import { BASE_URL, bootstrapAdminSession, getAdminPasscode, getE2ETestToken } from './_helpers'
+import { BASE_URL, bootstrapAdminSession, getAdminPasscode, getE2ETestToken, withRequestRetry } from './_helpers'
 import { requireFeedEvent, requireFeedEventById, waitForAttendanceCount } from './_ui-waits'
 
 const ADMIN_URL = `${BASE_URL}/schedule/admin/`
@@ -15,20 +15,24 @@ async function createAdminEvent(
 		capacity: number
 	}
 ): Promise<number> {
-	const response = await request.post(`${baseUrl}/api/admin/events`, {
-		headers: { origin: baseUrl },
-		data: {
-			...input,
-			repeatWeeks: 0,
-			costCents: 0,
-			currency: 'USD',
-			paymentProvider: null,
-			paymentHandle: null,
-			paymentNoteTemplate: null,
-			location: null,
-			note: null
-		}
-	})
+	const response = await withRequestRetry(
+		`create admin event ${input.title}`,
+		() =>
+			request.post(`${baseUrl}/api/admin/events`, {
+				headers: { origin: baseUrl },
+				data: {
+					...input,
+					repeatWeeks: 0,
+					costCents: 0,
+					currency: 'USD',
+					paymentProvider: null,
+					paymentHandle: null,
+					paymentNoteTemplate: null,
+					location: null,
+					note: null
+				}
+			})
+	)
 	if (!response.ok()) {
 		throw new Error(`admin event create failed (${input.title}): ${response.status()}`)
 	}
@@ -46,10 +50,14 @@ async function createMemberCalendarSession(
 	emailPrefix: string,
 	name: string
 ) {
-	const response = await request.post(`${BASE_URL}/api/test/calendar-session`, {
-		headers: { authorization: `Bearer ${token}` },
-		data: { email: `${emailPrefix}-${Date.now()}@example.com`, name }
-	})
+	const response = await withRequestRetry(
+		`create member calendar session ${name}`,
+		() =>
+			request.post(`${BASE_URL}/api/test/calendar-session`, {
+				headers: { authorization: `Bearer ${token}` },
+				data: { email: `${emailPrefix}-${Date.now()}@example.com`, name }
+			})
+	)
 	if (!response.ok()) {
 		throw new Error(`calendar member bootstrap failed (${name}): ${response.status()}`)
 	}
@@ -76,7 +84,7 @@ async function assertJoinLeaveFlow(
 		const cards = page.getByTestId('member-event-card')
 		const count = await cards.count()
 		const texts = (await cards.allInnerTexts().catch(() => [] as string[])).slice(0, 8)
-		const htmlRes = await request.get(`${BASE_URL}/schedule`)
+		const htmlRes = await withRequestRetry('fetch schedule page HTML', () => request.get(`${BASE_URL}/schedule`))
 		const html = await htmlRes.text().catch(() => '')
 		const ssrHasTitle = html.includes(title)
 		const ssrHasCardClass = html.includes('data-testid="member-event-card"')
@@ -86,14 +94,18 @@ async function assertJoinLeaveFlow(
 		)
 	}
 
-	const joinApi = await request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/join`, {
-		data: { guestCount: 1 }
-	})
+	const joinApi = await withRequestRetry(
+		`join main event ${mainEventId}`,
+		() => request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/join`, { data: { guestCount: 1 } })
+	)
 	if (!joinApi.ok()) throw new Error(`join API failed: ${joinApi.status()}`)
 	await page.reload({ waitUntil: 'domcontentloaded' })
 	await waitForAttendanceCount(page, mainEventId, '2')
 
-	const leaveApi = await request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/leave`)
+	const leaveApi = await withRequestRetry(
+		`leave main event ${mainEventId}`,
+		() => request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/leave`)
+	)
 	if (!leaveApi.ok()) throw new Error(`leave API failed: ${leaveApi.status()}`)
 	await page.reload({ waitUntil: 'domcontentloaded' })
 	await waitForAttendanceCount(page, mainEventId, '0')
@@ -104,9 +116,10 @@ async function assertWaitlistFlow(
 	eventId: number
 ) {
 	await requireFeedEventById(request, eventId)
-	const waitlistJoinRes = await request.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, {
-		data: { guestCount: 1 }
-	})
+	const waitlistJoinRes = await withRequestRetry(
+		`join waitlist event ${eventId}`,
+		() => request.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, { data: { guestCount: 1 } })
+	)
 	if (!waitlistJoinRes.ok()) throw new Error(`waitlist join failed: ${waitlistJoinRes.status()}`)
 
 	await requireFeedEventById(
@@ -118,7 +131,10 @@ async function assertWaitlistFlow(
 			event['userStatus'] === 'waitlist'
 	)
 
-	const waitlistLeaveRes = await request.post(`${BASE_URL}/api/calendar/events/${eventId}/leave`)
+	const waitlistLeaveRes = await withRequestRetry(
+		`leave waitlist event ${eventId}`,
+		() => request.post(`${BASE_URL}/api/calendar/events/${eventId}/leave`)
+	)
 	if (!waitlistLeaveRes.ok()) throw new Error(`waitlist leave failed: ${waitlistLeaveRes.status()}`)
 
 	const waitlistAfterLeave = await requireFeedEventById(
@@ -140,8 +156,14 @@ async function assertContentionFlow(
 	eventId: number
 ) {
 	const [joinARes, joinBRes] = await Promise.all([
-		requestA.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, { data: { guestCount: 0 } }),
-		requestB.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, { data: { guestCount: 0 } })
+		withRequestRetry(
+			`contention join A ${eventId}`,
+			() => requestA.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, { data: { guestCount: 0 } })
+		),
+		withRequestRetry(
+			`contention join B ${eventId}`,
+			() => requestB.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, { data: { guestCount: 0 } })
+		)
 	])
 	if (!joinARes.ok()) throw new Error(`contention join A failed: ${joinARes.status()}`)
 	if (!joinBRes.ok()) throw new Error(`contention join B failed: ${joinBRes.status()}`)
@@ -189,9 +211,11 @@ export async function runCalendarEventsFlow() {
 		if (!hasSessionCookie) throw new Error('admin session cookie missing after login')
 
 		// Clean prior E2E spam using the real admin session (dev-only endpoint).
-		await context.request
-			.post(`${BASE_URL}/api/admin/dev/cleanup-e2e`, { headers: { origin: BASE_URL } })
-			.catch(() => null)
+		await withRequestRetry(
+			'cleanup existing e2e fixtures',
+			() => context.request.post(`${BASE_URL}/api/admin/dev/cleanup-e2e`, { headers: { origin: BASE_URL } }),
+			{ attempts: 4, delayMs: 500 }
+		).catch(() => null)
 
 		await page.goto(`${BASE_URL}/schedule/admin/?preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 		await page.getByTestId('admin-dashboard-main').waitFor({ timeout: 30000 })
@@ -240,9 +264,11 @@ export async function runCalendarEventsFlow() {
 
 		console.log('[calendar-events-flow] PASS')
 	} finally {
-		await context.request
-			.post(`${BASE_URL}/api/admin/dev/cleanup-e2e`, { headers: { origin: BASE_URL } })
-			.catch(() => null)
+		await withRequestRetry(
+			'cleanup final e2e fixtures',
+			() => context.request.post(`${BASE_URL}/api/admin/dev/cleanup-e2e`, { headers: { origin: BASE_URL } }),
+			{ attempts: 4, delayMs: 500 }
+		).catch(() => null)
 		await context.close()
 		await contextB.close()
 		await browser.close()

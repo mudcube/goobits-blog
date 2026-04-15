@@ -23,6 +23,7 @@
 		return post?.metadata?.fm?.category ? [ post.metadata.fm.category ] : []
 	})
 	const tags = $derived(post?.metadata?.fm?.tags || [])
+	const explicitCoverImage = $derived(String(post?.metadata?.fm?.coverImage || '').trim())
 	const coverImage = $derived(post ? getCoverImageUrl(post, '') : '')
 	const coverAlt = $derived(post?.metadata?.fm?.image?.alt || post?.metadata?.fm?.title || 'Journal cover image')
 	const authorAvatar = $derived(post ? getAuthorAvatarUrl(post, '') : '')
@@ -32,6 +33,7 @@
 	const title = $derived(post?.metadata?.fm?.title || 'Untitled entry')
 	const excerpt = $derived(post?.metadata?.fm?.excerpt || '')
 	const formattedDate = $derived(post ? formatDate(post.date) : '')
+	const shouldShowHeroImage = $derived(Boolean(post && coverImage && explicitCoverImage))
 
 	const relatedPosts = $derived.by(() => {
 		if (!post) { return [] }
@@ -107,7 +109,7 @@
 			{/if}
 		</div>
 
-		{#if coverImage}
+		{#if shouldShowHeroImage}
 			<div class="miko-blog__entry-hero-image-wrap">
 				<img
 					class="miko-blog__entry-hero-image"

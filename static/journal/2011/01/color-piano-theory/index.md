@@ -6,9 +6,10 @@ categories:
 tags: 
   - "canvas"
   - "color"
-  - "html5"
+  - "color-theory"
+  - "midi"
   - "piano"
-  - "webaudio"
+  - "web-audio"
 ---
 
 **UPDATE:** There is a more recent post on [Color Piano](/journal/2011/12/color-piano/).

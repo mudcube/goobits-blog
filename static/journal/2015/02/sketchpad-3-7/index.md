@@ -4,7 +4,7 @@ date: "2015-02-03"
 categories: 
   - "apps"
 tags: 
-  - "html5"
+  - "drawing-app"
   - "sketchpad"
 coverImage: "images/Sketchpad-5-copy.jpg"
 ---

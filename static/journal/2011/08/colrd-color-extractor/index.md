@@ -6,8 +6,8 @@ categories:
   - "colrd"
 tags: 
   - "color"
-  - "color-picker"
-  - "html5"
+  - "color-tools"
+  - "image-analysis"
 ---
 
 UPDATE: Renamed to Image DNA and released as a Chrome Extension, [read more](/journal/2011/11/colrd-image-dna/).

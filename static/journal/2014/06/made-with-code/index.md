@@ -4,7 +4,8 @@ date: "2014-06-23"
 categories:
   - "apps"
 tags:
-  - "html5"
+  - "creative-coding"
+  - "generative-art"
   - "webgl"
 ---
 

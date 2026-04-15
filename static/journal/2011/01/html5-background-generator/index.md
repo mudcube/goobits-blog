@@ -5,7 +5,8 @@ categories:
   - "apps"
 tags: 
   - "canvas"
-  - "html5"
+  - "creative-tools"
+  - "gradient"
 coverImage: "images/hero.png"
 ---
 

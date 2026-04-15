@@ -6,8 +6,8 @@ categories:
   - "colrd"
 tags: 
   - "canvas"
-  - "color-picker"
-  - "html5"
+  - "color-tools"
+  - "image-analysis"
 ---
 
 ![DNA app icon](images/128x128.png "128x128")

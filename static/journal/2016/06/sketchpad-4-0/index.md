@@ -4,6 +4,7 @@ date: "2016-06-17"
 categories: 
   - "apps"
 tags: 
+  - "drawing-app"
   - "sketchpad"
 coverImage: "images/120e5b61-e808-4ffa-bcfd-b06b2d188479-2.jpeg"
 ---

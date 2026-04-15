@@ -6,8 +6,8 @@ categories:
   - "colrd"
 tags: 
   - "color"
-  - "gradient-picker"
-  - "html5"
+  - "color-tools"
+  - "gradient"
 coverImage: "images/hero.png"
 ---
 

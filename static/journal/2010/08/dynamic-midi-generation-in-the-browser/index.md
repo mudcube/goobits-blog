@@ -4,7 +4,8 @@ date: "2010-08-19"
 categories: 
   - "open-source"
 tags: 
-  - "html5"
+  - "javascript"
+  - "midi"
   - "piano"
 ---
 

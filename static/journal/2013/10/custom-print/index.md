@@ -4,7 +4,8 @@ date: "2013-10-28"
 categories: 
   - "apps"
 tags: 
-  - "html5"
+  - "creative-tools"
+  - "drawing-app"
   - "sketchpad"
 ---
 

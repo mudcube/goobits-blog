@@ -6,7 +6,8 @@ categories:
 tags: 
   - "canvas"
   - "color"
-  - "html5"
+  - "creative-coding"
+  - "generative-art"
   - "js1k"
 ---
 

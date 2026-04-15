@@ -4,7 +4,8 @@ date: "2011-08-08"
 categories: 
   - "apps"
 tags: 
-  - "html5"
+  - "creative-coding"
+  - "midi"
   - "piano"
   - "webgl"
 coverImage: "images/hero.png"

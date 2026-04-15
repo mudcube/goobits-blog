@@ -1,5 +1,5 @@
 import type { APIRequestContext, Page } from 'playwright'
-import { BASE_URL } from './_helpers'
+import { BASE_URL, sleep, withRequestRetry } from './_helpers'
 
 export async function waitForMonthLabel(page: Page, timeout = 5_000) {
 	const monthTitle = page.locator('.member-calendar__month-banner-title')
@@ -49,7 +49,10 @@ export async function waitForFeedEvent(
 	delayMs = 300
 ) {
 	for (let attempt = 0; attempt < attempts; attempt += 1) {
-		const res = await request.get(`${BASE_URL}/api/calendar/events`)
+		const res = await withRequestRetry(
+			`wait for feed event ${title}`,
+			() => request.get(`${BASE_URL}/api/calendar/events`)
+		)
 		if (res.ok()) {
 			const json = await res.json() as { upcoming?: Array<Record<string, unknown>> }
 			const found = (json.upcoming ?? []).find(
@@ -57,7 +60,7 @@ export async function waitForFeedEvent(
 			)
 			if (found) return found
 		}
-		await new Promise((resolve) => setTimeout(resolve, delayMs))
+		await sleep(delayMs)
 	}
 	return null
 }
@@ -70,7 +73,10 @@ export async function waitForFeedEventById(
 	delayMs = 300
 ) {
 	for (let attempt = 0; attempt < attempts; attempt += 1) {
-		const res = await request.get(`${BASE_URL}/api/calendar/events`)
+		const res = await withRequestRetry(
+			`wait for feed event id ${eventId}`,
+			() => request.get(`${BASE_URL}/api/calendar/events`)
+		)
 		if (res.ok()) {
 			const json = await res.json() as { upcoming?: Array<Record<string, unknown>> }
 			const found = (json.upcoming ?? []).find(
@@ -78,7 +84,7 @@ export async function waitForFeedEventById(
 			)
 			if (found) return found
 		}
-		await new Promise((resolve) => setTimeout(resolve, delayMs))
+		await sleep(delayMs)
 	}
 	return null
 }
@@ -91,7 +97,10 @@ export async function requireFeedEvent(
 	const found = await waitForFeedEvent(request, title, predicate)
 	if (found) return found
 
-	const res = await request.get(`${BASE_URL}/api/calendar/events`)
+	const res = await withRequestRetry(
+		`require feed event ${title}`,
+		() => request.get(`${BASE_URL}/api/calendar/events`)
+	)
 	const status = res.status()
 	const body = await res.text().catch(() => '')
 	throw new Error(`calendar feed event not found (${title}); status=${status}; body=${body.slice(0, 500)}`)
@@ -105,7 +114,10 @@ export async function requireFeedEventById(
 	const found = await waitForFeedEventById(request, eventId, predicate)
 	if (found) return found
 
-	const res = await request.get(`${BASE_URL}/api/calendar/events`)
+	const res = await withRequestRetry(
+		`require feed event id ${eventId}`,
+		() => request.get(`${BASE_URL}/api/calendar/events`)
+	)
 	const status = res.status()
 	const body = await res.text().catch(() => '')
 	throw new Error(`calendar feed event not found (id=${eventId}); status=${status}; body=${body.slice(0, 1000)}`)

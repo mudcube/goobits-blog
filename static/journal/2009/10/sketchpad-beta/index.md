@@ -5,7 +5,7 @@ coverImage: "/journal/2009/10/sketchpad-beta/images/13.png"
 categories: 
   - "apps"
 tags: 
-  - "html5"
+  - "drawing-app"
   - "sketchpad"
 ---
 

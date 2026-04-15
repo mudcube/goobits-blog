@@ -4,7 +4,7 @@ date: "2010-11-10"
 categories: 
   - "apps"
 tags: 
-  - "html5"
+  - "canvas"
   - "typography"
   - "unicode"
 ---

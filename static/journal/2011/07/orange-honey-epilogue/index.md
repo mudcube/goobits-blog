@@ -5,7 +5,7 @@ categories:
   - "code-art"
 tags: 
   - "canvas"
-  - "html5"
+  - "creative-tools"
   - "typography"
 ---
 

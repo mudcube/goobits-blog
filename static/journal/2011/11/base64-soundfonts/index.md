@@ -5,9 +5,9 @@ categories:
   - "open-source"
 tags: 
   - "audio"
-  - "html5"
+  - "midi"
   - "piano"
-  - "webaudio"
+  - "web-audio"
 coverImage: "images/hero.png"
 ---
 

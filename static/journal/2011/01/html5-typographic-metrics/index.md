@@ -5,7 +5,6 @@ categories:
   - "open-source"
 tags:
   - "canvas"
-  - "html5"
   - "typography"
 coverImage: "images/hero.png"
 ---

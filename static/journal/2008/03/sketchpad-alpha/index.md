@@ -4,7 +4,7 @@ date: "2008-03-02"
 categories: 
   - "apps"
 tags: 
-  - "html5"
+  - "drawing-app"
   - "sketchpad"
 coverImage: "images/hero.png"
 ---

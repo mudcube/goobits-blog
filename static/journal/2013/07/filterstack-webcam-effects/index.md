@@ -4,7 +4,10 @@ date: "2013-07-08"
 categories:
   - "apps"
 tags:
-  - "html5"
+  - "image-filters"
+  - "shaders"
+  - "webcam-effects"
+  - "webgl"
 ---
 
 [![unnamed1](images/unnamed1.jpg)](images/unnamed1.jpg)

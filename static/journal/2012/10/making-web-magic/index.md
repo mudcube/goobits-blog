@@ -4,8 +4,8 @@ date: "2012-10-09"
 categories: 
   - "talk"
 tags: 
-  - "html5"
-  - "interview"
+  - "creative-coding"
+  - "sketchpad"
 coverImage: "images/hero.png"
 ---
 
