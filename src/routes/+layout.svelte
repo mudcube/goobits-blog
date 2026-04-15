@@ -31,6 +31,15 @@
 	})
 </script>
 
+<svelte:head>
+	<link
+		rel="alternate"
+		type="application/rss+xml"
+		title="MIKO.ART Journal"
+		href="/journal/rss.xml"
+	/>
+</svelte:head>
+
 <ThemeProvider config={themeConfig} serverPreferences={data.preferences}>
 	<div class="code-theme">
 		{#if isCalendarRoute}
