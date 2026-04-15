@@ -7,6 +7,17 @@
  * IMPORTANT: CSS custom properties are inherited from the parent application's
  * design-tokens.css. Do not define :root level variables here as they will
  * override the theme system and break light/dark mode support.
+ *
+ * THEME CONTRACT:
+ * The default styles in this file consume the host app's token system:
+ *   --color-primary, --color-secondary, --gray-*, --amber-*, --green-*, --red-*
+ * plus the `--goo-*` and `--blog-*` taxonomy tokens declared by consumers.
+ *
+ * Themes built on @goobits/blog may either:
+ *   (a) inherit these defaults and override individual tokens, OR
+ *   (b) skip this stylesheet entirely and fully replace the UI with their own
+ *       component set (see @goobits/blog-theme-miko for an example).
+ * Both paths are supported. Mixed inheritance is discouraged — pick one per theme.
  */
 
 // Post meta styling - ensure consistent margin
@@ -835,24 +846,6 @@ $sidebar-width: 33.333333%;
 
 // Note: Direct component styles are also defined in the respective component files
 // This acts as a fallback for global styling
-
-// Specific scoped selectors for known category elements
-:global(.blog-card__category.s-1fha09V63BUh),
-:global(.blog__primary-category.s-xrw6CAgb2VxL),
-:global(.goo__card-category.s-1fha09V63BUh),
-:global(.goo__primary-category.s-xrw6CAgb2VxL) {
-  background-color: var(--blog-category-active-bg) !important;
-  color: var(--blog-category-active-color) !important;
-  border: 1px solid var(--blog-category-active-border) !important;
-  font-weight: 500;
-}
-
-:global(.blog-card__category.s-1fha09V63BUh a),
-:global(.blog__primary-category.s-xrw6CAgb2VxL a),
-:global(.goo__card-category.s-1fha09V63BUh a),
-:global(.goo__primary-category.s-xrw6CAgb2VxL a) {
-  color: white !important;
-}
 
 /* ========================================
  * NOTE: Tag/category color variables removed
