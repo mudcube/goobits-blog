@@ -5,6 +5,15 @@ export const SITE_DEFAULT_IMAGE = '/media/miko.jpg'
 export const SITE_DESCRIPTION =
 	'Creative software, design tools, music experiments, and process notes from Miko Meow.'
 
+/**
+ * Canonical one-sentence entity description. Used everywhere LLMs and AI
+ * retrieval systems cross-reference "what is Miko" — Person JSON-LD,
+ * llms.txt blockquote, and the about-page lead. Keep it ~160 chars and
+ * name the flagship products so entity linking stays consistent.
+ */
+export const SITE_ENTITY_DESCRIPTION =
+	'Miko Meow is a creative developer, designer, and musician making browser-native apps, drawing tools, and sound experiments — creator of Sketchpad, Color Piano, and ColRD.'
+
 export type JsonLdNode = Record<string, unknown>
 
 export function hasFileExtension(path: string) {
@@ -82,6 +91,7 @@ export function buildPersonJsonLd(): JsonLdNode {
 		name: SITE_AUTHOR,
 		url: SITE_ORIGIN,
 		image: toAbsoluteAssetUrl(SITE_DEFAULT_IMAGE),
+		description: SITE_ENTITY_DESCRIPTION,
 		jobTitle: 'Creative developer, designer, and musician',
 		worksFor: {
 			'@type': 'Organization',
