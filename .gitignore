@@ -33,6 +33,7 @@ tasks/*
 !tasks/nano-banana/**
 temp/
 tmp/
+.tmp/
 test-results/
 vm.yaml
 .artifacts/
