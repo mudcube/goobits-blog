@@ -7,13 +7,12 @@ tags:
   - "canvas"
   - "creative-coding"
   - "typography"
+coverImage: "images/Screen-shot-2011-05-15-at-10.57.14-PM.png"
 ---
 
 [HTML5 Rocks](http://www.html5rocks.com/) is a website that helps inspire developers and teach how to implement those shiny new HTML5 features in real world examples. They recently asked me to write an article for their website. Working on a project for Google was inspiring (even if there was no pay involved)!
 
 … [Neon Rainbow Jitter](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#neon+rainbow+jitter);
-
-[![Neon Rainbow Jitter example](images/Screen-shot-2011-05-15-at-10.57.14-PM.png "Screen shot 2011-05-15 at 10.57.14 PM")](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#neon+rainbow+jitter "Open Neon Rainbow Jitter example")
 
 … [Sleek Zebra](http://www.html5rocks.com/tutorials/canvas/texteffects/Text-Effects.html#pattern+gradient+reflect) (inspired by [WebDesignerWall](http://www.webdesignerwall.com/demo/css-gradient-text));
 

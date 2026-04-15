@@ -7,6 +7,7 @@ tags:
   - "javascript"
   - "midi"
   - "piano"
+coverImage: "images/midi-js-demo.png"
 ---
 
 **UPDATE:** This project has been cancelled, the MIDIBridge (which takes this idea much further) is what you’re looking for;  [http://www.abumarkub.net/abublog/?p=505](http://www.abumarkub.net/abublog/?p=505)
@@ -14,8 +15,6 @@ tags:
 Have you ever wanted to use MIDI in your Javascript or Flash project?  It’s been a long time dream of mine.  After a long search I came up with one solution that would provide the best support for the most computers (at present time) — utilizing Java’s [javax.sound.midi](http://java.sun.com/products/java-media/sound/doc-midi.html) interface through an . Introducing the MIDIPlugin providing the fundamental functions to create dynamic music & sound effects in your browser.
 
 The MIDIPlugin requires that [Java](http://www.java.com/en/download/manual.jsp) and a [MIDI Soundbank](http://java.sun.com/products/java-media/sound/soundbanks.html) be installed on your computer. Some computers have these installed by default, others do not. More on computability later.
-
-[![MIDI.js Piano demo](images/midi-js-demo.png "MIDI.js Piano Demo")](/labs/Piano/ "Open MIDI.js Piano demo")
 
 [Piano Theory](/piano/) was built utilizing the MIDIPlugin.  Although the MIDIPlugin works in Internet Explorer my piano webapp does not (at this time) — apologies to IE users.
 

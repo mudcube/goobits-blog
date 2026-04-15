@@ -6,6 +6,7 @@ categories:
 tags: 
   - "drawing-app"
   - "sketchpad"
+coverImage: "images/Screen-Shot-2012-05-17-at-4.29.13-PM.png"
 ---
 
 [Sketch Mobile](http://sketchpad.io/mobile) is a drawing app build for mobile browsers; taking advantage of technologies such as multi-touch, the accelerometer, and the gyroscope; providing a fun & novel environment to express yourself in colorful ways. Sketch Mobile was commissioned by Google as part of the [Mobile Chrome Experiments](http://m.chromeexperiments.com/) released at Google I/O show in San Francisco. It was an exciting project to be part of, I hope you enjoy!
@@ -65,7 +66,6 @@ Read more about Sketch Mobile on the “Information” section @ [http://sketch
 
 I apologize for the psychedelically colorful presets on the tools. Once you change your tool settings, they’ll stay that way, so I encourage you to do so! Here’s a few drawings created with Sketch Mobile:
 
-![Sketch Mobile artwork 1](/journal/2012/07/sketch-mobile/images/Screen-Shot-2012-05-17-at-4.29.13-PM.png)
 ![Sketch Mobile artwork 2](/journal/2012/07/sketch-mobile/images/Screen-Shot-2012-06-04-at-3.25.53-AM.png)
 ![Sketch Mobile artwork 3](/journal/2012/07/sketch-mobile/images/Screen-Shot-2012-05-17-at-4.53.13-PM.png)
 ![Sketch Mobile artwork 4](/journal/2012/07/sketch-mobile/images/Screen-Shot-2012-05-17-at-5.06.29-PM.png)

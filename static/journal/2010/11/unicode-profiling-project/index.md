@@ -7,6 +7,7 @@ tags:
   - "canvas"
   - "typography"
   - "unicode"
+coverImage: "images/Screen-shot-2010-11-10-at-7.39.11-PM.png"
 ---
 
 The **[Unicode Profiling Project](/labs/ucpp/)** was designed to gather statistics on unicode support across systems.  The software checks each symbol in your systems Unicode catalog (65,535 glyphs) to see which are visible on your computer using `<canvas>` and Javascript.
@@ -16,8 +17,6 @@ The data generated from your computer will help profile the state of unicode sup
 **Running the test:**
 
 Once the [test](/labs/ucpp/) is initiated you’ll be able to watch the glyphs as they’re scanned with their related unicode block name.  It typically takes over a minute to scan an entire collection of unicode characters.  This is what the acid test looks like while being processed:
-
-[![Unicode profiling scan in progress](images/Screen-shot-2010-11-10-at-7.39.11-PM.png "Screen shot 2010-11-10 at 7.39.11 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.39.11-PM.png "Open full-size scan screenshot")
 
 **Reading your profile:**
 

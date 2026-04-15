@@ -7,6 +7,7 @@ tags:
   - "canvas"
   - "creative-tools"
   - "typography"
+coverImage: "images/pastedGraphic_9.png"
 ---
 
 The past four years (2007-2011) much of my energy and capital has been focused into building the Mugtug graphics suite; [Sketchpad](http://mugtug.com/sketchpad/), [Darkroom](http://mugtug.com/darkroom/) and Lightbox. The suite has come a long way since I developed Sketchpad during a seven month work binge of Red-Bulls!  Through the collaboration of many developers we’ve moved forwards to create an entire framework that blurs the line between “web-app” and “desktop-app”…
@@ -16,8 +17,6 @@ Due to my own budgetary constraints, and differing visions within the corporatio
 The following highlight a few of my final contributions to Mugtug; made possible with HTML5;
 
 – **Layer Styles**; this module creates effects such as _InnerShadow_, _OuterShadow_, _InnerGlow_, and _OuterGlow_.  These are similar to what Photoshop achieves—the difference is, my version has the ability to do what I’ve coined “style stacking”.  Style stacking allows the designer to add multiple fills (solid, gradient, pattern) to, for instance, InnerShadow;
-
-[![Layer styles example](images/pastedGraphic_9.png "pastedGraphic_9")](/journal/2011/07/orange-honey-epilogue/images/pastedGraphic_9.png "Open full-size layer styles example")
 
 [![Layer styles reference](images/5807041058_21caef727a_o.png "5807041058_21caef727a_o")](/journal/2011/07/orange-honey-epilogue/images/5807041058_21caef727a_o.png "Open full-size layer styles reference")
 

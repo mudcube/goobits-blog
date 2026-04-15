@@ -6,9 +6,8 @@ categories:
 tags:
   - "canvas"
   - "generative-art"
+coverImage: "images/perlin-noise_19805217380_o.png"
 ---
-
-[![perlin-noise_19805217380_o](images/perlin-noise_19805217380_o.png)](images/perlin-noise_19805217380_o.png)
 
 I was recently asked to create artwork for the[C.A.R.D.S. Project](http://thecardsproject.com). Chris & John gave me no
 restrictions, and only one task: Create something interesting that fits on a 3.5 x 2.0 business card. For me, this was a
@@ -54,8 +53,6 @@ Here's a few of my favorites (the squid in the first image is by Justin Windle):
 [![perlin-noise_19966917556_o](images/perlin-noise_19966917556_o.png)](images/perlin-noise_19966917556_o.png)
 
 [![perlin-noise_19854886179_o](images/perlin-noise_19854886179_o.png)](images/perlin-noise_19854886179_o.png)
-
-[![perlin-noise_19805217380_o](images/perlin-noise_19805217380_o.png)](images/perlin-noise_19805217380_o.png)
 
 [![gradient2622scale00006865198035661689seed09447263730689883-1_20830072315_o](images/gradient2622scale00006865198035661689seed09447263730689883-1_20830072315_o.png)](images/gradient2622scale00006865198035661689seed09447263730689883-1_20830072315_o.png)
 

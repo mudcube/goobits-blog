@@ -7,9 +7,8 @@ tags:
   - "creative-tools"
   - "drawing-app"
   - "sketchpad"
+coverImage: "images/Screen-Shot-2013-10-28-at-3.55.16-PM.png"
 ---
-
-[![Screen Shot 2013-10-28 at 3.55.16 PM](images/Screen-Shot-2013-10-28-at-3.55.16-PM.png)](images/Screen-Shot-2013-10-28-at-3.55.16-PM.png)
 
 Sketchpad has been used in applications from scientific machine learning, to kids drawing, but we haven’t had much chance to focus on any commercial aspects. This is why we’re excited to be changing that. We’re gearing up to provide the technology that makes your users product customization experience quick and easy by tapping into our experience + codebase in building Sketchpad.
 

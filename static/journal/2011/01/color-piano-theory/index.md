@@ -10,6 +10,7 @@ tags:
   - "midi"
   - "piano"
   - "web-audio"
+coverImage: "images/250px-Number_Form-colored.jpeg"
 ---
 
 **UPDATE:** There is a more recent post on [Color Piano](/journal/2011/12/color-piano/).
@@ -20,7 +21,7 @@ This application also includes a bit of history; color schemes historic figures 
 
 **Visual/audial memory recognition**
 
-[![Number form color mapping](images/250px-Number_Form-colored.jpeg)](http://en.wikipedia.org/wiki/Synesthesia "Read about synesthesia")To improve memory recognition, colors are mapped to the sounds on the keyboard, creating a [synesthetic](http://en.wikipedia.org/wiki/Synesthesia) experience. By picking a color-mapping that works best for you, these colors will give you a _visual cue to the note_ you’re playing.
+To improve memory recognition, colors are mapped to the sounds on the keyboard, creating a [synesthetic](http://en.wikipedia.org/wiki/Synesthesia) experience. By picking a color-mapping that works best for you, these colors will give you a _visual cue to the note_ you’re playing.
 
 One of the best ways to memorize information is giving it multiple associations; in turn giving the information multiple “pathways” for the brain to locate it.  With color added to the mix, we are building a memory recognition triangulation:  **sound** (measured in hz), **color** (in RGB), and **space** (the XY coordinate of key on the keyboard).
 

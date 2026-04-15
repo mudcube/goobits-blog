@@ -7,9 +7,8 @@ tags:
   - "creative-coding"
   - "generative-art"
   - "webgl"
+coverImage: "images/bracelet-1024x512.jpg"
 ---
-
-[![bracelet](images/bracelet-1024x512.jpg)](images/bracelet.jpg)
 
 I recently had the pleasure of working on Google’s [Made with Code](https://www.madewithcode.com/) initiative with
 the [Red & Co.](http://redandco.com/) creative studio and Mash a group of developers located in Portland Oregon.
