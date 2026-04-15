@@ -184,6 +184,7 @@ export interface I18nConfig {
 /** Complete blog configuration type */
 export interface BlogConfig {
 	name: string
+	appName?: string
 	description: string
 	uri: string
 	version: string
@@ -215,6 +216,7 @@ export function getDefaultBlogPostFiles(): GlobImportRecord {
 export const defaultBlogConfig: BlogConfig = {
 	// --- Basic Information ---
 	name: 'Blog',
+	appName: '',
 	description: 'Our Blog',
 	uri: '/blog',
 

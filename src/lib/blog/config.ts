@@ -4,6 +4,7 @@ let initialized = false
 
 const journalBlogConfig = {
 	name: 'Miko Journal',
+	appName: 'Miko',
 	description: 'Ideas, process, and notes from Miko.',
 	uri: '/journal',
 	posts: {

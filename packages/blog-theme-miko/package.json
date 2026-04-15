@@ -1,0 +1,39 @@
+{
+  "name": "@goobits/blog-theme-miko",
+  "version": "0.1.0",
+  "description": "Miko presentation layer for @goobits/blog",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "svelte": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "svelte": "./index.ts",
+      "default": "./index.ts"
+    },
+    "./components/*": {
+      "svelte": "./components/*",
+      "default": "./components/*"
+    }
+  },
+  "sideEffects": [
+    "**/*.scss"
+  ],
+  "files": [
+    "index.ts",
+    "components",
+    "styles",
+    "tsconfig.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@sveltejs/kit": "^2.0.0",
+    "svelte": "^5.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@goobits/blog": "workspace:*"
+  }
+}

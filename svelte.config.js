@@ -57,6 +57,7 @@ export default {
 			'@src': './src',
 			'@static': './static',
 			'@packages': './packages',
+			'@goobits/blog-theme-miko': './packages/blog-theme-miko/index.ts',
 			'@miko/ui': './packages/ui/src',
 			'@calendar/app': './packages/calendar/app/src',
 			'@calendar/ui': './packages/calendar/ui/src'

@@ -1,7 +1,7 @@
 <script>
-	import { BlogRouter } from '@goobits/blog'
+	import { MikoBlogRouter } from '@goobits/blog-theme-miko'
 
 	let { data } = $props()
 </script>
 
-<BlogRouter {data} />
+<MikoBlogRouter {data} />
