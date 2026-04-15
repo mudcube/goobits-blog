@@ -563,15 +563,11 @@
 
 /* ---------- Cover image ---------- */
 .miko-blog__entry-hero-image-wrap {
+	position: relative;
 	margin-top: var(--space-10);
-	display: grid;
-	place-items: center;
-	padding: clamp(var(--space-4), 2vw, var(--space-6));
+	overflow: hidden;
 	border: 1px solid var(--showcase-outline-variant);
 	border-radius: var(--radius-lg);
-	background:
-		radial-gradient(circle at top, color-mix(in srgb, var(--showcase-primary) 12%, transparent), transparent 60%),
-		color-mix(in srgb, var(--showcase-surface-high) 42%, transparent);
 	box-shadow:
 		0 30px 70px -20px rgba(0, 0, 0, 0.55),
 		0 0 60px -20px color-mix(in srgb, var(--showcase-primary) 30%, transparent);
@@ -580,9 +576,9 @@
 .miko-blog__entry-hero-image {
 	display: block;
 	width: 100%;
+	height: 100%;
 	max-height: 32rem;
 	object-fit: cover;
-	border-radius: calc(var(--radius-lg) - 4px);
 }
 
 .miko-blog__entry-body-section,
