@@ -7,6 +7,7 @@
 		getSimilarPosts,
 		slugify
 	} from '@goobits/blog/core'
+	import { BlogLightbox, BlogProse } from '@goobits/blog/ui'
 	import { formatLabel } from '../utils/formatLabel.ts'
 
 	const { data } = $props()
@@ -127,9 +128,9 @@
 		<div class="miko-blog__entry-body">
 			{#if postContentComponent}
 				{@const SvelteComponent = postContentComponent}
-				<div class="miko-blog__prose ui-prose">
+				<BlogProse class="miko-blog__prose ui-prose">
 					<SvelteComponent />
-				</div>
+				</BlogProse>
 			{:else}
 				<p>Post content failed to load.</p>
 			{/if}
@@ -167,4 +168,6 @@
 			{/if}
 		</div>
 	</section>
+
+	<BlogLightbox />
 {/if}

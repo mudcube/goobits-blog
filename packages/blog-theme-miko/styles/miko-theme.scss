@@ -625,6 +625,19 @@
 }
 
 .miko-blog__prose {
+	/* Theme-side overrides for BlogProse gallery tiles (see @goobits/blog
+	 * BlogProse.svelte for the full custom-property contract). Colors and
+	 * shadows bind to --showcase-* so gallery tiles match the rest of the
+	 * journal surfaces. */
+	--blog-gallery-min-tile: 220px;
+	--blog-gallery-gap: 0.9rem;
+	--blog-gallery-radius: var(--radius-md);
+	--blog-gallery-border: var(--showcase-outline-variant);
+	--blog-gallery-surface: color-mix(in srgb, var(--showcase-surface-high) 60%, transparent);
+	--blog-gallery-shadow:
+		0 20px 45px -28px rgba(0, 0, 0, 0.5),
+		0 0 40px -24px color-mix(in srgb, var(--showcase-primary) 22%, transparent);
+
 	color: var(--showcase-text);
 	font-size: 1.08rem;
 	line-height: 1.75;

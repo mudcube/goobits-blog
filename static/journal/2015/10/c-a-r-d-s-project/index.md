@@ -9,7 +9,7 @@ tags:
 coverImage: "images/perlin-noise_19805217380_o.png"
 ---
 
-I was recently asked to create artwork for the[C.A.R.D.S. Project](http://thecardsproject.com). Chris & John gave me no
+I was recently asked to create artwork for the [C.A.R.D.S. Project](http://thecardsproject.com). Chris & John gave me no
 restrictions, and only one task: Create something interesting that fits on a 3.5 x 2.0 business card. For me, this was a
 dream project and an exciting excuse to play around with some generative algorithms!
 
@@ -19,7 +19,7 @@ parameters change over time; some linearly, while others are mapped to cosine/si
 resulted in a more organic feeling).
 
 I ended up submitting 250 unique cards to the project. Each card is composed of 10-frames and took 1-2 minutes to
-generate. Many were thrown out in the process! From there the cards were sent to [GifPop](http://gifpop.io/)for
+generate. Many were thrown out in the process! From there the cards were sent to [GifPop](http://gifpop.io/) for
 lenticular printing.
 
 Here's a few of my favorites (the squid in the first image is by Justin Windle):

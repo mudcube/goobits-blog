@@ -6,18 +6,22 @@
 	const description =
 		'Browse playful web experiments, prototypes, and creative coding labs from Miko Meow.'
 
-	const posterImages = [
-		'/media/stubs/product-stub-1.svg',
-		'/media/stubs/product-stub-2.svg',
-		'/media/stubs/product-stub-3.svg',
-		'/media/stubs/product-stub-4.svg',
-		'/media/stubs/product-stub-5.svg',
-		'/media/stubs/product-stub-6.svg',
-		'/media/stubs/product-stub-7.svg',
-		'/media/stubs/product-stub-8.svg',
-		'/media/stubs/product-stub-9.svg',
-		'/media/stubs/product-stub-3.svg'
-	]
+	const labImageByHref: Record<string, string> = {
+		'/labs/color-galaxy/': '/media/labs/color-galaxy-card.png',
+		'/labs/js1k/BreathingGalaxies.html': '/journal/2010/08/what-can-1kb-of-javascript-do/images/BreathingGalaxies.jpeg',
+		'/labs/js1k/Daltonize.html': '/journal/2011/10/color-accessibility-on-digital-displays/images/hero.png',
+		'/labs/js1k/MicroSketchpad.html': '/journal/2010/08/what-can-1kb-of-javascript-do/images/MicroSketchpad.jpeg',
+		'/labs/js1k/SpectrumDJ.html': '/journal/2010/08/what-can-1kb-of-javascript-do/images/SpectrumDJ.jpeg',
+		'/labs/midi-js/': '/journal/2012/02/midi-js/images/hero.png',
+		'/labs/sketch-js/': '/media/labs/sketch-js-card.png',
+		'/labs/sketchpad-1.0/': '/media/labs/sketchpad-v1-card.png',
+		'/labs/thumbnailer/': '/journal/2011/11/batch-thumbnail-generator/images/hero.png',
+		'/labs/zen-bg/': '/media/labs/zen-bg-card.png'
+	}
+
+	function getLabImage(href: string) {
+		return labImageByHref[href] || '/media/labs-flask.png'
+	}
 
 	function getLabMeta(href: string) {
 		if (href.includes('/js1k/')) return 'JS1K'
@@ -44,9 +48,9 @@
 		meta: string
 		badge: string
 		badgeTone: 'cool' | 'warm'
-	}> = labsCatalog.map((item, idx) => ({
+	}> = labsCatalog.map((item) => ({
 		...item,
-		image: posterImages[idx % posterImages.length]!,
+		image: getLabImage(item.href),
 		meta: getLabMeta(item.href),
 		badge: formatBadgeDate(item.date),
 		badgeTone: item.date ? 'cool' : 'warm'
