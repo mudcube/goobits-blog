@@ -1,18 +1,25 @@
 <script>
-	import { blogConfig, getAllCategories, getAllTags } from '@goobits/blog/core'
+	import { ShowcaseHero } from '@miko/ui'
+	import { blogConfig, getAllCategories, slugify } from '@goobits/blog/core'
 	import MikoArchiveRow from './MikoArchiveRow.svelte'
-	import MikoTaxonomyList from './MikoTaxonomyList.svelte'
 
 	const { data } = $props()
 
 	const posts = $derived(Array.isArray(data.posts) ? data.posts : [])
 	const allPosts = $derived(Array.isArray(data.allPosts) ? data.allPosts : posts)
-	const categories = $derived(getAllCategories(allPosts, 10))
-	const tags = $derived(getAllTags(allPosts, 14))
-	const title = $derived.by(() => {
+	const categories = $derived(getAllCategories(allPosts, 8))
+	const currentCategory = $derived(data.currentCategory || '')
+	const currentTag = $derived(data.currentTag || '')
+
+	const pageTitle = $derived.by(() => {
 		if (data.pageType === 'category') { return data.category || 'Category' }
 		if (data.pageType === 'tag') { return `#${data.tag || 'Tag'}` }
-		return blogConfig.name
+		return 'Insights, artifacts, and'
+	})
+	const titleAccent = $derived.by(() => {
+		if (data.pageType === 'category') { return '' }
+		if (data.pageType === 'tag') { return '' }
+		return 'creative breakthroughs'
 	})
 	const eyebrow = $derived.by(() => {
 		if (data.pageType === 'category') { return 'Category Archive' }
@@ -22,51 +29,65 @@
 	const description = $derived.by(() => {
 		if (data.pageType === 'category' && data.categoryDescription) { return data.categoryDescription }
 		if (data.pageType === 'tag' && data.tag) { return `Entries grouped under the ${data.tag} thread.` }
-		return blogConfig.description
+		return blogConfig.description || 'A chronological mapping of digital synthesis and sensory explorations.'
+	})
+	const signalLabel = $derived(`Archive No. ${String(posts.length).padStart(3, '0')}`)
+
+	const chips = $derived.by(() => {
+		if (!categories.length) { return [] }
+		const base = [
+			{ href: blogConfig.uri, label: 'All' },
+			...categories.map(c => ({ href: `${blogConfig.uri}/category/${slugify(c)}`, label: c }))
+		]
+		return base
 	})
 </script>
 
-<section class="miko-blog__archive">
-	<div class="miko-blog__hero">
-		<p class="miko-blog__eyebrow">{eyebrow}</p>
-		<h1 class="miko-blog__title">{title}</h1>
-		<p class="miko-blog__description">{description}</p>
-		<p class="miko-blog__count">{posts.length} entries</p>
-	</div>
+<ShowcaseHero
+	{eyebrow}
+	title={pageTitle}
+	{titleAccent}
+	intro={description}
+	{signalLabel}
+	{chips}
+/>
 
-	<div class="miko-blog__archive-layout">
-		<div class="miko-blog__archive-main">
-			{#if posts.length > 0}
-				<div class="miko-blog__rows" role="list">
+<section class="miko-blog__collection">
+	<div class="miko-blog__collection-inner">
+		<header class="miko-blog__toolbar">
+			<div class="miko-blog__toolbar-head">
+				<h2 class="miko-blog__toolbar-title">The Archive</h2>
+				<p class="miko-blog__toolbar-kicker">
+					Showing {posts.length} recorded synthesis {posts.length === 1 ? 'log' : 'logs'}
+					{#if currentCategory}— filtered by {currentCategory}{:else if currentTag}— filtered by #{currentTag}{/if}
+				</p>
+			</div>
+		</header>
+
+		{#if posts.length > 0}
+			<div class="miko-blog__table" role="table" aria-label="Journal entries">
+				<div class="miko-blog__thead" role="row">
+					<span role="columnheader">Timestamp</span>
+					<span role="columnheader">Entry Detail</span>
+					<span role="columnheader">Taxonomy</span>
+					<span class="miko-blog__th--end" role="columnheader">Link</span>
+				</div>
+				<div class="miko-blog__tbody" role="rowgroup">
 					{#each posts as post (post.urlPath)}
-						<div role="listitem">
-							<MikoArchiveRow {post} />
-						</div>
+						<MikoArchiveRow {post} />
 					{/each}
 				</div>
-			{:else}
-				<div class="miko-blog__empty">
-					<h2>No entries found</h2>
-					<p>This archive view does not have any posts yet.</p>
-				</div>
-			{/if}
+			</div>
+		{:else}
+			<div class="miko-blog__empty">
+				<h2>No entries found</h2>
+				<p>This archive view does not have any posts yet.</p>
+			</div>
+		{/if}
+
+		<div class="miko-blog__discover" aria-hidden="true">
+			<span>Archive complete</span>
+			<div class="miko-blog__discover-line"></div>
 		</div>
-
-		<aside class="miko-blog__archive-sidebar">
-			<MikoTaxonomyList
-				title="Categories"
-				items={categories}
-				type="category"
-				currentItem={data.currentCategory || ''}
-			/>
-
-			<MikoTaxonomyList
-				title="Tags"
-				items={tags}
-				type="tag"
-				currentItem={data.currentTag || ''}
-				showHashtag={true}
-			/>
-		</aside>
 	</div>
 </section>

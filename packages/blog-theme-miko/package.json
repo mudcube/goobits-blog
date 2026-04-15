@@ -34,6 +34,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@goobits/blog": "workspace:*"
+    "@goobits/blog": "workspace:*",
+    "@miko/ui": "workspace:*"
   }
 }
