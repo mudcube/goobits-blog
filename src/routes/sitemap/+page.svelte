@@ -1,13 +1,21 @@
 <script>
-	import { Filter } from '@lucide/svelte'
+	import {
+		BookOpen,
+		CalendarClock,
+		Compass,
+		FileText,
+		Filter,
+		Shield,
+		Terminal,
+		Wrench
+	} from '@lucide/svelte'
 	import {
 		FilterChipGroup,
-		FilterableCollection,
-		PageContainer,
 		PageShell,
 		SearchToolbar,
 		SegmentedControl,
 		ShowcaseHero,
+		ShowcaseSection,
 		SitemapCategory
 	} from '@miko/ui'
 	import { formatDateMmDdYyyy } from '$lib/utils/date'
@@ -34,36 +42,17 @@
 
 	const availableTags = $derived(getSitemapAvailableTags(data.canViewInternalRoutes))
 
-	const categoryOrder = [
-		'Main Pages',
-		'Journal Pages',
-		'Journal Posts',
-		'Admin Pages',
-		'API Routes',
-		'Utility Pages'
-	]
-	const accentColors = [
-		'#ec4899',
-		'#f59e0b',
-		'#eab308',
-		'#22c55e',
-		'#14b8a6',
-		'#3b82f6',
-		'#8b5cf6',
-		'#f43f5e',
-		'#f97316'
-	]
-
-	function hashString(input) {
-		let h = 0
-		for (let i = 0; i < input.length; i++) h = (h * 31 + input.charCodeAt(i)) | 0
-		return Math.abs(h)
+	const categoryMeta = {
+		'Main Pages':    { tone: 'primary',   icon: Compass },
+		'Journal Pages': { tone: 'primary',   icon: BookOpen },
+		'Journal Posts': { tone: 'primary',   icon: FileText },
+		'Scheduling':    { tone: 'primary',   icon: CalendarClock },
+		'Admin Pages':   { tone: 'secondary', icon: Shield },
+		'API Routes':    { tone: 'secondary', icon: Terminal },
+		'Utility Pages': { tone: 'secondary', icon: Wrench }
 	}
+	const categoryOrder = Object.keys(categoryMeta)
 
-	function getAccentColor(category) {
-		const idx = hashString(category || '') % accentColors.length
-		return accentColors[idx]
-	}
 	function toggleCategory(category) {
 		collapsedCategories[category] = !collapsedCategories[category]
 	}
@@ -87,7 +76,7 @@
 />
 
 <PageShell className="sitemap-page showcase-page showcase-page--sitemap">
-	<div class="showcase-page__inner sitemap-page__inner">
+	<div class="showcase-page__inner">
 		<ShowcaseHero
 			eyebrow="Sitemap"
 			title="A friendly map of"
@@ -98,142 +87,124 @@
 			signalLabel={`${data.stats.total} routes indexed`}
 		/>
 
-		<PageContainer className="sitemap-page__content">
-			<FilterableCollection
-				count={filteredCount}
-				countLabel={`of ${data.stats.total} routes`}
-				emptyMessage="No routes match your filters."
-				onClear={() => { searchQuery = ''; selectedTags = [] }}
-			>
-				{#snippet toolbar()}
-					<div class="sitemap-page__controls">
-						<SearchToolbar bind:query={searchQuery} placeholder="Search routes..." ariaLabel="Search routes">
-							<div class="sitemap-page__filters">
-								<div class="sitemap-page__tag-filters">
-									<span class="sitemap-page__filter-label">
-										<Filter size={13} strokeWidth={2.2} />
-										<span>Filters</span>
-									</span>
-									<FilterChipGroup
-										className="sitemap-page__tag-filter-group"
-										items={availableTags}
-										bind:selected={selectedTags}
-										multiple={true}
-										ariaLabel="Sitemap filters"
-									/>
-								</div>
+		<ShowcaseSection
+			title="Route Index"
+			kicker={`${filteredCount} of ${data.stats.total} routes · grouped by surface`}
+			filterLabel="View // Routes"
+		>
+			{#snippet toolbar()}
+				<SearchToolbar bind:query={searchQuery} placeholder="Search routes..." ariaLabel="Search routes">
+					<div class="sitemap-page__filters">
+						<div class="sitemap-page__tag-filters">
+							<span class="sitemap-page__filter-label">
+								<Filter size={13} strokeWidth={2.2} />
+								<span>Filters</span>
+							</span>
+							<FilterChipGroup
+								className="sitemap-page__tag-filter-group"
+								items={availableTags}
+								bind:selected={selectedTags}
+								multiple={true}
+								ariaLabel="Sitemap filters"
+							/>
+						</div>
 
-								<div class="sitemap-page__sort-view">
-									<SegmentedControl
-										className="sitemap-page__sort-toggle"
-										options={sortOptions}
-										bind:value={sortBy}
-										ariaLabel="Sort routes"
-									/>
-								</div>
-							</div>
-						</SearchToolbar>
+						<SegmentedControl
+							className="sitemap-page__sort-toggle"
+							options={sortOptions}
+							bind:value={sortBy}
+							ariaLabel="Sort routes"
+						/>
 					</div>
-				{/snippet}
+				</SearchToolbar>
+			{/snippet}
 
+			{#if filteredCount === 0}
+				<p class="sitemap-page__empty">No routes match your filters.</p>
+			{:else}
 				{#each categoryOrder as category}
 					{#if filteredGrouped[category]}
 						<SitemapCategory
-							category={category}
+							{category}
 							count={filteredGrouped[category].length}
+							tone={categoryMeta[category].tone}
+							icon={categoryMeta[category].icon}
 							collapsed={Boolean(collapsedCategories[category])}
 							onToggle={() => toggleCategory(category)}
-							accent={getAccentColor(category)}
 							routes={filteredGrouped[category]}
-							getRouteTags={getRouteTags}
+							{getRouteTags}
 							formatDate={formatDateMmDdYyyy}
 						/>
 					{/if}
 				{/each}
-			</FilterableCollection>
-		</PageContainer>
+			{/if}
+		</ShowcaseSection>
 	</div>
 </PageShell>
 
 <style>
 	:global(.sitemap-page) {
-		--showcase-surface: color-mix(in srgb, var(--bg) 95%, #5d8c7b 5%);
-		--showcase-surface-low: color-mix(in srgb, var(--bg) 91%, #5d8c7b 9%);
-		--showcase-surface-high: color-mix(in srgb, var(--card-bg) 82%, #a7b8c9 18%);
-		--showcase-surface-highest: color-mix(in srgb, var(--card-bg) 74%, #a7b8c9 26%);
-		--showcase-surface-bright: color-mix(in srgb, var(--card-bg) 68%, #e6c7a1 32%);
+		/* Match the default page background — no wash. */
+		--showcase-surface: var(--bg);
+		--showcase-surface-low: var(--bg);
+		--showcase-surface-high: var(--card-bg);
+		--showcase-surface-highest: var(--card-bg);
+		--showcase-surface-bright: var(--card-bg);
 		--showcase-text: var(--text);
 		--showcase-muted: color-mix(in srgb, var(--muted) 92%, var(--text));
+		/* Green only shows through text, rails, and a faint hero glow. */
 		--showcase-primary: #5d8c7b;
 		--showcase-primary-dim: #3e675a;
-		--showcase-secondary: #a7b8c9;
+		--showcase-secondary: #7a92aa;
 		--showcase-outline-variant: color-mix(in srgb, var(--border) 72%, transparent);
-		--showcase-glow-primary: rgba(93, 140, 123, 0.08);
-		--showcase-glow-secondary: rgba(167, 184, 201, 0.08);
-		--showcase-hero-shadow: rgba(12, 18, 20, 0.08);
+		--showcase-glow-primary: rgba(93, 140, 123, 0.12);
+		--showcase-glow-secondary: rgba(122, 146, 170, 0.06);
+		--showcase-hero-shadow: transparent;
 	}
 
-	.sitemap-page__inner {
-		--sitemap-controls-gap: 0.7rem;
-		--sitemap-filters-gap: 0.6rem;
-		--sitemap-tag-gap: 0.35rem;
-		--sitemap-filter-label-gap: 0.3rem;
-		--sitemap-filter-label-size: 0.78rem;
-		--sitemap-sort-gap: 0.35rem;
+	/* Breathing room before the footer — the section has no CTA below it.
+	   Specificity must match showcase.css's `.ui-page-shell.ui-page-shell.showcase-page` override. */
+	:global(.ui-page-shell.ui-page-shell.sitemap-page) {
+		padding-bottom: var(--space-12);
 	}
 
-	.sitemap-page__controls {
-		display: grid;
-		gap: var(--sitemap-controls-gap);
-		margin-bottom: 1.25rem;
-	}
-
-	:global(.sitemap-page__content) {
-		width: 100%;
-		max-width: var(--max-width);
-		justify-self: center;
-		padding-top: var(--space-6);
+	:global(.sitemap-page .showcase-section) {
+		padding-bottom: var(--space-10);
 	}
 
 	.sitemap-page__filters {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) auto;
-		gap: var(--sitemap-filters-gap);
+		gap: var(--space-4);
 		align-items: center;
-		margin-top: 0.5rem;
+		margin-top: var(--space-3);
 	}
 
 	.sitemap-page__tag-filters {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: var(--sitemap-tag-gap);
+		gap: var(--space-2);
 	}
 
 	.sitemap-page__filter-label {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--sitemap-filter-label-gap);
-		font-size: var(--sitemap-filter-label-size);
-		color: var(--muted);
-		margin-right: 0.35rem;
-		padding-right: 0.1rem;
+		gap: var(--space-1);
+		font-size: var(--font-size-xs);
+		color: var(--showcase-muted);
 	}
 
-	.sitemap-page__sort-view {
-		display: flex;
-		gap: var(--sitemap-sort-gap);
-		justify-self: end;
+	.sitemap-page__empty {
+		padding: var(--space-8) 0;
+		text-align: center;
+		color: var(--showcase-muted);
+		font-size: var(--font-size-sm);
 	}
 
 	@media (max-width: 600px) {
 		.sitemap-page__filters {
 			grid-template-columns: 1fr;
-			align-items: stretch;
-		}
-
-		.sitemap-page__sort-view {
-			justify-self: start;
 		}
 	}
 </style>

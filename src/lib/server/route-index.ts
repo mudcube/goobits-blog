@@ -241,7 +241,7 @@ function scanRoutes(dir: string, basePath = '') {
 				isDynamic: routePath.includes('['),
 				sitemap: getSitemapAudience(dir, routePath, 'api', routePath.includes('[')),
 				lastModified: stat.mtime.toISOString(),
-				category: 'API Routes'
+				category: categorizeRoute(routePath)
 			}
 			routes.push(apiRoute)
 		}
@@ -270,7 +270,8 @@ function getRouteName(routePath: string) {
 
 function categorizeRoute(routePath: string) {
 	if (routePath === '/') return 'Main Pages'
-	if (routePath.startsWith('/schedule/admin')) return 'Admin Pages'
+	if (routePath.startsWith('/schedule')) return 'Scheduling'
+	if (routePath.startsWith('/api/calendar')) return 'Scheduling'
 	if (routePath.startsWith('/api')) return 'API Routes'
 	if (routePath.startsWith('/journal')) return 'Journal Pages'
 	if (routePath === '/health' || routePath === '/sitemap') return 'Utility Pages'
@@ -386,9 +387,8 @@ export function getSitemapAudiencesForVisibility(visibility: HumanSitemapVisibil
 }
 
 function isPublicHumanSitemapRoute(route: RouteEntry) {
-	if (route.type !== 'page') return false
 	if (route.path.includes('[')) return false
-	if (route.isNoIndex) return false
+	if (route.type === 'page' && route.isNoIndex) return false
 	return route.sitemap === 'public'
 }
 
@@ -438,10 +438,9 @@ export async function getPublicHumanSitemapInventory(activeStage?: ReleaseStage)
 
 export async function getPublicSitemapRoutes(activeStage?: ReleaseStage) {
 	const inventory = await getPublicHumanSitemapInventory(activeStage)
-	const publicPages = inventory.routes.filter((route): route is PageRoute => route.type === 'page')
 
 	const deduped = new Map<string, SitemapRoute>()
-	for (const route of publicPages) {
+	for (const route of inventory.routes) {
 		deduped.set(route.path, { path: route.path, lastModified: route.lastModified })
 	}
 
