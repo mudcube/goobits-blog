@@ -1,5 +1,6 @@
 <script>
 	import { blogConfig, formatDate, getCoverImageUrl, slugify } from '@goobits/blog/core'
+	import { formatLabel } from '../utils/formatLabel.ts'
 
 	const { post } = $props()
 
@@ -49,7 +50,7 @@
 					class="miko-blog__row-pill miko-blog__row-pill--accent"
 					href={`${blogConfig.uri}/category/${slugify(primaryCategory)}`}
 				>
-					{primaryCategory}
+					{formatLabel(primaryCategory)}
 				</a>
 			{/if}
 			{#each tags.slice(0, 2) as tag}
@@ -57,7 +58,7 @@
 					class="miko-blog__row-pill"
 					href={`${blogConfig.uri}/tag/${slugify(tag)}`}
 				>
-					{tag}
+					{formatLabel(tag)}
 				</a>
 			{/each}
 		</div>

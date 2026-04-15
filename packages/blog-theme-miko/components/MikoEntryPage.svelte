@@ -7,6 +7,7 @@
 		getSimilarPosts,
 		slugify
 	} from '@goobits/blog/core'
+	import { formatLabel } from '../utils/formatLabel.ts'
 
 	const { data } = $props()
 
@@ -64,7 +65,7 @@
 					</li>
 					{#if primaryCategory}
 						<li>
-							<a href={taxonomyHref('category', primaryCategory)}>{primaryCategory}</a>
+							<a href={taxonomyHref('category', primaryCategory)}>{formatLabel(primaryCategory)}</a>
 							<span class="miko-blog__breadcrumbs-sep" aria-hidden="true">/</span>
 						</li>
 					{/if}
@@ -141,7 +142,7 @@
 					<ul>
 						{#each tags as tag}
 							<li>
-								<a href={taxonomyHref('tag', tag)}>#{tag}</a>
+								<a href={taxonomyHref('tag', tag)}>#{formatLabel(tag)}</a>
 							</li>
 						{/each}
 					</ul>

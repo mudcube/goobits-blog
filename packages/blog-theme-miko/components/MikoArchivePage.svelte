@@ -2,6 +2,7 @@
 	import { ShowcaseHero } from '@miko/ui'
 	import { blogConfig, getAllCategories, slugify } from '@goobits/blog/core'
 	import MikoArchiveRow from './MikoArchiveRow.svelte'
+	import { formatLabel } from '../utils/formatLabel.ts'
 
 	const { data } = $props()
 
@@ -12,8 +13,8 @@
 	const currentTag = $derived(data.currentTag || '')
 
 	const pageTitle = $derived.by(() => {
-		if (data.pageType === 'category') { return data.category || 'Category' }
-		if (data.pageType === 'tag') { return `#${data.tag || 'Tag'}` }
+		if (data.pageType === 'category') { return formatLabel(data.category) || 'Category' }
+		if (data.pageType === 'tag') { return `#${formatLabel(data.tag) || 'Tag'}` }
 		return 'Insights, artifacts, and'
 	})
 	const titleAccent = $derived.by(() => {
@@ -37,7 +38,10 @@
 		if (!categories.length) { return [] }
 		const base = [
 			{ href: blogConfig.uri, label: 'All' },
-			...categories.map(c => ({ href: `${blogConfig.uri}/category/${slugify(c)}`, label: c }))
+			...categories.map(c => ({
+				href: `${blogConfig.uri}/category/${slugify(c)}`,
+				label: formatLabel(c)
+			}))
 		]
 		return base
 	})
@@ -59,7 +63,7 @@
 				<h2 class="miko-blog__toolbar-title">The Archive</h2>
 				<p class="miko-blog__toolbar-kicker">
 					Showing {posts.length} recorded synthesis {posts.length === 1 ? 'log' : 'logs'}
-					{#if currentCategory}— filtered by {currentCategory}{:else if currentTag}— filtered by #{currentTag}{/if}
+					{#if currentCategory}— filtered by {formatLabel(currentCategory)}{:else if currentTag}— filtered by #{formatLabel(currentTag)}{/if}
 				</p>
 			</div>
 		</header>
