@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { blogConfig, getCoverImageUrl, slugify } from '@goobits/blog/core'
+	import { blogConfig, getCoverImageUrl, getPostExcerpt, slugify } from '@goobits/blog/core'
 	import { formatLabel } from '@goobits/blog-theme-miko'
 	import type { JournalPost } from '$lib/blog/viewmodel'
 	import Seo from './Seo.svelte'
@@ -98,10 +98,17 @@
 			const path = `${journalBase}${urlPath.startsWith('/') ? urlPath : `/${urlPath}`}`
 				.replace(/\/?$/, '/')
 			const title = fm.title || 'Untitled Entry'
-			const excerpt = fm.excerpt || ''
-			const description = excerpt
-				? toPlainTextExcerpt(excerpt)
-				: `${title} — a journal entry from Miko Meow.`
+			// Prefer frontmatter excerpt; otherwise derive one from the markdown
+			// body via blog core's getPostExcerpt (strips markup, clamps length);
+			// last resort is a generic fallback so meta description is never empty.
+			const frontmatterExcerpt = fm.excerpt || ''
+			const derivedExcerpt = frontmatterExcerpt
+				? toPlainTextExcerpt(frontmatterExcerpt)
+				: toPlainTextExcerpt(
+					getPostExcerpt(data.post as never, 200) || ''
+				)
+			const description =
+				derivedExcerpt || `${title} — a journal entry from Miko Meow.`
 			// getCoverImageUrl is the canonical helper — it respects blogConfig.uri
 			// and handles relative vs absolute paths. We pass a minimal shape so
 			// the Date/string mismatch on JournalPost vs ProcessedPost doesn't bite.
