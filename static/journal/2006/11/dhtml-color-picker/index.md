@@ -3,6 +3,10 @@ title: "DHTML Color Picker"
 date: "2006-11-20"
 categories: 
   - "open-source"
+tags: 
+  - "color"
+  - "color-picker"
+  - "javascript"
 coverImage: "images/hero.png"
 ---
 

@@ -3,6 +3,9 @@ title: "Sketchpad 5.0"
 date: "2018-01-09"
 categories: 
   - "apps"
+tags: 
+  - "html5"
+  - "sketchpad"
 ---
 
 Hot off the press! Introducing Sketchpad v5.0 (codename Fancy Fox)

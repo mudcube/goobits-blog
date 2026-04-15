@@ -3,6 +3,9 @@ title: "Sketchpad 4.1"
 date: "2017-01-04"
 categories: 
   - "apps"
+tags: 
+  - "html5"
+  - "sketchpad"
 coverImage: "images/Sketchpad-12-copy-2.jpg"
 ---
 
