@@ -7,6 +7,7 @@ tags:
   - "color"
   - "color-picker"
   - "html5"
+coverImage: "images/hero.png"
 ---
 
 Color Sphere was one of my 1st HTML5 projects, way back in 2007. Well, the years passed, browsers sped up, my hair grew longer, and nothing changed on Color Sphere… but the time has come! The latest rendition is bigger (easier to see), more accurate (pixel perfect), and looks really cool when you switch it to Websafe mode and move the Saturation slider around.

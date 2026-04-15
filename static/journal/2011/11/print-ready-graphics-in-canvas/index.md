@@ -6,6 +6,7 @@ categories:
 tags: 
   - "canvas"
   - "html5"
+coverImage: "images/hero.jpeg"
 ---
 
 Last month, I posted about the possibility of creating high-resolution and print-ready graphics in `<canvas>`. Since then, it’s been in the back of my mind, but happened to be at Kinko’s today, and decided to take this experiment to the next level…

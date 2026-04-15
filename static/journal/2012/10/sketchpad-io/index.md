@@ -6,6 +6,7 @@ categories:
 tags: 
   - "html5"
   - "sketchpad"
+coverImage: "images/hero.png"
 ---
 
 **UPDATE: [Read about Sketchpad 3.0](/journal/2013/07/sketchpad-3-0/)**

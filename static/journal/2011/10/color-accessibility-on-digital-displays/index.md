@@ -5,6 +5,7 @@ categories:
   - "apps"
 tags: 
   - "color"
+coverImage: "images/hero.png"
 ---
 
 Announcing the release of color-blindness daltonization + simulation bookmarklets; [daltonize.appspot.com](http://daltonize.appspot.com/)

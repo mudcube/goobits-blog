@@ -7,6 +7,7 @@ tags:
   - "html5"
   - "piano"
   - "webgl"
+coverImage: "images/hero.png"
 ---
 
 Last weekend I got a chance to mess around with [Mr. Doob](http://mrdoob.com/)’s rendering framework [Three.js](https://github.com/mrdoob/three.js/) and [Daniel van der Meer](http://www.abumarkub.net/abublog/)’s amazing [MIDIBridge](https://github.com/abudaan/javascriptmidi).  I’ve been a big fan of both Ricardo and Daniel for some time now, so it was fun to work with their codebases.

@@ -6,6 +6,7 @@ categories:
 tags: 
   - "canvas"
   - "html5"
+coverImage: "images/hero.png"
 ---
 
 **[Background Generator](/bg/)** (BG) provides the ability to edit the background of any website in real-time! To give you an idea, the backgrounds of the Journal, Photos, Projects, and Labs sections of Mudcu.be were created using BG.

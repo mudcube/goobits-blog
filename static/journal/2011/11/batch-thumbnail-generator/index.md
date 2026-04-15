@@ -5,6 +5,7 @@ categories:
   - "apps"
 tags: 
   - "html5"
+coverImage: "images/hero.png"
 ---
 
 Many times, when researching a larger project, I make smaller demos to break up my workflow and keep things fresh. The [Batch Thumbnail Generator](/software/Thumbnailer/) (BTG) is one of these offshoots, a sandbox for creating zip packages with the [BlobBuilder API](http://dev.w3.org/2009/dap/file-system/file-writer.html), and Flash-based download solutions. I also used BTG to create the thumbnails for the [Software](/software/) page, which didn’t quite justify the time invested.

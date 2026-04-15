@@ -7,6 +7,7 @@ tags:
   - "html5"
   - "music"
   - "piano"
+coverImage: "images/hero.png"
 ---
 
 Learn how to play piano songs by watching notes fall towards the keyboard as color-blocks; similar to how Guitar Hero works, but with a real instrument. Color piano Theory (CPT) ties together chords, scales, inversions, octaves, key signatures, and play-by-play examples of classical compositions, getting you started with _playing piano the easy way_ =)

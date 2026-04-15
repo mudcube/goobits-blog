@@ -6,6 +6,7 @@ categories:
 tags: 
   - "html5"
   - "sketchpad"
+coverImage: "images/hero.png"
 ---
 
 Welcome to the preview of [Sketchpad](http://mugtug.com/sketchpad/). Though not all browsers support [`<canvas>`](http://en.wikipedia.org/wiki/Canvas_\(HTML_element\)) we’re working hard to extend support before our official release. Until then, you lucky FireFox users ([download Firefox](http://www.mozilla.com/firefox/)) will be able to kick the tires and hold the wheel of what we believe will become the new standard in Web-authoring.

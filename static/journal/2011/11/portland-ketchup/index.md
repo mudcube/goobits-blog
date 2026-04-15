@@ -5,6 +5,7 @@ categories:
   - "portlandia-foods"
 tags: 
   - "portlandia"
+coverImage: "images/hero.jpeg"
 ---
 
 I’m thrilled to see [Portland Ketchup](http://portlandiafoods.com) in the [Oregon Museum of Science & Industry](http://www.omsi.edu/) (OMSI). This place has always held a sweet place in my heart; it was, and continues to be, an adventure to visit, from the newest exhibits to its oldest classics. Who could forget being part of a zero-gravity simulation, having their friends shock them with a hand-crank generator, or experiencing various types of earthquakes? There’s lizards, dry ice experiments, knowledge on the solar system, a planetarium, the [OMNIMAX](http://www.omsi.edu/omnimax), dinosaurs, games, and even a [nuclear submarine](http://www.omsi.edu/submarine). Keep up to date on the [events calendar](http://www.omsi.edu/events); there’s always something interesting going on at OMSI.

@@ -7,6 +7,7 @@ tags:
   - "canvas"
   - "html5"
   - "typography"
+coverImage: "images/hero.png"
 ---
 
 Typography support between browsers has a history of being spotty. One of the major hurdles in creating the (

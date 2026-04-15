@@ -8,6 +8,7 @@ tags:
   - "color"
   - "gradient-picker"
   - "html5"
+coverImage: "images/hero.png"
 ---
 
 Tonight, on [ColRD](http://colrd.com/), we released the latest rendition of [Palette Creator](http://colrd.com/create/palette/), along with our newest addition; the [Gradient Creator](http://colrd.com/create/gradient/)! This new webapp makes it fun and easy to create CSS3 linear gradients . **UPDATE:** You can also download the Gradient Creator as a [Chrome webapp](https://chrome.google.com/webstore/detail/hcplneddoadgichngfbobgpllfphdfla).
