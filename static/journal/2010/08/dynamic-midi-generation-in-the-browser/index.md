@@ -14,7 +14,7 @@ Have you ever wanted to use MIDI in your Javascript or Flash project?  It’s b
 
 The MIDIPlugin requires that [Java](http://www.java.com/en/download/manual.jsp) and a [MIDI Soundbank](http://java.sun.com/products/java-media/sound/soundbanks.html) be installed on your computer. Some computers have these installed by default, others do not. More on computability later.
 
-[![](images/midi-js-demo.png "MIDI.js Piano Demo")](/labs/Piano/)
+[![MIDI.js Piano demo](images/midi-js-demo.png "MIDI.js Piano Demo")](/labs/Piano/ "Open MIDI.js Piano demo")
 
 [Piano Theory](/piano/) was built utilizing the MIDIPlugin.  Although the MIDIPlugin works in Internet Explorer my piano webapp does not (at this time) — apologies to IE users.
 

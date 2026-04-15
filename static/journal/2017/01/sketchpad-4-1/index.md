@@ -3,6 +3,7 @@ title: "Sketchpad 4.1"
 date: "2017-01-04"
 categories: 
   - "apps"
+coverImage: "images/Sketchpad-12-copy-2.jpg"
 ---
 
 Extra extra! There’s a new SketchPad in town! Here’s a rundown of the latest features:

@@ -66,22 +66,19 @@
 	} = $props()
 
 	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
-
-		// Define state variables
-		let visiblePosts = $state([])
-	let totalPages = $state(1)
-
-	// Calculate what posts to display based on pagination
-	$effect(() => {
+	const visiblePosts = $derived.by(() => {
 		if (postsPerPage > 0 && posts.length > postsPerPage) {
 			const startIndex = (currentPage - 1) * postsPerPage
-			visiblePosts = posts.slice(startIndex, startIndex + postsPerPage)
-			totalPages = Math.ceil(posts.length / postsPerPage)
-		} else {
-			visiblePosts = posts
-			totalPages = 1
+			return posts.slice(startIndex, startIndex + postsPerPage)
 		}
+
+		return posts
 	})
+	const totalPages = $derived.by(() => (
+		postsPerPage > 0 && posts.length > postsPerPage
+			? Math.ceil(posts.length / postsPerPage)
+			: 1
+	))
 
 	// Helper to create an array of page numbers for pagination
 	const getPageNumbers = $derived.by(() => {

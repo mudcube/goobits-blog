@@ -1,14 +1,17 @@
 const postModules = import.meta.glob('/static/journal/**/index.md')
 
 export async function load({ data }: { data: Record<string, unknown> }) {
+	const pageType = data['pageType']
+	const post = data['post']
+
 	if (
-		data.pageType === 'post' &&
-		typeof data.post === 'object' &&
-		data.post !== null &&
-		'path' in data.post &&
-		typeof data.post.path === 'string'
+		pageType === 'post' &&
+		typeof post === 'object' &&
+		post !== null &&
+		'path' in post &&
+		typeof post.path === 'string'
 	) {
-		const resolver = postModules[data.post.path as keyof typeof postModules]
+		const resolver = postModules[post.path as keyof typeof postModules]
 
 		if (resolver) {
 			try {
@@ -16,13 +19,13 @@ export async function load({ data }: { data: Record<string, unknown> }) {
 				const postContent = (module as { default?: unknown }).default ?? null
 				return {
 					...data,
-					postContent
+						postContent
+					}
+				} catch (error) {
+					console.error('[journal] failed to load post module', post.path, error)
 				}
-			} catch (error) {
-				console.error('[journal] failed to load post module', data.post.path, error)
 			}
 		}
-	}
 
 	return data
 }

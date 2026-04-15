@@ -157,11 +157,11 @@
 				</button>
 			</div>
 
-				{#if post.metadata.fm.image?.src}
+				{#if coverImage}
 					<div class="goo__featured-image">
 						<img
 							src={coverImage}
-							alt={post.metadata.fm.image?.alt || post.metadata.fm.title || "Post image"}
+							alt={post.metadata.fm.image?.alt || post.metadata.fm.title || 'Post image'}
 						class="goo__image"
 						loading="lazy"
 						decoding="async"

@@ -17,9 +17,9 @@ The following highlight a few of my final contributions to Mugtug; made possible
 
 – **Layer Styles**; this module creates effects such as _InnerShadow_, _OuterShadow_, _InnerGlow_, and _OuterGlow_.  These are similar to what Photoshop achieves—the difference is, my version has the ability to do what I’ve coined “style stacking”.  Style stacking allows the designer to add multiple fills (solid, gradient, pattern) to, for instance, InnerShadow;
 
-[![Layer styles example graphic](images/pastedGraphic_9.png "pastedGraphic_9")](/journal/2011/07/orange-honey-epilogue/images/pastedGraphic_9.png "Open full-size layer styles image")
+[![Layer styles example](images/pastedGraphic_9.png "pastedGraphic_9")](/journal/2011/07/orange-honey-epilogue/images/pastedGraphic_9.png "Open full-size layer styles example")
 
-[![Layer styles photo example](images/5807041058_21caef727a_o.png "5807041058_21caef727a_o")](/journal/2011/07/orange-honey-epilogue/images/5807041058_21caef727a_o.png "Open full-size layer styles photo")
+[![Layer styles reference](images/5807041058_21caef727a_o.png "5807041058_21caef727a_o")](/journal/2011/07/orange-honey-epilogue/images/5807041058_21caef727a_o.png "Open full-size layer styles reference")
 
 [![Layer styles screenshot](images/Screen-shot-2011-03-26-at-9.37.34-PM.png "Screen shot 2011-03-26 at 9.37.34 PM")](/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-03-26-at-9.37.34-PM.png "Open full-size layer styles screenshot")
 

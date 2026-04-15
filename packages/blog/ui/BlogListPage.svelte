@@ -14,19 +14,21 @@
 
 	const POSTS_PER_BATCH = blogConfig.pagination.postsPerBatch
 
-	// State for infinite scroll
-	let allPosts = $state([])
+	const initialPosts = $derived.by(() => Array.isArray(data.posts) ? data.posts : [])
+	let loadedPosts = $state([])
 	let isLoading = $state(false)
 	let currentPage = $state(1) // Track current page for API calls
-	let hasMorePosts = $state(true) // Use server data or default to true
-
-	// Use allPosts as the visible posts (no more slicing)
-	const visiblePosts = $derived(allPosts)
+	let hasMorePostsOverride = $state(null)
+	const visiblePosts = $derived.by(() => (
+		loadedPosts.length > 0 ? [...initialPosts, ...loadedPosts] : initialPosts
+	))
+	const hasMorePosts = $derived(hasMorePostsOverride ?? (data.hasMorePosts !== false))
 
 	// Initialize posts from server data
 	$effect(() => {
-		allPosts = Array.isArray(data.posts) ? [...data.posts] : []
-		hasMorePosts = data.hasMorePosts !== false
+		data.posts
+		loadedPosts = []
+		hasMorePostsOverride = null
 		currentPage = 1
 	})
 
@@ -69,15 +71,15 @@
 
 			const result = await response.json()
 			if (result.posts && result.posts.length > 0) {
-				allPosts = [...allPosts, ...result.posts]
+				loadedPosts = [...loadedPosts, ...result.posts]
 				currentPage = nextPage
-				hasMorePosts = result.pagination.hasNextPage
+				hasMorePostsOverride = result.pagination.hasNextPage
 			} else {
-				hasMorePosts = false
+				hasMorePostsOverride = false
 			}
 		} catch (error) {
 			logger.error('Error loading more posts:', error)
-			hasMorePosts = false
+			hasMorePostsOverride = false
 		} finally {
 			isLoading = false
 		}

@@ -5,6 +5,7 @@ categories:
   - "apps"
 tags: 
   - "sketchpad"
+coverImage: "images/120e5b61-e808-4ffa-bcfd-b06b2d188479-2.jpeg"
 ---
 
 I’m excited to announce [Sketchpad 4.0](https://sketch.io/sketchpad/)! The focuses on this release has making the app more colorful, faster, and easier to use.

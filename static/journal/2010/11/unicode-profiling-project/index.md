@@ -17,27 +17,27 @@ The data generated from your computer will help profile the state of unicode sup
 
 Once the [test](/labs/ucpp/) is initiated you’ll be able to watch the glyphs as they’re scanned with their related unicode block name.  It typically takes over a minute to scan an entire collection of unicode characters.  This is what the acid test looks like while being processed:
 
-[![](images/Screen-shot-2010-11-10-at-7.39.11-PM.png "Screen shot 2010-11-10 at 7.39.11 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.39.11-PM.png)
+[![Unicode profiling scan in progress](images/Screen-shot-2010-11-10-at-7.39.11-PM.png "Screen shot 2010-11-10 at 7.39.11 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.39.11-PM.png "Open full-size scan screenshot")
 
 **Reading your profile:**
 
 Once the processing has completed you will be presented with a string of binary representing what characters are visible, and which ones are unavailable or invisible (65,535 numbers). Here are the results from my Chromium browser running on OSX 10.6.4:
 
-[![](images/Screen-shot-2010-11-10-at-7.43.37-PM.png "Screen shot 2010-11-10 at 7.43.37 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.43.37-PM.png)
+[![Unicode profiling results in Chromium](images/Screen-shot-2010-11-10-at-7.43.37-PM.png "Screen shot 2010-11-10 at 7.43.37 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.43.37-PM.png "Open full-size results screenshot")
 
 **Unicode characters:**
 
 Now the fun part, click on “Show Available” — this may take a few seconds as you’re referencing tens of thousands of unicode characters at once:
 
-[![](images/Screen-shot-2010-11-10-at-7.34.10-PM.png "Screen shot 2010-11-10 at 7.34.10 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.34.10-PM.png)
+[![Unicode available glyphs view](images/Screen-shot-2010-11-10-at-7.34.10-PM.png "Screen shot 2010-11-10 at 7.34.10 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.34.10-PM.png "Open full-size glyph screenshot")
 
 [Unicode #65018](http://www.fileformat.info/info/unicode/char/fdfa/index.htm)
 
-[![](images/Screen-shot-2010-11-10-at-11.55.10-PM.png "Screen shot 2010-11-10 at 11.55.10 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-11.55.10-PM.png)
+[![Unicode character 65018 sample](images/Screen-shot-2010-11-10-at-11.55.10-PM.png "Screen shot 2010-11-10 at 11.55.10 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-11.55.10-PM.png "Open full-size character sample")
 
 [Brail Patterns \[0x2800-28FF\]](http://www.fileformat.info/info/unicode/block/braille_patterns/utf8test.htm)
 
-![](images/Screen-shot-2010-11-10-at-11.54.12-PM.png "Screen shot 2010-11-10 at 11.54.12 PM")
+![Braille patterns sample](images/Screen-shot-2010-11-10-at-11.54.12-PM.png "Screen shot 2010-11-10 at 11.54.12 PM")
 
 **Supported Browsers:**
 

@@ -19,7 +19,7 @@ This application also includes a bit of history; color schemes historic figures 
 
 **Visual/audial memory recognition**
 
-[![](images/250px-Number_Form-colored.jpeg)](http://en.wikipedia.org/wiki/Synesthesia)To improve memory recognition, colors are mapped to the sounds on the keyboard, creating a [synesthetic](http://en.wikipedia.org/wiki/Synesthesia) experience. By picking a color-mapping that works best for you, these colors will give you a _visual cue to the note_ you’re playing.
+[![Number form color mapping](images/250px-Number_Form-colored.jpeg)](http://en.wikipedia.org/wiki/Synesthesia "Read about synesthesia")To improve memory recognition, colors are mapped to the sounds on the keyboard, creating a [synesthetic](http://en.wikipedia.org/wiki/Synesthesia) experience. By picking a color-mapping that works best for you, these colors will give you a _visual cue to the note_ you’re playing.
 
 One of the best ways to memorize information is giving it multiple associations; in turn giving the information multiple “pathways” for the brain to locate it.  With color added to the mix, we are building a memory recognition triangulation:  **sound** (measured in hz), **color** (in RGB), and **space** (the XY coordinate of key on the keyboard).
 
@@ -27,7 +27,7 @@ CPT also provides the [solfège](http://en.wikipedia.org/wiki/Solf%C3%A8ge) (_do
 
 **Historic mapping of color to sound**
 
-[![](images/Screen-shot-2011-01-19-at-9.17.14-PM.png)](http://rhythmiclight.com/archives/ideas/colorscales.html)
+[![Historic color scale chart](images/Screen-shot-2011-01-19-at-9.17.14-PM.png)](http://rhythmiclight.com/archives/ideas/colorscales.html "Open historic color scale research")
 
 The earliest known reference to the idea of mapping colors to sound came in _1704 by Issac Newton_ according to [Fred Collopy](http://rhythmiclight.com/index.html) author of [Three Centuries of Color Scales](http://rhythmiclight.com/archives/ideas/colorscales.html).  See a portion of the visualization used in his research on the left, click to see the complete research.
 
@@ -43,7 +43,7 @@ The [_Color Piano Project_](http://colorpiano.com/), developed by Dan Vlahos as
 
 Being a big HTML5 fan, I decided to program the application in Javascript—the first hurdle was getting MIDI working in the browser to synthesize sound.
 
-[![Color Piano inspiration image](images/112517__nickrave__don_tfeedDOG.png "112517__nickrave__don_tfeedDOG")](/journal/2011/01/color-piano-theory/images/112517__nickrave__don_tfeedDOG.png "Open full-size inspiration image") I began researching solutions:  **Dynamic WAV generation** (using sine waves) nearly killed my browser.  Creating **MIDI from scratch in base64** and playing through Quicktime note by note didn’t work since the piano is dynamic and requires each key to have one `<audio>` tag. Unfortunately there seems to be a limit to how many tags can be played in a browser at one time, and how quickly their base64 codes can be switched in-between. Firefox recently added [amazing sound support](https://developer.mozilla.org/en/Visualizing_Audio_Spectrum), but **no access to the MIDI Soundbanks**_._ Perhaps someday Google will provide a **Native Client MIDI solution**.  …until then…
+[![Color Piano inspiration artwork](images/112517__nickrave__don_tfeedDOG.png "112517__nickrave__don_tfeedDOG")](/journal/2011/01/color-piano-theory/images/112517__nickrave__don_tfeedDOG.png "Open full-size inspiration artwork") I began researching solutions:  **Dynamic WAV generation** (using sine waves) nearly killed my browser.  Creating **MIDI from scratch in base64** and playing through Quicktime note by note didn’t work since the piano is dynamic and requires each key to have one `<code>&lt;audio&gt;</code>` tag. Unfortunately there seems to be a limit to how many tags can be played in a browser at one time, and how quickly their base64 codes can be switched in-between. Firefox recently added [amazing sound support](https://developer.mozilla.org/en/Visualizing_Audio_Spectrum), but **no access to the MIDI Soundbanks**_._ Perhaps someday Google will provide a **Native Client MIDI solution**.  …until then…
 
 **Javascript `&lt;-&gt;` Java communication**
 

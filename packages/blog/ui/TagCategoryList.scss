@@ -26,7 +26,10 @@
       font-size: var(--font-size-small, 0.875rem);
       padding: var(--spacing-xsmall, 0.25rem) var(--spacing-small, 0.5rem);
       border-radius: var(--border-radius-full, 9999px);
-      transition: var(--transition-base, all 0.3s ease);
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
       text-decoration: none;
       border: 1px solid var(--color-border);
       color: var(--color-text-secondary);
@@ -92,7 +95,10 @@
       font-size: var(--font-size-small, 0.875rem);
       padding: var(--spacing-xsmall, 0.25rem) var(--spacing-small, 0.5rem);
       border-radius: var(--border-radius-full, 9999px);
-      transition: var(--transition-base, all 0.3s ease);
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
       text-decoration: none;
       background-color: var(--color-success-light);
       color: var(--color-success-text);

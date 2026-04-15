@@ -342,7 +342,8 @@ export function getPostImageData(post: ProcessedPost | null | undefined): PostIm
 	const config = blogConfig
 	if (!post?.metadata?.fm) { return { src: '', alt: 'Blog post' } }
 
-	const src = processImagePath(getRawPostImageSource(post), getPostImagePrefix(post), '')
+	const fallback = config.images.defaults.coverImage || ''
+	const src = processImagePath(getRawPostImageSource(post), getPostImagePrefix(post), fallback)
 
 	const alt = post.metadata.fm.thumbnail?.alt ||
 		post.metadata.fm.image?.alt ||

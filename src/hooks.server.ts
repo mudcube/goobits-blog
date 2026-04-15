@@ -5,9 +5,11 @@ import { createCalendarAuthHandles } from '@calendar/app'
 import { getCalendarConfig } from '@calendar/core'
 import { applyMikoCalendarPreset } from '@calendar/preset-miko'
 import { getActiveReleaseStage, isRouteReleased } from '$lib/app/release'
+import { ensureJournalBlogConfig } from '$lib/blog/config'
 import { dev } from '$app/environment'
 import type { Handle } from '@sveltejs/kit'
 applyMikoCalendarPreset()
+ensureJournalBlogConfig()
 const calendarConfig = getCalendarConfig()
 const forcedThemePreferences = {
 	theme: 'dark',

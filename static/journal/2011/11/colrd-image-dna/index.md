@@ -10,7 +10,7 @@ tags:
   - "html5"
 ---
 
-![Image DNA app icon](images/128x128.png "128x128")
+![DNA app icon](images/128x128.png "128x128")
 
 Exciting news on [ColRD.com](http://colrd.com)! Today we’re announcing the [public beta of Image DNA](https://chrome.google.com/webstore/detail/nifmhaejjafapjonfiidojfddmpndkmc), available exclusively on the Chrome Webstore. Image DNA is an application that aides you with intelligent extraction of colors from images. The colors extracted are spread evenly across the humanly visible spectrum; so you’ll notice, for example, although there is not much blue in this picture (above), the popular colors extracted will be evenly spread throughout the blue/brown spectrum—this gives you a wider range of colors to select from, with less choices.
 

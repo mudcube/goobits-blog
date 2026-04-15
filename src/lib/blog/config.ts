@@ -12,7 +12,8 @@ const journalBlogConfig = {
 	},
 	images: {
 		defaults: {
-			authorAvatar: '/media/miko.jpg'
+			authorAvatar: '/media/miko.jpg',
+			coverImage: '/media/journal-journaling.png'
 		}
 	},
 	pagination: {
@@ -25,7 +26,8 @@ export function ensureJournalBlogConfig() {
 	if (initialized) return
 
 	initBlogConfig(journalBlogConfig, {
-		getBlogPostFiles: () => import.meta.glob('/static/journal/**/index.md')
+		getBlogPostFiles: () => import.meta.glob('/static/journal/**/index.md'),
+		loadCategoryDescriptions: async () => ({})
 	})
 
 	initialized = true
