@@ -6,6 +6,8 @@
 
 /** @type {Array<Object>} */
 export const redirects = [
+	{ from: '/blog', to: '/journal/', status: 308 },
+	{ from: '^/blog/(.*)$', to: '/journal/$1', status: 308 },
 	{ from: '/privacy-policy*', to: '/privacy', status: 301 },
 	{ from: '/bg*', to: '/labs/zen-bg/', status: 301 },
 	{ from: '/journal/human*', to: '/about/', status: 301 },
