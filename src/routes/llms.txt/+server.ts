@@ -1,6 +1,5 @@
 import type { RequestHandler } from './$types'
-import { blogConfig, getAllCategories, getAllPosts, slugify } from '@goobits/blog/core'
-import { formatLabel } from '@goobits/blog-theme-miko'
+import { blogConfig, formatLabel, getAllCategories, getAllPosts, slugify } from '@goobits/blog/core'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import {
 	SITE_AUTHOR,
@@ -50,10 +49,17 @@ export const GET: RequestHandler = async () => {
 		})
 		.join('\n')
 
+	const generatedAt = new Date().toISOString()
+
 	const lines = [
 		`# ${SITE_NAME}`,
 		'',
 		`> ${SITE_ENTITY_DESCRIPTION}`,
+		'',
+		`Generated: ${generatedAt}`,
+		`Author: ${SITE_AUTHOR}`,
+		`Website: ${SITE_ORIGIN}`,
+		`Full content: ${SITE_ORIGIN}/llms-full.txt`,
 		'',
 		`${SITE_AUTHOR} is the creator of Sketchpad (sketch.io), a browser-based drawing app used by millions of people, and a collection of creative software including Color Piano, ColRD, Be Here Meow, Sand Art, and Zendala. This site collects the apps themselves, a journal of process notes dating back to 2006, and a music archive.`,
 		'',
@@ -89,8 +95,7 @@ export const GET: RequestHandler = async () => {
 
 	return new Response(lines.join('\n'), {
 		headers: {
-			'content-type': 'text/plain; charset=utf-8',
-			'cache-control': 'public, max-age=3600, s-maxage=3600'
+			'content-type': 'text/plain; charset=utf-8'
 		}
 	})
 }

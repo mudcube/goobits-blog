@@ -50,11 +50,20 @@ export function getFirstCategory(post: JournalPost) {
 	return post.metadata.fm?.categories?.[0] || ''
 }
 
-export function getJournalCoverImage(post: JournalPost) {
-	const rawImage = String(post.metadata.fm.coverImage || '')
-	if (!rawImage) return ''
-	if (rawImage.startsWith('http') || rawImage.startsWith('/')) return rawImage
-	return `/${post.urlPath}/${rawImage}`
+/**
+ * Convert a JournalPost (app viewmodel, `date: Date`) back to a
+ * ProcessedPost (blog core type, `date: string`) so it can be passed
+ * to blog core helpers like `getCoverImageUrl` and `getPostExcerpt`.
+ *
+ * This is a thin shape adapter — no data transformation beyond
+ * serializing the date.
+ */
+export function toProcessedPost(post: JournalPost | null | undefined): ProcessedPost | null {
+	if (!post) { return null }
+	return {
+		...post,
+		date: post.date instanceof Date ? post.date.toISOString() : String(post.date ?? '')
+	} as ProcessedPost
 }
 
 export function filterAndSortJournalPosts(

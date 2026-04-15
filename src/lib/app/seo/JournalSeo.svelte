@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { blogConfig, getCoverImageUrl, getPostExcerpt, slugify } from '@goobits/blog/core'
-	import { formatLabel } from '@goobits/blog-theme-miko'
-	import type { JournalPost } from '$lib/blog/viewmodel'
+	import { blogConfig, formatLabel, getCoverImageUrl, getPostExcerpt, slugify } from '@goobits/blog/core'
+	import { toProcessedPost, type JournalPost } from '$lib/blog/viewmodel'
 	import Seo from './Seo.svelte'
 	import {
 		buildArticleJsonLd,
@@ -98,29 +97,23 @@
 			const path = `${journalBase}${urlPath.startsWith('/') ? urlPath : `/${urlPath}`}`
 				.replace(/\/?$/, '/')
 			const title = fm.title || 'Untitled Entry'
+			// Adapt the viewmodel JournalPost to blog core's ProcessedPost shape
+			// so we can feed it to getPostExcerpt and getCoverImageUrl without
+			// the Date/string mismatch.
+			const processed = toProcessedPost(data.post)
 			// Prefer frontmatter excerpt; otherwise derive one from the markdown
 			// body via blog core's getPostExcerpt (strips markup, clamps length);
 			// last resort is a generic fallback so meta description is never empty.
 			const frontmatterExcerpt = fm.excerpt || ''
 			const derivedExcerpt = frontmatterExcerpt
 				? toPlainTextExcerpt(frontmatterExcerpt)
-				: toPlainTextExcerpt(
-					getPostExcerpt(data.post as never, 200) || ''
-				)
+				: toPlainTextExcerpt(getPostExcerpt(processed, 200) || '')
 			const description =
 				derivedExcerpt || `${title} — a journal entry from Miko Meow.`
-			// getCoverImageUrl is the canonical helper — it respects blogConfig.uri
-			// and handles relative vs absolute paths. We pass a minimal shape so
-			// the Date/string mismatch on JournalPost vs ProcessedPost doesn't bite.
-			const image =
-				getCoverImageUrl(
-					{
-						urlPath: data.post.urlPath ?? '',
-						metadata: { fm: { coverImage: fm.coverImage } }
-					} as never,
-					''
-				) || fallback.image
-			const datePublished = data.post.date?.toISOString?.() || String(data.post.date || '')
+			const image = getCoverImageUrl(processed, '') || fallback.image
+			const datePublished = data.post.date instanceof Date
+				? data.post.date.toISOString()
+				: String(data.post.date ?? '')
 			const dateModified = fm.updated || datePublished
 			const primaryCategory = fm.category || (fm.categories ?? [])[0] || ''
 

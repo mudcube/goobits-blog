@@ -1,6 +1,5 @@
 import type { RequestHandler } from './$types'
-import { blogConfig, getAllPosts } from '@goobits/blog/core'
-import { formatLabel } from '@goobits/blog-theme-miko'
+import { blogConfig, formatLabel, getAllPosts } from '@goobits/blog/core'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import {
 	SITE_AUTHOR,
@@ -19,26 +18,6 @@ export const prerender = true
  * file so AI retrieval systems can ingest the entire archive in one
  * fetch. Pair with /llms.txt (curated index).
  */
-
-function htmlToPlainText(html: string): string {
-	return String(html || '')
-		.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
-		.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
-		.replace(/<\/(p|div|h[1-6]|li|blockquote|pre|tr|section|article)>/gi, '\n\n')
-		.replace(/<br\s*\/?>(?!$)/gi, '\n')
-		.replace(/<li\b[^>]*>/gi, '- ')
-		.replace(/<[^>]+>/g, '')
-		.replace(/&nbsp;/g, ' ')
-		.replace(/&amp;/g, '&')
-		.replace(/&lt;/g, '<')
-		.replace(/&gt;/g, '>')
-		.replace(/&quot;/g, '"')
-		.replace(/&#39;/g, '\'')
-		.replace(/\n{3,}/g, '\n\n')
-		.replace(/[ \t]+/g, ' ')
-		.replace(/^[ \t]+|[ \t]+$/gm, '')
-		.trim()
-}
 
 export const GET: RequestHandler = async () => {
 	const allPosts = await getAllPosts({ lang: 'en', includeContent: true }).catch(() => [])
@@ -79,23 +58,24 @@ export const GET: RequestHandler = async () => {
 			.map((c: string) => formatLabel(c))
 			.join(', ')
 		const tags = (fm.tags ?? []).map((t: string) => formatLabel(t)).join(', ')
-		const body = htmlToPlainText(String(post.content || ''))
+		// post.content is raw source markdown (not HTML) — serve as-is. LLMs
+		// parse markdown cleanly and the structure preserved here (headings,
+		// lists, code fences) actually helps retrieval.
+		const body = String(post.content || '').trim()
 
 		const entry = [
 			`## ${title}`,
 			'',
 			`URL: ${url}`,
 			`Date: ${date}`,
-			categories ? `Categories: ${categories}` : '',
-			tags ? `Tags: ${tags}` : '',
+			...(categories ? [`Categories: ${categories}`] : []),
+			...(tags ? [`Tags: ${tags}`] : []),
 			'',
 			body || '_(no content)_',
 			'',
 			'---',
 			''
-		]
-			.filter(line => line !== null && line !== undefined)
-			.join('\n')
+		].join('\n')
 		entries.push(entry)
 	}
 
@@ -103,8 +83,7 @@ export const GET: RequestHandler = async () => {
 
 	return new Response(output, {
 		headers: {
-			'content-type': 'text/plain; charset=utf-8',
-			'cache-control': 'public, max-age=3600, s-maxage=3600'
+			'content-type': 'text/plain; charset=utf-8'
 		}
 	})
 }
