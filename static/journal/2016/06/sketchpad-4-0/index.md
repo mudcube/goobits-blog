@@ -9,7 +9,7 @@ tags:
 coverImage: "images/120e5b61-e808-4ffa-bcfd-b06b2d188479-2.jpeg"
 ---
 
-I’m excited to announce [Sketchpad 4.0](https://sketch.io/sketchpad/)! The focuses on this release has making the app more colorful, faster, and easier to use.
+I’m excited to announce [Sketchpad 4.0](https://sketch.io/sketchpad/)! The focus of this release was making the app more colorful, faster, and easier to use.
 
 Here’s an overview of what’s new:
 
@@ -31,8 +31,8 @@ Here’s an overview of what’s new:
 
 There are a couple things that could not be 100% converted to the new version Sketchpad. You may want to consider whether these matter to you before upgrading your files (you will be prompted). My apologies for any inconvenience these may cause you:
 
-- FloodFill was depreciated. It just did not make sense to keep in. It cost too much to maintain, it was notorious for crashing users browsers. Sketchpad is a vector app, so a bitmap FloodFill never made sense. The new VectorFill replaces the FloodFill, and the results are much nicer!
-- LinearGradient format needed to be upgraded in order support the new Gradient Editor, in doing so LinearGradients may shift slightly.
+- FloodFill was deprecated. It just did not make sense to keep in. It cost too much to maintain, it was notorious for crashing users' browsers. Sketchpad is a vector app, so a bitmap FloodFill never made sense. The new VectorFill replaces the FloodFill, and the results are much nicer!
+- LinearGradient format needed to be upgraded in order to support the new Gradient Editor, and in doing so, LinearGradients may shift slightly.
 
 If for any reason you’d like to use the _older version of Sketchpad_ you can find it at its new permanent URL: [https://sketch.io/sketchpad-3.7.6/](https://sketch.io/sketchpad-3.7.6/)
 

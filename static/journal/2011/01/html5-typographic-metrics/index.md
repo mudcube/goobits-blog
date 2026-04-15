@@ -178,10 +178,10 @@ ctx.fillText("Hello world!", 0, 0);
 
 Opera, Safari and Chrome work identically with “top”, “bottom”, “middle”, and “alphabetic”… however, Firefox seems to
 remove the “buffer-spacing” (the invisible spacing that goes above the ascenders, and below the descenders on each line
-of text) which prevents it from mimicking how Firefox draws other DOM elements. Older browsers wont support
+of text) which prevents it from mimicking how Firefox draws other DOM elements. Older browsers won't support
 baseline=”top” or other baseline variants at all.
 
-This illustrates our problem… lets find a solution!
+This illustrates our problem… let's find a solution!
 
 **`<canvas>` -> “Ascent”, “Descent” and “x-height”**
 

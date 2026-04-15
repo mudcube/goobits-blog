@@ -11,13 +11,13 @@ coverImage: "images/bracelet-1024x512.jpg"
 ---
 
 I recently had the pleasure of working on Google’s [Made with Code](https://www.madewithcode.com/) initiative with
-the [Red & Co.](http://redandco.com/) creative studio and Mash a group of developers located in Portland Oregon.
+the [Red & Co.](http://redandco.com/) creative studio and Mash, a group of developers located in Portland Oregon.
 
 My primary focuses were creating the renderer for the Bracelet Challenge along with the binary exporter that takes
-peoples rendered bracelets and sends them to Shapeways for 3D printing. I have to say this job was probably the most
+people's rendered bracelets and sends them to Shapeways for 3D printing. I have to say this job was probably the most
 satisfying work that’s come my way! For three reasons: (1) The initiative of inspiring a more diverse range of people
 interested in programming at an early age is awesome (2) Red & Co and Mash were friendly, fun and altogether great team
-to work with (3) The work was challenging and allowed me time to work with more cutting edge technologies ?
+to work with (3) The work was challenging and allowed me time to work with more cutting edge technologies.
 
 The Bracelet renderer was developed with ThreeJS. My modest contribution back to the ThreeJS project can be found
 here: [STLBinaryExporter](https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/STLBinaryExporter.js)

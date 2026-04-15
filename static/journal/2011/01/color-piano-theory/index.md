@@ -25,7 +25,7 @@ To improve memory recognition, colors are mapped to the sounds on the keyboard, 
 
 One of the best ways to memorize information is giving it multiple associations; in turn giving the information multiple “pathways” for the brain to locate it.  With color added to the mix, we are building a memory recognition triangulation:  **sound** (measured in hz), **color** (in RGB), and **space** (the XY coordinate of key on the keyboard).
 
-CPT also provides the [solfège](http://en.wikipedia.org/wiki/Solf%C3%A8ge) (_do, re, mi, fa, sol, la, ti, ect)_ to help people learn to sing by using the piano and a familiar sound to tune their voice.
+CPT also provides the [solfège](http://en.wikipedia.org/wiki/Solf%C3%A8ge) (_do, re, mi, fa, sol, la, ti, etc)_ to help people learn to sing by using the piano and a familiar sound to tune their voice.
 
 **Historic mapping of color to sound**
 

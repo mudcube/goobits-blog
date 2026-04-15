@@ -11,13 +11,13 @@ coverImage: "images/hero.png"
 
 **UPDATE: [Read about Sketchpad 3.0](/journal/2013/07/sketchpad-3-0/)**
 
-Where Sketchpad 2.0 introduced non-destructive vector + bitmap editing on the web. Sketchpad 2.1 (SP2.1) takes that bland package of vector tools and borrows features from [Sketch Mobile](http://sketchpad.io/mobile/), an app that exhibited my furthest exploration in creating colorful enviroments. SP2.1 is great at creating background wallpapers quickly now that most of the tools work with gradients, and are all editable in place—this can be especially fun on tools like Mr. Doob’s generative brushes, and the improved stamp tool.
+Where Sketchpad 2.0 introduced non-destructive vector + bitmap editing on the web. Sketchpad 2.1 (SP2.1) takes that bland package of vector tools and borrows features from [Sketch Mobile](http://sketchpad.io/mobile/), an app that exhibited my furthest exploration in creating colorful environments. SP2.1 is great at creating background wallpapers quickly now that most of the tools work with gradients, and are all editable in place—this can be especially fun on tools like Mr. Doob’s generative brushes, and the improved stamp tool.
 
 New features include:
 
 - Multiuser drawing (NodeJS + Socket.io)
 - Editable generative brushes: Chrome, Fur, Shader, Sketchy, Web (via [Mr Doob](http://mrdoob.com)‘s [Harmony](http://mrdoob.com/projects/harmony/))
-- Spacebar+drag while your in a brush (recommended by [Chris Smith](https://twitter.com/startsequence))
+- Spacebar+drag while you're in a brush (recommended by [Chris Smith](https://twitter.com/startsequence))
 - Change the tool type in the options drop-down menu after you’ve created a layer (Chris Smith)
 - Preview (ghost) the stamp tool before you apply it (Chris Smith)
 - Crayon tool reintroduced from Sketch Mobile.

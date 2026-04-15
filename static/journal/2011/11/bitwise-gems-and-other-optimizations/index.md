@@ -9,7 +9,7 @@ tags:
 coverImage: "images/1320621615_emerald-theme-manager1.png"
 ---
 
-One of my favorite posts in the last few years was [Bitwise Gems in AS3](http://lab.polygonal.de/2007/05/10/bitwise-gems-fast-integer-math/) by _Polygonal Labs_, an article inspired by [Bitwise Operations in C](http://www.gamedev.net/reference/articles/article1563.asp) on _Gamedev_. This article is a summery of what I’ve learned, applied to Javascript, plus a few other tricks.
+One of my favorite posts in the last few years was [Bitwise Gems in AS3](http://lab.polygonal.de/2007/05/10/bitwise-gems-fast-integer-math/) by _Polygonal Labs_, an article inspired by [Bitwise Operations in C](http://www.gamedev.net/reference/articles/article1563.asp) on _Gamedev_. This article is a summary of what I’ve learned, applied to Javascript, plus a few other tricks.
 
 **What’s the wisdom in using bit_wise_?**
 
@@ -251,7 +251,7 @@ There are 10 loops \* (1000×1000 pixels) = 10 million iterations are used to ge
     - var RAD2DEG = 180 / PI;
     - var DEG2RAD =  1 / RAD2DEG;
     - …and so on…
-- When using [Color Matrices](http://en.wikipedia.org/wiki/Color_balance#Mathematics_of_color_balance) store the values of the matrix to local-variables (m0, m1, m2, m3… ect) before looping the pixels.
+- When using [Color Matrices](http://en.wikipedia.org/wiki/Color_balance#Mathematics_of_color_balance) store the values of the matrix to local-variables (m0, m1, m2, m3… etc) before looping the pixels.
 - Use function calls sparingly; when speed is critical, instead of calling a function, use the contents of the function hard coded into your for() or while() loops. Choose where your line between readability, redundancy, and speed lies.
 
 **What optimizations do you use in your _graphics_ or _audio_ applications?**
