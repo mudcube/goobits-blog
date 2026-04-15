@@ -3,4 +3,5 @@ export type NavItem = {
 	label: string
 	matchPrefix?: boolean
 	external?: boolean
+	nofollow?: boolean
 }
