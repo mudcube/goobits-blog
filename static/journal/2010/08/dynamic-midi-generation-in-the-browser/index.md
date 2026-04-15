@@ -12,17 +12,17 @@ coverImage: "images/midi-js-demo.png"
 
 **UPDATE:** This project has been cancelled, the MIDIBridge (which takes this idea much further) is what you’re looking for;  [http://www.abumarkub.net/abublog/?p=505](http://www.abumarkub.net/abublog/?p=505)
 
-Have you ever wanted to use MIDI in your Javascript or Flash project?  It’s been a long time dream of mine.  After a long search I came up with one solution that would provide the best support for the most computers (at present time) — utilizing Java’s [javax.sound.midi](http://java.sun.com/products/java-media/sound/doc-midi.html) interface through an . Introducing the MIDIPlugin providing the fundamental functions to create dynamic music & sound effects in your browser.
+Have you ever wanted to use MIDI in your Javascript or Flash project?  It’s been a long time dream of mine.  After a long search I came up with one solution that would provide the best support for the most computers (at present time), utilizing Java’s [javax.sound.midi](http://java.sun.com/products/java-media/sound/doc-midi.html) interface through an . Introducing the MIDIPlugin providing the fundamental functions to create dynamic music & sound effects in your browser.
 
 The MIDIPlugin requires that [Java](http://www.java.com/en/download/manual.jsp) and a [MIDI Soundbank](http://java.sun.com/products/java-media/sound/soundbanks.html) be installed on your computer. Some computers have these installed by default, others do not. More on computability later.
 
-[Piano Theory](/piano/) was built utilizing the MIDIPlugin.  Although the MIDIPlugin works in Internet Explorer my piano webapp does not (at this time) — apologies to IE users.
+[Piano Theory](/piano/) was built utilizing the MIDIPlugin.  Although the MIDIPlugin works in Internet Explorer my piano webapp does not (at this time), apologies to IE users.
 
 **My pitch for MIDI support becoming a W3C standard**
 
-Just as color and native primitives are the building blocks of graphics MIDI is an essential building block of music — we have for graphics, we’re lacking decent support for dynamic music generation.
+Just as color and native primitives are the building blocks of graphics MIDI is an essential building block of music, we have for graphics, we’re lacking decent support for dynamic music generation.
 
-The benefits of dynamic music generation is substantial — saving bandwidth, opening up a whole new realm of sense (the sense of audio) to dynamic content, allowing developers to create more interactive & immersive projects.  MIDI is a well defined framework that could be implemented into the W3C standards, as long as there is the support behind it.  With the motion that the web has been moving forwards recently, the possibility is ripe.
+The benefits of dynamic music generation is substantial, saving bandwidth, opening up a whole new realm of sense (the sense of audio) to dynamic content, allowing developers to create more interactive & immersive projects.  MIDI is a well defined framework that could be implemented into the W3C standards, as long as there is the support behind it.  With the motion that the web has been moving forwards recently, the possibility is ripe.
 
 **The plugin is easy to use**
 
@@ -45,7 +45,7 @@ The benefits of dynamic music generation is substantial — saving bandwidth, op
     }, 0);
     ```
     
-3. When MIDIPlugin is false the user is either missing the [MIDI Soundbank](http://java.sun.com/products/java-media/sound/soundbanks.html) or [Java](http://www.java.com/en/download/manual.jsp) — prompt the user to install the appropriate software.  If the MIDIPlugin isn’t set to false… well then, the fun starts ;)Functions available to you within the MIDIPlugin object:
+3. When MIDIPlugin is false the user is either missing the [MIDI Soundbank](http://java.sun.com/products/java-media/sound/soundbanks.html) or [Java](http://www.java.com/en/download/manual.jsp), prompt the user to install the appropriate software.  If the MIDIPlugin isn’t set to false… well then, the fun starts ;)Functions available to you within the MIDIPlugin object:
     
     ```js
     MIDIPlugin {
@@ -84,7 +84,7 @@ The benefits of dynamic music generation is substantial — saving bandwidth, op
 
 **Licensed to use in your projects**
 
-Released as [CC0](http://creativecommons.org/publicdomain/zero/1.0/) — this means you can use the MIDIPlugin in your project, and modify it to your hearts content without giving recognition, be that commercial or non-commercial.
+Released as [CC0](http://creativecommons.org/publicdomain/zero/1.0/), this means you can use the MIDIPlugin in your project, and modify it to your hearts content without giving recognition, be that commercial or non-commercial.
 
 **Git me**
 

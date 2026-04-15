@@ -17,7 +17,7 @@ coverImage: "images/250px-Number_Form-colored.jpeg"
 
 [Color Piano Theory](/piano/) (CPT) was inspired by an interest in building an _educational application_ that utilizes colors in _teaching piano theory_.  CPT ties together chords, scales, inversions, octaves, and key signatures.  CPT is a visual interface for learning the keyboard.
 
-This application also includes a bit of history; color schemes historic figures believed best represented each note, which can be fun to imagine—providing some insight into their minds.
+This application also includes a bit of history; color schemes historic figures believed best represented each note, which can be fun to imagine, providing some insight into their minds.
 
 **Visual/audial memory recognition**
 
@@ -35,7 +35,7 @@ The earliest known reference to the idea of mapping colors to sound came in _170
 
 This leads me to a question brought to me recently, “_Why do so many of these people associate ‘red’ with ‘C’, ‘orange’ with ‘D’, ‘yellow’ with ‘E’, ‘green’ with ‘F’ and so on_?”  My best guess is many of these calculations were based on mappings to the rainbow, aka the [visible spectrum](http://en.wikipedia.org/wiki/Visible_spectrum);  where ‘C’ in western music has been historically thought of as a grounding, base note, the color ‘red’ is the shortest wavelength in the rainbow.
 
-My best guess is _Lous Castel_ was mapping notes to the [visible spectrum](http://en.wikipedia.org/wiki/Visible_spectrum), organized from shortest wavelength to longest, ending with the ultra-violet range—although, why is “A#” and “B” flipped? Perhaps a sign of dyslexia? _Alexander Schriabin_ declared that “D#” sounds “steely with the glint of metal”, and “E” sounds “pearly blue the shimmer of moonshine”, and who can argue with that?  What does sound look like to you?
+My best guess is _Lous Castel_ was mapping notes to the [visible spectrum](http://en.wikipedia.org/wiki/Visible_spectrum), organized from shortest wavelength to longest, ending with the ultra-violet range, although, why is “A#” and “B” flipped? Perhaps a sign of dyslexia? _Alexander Schriabin_ declared that “D#” sounds “steely with the glint of metal”, and “E” sounds “pearly blue the shimmer of moonshine”, and who can argue with that?  What does sound look like to you?
 
 **Color Piano Project**
 
@@ -43,7 +43,7 @@ The [_Color Piano Project_](http://colorpiano.com/), developed by Dan Vlahos as
 
 **Creating** **“MIDIPlugin”**
 
-Being a big HTML5 fan, I decided to program the application in Javascript—the first hurdle was getting MIDI working in the browser to synthesize sound.
+Being a big HTML5 fan, I decided to program the application in Javascript, the first hurdle was getting MIDI working in the browser to synthesize sound.
 
 [![Color Piano inspiration artwork](images/112517__nickrave__don_tfeedDOG.png "112517__nickrave__don_tfeedDOG")](/journal/2011/01/color-piano-theory/images/112517__nickrave__don_tfeedDOG.png "Open full-size inspiration artwork") I began researching solutions:  **Dynamic WAV generation** (using sine waves) nearly killed my browser.  Creating **MIDI from scratch in base64** and playing through Quicktime note by note didn’t work since the piano is dynamic and requires each key to have one `<code>&lt;audio&gt;</code>` tag. Unfortunately there seems to be a limit to how many tags can be played in a browser at one time, and how quickly their base64 codes can be switched in-between. Firefox recently added [amazing sound support](https://developer.mozilla.org/en/Visualizing_Audio_Spectrum), but **no access to the MIDI Soundbanks**_._ Perhaps someday Google will provide a **Native Client MIDI solution**.  …until then…
 
@@ -55,7 +55,7 @@ The sound works on most macs (natively), some linux based machines (natively), 
 
 **Presenting a synesthetic educational experiment**
 
-The end result was the Color Piano Theory [web-app](http://www.chromeexperiments.com/detail/color-piano/), made public in Google’s [Chrome Experiments](http://www.chromeexperiments.com/detail/color-piano/) collection. Play around with the application—I hope it helps you create something beautiful.
+The end result was the Color Piano Theory [web-app](http://www.chromeexperiments.com/detail/color-piano/), made public in Google’s [Chrome Experiments](http://www.chromeexperiments.com/detail/color-piano/) collection. Play around with the application, I hope it helps you create something beautiful.
 
 **Synesthesia on the web:**
 

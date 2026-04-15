@@ -44,32 +44,32 @@ _Getting your feet wet with Color Piano (features);_
 
 **UPDATES**
 
-- 2.1—1/6/13
+- 2.1 - 1/6/13
     - Download links on MIDIs.
     - Circle of Fifths Synesthesia modes.
     - Cache MIDIs in FileSystem for quicker loading.
-- 2.0.0–9/22/12
+- 2.0.0 - 9/22/12
     - 2,000 MIDI songs from Disklavier.
     - MIDI-browser w/ search engine.
-- 1.5.1–4/23/12
+- 1.5.1 - 4/23/12
     - Previous + next song buttons.
     - Faster rendering. Fix bugs in Chrome 18.
     - Play + Theory modes.
-- 1.4.2–12/23/11
+- 1.4.2 - 12/23/11
     - Load MIDI from remote URls in configure pane.
     - Improved MIDI reproduction.
-- 1.3.8–12/18/11
+- 1.3.8 - 12/18/11
     - Speed controls, and ability to scroll through midi.
     - Steinway grand piano synth.
-- 1.3.0–12/11/11
+- 1.3.0 - 12/11/11
     - Tie into [Web Audio API](http://www.html5rocks.com/en/tutorials/webaudio/intro/) for more accurate playback in Chrome.
     - Tie into localStorage to save settings.
     - Preview notes before they happen.
-- 1.2.0–12/6/11
+- 1.2.0 - 12/6/11
     - Using [base64 soundfonts](/journal/2011/11/base64-soundfonts/).
     - Now displays all 88-keys of a standard piano.
     - Watch notes falling towards the keys before the note plays!
-- 1.1.0–11/27/11
+- 1.1.0 - 11/27/11
     - HTML5 `<audio>` is used for sound-output.
     - Color Piano Theory is available on the [Chrome Webstore](https://chrome.google.com/webstore/detail/ihmigmmflfcbhdpdgbkkeojchjhhphnh).
 - 1.0beta

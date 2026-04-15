@@ -10,7 +10,7 @@ coverImage: "images/hero.png"
 
 Announcing the release of color-blindness daltonization + simulation bookmarklets; [daltonize.appspot.com](http://daltonize.appspot.com/)
 
-The [Chrome Daltonize](https://chrome.google.com/webstore/detail/efeladnkafmoofnbagdbfaieabmejfcf) extension is faster in many cases, and uses less bandwidth than the bookmarklet—highly recommended when Google Chrome is an option!
+The [Chrome Daltonize](https://chrome.google.com/webstore/detail/efeladnkafmoofnbagdbfaieabmejfcf) extension is faster in many cases, and uses less bandwidth than the bookmarklet, highly recommended when Google Chrome is an option!
 
 **What is daltonization?**
 
@@ -38,7 +38,7 @@ The following highlight some of the options to get around Cross Domain issues wi
 
 - Max Novakovic’s function [$.getImageData](http://www.maxnov.com/getimagedata/) using [Google App Engine](http://code.google.com/appengine/). This is used as a last-case scenario due to bandwidth concerns. The $.getImageData proxy is used as a last resort, as it produces bandwidth overhead.
 
-[CORS](http://www.w3.org/TR/cors/) is the preferable method to access images from external domains. The problem is knowing whether a server supports it or not—the following snippet is a hack to figure out whether an browser/server combination supports CORS, or not;
+[CORS](http://www.w3.org/TR/cors/) is the preferable method to access images from external domains. The problem is knowing whether a server supports it or not, the following snippet is a hack to figure out whether an browser/server combination supports CORS, or not;
 
 ```
 function hasCORS(src, callback) { // Cross-Origin Resource Sharing (CORS)

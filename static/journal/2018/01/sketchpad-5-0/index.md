@@ -9,7 +9,7 @@ tags:
 coverImage: "images/Screen-Shot-2017-08-14-at-4.31.34-PM_1200x800.png"
 ---
 
-Hot off the press! Introducing Sketchpad v5.0 (codename Fancy Fox)
+Hot off the press, released January 2018! Introducing Sketchpad v5.0 (codename Fancy Fox), a year after 4.1. The biggest change: brushes now draw *into* layers instead of just on top of them, which opens up a pile of creative techniques that weren't possible before.
 
 Sketchpad's exciting new features:
 

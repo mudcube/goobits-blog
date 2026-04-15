@@ -13,9 +13,9 @@ coverImage: "images/unnamed1.jpg"
 
 Take photos with your webcam: mix and match combinations of filters to come up with your own unique effects. FilterStack includes a large collection of filter combinations to help get you started.
 
-Once you're happy with your image, you can save to your computer, or upload to Sketch.IO to share with your friends. Similarly, you can share your custom filters as well—this way your friends can use the same filter you made for their own pictures.
+Once you're happy with your image, you can save to your computer, or upload to Sketch.IO to share with your friends. Similarly, you can share your custom filters as well, this way your friends can use the same filter you made for their own pictures.
 
-To enable editing, hover over the right side of the app—this will display the sidebar. Here you can: add filters, modify the values of each filter in the stack, reorganize which filter is processed first, enable/disable filters, or remove filters. Each of these controls can create vastly different effects.
+To enable editing, hover over the right side of the app, this will display the sidebar. Here you can: add filters, modify the values of each filter in the stack, reorganize which filter is processed first, enable/disable filters, or remove filters. Each of these controls can create vastly different effects.
 
 Play around, share the results, and let us know what you think!
 

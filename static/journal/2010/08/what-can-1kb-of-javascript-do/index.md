@@ -38,7 +38,7 @@ window.onload=function(){Q=Math.random;C=Math.cos;S=Math.sin;H=0;w=window;d=docu
 
 ## [Spectrum DJ](/labs/js1k/SpectrumDJ.html)
 
-Dynamically generated sphere controlled by mouse movements. I would love to see this made into a Audio Visualizer, there are a lot of cool effects that can be done very quickly with ColorMatrix’s. Here’s the same sphere in [Darkroom](http://mugtug.com/darkroom/) – allowing you to edit other attributes of the spectrum \[Tint, Temperature, Exposure, Contrast, etc\]. For instance, Exposure could be mapped to the bass beats. It might be cool.
+Dynamically generated sphere controlled by mouse movements. I would love to see this made into a Audio Visualizer, there are a lot of cool effects that can be done very quickly with ColorMatrix’s. Here’s the same sphere in [Darkroom](http://mugtug.com/darkroom/), allowing you to edit other attributes of the spectrum \[Tint, Temperature, Exposure, Contrast, etc\]. For instance, Exposure could be mapped to the bass beats. It might be cool.
 
 [![Spectrum DJ preview](images/SpectrumDJ.jpeg "SpectrumDJ")](images/SpectrumDJ.jpeg "Open full-size Spectrum DJ preview")
 
@@ -48,6 +48,6 @@ The code for the Spectrum DJ, 928 bytes:
 window.onload=function(){w=window;d=document.getElementById("c");c=d.getContext("2d");W=w.innerWidth;H=w.innerHeight;d.style.width=W+"px";d.style.height=H+"px";document.onmousemove=function(g){c.drawImage(image,0,0);var a=(g.pageX/W)*255-127,k=(g.pageY/H)*255-127,h=c.getImageData(0,0,d.width,d.height),f=h.data;for(var b=0,j=f.length;b&lt;j;b+=4){h.data[b]=f[b]-a;h.data[b+1]=f[b+1]+a;h.data[b+2]=f[b+2]+k}c.putImageData(h,0,0)};image=(function(){var k=document.createElement("canvas").getContext("2d"),a=300,h=a/2,f=(1/360)*Math.PI*2,j=W/H,e=-h/4,l=-h/2;d.width=k.canvas.width=h*j;d.height=k.canvas.height=h;k.fillRect(0,0,W,H);for(var b=0;b&lt;=359;b++){var i=k.createLinearGradient(e+h,l,e+h,l+h);i.addColorStop(0,"#000");i.addColorStop(0.5,"hsl("+((b+70)%360)+",100%,50%)");i.addColorStop(1,"#FFF");k.beginPath();k.moveTo(e+h,l);k.lineTo(e+h,l+h);k.lineTo(e+h+2,l+h);k.lineTo(e+h+5,l);k.fillStyle=i;k.fill();k.translate(e+h,l+h);k.rotate(f);k.translate(-(e+h),-(l+h))}return k.canvas})();c.drawImage(image,0,0)};
 ```
 
-Each entry is required to work in the latest versions of Firefox, Safari, Chrome and Opera… my apologies to IE users, Microsoft does not yet support the [canvas element](http://www.whatwg.org/specs/web-apps/current-work/complete/the-canvas-element.html#dom-canvas-getcontext) in the HTML5 specs—it’s said to be scheduled for their next release.
+Each entry is required to work in the latest versions of Firefox, Safari, Chrome and Opera… my apologies to IE users, Microsoft does not yet support the [canvas element](http://www.whatwg.org/specs/web-apps/current-work/complete/the-canvas-element.html#dom-canvas-getcontext) in the HTML5 specs, it’s said to be scheduled for their next release.
 
 **_Click, drag, and enjoy =)_**

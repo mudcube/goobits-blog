@@ -13,7 +13,7 @@ Typography support between browsers has a history of being spotty. One of the ma
 yet-to-be-released) next-incarnation of Sketchpad was typographic support; between browsers and even within the
 `<canvas>` specs. One pitfall of the `<canvas>` tag is the lack of text-metrics support (past calculating the width via
 ctx.measureText). This prevents us from emulating how text works in DOM for other elements such as `<div>` or even
-`<textarea>`—fortunately, these metrics can be measured through simple css-hacks.The solutions to the following are
+`<textarea>`, fortunately, these metrics can be measured through simple css-hacks.The solutions to the following are
 provided:
 
 - ctx.textBaseline=”alphabetic”; // alphabetic, top, bottom, middle
@@ -245,7 +245,7 @@ into getting the values from CSS.
 After searching for a solution for hours in `<canvas>` under the crazy pursuit of measuring something invisible, I came
 home and found a simple solution in CSS. By using an `<img>` (or any inline-block element) and the vertical-align property
 inside of a container element (such as a `<div>`), the values `<canvas>` provides for ctx.textBaseline can be matched with
-an error margin of +/- 2px—many fonts are matched exactly. Likely, these discrepancies are due to anti-aliasing in
+an error margin of +/- 2px, many fonts are matched exactly. Likely, these discrepancies are due to anti-aliasing in
 `<canvas>` vs. DOM.
 
 1. The “top” baseline is equal to the image.offsetTop since an `<img>` element is automatically aligned to the baseline of
@@ -253,7 +253,7 @@ an error margin of +/- 2px—many fonts are matched exactly. Likely, these discr
 2. The “bottom” baseline can be found by subtracting the height of the text (see the measureText section) from the “top”
    baseline.
 3. The “middle” baseline can be found using “line-height: 0” on the container element and measuring the
-   image.offsetTop—this works, because “line-height: 0” aligns the image to the center of the text, as the text now has
+   image.offsetTop, this works, because “line-height: 0” aligns the image to the center of the text, as the text now has
    a height of 0. In order to get the proper values the whole experiment must be offset vertically (so the text isn’t
    hidden off-screen).
 
@@ -336,7 +336,7 @@ if (topClipping < 0) { // is padding, not clipping
 On a side-note, it looks like at this time no browser supports the HTML5 standards “ideographic” or “hanging”.
 Opera/Safari/Chrome default to “top” and “bottom” respectively, whereas Firefox defaults to “alphabetic” in when these
 options are chosen. It looks impossible to fix “ideographic” and “hanging” without these values being provided via an
-external means (i.e. Python)—please prove me wrong.
+external means (i.e. Python), please prove me wrong.
 
 ## ctx.textAlign
 
@@ -428,7 +428,7 @@ The em-height of a font can be found in Opera, Safari, Chrome and Firefox throug
 method to the ctx.textAlign and ctx.measureText() demos.
 
 Create a `<span>` element with the text you want to measure, with the font-properties set how you want them, and run
-span.offsetHeight—this measures the em-height. The em-height is the value we’re going to use to offset our line-breaks.
+span.offsetHeight, this measures the em-height. The em-height is the value we’re going to use to offset our line-breaks.
 
 **Calculating line & letter breaks**
 

@@ -11,7 +11,7 @@ coverImage: "images/hero.jpeg"
 
 Last month, I posted about the possibility of creating high-resolution and print-ready graphics in `<canvas>`. Since then, it’s been in the back of my mind, but happened to be at Kinko’s today, and decided to take this experiment to the next level…
 
-The following flash-cards were designed in Illustrator \[by [Altered Focus](http://alteredfoc.us/)\], exported into SVG, then parsed into `<canvas>`… and finally, that one template card (in the picture below it’s the “C” major card on the left) was used to create a large variety of combinations—based on a set of music-theory instructions. Such as;
+The following flash-cards were designed in Illustrator \[by [Altered Focus](http://alteredfoc.us/)\], exported into SVG, then parsed into `<canvas>`… and finally, that one template card (in the picture below it’s the “C” major card on the left) was used to create a large variety of combinations, based on a set of music-theory instructions. Such as;
 
 ```js
 Chord = { // definition for an A chord

@@ -12,7 +12,7 @@ coverImage: "images/Screen-shot-2010-11-10-at-7.39.11-PM.png"
 
 The **[Unicode Profiling Project](/labs/ucpp/)** was designed to gather statistics on unicode support across systems.  The software checks each symbol in your systems Unicode catalog (65,535 glyphs) to see which are visible on your computer using `<canvas>` and Javascript.
 
-The data generated from your computer will help profile the state of unicode support on the web. Your computers unicode support, remote address, user agent and processing time will be submitted to the server upon completion of the test — a statistic analysis of the data will be published — no specific information about your computer will be published.
+The data generated from your computer will help profile the state of unicode support on the web. Your computers unicode support, remote address, user agent and processing time will be submitted to the server upon completion of the test, a statistic analysis of the data will be published, no specific information about your computer will be published.
 
 **Running the test:**
 
@@ -26,7 +26,7 @@ Once the processing has completed you will be presented with a string of binar
 
 **Unicode characters:**
 
-Now the fun part, click on “Show Available” — this may take a few seconds as you’re referencing tens of thousands of unicode characters at once:
+Now the fun part, click on “Show Available”, this may take a few seconds as you’re referencing tens of thousands of unicode characters at once:
 
 [![Unicode available glyphs view](images/Screen-shot-2010-11-10-at-7.34.10-PM.png "Screen shot 2010-11-10 at 7.34.10 PM")](/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.34.10-PM.png "Open full-size glyph screenshot")
 

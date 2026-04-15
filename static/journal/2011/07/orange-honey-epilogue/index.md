@@ -16,13 +16,13 @@ Due to my own budgetary constraints, and differing visions within the corporatio
 
 The following highlight a few of my final contributions to Mugtug; made possible with HTML5;
 
-– **Layer Styles**; this module creates effects such as _InnerShadow_, _OuterShadow_, _InnerGlow_, and _OuterGlow_.  These are similar to what Photoshop achieves—the difference is, my version has the ability to do what I’ve coined “style stacking”.  Style stacking allows the designer to add multiple fills (solid, gradient, pattern) to, for instance, InnerShadow;
+- **Layer Styles**; this module creates effects such as _InnerShadow_, _OuterShadow_, _InnerGlow_, and _OuterGlow_.  These are similar to what Photoshop achieves, the difference is, my version has the ability to do what I’ve coined “style stacking”.  Style stacking allows the designer to add multiple fills (solid, gradient, pattern) to, for instance, InnerShadow;
 
 [![Layer styles reference](images/5807041058_21caef727a_o.png "5807041058_21caef727a_o")](/journal/2011/07/orange-honey-epilogue/images/5807041058_21caef727a_o.png "Open full-size layer styles reference")
 
 [![Layer styles screenshot](images/Screen-shot-2011-03-26-at-9.37.34-PM.png "Screen shot 2011-03-26 at 9.37.34 PM")](/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-03-26-at-9.37.34-PM.png "Open full-size layer styles screenshot")
 
-– **SVG Parser**; this module converts .svg files into `<canvas>` commands, accepting complex examples, supporting features from `&lt;gaussianblur&gt;` to the `&lt;use&gt;` element;
+- **SVG Parser**; this module converts .svg files into `<canvas>` commands, accepting complex examples, supporting features from `&lt;gaussianblur&gt;` to the `&lt;use&gt;` element;
 
 [![SVG parser screenshot](images/Screen-shot-2011-07-16-at-11.09.30-AM.png "Screen shot 2011-07-16 at 11.09.30 AM")](/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-07-16-at-11.09.30-AM.png "Open full-size SVG parser screenshot")
 
@@ -34,18 +34,18 @@ There is no Gaussian blur in HTML5’s `<canvas>`, and to do a “true” Gaussi
 
 [![Gaussian blur comparison screenshot](images/Screen-shot-2011-03-14-at-12.41.25-AM.png "Screen shot 2011-03-14 at 12.41.25 AM")](/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-03-14-at-12.41.25-AM.png "Open full-size blur comparison")
 
-– **Radial Gradient**; this demo shows how fun radials and gradients can be.
+- **Radial Gradient**; this demo shows how fun radials and gradients can be.
 
 [![Radial gradient demo screenshot](images/Screen-shot-2011-07-16-at-3.07.38-PM1.png "Screen shot 2011-07-16 at 3.07.38 PM")](/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-07-16-at-3.07.38-PM1.png "Open full-size radial gradient demo")
 
-– **Composite Erase**; this module creates a new composite mode, allowing you to erase colors based on the color of a brush;
+- **Composite Erase**; this module creates a new composite mode, allowing you to erase colors based on the color of a brush;
 
 [![Composite erase demo screenshot](images/Screen-shot-2011-07-16-at-3.13.14-PM.png "Screen shot 2011-07-16 at 3.13.14 PM")](/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-07-16-at-3.13.14-PM.png "Open full-size composite erase demo")
 
-– **Brushes**; this module adds some fun new brushes to play with, like galaxy (left);
+- **Brushes**; this module adds some fun new brushes to play with, like galaxy (left);
 
 [![Brushes demo screenshot](images/Screen-shot-2011-03-15-at-9.51.50-PM.png "Screen shot 2011-03-15 at 9.51.50 PM")](/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-03-15-at-9.51.50-PM.png "Open full-size brushes demo")
 
-– **Marquee**; this module creates a “magick wand” with marching ants, for selecting portions of an image, and modifying them with fills, filters, and other effects;
+- **Marquee**; this module creates a “magick wand” with marching ants, for selecting portions of an image, and modifying them with fills, filters, and other effects;
 
 [![Marquee tool demo screenshot](images/Screen-shot-2011-07-16-at-3.12.37-PM.png "Screen shot 2011-07-16 at 3.12.37 PM")](/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-07-16-at-3.12.37-PM.png "Open full-size marquee demo")

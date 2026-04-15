@@ -13,7 +13,7 @@ coverImage: "images/hero.png"
 
 > **[MIDI.js](https://github.com/mudcube/MIDI.js)** (on github) ties together, and builds upon frameworks that bring MIDI generation to the browser. Combine MIDI.js with [jasmid](https://github.com/gasman/jasmid) to create a web-radio MIDI stream similar to this demo… or with [Three.js](https://github.com/mrdoob/three.js/), [Sparks.js](https://github.com/zz85/sparks.js/), or [GLSL](http://glsl.heroku.com/) to create Audio/visual experiments. Piano/guitar simulations, Drum machines, MIDI recording, and all kinds of certified funkitude are within your grasps (with a little elbow grease)!
 > 
-> [Google Chrome](https://www.google.com/chrome) is recommended for best listening experience—it has timing perfection. Firefox and Safari can both perform a bit more like the piano has been drinking, arrr.
+> [Google Chrome](https://www.google.com/chrome) is recommended for best listening experience, it has timing perfection. Firefox and Safari can both perform a bit more like the piano has been drinking, arrr.
 > 
 > Carpe beerum, and [commandeer](https://github.com/mudcube/MIDI.js) yer own copy!
 

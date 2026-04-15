@@ -9,7 +9,7 @@ tags:
 coverImage: "images/Sketchpad-12-copy-2.jpg"
 ---
 
-Extra extra! There’s a new SketchPad in town! Here’s a rundown of the latest features:
+Extra extra! Released January 2017. There’s a new SketchPad in town, focused on making it feel at home in more places around the world. Themes let you pick a look (I’m on "Deep Purple" right now), and 12 professional translations just shipped, including full RTL support. Here’s a rundown of the latest features:
 
 - Choose a theme, or create your own! My current favorite is [Deep Purple](https://sketch.io/sketchpad/?theme=DeepPurple)!
 - 12 languages professionally translated, complete with LTR/RTL support:
