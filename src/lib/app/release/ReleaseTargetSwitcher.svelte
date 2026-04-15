@@ -1,21 +1,34 @@
 <script lang="ts">
+	import { goto } from '$app/navigation'
 	import { PillButton } from '@miko/ui'
-	import { DEV_SURFACE_COOKIE, type DevSurface } from '$lib/app/dev-surface'
 	import { RELEASE_STAGE_COOKIE, type ReleaseStage } from '$lib/app/release'
+	import { TARGET_COOKIE, type Target } from '$lib/app/target'
+	import type { HumanSitemapVisibility } from '$lib/server/route-index'
 
 	type Props = {
 		activeStage: ReleaseStage
-		activeSurface: DevSurface
+		activeTarget: Target
+		activeVisibility?: HumanSitemapVisibility
+		showVisibilityToggle?: boolean
 	}
 
-	const { activeStage, activeSurface }: Props = $props()
+	const {
+		activeStage,
+		activeTarget,
+		activeVisibility = 'public',
+		showVisibilityToggle = false
+	}: Props = $props()
 	const stages = [
 		{ value: 'live', label: 'Live' },
 		{ value: 'preview', label: 'Preview' }
 	]
-	const surfaces = [
+	const targets = [
 		{ value: 'staging', label: 'Staging' },
 		{ value: 'dev', label: 'Dev' }
+	]
+	const visibilityOptions = [
+		{ value: 'public', label: 'Public' },
+		{ value: 'internal', label: 'Internal' }
 	]
 
 	function setStage(stage: ReleaseStage) {
@@ -23,8 +36,8 @@
 		window.location.reload()
 	}
 
-	function setSurface(surface: DevSurface) {
-		document.cookie = `${DEV_SURFACE_COOKIE}=${surface}; Path=/; Max-Age=31536000; SameSite=Lax`
+	function setTarget(target: Target) {
+		document.cookie = `${TARGET_COOKIE}=${target}; Path=/; Max-Age=31536000; SameSite=Lax`
 		window.location.reload()
 	}
 
@@ -32,12 +45,36 @@
 		if (typeof stage === 'string') setStage(stage as ReleaseStage)
 	}
 
-	function handleSurfaceChange(surface: string | string[]) {
-		if (typeof surface === 'string') setSurface(surface as DevSurface)
+	function handleTargetChange(target: string | string[]) {
+		if (typeof target === 'string') setTarget(target as Target)
+	}
+
+	async function setVisibility(visibility: HumanSitemapVisibility) {
+		if (typeof window === 'undefined') return
+
+		const nextUrl = new URL(window.location.href)
+		if (visibility === 'internal') {
+			nextUrl.searchParams.set('visibility', 'internal')
+		} else {
+			nextUrl.searchParams.delete('visibility')
+		}
+
+		await goto(`${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`, {
+			replaceState: true,
+			keepFocus: true,
+			noScroll: true,
+			invalidateAll: true
+		})
+	}
+
+	function handleVisibilityChange(visibility: string | string[]) {
+		if (typeof visibility === 'string') {
+			void setVisibility(visibility as HumanSitemapVisibility)
+		}
 	}
 </script>
 
-<aside class="release-switcher" aria-label="Site release preview">
+<aside class="release-switcher" aria-label="Site release controls">
 	<div class="release-switcher__row">
 		<span class="release-switcher__label">Release</span>
 		<PillButton
@@ -51,16 +88,30 @@
 	</div>
 
 	<div class="release-switcher__row">
-		<span class="release-switcher__label">Surface</span>
+		<span class="release-switcher__label">Target</span>
 		<PillButton
-			options={surfaces}
-			value={activeSurface}
+			options={targets}
+			value={activeTarget}
 			grouped
 			className="release-switcher__toggle"
-			ariaLabel="Local surface"
-			onChange={handleSurfaceChange}
+			ariaLabel="Target environment"
+			onChange={handleTargetChange}
 		/>
 	</div>
+
+	{#if showVisibilityToggle}
+		<div class="release-switcher__row">
+			<span class="release-switcher__label">Visibility</span>
+			<PillButton
+				options={visibilityOptions}
+				value={activeVisibility}
+				grouped
+				className="release-switcher__toggle"
+				ariaLabel="Sitemap visibility"
+				onChange={handleVisibilityChange}
+			/>
+		</div>
+	{/if}
 </aside>
 
 <style lang="scss">

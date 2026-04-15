@@ -11,14 +11,16 @@
 		value?: string
 		className?: string
 		ariaLabel?: string
+		onChange?: (value: string | string[]) => void
 	}
 
 	let {
 		options,
 		value = $bindable(''),
 		className = '',
-		ariaLabel = 'Segmented control'
+		ariaLabel = 'Segmented control',
+		onChange = () => {}
 	}: SegmentedControlProps = $props()
 </script>
 
-<PillButton bind:value {options} grouped className={className} ariaLabel={ariaLabel} />
+<PillButton bind:value {options} grouped className={className} ariaLabel={ariaLabel} {onChange} />

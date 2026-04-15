@@ -25,14 +25,14 @@
 	let selectedTags = $state([])
 	let sortBy = $state('path')
 	let collapsedCategories = $state({})
-	const description = 'A human-readable sitemap for MIKO.ART with public pages and journal entries.'
+	const description = 'A human-readable sitemap for MIKO.ART with public pages, journal entries, and optional internal routes.'
 	const sortOptions = [
 		{ value: 'path', label: 'Path' },
 		{ value: 'name', label: 'Name' },
 		{ value: 'modified', label: 'Recent' }
 	]
 
-	const availableTags = $derived(getSitemapAvailableTags(data.showDevDiagnostics))
+	const availableTags = $derived(getSitemapAvailableTags(data.canViewInternalRoutes))
 
 	const categoryOrder = [
 		'Main Pages',
@@ -94,7 +94,7 @@
 			titleAccent="everything here"
 			icon="/media/sitemap-compass.png"
 			iconAlt="Compass icon"
-			intro="A human-readable map of public pages, journal entries, and the standard routes that shape the site."
+			intro="A human-readable map of public pages, journal entries, and, when enabled locally, internal routes that shape the site."
 			signalLabel={`${data.stats.total} routes indexed`}
 		/>
 

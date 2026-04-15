@@ -85,7 +85,6 @@
 	border-bottom-width: 0.125rem;
 	border-bottom-color: var(--header-nav-accent, var(--color-white));
 	color: var(--header-nav-accent, var(--color-white));
-	pointer-events: none;
 }
 
 .layout-header__nav-link:hover,

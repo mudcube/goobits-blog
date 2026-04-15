@@ -28,7 +28,9 @@
 			<div class="sitemap-page__category-body">
 				<ul class="sitemap-page__route-list">
 					{#each routes as route}
-						<li class="sitemap-page__route">
+						<li
+							class={`sitemap-page__route ${route.sitemap === 'internal' ? 'sitemap-page__route--internal' : 'sitemap-page__route--public'}`}
+						>
 							<div class="sitemap-page__route-main">
 								{#if route.type === 'api'}
 									<span class="sitemap-page__route-path">{route.path}</span>
@@ -49,6 +51,11 @@
 								{/if}
 							</div>
 							<div class="sitemap-page__route-meta">
+								<span
+									class={`sitemap-page__audience sitemap-page__audience--${route.sitemap === 'internal' ? 'internal' : 'public'}`}
+								>
+									{route.sitemap === 'internal' ? 'Internal' : 'Public'}
+								</span>
 								<div class="sitemap-page__tags">
 									{#each getRouteTags(route) as tag}
 										<span class={`sitemap-page__tag sitemap-page__tag--${tag.toLowerCase()}`}>{tag}</span>

@@ -8,7 +8,7 @@
 	import { onMount } from 'svelte'
 	import { Topbar, FooterNav } from '@miko/ui'
 	import { getCalendarConfig } from '@calendar/core'
-	import DevReleaseSwitcher from '$lib/app/release/DevReleaseSwitcher.svelte'
+	import ReleaseTargetSwitcher from '$lib/app/release/ReleaseTargetSwitcher.svelte'
 	import { footerElsewhereItems, footerLegalItems, footerPrimaryItems, getHeaderNavItems } from '$lib/app/shell/nav'
 	import { enableLayoutShiftDebug } from '$lib/client/debug/layoutShift'
 
@@ -18,6 +18,9 @@
 	const isCalendarRoute = $derived(
 		$page.url.pathname.startsWith(calendarConfig.routes.calendarBase) ||
 			$page.url.pathname.startsWith(calendarConfig.routes.adminBase)
+	)
+	const showSitemapVisibilityToggle = $derived(
+		$page.url.pathname.startsWith('/sitemap') && Boolean($page.data.canViewInternalRoutes)
 	)
 	const topbarItems = $derived(getHeaderNavItems(data.activeStage))
 
@@ -46,7 +49,12 @@
 			/>
 
 			{#if data.showVersionSwitcher}
-				<DevReleaseSwitcher activeStage={data.activeStage} activeSurface={data.activeSurface} />
+				<ReleaseTargetSwitcher
+					activeStage={data.activeStage}
+					activeTarget={data.activeTarget}
+					activeVisibility={$page.data.activeVisibility}
+					showVisibilityToggle={showSitemapVisibilityToggle}
+				/>
 			{/if}
 		{/if}
 	</div>

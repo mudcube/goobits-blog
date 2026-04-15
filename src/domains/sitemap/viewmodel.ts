@@ -2,12 +2,13 @@ import type { RouteEntry } from '$lib/server/route-index'
 import { localeSort, matchesQuery, normalizeQuery } from '$lib/utils/collections'
 
 export type SitemapSort = 'path' | 'name' | 'modified'
+export type SitemapVisibility = 'public' | 'internal'
 
 export const baseSitemapTags = ['SSR', 'CSR', 'Dynamic', 'Layout'] as const
-export const devSitemapTags = ['SSR', 'CSR', 'Dynamic', 'Auth', 'NoIndex', 'API', 'Layout', 'Internal', 'Hidden'] as const
+export const internalSitemapTags = ['SSR', 'CSR', 'Dynamic', 'Auth', 'NoIndex', 'API', 'Layout', 'Internal'] as const
 
-export function getSitemapAvailableTags(showDevDiagnostics: boolean) {
-	return showDevDiagnostics ? [...devSitemapTags] : [...baseSitemapTags]
+export function getSitemapAvailableTags(canViewInternalRoutes: boolean) {
+	return canViewInternalRoutes ? [...internalSitemapTags] : [...baseSitemapTags]
 }
 
 export function getRouteTags(route: RouteEntry) {
@@ -20,7 +21,6 @@ export function getRouteTags(route: RouteEntry) {
 	if (route.type === 'page' && route.isNoIndex) tags.push('NoIndex')
 	if (route.type === 'page' && route.hasLayout) tags.push('Layout')
 	if (route.sitemap === 'internal') tags.push('Internal')
-	if (route.sitemap === 'hidden') tags.push('Hidden')
 	return tags
 }
 
