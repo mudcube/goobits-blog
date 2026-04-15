@@ -64,7 +64,6 @@
 }
 
 .sitemap-page__count {
-	font-family: var(--font-sans);
 	font-size: var(--font-size-xs);
 	font-weight: var(--font-weight-semibold);
 	letter-spacing: 0.04em;
@@ -145,24 +144,8 @@
 
 .sitemap-page__methods {
 	display: inline-flex;
-	gap: 0.2rem;
+	gap: 0.25rem;
 }
-
-.sitemap-page__method {
-	font-family: var(--font-sans);
-	font-size: 0.65rem;
-	font-weight: var(--font-weight-semibold);
-	padding: 0.1rem 0.4rem;
-	border-radius: var(--radius-sm);
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-}
-
-.sitemap-page__method--get { background: var(--link); color: var(--color-white); }
-.sitemap-page__method--post { background: var(--button-bg); color: var(--color-white); }
-.sitemap-page__method--put { background: var(--color-warning); color: var(--color-white); }
-.sitemap-page__method--delete { background: var(--form-error); color: var(--color-white); }
-.sitemap-page__method--patch { background: var(--color-teal); color: var(--color-white); }
 
 .sitemap-page__tags {
 	display: inline-flex;
@@ -171,18 +154,44 @@
 	justify-self: end;
 }
 
+/* Unified pill: same shape, same font, same size — only hue varies per variant.
+   Pastel formula: faint tinted bg, darker hue for text, faint hue border. */
+.sitemap-page__method,
 .sitemap-page__tag {
-	font-family: var(--font-sans);
-	font-size: 0.65rem;
-	font-weight: var(--font-weight-medium);
-	letter-spacing: 0.04em;
+	--pill-hue: var(--showcase-muted);
+	display: inline-flex;
+	align-items: center;
+	height: 1.25rem;
+	padding: 0 0.55rem;
+	border-radius: var(--radius-pill);
+	border: 1px solid color-mix(in srgb, var(--pill-hue) 32%, transparent);
+	background: color-mix(in srgb, var(--pill-hue) 12%, transparent);
+	color: color-mix(in srgb, var(--pill-hue) 72%, var(--showcase-text));
+	font-size: 0.6875rem;
+	font-weight: var(--font-weight-semibold);
+	letter-spacing: 0.05em;
 	text-transform: uppercase;
-	padding: 0.12rem 0.45rem;
-	border-radius: var(--radius-sm);
-	background: color-mix(in srgb, var(--showcase-surface-highest) 70%, transparent);
-	border: 1px solid var(--showcase-outline-variant);
-	color: var(--showcase-muted);
+	line-height: 1;
+	white-space: nowrap;
 }
+
+/* HTTP methods — harmonized pastel hues. */
+.sitemap-page__method--get    { --pill-hue: #3b82f6; }  /* blue */
+.sitemap-page__method--post   { --pill-hue: #22c55e; }  /* green */
+.sitemap-page__method--put    { --pill-hue: #f59e0b; }  /* amber */
+.sitemap-page__method--delete { --pill-hue: #f43f5e; }  /* rose */
+.sitemap-page__method--patch  { --pill-hue: #14b8a6; }  /* teal */
+
+/* Tag variants — same pastel formula, semantic hues. */
+.sitemap-page__tag--ssr      { --pill-hue: #3b82f6; }  /* blue — server-rendered */
+.sitemap-page__tag--csr      { --pill-hue: #8b5cf6; }  /* violet — client-rendered */
+.sitemap-page__tag--dynamic  { --pill-hue: #f59e0b; }  /* amber — parameterized */
+.sitemap-page__tag--layout   { --pill-hue: #14b8a6; }  /* teal — structural */
+.sitemap-page__tag--api      { --pill-hue: #64748b; }  /* slate — system */
+.sitemap-page__tag--auth     { --pill-hue: #f43f5e; }  /* rose — auth-gated */
+.sitemap-page__tag--noindex  { --pill-hue: #94a3b8; }  /* grey — hidden from search */
+.sitemap-page__tag--internal { --pill-hue: var(--showcase-primary); }  /* sage — matches rail */
+.sitemap-page__tag--hidden   { --pill-hue: #be123c; }  /* deep rose — fully hidden */
 
 .sitemap-page__modified {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;

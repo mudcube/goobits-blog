@@ -2,6 +2,7 @@
 	import {
 		BookOpen,
 		CalendarClock,
+		CalendarCog,
 		Compass,
 		FileText,
 		Filter,
@@ -32,7 +33,7 @@
 	let searchQuery = $state('')
 	let selectedTags = $state([])
 	let sortBy = $state('path')
-	let collapsedCategories = $state({})
+	let collapsedCategories = $state({ 'Journal Posts': true })
 	const description = 'A human-readable sitemap for MIKO.ART with public pages, journal entries, and optional internal routes.'
 	const sortOptions = [
 		{ value: 'path', label: 'Path' },
@@ -43,13 +44,14 @@
 	const availableTags = $derived(getSitemapAvailableTags(data.canViewInternalRoutes))
 
 	const categoryMeta = {
-		'Main Pages':    { tone: 'primary',   icon: Compass },
-		'Journal Pages': { tone: 'primary',   icon: BookOpen },
-		'Journal Posts': { tone: 'primary',   icon: FileText },
-		'Scheduling':    { tone: 'primary',   icon: CalendarClock },
-		'Admin Pages':   { tone: 'secondary', icon: Shield },
-		'API Routes':    { tone: 'secondary', icon: Terminal },
-		'Utility Pages': { tone: 'secondary', icon: Wrench }
+		'Main Pages':     { tone: 'primary',   icon: Compass },
+		'Journal Pages':  { tone: 'primary',   icon: BookOpen },
+		'Journal Posts':  { tone: 'primary',   icon: FileText },
+		'Scheduling':     { tone: 'primary',   icon: CalendarClock },
+		'Admin Pages':    { tone: 'secondary', icon: Shield },
+		'API Routes':     { tone: 'secondary', icon: Terminal },
+		'Scheduling API': { tone: 'secondary', icon: CalendarCog },
+		'Utility Pages':  { tone: 'secondary', icon: Wrench }
 	}
 	const categoryOrder = Object.keys(categoryMeta)
 
@@ -144,6 +146,7 @@
 
 <style>
 	:global(.sitemap-page) {
+		font-family: var(--font-ui-sans, var(--font-sans));
 		/* Match the default page background — no wash. */
 		--showcase-surface: var(--bg);
 		--showcase-surface-low: var(--bg);

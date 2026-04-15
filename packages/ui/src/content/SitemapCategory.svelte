@@ -68,7 +68,7 @@
 						</div>
 						<div class="sitemap-page__tags">
 							{#each getRouteTags(route) as tag}
-								<span class="sitemap-page__tag">{tag}</span>
+								<span class={`sitemap-page__tag sitemap-page__tag--${tag.toLowerCase()}`}>{tag}</span>
 							{/each}
 						</div>
 						<span class="sitemap-page__modified">{formatDate(route.lastModified)}</span>

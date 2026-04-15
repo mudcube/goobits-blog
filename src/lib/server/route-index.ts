@@ -271,7 +271,7 @@ function getRouteName(routePath: string) {
 function categorizeRoute(routePath: string) {
 	if (routePath === '/') return 'Main Pages'
 	if (routePath.startsWith('/schedule')) return 'Scheduling'
-	if (routePath.startsWith('/api/calendar')) return 'Scheduling'
+	if (routePath.startsWith('/api/calendar')) return 'Scheduling API'
 	if (routePath.startsWith('/api')) return 'API Routes'
 	if (routePath.startsWith('/journal')) return 'Journal Pages'
 	if (routePath === '/health' || routePath === '/sitemap') return 'Utility Pages'
