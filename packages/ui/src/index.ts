@@ -32,6 +32,7 @@ export {
 	ShowcaseCTA,
 	ShowcaseGrid,
 	ShowcaseHero,
+	ShowcaseSection,
 } from "./showcase";
 
 export type { NavItem } from "./types/nav";
