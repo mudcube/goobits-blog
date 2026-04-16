@@ -19,7 +19,7 @@ export function load(event: { locals: { user?: unknown }; url: URL }) {
 		event.url.pathname === config.routes.adminBase ||
 		event.url.pathname === `${config.routes.adminBase}/`
 	if (!user && !isAdminRoot) {
-		redirect(302, adminRootWithContext(event.url))
+		throw redirect(302, adminRootWithContext(event.url))
 	}
 	return { user }
 }

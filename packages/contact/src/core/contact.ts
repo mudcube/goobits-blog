@@ -1,9 +1,11 @@
 import { z } from 'zod'
-import { emailSchema } from '$lib/validation/zod/email'
-import { trimmedOptionalString } from '$lib/validation/zod/strings'
 
 const MIN_MESSAGE_LENGTH = 12
 const MIN_MESSAGE_WORDS = 3
+
+function trimmedOptionalString(max: number) {
+	return z.string().trim().max(max).optional().default('')
+}
 
 function hasSubstantiveMessage(message: string) {
 	const cleaned = message.replace(/\s+/g, ' ').trim()
@@ -21,7 +23,7 @@ export const contactSchema = z.object({
 	device_id: trimmedOptionalString(128),
 	website: trimmedOptionalString(256),
 	name: z.string().trim().min(1, 'Name is required').max(120, 'Name is required'),
-	email: emailSchema,
+	email: z.string().trim().email('Please provide a valid email address.'),
 	message: z
 		.string()
 		.trim()
@@ -32,3 +34,17 @@ export const contactSchema = z.object({
 })
 
 export type ContactFormData = z.infer<typeof contactSchema>
+
+export function getContactFormDefaults(input?: Partial<ContactFormData>): ContactFormData {
+	return {
+		from: input?.from || '',
+		topic: input?.topic || '',
+		started_at: input?.started_at || String(Date.now()),
+		device_id: input?.device_id || '',
+		website: input?.website || '',
+		name: input?.name || '',
+		email: input?.email || '',
+		message: input?.message || '',
+		['cf-turnstile-response']: input?.['cf-turnstile-response'] || ''
+	}
+}

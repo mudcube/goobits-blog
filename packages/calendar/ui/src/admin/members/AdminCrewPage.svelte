@@ -15,6 +15,7 @@
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { withAdminRoute } from '@calendar/ui/config'
+	import type { CalendarAdminUser } from '@calendar/ui/api/calendar'
 	import { adminActionHandlers, type AdminInviteAnchorRect } from '../shell/state'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
@@ -23,11 +24,21 @@
 	const authed = $derived(!!data.user)
 	const mockMode = $derived(isAdminMockMode($page.url))
 	const adminMockCatalog = getAdminMockCatalog()
-	type MemberUser = Record<string, unknown>
-	type InviteRow = Record<string, unknown>
-	let mockInvitesState = $state([...adminMockCatalog.crewInvites])
-	const users = $derived((mockMode ? (adminMockCatalog.crewUsers as unknown as MemberUser[]) : (members.users as MemberUser[])))
-	const invites = $derived((mockMode ? (mockInvitesState as unknown as InviteRow[]) : (members.invites as InviteRow[])))
+	type MemberUser = CalendarAdminUser & { role?: string; isSelf?: boolean }
+	type InviteRow = {
+		id: string | number
+		code: string
+		email: string | null
+		created_at: number
+		uses_remaining?: number | null
+		expires_at?: number | null
+		createdAt?: number
+		expires_in_days?: number
+		times_used?: string | number
+	}
+	let mockInvitesState = $state<InviteRow[]>([...adminMockCatalog.crewInvites])
+	const users = $derived.by(() => (mockMode ? (adminMockCatalog.crewUsers as MemberUser[]) : (members.users as MemberUser[])))
+	const invites = $derived.by(() => (mockMode ? mockInvitesState : (members.invites as InviteRow[])))
 	const eventsSource = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
 	const recentEventsSource = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
 
@@ -393,7 +404,7 @@
 
 		let inviteId = createdInviteId
 		if (!inviteId) {
-			const found = (members.invites as InviteRow[]).find((invite) => String(invite['code'] || '') === createdInviteCode)
+			const found = members.invites.find((invite) => String(invite.code || '') === createdInviteCode)
 			inviteId = found ? String(found['id'] || '') : ''
 		}
 		if (inviteId) {

@@ -1,4 +1,4 @@
-const FALLBACK_SITE_ORIGIN = 'https://miko.art'
+import type { SitemapRoute } from '../core/types'
 
 function trimTrailingSlash(value: string) {
 	return value.endsWith('/') ? value.slice(0, -1) : value
@@ -13,7 +13,15 @@ function isLocalOrigin(origin: string) {
 	}
 }
 
-export function resolveSiteOrigin({ baseUrl, requestUrl }: { baseUrl?: string; requestUrl?: URL }) {
+export function resolveSiteOrigin({
+	baseUrl,
+	requestUrl,
+	fallbackOrigin
+}: {
+	baseUrl?: string
+	requestUrl?: URL
+	fallbackOrigin: string
+}) {
 	if (baseUrl) {
 		try {
 			return trimTrailingSlash(new URL(baseUrl).origin)
@@ -26,7 +34,7 @@ export function resolveSiteOrigin({ baseUrl, requestUrl }: { baseUrl?: string; r
 		return trimTrailingSlash(requestUrl.origin)
 	}
 
-	return FALLBACK_SITE_ORIGIN
+	return trimTrailingSlash(fallbackOrigin)
 }
 
 export function getPlatformEnv(platform: unknown): Record<string, string | undefined> | undefined {
@@ -71,4 +79,14 @@ export function toAbsoluteUrl(origin: string, path: string) {
 			? normalizedPath
 			: `${normalizedPath}/`
 	return `${trimTrailingSlash(origin)}${canonicalPath}`
+}
+
+export function buildSitemapXml(origin: string, routes: SitemapRoute[]) {
+	const urlEntries = routes.map((route) => {
+		const loc = escapeXml(toAbsoluteUrl(origin, route.path))
+		const lastMod = escapeXml(formatSitemapLastMod(route.lastModified))
+		return `<url><loc>${loc}</loc><lastmod>${lastMod}</lastmod></url>`
+	}).join('')
+
+	return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urlEntries}</urlset>`
 }

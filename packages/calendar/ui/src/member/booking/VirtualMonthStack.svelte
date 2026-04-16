@@ -172,8 +172,6 @@
 
 		display: grid;
 		gap: 0.75rem;
-		max-width: 720px;
-		margin: 0 auto;
 		width: 100%;
 	}
 

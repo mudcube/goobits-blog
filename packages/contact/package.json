@@ -1,0 +1,38 @@
+{
+  "name": "@goobits/contact",
+  "version": "0.1.0",
+  "description": "Reusable contact form core and server helpers for SvelteKit sites",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "svelte": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./index.ts"
+    },
+    "./core": {
+      "types": "./core.ts",
+      "default": "./core.ts"
+    },
+    "./server": {
+      "types": "./server.ts",
+      "default": "./server.ts"
+    }
+  },
+  "files": [
+    "index.ts",
+    "core.ts",
+    "server.ts",
+    "src",
+    "tsconfig.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@sveltejs/kit": "^2.0.0",
+    "svelte": "^5.0.0",
+    "typescript": "^5.0.0",
+    "zod": "^4.0.0"
+  }
+}

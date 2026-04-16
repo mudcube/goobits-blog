@@ -51,7 +51,7 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.45rem;
-		border-radius: 999px;
+		border-radius: 0.625rem;
 		border: 1px solid transparent;
 		font: inherit;
 		font-weight: 600;
@@ -59,11 +59,11 @@
 		cursor: pointer;
 		line-height: 1;
 		transition:
-			background 150ms ease,
-			border-color 150ms ease,
-			color 150ms ease,
-			box-shadow 150ms ease,
-			opacity 150ms ease;
+			background 140ms ease,
+			border-color 140ms ease,
+			color 140ms ease,
+			box-shadow 140ms ease,
+			transform 140ms ease;
 	}
 
 	.calendar-btn:focus-visible {
@@ -82,31 +82,35 @@
 	.calendar-btn--full { width: 100%; }
 
 	.calendar-btn--primary {
-		background: color-mix(in srgb, var(--calendar-shell-text) 92%, black 8%);
-		color: var(--calendar-shell-bg);
+		background: var(--gradient-action);
+		color: #fff;
+		box-shadow: 0 2px 12px color-mix(in srgb, #7a5af8 22%, transparent);
 	}
 	.calendar-btn--primary:hover:not(:disabled) {
-		background: var(--calendar-shell-text);
+		box-shadow: 0 4px 18px color-mix(in srgb, #7a5af8 32%, transparent);
+		transform: translateY(-1px);
 	}
 
 	.calendar-btn--secondary {
-		background: color-mix(in srgb, var(--calendar-shell-bg) 80%, white 20%);
+		background: color-mix(in srgb, var(--calendar-shell-text) 8%, transparent);
 		border-color: color-mix(in srgb, var(--calendar-shell-text) 22%, transparent);
 		color: var(--calendar-shell-text);
 	}
 	.calendar-btn--secondary:hover:not(:disabled) {
-		background: color-mix(in srgb, var(--calendar-shell-bg) 68%, white 32%);
+		background: color-mix(in srgb, var(--calendar-shell-text) 14%, transparent);
 		border-color: color-mix(in srgb, var(--calendar-shell-text) 32%, transparent);
+		transform: translateY(-1px);
 	}
 
 	.calendar-btn--ghost {
 		background: transparent;
-		border-color: color-mix(in srgb, var(--calendar-shell-text) 25%, transparent);
-		color: var(--calendar-shell-text);
+		border-color: color-mix(in srgb, var(--calendar-shell-text) 22%, transparent);
+		color: color-mix(in srgb, var(--calendar-shell-text) 82%, transparent);
 	}
 	.calendar-btn--ghost:hover:not(:disabled) {
 		background: color-mix(in srgb, var(--calendar-shell-text) 8%, transparent);
-		border-color: color-mix(in srgb, var(--calendar-shell-text) 35%, transparent);
+		border-color: color-mix(in srgb, var(--calendar-shell-text) 32%, transparent);
+		color: var(--calendar-shell-text);
 	}
 
 	.calendar-btn--danger {
@@ -115,5 +119,6 @@
 	}
 	.calendar-btn--danger:hover:not(:disabled) {
 		background: color-mix(in srgb, #b91c1c 90%, black 10%);
+		transform: translateY(-1px);
 	}
 </style>

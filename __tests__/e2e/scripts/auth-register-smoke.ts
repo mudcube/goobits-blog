@@ -32,7 +32,7 @@ export async function runAuthRegisterSmoke() {
 		}
 
 		// Verify invalid token path redirects to login with invalid marker.
-		await page.goto(`${BASE_URL}/verify-email?token=invalid&email=test@example.com`, {
+		await page.goto(`${BASE_URL}/verify-email?token=invalid`, {
 			waitUntil: 'domcontentloaded',
 			timeout: 30000
 		})

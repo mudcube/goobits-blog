@@ -61,6 +61,11 @@ function createUserAdapter(db: D1DatabaseLike) {
 	})
 }
 
+async function rollbackRegistration(db: D1DatabaseLike, userId: string) {
+	await db.prepare('DELETE FROM calendar_email_verifications WHERE user_id = ?').bind(userId).run()
+	await db.prepare('DELETE FROM calendar_users WHERE id = ?').bind(userId).run()
+}
+
 export async function registerUser(db: D1DatabaseLike, input: RegisterUserInput): Promise<RegisterUserResult> {
 	const email = normalizeEmail(input.email)
 	const name = input.name.trim()
@@ -96,13 +101,18 @@ export async function registerUser(db: D1DatabaseLike, input: RegisterUserInput)
 		return { ok: false, error: 'We could not complete that request. Please try again later.' }
 	}
 
-	await issueEmailVerification({
+	const verification = await issueEmailVerification({
 		db,
 		userId,
 		email,
 		baseUrl: input.baseUrl,
 		env: input.env
 	})
+
+	if (!verification.sent && input.env['NODE_ENV'] !== 'development') {
+		await rollbackRegistration(db, userId)
+		return { ok: false, error: 'We could not send the verification email. Please try again later.' }
+	}
 
 	return { ok: true }
 }

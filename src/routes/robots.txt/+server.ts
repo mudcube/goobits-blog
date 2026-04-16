@@ -1,11 +1,11 @@
 import type { RequestHandler } from './$types'
-import { getBaseUrl, getPlatformEnv, resolveSiteOrigin } from '$lib/app/seo/server'
+import { getBaseUrl, getPlatformEnv, resolveSiteOrigin } from '@goobits/sitemap/server'
 
 export const prerender = true
 
 export const GET: RequestHandler = ({ platform, url }) => {
 	const baseUrl = getBaseUrl(getPlatformEnv(platform))
-	const origin = resolveSiteOrigin(baseUrl ? { baseUrl, requestUrl: url } : { requestUrl: url })
+	const origin = resolveSiteOrigin(baseUrl ? { baseUrl, requestUrl: url, fallbackOrigin: 'https://miko.art' } : { requestUrl: url, fallbackOrigin: 'https://miko.art' })
 
 	// Generative Engine Optimization: explicitly allow AI crawlers so the
 	// journal and apps surfaces are discoverable by ChatGPT, Claude,

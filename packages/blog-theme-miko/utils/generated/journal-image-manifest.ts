@@ -112,15 +112,15 @@ export const journalImageManifest = {
 		"fallbackSrc": "/journal/2011/08/webgl-music-box/images/generated/hero-640.webp"
 	},
 	"/journal/2011/10/background-generator/images/hero.jpeg": {
-		"width": 1,
-		"height": 1,
+		"width": 750,
+		"height": 468,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/10/background-generator/images/generated/hero-1.webp 1w",
-			"defaultSrc": "/journal/2011/10/background-generator/images/generated/hero-1.webp"
+			"srcset": "/journal/2011/10/background-generator/images/generated/hero-640.webp 640w",
+			"defaultSrc": "/journal/2011/10/background-generator/images/generated/hero-640.webp"
 		},
-		"fallbackSrc": "/journal/2011/10/background-generator/images/generated/hero-1.webp"
+		"fallbackSrc": "/journal/2011/10/background-generator/images/generated/hero-640.webp"
 	},
 	"/journal/2011/10/color-accessibility-on-digital-displays/images/hero.png": {
 		"width": 750,
@@ -145,15 +145,15 @@ export const journalImageManifest = {
 		"fallbackSrc": "/journal/2011/10/colrd-gradient-creator/images/generated/hero-640.webp"
 	},
 	"/journal/2011/10/portlandia-foods-uploader/images/hero.jpeg": {
-		"width": 1,
-		"height": 1,
+		"width": 750,
+		"height": 548,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-1.webp 1w",
-			"defaultSrc": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-1.webp"
+			"srcset": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-640.webp 640w",
+			"defaultSrc": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-640.webp"
 		},
-		"fallbackSrc": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-1.webp"
+		"fallbackSrc": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-640.webp"
 	},
 	"/journal/2011/11/base64-soundfonts/images/hero.webp": {
 		"width": 1344,

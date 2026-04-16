@@ -10,7 +10,7 @@ export async function load(event: RequestEvent) {
 
 	if (mockMode) {
 		const activity = scheduleMockPrograms.find((program) => program.slug === slug)
-		if (!activity) error(404, 'Program not found')
+		if (!activity) throw error(404, 'Program not found')
 
 		return {
 			activity,
@@ -22,7 +22,7 @@ export async function load(event: RequestEvent) {
 
 	const env = await buildEnv(event.platform)
 	const activity = await getCalendarProgramBySlug(env.DB, slug)
-	if (!activity) error(404, 'Program not found')
+	if (!activity) throw error(404, 'Program not found')
 
 	const rawUserId = event.locals.user?.id
 	const userId =

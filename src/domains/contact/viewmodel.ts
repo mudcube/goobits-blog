@@ -1,4 +1,4 @@
-import type { ContactFormData } from './schema'
+import type { ContactFormData } from '@goobits/contact/core'
 
 export function getContactContextLabel(data: Pick<ContactFormData, 'from' | 'topic'>) {
 	const parts = [data.from, data.topic].filter(Boolean)

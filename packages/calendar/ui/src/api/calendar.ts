@@ -16,14 +16,34 @@ const CalendarMutationOkSchema = z.object({
 	ok: z.literal(true)
 })
 
+const CalendarAdminInviteSchema = z.object({
+	id: z.union([z.number(), z.string()]),
+	code: z.string(),
+	email: z.union([z.string(), z.null()]),
+	uses_remaining: z.union([z.number(), z.null()]),
+	expires_at: z.union([z.number(), z.null()]),
+	created_at: z.number(),
+	times_used: z.union([z.number(), z.string()]).optional()
+})
+
 const CalendarInvitesResponseSchema = z.object({
 	ok: z.literal(true),
-	invites: z.array(z.unknown())
+	invites: z.array(CalendarAdminInviteSchema)
+})
+
+const CalendarAdminUserSchema = z.object({
+	id: z.union([z.number(), z.string()]),
+	email: z.string(),
+	name: z.union([z.string(), z.null()]),
+	avatar_url: z.union([z.string(), z.null()]),
+	email_verified: z.union([z.number(), z.boolean()]),
+	last_login_at: z.union([z.number(), z.null()]),
+	provider: z.union([z.string(), z.null()])
 })
 
 const CalendarUsersResponseSchema = z.object({
 	ok: z.literal(true),
-	users: z.array(z.unknown())
+	users: z.array(CalendarAdminUserSchema)
 })
 
 const CalendarUserAccessResponseSchema = z.object({
@@ -181,7 +201,9 @@ const CalendarProfileResponseSchema = z.object({
 
 export type CalendarOAuthStartResponse = z.infer<typeof CalendarOAuthStartResponseSchema>
 export type CalendarMutationOk = z.infer<typeof CalendarMutationOkSchema>
+export type CalendarAdminInvite = z.infer<typeof CalendarAdminInviteSchema>
 export type CalendarInvitesResponse = z.infer<typeof CalendarInvitesResponseSchema>
+export type CalendarAdminUser = z.infer<typeof CalendarAdminUserSchema>
 export type CalendarUsersResponse = z.infer<typeof CalendarUsersResponseSchema>
 export type CalendarEventsResponse = z.infer<typeof CalendarEventsResponseSchema>
 export type CalendarJoinResponse = z.infer<typeof CalendarJoinResponseSchema>

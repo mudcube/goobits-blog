@@ -162,6 +162,7 @@
 
 // Sections
 .calendar-page__section {
+	width: 100%;
 	max-width: var(--calendar-size-900);
 	margin: 0 auto;
 	padding: 0 var(--calendar-size-24) var(--calendar-size-64);

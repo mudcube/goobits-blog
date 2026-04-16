@@ -66,43 +66,50 @@ export async function issueEmailVerification({
 		 VALUES (?, ?, ?, ?, ?)`
 	).bind(userId, email.toLowerCase(), tokenHash, expiresAt, createdAt).run()
 
-	const verificationUrl = `${baseUrl}/verify-email?token=${encodeURIComponent(rawToken)}&email=${encodeURIComponent(email)}`
+	const verificationUrl = `${baseUrl}/verify-email?token=${encodeURIComponent(rawToken)}`
 	const webhook = env['EMAIL_VERIFICATION_WEBHOOK_URL'] || ''
+	const isDevelopment = env['NODE_ENV'] === 'development'
 
 	if (!webhook) {
-		console.info('[register] email verification token issued (no webhook configured)', {
-			email,
-			verificationUrl
-		})
-		return { sent: false, verificationUrl }
+		if (isDevelopment) {
+			console.info('[register] email verification token issued (no webhook configured)', {
+				email
+			})
+		}
+		return { sent: false as const, reason: 'not_configured' as const }
 	}
 
-	const response = await fetch(webhook, {
-		method: 'POST',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify({
-			event: 'email-verification',
-			email,
-			verificationUrl,
-			sentAt: new Date().toISOString()
+	try {
+		const response = await fetch(webhook, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({
+				event: 'email-verification',
+				email,
+				verificationUrl,
+				sentAt: new Date().toISOString()
+			})
 		})
-	})
 
-	if (!response.ok) {
-		console.warn('[register] verification webhook failed', { status: response.status })
-		return { sent: false, verificationUrl }
+		if (!response.ok) {
+			console.warn('[register] verification webhook failed', { status: response.status })
+			return { sent: false as const, reason: 'delivery_failed' as const }
+		}
+	} catch (error) {
+		console.warn('[register] verification webhook request failed', {
+			error: error instanceof Error ? error.message : String(error)
+		})
+		return { sent: false as const, reason: 'delivery_failed' as const }
 	}
 
-	return { sent: true, verificationUrl }
+	return { sent: true as const }
 }
 
 export async function consumeEmailVerificationToken({
 	db,
-	email,
 	token
 }: {
 	db: D1DatabaseLike
-	email: string
 	token: string
 }) {
 	await ensureVerificationTable(db)
@@ -112,9 +119,9 @@ export async function consumeEmailVerificationToken({
 	const row = await db.prepare(
 		`SELECT id, user_id as userId, expires_at as expiresAt, consumed_at as consumedAt
 		 FROM calendar_email_verifications
-		 WHERE token_hash = ? AND email = ?
+		 WHERE token_hash = ?
 		 LIMIT 1`
-	).bind(tokenHash, email.toLowerCase()).first<{ id: number; userId: string; expiresAt: number; consumedAt: number | null }>()
+	).bind(tokenHash).first<{ id: number; userId: string; expiresAt: number; consumedAt: number | null }>()
 
 	if (!row) return { ok: false as const, reason: 'invalid' as const }
 	if (row.consumedAt) return { ok: false as const, reason: 'already_used' as const }

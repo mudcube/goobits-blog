@@ -1,11 +1,5 @@
 import { json } from '@sveltejs/kit'
 
-export function getContactRedirectUrl(requestUrl: string, error?: string) {
-	const url = new URL('/contact/', requestUrl)
-	if (error) url.searchParams.set('error', error)
-	return url
-}
-
 export function redirectForContactForm(location: URL | string) {
 	return new Response(null, {
 		status: 303,
@@ -15,7 +9,10 @@ export function redirectForContactForm(location: URL | string) {
 	})
 }
 
-export async function parseContactRequest(request: Request) {
+export async function parseContactRequest(
+	request: Request,
+	options: { invalidBodyRedirectPath: string }
+) {
 	const contentType = request.headers.get('content-type') || ''
 	const expectsJson = contentType.includes('application/json')
 
@@ -33,23 +30,41 @@ export async function parseContactRequest(request: Request) {
 			expectsJson,
 			errorResponse: expectsJson
 				? json({ ok: false, error: 'Invalid request body.' }, { status: 400 })
-				: redirectForContactForm(getContactRedirectUrl(request.url, 'Invalid request body.'))
+				: redirectForContactForm(
+					new URL(
+						`${options.invalidBodyRedirectPath}?error=${encodeURIComponent('Invalid request body.')}`,
+						request.url
+					)
+				)
 		}
 	}
 }
 
-export function createContactFailureResponse(requestUrl: string, expectsJson: boolean, error: string, status: number) {
+export function createContactFailureResponse(
+	requestUrl: string,
+	expectsJson: boolean,
+	error: string,
+	status: number,
+	options: { errorRedirectPath: string }
+) {
 	if (expectsJson) {
 		return json({ ok: false, error }, { status })
 	}
 
-	return redirectForContactForm(getContactRedirectUrl(requestUrl, error))
+	return redirectForContactForm(
+		new URL(`${options.errorRedirectPath}?error=${encodeURIComponent(error)}`, requestUrl)
+	)
 }
 
-export function createContactSuccessResponse(requestUrl: string, expectsJson: boolean, status: number) {
+export function createContactSuccessResponse(
+	requestUrl: string,
+	expectsJson: boolean,
+	status: number,
+	options: { successRedirectPath: string }
+) {
 	if (expectsJson) {
 		return json({ ok: true }, { status: status === 202 ? 202 : 200 })
 	}
 
-	return redirectForContactForm(new URL('/contact/thank-you/', requestUrl))
+	return redirectForContactForm(new URL(options.successRedirectPath, requestUrl))
 }

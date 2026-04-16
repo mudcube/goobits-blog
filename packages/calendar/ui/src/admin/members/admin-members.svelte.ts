@@ -7,14 +7,15 @@ import {
 	loadMembersData
 } from '../dashboard/admin-dashboard'
 import { getCalendarAdminUserAccess, saveCalendarAdminUserAccess } from '../../api/calendar'
+import type { CalendarAdminInvite, CalendarAdminUser } from '../../api/calendar'
 
 export function createAdminMembersController(
 	options: { onUnauthorized?: (error: unknown) => boolean } = {}
 ) {
 	const { onUnauthorized } = options
 
-	let invites = $state<unknown[]>([])
-	let users = $state<unknown[]>([])
+	let invites = $state<CalendarAdminInvite[]>([])
+	let users = $state<CalendarAdminUser[]>([])
 	let loading = $state(false)
 	let error = $state('')
 	let inviteEmail = $state('')

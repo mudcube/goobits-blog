@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 
 const ROOT = process.cwd()
 const JOURNAL_DIR = path.join(ROOT, 'static', 'journal')
@@ -28,6 +28,31 @@ async function walk(dir) {
 
 function toPosix(value) {
 	return value.replaceAll(path.sep, '/')
+}
+
+function hasCommand(command, args = ['--version']) {
+	const result = spawnSync(command, args, { stdio: 'ignore' })
+	return !result.error && result.status === 0
+}
+
+async function canGenerateVariants() {
+	const missing = []
+	if (!hasCommand('file')) missing.push('file')
+	if (!hasCommand('ffmpeg')) missing.push('ffmpeg')
+
+	if (missing.length === 0) return true
+
+	const hasManifest = await fs.access(MANIFEST_PATH).then(() => true).catch(() => false)
+	if (hasManifest) {
+		console.warn(
+			`[journal-images] Skipping generation; missing required tool${missing.length === 1 ? '' : 's'}: ${missing.join(', ')}. Using checked-in generated assets.`
+		)
+		return false
+	}
+
+	throw new Error(
+		`[journal-images] Missing required tool${missing.length === 1 ? '' : 's'}: ${missing.join(', ')} and no generated manifest is available.`
+	)
 }
 
 function getImageDimensions(filePath) {
@@ -95,6 +120,8 @@ async function emptyGeneratedDirs(heroSources) {
 }
 
 async function run() {
+	if (!(await canGenerateVariants())) return
+
 	const files = await walk(JOURNAL_DIR)
 	const heroSources = files
 		.filter((file) => /\/images\/hero\.(png|jpe?g|webp)$/i.test(toPosix(file)))

@@ -53,9 +53,7 @@
 
 <style lang="scss">
 	.program-editor {
-		--bg: var(--bg);
 		--surface: color-mix(in srgb, var(--panel-bg) 88%, var(--text) 12%);
-		--text: var(--text);
 		--admin-accent: color-mix(in srgb, var(--link) 72%, #7a5af8 28%);
 		--admin-calendar-border-uniform: color-mix(in srgb, var(--text) 14%, transparent);
 		--admin-calendar-arrow-fg: color-mix(in srgb, var(--text) 60%, transparent);
@@ -82,13 +80,7 @@
 		padding: 1.1rem 1rem 1.65rem;
 		display: flex;
 		flex-direction: column;
-		align-items: stretch;
-		background:
-			linear-gradient(
-				180deg,
-				color-mix(in srgb, #efe7ff 78%, var(--bg) 22%) 0%,
-				color-mix(in srgb, #f8f4ff 86%, var(--bg) 14%) 100%
-			);
+		align-items: center;
 	}
 
 	.program-editor__hero {
@@ -218,7 +210,9 @@
 
 	.program-editor :global(.calendar-page__section.calendar-home__section) {
 		margin: 0;
-		padding: 0;
+		padding: 0 var(--calendar-size-24);
+		width: 100%;
+		max-width: var(--calendar-size-900);
 	}
 
 	.program-editor :global(.calendar-home__feed-head) {

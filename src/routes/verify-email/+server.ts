@@ -10,12 +10,11 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 	if (!db) throw redirect(303, `${calendarLoginPath}?verified=unavailable`)
 
 	const token = (url.searchParams.get('token') || '').trim()
-	const email = (url.searchParams.get('email') || '').trim().toLowerCase()
-	if (!token || !email) {
+	if (!token) {
 		throw redirect(303, `${calendarLoginPath}?verified=invalid`)
 	}
 
-	const result = await consumeEmailVerificationToken({ db, token, email })
+	const result = await consumeEmailVerificationToken({ db, token })
 	if (!result.ok) {
 		throw redirect(303, `${calendarLoginPath}?verified=${result.reason}`)
 	}

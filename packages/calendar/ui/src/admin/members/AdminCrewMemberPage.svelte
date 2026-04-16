@@ -8,6 +8,7 @@
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { withAdminRoute } from '@calendar/ui/config'
+	import type { CalendarAdminUser } from '@calendar/ui/api/calendar'
 
 	const { data } = $props<{ data: { user: unknown | null; userId: string } }>()
 
@@ -17,7 +18,8 @@
 	const userId = $derived(data.userId)
 	const mockMode = $derived(isAdminMockMode($page.url))
 	const adminMockCatalog = getAdminMockCatalog()
-	const users = $derived((mockMode ? adminMockCatalog.crewUsers : (members.users as Array<Record<string, unknown>>)))
+	type CrewMember = CalendarAdminUser & { role?: string; isSelf?: boolean; created_at?: number }
+	const users = $derived.by(() => (mockMode ? (adminMockCatalog.crewUsers as CrewMember[]) : (members.users as CrewMember[])))
 	const upcomingEvents = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
 	const recentEvents = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
 
@@ -40,7 +42,7 @@
 			.join(' ')
 	}
 
-	function displayName(user: Record<string, unknown>) {
+	function displayName(user: CrewMember) {
 		const byName = normalizeName(user['name'])
 		if (byName) return byName
 		const byEmail = normalizeName(user['email'])
@@ -69,7 +71,7 @@
 		})
 	}
 
-	const member = $derived.by(() => users.find((u) => String(u['id'] || '') === userId) || null)
+	const member = $derived.by(() => (users.find((u) => String(u['id'] || '') === userId) || null) as CrewMember | null)
 	const memberName = $derived(member ? displayName(member) : 'Member')
 	const memberEmail = $derived(member ? normalizeName(member.email) : '')
 	const memberRole = $derived(member ? normalizeName(member.role) : '')

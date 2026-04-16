@@ -8,7 +8,7 @@
 	import { seedAntiAbuseFields } from '$lib/forms/antiabuse'
 	import TurnstileScript from '$lib/forms/TurnstileScript.svelte'
 	import VerificationField from '$lib/forms/VerificationField.svelte'
-	import { contactSchema, type ContactFormData } from './schema'
+	import { contactSchema, type ContactFormData } from '@goobits/contact/core'
 	import { getContactMessagePlaceholder } from './viewmodel'
 	import type { SuperValidated } from 'sveltekit-superforms'
 

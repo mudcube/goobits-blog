@@ -25,7 +25,7 @@
 		getFilteredSitemapGroups,
 		getRouteTags,
 		getSitemapAvailableTags
-	} from '@src/domains/sitemap/viewmodel'
+	} from '@goobits/sitemap/core'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 
 	const { data } = $props()

@@ -66,9 +66,12 @@
 		position: sticky;
 		top: 0;
 		z-index: 10;
-		backdrop-filter: blur(12px) saturate(110%);
-		background: color-mix(in srgb, var(--calendar-shell-bg) 88%, transparent);
-		border-bottom: 1px solid color-mix(in srgb, var(--calendar-shell-text) 12%, transparent);
+		backdrop-filter: blur(14px) saturate(120%);
+		background:
+			radial-gradient(circle at 78% 0.5rem, rgba(172, 138, 255, 0.12) 0%, rgba(172, 138, 255, 0) 20rem),
+			radial-gradient(circle at 16% -1rem, rgba(76, 215, 246, 0.07) 0%, rgba(76, 215, 246, 0) 16rem),
+			linear-gradient(180deg, rgba(6, 14, 32, 0.92) 0%, rgba(6, 14, 32, 0.82) 100%);
+		border-bottom: 1px solid color-mix(in srgb, var(--calendar-shell-text) 10%, transparent);
 	}
 	.calendar-shell-nav__inner {
 		display: flex;

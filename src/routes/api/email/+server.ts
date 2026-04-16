@@ -3,12 +3,17 @@ import {
 	createContactFailureResponse,
 	createContactSuccessResponse,
 	parseContactRequest
-} from '$lib/server/contact/api'
+} from '@goobits/contact/server'
 import { submitContactData } from '$lib/server/contact/submit'
-import { contactSchema } from '@src/domains/contact/schema'
+import { contactSchema } from '@goobits/contact/core'
+
+const CONTACT_FORM_PATH = '/contact/'
+const CONTACT_THANK_YOU_PATH = '/contact/thank-you/'
 
 export const POST: RequestHandler = async ({ request, platform, getClientAddress }) => {
-	const { expectsJson, payload, errorResponse } = await parseContactRequest(request)
+	const { expectsJson, payload, errorResponse } = await parseContactRequest(request, {
+		invalidBodyRedirectPath: CONTACT_FORM_PATH
+	})
 	if (errorResponse) {
 		return errorResponse
 	}
@@ -19,14 +24,19 @@ export const POST: RequestHandler = async ({ request, platform, getClientAddress
 			request.url,
 			expectsJson,
 			'Please provide a valid name, email, and message.',
-			400
+			400,
+			{ errorRedirectPath: CONTACT_FORM_PATH }
 		)
 	}
 
 	const result = await submitContactData({ request, platform, getClientAddress }, parsed.data)
 	if (!result.ok) {
-		return createContactFailureResponse(request.url, expectsJson, result.error, result.status)
+		return createContactFailureResponse(request.url, expectsJson, result.error, result.status, {
+			errorRedirectPath: CONTACT_FORM_PATH
+		})
 	}
 
-	return createContactSuccessResponse(request.url, expectsJson, result.status)
+	return createContactSuccessResponse(request.url, expectsJson, result.status, {
+		successRedirectPath: CONTACT_THANK_YOU_PATH
+	})
 }

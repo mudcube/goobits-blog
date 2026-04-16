@@ -4,8 +4,7 @@ import { zod4 as zod } from 'sveltekit-superforms/adapters'
 import { mergeRuntimeEnv } from '$lib/server/calendar/runtime'
 import { getTurnstileSiteKey } from '$lib/server/antiabuse/turnstile-site-key'
 import { submitContactData } from '$lib/server/contact/submit'
-import { contactSchema, type ContactFormData } from './schema'
-import { getContactFormDefaults } from './defaults'
+import { contactSchema, getContactFormDefaults, type ContactFormData } from '@goobits/contact/core'
 
 export const prerender = false
 
@@ -40,7 +39,7 @@ export const actions: Actions = {
 
 		const result = await submitContactData(event, form.data as ContactFormData)
 		if (!result.ok) {
-			return setError(form, '', result.error, { status: result.status })
+			return setError(form, '', result.error, { status: result.status as 400 | 502 | 503 })
 		}
 
 		throw redirect(303, '/contact/thank-you/')
