@@ -4,12 +4,29 @@ import { sequence } from '@sveltejs/kit/hooks'
 import { createCalendarAuthHandles } from '@calendar/app'
 import { getCalendarConfig } from '@calendar/core'
 import { applyMikoCalendarPreset } from '@calendar/preset-miko'
+import { configureAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 import { getActiveReleaseStage, isRouteReleased } from '$lib/app/release'
 import { isLocalPreviewHost as isAllowedLocalPreviewHost } from '$lib/app/is-local-preview-host'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import { dev } from '$app/environment'
 import type { Handle } from '@sveltejs/kit'
+import {
+	mockCrewInvites,
+	mockCrewUsers,
+	mockDashboardEvents,
+	mockDashboardRecentEvents,
+	mockPaymentDefaults,
+	mockPrograms
+} from '$lib/app/schedule/admin/mock-data'
 applyMikoCalendarPreset()
+configureAdminMockCatalog({
+	dashboardEvents: mockDashboardEvents,
+	dashboardRecentEvents: mockDashboardRecentEvents,
+	programs: mockPrograms,
+	crewUsers: mockCrewUsers,
+	crewInvites: mockCrewInvites,
+	paymentDefaults: mockPaymentDefaults
+})
 ensureJournalBlogConfig()
 const calendarConfig = getCalendarConfig()
 const forcedThemePreferences = {

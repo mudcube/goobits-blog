@@ -8,8 +8,8 @@
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
+	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
-	import { mockDashboardEvents, mockDashboardRecentEvents } from '@calendar/ui/admin/mock/admin-mock-data'
 	import { adminActionHandlers, adminEventDetailBreadcrumb } from '../shell/state'
 
 	const { data } = $props<{ data: { user: unknown | null; eventId: string } }>()
@@ -18,6 +18,7 @@
 	const authed = $derived(!!data.user)
 	const eventId = $derived(Number(data.eventId))
 	const mockMode = $derived(isAdminMockMode($page.url))
+	const adminMockCatalog = getAdminMockCatalog()
 
 	function hrefWithMock(path: string) {
 		return withAdminMock(path, mockMode)
@@ -30,7 +31,8 @@
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
 	const mockEvent = $derived.by(() => {
 		if (!mockMode || !Number.isFinite(eventId) || eventId <= 0) return null
-		return [...mockDashboardEvents, ...mockDashboardRecentEvents].find((event) => event.id === eventId) || null
+		return [...adminMockCatalog.dashboardEvents, ...adminMockCatalog.dashboardRecentEvents]
+			.find((event) => event.id === eventId) || null
 	})
 	const detail = $derived.by(() => {
 		if (mockMode) {

@@ -3,7 +3,7 @@
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import AdminWysiwygWorkspace from './AdminWysiwygWorkspace.svelte'
 	import { getActivityColor, getActivityEmoji } from '../../../shared'
-	import { mockPrograms } from '../../mock/admin-mock-data'
+	import { getAdminMockCatalog } from '../../mock/catalog'
 
 	type DashboardController = ReturnType<typeof createAdminDashboardController>
 
@@ -18,9 +18,10 @@
 		mockMode: boolean
 		hrefWithMock: (path: string) => string
 	}>()
+	const adminMockCatalog = getAdminMockCatalog()
 
 	const programsSource = $derived(
-		mockMode ? mockPrograms.filter((program) => program.enabled) : dashboard.enabledPrograms
+		mockMode ? adminMockCatalog.programs.filter((program) => program.enabled) : dashboard.enabledPrograms
 	)
 
 	let selectedActivitySlug = $state('')

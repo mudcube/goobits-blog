@@ -6,13 +6,14 @@ import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/adm
 import { AdminEventDetailSheet, AdminLoginCard } from '@calendar/ui'
 import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 import AdminDashboardContent from '@calendar/ui/admin/dashboard/AdminDashboardContent.svelte'
-import { mockDashboardEvents, mockDashboardRecentEvents } from '@calendar/ui/admin/mock/admin-mock-data'
+import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 
 	const { data, form } = $props<{ data: { user: unknown | null }; form: unknown }>()
 const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 const authed = $derived(!!data.user)
 const isMobile = $derived(typeof window !== 'undefined' && window.matchMedia('(max-width: 820px)').matches)
 const mockMode = $derived($page.url.searchParams.get('mock') === '1')
+const adminMockCatalog = getAdminMockCatalog()
 
 	let openedDetailId = $state<number | null>(null)
 
@@ -63,8 +64,8 @@ const mockMode = $derived($page.url.searchParams.get('mock') === '1')
 				<p class="social-home__loading">Loading dashboard…</p>
 			{:else}
 				<AdminDashboardContent
-					events={mockMode ? mockDashboardEvents : dashboard.events}
-					recentEvents={mockMode ? mockDashboardRecentEvents : dashboard.recentEvents}
+					events={mockMode ? adminMockCatalog.dashboardEvents : dashboard.events}
+					recentEvents={mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents}
 					{mockMode}
 					onOpenEvent={openEventDetail}
 				/>

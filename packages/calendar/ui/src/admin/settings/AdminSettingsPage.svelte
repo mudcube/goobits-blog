@@ -11,7 +11,7 @@
     type AdminCalendarWeekStart,
   } from "@calendar/ui/admin/shared/calendar-preferences";
   import { isAdminMockMode } from "@calendar/ui/admin/mock/mock-mode";
-  import { mockPaymentDefaults } from "@calendar/ui/admin/mock/admin-mock-data";
+  import { getAdminMockCatalog } from "@calendar/ui/admin/mock/catalog";
 
   const { data } = $props<{ data: { user: unknown | null } }>();
   const dashboard = createAdminDashboardController({
@@ -19,6 +19,7 @@
   });
   const authed = $derived(!!data.user);
   const mockMode = $derived(isAdminMockMode($page.url));
+  const adminMockCatalog = getAdminMockCatalog();
 
   let toastMessage = $state("");
   let toastIsError = $state(false);
@@ -141,8 +142,8 @@
     if (!authed) return;
     if (mockMode) {
       const next = hydratePaymentMethods(
-        mockPaymentDefaults.provider,
-        mockPaymentDefaults.handle,
+        adminMockCatalog.paymentDefaults.provider,
+        adminMockCatalog.paymentDefaults.handle,
       );
       paymentMethods = next;
       initialPaymentMethods = {

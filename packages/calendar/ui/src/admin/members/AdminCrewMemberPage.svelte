@@ -6,7 +6,7 @@
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import { ChevronRowCard } from '@calendar/ui/shared'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
-	import { mockCrewUsers, mockDashboardEvents, mockDashboardRecentEvents } from '@calendar/ui/admin/mock/admin-mock-data'
+	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 
 	const { data } = $props<{ data: { user: unknown | null; userId: string } }>()
 
@@ -15,9 +15,10 @@
 	const authed = $derived(!!data.user)
 	const userId = $derived(data.userId)
 	const mockMode = $derived(isAdminMockMode($page.url))
-	const users = $derived((mockMode ? mockCrewUsers : (members.users as Array<Record<string, unknown>>)))
-	const upcomingEvents = $derived((mockMode ? mockDashboardEvents : dashboard.events))
-	const recentEvents = $derived((mockMode ? mockDashboardRecentEvents : dashboard.recentEvents))
+	const adminMockCatalog = getAdminMockCatalog()
+	const users = $derived((mockMode ? adminMockCatalog.crewUsers : (members.users as Array<Record<string, unknown>>)))
+	const upcomingEvents = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
+	const recentEvents = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
 
 	function hrefWithMock(path: string) {
 		return withAdminMock(path, mockMode)

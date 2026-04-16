@@ -9,15 +9,16 @@
 	import { getActivityEmoji } from '@calendar/ui/shared'
 	import { formatEventDayLabel } from '@calendar/ui/shared'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
-	import { mockDashboardEvents, mockDashboardRecentEvents, mockPrograms } from '@calendar/ui/admin/mock/admin-mock-data'
+	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	const authed = $derived(!!data.user)
 	const mockMode = $derived(isAdminMockMode($page.url))
-	const programsSource = $derived((mockMode ? mockPrograms : dashboard.programs))
-	const eventsSource = $derived((mockMode ? mockDashboardEvents : dashboard.events))
-	const recentEventsSource = $derived((mockMode ? mockDashboardRecentEvents : dashboard.recentEvents))
+	const adminMockCatalog = getAdminMockCatalog()
+	const programsSource = $derived((mockMode ? adminMockCatalog.programs : dashboard.programs))
+	const eventsSource = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
+	const recentEventsSource = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
 
 	function hrefWithMock(path: string) {
 		return withAdminMock(path, mockMode)

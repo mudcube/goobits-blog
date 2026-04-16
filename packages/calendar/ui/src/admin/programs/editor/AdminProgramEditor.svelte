@@ -6,7 +6,7 @@
 	import AdminCalendarWidget from '../../dashboard/AdminCalendarWidget.svelte'
 	import ProgramDayPopover from './ProgramDayPopover.svelte'
 	import ProgramSettingsDrawer from './ProgramSettingsDrawer.svelte'
-	import { mockDashboardEvents, mockPrograms } from '../../mock/admin-mock-data'
+	import { getAdminMockCatalog } from '../../mock/catalog'
 	import { createHistory } from '../../history/create-history'
 	import { adminActionHandlers } from '../../shell/state'
 
@@ -66,8 +66,9 @@
 	let popCap = $state(8)
 
 	let activeDays = $state<Record<string, ActiveDay>>({})
-	const eventsSource = $derived(mockMode ? mockDashboardEvents : dashboard.events)
-	const programsSource = $derived(mockMode ? mockPrograms : dashboard.programs)
+	const adminMockCatalog = getAdminMockCatalog()
+	const eventsSource = $derived(mockMode ? adminMockCatalog.dashboardEvents : dashboard.events)
+	const programsSource = $derived(mockMode ? adminMockCatalog.programs : dashboard.programs)
 	const editorHistory = createHistory<ProgramEditorSnapshot>({
 		maxEntries: 100,
 		coalesceMs: 700

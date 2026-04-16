@@ -12,27 +12,23 @@
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import AdminCrewInviteModal from '@calendar/ui/admin/members/AdminCrewInviteModal.svelte'
 	import { getActivityEmoji } from '@calendar/ui/shared'
+	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { adminActionHandlers, type AdminInviteAnchorRect } from '../shell/state'
-	import {
-		mockCrewInvites,
-		mockCrewUsers,
-		mockDashboardEvents,
-		mockDashboardRecentEvents
-	} from '@calendar/ui/admin/mock/admin-mock-data'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const members = createAdminMembersController({ onUnauthorized: handleUnauthorizedSessionError })
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	const authed = $derived(!!data.user)
 	const mockMode = $derived(isAdminMockMode($page.url))
+	const adminMockCatalog = getAdminMockCatalog()
 	type MemberUser = Record<string, unknown>
 	type InviteRow = Record<string, unknown>
-	let mockInvitesState = $state([...mockCrewInvites])
-	const users = $derived((mockMode ? (mockCrewUsers as unknown as MemberUser[]) : (members.users as MemberUser[])))
+	let mockInvitesState = $state([...adminMockCatalog.crewInvites])
+	const users = $derived((mockMode ? (adminMockCatalog.crewUsers as unknown as MemberUser[]) : (members.users as MemberUser[])))
 	const invites = $derived((mockMode ? (mockInvitesState as unknown as InviteRow[]) : (members.invites as InviteRow[])))
-	const eventsSource = $derived((mockMode ? mockDashboardEvents : dashboard.events))
-	const recentEventsSource = $derived((mockMode ? mockDashboardRecentEvents : dashboard.recentEvents))
+	const eventsSource = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
+	const recentEventsSource = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
 
 	let expandedUserId = $state<string | null>(null)
 	let mockAccessRows = $state<Array<{ programSlug: string; allowed: boolean }>>([])
