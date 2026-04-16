@@ -4,9 +4,7 @@ import { dev } from '$app/environment'
 import { getAdminAuth, getCalendarAuth } from '@calendar/kit'
 import { getCalendarConfig, type CalendarConfigInput } from '@calendar/core'
 import { buildEnv } from '@calendar/kit'
-import { D1SessionAdapter } from '@goobits/auth/adapters'
-
-type CalendarUserRow = { id: string | number }
+import { ensureCalendarUserByEmail, setCalendarSessionCookie } from './server/auth/calendar-session'
 
 async function tryBootstrapDevCalendarSession(event: Parameters<Handle>[0]['event']) {
 	if (!dev) return false
@@ -20,42 +18,20 @@ async function tryBootstrapDevCalendarSession(event: Parameters<Handle>[0]['even
 
 	const email = (requestUrl.searchParams.get('previewEmail') || 'preview-user@local.dev').trim().toLowerCase()
 	const name = (requestUrl.searchParams.get('previewName') || 'Preview User').trim()
-
-	const existing = await env.DB.prepare(
-		`SELECT id FROM calendar_users WHERE lower(email) = lower(?) LIMIT 1`
-	).bind(email).first<CalendarUserRow>()
-
-	let userId = existing?.id
-	if (!userId) {
-		const inserted = await env.DB.prepare(
-			`INSERT INTO calendar_users (email, name, email_verified, created_at, last_login_at)
-			 VALUES (?, ?, 1, unixepoch(), unixepoch())`
-		).bind(email, name || 'Preview User').run()
-		userId = inserted.meta.last_row_id
-	} else {
-		await env.DB.prepare(
-			`UPDATE calendar_users SET last_login_at = unixepoch() WHERE id = ?`
-		).bind(userId).run()
-	}
-
-	const sessionAdapter = new D1SessionAdapter(env.DB, {
-		sessionsTable: 'calendar_sessions',
-		usersTable: 'calendar_users',
-		cookieName: 'calendar_session',
-		secureCookies: false,
-		sessionLifetime: 7 * 24 * 60 * 60 * 1000,
-		userColumns: {
-			id: 'id',
-			email: 'email',
-			name: 'name',
-			avatar: 'avatar_url',
-			password: 'password',
-			emailVerified: 'email_verified'
-		}
+	const user = await ensureCalendarUserByEmail({
+		db: env.DB,
+		email,
+		name: name || 'Preview User',
+		emailVerified: true
 	})
+	if (!user.ok) return false
 
-	const session = await sessionAdapter.createSession(String(userId))
-	sessionAdapter.setSessionCookie(event.cookies, session)
+	await setCalendarSessionCookie({
+		db: env.DB,
+		cookies: event.cookies,
+		secureCookies: false,
+		userId: String(user.userId)
+	})
 	return true
 }
 

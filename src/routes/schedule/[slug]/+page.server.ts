@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { buildPaymentLink, getCalendarProgramBySlug, listEventsFeed } from '@calendar/core'
-import { mockCalendarRecent, mockCalendarUpcoming, mockPrograms } from '@calendar/ui/admin/mock/admin-mock-data'
+import { scheduleMockPrograms, scheduleMockRecent, scheduleMockUpcoming } from '$lib/app/schedule/mock-data'
 import type { RequestEvent } from './$types'
 
 export async function load(event: RequestEvent) {
@@ -9,14 +9,14 @@ export async function load(event: RequestEvent) {
 	const slug = event.params.slug
 
 	if (mockMode) {
-		const activity = mockPrograms.find((program) => program.slug === slug)
+		const activity = scheduleMockPrograms.find((program) => program.slug === slug)
 		if (!activity) error(404, 'Program not found')
 
 		return {
 			activity,
 			mockMode: true,
-			upcoming: mockCalendarUpcoming.filter((entry) => entry.activitySlug === slug),
-			recent: mockCalendarRecent.filter((entry) => entry.activitySlug === slug)
+			upcoming: scheduleMockUpcoming.filter((entry) => entry.activitySlug === slug),
+			recent: scheduleMockRecent.filter((entry) => entry.activitySlug === slug)
 		}
 	}
 

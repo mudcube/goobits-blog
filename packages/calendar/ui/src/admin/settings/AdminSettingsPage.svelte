@@ -759,7 +759,7 @@
     padding: 0.62rem 0.72rem;
     border: 1px solid var(--admin-card-border);
     background: color-mix(in srgb, var(--admin-card-bg) 88%, var(--bg) 12%);
-    border-radius: 0.64rem;
+    border-radius: 0.75rem;
   }
 
   .admin-settings__sync-action {
@@ -837,7 +837,7 @@
     gap: 0.42rem;
     min-height: 2.05rem;
     padding: 0 0.62rem;
-    border-radius: 0.6rem;
+    border-radius: 0.75rem;
     border: 1px solid var(--admin-card-border);
     background: color-mix(in srgb, var(--admin-card-bg) 86%, var(--bg) 14%);
     color: color-mix(in srgb, var(--text) 70%, transparent);
@@ -893,7 +893,7 @@
   .admin-settings__payment-card {
     border: 1px solid var(--admin-card-border);
     background: color-mix(in srgb, var(--admin-card-bg) 86%, var(--bg) 14%);
-    border-radius: 0.7rem;
+    border-radius: 0.75rem;
     overflow: clip;
   }
 

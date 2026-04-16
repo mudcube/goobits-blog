@@ -118,27 +118,29 @@
 	.social-events__program-grid {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.5rem;
-		margin-bottom: 0.75rem;
+		gap: 0.75rem;
+		margin-bottom: 1rem;
 	}
 
 	.social-events__program-card {
-		padding: 1rem;
+		padding: 1.1rem 1rem;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 0.5rem;
+		gap: 0.55rem;
 		text-align: left;
 	}
 
 	.social-events__program-icon {
-		font-size: 1.5rem;
+		font-size: 1.6rem;
 		line-height: 1;
 	}
 
 	.social-events__program-label {
-		font-size: 0.875rem;
-		font-weight: 600;
+		font-family: var(--font-display);
+		font-size: 0.95rem;
+		font-weight: 500;
+		letter-spacing: -0.01em;
 		color: var(--text);
 	}
 

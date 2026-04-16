@@ -1,4 +1,3 @@
-import { D1SessionAdapter } from '@goobits/auth/adapters'
 import {
 	consumeInvite,
 	parseCalendarInviteClaimInput,
@@ -7,8 +6,7 @@ import {
 } from '@calendar/core'
 import { apiError, apiOk, apiValidationError, buildEnv } from '@calendar/kit'
 import type { RequestEvent } from '@sveltejs/kit'
-
-type CalendarUserRow = { id: string | number }
+import { ensureCalendarUserByEmail, setCalendarSessionCookie } from '../../../../server/auth/calendar-session'
 
 function createGuestEmail() {
 	return `guest-${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}@guest.local`
@@ -37,50 +35,32 @@ export async function POST(event: RequestEvent) {
 		}
 
 		const effectiveEmail = (email || result.invite.email || createGuestEmail()).toLowerCase()
-		const existing = await env.DB.prepare(
-			`SELECT id FROM calendar_users WHERE lower(email) = lower(?) LIMIT 1`
-		).bind(effectiveEmail).first<CalendarUserRow>()
+		const user = await ensureCalendarUserByEmail({
+			db: env.DB,
+			email: effectiveEmail,
+			name,
+			emailVerified: !!(result.invite.email && effectiveEmail === result.invite.email.toLowerCase()),
+			rejectIfExists: true
+		})
 
-		if (existing) {
+		if (!user.ok) {
 			return apiError('An account already exists for that email. Use Google or Apple sign-in instead.', {
 				status: 409,
 				code: 'account_exists'
 			})
 		}
+		await consumeInvite({ db: env.DB, inviteId: result.invite.id, userId: String(user.userId) })
 
-		let userId: string | number | undefined
-		if (!userId) {
-			const inserted = await env.DB.prepare(
-				`INSERT INTO calendar_users (email, name, email_verified, created_at, last_login_at)
-				 VALUES (?, ?, ?, unixepoch(), unixepoch())`
-			).bind(effectiveEmail, name, result.invite.email || email ? 1 : 0).run()
-			userId = inserted.meta.last_row_id
-		}
-
-		await consumeInvite({ db: env.DB, inviteId: result.invite.id, userId: String(userId) })
-
-		const sessionAdapter = new D1SessionAdapter(env.DB, {
-			sessionsTable: 'calendar_sessions',
-			usersTable: 'calendar_users',
-			cookieName: 'calendar_session',
+		await setCalendarSessionCookie({
+			db: env.DB,
+			cookies: event.cookies,
 			secureCookies,
-			sessionLifetime: 7 * 24 * 60 * 60 * 1000,
-			userColumns: {
-				id: 'id',
-				email: 'email',
-				name: 'name',
-				avatar: 'avatar_url',
-				password: 'password',
-				emailVerified: 'email_verified'
-			}
+			userId: String(user.userId)
 		})
-
-		const session = await sessionAdapter.createSession(String(userId))
-		sessionAdapter.setSessionCookie(event.cookies, session)
 
 		return apiOk({
 			ok: true,
-			userId: String(userId),
+			userId: String(user.userId),
 			email: effectiveEmail
 		})
 	} catch (error) {

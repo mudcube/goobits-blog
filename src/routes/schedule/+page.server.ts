@@ -1,12 +1,12 @@
 import { load as coreLoad } from '@calendar/app/routes/calendar/page.server'
-import { mockCalendarRecent, mockCalendarUpcoming, mockPrograms } from '@calendar/ui/admin/mock/admin-mock-data'
+import { scheduleMockPrograms, scheduleMockRecent, scheduleMockUpcoming } from '$lib/app/schedule/mock-data'
 
 export async function load(event: Parameters<typeof coreLoad>[0]) {
 	const mockMode = event.url.searchParams.get('mock') === '1'
 	if (!mockMode) return coreLoad(event)
 
 	const baseData = await coreLoad(event)
-	const activities = mockPrograms.map((program) => ({
+	const activities = scheduleMockPrograms.map((program) => ({
 		id: program.slug,
 		slug: program.slug,
 		label: program.activityName || program.label,
@@ -19,7 +19,7 @@ export async function load(event: Parameters<typeof coreLoad>[0]) {
 		...baseData,
 		mockMode: true,
 		activities,
-		upcoming: mockCalendarUpcoming,
-		recent: mockCalendarRecent
+		upcoming: scheduleMockUpcoming,
+		recent: scheduleMockRecent
 	}
 }

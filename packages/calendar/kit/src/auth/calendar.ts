@@ -50,15 +50,20 @@ function normalizeRedirectUri(value: string) {
 
 export function normalizeCalendarRedirect(redirectTo: unknown) {
 	const config = getCalendarConfig()
-	const safeRedirectPrefixes = [config.routes.calendarBase, config.routes.adminBase]
 	if (!redirectTo || typeof redirectTo !== 'string') return null
 	const trimmed = redirectTo.trim()
 	if (!trimmed.startsWith('/')) return null
 	if (trimmed.startsWith('//')) return null
 	if (trimmed.includes('\\')) return null
 	if (/[\r\n]/.test(trimmed)) return null
-	if (!safeRedirectPrefixes.some(prefix => trimmed.startsWith(prefix))) return null
-	return trimmed
+	const parsed = new URL(trimmed, 'https://calendar.local')
+	const pathname = parsed.pathname
+	const allowedPrefixes = [config.routes.calendarBase, config.routes.adminBase]
+	const isAllowed = allowedPrefixes.some((prefix) => (
+		pathname === prefix || pathname.startsWith(`${prefix}/`)
+	))
+	if (!isAllowed) return null
+	return `${pathname}${parsed.search}${parsed.hash}`
 }
 
 export async function getCalendarAuth({ event }: { event: { platform?: PlatformLike; url: URL } }) {

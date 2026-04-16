@@ -172,6 +172,9 @@
 
 		display: grid;
 		gap: 0.75rem;
+		max-width: 720px;
+		margin: 0 auto;
+		width: 100%;
 	}
 
 	.member-calendar__debug {
@@ -249,7 +252,7 @@
 	}
 
 	.member-calendar__viewport {
-		height: min(70vh, 44rem);
+		height: min(76vh, 52rem);
 		display: grid;
 		align-content: start;
 		overflow: hidden;
@@ -260,7 +263,7 @@
 
 	@media (max-width: 720px) {
 		.member-calendar__viewport {
-			height: min(68vh, 38rem);
+			height: min(72vh, 44rem);
 		}
 	}
 </style>
