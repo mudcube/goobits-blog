@@ -1,16 +1,11 @@
 import { getJournalPosts } from '$lib/blog/server'
 import type { JournalPost } from '$lib/blog/viewmodel'
-
-type MusicPost = {
-	title: string
-	urlPath: string
-	date: string
-}
+import type { MusicPostEntry } from '@src/domains/music/viewmodel'
 
 export async function load() {
 	const posts = await getJournalPosts()
 
-	const musicPosts: MusicPost[] = posts
+	const musicPosts: MusicPostEntry[] = posts
 		.filter((post: JournalPost) => {
 			const categories = post?.metadata?.fm?.categories
 			if (!Array.isArray(categories)) return false

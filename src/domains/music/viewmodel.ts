@@ -6,6 +6,10 @@ export type MusicPostEntry = {
 	date: string
 }
 
+export type MusicPageData = {
+	musicPosts: MusicPostEntry[]
+}
+
 export type MusicPortfolioEntry = {
 	title: string
 	href: string

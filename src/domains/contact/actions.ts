@@ -29,6 +29,8 @@ export const load = async ({ url, platform }: ContactLoadEvent) => {
 	}
 }
 
+export type ContactPageData = Awaited<ReturnType<typeof load>>
+
 export const actions: Actions = {
 	default: async (event) => {
 		const form = await superValidate(event, zod(contactSchema))

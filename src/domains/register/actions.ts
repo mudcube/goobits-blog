@@ -18,6 +18,8 @@ export const load = async ({ platform }: RegisterLoadEvent) => {
 	}
 }
 
+export type RegisterPageData = Awaited<ReturnType<typeof load>>
+
 export const actions: Actions = {
 	default: async (event) => {
 		const form = await superValidate(event, zod(registerSchema))
