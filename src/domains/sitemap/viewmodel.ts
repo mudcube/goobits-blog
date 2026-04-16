@@ -1,4 +1,4 @@
-import type { RouteEntry } from '$lib/server/route-index'
+import type { RouteEntry } from '$lib/app/routes/route-index.server'
 import { localeSort, matchesQuery, normalizeQuery } from '$lib/utils/collections'
 
 export type SitemapSort = 'path' | 'name' | 'modified'

@@ -5,8 +5,9 @@
 	import { superForm } from 'sveltekit-superforms'
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters'
 	import { initializeAntiAbuseFields } from '$lib/client/antiabuse'
-	import VerificationField from '@src/domains/shared/VerificationField.svelte'
-	import { contactSchema, getContactMessagePlaceholder, type ContactFormData } from './schema'
+	import VerificationField from '$lib/forms/VerificationField.svelte'
+	import { contactSchema, type ContactFormData } from './schema'
+	import { getContactMessagePlaceholder } from './viewmodel'
 	import type { SuperValidated } from 'sveltekit-superforms'
 
 	const { form, turnstileSiteKey } = $props<{ form: SuperValidated<ContactFormData>; turnstileSiteKey?: string }>()

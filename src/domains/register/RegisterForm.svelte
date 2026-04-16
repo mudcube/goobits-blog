@@ -6,7 +6,7 @@
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters'
 	import { initializeAntiAbuseFields } from '$lib/client/antiabuse'
 	import type { SuperValidated } from 'sveltekit-superforms'
-	import VerificationField from '@src/domains/shared/VerificationField.svelte'
+	import VerificationField from '$lib/forms/VerificationField.svelte'
 	import { registerSchema, type RegisterFormData } from './schema'
 
 	const { form, turnstileSiteKey } = $props<{ form: SuperValidated<RegisterFormData>; turnstileSiteKey?: string }>()

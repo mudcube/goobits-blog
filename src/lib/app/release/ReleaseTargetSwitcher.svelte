@@ -3,7 +3,7 @@
 	import { PillButton } from '@miko/ui'
 	import { RELEASE_STAGE_COOKIE, type ReleaseStage } from '$lib/app/release'
 	import { TARGET_COOKIE, type Target } from '$lib/app/target'
-	import type { HumanSitemapVisibility } from '$lib/server/route-index'
+	import type { HumanSitemapVisibility } from '$lib/app/routes/route-index.server'
 
 	type Props = {
 		activeStage: ReleaseStage

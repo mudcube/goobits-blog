@@ -1,20 +1,15 @@
-import { dev } from '$app/environment'
 import { redirect, type Actions, type RequestEvent, type ServerLoad } from '@sveltejs/kit'
 import { setError, superValidate } from 'sveltekit-superforms/server'
 import { zod4 as zod } from 'sveltekit-superforms/adapters'
-import { mergeRuntimeEnv, resolveBaseUrl, resolveRuntimeDb } from '$lib/server/runtime'
+import { mergeRuntimeEnv, resolveBaseUrl, resolveRuntimeDb } from '$lib/server/calendar/runtime'
 import { runRegisterAntiAbuse } from '$lib/server/antiabuse'
-import { registerUser } from '$lib/server/auth/register'
+import { getTurnstileSiteKey } from '$lib/server/antiabuse/turnstile-site-key'
+import { registerUser } from '$lib/server/calendar/auth/register'
 import { getAsn, getClientIp } from '$lib/server/request-meta'
 import { getRegisterFormDefaults } from './defaults'
 import { registerSchema, type RegisterFormData } from './schema'
 
 type RegisterLoadEvent = Parameters<ServerLoad>[0]
-
-function getTurnstileSiteKey(env: Record<string, string | undefined>) {
-	const localWidgetEnabled = env['TURNSTILE_ENABLE_LOCALHOST'] === 'true'
-	return dev && !localWidgetEnabled ? '' : env['PUBLIC_TURNSTILE_SITE_KEY'] || ''
-}
 
 export async function submitRegisterData(
 	event: Pick<RequestEvent, 'request' | 'platform' | 'getClientAddress' | 'url'>,

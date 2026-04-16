@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { emailSchema } from '@src/domains/shared/zod/email'
-import { trimmedOptionalString } from '@src/domains/shared/zod/strings'
+import { emailSchema } from '$lib/validation/zod/email'
+import { trimmedOptionalString } from '$lib/validation/zod/strings'
 
 export const registerSchema = z.object({
 	name: z.string().trim().min(1, 'Name is required').max(120, 'Name is required'),

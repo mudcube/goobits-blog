@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero } from '@miko/ui'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
-	import { labsCatalog } from '@src/domains/labs/viewmodel'
+	import { labsCatalog } from '@src/domains/labs/catalog'
 
 	const description =
 		'Browse playful web experiments, prototypes, and creative coding labs from Miko Meow.'

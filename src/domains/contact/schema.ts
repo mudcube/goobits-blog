@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { emailSchema } from '@src/domains/shared/zod/email'
-import { trimmedOptionalString } from '@src/domains/shared/zod/strings'
+import { emailSchema } from '$lib/validation/zod/email'
+import { trimmedOptionalString } from '$lib/validation/zod/strings'
 
 const MIN_MESSAGE_LENGTH = 12
 const MIN_MESSAGE_WORDS = 3
@@ -32,15 +32,3 @@ export const contactSchema = z.object({
 })
 
 export type ContactFormData = z.infer<typeof contactSchema>
-
-export function getContactContextLabel(data: Pick<ContactFormData, 'from' | 'topic'>) {
-	const parts = [data.from, data.topic].filter(Boolean)
-	return parts.length ? parts.join(' / ') : ''
-}
-
-export function getContactMessagePlaceholder(data: Pick<ContactFormData, 'from' | 'topic'>) {
-	if (data.from === 'music' && data.topic) return 'Tell me what you need and include any links...'
-	if (data.from === 'art') return 'Tell me about the piece, timeline, and any reference links...'
-	if (data.from === 'about' && data.topic) return 'Tell me a bit about your project and what you are looking for...'
-	return 'Tell me about your project…'
-}

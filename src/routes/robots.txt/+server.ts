@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types'
-import { getBaseUrl, getPlatformEnv, resolveSiteOrigin } from '$lib/server/seo'
+import { getBaseUrl, getPlatformEnv, resolveSiteOrigin } from '$lib/app/seo/server'
 
 export const prerender = true
 

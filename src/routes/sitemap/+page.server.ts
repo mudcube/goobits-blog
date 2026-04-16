@@ -7,8 +7,8 @@ import {
 	getSitemapAudiencesForVisibility,
 	getPublicHumanSitemapInventory,
 	getRouteInventory
-} from '$lib/server/route-index'
-import type { HumanSitemapVisibility } from '$lib/server/route-index'
+} from '$lib/app/routes/route-index.server'
+import type { HumanSitemapVisibility } from '$lib/app/routes/route-index.server'
 
 export const prerender = true
 

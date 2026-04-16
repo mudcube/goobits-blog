@@ -175,7 +175,7 @@
 		background: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 10%, transparent);
 	}
 
-	@media (max-width: 56em) {
+	@media (max-width: 50em) {
 		:global(.layout-header__nav) {
 			display: none;
 		}

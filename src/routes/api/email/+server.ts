@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
-import { submitContactData } from '@src/domains/contact/actions'
+import { submitContactData } from '$lib/server/contact/submit'
 import { contactSchema } from '@src/domains/contact/schema'
 
 function getContactRedirectUrl(requestUrl: string, error?: string) {

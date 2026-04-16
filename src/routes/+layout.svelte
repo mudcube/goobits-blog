@@ -123,7 +123,7 @@
 		color: var(--header-nav-accent, var(--color-white));
 	}
 
-	@media (max-width: 56em) {
+	@media (max-width: 50em) {
 		:global(.layout-header__utility-link) {
 			width: 2.35rem;
 			height: 2.35rem;

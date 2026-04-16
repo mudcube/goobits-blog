@@ -1,8 +1,8 @@
 import type { RequestHandler } from './$types'
 import { isLocalPreviewHost } from '$lib/app/is-local-preview-host'
 import { getActiveReleaseStage } from '$lib/app/release'
-import { getPublicSitemapRoutes } from '$lib/server/route-index'
-import { escapeXml, formatSitemapLastMod, getBaseUrl, getPlatformEnv, resolveSiteOrigin, toAbsoluteUrl } from '$lib/server/seo'
+import { getPublicSitemapRoutes } from '$lib/app/routes/route-index.server'
+import { escapeXml, formatSitemapLastMod, getBaseUrl, getPlatformEnv, resolveSiteOrigin, toAbsoluteUrl } from '$lib/app/seo/server'
 
 export const prerender = true
 

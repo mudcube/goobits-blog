@@ -1,5 +1,5 @@
 import { dev } from '$app/environment'
-import type { ContactFormData } from './schema'
+import type { ContactFormData } from '@src/domains/contact/schema'
 
 export type ContactDeliveryResult =
 	| { ok: true; status: 200 | 202 }
