@@ -48,6 +48,13 @@ function normalizeRedirectUri(value: string) {
 	return value.endsWith('/') ? value.slice(0, -1) : value
 }
 
+function emailMatchesDomain(email: string, domain: string) {
+	if (!email || !domain) return false
+	const atIndex = email.lastIndexOf('@')
+	if (atIndex < 0 || atIndex === email.length - 1) return false
+	return email.slice(atIndex + 1) === domain
+}
+
 export function normalizeCalendarRedirect(redirectTo: unknown) {
 	const config = getCalendarConfig()
 	if (!redirectTo || typeof redirectTo !== 'string') return null
@@ -172,6 +179,7 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 		profile: 'secure',
 		sessions: {},
 		hooks: {
+			onLoginMode: 'manual',
 			onLogin: async (evt: RequestEventLike, profile: OAuthProfile, _tokens: OAuthTokens | null, user?: User | null) => {
 				const { invite, redirectTo } = getCalendarLoginContext(evt.cookies)
 
@@ -179,7 +187,7 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 					const hasRedeemed = await hasUserRedeemedAnyInvite({ db, userId: user.id })
 					const normalizedEmail = (profile.email || '').trim().toLowerCase()
 					const inviteBypassDomain = config.brand.inviteBypassDomain.trim().toLowerCase()
-					const canBypassInvite = !!inviteBypassDomain && normalizedEmail.endsWith(inviteBypassDomain)
+					const canBypassInvite = emailMatchesDomain(normalizedEmail, inviteBypassDomain)
 					if (!hasRedeemed) {
 						if (!canBypassInvite) {
 							if (!invite) {

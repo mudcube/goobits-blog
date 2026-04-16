@@ -12,8 +12,37 @@ function createGuestEmail() {
 	return `guest-${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}@guest.local`
 }
 
+async function rollbackInviteConsumption({
+	db,
+	inviteId,
+	userId
+}: {
+	db: Awaited<ReturnType<typeof buildEnv>>['DB']
+	inviteId: number
+	userId: string
+}) {
+	await db.prepare(
+		`DELETE FROM calendar_invite_redemptions
+		 WHERE id = (
+			 SELECT id
+			 FROM calendar_invite_redemptions
+			 WHERE invite_id = ? AND user_id = ?
+			 ORDER BY redeemed_at DESC, id DESC
+			 LIMIT 1
+		 )`
+	).bind(inviteId, userId).run()
+
+	await db.prepare(
+		`UPDATE calendar_invites
+		 SET uses_remaining = uses_remaining + 1
+		 WHERE id = ? AND uses_remaining IS NOT NULL`
+	).bind(inviteId).run()
+}
+
 export async function POST(event: RequestEvent) {
 	let createdUserId: string | null = null
+	let consumedInviteId: number | null = null
+	let consumedUserId: string | null = null
 	try {
 		const env = await buildEnv(event.platform)
 		const secureCookies = env['NODE_ENV'] !== 'development'
@@ -67,6 +96,8 @@ export async function POST(event: RequestEvent) {
 				code: `invite_${consumed.reason}`
 			})
 		}
+		consumedInviteId = result.invite.id
+		consumedUserId = String(user.userId)
 
 		await setCalendarSessionCookie({
 			db: env.DB,
@@ -81,6 +112,18 @@ export async function POST(event: RequestEvent) {
 			email: effectiveEmail
 		})
 	} catch (error) {
+		if (consumedInviteId !== null && consumedUserId) {
+			try {
+				const env = await buildEnv(event.platform)
+				await rollbackInviteConsumption({
+					db: env.DB,
+					inviteId: consumedInviteId,
+					userId: consumedUserId
+				})
+			} catch (rollbackError) {
+				console.error('Calendar invite claim rollback failed:', rollbackError)
+			}
+		}
 		if (createdUserId) {
 			try {
 				const env = await buildEnv(event.platform)
