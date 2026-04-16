@@ -35,17 +35,18 @@ export async function verifyTurnstileToken({
 	})
 	if (remoteIp) body.set('remoteip', remoteIp)
 
-	let json: TurnstileApiResponse | null = null
+	let response: Response
 	try {
-		const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+		response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
 			method: 'POST',
 			headers: { 'content-type': 'application/x-www-form-urlencoded' },
 			body: body.toString()
 		})
-		json = (await response.json()) as TurnstileApiResponse
 	} catch {
 		return { success: false, errorCodes: ['network-error'] }
 	}
+
+	const json = (await response.json()) as TurnstileApiResponse
 
 	return {
 		success: Boolean(json?.success),

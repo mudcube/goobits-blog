@@ -6,7 +6,7 @@ import PillButton from '../primitives/CalendarPillButton.svelte'
 	import { goto } from '$app/navigation'
 	import { getCalendarUiConfig } from '../config'
 
-	const { children, data } = $props()
+	const { children, data, logoSrc, logoAlt = 'Home' } = $props()
 	const calendarConfig = getCalendarUiConfig()
 	const connectedNow = $derived($page.url.searchParams.get('connected') === '1')
 
@@ -22,8 +22,8 @@ import PillButton from '../primitives/CalendarPillButton.svelte'
 		currentPath={$page.url.pathname}
 		showLogo={true}
 		homeHref="/"
-		logoSrc="/media/brand/logo.svg"
-		logoAlt={calendarConfig.brand.siteName}
+		{logoSrc}
+		logoAlt={logoAlt}
 	>
 		{#snippet right()}
 			<span class="admin-shell__nav-badge">Admin</span>

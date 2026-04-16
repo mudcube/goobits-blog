@@ -5,6 +5,7 @@
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import AdminCalendarWidget from '../../dashboard/AdminCalendarWidget.svelte'
 	import AdminActionButton from '../../shared/AdminActionButton.svelte'
+	import ProgramDayPopover from './ProgramDayPopover.svelte'
 	import { mockDashboardEvents, mockPrograms } from '../../mock/admin-mock-data'
 	import { createHistory } from '../../history/create-history'
 	import { adminActionHandlers } from '$lib/app/schedule/admin/state'
@@ -702,120 +703,23 @@
 				</div>
 
 				{#if popOpen}
-					<div
-						class="program-editor__popover"
-						style={`left:${popLeft}px; ${popAbove ? `bottom:${popBottom}px` : `top:${popTop}px`}; transform:translateX(-50%);`}
-					>
-						<div
-							class="program-editor__popover-arrow"
-							class:program-editor__popover-arrow--above={popAbove}
-						></div>
-						<div class="program-editor__popover-title">
-							{#if selectedDayDate}
-								{selectedDayDate.toLocaleDateString(undefined, {
-									weekday: 'long',
-									month: 'short',
-									day: 'numeric'
-								})}
-							{/if}
-						</div>
-
-						{#if selectedDayDate && !activeDays[isoDay(selectedDayDate)]}
-							<div class="program-editor__opt-row">
-								<button
-									type="button"
-									class="program-editor__opt"
-									class:program-editor__opt--on={newMode === 'once'}
-									onclick={() => (newMode = 'once')}
-								>
-									Just this day
-								</button>
-								<button
-									type="button"
-									class="program-editor__opt"
-									class:program-editor__opt--on={newMode === 'repeat'}
-									onclick={() => (newMode = 'repeat')}
-								>
-									Repeat weekly
-								</button>
-							</div>
-
-							{#if newMode === 'repeat'}
-								<div class="program-editor__until">
-									<button
-										type="button"
-										class:program-editor__until-btn--on={untilMode === 'ongoing'}
-										class="program-editor__until-btn"
-										onclick={() => (untilMode = 'ongoing')}
-									>
-										Ongoing
-									</button>
-									<button
-										type="button"
-										class:program-editor__until-btn--on={untilMode === 'date'}
-										class="program-editor__until-btn"
-										onclick={() => (untilMode = 'date')}
-									>
-										Pick date
-									</button>
-								</div>
-								{#if untilMode === 'date'}
-									<input
-										class="ui-form-control program-editor__input"
-										type="date"
-										bind:value={untilDate}
-									/>
-								{/if}
-							{/if}
-
-							<div class="program-editor__fields">
-								<label>
-									<span>Time</span>
-									<input class="ui-form-control program-editor__input" type="time" step="900" bind:value={popTime} />
-								</label>
-								<label>
-									<span>Capacity</span>
-									<input class="ui-form-control program-editor__input" type="number" min="1" max="50" bind:value={popCap} />
-								</label>
-							</div>
-							<div class="program-editor__actions">
-								<AdminActionButton variant="subtle" onclick={closePop}>Cancel</AdminActionButton>
-								<AdminActionButton variant="primary" onclick={() => void persistDaySchedule()}
-									>Add</AdminActionButton
-								>
-							</div>
-						{:else}
-							<div class="program-editor__fields">
-								<label>
-									<span>Time</span>
-									<input class="ui-form-control program-editor__input" type="time" step="900" bind:value={popTime} />
-								</label>
-								<label>
-									<span>Capacity</span>
-									<input class="ui-form-control program-editor__input" type="number" min="1" max="50" bind:value={popCap} />
-								</label>
-							</div>
-							{#if selectedDayDate && activeDays[isoDay(selectedDayDate)]?.repeatLabel}
-								<div class="program-editor__override">
-									<div class="program-editor__override-label">Part of repeating schedule</div>
-									<div class="program-editor__override-text">
-										Changes here apply to this day preview only. Save a new schedule to persist.
-									</div>
-								</div>
-							{/if}
-							<div class="program-editor__actions program-editor__actions--split">
-								<AdminActionButton variant="danger" onclick={() => void removeDay()}
-									>Remove</AdminActionButton
-								>
-								<AdminActionButton
-									variant="primary"
-									onclick={() => void persistExistingDayEdits()}
-								>
-									Done
-								</AdminActionButton>
-							</div>
-						{/if}
-					</div>
+					<ProgramDayPopover
+						selectedDayDate={selectedDayDate}
+						activeDay={selectedDayDate ? (activeDays[isoDay(selectedDayDate)] ?? null) : null}
+						{popLeft}
+						{popTop}
+						{popBottom}
+						{popAbove}
+						bind:newMode
+						bind:untilMode
+						bind:untilDate
+						bind:popTime
+						bind:popCap
+						onClose={closePop}
+						onAdd={() => void persistDaySchedule()}
+						onRemove={() => void removeDay()}
+						onDone={() => void persistExistingDayEdits()}
+					/>
 				{/if}
 
 				<p class="program-editor__hint">
@@ -1215,208 +1119,6 @@
 		white-space: pre-wrap;
 	}
 
-	.program-editor__popover {
-		position: fixed;
-		width: 306px;
-		--popover-surface: var(--popover-surface, color-mix(in srgb, var(--bg) 94%, var(--text) 6%));
-		--popover-control-bg: color-mix(in srgb, #faf6ff 88%, var(--popover-surface) 12%);
-		--popover-control-border: var(--border-s);
-		--popover-control-text: var(--text);
-		background-image: none;
-		background-color: var(--popover-surface);
-		border: 1px solid var(--popover-control-border);
-		border-radius: 1rem;
-		box-shadow:
-			0 30px 65px color-mix(in srgb, black 24%, transparent),
-			0 8px 20px color-mix(in srgb, black 14%, transparent);
-		padding: 1rem;
-		z-index: 9991 !important;
-		color: var(--text);
-		opacity: 1;
-		backdrop-filter: none;
-	}
-
-	.program-editor__popover :global(.ui-form-control) {
-		background: var(--popover-control-bg);
-		border-color: var(--popover-control-border);
-		color: var(--popover-control-text);
-	}
-
-	.program-editor__popover :global(.ui-form-control:focus) {
-		border-color: color-mix(in srgb, #7a5af8 56%, transparent);
-		box-shadow: 0 0 0 2px color-mix(in srgb, #7a5af8 22%, transparent);
-	}
-
-	.program-editor__popover :global(.ui-form-select__chevron) {
-		color: var(--text-3);
-	}
-
-	.program-editor__popover :global(.ui-stepper__button) {
-		background: var(--popover-control-bg);
-		border-color: var(--popover-control-border);
-		color: var(--popover-control-text);
-	}
-
-	.program-editor__popover :global(.ui-stepper__button:hover) {
-		background: color-mix(in srgb, var(--text) 6%, var(--popover-control-bg) 94%);
-	}
-
-	.program-editor__popover :global(.ui-time-selector__period) {
-		border-color: var(--popover-control-border);
-	}
-
-	.program-editor__popover :global(.ui-time-selector__period-button) {
-		background: var(--popover-control-bg);
-		color: var(--popover-control-text);
-		border-right-color: var(--popover-control-border);
-	}
-
-	.program-editor__popover :global(.ui-time-selector__period-button--active) {
-		background: var(--blue-soft);
-		color: var(--text);
-	}
-
-	.program-editor__popover-arrow {
-		position: absolute;
-		width: 10px;
-		height: 10px;
-		background: var(--popover-surface);
-		border-left: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
-		border-top: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
-		top: -6px;
-		left: 50%;
-		transform: translateX(-50%) rotate(45deg);
-		z-index: 1;
-	}
-
-	.program-editor__popover-arrow--above {
-		top: auto;
-		bottom: -6px;
-		transform: translateX(-50%) rotate(225deg);
-	}
-
-	.program-editor__popover-title {
-		font-size: 0.82rem;
-		font-weight: 700;
-		color: var(--text);
-		margin-bottom: 0.8rem;
-	}
-
-	.program-editor__opt-row {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.35rem;
-		margin-bottom: 0.8rem;
-	}
-
-	.program-editor__opt {
-		border: 1px solid var(--popover-control-border);
-		background: var(--popover-control-bg);
-		padding: 0.52rem 0.65rem;
-		border-radius: 0.5rem;
-		text-align: center;
-		font-size: 0.78rem;
-		font-weight: 600;
-		cursor: pointer;
-		color: var(--text);
-	}
-
-	.program-editor__opt:hover {
-		background: color-mix(in srgb, var(--text) 6%, var(--popover-control-bg) 94%);
-		color: var(--text);
-	}
-
-	.program-editor__opt--on {
-		background: var(--blue-soft);
-		border-color: color-mix(in srgb, var(--blue) 72%, transparent);
-		color: var(--text);
-	}
-
-	.program-editor__until {
-		display: flex;
-		gap: 0.35rem;
-		margin-bottom: 0.6rem;
-	}
-
-	.program-editor__until-btn {
-		font-size: 0.7rem;
-		padding: 0.3rem 0.55rem;
-		border-radius: 0.4rem;
-		border: 1px solid var(--popover-control-border);
-		background: var(--popover-control-bg);
-		color: var(--text);
-		cursor: pointer;
-	}
-
-	.program-editor__until-btn--on {
-		background: var(--blue-soft);
-		border-color: color-mix(in srgb, var(--blue) 72%, transparent);
-		color: var(--text);
-	}
-
-	.program-editor__fields {
-		display: grid;
-		gap: 0.55rem;
-		margin-bottom: 0.9rem;
-	}
-
-	.program-editor__fields label {
-		display: grid;
-		gap: 0.2rem;
-	}
-
-	.program-editor__fields label span {
-		font-size: 0.66rem;
-		font-weight: 700;
-		color: var(--text-3);
-	}
-
-	.program-editor__input {
-		font-size: 0.8rem;
-		padding: 0.48rem 0.65rem;
-		border-radius: 0.5rem;
-		border: 1px solid color-mix(in srgb, #7a5af8 24%, transparent);
-		background: color-mix(in srgb, #faf6ff 88%, var(--surface) 12%);
-		color: var(--text);
-		outline: none;
-	}
-
-	.program-editor__input:focus {
-		border-color: color-mix(in srgb, #7a5af8 56%, transparent);
-		box-shadow: 0 0 0 2px color-mix(in srgb, #7a5af8 22%, transparent);
-	}
-
-	.program-editor__override {
-		margin-bottom: 0.8rem;
-		padding: 0.6rem;
-		border-radius: 0.5rem;
-		background: color-mix(in srgb, var(--blue) 8%, transparent);
-		border: 1px solid color-mix(in srgb, var(--blue) 16%, transparent);
-	}
-
-	.program-editor__override-label {
-		font-size: 0.66rem;
-		font-weight: 700;
-		color: var(--blue);
-		margin-bottom: 0.2rem;
-	}
-
-	.program-editor__override-text {
-		font-size: 0.7rem;
-		color: var(--text-2);
-		line-height: 1.35;
-	}
-
-	.program-editor__actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: 0.45rem;
-	}
-
-	.program-editor__actions--split {
-		justify-content: space-between;
-		align-items: center;
-	}
 
 	.program-editor__hint {
 		margin-top: 1rem;

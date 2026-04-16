@@ -12,7 +12,7 @@ describe('admin transport validation', () => {
 			slug: 'gym',
 			label: 'Gym',
 			activityName: 'Gym',
-			pageTitle: 'Gym | MIKO.ART',
+			pageTitle: 'Gym | SITE',
 			eyebrow: 'Gym',
 			heroTitleLine1: 'Move daily.',
 			heroTitleLine2: 'Stay strong.',

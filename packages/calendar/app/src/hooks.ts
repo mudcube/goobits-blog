@@ -4,6 +4,7 @@ import { dev } from '$app/environment'
 import { getAdminAuth, getCalendarAuth } from '@calendar/kit'
 import { getCalendarConfig, type CalendarConfigInput } from '@calendar/core'
 import { buildEnv } from '@calendar/kit'
+import { ensureCalendarProgramCatalog } from './server/runtime/calendar-program-catalog'
 import { ensureCalendarUserByEmail, setCalendarSessionCookie } from './server/auth/calendar-session'
 
 async function tryBootstrapDevCalendarSession(event: Parameters<Handle>[0]['event']) {
@@ -60,6 +61,8 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 		}
 
 		try {
+			const env = await buildEnv(event.platform)
+			await ensureCalendarProgramCatalog(env.DB)
 			const { auth } = await getAdminAuth({ event })
 			return auth.handle()({ event, resolve })
 		} catch (error) {
@@ -84,6 +87,8 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 			return resolve(event)
 		}
 
+		const env = await buildEnv(event.platform)
+		await ensureCalendarProgramCatalog(env.DB)
 		const { auth } = await getCalendarAuth({ event })
 		return auth.handle()({ event, resolve })
 	}
@@ -129,7 +134,8 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 				throw redirect(302, `${next.pathname}${next.search}`)
 			}
 
-			const redirectTo = encodeURIComponent(pathname)
+			const redirectTarget = `${pathname}${event.url.search}`
+			const redirectTo = encodeURIComponent(redirectTarget)
 			throw redirect(302, `${calendarLoginPath}?redirect=${redirectTo}`)
 		}
 

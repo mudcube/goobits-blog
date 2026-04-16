@@ -5,7 +5,7 @@
 	import { getCalendarUiConfig } from '../config'
 	import PillButton from '../primitives/CalendarPillButton.svelte'
 import ShellNav from '../primitives/CalendarShellNav.svelte'
-	const { data, children } = $props()
+	const { data, children, logoSrc, logoAlt = 'Home' } = $props()
 	const headerLinks = $derived([...(data.activities ?? [])].sort((a, b) => a.label.localeCompare(b.label)))
 	const calendarConfig = getCalendarUiConfig()
 
@@ -20,8 +20,8 @@ import ShellNav from '../primitives/CalendarShellNav.svelte'
 	<ShellNav
 		homeHref="/"
 		showLogo={true}
-		logoSrc="/media/brand/logo.svg"
-		logoAlt={calendarConfig.brand.siteName}
+		{logoSrc}
+		logoAlt={logoAlt}
 		links={headerLinks}
 		linksAlign="right"
 		currentPath={$page.url.pathname}

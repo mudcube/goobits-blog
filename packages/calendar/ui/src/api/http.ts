@@ -29,13 +29,7 @@ function getPayloadError(payload: unknown) {
 export async function requestApi<T = unknown>(url: string, options: RequestOptions<T> = {}): Promise<T> {
 	const { expectOk = true, parse, ...init } = options
 	const response = await fetch(url, init)
-	let payload: unknown = null
-
-	try {
-		payload = await response.json()
-	} catch {
-		payload = null
-	}
+	const payload: unknown = await response.json().catch(() => null)
 
 	if (!response.ok) {
 		const payloadError = getPayloadError(payload)

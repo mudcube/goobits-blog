@@ -8,12 +8,8 @@ const REPORT_PATH = path.join(ROOT, '.llm', 'scratch', 'labs-lowercase-collision
 
 async function walk(dir) {
   const out = []
-  let entries = []
-  try {
-    entries = await fs.readdir(dir, { withFileTypes: true })
-  } catch {
-    return out
-  }
+  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => null)
+  if (!entries) return out
   for (const entry of entries) {
     const full = path.join(dir, entry.name)
     out.push({ full, isDirectory: entry.isDirectory() })

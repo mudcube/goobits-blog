@@ -1,4 +1,4 @@
-import { getCalendarActivityList, type CalendarActivityConfig } from '../social/activities.ts'
+import type { CalendarActivityConfig } from '../social/activities.ts'
 import { isValidProgramSlug, type CalendarProgramSlug } from '../social/programs.ts'
 import type { D1DatabaseLike } from '../storage/d1.ts'
 import { getCalendarConfig } from '../config/calendar.ts'
@@ -65,36 +65,7 @@ async function listProgramRows(db: D1DatabaseLike) {
 	return result?.results ?? []
 }
 
-async function seedProgramRows(db: D1DatabaseLike) {
-	for (const [index, program] of getCalendarActivityList().entries()) {
-		const titleLine2 = program.heroTitleLines.length > 1 ? program.heroTitleLines[1] : null
-		await db.prepare(
-			`INSERT OR IGNORE INTO calendar_programs (
-			  slug, label, activity_name, page_title, eyebrow,
-			  hero_title_line_1, hero_title_line_2, hero_subtitle, description, icon,
-			  eyebrow_class, glow_class, form_glow_class, enabled, sort_order, created_at, updated_at
-			) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, unixepoch(), unixepoch())`
-		).bind(
-			program.slug,
-			program.label,
-			program.activityName,
-			program.pageTitle,
-			program.eyebrow,
-			program.heroTitleLines[0],
-			titleLine2,
-			program.heroSubtitle,
-			program.description,
-			program.icon,
-			program.eyebrowClass ?? null,
-			program.glowClass ?? null,
-			program.formGlowClass ?? null,
-			(index + 1) * 10
-		).run()
-	}
-}
-
 export async function getCalendarPrograms(db: D1DatabaseLike): Promise<CalendarProgramState[]> {
-	await seedProgramRows(db)
 	const rows = await listProgramRows(db)
 	return rows.map(toProgram)
 }
@@ -118,7 +89,6 @@ export async function setCalendarProgramEnabled(db: D1DatabaseLike, slug: Calend
 }
 
 export async function getCalendarProgramBySlug(db: D1DatabaseLike, slug: string, options: { includeDisabled?: boolean } = {}) {
-	await seedProgramRows(db)
 	const row = await db.prepare(
 		`SELECT slug, label, activity_name, page_title, eyebrow, hero_title_line_1, hero_title_line_2,
 		        hero_subtitle, description, icon, eyebrow_class, glow_class, form_glow_class,

@@ -11,12 +11,8 @@ const WIDTH_CANDIDATES = [640, 960, 1280, 1600]
 const MANIFEST_PATH = path.join(ROOT, 'packages', 'blog-theme-miko', 'utils', 'generated', 'journal-image-manifest.ts')
 
 async function walk(dir) {
-	let entries = []
-	try {
-		entries = await fs.readdir(dir, { withFileTypes: true })
-	} catch {
-		return []
-	}
+	const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => null)
+	if (!entries) return []
 
 	const files = []
 	for (const entry of entries) {

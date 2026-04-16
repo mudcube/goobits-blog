@@ -11,12 +11,8 @@ const GENERATED_MAX_BYTES = 450 * 1024
 const IGNORED_PREFIXES = ['labs/sketchpad-1.0/source/', 'labs/zen-bg/source/']
 
 async function walk(dir) {
-	let entries = []
-	try {
-		entries = await fs.readdir(dir, { withFileTypes: true })
-	} catch {
-		return []
-	}
+	const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => null)
+	if (!entries) return []
 
 	const files = []
 	for (const entry of entries) {

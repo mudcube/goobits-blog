@@ -1,5 +1,19 @@
 import type { D1DatabaseLike } from '../storage/d1.ts'
 
+async function resolveInviteConsumeFailure(db: D1DatabaseLike, inviteId: number) {
+	const invite = await db.prepare(
+		`SELECT uses_remaining, expires_at FROM calendar_invites WHERE id = ? LIMIT 1`
+	).bind(inviteId).first<{ uses_remaining: number | null; expires_at: number | null }>()
+	const now = Math.floor(Date.now() / 1000)
+	if (invite?.expires_at && now >= invite.expires_at) {
+		return { ok: false as const, reason: 'expired' as const }
+	}
+	if (invite?.uses_remaining !== null && (invite?.uses_remaining ?? 0) <= 0) {
+		return { ok: false as const, reason: 'exhausted' as const }
+	}
+	return { ok: false as const, reason: 'exhausted' as const }
+}
+
 export function generateInviteCode() {
 	const bytes = new Uint8Array(12)
 	crypto.getRandomValues(bytes)
@@ -79,10 +93,22 @@ export async function consumeInvite({
 }) {
 	if (usesRemaining !== null) {
 		const update = await db.prepare(
-			`UPDATE calendar_invites SET uses_remaining = uses_remaining - 1 WHERE id = ? AND uses_remaining > 0`
+			`UPDATE calendar_invites
+			 SET uses_remaining = uses_remaining - 1
+			 WHERE id = ?
+			   AND uses_remaining > 0
+			   AND (expires_at IS NULL OR expires_at > strftime('%s','now'))`
 		).bind(inviteId).run()
 		if ((update.meta?.changes ?? 0) < 1) {
-			return { ok: false as const, reason: 'exhausted' as const }
+			return resolveInviteConsumeFailure(db, inviteId)
+		}
+	} else {
+		const invite = await db.prepare(
+			`SELECT expires_at FROM calendar_invites WHERE id = ? LIMIT 1`
+		).bind(inviteId).first<{ expires_at: number | null }>()
+		const now = Math.floor(Date.now() / 1000)
+		if (!invite || (invite.expires_at && now >= invite.expires_at)) {
+			return { ok: false as const, reason: 'expired' as const }
 		}
 	}
 

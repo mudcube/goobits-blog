@@ -46,12 +46,8 @@ const TEXT_EXTS = new Set([
 
 async function walk(dir) {
   const files = []
-  let entries = []
-  try {
-    entries = await fs.readdir(dir, { withFileTypes: true })
-  } catch {
-    return files
-  }
+  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => null)
+  if (!entries) return files
 
   for (const entry of entries) {
     const full = path.join(dir, entry.name)
@@ -151,12 +147,8 @@ async function run() {
 
     if (!isTextLikeFile(sourceFile)) continue
 
-    let content = ''
-    try {
-      content = await fs.readFile(sourceFile, 'utf8')
-    } catch {
-      continue
-    }
+    const content = await fs.readFile(sourceFile, 'utf8').catch(() => null)
+    if (content === null) continue
 
     const imageRefs = extractImageRefs(content)
     for (const imageRef of imageRefs) {

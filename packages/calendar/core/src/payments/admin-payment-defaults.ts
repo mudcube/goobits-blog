@@ -6,21 +6,20 @@ export type AdminPaymentDefaults = {
 }
 
 export async function getAdminPaymentDefaults(db: D1DatabaseLike): Promise<AdminPaymentDefaults> {
-	let rows: { results?: Array<{ key: string; value: string | null }> } | null = null
 	try {
-		rows = await db.prepare(
+		const rows = await db.prepare(
 			`SELECT key, value
 			 FROM calendar_admin_settings
 			 WHERE key IN ('payment_provider', 'payment_handle')`
 		).all<{ key: string; value: string | null }>()
+
+		const map = new Map((rows?.results ?? []).map((row) => [row.key, row.value]))
+		return {
+			provider: map.get('payment_provider') ?? null,
+			handle: map.get('payment_handle') ?? null
+		}
 	} catch {
 		return { provider: null, handle: null }
-	}
-
-	const map = new Map((rows?.results ?? []).map((row) => [row.key, row.value]))
-	return {
-		provider: map.get('payment_provider') ?? null,
-		handle: map.get('payment_handle') ?? null
 	}
 }
 

@@ -13,6 +13,7 @@ function createGuestEmail() {
 }
 
 export async function POST(event: RequestEvent) {
+	let createdUserId: string | null = null
 	try {
 		const env = await buildEnv(event.platform)
 		const secureCookies = env['NODE_ENV'] !== 'development'
@@ -49,6 +50,7 @@ export async function POST(event: RequestEvent) {
 				code: 'account_exists'
 			})
 		}
+		if (user.created) createdUserId = String(user.userId)
 		const consumed = await consumeInvite({
 			db: env.DB,
 			inviteId: result.invite.id,
@@ -56,8 +58,12 @@ export async function POST(event: RequestEvent) {
 			usesRemaining: result.invite.uses_remaining
 		})
 		if (!consumed.ok) {
-			return apiError('This invite has already been used.', {
-				status: 409,
+			if (createdUserId) {
+				await env.DB.prepare(`DELETE FROM calendar_users WHERE id = ?`).bind(createdUserId).run()
+				createdUserId = null
+			}
+			return apiError('This invite can no longer be claimed.', {
+				status: consumed.reason === 'expired' ? 409 : 409,
 				code: `invite_${consumed.reason}`
 			})
 		}
@@ -75,6 +81,14 @@ export async function POST(event: RequestEvent) {
 			email: effectiveEmail
 		})
 	} catch (error) {
+		if (createdUserId) {
+			try {
+				const env = await buildEnv(event.platform)
+				await env.DB.prepare(`DELETE FROM calendar_users WHERE id = ?`).bind(createdUserId).run()
+			} catch (cleanupError) {
+				console.error('Calendar invite claim cleanup failed:', cleanupError)
+			}
+		}
 		if (error instanceof TransportValidationError) {
 			return apiValidationError(error)
 		}
