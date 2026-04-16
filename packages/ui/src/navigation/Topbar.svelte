@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Menu, X } from '@lucide/svelte'
-	import { onMount } from 'svelte'
 	import type { Snippet } from 'svelte'
 	import type { NavItem } from '../types/nav'
 	import TopbarDesktopNav from './topbar/TopbarDesktopNav.svelte'
@@ -26,12 +25,6 @@
 		utility
 	}: TopbarProps = $props()
 	let mobileMenuOpen = $state(false)
-	let compactMode = $state(false)
-	let headerInner: HTMLDivElement | null = null
-	let headerLogo: HTMLDivElement | null = null
-	let headerUtilities: HTMLDivElement | null = null
-	let navMeasure: HTMLDivElement | null = null
-
 	function toggleMobileMenu() {
 		mobileMenuOpen = !mobileMenuOpen
 	}
@@ -40,59 +33,15 @@
 		mobileMenuOpen = false
 	}
 
-	function updateCompactMode() {
-		if (!headerInner || !headerLogo || !headerUtilities || !navMeasure) return
-
-		const innerWidth = headerInner.clientWidth
-		const logoWidth = headerLogo.offsetWidth
-		const utilitiesWidth = headerUtilities.offsetWidth
-		const navWidth = navMeasure.scrollWidth
-		const columnGap = 32
-		const menuWidth = 38
-		const requiredWidth = logoWidth + navWidth + utilitiesWidth + menuWidth + columnGap * 3
-
-		compactMode = requiredWidth > innerWidth
-	}
-
 	$effect(() => {
 		void currentPath
 		mobileMenuOpen = false
 	})
-
-	$effect(() => {
-		if (!compactMode) {
-			mobileMenuOpen = false
-		}
-	})
-
-	onMount(() => {
-		updateCompactMode()
-
-		const resizeObserver = typeof ResizeObserver === 'undefined'
-			? null
-			: new ResizeObserver(() => {
-				updateCompactMode()
-			})
-
-		if (resizeObserver) {
-			if (headerInner) resizeObserver.observe(headerInner)
-			if (headerLogo) resizeObserver.observe(headerLogo)
-			if (headerUtilities) resizeObserver.observe(headerUtilities)
-			if (navMeasure) resizeObserver.observe(navMeasure)
-		}
-
-		window.addEventListener('resize', updateCompactMode)
-
-		return () => {
-			resizeObserver?.disconnect()
-			window.removeEventListener('resize', updateCompactMode)
-		}
-	})
 </script>
 
-<header class:layout-header--compact={compactMode} class="layout-header">
-	<div class="layout-header__inner" bind:this={headerInner}>
-		<div class="layout-header__logo" bind:this={headerLogo}>
+<header class="layout-header">
+	<div class="layout-header__inner">
+		<div class="layout-header__logo">
 			<a href={logoHref} class="layout-header__logo-link">
 				{#if logoSrc}
 					<img src={logoSrc} alt={logoAlt} class="layout-header__logo-image" />
@@ -102,7 +51,7 @@
 			</a>
 		</div>
 		<TopbarDesktopNav {items} {currentPath} {disablePrefetchPrefixes} />
-		<div class="layout-header__utilities" aria-label="Quick actions" bind:this={headerUtilities}>
+		<div class="layout-header__utilities" aria-label="Quick actions">
 			{@render utility?.()}
 		</div>
 
@@ -120,10 +69,6 @@
 				<Menu size={22} strokeWidth={2.1} aria-hidden="true" />
 			{/if}
 		</button>
-	</div>
-
-	<div class="layout-header__nav-measure" bind:this={navMeasure} aria-hidden="true">
-		<TopbarDesktopNav {items} {currentPath} measureOnly />
 	</div>
 
 	{#if mobileMenuOpen}
@@ -155,18 +100,6 @@
 		align-items: center;
 		gap: 0.7rem;
 		margin-left: 1.5rem;
-	}
-
-	.layout-header__nav-measure {
-		position: absolute;
-		left: -9999px;
-		top: 0;
-		display: inline-flex;
-		align-items: center;
-		gap: 2.5rem;
-		visibility: hidden;
-		pointer-events: none;
-		white-space: nowrap;
 	}
 
 	.layout-header__menu-button {
@@ -242,18 +175,20 @@
 		background: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 10%, transparent);
 	}
 
-	:global(.layout-header--compact .layout-header__nav) {
-		display: none;
-	}
+	@media (max-width: 56em) {
+		:global(.layout-header__nav) {
+			display: none;
+		}
 
-	.layout-header--compact .layout-header__utilities {
-		display: inline-flex;
-		margin-left: auto;
-		gap: 0.45rem;
-	}
+		.layout-header__utilities {
+			display: inline-flex;
+			margin-left: auto;
+			gap: 0.45rem;
+		}
 
-	.layout-header--compact .layout-header__menu-button {
-		display: inline-flex;
+		.layout-header__menu-button {
+			display: inline-flex;
+		}
 	}
 
 	@media (max-width: 43.75em) {

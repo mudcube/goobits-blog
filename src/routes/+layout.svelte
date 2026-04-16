@@ -123,18 +123,20 @@
 		color: var(--header-nav-accent, var(--color-white));
 	}
 
-	:global(.layout-header--compact .layout-header__utility-link) {
-		width: 2.35rem;
-		height: 2.35rem;
-		padding: 0;
-		border: 1px solid color-mix(in srgb, var(--color-white) 14%, transparent);
-		border-radius: var(--radius-pill);
-		background: color-mix(in srgb, var(--color-white) 5%, transparent);
-	}
+	@media (max-width: 56em) {
+		:global(.layout-header__utility-link) {
+			width: 2.35rem;
+			height: 2.35rem;
+			padding: 0;
+			border: 1px solid color-mix(in srgb, var(--color-white) 14%, transparent);
+			border-radius: var(--radius-pill);
+			background: color-mix(in srgb, var(--color-white) 5%, transparent);
+		}
 
-	:global(.layout-header--compact .layout-header__utility-link:hover),
-	:global(.layout-header--compact .layout-header__utility-link--active) {
-		border-color: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 36%, transparent);
-		background: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 10%, transparent);
+		:global(.layout-header__utility-link:hover),
+		:global(.layout-header__utility-link--active) {
+			border-color: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 36%, transparent);
+			background: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 10%, transparent);
+		}
 	}
 </style>
