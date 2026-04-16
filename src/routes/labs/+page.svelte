@@ -20,7 +20,7 @@
 	}
 
 	function getLabImage(href: string) {
-		return labImageByHref[href] || '/media/labs-flask.png'
+		return labImageByHref[href] || '/media/page-icons/labs-flask.png'
 	}
 
 	function getLabMeta(href: string) {
@@ -61,7 +61,7 @@
 	title="Creative Coding Labs"
 	{description}
 	path="/labs/"
-	image="/media/labs-flask.png"
+	image="/media/page-icons/labs-flask.png"
 	jsonLd={[
 		buildWebPageJsonLd({
 			path: '/labs/',
@@ -78,7 +78,7 @@
 			eyebrow="Labs"
 			title="Experiments, tools, and"
 			titleAccent="browser curiosities"
-			icon="/media/labs-flask.png"
+			icon="/media/page-icons/labs-flask.png"
 			iconAlt="Labs flask icon"
 			intro="A cabinet of playful browser sketches, tiny creative tools, old prototypes, and odd technical artifacts from different eras of the web."
 			signalLabel="Lab Archive No. 010"

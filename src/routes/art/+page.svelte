@@ -17,63 +17,63 @@
 		{
 			title: 'Portland Ketchup Summer Tee',
 			category: 'T-shirt design',
-			image: '/media/stubs/product-stub-1.svg',
+			image: '/media/placeholders/product-stub-1.svg',
 			note: 'Playful bottle mascot system and back-print layout for a seasonal apparel drop.',
 			badge: 'Screen Print Ready'
 		},
 		{
 			title: 'Late-Night Fries Club Shirt',
 			category: 'T-shirt design',
-			image: '/media/stubs/product-stub-2.svg',
+			image: '/media/placeholders/product-stub-2.svg',
 			note: 'Bold one-color graphic concept built for high-contrast screen printing.',
 			badge: 'Merch System'
 		},
 		{
 			title: 'Ketchup & Friends Sticker Set',
 			category: 'Merch',
-			image: '/media/stubs/product-stub-3.svg',
+			image: '/media/placeholders/product-stub-3.svg',
 			note: 'Character-led sticker sheet ideas with alternate expressions and mini slogans.',
 			badge: 'Character Pack'
 		},
 		{
 			title: 'Hot Dog Cart Label Refresh',
 			category: 'Packaging',
-			image: '/media/stubs/product-stub-4.svg',
+			image: '/media/placeholders/product-stub-4.svg',
 			note: 'Retro-inspired label direction balancing shelf readability with playful voice.',
 			badge: 'Shelf Refresh'
 		},
 		{
 			title: 'Funny Condiment Pin Collection',
 			category: 'Accessories',
-			image: '/media/stubs/product-stub-5.svg',
+			image: '/media/placeholders/product-stub-5.svg',
 			note: 'Enamel pin concepts featuring cheeky micro-copy and icon-forward silhouettes.',
 			badge: 'Product Drop'
 		},
 		{
 			title: 'Weekend Market Tote Series',
 			category: 'Soft goods',
-			image: '/media/stubs/product-stub-6.svg',
+			image: '/media/placeholders/product-stub-6.svg',
 			note: 'Reusable tote family with modular lockups for events, popups, and collabs.',
 			badge: 'Retail Set'
 		},
 		{
 			title: 'Snackline Poster Pack',
 			category: 'Print',
-			image: '/media/stubs/product-stub-7.svg',
+			image: '/media/placeholders/product-stub-7.svg',
 			note: 'Whimsical promotional posters designed as companion pieces to apparel launches.',
 			badge: 'Campaign Art'
 		},
 		{
 			title: 'Pickle Parade Apron',
 			category: 'Kitchenware',
-			image: '/media/stubs/product-stub-8.svg',
+			image: '/media/placeholders/product-stub-8.svg',
 			note: 'Front-pocket print layout with oversized character art and punchy typography.',
 			badge: 'Kitchen Collab'
 		},
 		{
 			title: 'Festival Booth Sign Kit',
 			category: 'Brand system',
-			image: '/media/stubs/product-stub-9.svg',
+			image: '/media/placeholders/product-stub-9.svg',
 			note: 'Coordinated signage concepts tying merch, menu boards, and giveaway cards together.',
 			badge: 'Booth System'
 		}
@@ -84,7 +84,7 @@
 	title="Art, Product Concepts & Visual Experiments"
 	{description}
 	path="/art/"
-	image="/media/art-rainbow-imagination.png"
+	image="/media/page-icons/art-rainbow-imagination.png"
 	jsonLd={[
 		buildWebPageJsonLd({
 			path: '/art/',
@@ -101,7 +101,7 @@
 			eyebrow="Art"
 			title="Product concepts, merch, and"
 			titleAccent="visual experiments"
-			icon="/media/art-rainbow-imagination.png"
+			icon="/media/page-icons/art-rainbow-imagination.png"
 			iconAlt="Art rainbow icon"
 			intro="A working gallery of t-shirt concepts, Portland Ketchup experiments, packaging directions, and other product-ready visuals."
 			signalLabel="Studio Board No. 019"

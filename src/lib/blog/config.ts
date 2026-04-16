@@ -13,8 +13,8 @@ const journalBlogConfig = {
 	},
 	images: {
 		defaults: {
-			authorAvatar: '/media/miko.jpg',
-			coverImage: '/media/journal-journaling.png'
+			authorAvatar: '/media/brand/miko.jpg',
+			coverImage: '/media/page-icons/journal-journaling.png'
 		}
 	},
 	pagination: {

@@ -67,7 +67,7 @@
 	title="Sitemap"
 	{description}
 	path="/sitemap/"
-	image="/media/sitemap-compass.png"
+	image="/media/page-icons/sitemap-compass.png"
 	jsonLd={[
 		buildWebPageJsonLd({
 			path: '/sitemap/',
@@ -83,7 +83,7 @@
 			eyebrow="Sitemap"
 			title="A friendly map of"
 			titleAccent="everything here"
-			icon="/media/sitemap-compass.png"
+			icon="/media/page-icons/sitemap-compass.png"
 			iconAlt="Compass icon"
 			intro="A human-readable map of public pages, journal entries, and, when enabled locally, internal routes that shape the site."
 			signalLabel={`${data.stats.total} routes indexed`}

@@ -59,7 +59,7 @@ function normalizeUrlPath(raw) {
   if (!raw) return null
   if (/^(https?:|mailto:|tel:|#|javascript:|data:)/i.test(raw)) return null
   let v = raw.trim()
-  // Avoid flagging templated paths like `/media/project-{id}.png` in Svelte styles.
+  // Avoid flagging templated paths like `/media/projects/project-{id}.png` in Svelte styles.
   if (/[{}]/.test(v)) return null
   if (!v.startsWith('/')) return null
   v = v.split('#')[0].split('?')[0]

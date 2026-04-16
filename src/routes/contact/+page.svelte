@@ -13,7 +13,7 @@
 	title="Contact Miko Meow"
 	{description}
 	path="/contact/"
-	image="/media/contact-email-heart.png"
+	image="/media/page-icons/contact-email-heart.png"
 	jsonLd={[
 		buildWebPageJsonLd({
 			path: '/contact/',

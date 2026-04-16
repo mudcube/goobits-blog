@@ -11,7 +11,7 @@
 	title="Creative Software, Design Tools & Music Experiments"
 	{description}
 	path="/"
-	image="/media/project-sketchpad.png"
+	image="/media/projects/project-sketchpad.png"
 	jsonLd={[
 		buildWebsiteJsonLd(),
 		buildPersonJsonLd(),
@@ -27,7 +27,7 @@
     <h1 class="home__hero-title">MAKE, LEARN&hellip; PLAY!</h1>
     <h2 class="home__hero-subtitle">APPS CRAFTED WITH
         <img
-                src="/media/emoji-sparkling-heart.png"
+                src="/media/decor/emoji-sparkling-heart.png"
                 height="40"
                 width="40"
                 class="home__hero-heart"
@@ -39,7 +39,7 @@
 <div class="home__projects">
     {#each apps as { id, description, title, url }}
         <a class="home__project" href="{url}">
-            <span class="home__project-image" style="background-image: url('/media/project-{id}.png')"></span>
+            <span class="home__project-image" style="background-image: url('/media/projects/project-{id}.png')"></span>
             <span class="home__project-description">{description}</span>
             <span class="home__project-title"><span class="home__project-title-text">{title}</span></span>
         </a>
@@ -51,7 +51,7 @@
 <!--<projects>-->
 <!--    {#each art as {id, description, title, url}, i}-->
 <!--        <a class="project" href="{url}">-->
-<!--            <project-image style="background-image: url('/media/project-{id}.png')"></project-image>-->
+<!--            <project-image style="background-image: url('/media/projects/project-{id}.png')"></project-image>-->
 <!--            <project-description>{description}</project-description>-->
 <!--            <project-title><span>{title}</span></project-title>-->
 <!--        </a>-->

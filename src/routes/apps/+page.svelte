@@ -16,7 +16,7 @@
 	}
 
 	function getAppImage(id) {
-		return `/media/generated/nano-banana/apps-upscaled/project-${id}-upscaled.png`
+		return `/media/projects/generated/apps-upscaled/project-${id}-upscaled.png`
 	}
 
 	function getAppMeta(id) {
@@ -45,7 +45,19 @@
 			<div class="apps-page__hero-copy">
 				<p class="apps-page__eyebrow">Apps</p>
 				<h1 id="apps-page-title" class="apps-page__title">
-					Playful tools, creative apps, and <span>interactive software</span>
+					Playful tools, creative apps, and
+					<span>
+						interactive software
+						<span class="apps-page__title-icon-wrap">
+							<img
+								src="/media/page-icons/holidays-party.png"
+								alt="Apps illustration"
+								class="apps-page__title-icon"
+								loading="eager"
+								decoding="async"
+							/>
+						</span>
+					</span>
 				</h1>
 				<p class="apps-page__intro">
 					Apps crafted for making, learning, and play. Browser-native tools for drawing, music, color, mindfulness, and generative exploration.
@@ -198,6 +210,20 @@
 			color: var(--apps-primary);
 			font-style: italic;
 		}
+	}
+
+	.apps-page__title-icon-wrap {
+		display: inline-block;
+		margin-left: 0.3em;
+		white-space: nowrap;
+	}
+
+	.apps-page__title-icon {
+		width: clamp(2rem, 4vw, 2.6rem);
+		height: clamp(2rem, 4vw, 2.6rem);
+		object-fit: contain;
+		vertical-align: -0.18em;
+		filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.22));
 	}
 
 	.apps-page__intro {

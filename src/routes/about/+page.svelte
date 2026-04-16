@@ -64,7 +64,7 @@
 	title="About Miko Meow"
 	{description}
 	path="/about/"
-	image="/media/miko.jpg"
+	image="/media/brand/miko.jpg"
 	jsonLd={[
 		buildPersonJsonLd(),
 		buildWebPageJsonLd({
@@ -81,14 +81,14 @@
 		eyebrow="About"
 		title="Haai! I'm Miko"
 		titleClass="about-page__hero-title"
-		icon="/media/about-kitty-unicorn.png"
+		icon="/media/page-icons/about-kitty-unicorn.png"
 		iconAlt="Unicorn kitty icon"
 		subtitle="Developer, designer & musician"
 	>
 		<section class="about-page__intro">
 			<figure class="about-page__photo">
 				<img
-					src="/media/miko.jpg"
+					src="/media/brand/miko.jpg"
 					alt="Portrait of Miko"
 					width="160"
 					height="160"

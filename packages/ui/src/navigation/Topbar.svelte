@@ -38,7 +38,7 @@
 	<div class="layout-header__inner">
 		<div class="layout-header__logo">
 			<a href="/" class="layout-header__logo-link">
-				<img src="/media/logo.svg" alt="logo" class="layout-header__logo-image" />
+				<img src="/media/brand/logo.svg" alt="logo" class="layout-header__logo-image" />
 			</a>
 		</div>
 		<nav class="layout-header__nav">

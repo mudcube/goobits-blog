@@ -11,7 +11,7 @@
 <DirectoryCatalogPage
 	eyebrow="Dev"
 	title="Dev"
-	icon="/media/labs-flask.png"
+	icon="/media/page-icons/labs-flask.png"
 	iconAlt="Flask icon"
 	subtitle="Internal prototypes and route-level design explorations."
 	items={data.items}

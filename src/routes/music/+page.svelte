@@ -20,20 +20,20 @@
 		subtitle: 'synth ambient',
 		date: '2025-01-12',
 		tag: 'Track',
-		image: '/media/generated/nano-banana/neon-drift-synth-ambient.png',
+		image: '/media/projects/generated/neon-drift-synth-ambient.png',
 		alt: 'Illustrated night drive with neon reflections and glowing audio waves'
 	}
 
 	const artworkUrls = [
 		featuredTrack.image,
-		'/media/project-color-piano.png',
+		'/media/projects/project-color-piano.png',
 		'/journal/2011/08/webgl-music-box/images/hero.png',
-		'/media/project-sketchpad.png',
-		'/media/project-color-sphere.png',
-		'/media/project-sand-art.png',
-		'/media/project-zendala.png',
-		'/media/art-rainbow-imagination.png',
-		'/media/about-kitty-unicorn.png'
+		'/media/projects/project-sketchpad.png',
+		'/media/projects/project-color-sphere.png',
+		'/media/projects/project-sand-art.png',
+		'/media/projects/project-zendala.png',
+		'/media/page-icons/art-rainbow-imagination.png',
+		'/media/page-icons/about-kitty-unicorn.png'
 	]
 
 	const fallbackEntries = [
@@ -91,7 +91,7 @@
 			eyebrow="Music"
 			title="Songs, sketches, and"
 			titleAccent="sound experiments"
-			icon="/media/music-notes-flow.png"
+			icon="/media/page-icons/music-notes-flow.png"
 			iconAlt="Music notes icon"
 			intro="Exploring the thin membrane between build sessions and sonic textures. Tracks, demos, and music-related experiments from Miko."
 			signalLabel="Sonic Explorer No. 042"

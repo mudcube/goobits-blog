@@ -10,7 +10,7 @@
 	title="Privacy Policy"
 	{description}
 	path="/privacy/"
-	image="/media/privacy-shield.png"
+	image="/media/page-icons/privacy-shield.png"
 	jsonLd={[
 		buildWebPageJsonLd({
 			path: '/privacy/',
@@ -24,7 +24,7 @@
 	title="Privacy"
 	titleAccent="Policy"
 	accentColor="#67e8f9"
-	icon="/media/privacy-shield.png"
+	icon="/media/page-icons/privacy-shield.png"
 	subtitle="What I collect, why, and how it is protected."
 	updatedAt="February 11, 2026"
 	className="legal--privacy"

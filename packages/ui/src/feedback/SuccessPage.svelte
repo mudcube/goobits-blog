@@ -19,7 +19,7 @@
 		copy,
 		buttonHref,
 		buttonLabel,
-		imageSrc = '/media/contact-thank-you.svg',
+		imageSrc = '/media/page-icons/contact-thank-you.svg',
 		imageAlt = 'Success illustration',
 		buttonIcon = 'none',
 		className = ''

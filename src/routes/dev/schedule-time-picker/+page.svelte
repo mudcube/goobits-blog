@@ -125,7 +125,7 @@
 			eyebrow="Dev"
 			title="Schedule Time Picker"
 			titleClass="schedule-time-picker__hero-title"
-			icon="/media/labs-flask.png"
+			icon="/media/page-icons/labs-flask.png"
 			iconAlt="Flask icon"
 			subtitle="An interactive route prototype for dragging a training window across the day with daylight cues and a lightweight confirmation state."
 			compact

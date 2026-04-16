@@ -26,7 +26,7 @@
 		<div class="calendar-shell-nav__left">
 			{#if showLogo}
 				<a class="calendar-shell-nav__home" href={homeHref} aria-label="Home">
-					<img src="/media/logo.svg" alt="MIKO.ART" class="calendar-shell-nav__home-logo" />
+					<img src="/media/brand/logo.svg" alt="MIKO.ART" class="calendar-shell-nav__home-logo" />
 				</a>
 			{/if}
 			{#if brandLabel}

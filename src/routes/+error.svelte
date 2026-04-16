@@ -6,7 +6,7 @@
 
 <div class="error-page__container">
 	<a class="error-page__link" href="/" aria-label="Return home">
-		<img class="error-page__image" src="/media/404-cat.svg" alt="404 Cat" />
+		<img class="error-page__image" src="/media/decor/404-cat.svg" alt="404 Cat" />
 	</a>
 </div>
 

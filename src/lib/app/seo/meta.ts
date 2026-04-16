@@ -1,7 +1,7 @@
 export const SITE_ORIGIN = 'https://miko.art'
 export const SITE_NAME = 'MIKO.ART'
 export const SITE_AUTHOR = 'Miko Meow'
-export const SITE_DEFAULT_IMAGE = '/media/miko.jpg'
+export const SITE_DEFAULT_IMAGE = '/media/brand/miko.jpg'
 export const SITE_DESCRIPTION =
 	'Creative software, design tools, music experiments, and process notes from Miko Meow.'
 

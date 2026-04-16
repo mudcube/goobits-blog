@@ -51,6 +51,8 @@
 	{eyebrow}
 	title={pageTitle}
 	{titleAccent}
+	icon="/media/page-icons/journal-journaling.png"
+	iconAlt="Journal illustration"
 	intro={description}
 	{signalLabel}
 	{chips}

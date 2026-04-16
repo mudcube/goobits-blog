@@ -10,7 +10,7 @@
 	title="Terms of Use"
 	{description}
 	path="/terms/"
-	image="/media/terms-justice.png"
+	image="/media/page-icons/terms-justice.png"
 	jsonLd={[
 		buildWebPageJsonLd({
 			path: '/terms/',
@@ -24,7 +24,7 @@
 	title="Terms of"
 	titleAccent="Use"
 	accentColor="#f9a8d4"
-	icon="/media/terms-justice.png"
+	icon="/media/page-icons/terms-justice.png"
 	subtitle="A quick guide to using this site smoothly."
 	updatedAt="February 11, 2026"
 	className="legal--terms"

@@ -42,7 +42,7 @@
 			description:
 				blogConfig.description || 'Ideas, process, and notes from Miko Meow.',
 			path: journalIndexPath,
-			image: blogConfig.images?.defaults?.coverImage || '/media/miko.jpg',
+			image: blogConfig.images?.defaults?.coverImage || '/media/brand/miko.jpg',
 			type: 'website' as 'website' | 'article',
 			publishedTime: '',
 			modifiedTime: '',

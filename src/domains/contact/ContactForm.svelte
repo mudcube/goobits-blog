@@ -44,7 +44,7 @@
 		eyebrow="Contact"
 		title="Say Hello"
 		titleClass="contact-page__hero-title"
-		icon="/media/contact-email-heart.png"
+		icon="/media/page-icons/contact-email-heart.png"
 		iconAlt="Email heart icon"
 		subtitle="Got a question, a project idea, or just want to chat? Drop me a line."
 		compact
@@ -146,7 +146,7 @@
 			<div class="contact-page__raccoon-wrap">
 				<img
 					class="contact-page__image"
-					src="/media/super-racoon.svg"
+					src="/media/decor/super-racoon.svg"
 					alt="Raccoon illustration"
 					width="180"
 					height="180"

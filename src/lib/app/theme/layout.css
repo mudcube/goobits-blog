@@ -1,5 +1,5 @@
 .layout-header {
-	background: var(--header-gradient), url('/media/hexabump.png');
+	background: var(--header-gradient), url('/media/decor/hexabump.png');
 	border-bottom: 1px solid color-mix(in srgb, var(--border) 52%, transparent);
 	box-shadow: 0 0 50px -18px rgba(172, 138, 255, 0.22);
 	backdrop-filter: blur(18px) saturate(120%);

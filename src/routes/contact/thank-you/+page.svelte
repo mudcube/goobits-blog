@@ -16,7 +16,7 @@
 	copy="Thank you for reaching out. I&apos;ll get back to you as soon as possible."
 	buttonHref="/"
 	buttonLabel="Back to home"
-	imageSrc="/media/contact-thank-you.svg"
+	imageSrc="/media/page-icons/contact-thank-you.svg"
 	imageAlt="Thank you illustration"
 	buttonIcon="home"
 />

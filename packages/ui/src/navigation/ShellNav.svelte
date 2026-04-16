@@ -27,7 +27,7 @@
 <nav class="shell-nav">
 	<div class="shell-nav__inner">
 		<a href={homeHref} class="shell-nav__home" aria-label="Home">
-			<img src="/media/logo.svg" alt="MIKO.ART" class="shell-nav__home-logo" />
+			<img src="/media/brand/logo.svg" alt="MIKO.ART" class="shell-nav__home-logo" />
 		</a>
 		{#if brandLabel && brandHref}
 			<a href={brandHref} class="shell-nav__brand">{brandLabel}</a>

@@ -10,7 +10,7 @@
 	title="Cookie Policy"
 	{description}
 	path="/cookies/"
-	image="/media/cookies-cookie.png"
+	image="/media/page-icons/cookies-cookie.png"
 	jsonLd={[
 		buildWebPageJsonLd({
 			path: '/cookies/',
@@ -24,7 +24,7 @@
 	title="Cookie"
 	titleAccent="Policy"
 	accentColor="#fdba74"
-	icon="/media/cookies-cookie.png"
+	icon="/media/page-icons/cookies-cookie.png"
 	subtitle="What cookies do here, and what they don't."
 	updatedAt="February 11, 2026"
 	className="legal--cookies"
