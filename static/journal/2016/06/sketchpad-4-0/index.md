@@ -34,8 +34,8 @@ There are a couple things that could not be 100% converted to the new version Sk
 - FloodFill was deprecated. It just did not make sense to keep in. It cost too much to maintain, it was notorious for crashing users' browsers. Sketchpad is a vector app, so a bitmap FloodFill never made sense. The new VectorFill replaces the FloodFill, and the results are much nicer!
 - LinearGradient format needed to be upgraded in order to support the new Gradient Editor, and in doing so, LinearGradients may shift slightly.
 
-If for any reason you’d like to use the _older version of Sketchpad_ you can find it at its new permanent URL: [https://sketch.io/sketchpad-3.7.6/](https://sketch.io/sketchpad-3.7.6/)
+If for any reason you’d like to use the _older version of Sketchpad_ you can find it at its new permanent URL: [Sketchpad 3.7.6](https://sketch.io/sketchpad-3.7.6/)
 
 Or better yet, check out the latest!
 
-[https://sketch.io/sketchpad/](https://sketch.io/sketchpad/)
+[Sketchpad](https://sketch.io/sketchpad/)

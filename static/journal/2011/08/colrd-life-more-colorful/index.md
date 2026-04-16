@@ -21,6 +21,6 @@ natural for me so far has been combining the powers of RGB w/ HSL. This is what 
 the [Color Creator](http://colrd.com/create/color/) and the [Palette Creator](http://colrd.com/create/palette/);
 
 Once you create some content, or find some things you like, you can start building your own Swatch, where you can
-quickly find the content that you like. Check out my page, cool stuff: [http://colrd.com/@/mud/](http://colrd.com/@/mud/)
+quickly find the content that you like. Check out my page, cool stuff: [my ColRD profile on the Wayback Machine](https://web.archive.org/web/*/http://colrd.com/@/mud/)
 
 Let us know what you think, and how we can improve your experience!

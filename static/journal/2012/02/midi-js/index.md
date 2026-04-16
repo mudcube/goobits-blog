@@ -17,7 +17,7 @@ coverImage: "images/hero.png"
 > 
 > Carpe beerum, and [commandeer](https://github.com/mudcube/MIDI.js) yer own copy!
 
-The Jack the Tunafish artwork was graciously provided by Boni Deal; [http://bonideal.com/](http://bonideal.com/)
+The Jack the Tunafish artwork was designed by my mom, Boni Deal; [http://bonideal.com/](http://bonideal.com/)
 
 View a live demo of the github project; [/midi-js/](/midi-js/)
 

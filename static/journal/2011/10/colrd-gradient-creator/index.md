@@ -51,4 +51,4 @@ If you have any ideas for the future, let us know!
 
 For those interested in exotic gradient editors, SpectraG is a project that uses mathematic equations to generate gradients;
 
-[http://sourceforge.net/projects/spectrag/](http://sourceforge.net/projects/spectrag/)
+[SpectraG on SourceForge](https://sourceforge.net/projects/spectrag/)

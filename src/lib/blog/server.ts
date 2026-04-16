@@ -56,6 +56,60 @@ function upgradeInsecureMediaUrls(html: string) {
 	return html.replace(/(<(?:img|source)\b[^>]*\b(?:src|srcset)=["'])http:\/\//gi, '$1https://')
 }
 
+const OWNED_EXTERNAL_DOMAINS = [
+	'miko.art',
+	'sketch.io',
+	'sketchpad.com',
+	'colorpiano.com',
+	'colorsphere.app',
+	'sandart.app',
+	'zendala.app',
+	'beheremeow.app'
+]
+
+function isOwnedExternalUrl(href: string) {
+	try {
+		const url = new URL(href)
+		return OWNED_EXTERNAL_DOMAINS.some(
+			(domain) => url.hostname === domain || url.hostname.endsWith(`.${domain}`)
+		)
+	} catch {
+		return false
+	}
+}
+
+function mergeRelAttribute(existingRel: string | null, requiredTokens: string[]) {
+	const relTokens = new Set(
+		(existingRel ?? '')
+			.split(/\s+/)
+			.map((token) => token.trim())
+			.filter(Boolean)
+	)
+
+	for (const token of requiredTokens) {
+		relTokens.add(token)
+	}
+
+	return [ ...relTokens ].join(' ')
+}
+
+function normalizeExternalAnchorRel(html: string) {
+	return html.replace(/<a\b[^>]*\bhref=(['"])(.*?)\1[^>]*>/gi, (anchorTag, quote, href: string) => {
+		if (!/^https?:\/\//i.test(href) || isOwnedExternalUrl(href)) {
+			return anchorTag
+		}
+
+		const relMatch = anchorTag.match(/\brel=(['"])(.*?)\1/i)
+		const mergedRel = mergeRelAttribute(relMatch?.[2] ?? null, [ 'nofollow' ])
+
+		if (relMatch) {
+			return anchorTag.replace(/\brel=(['"])(.*?)\1/i, `rel=${quote}${mergedRel}${quote}`)
+		}
+
+		return anchorTag.replace(/>$/, ` rel=${quote}${mergedRel}${quote}>`)
+	})
+}
+
 function getJournalPostFilePath(year: string, month: string, slug: string) {
 	return join(process.cwd(), 'static/journal', year, month, slug, 'index.md')
 }
@@ -92,7 +146,9 @@ export async function getPost({
 			remarkPlugins: [remarkTableOfContents]
 		})) as MdsvexCompileResult
 		const renderedContent = (compiled?.code ?? '').replace(/{@html `(.*?)`}/gs, '$1')
-		const strippedContent = stripScriptTags(upgradeInsecureMediaUrls(renderedContent))
+		const strippedContent = normalizeExternalAnchorRel(
+			stripScriptTags(upgradeInsecureMediaUrls(renderedContent))
+		)
 		const fallbackDate = () => new Date(`${year}-${month}-01`)
 		const postDate = resolvePostDate(compiled?.data?.date, fallbackDate)
 

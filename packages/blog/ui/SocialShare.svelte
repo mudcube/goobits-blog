@@ -83,7 +83,7 @@
 		<a
 			href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`}
 			target="_blank"
-			rel="noopener noreferrer"
+			rel="noopener noreferrer nofollow"
 			class="goo__share-button"
 			aria-label={getMessage('shareFacebook', 'Share on Facebook')}
 			role="button"
@@ -97,7 +97,7 @@
 		<a
 			href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`}
 			target="_blank"
-			rel="noopener noreferrer"
+			rel="noopener noreferrer nofollow"
 			class="goo__share-button"
 			aria-label={getMessage('shareTwitter', 'Share on Twitter')}
 			role="button"

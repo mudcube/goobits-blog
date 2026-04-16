@@ -26,7 +26,7 @@ _Getting your feet wet with Color Piano (features);_
     - [eHow](http://www.ehow.com/how_5091403_convert-audio-midi.html) explains how-to convert Audio to MIDI.
     - [VGMusic](http://www.vgmusic.com/) provides MIDIs to an amazing assortment of video games!
     - [Freebyte](http://www.freebyte.com/music/#midifiles) has links to other collections of MIDI files.
-    - [http://www.piano-midi.de/midi\_files.htm](http://www.piano-midi.de/midi_files.htm)
+    - [Piano MIDI collection](http://www.piano-midi.de/midi_files.htm)
 2. **Seek to a specific location in the song**, or replay parts your having troubles with;
     - To do this, use your MouseWheel, or Scroll with two fingers using a Trackpad, or Use the Scrollbar on the right of the Piano.
 3. **Play the keyboard with your computers keyboard =)**
@@ -74,6 +74,6 @@ _Getting your feet wet with Color Piano (features);_
     - Color Piano Theory is available on the [Chrome Webstore](https://chrome.google.com/webstore/detail/ihmigmmflfcbhdpdgbkkeojchjhhphnh).
 - 1.0beta
     - MIDI-reading support via [Matt West](http://matt.west.co.tt/)‘s very kindly provided [jasmid](https://github.com/gasman/jasmid) project.
-    - Royalty free classical piano pieces from [Disklavier World](http://www.kuhmann.com/Yamaha.htm).
+    - Royalty free classical piano pieces from [Disklavier World on the Wayback Machine](https://web.archive.org/web/*/http://www.kuhmann.com/Yamaha.htm).
     - [/journal/2011/01/color-piano-theory/](/journal/2011/01/color-piano-theory/)
     - [/journal/2007/03/piano-theory-widget/](/journal/2007/03/piano-theory-widget/)

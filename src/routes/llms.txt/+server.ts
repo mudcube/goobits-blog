@@ -14,7 +14,7 @@ export const prerender = true
 
 /**
  * /llms.txt — a curated, markdown-formatted index written for LLMs and
- * AI retrieval systems. Spec: https://llmstxt.org.
+ * AI retrieval systems. Spec: https://llmstxt.org
  *
  * This file gives ChatGPT, Claude, Perplexity, and similar systems a
  * single entry point for understanding the site without having to crawl

@@ -10,7 +10,7 @@ tags:
 coverImage: "images/midi-js-demo.png"
 ---
 
-**UPDATE:** This project has been cancelled, the MIDIBridge (which takes this idea much further) is what you’re looking for;  [http://www.abumarkub.net/abublog/?p=505](http://www.abumarkub.net/abublog/?p=505)
+**UPDATE:** This project has been cancelled. The MIDIBridge took this idea much further; see the archived project page on the [Wayback Machine](https://web.archive.org/web/*/http://www.abumarkub.net/abublog/?p=505).
 
 Have you ever wanted to use MIDI in your Javascript or Flash project?  It’s been a long time dream of mine.  After a long search I came up with one solution that would provide the best support for the most computers (at present time), utilizing Java’s [javax.sound.midi](http://java.sun.com/products/java-media/sound/doc-midi.html) interface through an . Introducing the MIDIPlugin providing the fundamental functions to create dynamic music & sound effects in your browser.
 
@@ -88,10 +88,17 @@ Released as [CC0](http://creativecommons.org/publicdomain/zero/1.0/), this means
 
 **Git me**
 
-Easily forkable on [GITHub](http://github.com/mudx/MIDIPlugin) or download the precompiled [.jar applet](/labs/Piano/MIDIPlugin-0.2.jar).
+The original MIDIPlugin repository is available on the [Wayback Machine](https://web.archive.org/web/*/https://github.com/mudx/MIDIPlugin), or you can download the precompiled [.jar applet](/labs/Piano/MIDIPlugin-0.2.jar).
 
 **Supported OS/Browsers**
 
 MIDIDPlugin works on Macs out of the box.  Linux works out of the box depending on distribution, other times it requires Java SE to be installed.  Windows requires Java SE as well as the MIDI Soundbanks to be installed (the Windows version of Java SE doesn’t ship with MIDI Soundbanks included).  On the browser front the plugin works across the board:  Chrome, Opera, Firefox, Safari and IE.
 
-**Other fun things in the name of music** [http://rhythmiclight.com/archives/ideas/colorscales.html](http://rhythmiclight.com/archives/ideas/colorscales.html) [http://www.alexisisaac.net/products/flashMidi/](http://www.alexisisaac.net/products/flashMidi/) [http://homepage3.nifty.com/sketch/flash/flmml050.swf](http://homepage3.nifty.com/sketch/flash/flmml050.swf) [http://code.google.com/p/abcjs/](http://code.google.com/p/abcjs/) [http://www.vexflow.com/](http://www.vexflow.com/) [http://en.wikipedia.org/wiki/General\_MIDI](http://en.wikipedia.org/wiki/General_MIDI)
+**Other fun things in the name of music**
+
+- [Three Centuries of Color Scales](https://web.archive.org/web/*/http://rhythmiclight.com/archives/ideas/colorscales.html)
+- [Flash MIDI](https://web.archive.org/web/*/http://www.alexisisaac.net/products/flashMidi/)
+- [FlMML demo](https://web.archive.org/web/*/http://homepage3.nifty.com/sketch/flash/flmml050.swf)
+- [ABCjs](https://www.abcjs.net/)
+- [VexFlow](https://vexflow.com/)
+- [General MIDI](https://en.wikipedia.org/wiki/General_MIDI)

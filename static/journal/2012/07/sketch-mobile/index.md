@@ -9,7 +9,7 @@ tags:
 coverImage: "images/Screen-Shot-2012-05-17-at-4.29.13-PM.png"
 ---
 
-[Sketch Mobile](http://sketchpad.io/mobile) is a drawing app build for mobile browsers; taking advantage of technologies such as multi-touch, the accelerometer, and the gyroscope; providing a fun & novel environment to express yourself in colorful ways. Sketch Mobile was commissioned by Google as part of the [Mobile Chrome Experiments](http://m.chromeexperiments.com/) released at Google I/O show in San Francisco. It was an exciting project to be part of, I hope you enjoy!
+[Sketch Mobile](https://web.archive.org/web/*/http://sketchpad.io/mobile) is a drawing app build for mobile browsers; taking advantage of technologies such as multi-touch, the accelerometer, and the gyroscope; providing a fun & novel environment to express yourself in colorful ways. Sketch Mobile was commissioned by Google as part of the [Mobile Chrome Experiments](http://m.chromeexperiments.com/) released at Google I/O show in San Francisco. It was an exciting project to be part of, I hope you enjoy!
 
 This is a short rundown of some of the technologies used to create the Sketch Mobile app;
 
@@ -22,11 +22,11 @@ This is a short rundown of some of the technologies used to create the Sketch Mo
 
 **Icon Fonts**
 
-One of the biggest challenges in this project was creating a design that would work as well on a 30” monitor, as it would on an iPhone display, without programming separate designs for each of them. In order to achieve this resolution independence we had to throw raster images out the window; instead we opted to use Icon Fonts along with some fancy CSS3 designed/coded by [Daniel Christopher](http://uxmonk.com/).
+One of the biggest challenges in this project was creating a design that would work as well on a 30” monitor, as it would on an iPhone display, without programming separate designs for each of them. In order to achieve this resolution independence we had to throw raster images out the window; instead we opted to use Icon Fonts along with some fancy CSS3 designed/coded by Daniel Christopher.
 
-Icon Fonts allow you to create a package consisting of your own custom SVG illustrations, which are embedded with the @fontface CSS3 attribute; the best part is, this feature is supported by all modern browsers ([http://caniuse.com/fontface](http://caniuse.com/fontface)). My favorite resource for creating your custom fonts is IcoMoon ([http://keyamoon.com/icomoon/](http://keyamoon.com/icomoon/)), they make generating Icon Fonts a snap! Check it out 😊
+Icon Fonts allow you to create a package consisting of your own custom SVG illustrations, which are embedded with the @fontface CSS3 attribute; the best part is, this feature is supported by all modern browsers ([Can I use: Font Face](https://caniuse.com/fontface)). My favorite resource for creating your custom fonts is [IcoMoon](https://icomoon.io/), they make generating Icon Fonts a snap! Check it out 😊
 
-The only Javascript required for this scalability is the “font-size” on the html/body, everything else uses em’s or %’s to scale from what that “font-size” was set to, looking like this;
+The only Javascript required for this scalability is the “font-size” on the html/body, everything else uses em’s or %’s to scale from what that “font-size” was set to, looking like this;
 
 ```js
 var width = window.innerWidth / 1280;
@@ -38,7 +38,7 @@ document.body.style.fontSize = ratio + "%";
 
 **Event.js**
 
-Another hurdle in creating Sketch Mobile was getting the Events working the same across devices, and prototyping missing event features such as gesture support.  I ended up putting together one of the most complete events libraries available, this library is especially relevant if you’re building a HTML5 Canvas application, as it takes into account CSS zooming. Event.js is available to you at Github ([https://github.com/mudcube/Event.js)](https://github.com/mudcube/Event.js) under the MIT license. The primary features of the library includes;
+Another hurdle in creating Sketch Mobile was getting the Events working the same across devices, and prototyping missing event features such as gesture support. I ended up putting together one of the most complete events libraries available, this library is especially relevant if you’re building a HTML5 Canvas application, as it takes into account CSS zooming. [Event.js](https://github.com/mudcube/Event.js) is available on GitHub under the MIT license. The primary features of the library includes;
 
 - 1 finger click, dblclick, and dbltap, Ghost onclick event shaves off 300ms on response.
 - 1+ finger tap, taphold, drag, and swipe, Customizable, from 1 to 12 fingers.
@@ -54,15 +54,15 @@ Tongseng allows developers to use the MacBook pro touch pad as if it were an iPa
 
 **Adobe Shadow**
 
-Developer tool from Adobe that allows you to use your desktop computer as a debug console for mobile devices. You can connect to your device wirelessly, and use your browsers normal error console to get helpful messages that will help debug your applications. Shadow works with Mobile Safari, Chrome Mobile, and the Android Browser; [http://labs.adobe.com/technologies/shadow/](http://labs.adobe.com/technologies/shadow/)
+Developer tool from Adobe that allows you to use your desktop computer as a debug console for mobile devices. You can connect to your device wirelessly, and use your browsers normal error console to get helpful messages that will help debug your applications. Shadow works with Mobile Safari, Chrome Mobile, and the Android Browser; [archived overview on the Wayback Machine](https://web.archive.org/web/*/http://labs.adobe.com/technologies/shadow/)
 
 **Chrome Mobile Debug**
 
-Even better than Adobe Shadow is the built in debugger for Chrome Mobile. It provides pretty much the same type of functionality as Shadow, but is more “integrated”, and less buggy. Read more about how to get this up and running; [https://developers.google.com/chrome/mobile/docs/debugging](https://developers.google.com/chrome/mobile/docs/debugging)
+Even better than Adobe Shadow is the built in debugger for Chrome Mobile. It provides pretty much the same type of functionality as Shadow, but is more “integrated”, and less buggy. Read more about how to get this up and running in Chrome’s modern [remote debugging docs](https://developer.chrome.com/docs/devtools/remote-debugging/).
 
 …
 
-Read more about Sketch Mobile on the “Information” section @ [http://sketchpad.io/mobile/](http://sketchpad.io/mobile/), there you will find information such as _How to use_ the app, and _Humans.txt_ for a full list of contributors.
+Read more about Sketch Mobile in the archived “Information” section on the [Wayback Machine](https://web.archive.org/web/*/http://sketchpad.io/mobile/), where you can still find information such as _How to use_ the app and _Humans.txt_ for a full list of contributors.
 
 I apologize for the psychedelically colorful presets on the tools. Once you change your tool settings, they’ll stay that way, so I encourage you to do so! Here’s a few drawings created with Sketch Mobile:
 

@@ -101,7 +101,7 @@
 				<p>I'm passionate about creating colorful, creative & educational applications.</p>
 				<p>
 					Founder & CTO of
-					<strong><a href="https://sketch.io" target="_blank" rel="noreferrer noopener nofollow">Sketch.IO</a></strong>,
+					<strong><a href="https://sketch.io" target="_blank" rel="noreferrer noopener">Sketch.IO</a></strong>,
 					creators of Sketchpad 🎨
 				</p>
 				<p>

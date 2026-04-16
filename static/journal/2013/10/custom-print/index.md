@@ -14,4 +14,4 @@ Sketchpad has been used in applications from scientific machine learning, to kid
 
 One of the many features we’re creating to push the envelope is instant previews of customized products, there is no more need to upload the artwork, process the preview on the server, and then download once again, this can all be done in milliseconds in the browser.
 
-We’re looking for partners who own print companies, with websites that are in the need of automation and HTML5 goodness. Connect with us, [https://sketch.io/contact.html](https://sketch.io/contact.html)
+We’re looking for partners who own print companies, with websites that are in the need of automation and HTML5 goodness. Connect with us at [Sketch contact](https://sketch.io/contact.html).

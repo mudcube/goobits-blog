@@ -10,9 +10,9 @@ tags:
 coverImage: "images/pastedGraphic_9.png"
 ---
 
-The past four years (2007-2011) much of my energy and capital has been focused into building the Mugtug graphics suite; [Sketchpad](http://mugtug.com/sketchpad/), [Darkroom](http://mugtug.com/darkroom/) and Lightbox. The suite has come a long way since I developed Sketchpad during a seven month work binge of Red-Bulls!  Through the collaboration of many developers we’ve moved forwards to create an entire framework that blurs the line between “web-app” and “desktop-app”…
+The past four years (2007-2011) much of my energy and capital has been focused into building the Mugtug graphics suite; [Sketchpad](https://sketch.io/sketchpad/), [Darkroom on the Wayback Machine](https://web.archive.org/web/*/http://mugtug.com/darkroom/), and Lightbox. The suite has come a long way since I developed Sketchpad during a seven month work binge of Red-Bulls! Through the collaboration of many developers we’ve moved forwards to create an entire framework that blurs the line between “web-app” and “desktop-app”…
 
-Due to my own budgetary constraints, and differing visions within the corporation, the time has come for me to move on from [Orange Honey](http://orangehoney.com/).  The projects will continue under the direction of my good friend Charles Pritchard.  He is without a doubt _the most_ knowledgable developer I’ve worked with.
+Due to my own budgetary constraints, and differing visions within the corporation, the time has come for me to move on from [Orange Honey on the Wayback Machine](https://web.archive.org/web/*/http://orangehoney.com/). The projects will continue under the direction of my good friend Charles Pritchard. He is without a doubt _the most_ knowledgable developer I’ve worked with.
 
 The following highlight a few of my final contributions to Mugtug; made possible with HTML5;
 
@@ -30,7 +30,7 @@ This is an image from [OpenClipart](http://www.openclipart.org/detail/21763/spor
 
 [![OpenClipart rendered in SVG parser](images/Screen-shot-2011-07-16-at-11.08.19-AM.png "Screen shot 2011-07-16 at 11.08.19 AM")](/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-07-16-at-11.08.19-AM.png "Open full-size OpenClipart render")
 
-There is no Gaussian blur in HTML5’s `<canvas>`, and to do a “true” Gaussian blur takes a lot of processing, and computational time.  I ended up using Mario Klingemann’s [StackBlur](http://www.quasimondo.com/StackBlurForCanvas/StackBlurDemo.html) to polyfill the support in the SVG parser, the results are pretty good;  I think some of the blurring wasn’t turned up enough do to my own Matrix scaling issues. Canvas left, SVG right;
+There is no Gaussian blur in HTML5’s `<canvas>`, and to do a “true” Gaussian blur takes a lot of processing, and computational time. I ended up using Mario Klingemann’s [StackBlur demo on the Wayback Machine](https://web.archive.org/web/*/http://www.quasimondo.com/StackBlurForCanvas/StackBlurDemo.html) to polyfill the support in the SVG parser, the results are pretty good; I think some of the blurring wasn’t turned up enough do to my own Matrix scaling issues. Canvas left, SVG right;
 
 [![Gaussian blur comparison screenshot](images/Screen-shot-2011-03-14-at-12.41.25-AM.png "Screen shot 2011-03-14 at 12.41.25 AM")](/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-03-14-at-12.41.25-AM.png "Open full-size blur comparison")
 

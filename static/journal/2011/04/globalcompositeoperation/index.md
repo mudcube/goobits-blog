@@ -11,9 +11,9 @@ coverImage: "images/Screen-shot-2011-05-14-at-10.30.24-PM.png"
 
 The [standard chart](https://developer.mozilla.org/samples/canvas-tutorial/6_1_canvas_composite.html) (a great resource provided by Mozilla) describing the effects of the globalCompositeOperation is incomplete, as it leaves us to extrapolate how 99% of the color-spectrum, and multiple levels of opacity, will affect the composite operation. The [following chart](/labs/html5rocks/globalCompositeOperation.html) allows you to see what the globalCompositeOperation’s is doing on a pixel-to-pixel basis.
 
-The source-image contains strictly 0% and 100% opaque pixels. This image depicts the traditional [RGB additive color model](http://www.colorjack.com/knowledge/color_models.html), and was created with three overlapping ellipses using the “lighter” globalCompositeOperation;
+The source-image contains strictly 0% and 100% opaque pixels. This image depicts the traditional [RGB additive color model](https://en.wikipedia.org/wiki/Additive_color), and was created with three overlapping ellipses using the “lighter” globalCompositeOperation;
 
-The destination-image contains a gradient of 0% through 100% opaque pixels. This is the same graphic that is used in [Color Sphere](http://www.colorjack.com/sphere/), and has been useful for a multitude of other things. This was created with lots of triangles and linear-gradients;
+The destination-image contains a gradient of 0% through 100% opaque pixels. This is the same graphic that is used in [Color Sphere](https://colorsphere.app/), and has been useful for a multitude of other things. This was created with lots of triangles and linear-gradients;
 
 ![Opacity gradient chart](images/Screen-shot-2011-05-14-at-10.29.37-PM.png)
 

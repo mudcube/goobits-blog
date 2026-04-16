@@ -57,7 +57,8 @@ The project fully supports Chrome, Firefox, Safari, and Opera.  Some false posi
 - **Google Chrome 7.0** 47,267 visible glyphs _NOTE:  Textarea can have different unicode support than Div in some cases.  For instance, on my computer_ _ﰿ works in Textarea, but not in Div._
 - **Opera 10.6** 56,024 visible glyphs _NOTE:  Supports different unicode in Canvas than Div and Textarea.  Also, Opera supports more unicode characters than other browsers by far, possibly included in the package?_
 
-**Further Research:** 
-- [http://unicode.org/](http://unicode.org/) 
-- [http://en.wikipedia.org/wiki/Unicode](http://en.wikipedia.org/wiki/Unicode)
-- [http://www.fileformat.info/info/unicode/](http://www.fileformat.info/info/unicode/)
+**Further Research:**
+
+- [Unicode Consortium](https://unicode.org/)
+- [Unicode on Wikipedia](https://en.wikipedia.org/wiki/Unicode)
+- [FileFormat.info Unicode reference](https://www.fileformat.info/info/unicode/)

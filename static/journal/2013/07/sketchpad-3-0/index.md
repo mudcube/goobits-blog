@@ -19,4 +19,4 @@ Some of the major improvements include:
 - Improved SVG parsing/rendering.
 - Improved UX.
 
-[https://chrome.google.com/webstore/detail/sketchpad/kkghjbajgkcialbbimbifdcjilhcgoim](https://chrome.google.com/webstore/detail/sketchpad/kkghjbajgkcialbbimbifdcjilhcgoim)
+[Sketchpad](https://sketch.io/sketchpad/)

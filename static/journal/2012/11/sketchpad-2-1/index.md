@@ -11,7 +11,7 @@ coverImage: "images/hero.png"
 
 **UPDATE: [Read about Sketchpad 3.0](/journal/2013/07/sketchpad-3-0/)**
 
-Where Sketchpad 2.0 introduced non-destructive vector + bitmap editing on the web. Sketchpad 2.1 (SP2.1) takes that bland package of vector tools and borrows features from [Sketch Mobile](http://sketchpad.io/mobile/), an app that exhibited my furthest exploration in creating colorful environments. SP2.1 is great at creating background wallpapers quickly now that most of the tools work with gradients, and are all editable in place, this can be especially fun on tools like Mr. Doob’s generative brushes, and the improved stamp tool.
+Where Sketchpad 2.0 introduced non-destructive vector + bitmap editing on the web. Sketchpad 2.1 (SP2.1) takes that bland package of vector tools and borrows features from [Sketch Mobile on the Wayback Machine](https://web.archive.org/web/*/http://sketchpad.io/mobile/), an app that exhibited my furthest exploration in creating colorful environments. SP2.1 is great at creating background wallpapers quickly now that most of the tools work with gradients, and are all editable in place, this can be especially fun on tools like Mr. Doob’s generative brushes, and the improved stamp tool.
 
 New features include:
 
@@ -28,8 +28,8 @@ New features include:
 You can access SP2.1beta in two ways:
 
 - Create your own multi-user drawing room (replace “myRoom” with your room):
-    - [http://sketchpad.io/sketch2.1/?server=myRoom](http://sketchpad.io/sketch2.1/?server=myRoom)
+    - [Archived multi-user room example](https://web.archive.org/web/*/http://sketchpad.io/sketch2.1/?server=myRoom)
 - Create your own personal drawing room:
-    - [http://sketchpad.io/sketch2.1/](http://sketchpad.io/sketch2.1/)
+    - [Archived Sketchpad 2.1 app](https://web.archive.org/web/*/http://sketchpad.io/sketch2.1/)
 
 Have feature requests, or thoughts of how the interface is horrible? I would love to hear!
