@@ -11,7 +11,8 @@ pnpm dev:restart  # Restart dev server
 pnpm build        # Production build
 pnpm release:patch:build  # Patch bump + build
 pnpm check        # Types + svelte-check + lint + circular deps
-pnpm test         # Full e2e suite
+pnpm test         # Checks + full e2e suite
+pnpm test:e2e     # Direct full e2e suite
 pnpm dev:wrangler # Dev with Cloudflare D1 runtime
 ```
 

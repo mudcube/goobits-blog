@@ -53,8 +53,11 @@ Defined in `svelte.config.js`:
 # Types + svelte-check + eslint + circular deps
 pnpm check
 
-# Full e2e suite (Vitest + Playwright)
+# Repo checks + full e2e suite
 pnpm test
+
+# Direct full e2e suite
+pnpm test:e2e
 
 # High-signal subset (CI gate)
 pnpm e2e:critical
