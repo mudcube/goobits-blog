@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types'
-import { blogConfig, formatLabel, getAllCategories, getAllPosts, slugify } from '@goobits/blog/core'
+import { blogConfig, formatLabel, getAllCategories, getAllPosts, getPostUrl, slugify } from '@goobits/blog/core'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import {
 	SITE_AUTHOR,
@@ -41,7 +41,7 @@ export const GET: RequestHandler = async () => {
 		.map(post => {
 			const title = post.metadata?.fm?.title || 'Untitled Entry'
 			const excerpt = post.metadata?.fm?.excerpt || ''
-			const url = `${SITE_ORIGIN}${blogConfig.uri}${post.urlPath}`.replace(/\/?$/, '/')
+			const url = `${SITE_ORIGIN}${getPostUrl(post)}`.replace(/\/?$/, '/')
 			const description = excerpt
 				? excerpt.replace(/\s+/g, ' ').slice(0, 140)
 				: `Journal entry from ${new Date(post.date).getFullYear()}.`

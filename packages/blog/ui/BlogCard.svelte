@@ -82,7 +82,7 @@
 	<div class="goo__card-layout">
 		{#if !hideImage}
 			<div class="goo__card-image">
-				<a href={`${blogConfig.uri}${post?.urlPath || ''}`} class="goo__card-image-link">
+				<a href={getBlogUrl({ type: 'post', data: post })} class="goo__card-image-link">
 					{#if imageData.src}
 						<img
 								src={imageData.src}

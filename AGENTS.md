@@ -15,7 +15,7 @@ pnpm test         # Full e2e suite
 pnpm dev:wrangler # Dev with Cloudflare D1 runtime
 ```
 
-Root tests use Vitest + Playwright under `__tests__/e2e`. `repos/auth` also has Vitest.
+Root tests use Vitest + Playwright under `__tests__/e2e`. `packages/auth` also has Vitest.
 
 ## Architecture
 
@@ -23,7 +23,7 @@ SvelteKit 5 + Cloudflare Pages monorepo (pnpm workspaces).
 
 **Internal packages:**
 - `packages/calendar/core` (`@calendar/core`) — Booking, D1 storage, Google Calendar, invites, admin auth
-- `repos/auth` (`@goobits/auth`) — OAuth (Google/Apple), sessions, credentials, WebAuthn
+- `packages/auth` (`@goobits/auth`) — OAuth (Google/Apple), sessions, credentials, WebAuthn
 
 **API env bridge:** API route handlers (`src/routes/api/**/+server.ts`) call `buildEnv(platform)` in `packages/calendar/kit/src/runtime/build-env.ts` to access D1 in production and a local SQLite-backed D1 wrapper in dev (`.dev/db.sqlite`, auto-migrates).
 

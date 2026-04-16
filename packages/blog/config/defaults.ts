@@ -227,7 +227,7 @@ export const defaultBlogConfig: BlogConfig = {
 	// --- Content & Structure ---
 	posts: {
 		contentBasePath: '/src/content/Blog',
-		urlBasePath: '/blog',
+		urlBasePath: '',
 		importFailureMode: 'warn',
 		excerptLength: 160,
 		relatedPostsCount: 3,

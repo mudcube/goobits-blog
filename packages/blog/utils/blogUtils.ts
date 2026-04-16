@@ -250,6 +250,36 @@ function resolveContentDiskPath(filePath: string, contentBasePath: string): stri
 	return filePath
 }
 
+function normalizeRoutePath(path: string): string {
+	const normalized = path.trim()
+	if (!normalized) return ''
+	return normalized.startsWith('/') ? normalized : `/${normalized}`
+}
+
+function normalizeRouteBase(path: string): string {
+	const normalized = normalizeRoutePath(path)
+	if (!normalized || normalized === '/') return ''
+	return normalized.replace(/\/+$/, '')
+}
+
+function getMountedPostUrlPath(post: ProcessedPost | null | undefined): string {
+	const config = blogConfig
+	const rawPath = normalizeRoutePath(post?.urlPath || '')
+	if (!rawPath) return normalizeRouteBase(config.uri) || '/'
+
+	const configuredUri = normalizeRouteBase(config.uri)
+	const configuredUrlBase = normalizeRouteBase(config.posts.urlBasePath)
+
+	if (
+		(configuredUri && (rawPath === configuredUri || rawPath.startsWith(`${configuredUri}/`))) ||
+		(configuredUrlBase && (rawPath === configuredUrlBase || rawPath.startsWith(`${configuredUrlBase}/`)))
+	) {
+		return rawPath
+	}
+
+	return `${configuredUri}${rawPath}` || rawPath
+}
+
 function getImportFailureMode(): 'throw' | 'warn' | 'silent' {
 	const mode = blogConfig.posts.importFailureMode
 	if (mode === 'throw' || mode === 'warn' || mode === 'silent') {
@@ -323,9 +353,7 @@ function getPostImagePrefix(post: ProcessedPost | null | undefined): string {
 		return config.images.defaults.blogPath
 	}
 
-	const baseUri = config.uri === '/' ? '' : (config.uri || '')
-	const normalizedPath = post.urlPath.startsWith('/') ? post.urlPath : `/${ post.urlPath }`
-	const fullPath = `${ baseUri }${ normalizedPath }`
+	const fullPath = getMountedPostUrlPath(post)
 	return fullPath.endsWith('/') ? fullPath : `${ fullPath }/`
 }
 
@@ -582,7 +610,7 @@ export function localizeUrl(url: string): string {
 export function getPostUrl(post: ProcessedPost | null | undefined, withLanguage = false): string {
 	const config = blogConfig
 	if (!post?.urlPath) { return withLanguage ? _localizeUrl(config.uri) : config.uri }
-	const url = `${ config.uri }${ post.urlPath }`
+	const url = getMountedPostUrlPath(post)
 	return withLanguage ? _localizeUrl(url) : url
 }
 
@@ -975,7 +1003,8 @@ export async function getAllPosts(options: GetAllPostsOptions = {}): Promise<Pro
 				const year = pathParts.year || postDate.getFullYear().toString()
 				const month = pathParts.month || (postDate.getMonth() + 1).toString().padStart(2, '0')
 				const slug = postModule.metadata.slug || pathParts.slug
-				const urlPath = `${ config.posts.urlBasePath }/${ year }/${ month }/${ slug }`
+				const urlBasePath = normalizeRouteBase(config.posts.urlBasePath)
+				const urlPath = `${ urlBasePath }/${ year }/${ month }/${ slug }`.replace(/\/{2,}/g, '/')
 
 				// Get content when needed for rendering, preview extraction, or read-time calculation
 				let content = ''

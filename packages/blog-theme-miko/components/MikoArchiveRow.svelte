@@ -1,11 +1,11 @@
 <script>
-	import { blogConfig, formatDate, getCoverImageUrl, slugify } from '@goobits/blog/core'
+	import { blogConfig, formatDate, getCoverImageUrl, getPostUrl, slugify } from '@goobits/blog/core'
 	import { getJournalImageVariants } from '../utils/journalImageVariants.ts'
 	import { formatLabel } from '../utils/formatLabel.ts'
 
 	const { post } = $props()
 
-	const postUrl = $derived(`${blogConfig.uri}${post.urlPath}`)
+	const postUrl = $derived(getPostUrl(post))
 	const coverImage = $derived(getCoverImageUrl(post, ''))
 	const coverVariants = $derived(getJournalImageVariants(coverImage))
 	const categories = $derived(post.metadata?.fm?.categories || [])

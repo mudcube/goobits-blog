@@ -25,6 +25,10 @@ export interface BlogConfig {
 	pagination?: {
 		postsPerBatch?: number
 	}
+	posts?: {
+		urlBasePath?: string
+	}
+	uri?: string
 	[key: string]: unknown
 }
 
@@ -104,6 +108,33 @@ function isHttpError(error: unknown): error is HttpError {
 		'status' in error &&
 		typeof (error as HttpError).status === 'number'
 	)
+}
+
+function normalizeRoutePath(path: string): string {
+	return path.startsWith('/') ? path : `/${path}`
+}
+
+function normalizeRouteBase(path: string): string {
+	if (!path || path === '/') return ''
+	return normalizeRoutePath(path).replace(/\/+$/, '')
+}
+
+function getRouteRelativePostPath(path: string, config: BlogConfig | null = null): string {
+	const resolvedConfig = config ?? getBlogConfig()
+	const normalizedPath = normalizeRoutePath(path)
+	const candidateBases = [
+		normalizeRouteBase(String(resolvedConfig.posts?.urlBasePath || '')),
+		normalizeRouteBase(String((resolvedConfig as Record<string, unknown>).uri || ''))
+	].filter(Boolean)
+
+	for (const base of candidateBases) {
+		if (normalizedPath === base) return '/'
+		if (normalizedPath.startsWith(`${base}/`)) {
+			return normalizedPath.slice(base.length) || '/'
+		}
+	}
+
+	return normalizedPath
 }
 
 /**
@@ -290,7 +321,7 @@ export async function loadPost(
 				return false
 			}
 
-			const urlParts = p.urlPath.split('/').filter((part: string) => part)
+			const urlParts = getRouteRelativePostPath(p.urlPath, _config).split('/').filter((part: string) => part)
 			if (urlParts.length !== 3) {
 				return false
 			}
@@ -344,7 +375,7 @@ export async function generateBlogEntries(
 	allPostsData.forEach((post: ProcessedPost) => {
 		if (!post?.urlPath) {return}
 
-		const pathParts = post.urlPath.split('/').filter((part: string) => part)
+		const pathParts = getRouteRelativePostPath(post.urlPath, _config).split('/').filter((part: string) => part)
 		if (pathParts.length < 3) {return}
 
 		const [ year, month, postSlug ] = pathParts as [string, string, string, ...string[]]

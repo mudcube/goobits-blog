@@ -19,13 +19,13 @@ export async function load({ data }: { data: Record<string, unknown> }) {
 				const postContent = (module as { default?: unknown }).default ?? null
 				return {
 					...data,
-						postContent
-					}
-				} catch (error) {
-					console.error('[journal] failed to load post module', post.path, error)
+					postContent
 				}
+			} catch (error) {
+				console.error('[journal] failed to load post module', post.path, error)
 			}
 		}
+	}
 
 	return data
 }

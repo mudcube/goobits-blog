@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
-import { blogConfig, formatLabel, getAllPosts, loadPost } from '@goobits/blog/core'
+import { formatLabel, getAllPosts, getPostUrl, loadPost } from '@goobits/blog/core'
 import type { ProcessedPost } from '@goobits/blog/utils'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import { SITE_AUTHOR, SITE_ORIGIN } from '$lib/app/seo/meta'
@@ -44,7 +44,7 @@ export const GET: RequestHandler = async ({ params }) => {
 	const date = post.date
 		? new Date(post.date).toISOString().slice(0, 10)
 		: ''
-	const url = `${SITE_ORIGIN}${blogConfig.uri}${post.urlPath}`.replace(/\/?$/, '/')
+	const url = `${SITE_ORIGIN}${getPostUrl(post)}`.replace(/\/?$/, '/')
 	const categories = (fm.categories ?? (fm.category ? [fm.category] : [])) as string[]
 	const tags = (fm.tags ?? []) as string[]
 
@@ -92,8 +92,11 @@ export async function entries() {
 	const posts: ProcessedPost[] = await getAllPosts({ lang: 'en' }).catch(() => [])
 	return posts
 		.map((post: ProcessedPost) => {
-			// urlPath looks like "/2018/01/sketchpad-5-0" — split into parts
-			const parts = String(post.urlPath || '').split('/').filter(Boolean)
+			const parts = String(getPostUrl(post) || '')
+				.replace(/^\/journal\//, '')
+				.replace(/^\/blog\//, '')
+				.split('/')
+				.filter(Boolean)
 			if (parts.length !== 3) { return null }
 			const [year, month, slug] = parts as [string, string, string]
 			return { year, month, slug }

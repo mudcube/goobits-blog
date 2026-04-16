@@ -42,7 +42,7 @@
 
     // ===== PATH ALIASES =====
     "paths": {
-      "@blog/*": ["./tests/fixtures/*"]
+      "@blog/*": ["./__tests__/fixtures/*"]
     }
   },
   "include": [

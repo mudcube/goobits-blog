@@ -81,7 +81,7 @@ pnpm deploy:prod:full
 
 ## 🔗 Related Packages
 - **`packages/calendar`** - Calendar domain logic (storage, services, transports, migrations)
-- **`repos/auth`** - Auth library used by this repo (its own README + tests)
+- **`packages/auth`** - Auth library used by this repo (its own README + tests)
 
 ## 📝 License
 MIT

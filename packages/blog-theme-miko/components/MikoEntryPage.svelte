@@ -4,6 +4,7 @@
 		formatDate,
 		getAuthorAvatarUrl,
 		getCoverImageUrl,
+		getPostUrl,
 		getSimilarPosts,
 		slugify
 	} from '@goobits/blog/core'
@@ -55,7 +56,7 @@
 	}
 
 	function postHref(entry) {
-		return `${blogConfig.uri}${entry.urlPath}`
+		return getPostUrl(entry)
 	}
 </script>
 

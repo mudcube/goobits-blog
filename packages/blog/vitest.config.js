@@ -7,12 +7,12 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url))
 export default defineConfig({
   resolve: {
     alias: {
-      '@blog': resolve(__dirname, './tests/fixtures')
+      '@blog': resolve(__dirname, './__tests__/fixtures')
     }
   },
   test: {
     environment: 'node',
-    include: ['tests/**/*.test.ts'],
+    include: ['__tests__/**/*.test.ts'],
     globals: true
   }
 })

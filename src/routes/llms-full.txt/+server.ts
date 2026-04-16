@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types'
-import { blogConfig, formatLabel, getAllPosts } from '@goobits/blog/core'
+import { blogConfig, formatLabel, getAllPosts, getPostUrl } from '@goobits/blog/core'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import {
 	SITE_AUTHOR,
@@ -53,7 +53,7 @@ export const GET: RequestHandler = async () => {
 		const date = post.date
 			? new Date(post.date).toISOString().slice(0, 10)
 			: 'unknown'
-		const url = `${SITE_ORIGIN}${blogConfig.uri}${post.urlPath}`.replace(/\/?$/, '/')
+		const url = `${SITE_ORIGIN}${getPostUrl(post)}`.replace(/\/?$/, '/')
 		const categories = (fm.categories ?? (fm.category ? [fm.category] : []))
 			.map((c: string) => formatLabel(c))
 			.join(', ')

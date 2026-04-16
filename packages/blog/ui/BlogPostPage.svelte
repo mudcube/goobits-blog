@@ -12,6 +12,7 @@
 		getAuthorAvatarUrl,
 		getEmojiFromTitle,
 		getSimilarPosts,
+		getPostUrl,
 		createMessageGetter
 	} from '@goobits/blog/utils/index.js'
 
@@ -226,7 +227,7 @@
 					<div class="goo__related-posts-list">
 						{#each similarPosts as post (post.urlPath)}
 							<div class="goo__related-post">
-								<a href={`${blogConfig.uri || '/blog'}${post.urlPath}`} class="goo__related-post-image-container">
+								<a href={getPostUrl(post)} class="goo__related-post-image-container">
 									{#if post.metadata?.fm?.image?.src}
 										<img
 											src={getRelatedPostImage(post)}
@@ -247,7 +248,7 @@
 										</a>
 									{/if}
 
-									<a href={`${blogConfig.uri || '/blog'}${post.urlPath}`} class="goo__related-post-title-link">
+									<a href={getPostUrl(post)} class="goo__related-post-title-link">
 										<h3 class="goo__related-post-title">{post.metadata?.fm?.title || getMessage('untitledPost', 'Untitled Post')}</h3>
 									</a>
 
