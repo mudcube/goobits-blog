@@ -6,6 +6,18 @@ export type MusicPostEntry = {
 	date: string
 }
 
+export type MusicPortfolioEntry = {
+	title: string
+	href: string
+	date: string
+	tag: string
+	image: string
+	alt: string
+	format: string
+	badge: string
+	badgeTone: 'cool' | 'warm'
+}
+
 export const musicPlatforms = [
 	{ label: 'Spotify', href: '/contact?from=music&topic=spotify', icon: Music2 },
 	{ label: 'Apple Music', href: '/contact?from=music&topic=apple_music', icon: Apple },
@@ -34,6 +46,10 @@ const artworkUrls = [
 	'/media/page-icons/about-kitty-unicorn.png'
 ]
 
+function getArtworkUrl(index: number) {
+	return artworkUrls[index % artworkUrls.length] ?? featuredTrack.image
+}
+
 const fallbackEntries = [
 	{ title: 'Neon Drift — synth ambient', href: '/music', date: '2025-01-12', tag: 'Track' },
 	{ title: 'Sunroom — acoustic sketch', href: '/music', date: '2024-08-04', tag: 'Demo' },
@@ -57,10 +73,10 @@ function getMusicEntries(musicPosts: MusicPostEntry[]) {
 	return [...liveEntries, ...fallbackEntries].slice(0, 10)
 }
 
-export function getMusicPortfolioEntries(musicPosts: MusicPostEntry[]) {
+export function getMusicPortfolioEntries(musicPosts: MusicPostEntry[]): MusicPortfolioEntry[] {
 	return getMusicEntries(musicPosts).slice(0, 9).map((entry, idx) => ({
 		...entry,
-		image: artworkUrls[idx % artworkUrls.length],
+		image: getArtworkUrl(idx),
 		alt: `${entry.title} artwork`,
 		format:
 			idx % 3 === 1

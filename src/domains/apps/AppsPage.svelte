@@ -1,7 +1,25 @@
 <script lang="ts">
 	import { PageShell } from '@miko/ui'
-	import { appsCollection, getAppImage, getAppMeta } from './catalog'
+	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
+	import { appsCollection, appsDescription, getAppImage, getAppMeta } from './catalog'
+
+	const heroImage = getAppImage(appsCollection[0]?.id ?? 'sketchpad')
 </script>
+
+<Seo
+	title="Apps, Tools & Interactive Software"
+	description={appsDescription}
+	path="/apps/"
+	image={heroImage}
+	jsonLd={[
+		buildWebPageJsonLd({
+			path: '/apps/',
+			title: 'Apps, Tools & Interactive Software',
+			description: appsDescription,
+			type: 'CollectionPage'
+		})
+	]}
+/>
 
 <PageShell className="apps-page">
 	<div class="apps-page">
