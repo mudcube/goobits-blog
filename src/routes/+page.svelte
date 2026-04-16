@@ -1,5 +1,5 @@
 <script>
-	import { apps } from './_projects.ts'
+	import { appProjects } from '@src/domains/projects/catalog'
 	import '$lib/app/theme/home.css'
 	import { Seo, buildPersonJsonLd, buildWebPageJsonLd, buildWebsiteJsonLd } from '$lib/app/seo'
 
@@ -37,7 +37,7 @@
 </div>
 
 <div class="home__projects">
-    {#each apps as { id, description, title, url }}
+    {#each appProjects as { id, description, title, url }}
         <a class="home__project" href="{url}">
             <span class="home__project-image" style="background-image: url('/media/projects/project-{id}.webp')"></span>
             <span class="home__project-description">{description}</span>

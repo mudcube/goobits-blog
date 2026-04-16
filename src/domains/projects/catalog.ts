@@ -1,4 +1,11 @@
-export const apps = [
+export type ProjectEntry = {
+	id: string
+	description: string
+	title: string
+	url: string
+}
+
+export const appProjects: ProjectEntry[] = [
 	{
 		id: 'sketchpad',
 		description:
@@ -41,10 +48,3 @@ export const apps = [
 		url: 'https://zendala.app/'
 	}
 ]
-
-export const art: Array<{
-	id: string
-	description: string
-	title: string
-	url: string
-}> = []
