@@ -62,12 +62,13 @@
 	width: var(--calendar-size-600);
 	height: var(--calendar-size-600);
 	border-radius: 50%;
-	background: radial-gradient(
-		circle,
-		color-mix(in srgb, var(--calendar-slot-selected-bg) 8%, transparent) 0%,
-		color-mix(in srgb, var(--calendar-slot-selected-bg) 2%, transparent) 40%,
-		transparent 70%
-	);
+	background:
+		radial-gradient(
+			circle,
+			color-mix(in srgb, var(--calendar-slot-selected-bg) 14%, transparent) 0%,
+			color-mix(in srgb, var(--calendar-slot-selected-bg) 5%, transparent) 42%,
+			transparent 70%
+		);
 	pointer-events: none;
 	z-index: 0;
 }

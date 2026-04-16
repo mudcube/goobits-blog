@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import { Lightbulb } from '@lucide/svelte'
-	import { NumberStepper, TimeSelector } from '@miko/ui'
 	import { onMount } from 'svelte'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import AdminCalendarWidget from '../../dashboard/AdminCalendarWidget.svelte'
@@ -772,11 +771,11 @@
 							<div class="program-editor__fields">
 								<label>
 									<span>Time</span>
-									<TimeSelector bind:value={popTime} />
+									<input class="ui-form-control program-editor__input" type="time" step="900" bind:value={popTime} />
 								</label>
 								<label>
 									<span>Capacity</span>
-									<NumberStepper bind:value={popCap} min={1} max={50} />
+									<input class="ui-form-control program-editor__input" type="number" min="1" max="50" bind:value={popCap} />
 								</label>
 							</div>
 							<div class="program-editor__actions">
@@ -789,11 +788,11 @@
 							<div class="program-editor__fields">
 								<label>
 									<span>Time</span>
-									<TimeSelector bind:value={popTime} />
+									<input class="ui-form-control program-editor__input" type="time" step="900" bind:value={popTime} />
 								</label>
 								<label>
 									<span>Capacity</span>
-									<NumberStepper bind:value={popCap} min={1} max={50} />
+									<input class="ui-form-control program-editor__input" type="number" min="1" max="50" bind:value={popCap} />
 								</label>
 							</div>
 							{#if selectedDayDate && activeDays[isoDay(selectedDayDate)]?.repeatLabel}

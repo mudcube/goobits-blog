@@ -5,6 +5,7 @@ import { createCalendarAuthHandles } from '@calendar/app'
 import { getCalendarConfig } from '@calendar/core'
 import { applyMikoCalendarPreset } from '@calendar/preset-miko'
 import { getActiveReleaseStage, isRouteReleased } from '$lib/app/release'
+import { isLocalPreviewHost as isAllowedLocalPreviewHost } from '$lib/app/is-local-preview-host'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import { dev } from '$app/environment'
 import type { Handle } from '@sveltejs/kit'
@@ -81,8 +82,7 @@ const themeHandle: Handle = async ({ event, resolve }) => {
 }
 
 const releaseVisibilityHandle: Handle = async ({ event, resolve }) => {
-	const isLocalPreviewHost =
-		dev && ['localhost', '127.0.0.1'].includes(event.url.hostname)
+	const isLocalPreviewHost = dev && isAllowedLocalPreviewHost(event.url.hostname)
 	const activeStage = getActiveReleaseStage({
 		cookies: event.cookies,
 		enablePreview: isLocalPreviewHost

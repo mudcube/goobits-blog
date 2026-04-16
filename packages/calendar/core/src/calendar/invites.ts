@@ -69,20 +69,29 @@ export async function validateInvite({
 export async function consumeInvite({
 	db,
 	inviteId,
-	userId
+	userId,
+	usesRemaining = 1
 }: {
 	db: D1DatabaseLike
 	inviteId: number
 	userId: string
+	usesRemaining?: number | null
 }) {
-	await db.prepare(
-		`UPDATE calendar_invites SET uses_remaining = uses_remaining - 1 WHERE id = ? AND uses_remaining > 0`
-	).bind(inviteId).run()
+	if (usesRemaining !== null) {
+		const update = await db.prepare(
+			`UPDATE calendar_invites SET uses_remaining = uses_remaining - 1 WHERE id = ? AND uses_remaining > 0`
+		).bind(inviteId).run()
+		if ((update.meta?.changes ?? 0) < 1) {
+			return { ok: false as const, reason: 'exhausted' as const }
+		}
+	}
 
 	await db.prepare(
 		`INSERT INTO calendar_invite_redemptions (invite_id, user_id, redeemed_at)
 		 VALUES (?, ?, strftime('%s','now'))`
 	).bind(inviteId, userId).run()
+
+	return { ok: true as const }
 }
 
 export async function listInvites({ db }: { db: D1DatabaseLike }) {

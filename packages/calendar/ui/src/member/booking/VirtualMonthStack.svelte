@@ -116,7 +116,7 @@
 <div class="member-calendar" data-testid={testId}>
 	<div class="member-calendar__legend">
 		<span class="member-calendar__legend-dot" aria-hidden="true"></span>
-		<span>Available days carry dots. Scroll naturally to move through months.</span>
+		<span>has events</span>
 	</div>
 
 	<div class="member-calendar__month-banner" data-current-month-key={visibleMonth.key}>
@@ -208,9 +208,11 @@
 	.member-calendar__legend {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.78rem;
-		color: color-mix(in srgb, var(--text) 58%, transparent);
+		gap: 0.4rem;
+		font-size: 0.72rem;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		color: color-mix(in srgb, var(--text) 46%, transparent);
 	}
 
 	.member-calendar__legend-dot {

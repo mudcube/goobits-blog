@@ -107,7 +107,7 @@
       <div class="admin-crew-modal__arrow" aria-hidden="true"></div>
       {#if step === 1}
         <div class="admin-crew-modal__body">
-          <div class="admin-crew-modal__title">Invite a friend</div>
+          <div class="admin-crew-modal__title">Create invite link</div>
           <div class="admin-crew-modal__field">
             <label for="crew-invite-name">Who's this for?</label>
             <input
@@ -127,7 +127,7 @@
             <button
               type="button"
               class="admin-ui-btn admin-ui-btn--primary"
-              onclick={onCreate}>Create Link</button
+              onclick={onCreate}>Create Invite</button
             >
           </div>
         </div>
@@ -135,7 +135,7 @@
         <div class="admin-crew-modal__body">
           <div class="admin-crew-modal__icon">🎉</div>
           <div class="admin-crew-modal__title admin-crew-modal__title--center">
-            Invite for {inviteName || "friend"}
+            Invite link ready for {inviteName || "friend"}
           </div>
           <div class="admin-crew-modal__url-box">
             <span class="admin-crew-modal__url-text">{inviteUrl}</span>
@@ -156,7 +156,7 @@
             </button>
           </div>
           <p class="admin-crew-modal__hint">
-            Link expires in 7 days · single use
+            Share this by text or copy it below. Uses and expiry follow your current invite settings.
           </p>
           <div class="admin-crew-modal__actions">
             <button

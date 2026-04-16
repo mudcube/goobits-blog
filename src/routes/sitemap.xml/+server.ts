@@ -1,4 +1,5 @@
 import type { RequestHandler } from './$types'
+import { isLocalPreviewHost } from '$lib/app/is-local-preview-host'
 import { getActiveReleaseStage } from '$lib/app/release'
 import { getPublicSitemapRoutes } from '$lib/server/route-index'
 import { escapeXml, formatSitemapLastMod, getBaseUrl, getPlatformEnv, resolveSiteOrigin, toAbsoluteUrl } from '$lib/server/seo'
@@ -8,10 +9,10 @@ export const prerender = true
 export const GET: RequestHandler = async ({ cookies, platform, url }) => {
 	const baseUrl = getBaseUrl(getPlatformEnv(platform))
 	const origin = resolveSiteOrigin(baseUrl ? { baseUrl, requestUrl: url } : { requestUrl: url })
-	const isLocalPreviewHost = ['localhost', '127.0.0.1'].includes(url.hostname)
+	const isLocalPreviewHostRequest = isLocalPreviewHost(url.hostname)
 	const activeStage = getActiveReleaseStage({
 		cookies,
-		enablePreview: isLocalPreviewHost
+		enablePreview: isLocalPreviewHostRequest
 	})
 	const routes = await getPublicSitemapRoutes(activeStage)
 

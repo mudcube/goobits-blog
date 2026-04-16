@@ -107,9 +107,14 @@
 	const firstName = $derived(data.user?.name?.split(' ')[0] || '')
 	const homeTitleLines = $derived(firstName ? [`Hey, ${firstName}.`, "What's the move?"] : ['Hey.', "What's the move?"])
 
+	function withMock(path) {
+		if (!mockMode) return path
+		return path.includes('?') ? `${path}&mock=1` : `${path}?mock=1`
+	}
+
 	function eventRoute(event) {
-		if (event?.activitySlug) return `${calendarConfig.routes.calendarBase}/${event.activitySlug}/`
-		return calendarConfig.routes.calendarBase
+		if (event?.activitySlug) return withMock(`${calendarConfig.routes.calendarBase}/${event.activitySlug}/`)
+		return withMock(calendarConfig.routes.calendarBase)
 	}
 
 	function dayLabel(iso) {
@@ -148,8 +153,8 @@
 		<div class="calendar-home__feed-head">
 				<h2 class="calendar-home__feed-title">{data.onlyMine ? 'My Schedule' : 'Upcoming Events'}</h2>
 			<PillButton
-				href={data.onlyMine ? calendarConfig.routes.calendarBase : `${calendarConfig.routes.calendarBase}?mine=1`}
-				variant="ghost"
+				href={data.onlyMine ? withMock(calendarConfig.routes.calendarBase) : withMock(`${calendarConfig.routes.calendarBase}?mine=1`)}
+				variant={data.onlyMine ? 'secondary' : 'ghost'}
 				size="md"
 				className="calendar-page__ghost-button"
 			>
@@ -160,7 +165,11 @@
 			<p class="calendar-page__status-text--muted">{feedError}</p>
 		{/if}
 		{#if upcoming.length === 0}
-			<p class="calendar-page__subtitle calendar-home__sub">No events are scheduled yet.</p>
+			<div class="calendar-home__empty">
+				<span class="calendar-home__empty-icon">📅</span>
+				<p class="calendar-home__empty-text">No events are scheduled yet.</p>
+				<p class="calendar-home__empty-hint">Browse activities above to find something fun.</p>
+			</div>
 		{:else}
 			<div class="social-events__upcoming-grid">
 				{#each upcoming as event}
@@ -173,7 +182,11 @@
 	<section class="calendar-page__section calendar-home__section">
 		<h2 class="calendar-home__feed-title">Last Week</h2>
 		{#if recent.length === 0}
-			<p class="calendar-page__subtitle calendar-home__sub">No completed events yet.</p>
+			<div class="calendar-home__empty">
+				<span class="calendar-home__empty-icon">✨</span>
+				<p class="calendar-home__empty-text">No completed events yet.</p>
+				<p class="calendar-home__empty-hint">Your past sessions will show up here.</p>
+			</div>
 		{:else}
 			<div class="social-events__past-list">
 				{#each recent as event}
@@ -219,32 +232,59 @@
 	.social-events__upcoming-grid {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.5rem;
+		gap: 0.75rem;
 	}
 
 	.social-events__past-list {
 		display: flex;
 		flex-direction: column;
-		gap: 0.375rem;
+		gap: 0.5rem;
 	}
 
 	.social-events__past-title {
-		font-size: 0.8125rem;
+		font-size: 0.84rem;
 		font-weight: 600;
-		color: color-mix(in srgb, var(--calendar-shell-text) 84%, transparent);
+		color: color-mix(in srgb, var(--calendar-shell-text) 86%, transparent);
 	}
 
 	.social-events__past-emoji {
-		font-size: 1rem;
+		font-size: 1.1rem;
 		line-height: 1;
 		flex-shrink: 0;
 	}
 
 	.social-events__event-sub {
-		font-size: 0.74rem;
-		line-height: 1;
+		font-size: 0.78rem;
+		line-height: 1.3;
 		color: color-mix(in srgb, var(--calendar-shell-text) 60%, transparent);
-		margin-top: 0.1rem;
+		margin-top: 0.15rem;
+	}
+
+	.calendar-home__empty {
+		display: grid;
+		justify-items: center;
+		gap: 0.35rem;
+		padding: 2.5rem 1rem;
+		text-align: center;
+	}
+
+	.calendar-home__empty-icon {
+		font-size: 1.8rem;
+		line-height: 1;
+		margin-bottom: 0.25rem;
+	}
+
+	.calendar-home__empty-text {
+		margin: 0;
+		font-size: 0.95rem;
+		font-weight: 500;
+		color: color-mix(in srgb, var(--calendar-shell-text) 64%, transparent);
+	}
+
+	.calendar-home__empty-hint {
+		margin: 0;
+		font-size: 0.82rem;
+		color: color-mix(in srgb, var(--calendar-shell-text) 42%, transparent);
 	}
 
 	@media (max-width: 720px) {

@@ -1,5 +1,6 @@
 import { dev } from '$app/environment'
 import { getActiveReleaseStage } from '$lib/app/release'
+import { isLocalPreviewHost as isAllowedLocalPreviewHost } from '$lib/app/is-local-preview-host'
 import { getTarget } from '$lib/app/target'
 import {
 	filterRouteInventoryBySitemapAudiences,
@@ -16,7 +17,7 @@ function normalizeVisibility(value: string | null | undefined): HumanSitemapVisi
 }
 
 export async function load({ cookies, url }: { cookies: import('@sveltejs/kit').Cookies; url: URL }) {
-	const isLocalPreviewHost = dev && ['localhost', '127.0.0.1'].includes(url.hostname)
+	const isLocalPreviewHost = dev && isAllowedLocalPreviewHost(url.hostname)
 	const activeTarget = getTarget(cookies)
 	const canViewInternalRoutes = isLocalPreviewHost
 	const activeVisibility = canViewInternalRoutes

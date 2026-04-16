@@ -3,6 +3,8 @@
 	let {
 		homeHref = '/',
 		showLogo = false,
+		logoSrc,
+		logoAlt = 'Home',
 		brandLabel,
 		brandHref,
 		links = [],
@@ -12,6 +14,8 @@
 	}: {
 		homeHref?: string
 		showLogo?: boolean
+		logoSrc?: string
+		logoAlt?: string
 		brandLabel?: string
 		brandHref?: string
 		links?: Array<{ href?: string; label?: string }>
@@ -24,9 +28,9 @@
 <nav class="calendar-shell-nav">
 	<div class="calendar-shell-nav__inner">
 		<div class="calendar-shell-nav__left">
-			{#if showLogo}
-				<a class="calendar-shell-nav__home" href={homeHref} aria-label="Home">
-					<img src="/media/brand/logo.svg" alt="MIKO.ART" class="calendar-shell-nav__home-logo" />
+			{#if showLogo && logoSrc}
+				<a class="calendar-shell-nav__home" href={homeHref} aria-label={logoAlt}>
+					<img src={logoSrc} alt={logoAlt} class="calendar-shell-nav__home-logo" />
 				</a>
 			{/if}
 			{#if brandLabel}
@@ -97,6 +101,11 @@
 		font-family: var(--font-serif);
 		font-size: 0.84rem;
 		letter-spacing: 0.01em;
+		transition: background 150ms ease, color 150ms ease;
+	}
+	.calendar-shell-nav__link:hover {
+		color: var(--calendar-shell-text);
+		background: color-mix(in srgb, var(--calendar-shell-text) 8%, transparent);
 	}
 	.calendar-shell-nav__link--active {
 		color: var(--calendar-shell-text);

@@ -193,16 +193,4 @@
 			font-size: 0.62rem;
 		}
 	}
-
-	@media (max-width: 48em) {
-		.release-switcher {
-			display: none;
-		}
-	}
-
-	@media (max-width: 40em) {
-		.release-switcher {
-			display: none;
-		}
-	}
 </style>

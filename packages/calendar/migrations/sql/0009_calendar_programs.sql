@@ -34,7 +34,7 @@ INSERT OR IGNORE INTO calendar_programs (
    'Aerial arts and circus skills', '🎪',
    'eyebrow-circus', 'glow-circus', 'form-glow-circus', NULL, 1, 20),
   ('adventure', 'Adventure', 'Community Adventure', 'Adventure | Community Calendar | SITE', 'Community Adventure',
-   'Get outside.', 'Find something new.', 'Outdoor excursions and group adventures in the Pacific Northwest.',
+   'Get outside.', 'Find something new.', 'Outdoor excursions and group adventures.',
    'Outdoor excursions and trips', '🏔️',
    'eyebrow-adventure', 'glow-adventure', 'form-glow-adventure', NULL, 1, 30),
   ('movie-night', 'Movies', 'Movie Night', 'Movie Night | Community Calendar | SITE', 'Movie Night',

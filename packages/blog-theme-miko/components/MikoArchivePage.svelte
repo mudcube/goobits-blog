@@ -51,6 +51,7 @@
 	{eyebrow}
 	title={pageTitle}
 	{titleAccent}
+	titleAccentNewLine={data.pageType !== 'category' && data.pageType !== 'tag'}
 	icon="/media/page-icons/journal-journaling.png"
 	iconAlt="Journal illustration"
 	intro={description}

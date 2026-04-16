@@ -18,7 +18,7 @@
 </script>
 
 <h1 class="admin-page__title">Members</h1>
-<p class="admin-page__subtitle">Manage invite codes and users.</p>
+<p class="admin-page__subtitle">Manage people, invite links, and member access.</p>
 
 {#if members.error}
   <div class="admin-page__section admin-page__section--error">
@@ -34,10 +34,10 @@
 
 <div class="admin-page__section">
   <div class="admin-page__section-head">
-    <h3 class="admin-page__section-title">Create invite</h3>
+    <h3 class="admin-page__section-title">Create invite link</h3>
   </div>
   <p class="admin-page__section-description">
-    Generate invite codes for new members.
+    Generate a guest link. Optional email, uses, and expiry control how it can be claimed.
   </p>
   <div class="admin-page__fields-grid">
     <div class="admin-page__fields-row admin-page__fields-row--invite">
@@ -92,7 +92,7 @@
       <Loader size={12} class="admin-page__spin" />
       Creating...
     {:else}
-      Create Invite
+      Create Invite Link
     {/if}
   </PillButton>
 </div>

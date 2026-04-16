@@ -1,6 +1,7 @@
 import { dev } from '$app/environment'
 import { getActiveReleaseStage } from '$lib/app/release'
 import { getTarget } from '$lib/app/target'
+import { isLocalPreviewHost as isAllowedLocalPreviewHost } from '$lib/app/is-local-preview-host'
 
 const fixedThemePreferences = {
 	theme: 'dark',
@@ -16,8 +17,7 @@ export function load({
 	locals: Record<string, unknown>
 	url: URL
 }) {
-	const isLocalPreviewHost =
-		dev && ['localhost', '127.0.0.1'].includes(url.hostname)
+	const isLocalPreviewHost = dev && isAllowedLocalPreviewHost(url.hostname)
 	const activeTarget = getTarget(cookies)
 
 	return {

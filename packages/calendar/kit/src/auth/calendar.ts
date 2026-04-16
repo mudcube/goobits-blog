@@ -66,6 +66,19 @@ export function normalizeCalendarRedirect(redirectTo: unknown) {
 	return `${pathname}${parsed.search}${parsed.hash}`
 }
 
+
+export function getCalendarLoginContext(cookies: Pick<Cookies, 'get'>) {
+	return {
+		invite: cookies.get(INVITE_COOKIE) || null,
+		redirectTo: normalizeCalendarRedirect(cookies.get(REDIRECT_COOKIE))
+	}
+}
+
+export function clearCalendarLoginContext(cookies: Pick<Cookies, 'delete'>) {
+	cookies.delete(INVITE_COOKIE, { path: '/' })
+	cookies.delete(REDIRECT_COOKIE, { path: '/' })
+}
+
 export async function getCalendarAuth({ event }: { event: { platform?: PlatformLike; url: URL } }) {
 	const db = await getDb(event.platform)
 	if (!db) throw new Error('Database unavailable')
@@ -160,15 +173,7 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 		sessions: {},
 		hooks: {
 			onLogin: async (evt: RequestEventLike, profile: OAuthProfile, _tokens: OAuthTokens | null, user?: User | null) => {
-				const invite = evt.cookies.get(INVITE_COOKIE)
-				const redirectTo = evt.cookies.get(REDIRECT_COOKIE)
-
-				if (invite) {
-					evt.cookies.delete(INVITE_COOKIE, { path: '/' })
-				}
-				if (redirectTo) {
-					evt.cookies.delete(REDIRECT_COOKIE, { path: '/' })
-				}
+				const { invite, redirectTo } = getCalendarLoginContext(evt.cookies)
 
 				if (user) {
 					const hasRedeemed = await hasUserRedeemedAnyInvite({ db, userId: user.id })
@@ -188,7 +193,15 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 								throw redirect(302, `${config.routes.calendarLoginPath}?error=invite_invalid`)
 							}
 
-							await consumeInvite({ db, inviteId: result.invite.id, userId: user.id })
+							const consumed = await consumeInvite({
+									db,
+									inviteId: result.invite.id,
+									userId: user.id,
+									usesRemaining: result.invite.uses_remaining
+								})
+								if (!consumed.ok) {
+									throw redirect(302, `${config.routes.calendarLoginPath}?error=invite_${consumed.reason}`)
+								}
 						}
 					}
 
@@ -202,6 +215,7 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 				}
 				const session = await sessionAdapter.createSession(user.id)
 				sessionAdapter.setSessionCookie(evt.cookies, session)
+				clearCalendarLoginContext(evt.cookies)
 
 				if (redirectTo) {
 					evt.cookies.set(REDIRECT_COOKIE, redirectTo, {

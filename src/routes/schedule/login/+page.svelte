@@ -16,6 +16,7 @@
     data: {
       providers: Record<CalendarProviderName, boolean>;
       hasAnyProvider: boolean;
+      inviteCode: string;
       inviteStatus:
         | "valid"
         | "expired"
@@ -35,11 +36,15 @@
   const rawError = $page.url.searchParams.get("error") || "";
   let error = $state(getProviderErrorMessage(rawError));
 
-  const inviteCode = $page.url.searchParams.get("invite") || "";
+  const inviteCode = $derived(data.inviteCode || "");
   const redirectTo = $derived(data.redirectTo);
   const verifiedStatus = $page.url.searchParams.get("verified") || "";
-  let inviteInput = $state(inviteCode);
+  let inviteInput = $state("");
   let claimName = $state("");
+
+  $effect(() => {
+    if (!inviteInput && inviteCode) inviteInput = inviteCode;
+  });
   let claimEmail = $state("");
   let claimError = $state("");
 
@@ -150,17 +155,29 @@
   <div class="calendar-login__center">
     <section class="calendar-login__card" aria-label="Members sign in">
       <p class="calendar-login__label">
-        {targetActivity ? targetActivity.eyebrow : "Members"}
+        {hasValidInvite
+          ? targetActivity
+            ? `${targetActivity.eyebrow} Invite`
+            : "Invitation"
+          : targetActivity
+            ? targetActivity.eyebrow
+            : "Members"}
       </p>
       <h1 class="calendar-login__title">
-        {targetActivity
-          ? `${targetActivity.label} ${targetActivity.icon}`
-          : "Welcome back ✨"}
+        {hasValidInvite
+          ? targetActivity
+            ? `Join ${targetActivity.label} ${targetActivity.icon}`
+            : "You're invited ✨"
+          : targetActivity
+            ? `${targetActivity.label} ${targetActivity.icon}`
+            : "Welcome back ✨"}
       </h1>
       <p class="calendar-login__subtitle">
-        {targetActivity
-          ? `${targetActivity.heroSubtitle} Sign in to continue.`
-          : "Sign in to access activities and events."}
+        {hasValidInvite
+          ? "Join instantly without creating an account. Google or Apple sign-in is optional."
+          : targetActivity
+            ? `${targetActivity.heroSubtitle} Sign in to continue.`
+            : "Sign in to access activities and events."}
       </p>
 
       {#if error}
@@ -290,7 +307,7 @@
       {#if data.hasAnyProvider}
         <div class="calendar-login__divider" aria-hidden="true">
           <div class="calendar-login__divider-line"></div>
-          <span>{hasValidInvite ? "or use a provider" : "or join with invite"}</span>
+          <span>{hasValidInvite ? "or sign in with a provider" : "or join with invite"}</span>
           <div class="calendar-login__divider-line"></div>
         </div>
 

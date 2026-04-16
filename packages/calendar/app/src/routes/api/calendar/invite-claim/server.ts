@@ -49,7 +49,18 @@ export async function POST(event: RequestEvent) {
 				code: 'account_exists'
 			})
 		}
-		await consumeInvite({ db: env.DB, inviteId: result.invite.id, userId: String(user.userId) })
+		const consumed = await consumeInvite({
+			db: env.DB,
+			inviteId: result.invite.id,
+			userId: String(user.userId),
+			usesRemaining: result.invite.uses_remaining
+		})
+		if (!consumed.ok) {
+			return apiError('This invite has already been used.', {
+				status: 409,
+				code: `invite_${consumed.reason}`
+			})
+		}
 
 		await setCalendarSessionCookie({
 			db: env.DB,

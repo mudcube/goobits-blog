@@ -18,7 +18,13 @@ import PillButton from '../primitives/CalendarPillButton.svelte'
 </script>
 
 <div class="admin-root">
-	<ShellNav currentPath={$page.url.pathname}>
+	<ShellNav
+		currentPath={$page.url.pathname}
+		showLogo={true}
+		homeHref="/"
+		logoSrc="/media/brand/logo.svg"
+		logoAlt={calendarConfig.brand.siteName}
+	>
 		{#snippet right()}
 			<span class="admin-shell__nav-badge">Admin</span>
 			{#if data.user}

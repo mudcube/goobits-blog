@@ -20,6 +20,8 @@ import ShellNav from '../primitives/CalendarShellNav.svelte'
 	<ShellNav
 		homeHref="/"
 		showLogo={true}
+		logoSrc="/media/brand/logo.svg"
+		logoAlt={calendarConfig.brand.siteName}
 		links={headerLinks}
 		linksAlign="right"
 		currentPath={$page.url.pathname}

@@ -45,7 +45,7 @@
 	class:social-admin__breadcrumbs-actions--empty={actions.length === 0}
 >
 	{#if actions.includes('view-program') && programSlug}
-		<AdminActionButton variant="subtle" icon={Eye} href={hrefWithMock(`/schedule/${programSlug}/`)}>View</AdminActionButton>
+		<AdminActionButton variant="subtle" icon={Eye} href={hrefWithMock(`/schedule/${programSlug}/`)}>View Program</AdminActionButton>
 	{/if}
 
 	{#if actions.includes('program-settings')}
@@ -54,13 +54,13 @@
 			icon={Settings}
 			onclick={() => $adminActionHandlers.onProgramEditorToggleSettings?.()}
 		>
-			Settings
+			Program Settings
 		</AdminActionButton>
 	{/if}
 
 	{#if actions.includes('new-event')}
 		<AdminActionButton variant="primary" icon={CalendarPlus} href={hrefWithMock('/schedule/admin/events/new/')}>
-			New
+			New Event
 		</AdminActionButton>
 	{/if}
 
@@ -80,12 +80,12 @@
 			icon={UserPlus}
 			onclick={(event) => $adminActionHandlers.onCrewCreateInvite?.(crewInvitePayload(event))}
 		>
-			Invite
+			Create Invite
 		</AdminActionButton>
 	{/if}
 
 	{#if actions.includes('view-calendar')}
-		<AdminActionButton variant="subtle" icon={CalendarDays} href={hrefWithMock('/schedule/')}>Calendar</AdminActionButton>
+		<AdminActionButton variant="subtle" icon={CalendarDays} href={hrefWithMock('/schedule/')}>Open Calendar</AdminActionButton>
 	{/if}
 
 	{#if actions.includes('event-edit')}
@@ -94,7 +94,7 @@
 			icon={Pencil}
 			onclick={() => $adminActionHandlers.onEventDetailEdit?.()}
 		>
-			Edit
+			Edit Event
 		</AdminActionButton>
 	{/if}
 

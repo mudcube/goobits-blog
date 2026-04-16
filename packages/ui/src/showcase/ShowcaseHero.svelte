@@ -42,7 +42,10 @@
 		<h1 class="showcase-hero__title">
 			{title}
 			{#if titleAccent}
-				<span class:showcase-hero__title-accent-line={titleAccentNewLine}>
+				<span
+					class="showcase-hero__title-accent-line"
+					class:showcase-hero__title-accent--block={titleAccentNewLine}
+				>
 					<span>{titleAccent}</span>
 					{#if icon}
 						<span class="showcase-hero__title-icon-wrap"
