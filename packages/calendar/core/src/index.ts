@@ -33,7 +33,15 @@ import {
 	type CalendarConfigInput
 } from './config/calendar.ts'
 import { requireEnv, getEnv } from './config/env.ts'
-import { getCalendarActivities, getCalendarActivityList, type CalendarActivityConfig } from './social/activities.ts'
+import {
+	configureCalendarActivityCatalog,
+	getCalendarActivities,
+	getCalendarActivityDefinitions,
+	getCalendarActivityList,
+	resetCalendarActivityCatalog,
+	type CalendarActivityConfig,
+	type CalendarActivityDefinition
+} from './social/activities.ts'
 import { isKnownProgramSlug, isValidProgramSlug, type CalendarProgramSlug } from './social/programs.ts'
 import { buildPaymentLink, type PaymentProvider } from './services/pay.ts'
 import {
@@ -171,8 +179,11 @@ export {
 	resetCalendarConfig,
 	requireEnv,
 	getEnv,
+	configureCalendarActivityCatalog,
 	getCalendarActivities,
+	getCalendarActivityDefinitions,
 	getCalendarActivityList,
+	resetCalendarActivityCatalog,
 	isKnownProgramSlug,
 	isValidProgramSlug,
 	buildPaymentLink,
@@ -245,6 +256,7 @@ export type {
 	CalendarConfig,
 	CalendarConfigInput,
 	CalendarActivityConfig,
+	CalendarActivityDefinition,
 	CalendarProgramSlug,
 	PaymentProvider,
 	CalendarHomeFeedEvent,

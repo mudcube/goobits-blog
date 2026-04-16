@@ -91,6 +91,7 @@
 			eyebrow="Music"
 			title="Songs, sketches, and"
 			titleAccent="sound experiments"
+			titleAccentNewLine
 			icon="/media/page-icons/music-notes-flow.png"
 			iconAlt="Music notes icon"
 			intro="Exploring the thin membrane between build sessions and sonic textures. Tracks, demos, and music-related experiments from Miko."

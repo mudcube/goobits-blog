@@ -492,7 +492,9 @@
 			align-items: stretch;
 			flex-direction: column;
 		}
+	}
 
+	@media (max-width: 640px) {
 		.apps-page__grid {
 			grid-template-columns: minmax(0, 1fr);
 		}

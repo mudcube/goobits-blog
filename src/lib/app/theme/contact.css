@@ -184,6 +184,10 @@
     gap: 3.5rem;
   }
 
+  .contact-page__aside-section {
+    display: none;
+  }
+
   .contact-page__raccoon-wrap {
     display: none;
   }

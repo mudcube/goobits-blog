@@ -101,6 +101,7 @@
 			eyebrow="Art"
 			title="Product concepts, merch, and"
 			titleAccent="visual experiments"
+			titleAccentNewLine
 			icon="/media/page-icons/art-rainbow-imagination.png"
 			iconAlt="Art rainbow icon"
 			intro="A working gallery of t-shirt concepts, Portland Ketchup experiments, packaging directions, and other product-ready visuals."

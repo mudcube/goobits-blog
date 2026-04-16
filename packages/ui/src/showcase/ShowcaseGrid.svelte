@@ -135,7 +135,9 @@
 			align-items: stretch;
 			flex-direction: column;
 		}
+	}
 
+	@media (max-width: 640px) {
 		.showcase-grid__items {
 			grid-template-columns: minmax(0, 1fr);
 		}
