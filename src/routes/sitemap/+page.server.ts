@@ -1,51 +1,18 @@
-import { dev } from '$app/environment'
-import { getActiveReleaseStage } from '$lib/app/release'
-import { isLocalPreviewHost as isAllowedLocalPreviewHost } from '$lib/app/is-local-preview-host'
-import { getTarget } from '$lib/app/target'
-import {
-	filterRouteInventoryBySitemapAudiences,
-	getSitemapAudiencesForVisibility,
-	getPublicHumanSitemapInventory,
-	getRouteInventory
-} from '$lib/app/routes/route-index.server'
-import type { HumanSitemapVisibility } from '$lib/app/routes/route-index.server'
+import { getConfiguredReleaseStage } from '$lib/app/release'
+import { getPublicHumanSitemapInventory } from '$lib/app/routes/route-index.server'
 
-export const prerender = false
+export const prerender = true
 
-function normalizeVisibility(value: string | null | undefined): HumanSitemapVisibility {
-	return value === 'internal' ? 'internal' : 'public'
-}
-
-export async function load({ cookies, url }: { cookies: import('@sveltejs/kit').Cookies; url: URL }) {
-	const isLocalPreviewHost = dev && isAllowedLocalPreviewHost(url.hostname)
-	const activeTarget = getTarget(cookies)
-	const canViewInternalRoutes = isLocalPreviewHost
-	const activeVisibility = canViewInternalRoutes
-		? normalizeVisibility(url.searchParams.get('visibility'))
-		: 'public'
-	const activeStage = getActiveReleaseStage({
-		cookies,
-		enablePreview: isLocalPreviewHost
-	})
-	const inventory = canViewInternalRoutes
-		? await getRouteInventory({
-			includeDevOnlyCategories: true,
-			activeStage
-		})
-		: await getPublicHumanSitemapInventory(activeStage)
-
-	const visibilityAudiences = getSitemapAudiencesForVisibility(activeVisibility)
-	const filteredInventory = canViewInternalRoutes
-		? filterRouteInventoryBySitemapAudiences(inventory, visibilityAudiences)
-		: inventory
+export async function load() {
+	const activeStage = getConfiguredReleaseStage()
+	const inventory = await getPublicHumanSitemapInventory(activeStage)
 
 	return {
-		routes: filteredInventory.routes,
-		grouped: filteredInventory.grouped,
-		stats: filteredInventory.stats,
-		canViewInternalRoutes,
-		activeVisibility,
-		activeTarget,
+		routes: inventory.routes,
+		grouped: inventory.grouped,
+		stats: inventory.stats,
+		canViewInternalRoutes: false,
+		activeVisibility: 'public',
 		activeStage
 	}
 }

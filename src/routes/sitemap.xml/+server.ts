@@ -1,21 +1,17 @@
 import type { RequestHandler } from './$types'
-import { isLocalPreviewHost } from '$lib/app/is-local-preview-host'
-import { getActiveReleaseStage } from '$lib/app/release'
+import { getConfiguredReleaseStage } from '$lib/app/release'
 import { getPublicSitemapRoutes } from '$lib/app/routes/route-index.server'
-import { buildSitemapXml, getBaseUrl, getPlatformEnv, resolveSiteOrigin } from '@goobits/sitemap/server'
+import { buildSitemapXml, getBaseUrl, resolveSiteOrigin } from '@goobits/sitemap/server'
 
-export const prerender = false
+export const prerender = true
 
-export const GET: RequestHandler = async ({ cookies, platform, url }) => {
-	const baseUrl = getBaseUrl(getPlatformEnv(platform))
-	const origin = resolveSiteOrigin(baseUrl ? { baseUrl, requestUrl: url, fallbackOrigin: 'https://miko.art' } : { requestUrl: url, fallbackOrigin: 'https://miko.art' })
-	const isLocalPreviewHostRequest = isLocalPreviewHost(url.hostname)
-	const activeStage = getActiveReleaseStage({
-		cookies,
-		enablePreview: isLocalPreviewHostRequest
-	})
+export const GET: RequestHandler = async () => {
+	const activeStage = getConfiguredReleaseStage()
+	const baseUrl = getBaseUrl(undefined)
+	const origin = baseUrl
+		? resolveSiteOrigin({ baseUrl, fallbackOrigin: 'https://miko.art' })
+		: resolveSiteOrigin({ fallbackOrigin: 'https://miko.art' })
 	const routes = await getPublicSitemapRoutes(activeStage)
-
 	const xml = buildSitemapXml(origin, routes)
 
 	return new Response(xml, {
