@@ -29,7 +29,6 @@ export interface BlogConfig {
 		urlBasePath?: string
 	}
 	uri?: string
-	[key: string]: unknown
 }
 
 // Re-export types from blogUtils for convenience
@@ -110,25 +109,35 @@ function isHttpError(error: unknown): error is HttpError {
 	)
 }
 
-function normalizeRoutePath(path: string): string {
+function normalizeRoutePath(path: string | null | undefined): string {
+	if (typeof path !== 'string' || path.length === 0) {
+		return ''
+	}
 	return path.startsWith('/') ? path : `/${path}`
 }
 
-function normalizeRouteBase(path: string): string {
-	if (!path || path === '/') return ''
+function normalizeRouteBase(path: string | null | undefined): string {
+	if (!path || path === '/') {
+		return ''
+	}
 	return normalizeRoutePath(path).replace(/\/+$/, '')
 }
 
 function getRouteRelativePostPath(path: string, config: BlogConfig | null = null): string {
 	const resolvedConfig = config ?? getBlogConfig()
 	const normalizedPath = normalizeRoutePath(path)
+	const routeBasePath = resolvedConfig.posts?.urlBasePath
+	const routeBase = typeof routeBasePath === 'string' ? routeBasePath : ''
+	const normalizedUri = typeof resolvedConfig.uri === 'string' ? resolvedConfig.uri : ''
 	const candidateBases = [
-		normalizeRouteBase(String(resolvedConfig.posts?.urlBasePath || '')),
-		normalizeRouteBase(String((resolvedConfig as Record<string, unknown>).uri || ''))
+		normalizeRouteBase(routeBase),
+		normalizeRouteBase(normalizedUri)
 	].filter(Boolean)
 
 	for (const base of candidateBases) {
-		if (normalizedPath === base) return '/'
+		if (normalizedPath === base) {
+			return '/'
+		}
 		if (normalizedPath.startsWith(`${base}/`)) {
 			return normalizedPath.slice(base.length) || '/'
 		}

@@ -250,25 +250,31 @@ function resolveContentDiskPath(filePath: string, contentBasePath: string): stri
 	return filePath
 }
 
-function normalizeRoutePath(path: string): string {
-	const normalized = path.trim()
-	if (!normalized) return ''
+function normalizeRoutePath(path: string | null | undefined): string {
+	const normalized = typeof path === 'string' ? path.trim() : ''
+	if (!normalized) {
+		return ''
+	}
 	return normalized.startsWith('/') ? normalized : `/${normalized}`
 }
 
-function normalizeRouteBase(path: string): string {
+function normalizeRouteBase(path: string | null | undefined): string {
 	const normalized = normalizeRoutePath(path)
-	if (!normalized || normalized === '/') return ''
+	if (!normalized || normalized === '/') {
+		return ''
+	}
 	return normalized.replace(/\/+$/, '')
 }
 
 function getMountedPostUrlPath(post: ProcessedPost | null | undefined): string {
 	const config = blogConfig
 	const rawPath = normalizeRoutePath(post?.urlPath || '')
-	if (!rawPath) return normalizeRouteBase(config.uri) || '/'
+	if (!rawPath) {
+		return normalizeRouteBase(config.uri) || '/'
+	}
 
 	const configuredUri = normalizeRouteBase(config.uri)
-	const configuredUrlBase = normalizeRouteBase(config.posts.urlBasePath)
+	const configuredUrlBase = normalizeRouteBase(config.posts?.urlBasePath)
 
 	if (
 		(configuredUri && (rawPath === configuredUri || rawPath.startsWith(`${configuredUri}/`))) ||

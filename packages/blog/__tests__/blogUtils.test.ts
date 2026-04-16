@@ -633,7 +633,7 @@ describe('getAllPosts path handling', () => {
 
 		const posts = await getAllPosts()
 		expect(posts).toHaveLength(1)
-		expect(posts[0]?.urlPath).toBe('/2024/01/test-post')
+		expect(posts[0]?.urlPath).toBe('/blog/2024/01/test-post')
 		expect(posts[0]?.path).toBe('/content/Blog/2024/01/test-post.md')
 	})
 
@@ -645,7 +645,7 @@ describe('getAllPosts path handling', () => {
 
 		const posts = await getAllPosts()
 		expect(posts).toHaveLength(1)
-		expect(posts[0]?.urlPath).toBe('/2024/01/test-post')
+		expect(posts[0]?.urlPath).toBe('/blog/2024/01/test-post')
 		expect(posts[0]?.path).toBe('/content/Blog/2024/01/test-post/index.md')
 	})
 
