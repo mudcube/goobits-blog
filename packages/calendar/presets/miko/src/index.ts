@@ -5,7 +5,7 @@ export const mikoCalendarPreset = {
 		siteName: 'MIKO.ART',
 		calendarName: 'Rainbow Gym',
 		adminEmail: 'admin@miko.art',
-		inviteBypassDomain: '@miko.art'
+		inviteBypassDomain: 'miko.art'
 	},
 	routes: {
 		calendarBase: '/schedule',

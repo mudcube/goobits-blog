@@ -13,6 +13,11 @@ function isAuthUser(value: unknown): value is User {
 		&& typeof record['email'] === 'string'
 }
 
+function withMockContext(path: string, url: URL) {
+	if (url.searchParams.get('mock') !== '1') return path
+	return `${path}${path.includes('?') ? '&' : '?'}mock=1`
+}
+
 export const load = async (event: RequestEvent) => {
 	const locals = event.locals as { user?: Record<string, unknown> }
 	return { user: locals.user ?? null, initialTab: 'dashboard' }
@@ -39,7 +44,7 @@ export const actions: Actions = {
 				},
 				userAdapter,
 				sessionAdapter,
-				redirectTo: `${getCalendarConfig().routes.adminBase}/`,
+				redirectTo: withMockContext(`${getCalendarConfig().routes.adminBase}/`, event.url),
 				rateLimit: {
 					check: async (key: string) => {
 						try {
@@ -73,6 +78,9 @@ export const actions: Actions = {
 
 	logout: async (event) => {
 		const { sessionAdapter } = await getAdminAuth({ event })
-		return createLogoutHandler({ sessionAdapter, redirectAfterLogout: `${getCalendarConfig().routes.adminBase}/` })(event)
+		return createLogoutHandler({
+			sessionAdapter,
+			redirectAfterLogout: withMockContext(`${getCalendarConfig().routes.adminBase}/`, event.url)
+		})(event)
 	}
 }

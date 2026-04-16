@@ -1,3 +1,5 @@
+import { getCalendarUiConfig } from '../../config'
+
 export type AdminNavSection = 'dashboard' | 'crew' | 'events' | 'settings'
 
 export type AdminBreadcrumbItem = {
@@ -51,14 +53,21 @@ function prettySegment(value: string) {
 		.join(' ')
 }
 
+function escapeRegex(value: string) {
+	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = {}): AdminRouteInfo {
+	const config = getCalendarUiConfig()
+	const adminBase = config.routes.adminBase
 	const normalized = normalizePath(pathname)
 	const hrefWithMock = options.hrefWithMock ?? ((path: string) => path)
 	const baseCrumbs: AdminBreadcrumbItem[] = [
-		{ label: 'Dashboard', href: hrefWithMock('/schedule/admin/') }
+		{ label: 'Dashboard', href: hrefWithMock(`${adminBase}/`) }
 	]
+	const adminBasePattern = escapeRegex(adminBase)
 
-	if (normalized === '/schedule/admin') {
+	if (normalized === adminBase) {
 		return {
 			kind: 'dashboard',
 			currentSection: 'dashboard',
@@ -68,7 +77,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 		}
 	}
 
-	if (normalized === '/schedule/admin/crew') {
+	if (normalized === `${adminBase}/crew`) {
 		return {
 			kind: 'crew-index',
 			currentSection: 'crew',
@@ -78,7 +87,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 		}
 	}
 
-	const crewDetailMatch = normalized.match(/^\/schedule\/admin\/crew\/([^/]+)$/)
+	const crewDetailMatch = normalized.match(new RegExp(`^${adminBasePattern}/crew/([^/]+)$`))
 	if (crewDetailMatch) {
 		const userId = crewDetailMatch[1]!
 		return {
@@ -87,7 +96,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 			title: 'Crew',
 			breadcrumbs: [
 				...baseCrumbs,
-				{ label: 'Crew', href: hrefWithMock('/schedule/admin/crew/') },
+				{ label: 'Crew', href: hrefWithMock(`${adminBase}/crew/`) },
 				{ label: prettySegment(userId) }
 			],
 			actions: [],
@@ -95,7 +104,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 		}
 	}
 
-	if (normalized === '/schedule/admin/events') {
+	if (normalized === `${adminBase}/events`) {
 		return {
 			kind: 'events-index',
 			currentSection: 'events',
@@ -105,21 +114,21 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 		}
 	}
 
-	if (normalized === '/schedule/admin/events/new') {
+	if (normalized === `${adminBase}/events/new`) {
 		return {
 			kind: 'event-new',
 			currentSection: 'events',
 			title: 'Events',
 			breadcrumbs: [
 				...baseCrumbs,
-				{ label: 'Events', href: hrefWithMock('/schedule/admin/events/') },
+				{ label: 'Events', href: hrefWithMock(`${adminBase}/events/`) },
 				{ label: 'New Event' }
 			],
 			actions: ['back-to-events']
 		}
 	}
 
-	const eventProgramMatch = normalized.match(/^\/schedule\/admin\/events\/program\/([^/]+)$/)
+	const eventProgramMatch = normalized.match(new RegExp(`^${adminBasePattern}/events/program/([^/]+)$`))
 	if (eventProgramMatch) {
 		const programSlug = eventProgramMatch[1]!
 		return {
@@ -128,7 +137,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 			title: 'Events',
 			breadcrumbs: [
 				...baseCrumbs,
-				{ label: 'Events', href: hrefWithMock('/schedule/admin/events/') },
+				{ label: 'Events', href: hrefWithMock(`${adminBase}/events/`) },
 				{ label: prettySegment(programSlug) }
 			],
 			actions: ['view-program', 'program-settings'],
@@ -136,7 +145,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 		}
 	}
 
-	const eventDetailMatch = normalized.match(/^\/schedule\/admin\/events\/detail\/([^/]+)$/)
+	const eventDetailMatch = normalized.match(new RegExp(`^${adminBasePattern}/events/detail/([^/]+)$`))
 	if (eventDetailMatch) {
 		const eventId = eventDetailMatch[1]!
 		return {
@@ -145,7 +154,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 			title: 'Events',
 			breadcrumbs: [
 				...baseCrumbs,
-				{ label: 'Events', href: hrefWithMock('/schedule/admin/events/') },
+				{ label: 'Events', href: hrefWithMock(`${adminBase}/events/`) },
 				{ label: options.detailLabel?.trim() || 'Event Detail' }
 			],
 			actions: ['event-edit', 'event-cancel'],
@@ -155,9 +164,9 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 
 	return {
 		kind: 'settings',
-		currentSection: 'settings',
-		title: 'Settings',
-		breadcrumbs: [...baseCrumbs, { label: 'Settings' }],
-		actions: []
+			currentSection: 'settings',
+			title: 'Settings',
+			breadcrumbs: [...baseCrumbs, { label: 'Settings' }],
+			actions: []
 	}
 }

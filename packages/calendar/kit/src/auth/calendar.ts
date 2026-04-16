@@ -50,9 +50,11 @@ function normalizeRedirectUri(value: string) {
 
 function emailMatchesDomain(email: string, domain: string) {
 	if (!email || !domain) return false
+	const normalizedDomain = domain.trim().toLowerCase().replace(/^@+/, '')
+	if (!normalizedDomain) return false
 	const atIndex = email.lastIndexOf('@')
 	if (atIndex < 0 || atIndex === email.length - 1) return false
-	return email.slice(atIndex + 1) === domain
+	return email.slice(atIndex + 1) === normalizedDomain
 }
 
 export function normalizeCalendarRedirect(redirectTo: unknown) {

@@ -7,6 +7,7 @@
 		Settings,
 		Users
 	} from '@lucide/svelte'
+	import { getCalendarUiConfig } from '../../../config'
 	import type { AdminNavSection } from '../route'
 
 	type NavItem = {
@@ -22,15 +23,17 @@
 		hrefWithMock: (path: string) => string
 		user: unknown | null
 	}>()
+	const calendarConfig = getCalendarUiConfig()
+	const adminBase = calendarConfig.routes.adminBase
 
 	const primaryNav: NavItem[] = [
-		{ href: '/schedule/admin/', label: 'Dashboard', icon: LayoutDashboard, section: 'dashboard' },
-		{ href: '/schedule/admin/crew/', label: 'Crew', icon: Users, section: 'crew' },
-		{ href: '/schedule/admin/events/', label: 'Events', icon: CalendarDays, section: 'events' }
+		{ href: `${adminBase}/`, label: 'Dashboard', icon: LayoutDashboard, section: 'dashboard' },
+		{ href: `${adminBase}/crew/`, label: 'Crew', icon: Users, section: 'crew' },
+		{ href: `${adminBase}/events/`, label: 'Events', icon: CalendarDays, section: 'events' }
 	]
 
 	const footerNav: NavItem[] = [
-		{ href: '/schedule/admin/settings/', label: 'Settings', icon: Settings, section: 'settings' }
+		{ href: `${adminBase}/settings/`, label: 'Settings', icon: Settings, section: 'settings' }
 	]
 
 	function normalizePath(pathname: string) {
@@ -40,13 +43,13 @@
 	function active(item: NavItem) {
 		const current = normalizePath(currentPath)
 		const target = normalizePath(item.href)
-		if (item.section === 'dashboard') return current === '/schedule/admin'
+		if (item.section === 'dashboard') return current === adminBase
 		return currentSection === item.section && (current === target || current.startsWith(`${target}/`))
 	}
 </script>
 
 <aside class="social-admin__sidebar">
-	<a class="social-admin__brand" href={hrefWithMock('/schedule/admin/events/')}>Admin</a>
+	<a class="social-admin__brand" href={hrefWithMock(`${adminBase}/events/`)}>Admin</a>
 
 	<nav class="social-admin__nav" aria-label="Admin">
 		{#each primaryNav as item}
@@ -77,7 +80,7 @@
 	{/each}
 
 	{#if user}
-		<form class="social-admin__logout" method="POST" action="/schedule/admin?/logout" use:enhance>
+		<form class="social-admin__logout" method="POST" action={`${adminBase}?/logout`} use:enhance>
 			<button type="submit">
 				<LogOut size={16} strokeWidth={1.8} />
 				<span>Log out</span>

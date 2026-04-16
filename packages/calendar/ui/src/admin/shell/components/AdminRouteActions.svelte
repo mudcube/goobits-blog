@@ -10,6 +10,7 @@
 		Trash2,
 		UserPlus
 	} from '@lucide/svelte'
+	import { getCalendarUiConfig } from '../../../config'
 	import AdminActionButton from '../../shared/AdminActionButton.svelte'
 	import type { AdminRouteActionId } from '../route'
 	import { adminActionHandlers } from '../state'
@@ -19,6 +20,9 @@
 		hrefWithMock: (path: string) => string
 		programSlug: string | undefined
 	}>()
+	const calendarConfig = getCalendarUiConfig()
+	const calendarBase = calendarConfig.routes.calendarBase
+	const adminBase = calendarConfig.routes.adminBase
 
 	function anchorRectFromEvent(event?: MouseEvent) {
 		const target = event?.currentTarget as HTMLElement | null
@@ -45,7 +49,7 @@
 	class:social-admin__breadcrumbs-actions--empty={actions.length === 0}
 >
 	{#if actions.includes('view-program') && programSlug}
-		<AdminActionButton variant="subtle" icon={Eye} href={hrefWithMock(`/schedule/${programSlug}/`)}>View Program</AdminActionButton>
+		<AdminActionButton variant="subtle" icon={Eye} href={hrefWithMock(`${calendarBase}/${programSlug}/`)}>View Program</AdminActionButton>
 	{/if}
 
 	{#if actions.includes('program-settings')}
@@ -59,7 +63,7 @@
 	{/if}
 
 	{#if actions.includes('new-event')}
-		<AdminActionButton variant="primary" icon={CalendarPlus} href={hrefWithMock('/schedule/admin/events/new/')}>
+		<AdminActionButton variant="primary" icon={CalendarPlus} href={hrefWithMock(`${adminBase}/events/new/`)}>
 			New Event
 		</AdminActionButton>
 	{/if}
@@ -68,7 +72,7 @@
 		<AdminActionButton
 			variant="subtle"
 			icon={ArrowLeft}
-			onclick={() => void goto(hrefWithMock('/schedule/admin/events/'))}
+			onclick={() => void goto(hrefWithMock(`${adminBase}/events/`))}
 		>
 			Back to Events
 		</AdminActionButton>
@@ -85,7 +89,7 @@
 	{/if}
 
 	{#if actions.includes('view-calendar')}
-		<AdminActionButton variant="subtle" icon={CalendarDays} href={hrefWithMock('/schedule/')}>Open Calendar</AdminActionButton>
+		<AdminActionButton variant="subtle" icon={CalendarDays} href={hrefWithMock(`${calendarBase}/`)}>Open Calendar</AdminActionButton>
 	{/if}
 
 	{#if actions.includes('event-edit')}
