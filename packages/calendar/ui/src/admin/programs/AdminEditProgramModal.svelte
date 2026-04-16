@@ -1,4 +1,5 @@
 <script>
+  import { getCalendarActivityDefinitions } from "@calendar/core";
   import { withCalendarRoute } from "@calendar/ui/config";
   import PillButton from "../../primitives/CalendarPillButton.svelte";
   const { dashboard, onClose } = $props();
@@ -12,27 +13,27 @@
       glowClass: "",
       formGlowClass: "",
     },
-    {
-      id: "circus",
-      label: "Circus",
-      eyebrowClass: "eyebrow-circus",
-      glowClass: "glow-circus",
-      formGlowClass: "form-glow-circus",
-    },
-    {
-      id: "adventure",
-      label: "Adventure",
-      eyebrowClass: "eyebrow-adventure",
-      glowClass: "glow-adventure",
-      formGlowClass: "form-glow-adventure",
-    },
-    {
-      id: "movie",
-      label: "Movie",
-      eyebrowClass: "eyebrow-movie",
-      glowClass: "glow-movie",
-      formGlowClass: "form-glow-movie",
-    },
+    ...getCalendarActivityDefinitions()
+      .filter(
+        (activity) =>
+          activity.eyebrowClass || activity.glowClass || activity.formGlowClass,
+      )
+      .map((activity) => ({
+        id: activity.slug,
+        label: activity.label,
+        eyebrowClass: activity.eyebrowClass || "",
+        glowClass: activity.glowClass || "",
+        formGlowClass: activity.formGlowClass || "",
+      }))
+      .filter(
+        (option, index, options) =>
+          options.findIndex(
+            (candidate) =>
+              candidate.eyebrowClass === option.eyebrowClass &&
+              candidate.glowClass === option.glowClass &&
+              candidate.formGlowClass === option.formGlowClass,
+          ) === index,
+      ),
   ];
 
   function updateProgramDraft(patch) {
