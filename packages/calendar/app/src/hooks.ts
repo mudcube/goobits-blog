@@ -130,6 +130,19 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 		}
 
 		const locals = event.locals as { user?: unknown }
+		if (dev && event.url.searchParams.get('mock') === '1') {
+			if (!locals.user) {
+				locals.user = {
+					id: '0',
+					email: 'mock-user@local.dev',
+					name: 'Mock User',
+					avatar_url: null,
+					emailVerified: true
+				}
+			}
+			return resolve(event)
+		}
+
 		if (!locals.user) {
 			const bootstrapped = await tryBootstrapDevCalendarSession(event)
 			if (bootstrapped) {

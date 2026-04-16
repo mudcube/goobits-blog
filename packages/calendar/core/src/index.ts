@@ -133,11 +133,13 @@ import {
 	parseCalendarJoinEventInput,
 	parseCalendarProfileInput,
 	parseCalendarInviteCreateInput,
+	parseCalendarInviteClaimInput,
 	parseCalendarSessionBootstrapInput,
 	parseDiscordWebhookTextInput,
 	type CalendarJoinEventInput,
 	type CalendarProfileInput,
 	type CalendarInviteCreateInput,
+	type CalendarInviteClaimInput,
 	type CalendarSessionBootstrapInput
 } from './transport/calendar.ts'
 import { TransportValidationError, asTransportErrorMessage } from './transport/errors.ts'
@@ -232,6 +234,7 @@ export {
 	parseCalendarJoinEventInput,
 	parseCalendarProfileInput,
 	parseCalendarInviteCreateInput,
+	parseCalendarInviteClaimInput,
 	parseCalendarSessionBootstrapInput,
 	parseDiscordWebhookTextInput,
 	TransportValidationError,
@@ -267,6 +270,7 @@ export type {
 	CalendarJoinEventInput,
 	CalendarProfileInput,
 	CalendarInviteCreateInput,
+	CalendarInviteClaimInput,
 	CalendarSessionBootstrapInput,
 	CalendarUserProgramAccess,
 	AdminPaymentDefaults,

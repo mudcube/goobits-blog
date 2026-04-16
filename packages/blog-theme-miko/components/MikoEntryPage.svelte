@@ -8,6 +8,7 @@
 		slugify
 	} from '@goobits/blog/core'
 	import { BlogLightbox, BlogProse } from '@goobits/blog/ui'
+	import { getJournalImageVariants } from '../utils/journalImageVariants.ts'
 	import { formatLabel } from '../utils/formatLabel.ts'
 
 	const { data } = $props()
@@ -26,6 +27,7 @@
 	const tags = $derived(post?.metadata?.fm?.tags || [])
 	const explicitCoverImage = $derived(String(post?.metadata?.fm?.coverImage || '').trim())
 	const coverImage = $derived(post ? getCoverImageUrl(post, '') : '')
+	const coverVariants = $derived(getJournalImageVariants(coverImage))
 	const coverAlt = $derived(post?.metadata?.fm?.image?.alt || post?.metadata?.fm?.title || 'Journal cover image')
 	const authorAvatar = $derived(post ? getAuthorAvatarUrl(post, '') : '')
 	const authorName = $derived(post?.metadata?.fm?.author?.name || blogConfig.appName || blogConfig.name)
@@ -112,14 +114,41 @@
 
 		{#if shouldShowHeroImage}
 			<div class="miko-blog__entry-hero-image-wrap">
-				<img
-					class="miko-blog__entry-hero-image"
-					src={coverImage}
-					alt={coverAlt}
-					loading="eager"
-					fetchpriority="high"
-					decoding="async"
-				/>
+				{#if coverVariants}
+					<picture>
+						{#if coverVariants.avif}
+							<source
+								type={coverVariants.avif.type}
+								srcset={coverVariants.avif.srcset}
+								sizes={coverVariants.sizes}
+							/>
+						{/if}
+						{#if coverVariants.webp}
+							<source
+								type={coverVariants.webp.type}
+								srcset={coverVariants.webp.srcset}
+								sizes={coverVariants.sizes}
+							/>
+						{/if}
+						<img
+							class="miko-blog__entry-hero-image"
+							src={coverVariants.fallbackSrc}
+							alt={coverAlt}
+							loading="eager"
+							fetchpriority="high"
+							decoding="async"
+						/>
+					</picture>
+				{:else}
+					<img
+						class="miko-blog__entry-hero-image"
+						src={coverImage}
+						alt={coverAlt}
+						loading="eager"
+						fetchpriority="high"
+						decoding="async"
+					/>
+				{/if}
 			</div>
 		{/if}
 	</header>

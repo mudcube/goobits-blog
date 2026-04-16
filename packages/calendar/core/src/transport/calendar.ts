@@ -1,4 +1,4 @@
-import { asJsonObject, readIntInRange, readOptionalString } from './parse.ts'
+import { asJsonObject, readIntInRange, readOptionalString, readRequiredString } from './parse.ts'
 import { TransportValidationError } from './errors.ts'
 
 export type CalendarJoinEventInput = {
@@ -60,6 +60,21 @@ export function parseCalendarSessionBootstrapInput(input: unknown): CalendarSess
 	const email = (readOptionalString(body, 'email', { maxLength: 320 }) ?? `e2e-calendar-${Date.now()}@example.com`).toLowerCase()
 	const name = readOptionalString(body, 'name', { maxLength: 120 }) ?? 'E2E Calendar User'
 	return { email, name }
+}
+
+export type CalendarInviteClaimInput = {
+	code: string
+	name: string
+	email: string | null
+}
+
+export function parseCalendarInviteClaimInput(input: unknown): CalendarInviteClaimInput {
+	const body = input == null ? {} : asJsonObject(input)
+	return {
+		code: readRequiredString(body, 'code', { maxLength: 24 }),
+		name: readRequiredString(body, 'name', { maxLength: 120 }),
+		email: readOptionalString(body, 'email', { maxLength: 320 })?.toLowerCase() ?? null
+	}
 }
 
 export function parseDiscordWebhookTextInput(input: unknown) {

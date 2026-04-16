@@ -1,11 +1,13 @@
 <script>
 	import { blogConfig, formatDate, getCoverImageUrl, slugify } from '@goobits/blog/core'
+	import { getJournalImageVariants } from '../utils/journalImageVariants.ts'
 	import { formatLabel } from '../utils/formatLabel.ts'
 
 	const { post } = $props()
 
 	const postUrl = $derived(`${blogConfig.uri}${post.urlPath}`)
 	const coverImage = $derived(getCoverImageUrl(post, ''))
+	const coverVariants = $derived(getJournalImageVariants(coverImage))
 	const categories = $derived(post.metadata?.fm?.categories || [])
 	const primaryCategory = $derived(post.metadata?.fm?.category || categories[0] || '')
 	const tags = $derived(post.metadata?.fm?.tags || [])
@@ -24,13 +26,39 @@
 	<div class="miko-blog__cell miko-blog__cell--detail">
 		{#if coverImage}
 			<div class="miko-blog__row-thumb-wrap" aria-hidden="true">
-				<img
-					class="miko-blog__row-thumb"
-					src={coverImage}
-					alt={thumbAlt}
-					loading="lazy"
-					decoding="async"
-				/>
+				{#if coverVariants}
+					<picture>
+						{#if coverVariants.avif}
+							<source
+								type={coverVariants.avif.type}
+								srcset={coverVariants.avif.srcset}
+								sizes="160px"
+							/>
+						{/if}
+						{#if coverVariants.webp}
+							<source
+								type={coverVariants.webp.type}
+								srcset={coverVariants.webp.srcset}
+								sizes="160px"
+							/>
+						{/if}
+						<img
+							class="miko-blog__row-thumb"
+							src={coverVariants.fallbackSrc}
+							alt={thumbAlt}
+							loading="lazy"
+							decoding="async"
+						/>
+					</picture>
+				{:else}
+					<img
+						class="miko-blog__row-thumb"
+						src={coverImage}
+						alt={thumbAlt}
+						loading="lazy"
+						decoding="async"
+					/>
+				{/if}
 			</div>
 		{/if}
 		<div class="miko-blog__row-copy">

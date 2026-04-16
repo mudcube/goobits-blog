@@ -16,10 +16,19 @@
     data: {
       providers: Record<CalendarProviderName, boolean>;
       hasAnyProvider: boolean;
+      inviteStatus:
+        | "valid"
+        | "expired"
+        | "exhausted"
+        | "not_found"
+        | "email_mismatch"
+        | "missing_code"
+        | null;
     };
   }>();
 
   let loading = $state(false);
+  let claimLoading = $state(false);
   const calendarConfig = getCalendarConfig();
   const rawError = $page.url.searchParams.get("error") || "";
   let error = $state(getProviderErrorMessage(rawError));
@@ -30,8 +39,22 @@
     calendarConfig.routes.calendarBase;
   const verifiedStatus = $page.url.searchParams.get("verified") || "";
   let inviteInput = $state(inviteCode);
+  let claimName = $state("");
+  let claimEmail = $state("");
+  let claimError = $state("");
 
   const targetActivity = resolveCalendarLoginTargetActivity(redirectTo);
+  const inviteStatus = $derived(data.inviteStatus);
+  const hasValidInvite = $derived(!!inviteCode && inviteStatus === "valid");
+  const inviteStatusMessage = $derived.by(() => {
+    if (!inviteCode || hasValidInvite) return "";
+    if (inviteStatus === "expired") return "This invite has expired.";
+    if (inviteStatus === "exhausted")
+      return "This invite has already been used.";
+    if (inviteStatus === "email_mismatch")
+      return "This invite is tied to a different email address.";
+    return "This invite link is invalid.";
+  });
 
   async function loginWith(
     provider: CalendarProviderName,
@@ -49,6 +72,52 @@
     } catch {
       error = "Something went wrong. Please try again.";
       loading = false;
+    }
+  }
+
+  async function claimInvite(event: SubmitEvent) {
+    event.preventDefault();
+    claimError = "";
+
+    if (!inviteCode || !hasValidInvite) {
+      claimError = "This invite link is not valid anymore.";
+      return;
+    }
+
+    if (!claimName.trim()) {
+      claimError = "Enter your name to continue.";
+      return;
+    }
+
+    claimLoading = true;
+
+    try {
+      const response = await fetch("/api/calendar/invite-claim", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          code: inviteCode,
+          name: claimName.trim(),
+          email: claimEmail.trim() || null,
+        }),
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        claimError =
+          payload?.error ||
+          payload?.message ||
+          "Could not claim this invite. Please try again.";
+        claimLoading = false;
+        return;
+      }
+
+      window.location.href = redirectTo;
+    } catch {
+      claimError = "Could not claim this invite. Please try again.";
+      claimLoading = false;
     }
   }
 
@@ -100,6 +169,12 @@
         </div>
       {/if}
 
+      {#if claimError}
+        <div class="calendar-page__error-message calendar-login__error">
+          {claimError}
+        </div>
+      {/if}
+
       {#if verifiedStatus === "1"}
         <div class="calendar-page__invite-notice calendar-login__invite-notice">
           Email verified. You can sign in now.
@@ -110,9 +185,52 @@
         </div>
       {/if}
 
-      {#if inviteCode}
+      {#if hasValidInvite}
         <div class="calendar-page__invite-notice calendar-login__invite-notice">
-          Using invite code: <code>{inviteCode}</code>
+          You're invited. Join instantly with this link, or use Google / Apple
+          below.
+        </div>
+        <form class="calendar-login__claim-form" onsubmit={claimInvite}>
+          <label class="calendar-login__claim-field" for="calendar-claim-name">
+            <span>Your name</span>
+            <input
+              id="calendar-claim-name"
+              class="ui-form-control"
+              type="text"
+              maxlength="120"
+              autocomplete="name"
+              placeholder="How should I save your name?"
+              bind:value={claimName}
+            />
+          </label>
+          <label
+            class="calendar-login__claim-field"
+            for="calendar-claim-email"
+          >
+            <span>Email for reminders (optional)</span>
+            <input
+              id="calendar-claim-email"
+              class="ui-form-control"
+              type="email"
+              maxlength="320"
+              autocomplete="email"
+              placeholder="you@example.com"
+              bind:value={claimEmail}
+            />
+          </label>
+          <PillButton
+            type="submit"
+            size="lg"
+            fullWidth
+            variant="primary"
+            disabled={claimLoading}
+          >
+            {claimLoading ? "Joining…" : "Join with Invite"}
+          </PillButton>
+        </form>
+      {:else if inviteCode}
+        <div class="calendar-page__error-message calendar-login__error">
+          {inviteStatusMessage}
         </div>
       {/if}
 
@@ -171,41 +289,43 @@
       {#if data.hasAnyProvider}
         <div class="calendar-login__divider" aria-hidden="true">
           <div class="calendar-login__divider-line"></div>
-          <span>or join with invite</span>
+          <span>{hasValidInvite ? "or use a provider" : "or join with invite"}</span>
           <div class="calendar-login__divider-line"></div>
         </div>
 
-        <form class="calendar-login__invite-form" onsubmit={joinWithInvite}>
-          <div class="ui-inline-field calendar-login__invite-row">
-            <label
-              class="calendar-login__invite-input-shell"
-              for="calendar-invite-code"
-            >
-              <input
-                id="calendar-invite-code"
-                class="ui-form-control calendar-login__invite-input"
-                type="text"
-                maxlength="24"
-                spellcheck="false"
-                autocomplete="off"
-                placeholder="Invite code"
-                bind:value={inviteInput}
-              />
-            </label>
-            <PillButton
-              className="ui-inline-field__action calendar-login__invite-button"
-              type="submit"
-              size="lg"
-              variant="primary"
-              disabled={loading}
-            >
-              Join
-            </PillButton>
-          </div>
-        </form>
+        {#if !inviteCode}
+          <form class="calendar-login__invite-form" onsubmit={joinWithInvite}>
+            <div class="ui-inline-field calendar-login__invite-row">
+              <label
+                class="calendar-login__invite-input-shell"
+                for="calendar-invite-code"
+              >
+                <input
+                  id="calendar-invite-code"
+                  class="ui-form-control calendar-login__invite-input"
+                  type="text"
+                  maxlength="24"
+                  spellcheck="false"
+                  autocomplete="off"
+                  placeholder="Invite code"
+                  bind:value={inviteInput}
+                />
+              </label>
+              <PillButton
+                className="ui-inline-field__action calendar-login__invite-button"
+                type="submit"
+                size="lg"
+                variant="primary"
+                disabled={loading}
+              >
+                Continue
+              </PillButton>
+            </div>
+          </form>
+        {/if}
       {/if}
 
-      {#if !data.hasAnyProvider}
+      {#if !data.hasAnyProvider && !hasValidInvite}
         <p class="calendar-page__invite-hint calendar-login__hint">
           No sign-in provider is configured yet. Please add OAuth credentials in
           environment settings.
@@ -220,3 +340,23 @@
     </section>
   </div>
 </div>
+
+<style>
+  .calendar-login__claim-form {
+    display: grid;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .calendar-login__claim-field {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .calendar-login__claim-field > span {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--text) 68%, transparent);
+  }
+
+</style>
