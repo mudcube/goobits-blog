@@ -11,5 +11,8 @@
   "dependencies": {
     "@calendar/core": "workspace:*",
     "@calendar/kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@sveltejs/kit": "^2.57.1"
   }
 }

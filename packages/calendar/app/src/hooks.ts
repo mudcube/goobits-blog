@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit'
 import type { Handle } from '@sveltejs/kit'
-import { dev } from '$app/environment'
+import { building, dev } from '$app/environment'
 import { getAdminAuth, getCalendarAuth } from '@calendar/kit'
 import { getCalendarConfig, type CalendarConfigInput } from '@calendar/core'
 import { buildEnv } from '@calendar/kit'
@@ -50,6 +50,10 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 	const calendarLoginRedirectPath = routes.calendarLoginRedirectPath
 
 	const handleAdminAuth: Handle = async ({ event, resolve }) => {
+		if (building) {
+			return resolve(event)
+		}
+
 		const pathname = event.url.pathname
 
 		if (
@@ -79,6 +83,10 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 	}
 
 	const handleCalendarAuth: Handle = async ({ event, resolve }) => {
+		if (building) {
+			return resolve(event)
+		}
+
 		const pathname = event.url.pathname
 		if (
 			pathname.startsWith(apiCalendarAdminBase) ||
@@ -94,6 +102,10 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 	}
 
 	const requireCalendarUser: Handle = async ({ event, resolve }) => {
+		if (building) {
+			return resolve(event)
+		}
+
 		const pathname = event.url.pathname
 
 		if (!pathname.startsWith(calendarBase)) {

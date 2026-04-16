@@ -9,12 +9,13 @@
 	import VerificationField from '@src/domains/shared/VerificationField.svelte'
 	import { registerSchema, type RegisterFormData } from './schema'
 
-	const props = $props<{ form: SuperValidated<RegisterFormData>; turnstileSiteKey?: string }>()
-	const registerForm = superForm(props.form, {
-		validators: zodClient(registerSchema),
-		validationMethod: 'onblur',
-		clearOnSubmit: 'message'
-	})
+	const { form, turnstileSiteKey } = $props<{ form: SuperValidated<RegisterFormData>; turnstileSiteKey?: string }>()
+	const registerForm = (() =>
+		superForm(form, {
+			validators: zodClient(registerSchema),
+			validationMethod: 'onblur',
+			clearOnSubmit: 'message'
+		}))()
 
 	const { form: formData, errors, enhance } = registerForm
 
@@ -35,7 +36,7 @@
 <Seo title="Register" description="Account registration for MIKO.ART calendar features." path="/register/" noindex />
 
 <svelte:head>
-	{#if props.turnstileSiteKey}
+	{#if turnstileSiteKey}
 		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 	{/if}
 </svelte:head>
@@ -97,8 +98,8 @@
 			/>
 		</FormField>
 
-		{#if props.turnstileSiteKey}
-			<VerificationField className="register-page__verification" siteKey={props.turnstileSiteKey} />
+		{#if turnstileSiteKey}
+			<VerificationField className="register-page__verification" siteKey={turnstileSiteKey} />
 		{/if}
 
 		{#if $errors._errors?.length}

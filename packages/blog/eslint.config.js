@@ -177,6 +177,11 @@ export default tseslint.config(
   // Svelte files - without type-checked rules
   {
     files: ['**/*.svelte'],
+    languageOptions: {
+      parserOptions: {
+        parser: tseslint.parser
+      }
+    },
     rules: {
       // Svelte-specific rules
       'svelte/no-navigation-without-resolve': 'off',

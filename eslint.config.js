@@ -23,7 +23,6 @@ export default tseslint.config(
 		]
 	},
 	js.configs.recommended,
-	...tseslint.configs.recommended,
 	...svelte.configs['flat/recommended'],
 	{
 		files: ['**/*.{js,mjs,cjs}'],
@@ -39,10 +38,15 @@ export default tseslint.config(
 	},
 	{
 		files: ['**/*.{ts,tsx}'],
+		extends: [...tseslint.configs.recommendedTypeChecked],
 		languageOptions: {
 			globals: {
 				...globals.node,
 				...globals.browser
+			},
+			parserOptions: {
+				projectService: true,
+				tsconfigRootDir: import.meta.dirname
 			}
 		},
 		rules: {
@@ -50,7 +54,17 @@ export default tseslint.config(
 			'no-empty': ['error', { allowEmptyCatch: true }],
 			'no-unused-vars': 'off',
 			'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-			'@typescript-eslint/no-explicit-any': 'error'
+			'@typescript-eslint/no-explicit-any': 'error',
+			'@typescript-eslint/no-base-to-string': 'off',
+			'@typescript-eslint/no-redundant-type-constituents': 'off',
+			'@typescript-eslint/no-unnecessary-type-assertion': 'off',
+			'@typescript-eslint/no-unsafe-argument': 'off',
+			'@typescript-eslint/no-unsafe-assignment': 'off',
+			'@typescript-eslint/no-unsafe-member-access': 'off',
+			'@typescript-eslint/no-unsafe-return': 'off',
+			'@typescript-eslint/only-throw-error': 'off',
+			'@typescript-eslint/require-await': 'off',
+			'@typescript-eslint/restrict-template-expressions': 'off'
 		}
 	},
 	{
@@ -66,10 +80,20 @@ export default tseslint.config(
 		},
 		rules: {
 			'no-undef': 'off',
+			'no-unused-vars': 'off',
 			'svelte/no-navigation-without-resolve': 'off',
 			'svelte/require-each-key': 'off',
 			'svelte/prefer-svelte-reactivity': 'off',
 			'svelte/no-at-html-tags': 'off'
+		}
+	},
+	{
+		files: ['*.config.js', '*.config.ts'],
+		extends: [tseslint.configs.disableTypeChecked],
+		rules: {
+			'@typescript-eslint/no-unsafe-assignment': 'off',
+			'@typescript-eslint/no-unsafe-member-access': 'off',
+			'@typescript-eslint/no-unsafe-call': 'off'
 		}
 	}
 )

@@ -36,5 +36,8 @@
   "dependencies": {
     "@goobits/blog": "workspace:*",
     "@miko/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@sveltejs/kit": "^2.57.1"
   }
 }

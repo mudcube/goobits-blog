@@ -120,10 +120,13 @@
 	}
 
 	onMount(() => {
-		document.addEventListener('gallery:open', handleGalleryOpen as EventListener)
+		const galleryOpenListener = (event: Event) => {
+			handleGalleryOpen(event)
+		}
+		document.addEventListener('gallery:open', galleryOpenListener)
 		document.addEventListener('keydown', handleKey)
 		return () => {
-			document.removeEventListener('gallery:open', handleGalleryOpen as EventListener)
+			document.removeEventListener('gallery:open', galleryOpenListener)
 			document.removeEventListener('keydown', handleKey)
 		}
 	})

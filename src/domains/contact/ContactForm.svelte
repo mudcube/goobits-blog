@@ -9,12 +9,13 @@
 	import { contactSchema, getContactMessagePlaceholder, type ContactFormData } from './schema'
 	import type { SuperValidated } from 'sveltekit-superforms'
 
-	const props = $props<{ form: SuperValidated<ContactFormData>; turnstileSiteKey?: string }>()
-	const contactForm = superForm(props.form, {
-		validators: zodClient(contactSchema),
-		validationMethod: 'onblur',
-		clearOnSubmit: 'message'
-	})
+	const { form, turnstileSiteKey } = $props<{ form: SuperValidated<ContactFormData>; turnstileSiteKey?: string }>()
+	const contactForm = (() =>
+		superForm(form, {
+			validators: zodClient(contactSchema),
+			validationMethod: 'onblur',
+			clearOnSubmit: 'message'
+		}))()
 
 	const { form: formData, errors, enhance, submitting } = contactForm
 
@@ -33,7 +34,7 @@
 </script>
 
 <svelte:head>
-	{#if props.turnstileSiteKey}
+	{#if turnstileSiteKey}
 		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 	{/if}
 </svelte:head>
@@ -114,8 +115,8 @@
 					<p class="contact-page__submit-error">{$errors._errors[0]}</p>
 				{/if}
 
-				{#if props.turnstileSiteKey}
-					<VerificationField className="contact-page__verification" siteKey={props.turnstileSiteKey} />
+				{#if turnstileSiteKey}
+					<VerificationField className="contact-page__verification" siteKey={turnstileSiteKey} />
 				{/if}
 
 				<PillButton className="contact-page__submit" type="submit" variant="primary" size="lg" disabled={$submitting}>

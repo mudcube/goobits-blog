@@ -35,6 +35,7 @@ export type GalleryOpenDetail = {
 }
 
 type CleanupFn = () => void
+type GallerySetEntry = { items: GalleryItem[]; index: number }
 
 /**
  * Attach the gallery + lightbox behavior to a prose container.
@@ -42,7 +43,7 @@ type CleanupFn = () => void
  * grid can target them consistently across browsers that support :has()
  * and as a hook for the click listener.
  */
-export function galleryLightbox(node: HTMLElement) {
+export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 	const cleanups: CleanupFn[] = []
 
 	function isImageOnlyParagraph(el: Element): el is HTMLParagraphElement {
@@ -79,8 +80,8 @@ export function galleryLightbox(node: HTMLElement) {
 		return { href, src, alt }
 	}
 
-	function collectSets(): Map<HTMLParagraphElement, { items: GalleryItem[], index: number }> {
-		const sets = new Map<HTMLParagraphElement, { items: GalleryItem[], index: number }>()
+	function collectSets(): Map<HTMLParagraphElement, GallerySetEntry> {
+		const sets = new Map<HTMLParagraphElement, GallerySetEntry>()
 		const paragraphs = Array.from(node.querySelectorAll<HTMLParagraphElement>(':scope > p'))
 
 		let currentSet: HTMLParagraphElement[] = []
@@ -115,10 +116,10 @@ export function galleryLightbox(node: HTMLElement) {
 
 	const sets = collectSets()
 
-	function handleClick(event: Event) {
+	function handleClick(event: Event): void {
 		const target = event.target as Element | null
 		if (!target) { return }
-		const paragraph = target.closest('p[data-blog-gallery-tile]') as HTMLParagraphElement | null
+		const paragraph = target.closest<HTMLParagraphElement>('p[data-blog-gallery-tile]')
 		if (!paragraph) { return }
 		const entry = sets.get(paragraph)
 		if (!entry || entry.items.length === 0) { return }
@@ -140,7 +141,9 @@ export function galleryLightbox(node: HTMLElement) {
 	}
 
 	node.addEventListener('click', handleClick)
-	cleanups.push(() => node.removeEventListener('click', handleClick))
+	cleanups.push(() => {
+		node.removeEventListener('click', handleClick)
+	})
 
 	// Set cursor affordance on tiles so users know they're clickable
 	for (const paragraph of sets.keys()) {
@@ -148,7 +151,7 @@ export function galleryLightbox(node: HTMLElement) {
 	}
 
 	return {
-		destroy() {
+		destroy(): void {
 			for (const fn of cleanups) { fn() }
 			for (const paragraph of sets.keys()) {
 				paragraph.removeAttribute('data-blog-gallery-tile')

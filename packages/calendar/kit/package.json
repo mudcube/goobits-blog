@@ -12,6 +12,9 @@
     "@calendar/core": "workspace:*",
     "@calendar/migrations": "workspace:*",
     "@goobits/auth": "workspace:*",
-    "better-sqlite3": "^12.6.2"
+    "better-sqlite3": "^12.9.0"
+  },
+  "devDependencies": {
+    "@sveltejs/kit": "^2.57.1"
   }
 }

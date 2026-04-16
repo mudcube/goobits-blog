@@ -1,5 +1,5 @@
 <script>
-	import { Apple, Cloud, Music2, Youtube } from '@lucide/svelte'
+	import { Apple, Cloud, Music2, Play } from '@lucide/svelte'
 	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero } from '@miko/ui'
 	import { formatDateMonthDayYearShort } from '$lib/utils/date'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
@@ -11,7 +11,7 @@
 	const platforms = [
 		{ label: 'Spotify', href: '/contact?from=music&topic=spotify', icon: Music2 },
 		{ label: 'Apple Music', href: '/contact?from=music&topic=apple_music', icon: Apple },
-		{ label: 'YouTube Music', href: '/contact?from=music&topic=youtube_music', icon: Youtube },
+		{ label: 'YouTube Music', href: '/contact?from=music&topic=youtube_music', icon: Play },
 		{ label: 'SoundCloud', href: '/contact?from=music&topic=soundcloud', icon: Cloud }
 	]
 
