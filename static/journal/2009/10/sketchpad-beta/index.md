@@ -1,7 +1,7 @@
 ---
 title: "Sketchpad 1.0"
 date: "2009-10-27"
-coverImage: "/journal/2009/10/sketchpad-beta/images/13.png"
+coverImage: "images/13.png"
 categories: 
   - "apps"
 tags: 
