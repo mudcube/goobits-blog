@@ -4,8 +4,8 @@
 	import { onMount } from 'svelte'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import AdminCalendarWidget from '../../dashboard/AdminCalendarWidget.svelte'
-	import AdminActionButton from '../../shared/AdminActionButton.svelte'
 	import ProgramDayPopover from './ProgramDayPopover.svelte'
+	import ProgramSettingsDrawer from './ProgramSettingsDrawer.svelte'
 	import { mockDashboardEvents, mockPrograms } from '../../mock/admin-mock-data'
 	import { createHistory } from '../../history/create-history'
 	import { adminActionHandlers } from '../../shell/state'
@@ -728,129 +728,18 @@
 				</p>
 			</div>
 
-			{#if settingsOpen}
-				<button
-					type="button"
-					class="program-editor__settings-overlay"
-					aria-label="Close settings"
-					onclick={() => (settingsOpen = false)}
-				></button>
-				<aside class="program-editor__settings">
-					<div class="program-editor__settings-body">
-						<div class="program-editor__toggle-row">
-							<span>Accepting bookings</span>
-							<button
-								type="button"
-								aria-label={dashboard.programDraft.enabled ? 'Disable bookings' : 'Enable bookings'}
-								class="program-editor__switch"
-								class:program-editor__switch--on={dashboard.programDraft.enabled}
-								onclick={() =>
-									updateProgramDraft(
-										{ enabled: !dashboard.programDraft.enabled },
-										'enabled'
-									)}
-							>
-								<span></span>
-							</button>
-						</div>
-						<label
-							><span>URL path</span><input
-								class="ui-form-control"
-								type="text"
-								value={dashboard.programDraft.slug}
-								oninput={(event) => handleSettingInput('slug', event.currentTarget.value)}
-								onblur={() => pushEditorHistory('slug')}
-							/></label
-						>
-						<label
-							><span>Sort order</span><input
-								class="ui-form-control ui-form-control--number"
-								type="number"
-								value={dashboard.programDraft.sortOrder}
-								oninput={(event) =>
-									handleSettingInput(
-										'sortOrder',
-										Number.isFinite(event.currentTarget.valueAsNumber)
-											? event.currentTarget.valueAsNumber
-											: 0
-									)}
-								onblur={() => pushEditorHistory('sortOrder')}
-							/></label
-						>
-						<label
-							><span>Status note</span><input
-								class="ui-form-control"
-								type="text"
-								value={dashboard.programDraft.serviceStatusNote}
-								oninput={(event) =>
-									handleSettingInput('serviceStatusNote', event.currentTarget.value)}
-								onblur={() => pushEditorHistory('serviceStatusNote')}
-							/></label
-						>
-						<label
-							><span>Page title</span><input
-								class="ui-form-control"
-								type="text"
-								value={dashboard.programDraft.pageTitle}
-								oninput={(event) => handleSettingInput('pageTitle', event.currentTarget.value)}
-								onblur={() => pushEditorHistory('pageTitle')}
-							/></label
-						>
-						<label
-							><span>Activity name</span><input
-								class="ui-form-control"
-								type="text"
-								value={dashboard.programDraft.activityName}
-								oninput={(event) => handleSettingInput('activityName', event.currentTarget.value)}
-								onblur={() => pushEditorHistory('activityName')}
-							/></label
-						>
-						<label
-							><span>Eyebrow class</span><input
-								class="ui-form-control"
-								type="text"
-								value={dashboard.programDraft.eyebrowClass}
-								oninput={(event) => handleSettingInput('eyebrowClass', event.currentTarget.value)}
-								onblur={() => pushEditorHistory('eyebrowClass')}
-							/></label
-						>
-						<label
-							><span>Glow class</span><input
-								class="ui-form-control"
-								type="text"
-								value={dashboard.programDraft.glowClass}
-								oninput={(event) => handleSettingInput('glowClass', event.currentTarget.value)}
-								onblur={() => pushEditorHistory('glowClass')}
-							/></label
-						>
-						<label
-							><span>Form glow class</span><input
-								class="ui-form-control"
-								type="text"
-								value={dashboard.programDraft.formGlowClass}
-								oninput={(event) => handleSettingInput('formGlowClass', event.currentTarget.value)}
-								onblur={() => pushEditorHistory('formGlowClass')}
-							/></label
-						>
-						<div class="program-editor__settings-actions">
-							<AdminActionButton
-								variant="danger"
-								onclick={() => void deleteProgram()}
-								disabled={dashboard.programDeleting}
-							>
-								{dashboard.programDeleting ? 'Deleting…' : 'Delete'}
-							</AdminActionButton>
-							<AdminActionButton
-								variant="primary"
-								onclick={() => void saveProgram()}
-								disabled={dashboard.programSaving}
-							>
-								{dashboard.programSaving ? 'Saving…' : 'Save'}
-							</AdminActionButton>
-						</div>
-					</div>
-				</aside>
-			{/if}
+			<ProgramSettingsDrawer
+				open={settingsOpen}
+				draft={dashboard.programDraft}
+				programSaving={dashboard.programSaving}
+				programDeleting={dashboard.programDeleting}
+				onClose={() => (settingsOpen = false)}
+				onPatch={updateProgramDraft}
+				onFieldInput={handleSettingInput}
+				onFieldCommit={(field) => pushEditorHistory(String(field))}
+				onDelete={() => void deleteProgram()}
+				onSave={() => void saveProgram()}
+			/>
 		</div>
 	</div>
 {/if}
@@ -1141,114 +1030,8 @@
 		flex-shrink: 0;
 	}
 
-	.program-editor__settings-overlay {
-		position: fixed;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		top: calc(2.5rem + 1px);
-		border: none;
-		background: color-mix(in srgb, var(--text) 68%, transparent);
-		z-index: 9993 !important;
-	}
-
-	.program-editor__settings {
-		position: fixed;
-		top: calc(2.5rem + 1px);
-		right: 0;
-		bottom: 0;
-		width: min(20rem, 90vw);
-		height: calc(100vh - 2.5rem - 1px);
-		border-left: 1px solid var(--border);
-		background-color: var(--surface);
-		background-image: none;
-		z-index: 9994 !important;
-		display: flex;
-		flex-direction: column;
-		color: var(--text);
-		font-family: var(--font-ui-sans, var(--font-sans));
-	}
-
-	.program-editor__settings-body {
-		padding: 0.95rem 0.9rem;
-		display: grid;
-		gap: 0.55rem;
-		overflow: auto;
-		font-family: var(--font-ui-sans, var(--font-sans));
-	}
-
-	.program-editor__settings-body label {
-		display: grid;
-		gap: 0.2rem;
-	}
-
-	.program-editor__settings-body label span {
-		font-size: 0.66rem;
-		font-weight: 700;
-		color: var(--text-3);
-	}
-
-	.program-editor__toggle-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.program-editor__toggle-row span {
-		font-size: 0.75rem;
-		font-weight: 600;
-	}
-
-	.program-editor__switch {
-		width: 46px;
-		height: 26px;
-		border: 1px solid var(--border-s);
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--text) 20%, transparent);
-		cursor: pointer;
-		position: relative;
-	}
-
-	.program-editor__switch span {
-		position: absolute;
-		width: 18px;
-		height: 18px;
-		border-radius: 999px;
-		top: 3px;
-		left: 4px;
-		background: var(--bg);
-		transition: left 120ms ease;
-	}
-
-	.program-editor__switch--on {
-		background: color-mix(in srgb, var(--text) 70%, var(--bg) 30%);
-	}
-
-	.program-editor__switch--on span {
-		left: 23px;
-	}
-
-	.program-editor__settings-actions {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-top: 0.5rem;
-	}
-
 	.program-editor__toast {
 		bottom: 1rem;
 		z-index: 9995;
-	}
-
-	@media (max-width: 1080px) {
-		.program-editor__settings-overlay {
-			top: calc(2.5rem + 1px);
-		}
-
-		.program-editor__settings {
-			width: min(20rem, 90vw);
-			top: calc(2.5rem + 1px);
-			height: calc(100vh - 2.5rem - 1px);
-		}
 	}
 </style>
