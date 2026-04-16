@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { deliverContactMessage, submitContactMessage } from '@goobits/contact/server'
 import type { ContactFormData } from '@goobits/contact/core'
-import { mergeRuntimeEnv } from '$lib/server/calendar/runtime'
+import { mergeRuntimeEnv } from '$lib/server/runtime'
 import { runContactAntiAbuse } from '$lib/server/antiabuse'
 import { getAsn, getClientIp } from '$lib/server/request-meta'
 

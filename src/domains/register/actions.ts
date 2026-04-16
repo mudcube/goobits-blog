@@ -1,7 +1,7 @@
 import { redirect, type Actions, type ServerLoad } from '@sveltejs/kit'
 import { setError, superValidate } from 'sveltekit-superforms/server'
 import { zod4 as zod } from 'sveltekit-superforms/adapters'
-import { mergeRuntimeEnv } from '$lib/server/calendar/runtime'
+import { mergeRuntimeEnv } from '$lib/server/runtime'
 import { getTurnstileSiteKey } from '$lib/server/antiabuse/turnstile-site-key'
 import { submitRegisterData } from '$lib/server/register/submit'
 import { getRegisterFormDefaults } from './defaults'
