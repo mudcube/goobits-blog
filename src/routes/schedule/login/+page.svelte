@@ -24,6 +24,8 @@
         | "email_mismatch"
         | "missing_code"
         | null;
+      inviteEmailRestricted: boolean;
+      redirectTo: string;
     };
   }>();
 
@@ -34,16 +36,14 @@
   let error = $state(getProviderErrorMessage(rawError));
 
   const inviteCode = $page.url.searchParams.get("invite") || "";
-  const redirectTo =
-    $page.url.searchParams.get("redirect") ||
-    calendarConfig.routes.calendarBase;
+  const redirectTo = $derived(data.redirectTo);
   const verifiedStatus = $page.url.searchParams.get("verified") || "";
   let inviteInput = $state(inviteCode);
   let claimName = $state("");
   let claimEmail = $state("");
   let claimError = $state("");
 
-  const targetActivity = resolveCalendarLoginTargetActivity(redirectTo);
+  const targetActivity = $derived(resolveCalendarLoginTargetActivity(redirectTo));
   const inviteStatus = $derived(data.inviteStatus);
   const hasValidInvite = $derived(!!inviteCode && inviteStatus === "valid");
   const inviteStatusMessage = $derived.by(() => {
@@ -107,7 +107,7 @@
       const payload = await response.json().catch(() => null);
       if (!response.ok) {
         claimError =
-          payload?.error ||
+          payload?.error?.message ||
           payload?.message ||
           "Could not claim this invite. Please try again.";
         claimLoading = false;
@@ -207,7 +207,7 @@
             class="calendar-login__claim-field"
             for="calendar-claim-email"
           >
-            <span>Email for reminders (optional)</span>
+            <span>Email for reminders {data.inviteEmailRestricted ? "" : "(optional)"}</span>
             <input
               id="calendar-claim-email"
               class="ui-form-control"
@@ -215,6 +215,7 @@
               maxlength="320"
               autocomplete="email"
               placeholder="you@example.com"
+              required={data.inviteEmailRestricted}
               bind:value={claimEmail}
             />
           </label>

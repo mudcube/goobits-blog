@@ -6,7 +6,7 @@ categories:
 tags:
   - "canvas"
   - "typography"
-coverImage: "images/hero.png"
+coverImage: "images/hero.webp"
 ---
 
 Typography support between browsers has a history of being spotty. One of the major hurdles in creating the (

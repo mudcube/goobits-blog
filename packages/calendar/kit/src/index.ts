@@ -2,7 +2,7 @@ import { apiError, apiOk, apiValidationError, logApiError, noStoreHeaders } from
 import { getCalendarUserId, requireCalendarUserId, runCalendarRequest, unauthorizedCalendar } from './http/calendar-auth'
 import { buildEnv, type RuntimeEnv } from './runtime/build-env'
 import { getAdminAuth, ensureAdminAccount } from './auth/admin'
-import { getCalendarAuth, getCalendarRedirect, setCalendarLoginContext } from './auth/calendar'
+import { getCalendarAuth, getCalendarRedirect, normalizeCalendarRedirect, setCalendarLoginContext } from './auth/calendar'
 import { getDevDb } from './dev/devDb'
 import type { D1DatabaseLike, D1PreparedStatement } from './dev/types'
 
@@ -21,6 +21,7 @@ export {
 	ensureAdminAccount,
 	getCalendarAuth,
 	getCalendarRedirect,
+	normalizeCalendarRedirect,
 	setCalendarLoginContext,
 	getDevDb
 }

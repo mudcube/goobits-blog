@@ -14,9 +14,9 @@
 		'/labs/js1k/SpectrumDJ.html': '/journal/2010/08/what-can-1kb-of-javascript-do/images/SpectrumDJ.jpeg',
 		'/labs/midi-js/': '/journal/2012/02/midi-js/images/hero.png',
 		'/labs/sketch-js/': '/media/labs/sketch-js-card.png',
-		'/labs/sketchpad-1.0/': '/media/labs/sketchpad-v1-card.png',
+		'/labs/sketchpad-1.0/': '/media/labs/sketchpad-v1-card.webp',
 		'/labs/thumbnailer/': '/journal/2011/11/batch-thumbnail-generator/images/hero.png',
-		'/labs/zen-bg/': '/media/labs/zen-bg-card.png'
+		'/labs/zen-bg/': '/media/labs/zen-bg-card.webp'
 	}
 
 	function getLabImage(href: string) {

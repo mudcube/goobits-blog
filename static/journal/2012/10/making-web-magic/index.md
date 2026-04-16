@@ -6,7 +6,7 @@ categories:
 tags: 
   - "creative-coding"
   - "sketchpad"
-coverImage: "images/hero.png"
+coverImage: "images/hero.webp"
 ---
 
 I recently had the honor to be part of a new series called Presets on Google Developer Live hosted by [Paul Irish](https://plus.google.com/113127438179392830442), and lovingly put together by [Louis Grey](https://plus.google.com/100535338638690515335), [Phoebe Peronto](https://plus.google.com/111795175737033304392) amongst other Googlers. We discussed my most popular [Chrome Experiments](http://www.chromeexperiments.com) including [Color Sphere](/sphere/), [Color Piano](/piano/), as well as my latest project [Sketchpad 2.0](http://dev.sketchpad.io). Here’s the description of the show;

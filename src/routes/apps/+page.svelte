@@ -16,7 +16,7 @@
 	}
 
 	function getAppImage(id) {
-		return `/media/projects/generated/apps-upscaled/project-${id}-upscaled.png`
+		return `/media/projects/generated/apps-upscaled/project-${id}-upscaled.webp`
 	}
 
 	function getAppMeta(id) {

@@ -40,6 +40,7 @@ const providerErrors: Record<string, string> = {
 	invite_invalid: 'That invite code is invalid. Please check and try again.',
 	invite_expired: 'That invite has expired. Please request a new one.',
 	invite_used_up: 'That invite has no remaining uses. Please request a new one.',
+	invite_exhausted: 'That invite has no remaining uses. Please request a new one.',
 	invite_email_mismatch: 'This invite is for a different email address.'
 }
 

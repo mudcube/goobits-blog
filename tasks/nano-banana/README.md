@@ -22,7 +22,7 @@ The task also reads `config/env/.env` and `.env` when present.
 pnpm task:nano-banana "A jar of honey in sunlight"
 pnpm task:nano-banana --style hero --aspect-ratio 16:9 "A wide storybook header"
 pnpm task:nano-banana --style product --resolution 2K "A clean product shot of a honey jar"
-pnpm task:nano-banana --reference-image static/media/generated/nano-banana/apps-upscaled/project-sketchpad-upscaled.png --no-style "Use the supplied image as the base composition, preserve the subject and overall design, and improve clarity, finish, and polish for a premium software card illustration"
+pnpm task:nano-banana --reference-image static/media/projects/generated/apps-upscaled/project-sketchpad-upscaled.webp --no-style "Use the supplied image as the base composition, preserve the subject and overall design, and improve clarity, finish, and polish for a premium software card illustration"
 pnpm task:nano-banana --prompt-file tasks/nano-banana/prompts/home-hero.txt
 pnpm task:nano-banana "A test prompt" --dry-run --json
 ```

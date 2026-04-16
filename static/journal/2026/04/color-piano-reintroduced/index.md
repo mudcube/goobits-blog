@@ -8,7 +8,7 @@ tags:
   - "music"
   - "piano"
   - "web-audio"
-coverImage: "images/hero.png"
+coverImage: "images/hero.webp"
 excerpt: "A retrospective reintroduction to the new Color Piano site and the larger idea behind seeing music through color."
 ---
 

@@ -8,6 +8,7 @@ const IMAGE_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif', '.gif'])
 const DEFAULT_MAX_BYTES = 350 * 1024
 const HERO_MAX_BYTES = 700 * 1024
 const GENERATED_MAX_BYTES = 450 * 1024
+const IGNORED_PREFIXES = ['labs/sketchpad-1.0/source/', 'labs/zen-bg/source/']
 
 async function walk(dir) {
 	let entries = []
@@ -39,6 +40,10 @@ function thresholdFor(relPath) {
 	return DEFAULT_MAX_BYTES
 }
 
+function shouldIgnore(relPath) {
+	return IGNORED_PREFIXES.some((prefix) => relPath.startsWith(prefix))
+}
+
 function formatKB(bytes) {
 	return `${Math.round(bytes / 1024)} KB`
 }
@@ -53,6 +58,7 @@ async function run() {
 
 		const stat = await fs.stat(filePath)
 		const relPath = toPosix(path.relative(STATIC_DIR, filePath))
+		if (shouldIgnore(relPath)) continue
 		const limit = thresholdFor(relPath)
 		if (stat.size <= limit) continue
 

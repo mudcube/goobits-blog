@@ -27,6 +27,12 @@ export async function POST(event: RequestEvent) {
 			guestCount: input.guestCount,
 			note: input.note
 		})
+
+		if (!result.ok) {
+			const status = result.code === 'forbidden' ? 403 : 404
+			return apiError(result.message, { status, code: result.code })
+		}
+
 		// Don't block member experience if queue write fails.
 		try {
 			await enqueueCalendarSyncJob(env.DB, {
@@ -40,11 +46,6 @@ export async function POST(event: RequestEvent) {
 			})
 		} catch (error) {
 			console.warn('Failed to enqueue calendar sync after join:', error)
-		}
-
-		if (!result.ok) {
-			const status = result.code === 'forbidden' ? 403 : 404
-			return apiError(result.message, { status, code: result.code })
 		}
 		return apiOk({ status: result.status, state: result.state })
 	}, {

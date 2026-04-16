@@ -48,7 +48,7 @@ function normalizeRedirectUri(value: string) {
 	return value.endsWith('/') ? value.slice(0, -1) : value
 }
 
-function normalizeRedirect(redirectTo: unknown) {
+export function normalizeCalendarRedirect(redirectTo: unknown) {
 	const config = getCalendarConfig()
 	const safeRedirectPrefixes = [config.routes.calendarBase, config.routes.adminBase]
 	if (!redirectTo || typeof redirectTo !== 'string') return null
@@ -240,7 +240,7 @@ export function setCalendarLoginContext(
 			maxAge: INVITE_TTL_SECONDS
 		})
 	}
-	const safeRedirect = normalizeRedirect(redirectTo)
+	const safeRedirect = normalizeCalendarRedirect(redirectTo)
 	if (safeRedirect) {
 		cookies.set(REDIRECT_COOKIE, safeRedirect, {
 			httpOnly: true,
@@ -256,7 +256,7 @@ export function getCalendarRedirect(cookies: Pick<Cookies, 'get' | 'delete'>) {
 	const redirectTo = cookies.get(REDIRECT_COOKIE)
 	if (redirectTo) {
 		cookies.delete(REDIRECT_COOKIE, { path: '/' })
-		return normalizeRedirect(redirectTo)
+		return normalizeCalendarRedirect(redirectTo)
 	}
 	return null
 }

@@ -17,5 +17,6 @@ type JournalImageEntry = {
 
 export function getJournalImageVariants(sourcePath: string): JournalImageEntry | null {
 	if (!sourcePath) return null
+	// Source paths are journal-frontmatter or page-level public asset paths.
 	return (journalImageManifest as Record<string, JournalImageEntry>)[sourcePath] ?? null
 }

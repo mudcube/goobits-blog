@@ -20,18 +20,18 @@
 		subtitle: 'synth ambient',
 		date: '2025-01-12',
 		tag: 'Track',
-		image: '/media/projects/generated/neon-drift-synth-ambient.png',
+		image: '/media/projects/generated/neon-drift-synth-ambient.webp',
 		alt: 'Illustrated night drive with neon reflections and glowing audio waves'
 	}
 
 	const artworkUrls = [
 		featuredTrack.image,
-		'/media/projects/project-color-piano.png',
+		'/media/projects/project-color-piano.webp',
 		'/journal/2011/08/webgl-music-box/images/hero.png',
-		'/media/projects/project-sketchpad.png',
-		'/media/projects/project-color-sphere.png',
-		'/media/projects/project-sand-art.png',
-		'/media/projects/project-zendala.png',
+		'/media/projects/project-sketchpad.webp',
+		'/media/projects/project-color-sphere.webp',
+		'/media/projects/project-sand-art.webp',
+		'/media/projects/project-zendala.webp',
 		'/media/page-icons/art-rainbow-imagination.png',
 		'/media/page-icons/about-kitty-unicorn.png'
 	]

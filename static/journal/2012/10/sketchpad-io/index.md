@@ -6,7 +6,7 @@ categories:
 tags: 
   - "drawing-app"
   - "sketchpad"
-coverImage: "images/hero.png"
+coverImage: "images/hero.webp"
 ---
 
 **UPDATE: [Read about Sketchpad 3.0](/journal/2013/07/sketchpad-3-0/)**

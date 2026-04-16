@@ -45,7 +45,7 @@
 	class:social-admin__breadcrumbs-actions--empty={actions.length === 0}
 >
 	{#if actions.includes('view-program') && programSlug}
-		<AdminActionButton variant="subtle" icon={Eye} href={`/schedule/${programSlug}/`}>View</AdminActionButton>
+		<AdminActionButton variant="subtle" icon={Eye} href={hrefWithMock(`/schedule/${programSlug}/`)}>View</AdminActionButton>
 	{/if}
 
 	{#if actions.includes('program-settings')}
@@ -85,7 +85,7 @@
 	{/if}
 
 	{#if actions.includes('view-calendar')}
-		<AdminActionButton variant="subtle" icon={CalendarDays} href="/schedule/">Calendar</AdminActionButton>
+		<AdminActionButton variant="subtle" icon={CalendarDays} href={hrefWithMock('/schedule/')}>Calendar</AdminActionButton>
 	{/if}
 
 	{#if actions.includes('event-edit')}

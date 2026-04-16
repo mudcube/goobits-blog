@@ -62,7 +62,7 @@
 		position: sticky;
 		top: 0;
 		z-index: 10;
-		backdrop-filter: blur(8px);
+		backdrop-filter: blur(12px) saturate(110%);
 		background: color-mix(in srgb, var(--calendar-shell-bg) 88%, transparent);
 		border-bottom: 1px solid color-mix(in srgb, var(--calendar-shell-text) 12%, transparent);
 	}
@@ -94,7 +94,9 @@
 		color: color-mix(in srgb, var(--calendar-shell-text) 75%, transparent);
 		padding: 0.3rem 0.6rem;
 		border-radius: 999px;
-		font-size: 0.82rem;
+		font-family: var(--font-serif);
+		font-size: 0.84rem;
+		letter-spacing: 0.01em;
 	}
 	.calendar-shell-nav__link--active {
 		color: var(--calendar-shell-text);

@@ -6,7 +6,7 @@ categories:
 tags: 
   - "drawing-app"
   - "sketchpad"
-coverImage: "images/hero.png"
+coverImage: "images/hero.webp"
 ---
 
 Welcome to the preview of [Sketchpad](https://sketch.io/sketchpad/). Though not all browsers support [`<canvas>`](https://en.wikipedia.org/wiki/Canvas_element) we’re working hard to extend support before our official release. Until then, you lucky FireFox users ([download Firefox](https://www.mozilla.org/firefox/new/)) will be able to kick the tires and hold the wheel of what we believe will become the new standard in Web-authoring.

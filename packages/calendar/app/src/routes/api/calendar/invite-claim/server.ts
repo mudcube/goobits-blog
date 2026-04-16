@@ -29,25 +29,32 @@ export async function POST(event: RequestEvent) {
 			return apiError(`Invite ${reason}`, { status, code: `invite_${reason}` })
 		}
 
+		if (result.invite.email && !email) {
+			return apiError('This invite requires the matching email address.', {
+				status: 400,
+				code: 'invite_email_required'
+			})
+		}
+
 		const effectiveEmail = (email || result.invite.email || createGuestEmail()).toLowerCase()
 		const existing = await env.DB.prepare(
 			`SELECT id FROM calendar_users WHERE lower(email) = lower(?) LIMIT 1`
 		).bind(effectiveEmail).first<CalendarUserRow>()
 
-		let userId = existing?.id
+		if (existing) {
+			return apiError('An account already exists for that email. Use Google or Apple sign-in instead.', {
+				status: 409,
+				code: 'account_exists'
+			})
+		}
+
+		let userId: string | number | undefined
 		if (!userId) {
 			const inserted = await env.DB.prepare(
 				`INSERT INTO calendar_users (email, name, email_verified, created_at, last_login_at)
 				 VALUES (?, ?, ?, unixepoch(), unixepoch())`
-			).bind(effectiveEmail, name, email ? 1 : 0).run()
+			).bind(effectiveEmail, name, result.invite.email || email ? 1 : 0).run()
 			userId = inserted.meta.last_row_id
-		} else {
-			await env.DB.prepare(
-				`UPDATE calendar_users
-				 SET name = COALESCE(NULLIF(?, ''), name),
-				     last_login_at = unixepoch()
-				 WHERE id = ?`
-			).bind(name, userId).run()
 		}
 
 		await consumeInvite({ db: env.DB, inviteId: result.invite.id, userId: String(userId) })
