@@ -13,7 +13,7 @@
 	import AdminCrewInviteModal from '@calendar/ui/admin/members/AdminCrewInviteModal.svelte'
 	import { getActivityEmoji } from '@calendar/ui/shared'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
-	import { adminActionHandlers, type AdminInviteAnchorRect } from '$lib/app/schedule/admin/state'
+	import { adminActionHandlers, type AdminInviteAnchorRect } from '../shell/state'
 	import {
 		mockCrewInvites,
 		mockCrewUsers,

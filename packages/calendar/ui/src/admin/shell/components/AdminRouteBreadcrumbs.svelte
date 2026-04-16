@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AdminBreadcrumbItem } from '$lib/app/schedule/admin/route'
+	import type { AdminBreadcrumbItem } from '../route'
 
 	const { items } = $props<{ items: AdminBreadcrumbItem[] }>()
 </script>

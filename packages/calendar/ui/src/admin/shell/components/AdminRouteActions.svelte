@@ -10,9 +10,9 @@
 		Trash2,
 		UserPlus
 	} from '@lucide/svelte'
-	import AdminActionButton from '@calendar/ui/admin/shared/AdminActionButton.svelte'
-	import type { AdminRouteActionId } from '$lib/app/schedule/admin/route'
-	import { adminActionHandlers } from '$lib/app/schedule/admin/state'
+	import AdminActionButton from '../../shared/AdminActionButton.svelte'
+	import type { AdminRouteActionId } from '../route'
+	import { adminActionHandlers } from '../state'
 
 	const { actions, hrefWithMock, programSlug } = $props<{
 		actions: AdminRouteActionId[]

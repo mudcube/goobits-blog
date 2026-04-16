@@ -81,19 +81,19 @@ $admin-mobile-breakpoint: 820px;
   overflow-x: clip;
 }
 
-:global(.social-admin :is(button, a, input, select, textarea):focus-visible) {
+.social-admin :is(button, a, input, select, textarea):focus-visible {
   outline: 2px solid var(--admin-focus-ring);
   outline-offset: 2px;
 }
 
-:global(.social-admin .calendar-ui-card) {
+.social-admin .calendar-ui-card {
   border-radius: 14px;
   border: 1px solid var(--admin-card-border);
   background: var(--admin-card-bg);
   box-shadow: 0 1px 2px var(--shadow-softest);
 }
 
-:global(.social-admin .calendar-ui-card--interactive) {
+.social-admin .calendar-ui-card--interactive {
   cursor: pointer;
   will-change: transform, box-shadow;
   transition:
@@ -103,19 +103,19 @@ $admin-mobile-breakpoint: 820px;
     transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-:global(.social-admin .calendar-ui-card--interactive:hover) {
+.social-admin .calendar-ui-card--interactive:hover {
   background: var(--admin-card-bg-hover, var(--admin-card-bg));
   border-color: color-mix(in srgb, var(--text) 18%, transparent);
   box-shadow: 0 4px 16px color-mix(in srgb, var(--admin-accent) 8%, transparent);
   transform: translateY(-1px);
 }
 
-:global(.social-admin .calendar-ui-card--interactive:focus-visible) {
+.social-admin .calendar-ui-card--interactive:focus-visible {
   border-color: var(--admin-selected-border);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
 }
 
-:global(.social-admin .admin-ui-overlay) {
+.social-admin .admin-ui-overlay {
   position: fixed;
   inset: 0;
   background: color-mix(in srgb, var(--text) 30%, transparent);
@@ -123,21 +123,21 @@ $admin-mobile-breakpoint: 820px;
   z-index: 100;
 }
 
-:global(.social-admin .admin-ui-overlay--end) {
+.social-admin .admin-ui-overlay--end {
   justify-content: flex-end;
 }
 
-:global(.social-admin .admin-ui-overlay--center) {
+.social-admin .admin-ui-overlay--center {
   align-items: center;
   justify-content: center;
 }
 
-:global(.social-admin .admin-ui-dialog) {
+.social-admin .admin-ui-dialog {
   background: var(--admin-card-bg);
   border: 1px solid var(--admin-card-border);
 }
 
-:global(.social-admin .admin-ui-toast) {
+.social-admin .admin-ui-toast {
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
@@ -152,13 +152,13 @@ $admin-mobile-breakpoint: 820px;
   z-index: 140;
 }
 
-:global(.social-admin .admin-ui-toast--error) {
+.social-admin .admin-ui-toast--error {
   background: var(--admin-toast-error-bg);
   border-color: var(--admin-toast-error-border);
   color: var(--admin-toast-error-fg);
 }
 
-:global(.social-admin .admin-ui-drawer-head) {
+.social-admin .admin-ui-drawer-head {
   padding: 0.8rem 0.95rem;
   display: flex;
   align-items: center;
@@ -166,12 +166,12 @@ $admin-mobile-breakpoint: 820px;
   border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
 }
 
-:global(.social-admin .admin-ui-drawer-head > strong) {
+.social-admin .admin-ui-drawer-head > strong {
   font-size: 0.83rem;
   color: var(--text);
 }
 
-:global(.social-admin .admin-ui-drawer-close) {
+.social-admin .admin-ui-drawer-close {
   width: 28px;
   height: 28px;
   border-radius: 8px;
@@ -181,30 +181,30 @@ $admin-mobile-breakpoint: 820px;
   cursor: pointer;
 }
 
-:global(.social-admin .admin-ui-drawer-body) {
+.social-admin .admin-ui-drawer-body {
   padding: 0.9rem;
   display: grid;
   gap: 0.65rem;
   overflow: auto;
 }
 
-:global(.social-admin .admin-ui-drawer-body label) {
+.social-admin .admin-ui-drawer-body label {
   display: grid;
   gap: 0.2rem;
 }
 
-:global(.social-admin .admin-ui-drawer-body label > span) {
+.social-admin .admin-ui-drawer-body label > span {
   font-size: 0.69rem;
   font-weight: 600;
   color: color-mix(in srgb, var(--text) 58%, transparent);
 }
 
-:global(.social-admin .admin-content) {
+.social-admin .admin-content {
   width: 100%;
   max-width: var(--admin-content-max);
 }
 
-:global(.social-admin .admin-content > h4) {
+.social-admin .admin-content > h4 {
   margin: 0 0 0.35rem;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
@@ -212,7 +212,7 @@ $admin-mobile-breakpoint: 820px;
   color: color-mix(in srgb, var(--text) 55%, transparent);
 }
 
-:global(.social-admin .admin-ui-btn) {
+.social-admin .admin-ui-btn {
   min-height: 32px;
   padding: 0 0.9rem;
   border-radius: var(--admin-control-radius);
@@ -237,42 +237,42 @@ $admin-mobile-breakpoint: 820px;
     transform 110ms ease;
 }
 
-:global(.social-admin .admin-ui-btn svg) {
+.social-admin .admin-ui-btn svg {
   display: block;
   flex-shrink: 0;
   vector-effect: non-scaling-stroke;
   shape-rendering: geometricPrecision;
 }
 
-:global(.social-admin .admin-ui-btn:hover:not(:disabled)) {
+.social-admin .admin-ui-btn:hover:not(:disabled) {
   background: var(--admin-control-bg-hover);
   box-shadow: 0 4px 14px var(--shadow-soft);
   transform: translateY(-1px);
 }
 
-:global(.social-admin .admin-ui-btn:disabled) {
+.social-admin .admin-ui-btn:disabled {
   opacity: 0.45;
   cursor: default;
 }
 
-:global(.social-admin .admin-ui-btn--primary) {
+.social-admin .admin-ui-btn--primary {
   background: var(--gradient-action);
   border-color: transparent;
   color: var(--color-white);
   box-shadow: 0 2px 12px color-mix(in srgb, var(--admin-accent) 22%, transparent);
 }
 
-:global(.social-admin .admin-ui-btn--primary:hover:not(:disabled)) {
+.social-admin .admin-ui-btn--primary:hover:not(:disabled) {
   box-shadow: 0 4px 18px color-mix(in srgb, var(--admin-accent) 32%, transparent);
 }
 
-:global(.social-admin .admin-ui-btn--danger) {
+.social-admin .admin-ui-btn--danger {
   background: var(--admin-control-danger-bg);
   color: var(--admin-control-danger-fg);
   border-color: var(--admin-control-border);
 }
 
-:global(.social-admin .ui-form-control) {
+.social-admin .ui-form-control {
   width: 100%;
   min-height: 36px;
   padding: 0 0.72rem;
@@ -284,13 +284,13 @@ $admin-mobile-breakpoint: 820px;
   font-size: 0.86rem;
 }
 
-:global(.social-admin .ui-form-control:focus) {
+.social-admin .ui-form-control:focus {
   outline: none;
   border-color: var(--admin-selected-border);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring) 45%, transparent);
 }
 
-:global(.social-admin .admin-ui-chip) {
+.social-admin .admin-ui-chip {
   min-height: 32px;
   padding: 0 0.65rem;
   border-radius: 20px;
@@ -306,12 +306,12 @@ $admin-mobile-breakpoint: 820px;
     border-color 120ms ease;
 }
 
-:global(.social-admin .admin-ui-chip:hover) {
+.social-admin .admin-ui-chip:hover {
   background: var(--admin-control-bg-hover);
   color: var(--admin-control-fg);
 }
 
-:global(.social-admin .admin-ui-chip--active) {
+.social-admin .admin-ui-chip--active {
   background: var(--admin-selected-bg);
   border-color: var(--admin-selected-border);
   color: var(--admin-control-fg);
@@ -382,7 +382,7 @@ $admin-mobile-breakpoint: 820px;
     color 0.15s;
 }
 
-.social-admin__nav-item :global(svg) {
+.social-admin__nav-item svg {
   width: 16px;
   height: 16px;
   flex-shrink: 0;

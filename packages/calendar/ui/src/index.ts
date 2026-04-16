@@ -8,6 +8,7 @@ import ActivityBookingPage from './member/booking/ActivityBookingPage.svelte'
 import CalendarProfilePage from './member/profile/CalendarProfilePage.svelte'
 
 import AdminLoginCard from './admin/auth/AdminLoginCard.svelte'
+import AdminRouteShell from './admin/shell/AdminRouteShell.svelte'
 import AdminCalendarPanel from './admin/availability/AdminCalendarPanel.svelte'
 import AdminDashboardPanel from './admin/dashboard/AdminDashboardPanel.svelte'
 import AdminWeekGrid from './admin/dashboard/AdminWeekGrid.svelte'
@@ -34,6 +35,7 @@ export {
 	ActivityBookingPage,
 	CalendarProfilePage,
 	AdminLoginCard,
+	AdminRouteShell,
 	AdminCalendarPanel,
 	AdminDashboardPanel,
 	AdminWeekGrid,

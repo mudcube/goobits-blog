@@ -7,7 +7,7 @@
 		Settings,
 		Users
 	} from '@lucide/svelte'
-	import type { AdminNavSection } from '$lib/app/schedule/admin/route'
+	import type { AdminNavSection } from '../route'
 
 	type NavItem = {
 		href: string

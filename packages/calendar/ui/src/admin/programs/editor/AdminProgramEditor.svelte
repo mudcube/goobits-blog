@@ -8,7 +8,7 @@
 	import ProgramDayPopover from './ProgramDayPopover.svelte'
 	import { mockDashboardEvents, mockPrograms } from '../../mock/admin-mock-data'
 	import { createHistory } from '../../history/create-history'
-	import { adminActionHandlers } from '$lib/app/schedule/admin/state'
+	import { adminActionHandlers } from '../../shell/state'
 
 	type DashboardController = ReturnType<typeof createAdminDashboardController>
 	type ProgramDraft = DashboardController['programDraft']

@@ -10,7 +10,7 @@
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { mockDashboardEvents, mockDashboardRecentEvents } from '@calendar/ui/admin/mock/admin-mock-data'
-	import { adminActionHandlers, adminEventDetailBreadcrumb } from '$lib/app/schedule/admin/state'
+	import { adminActionHandlers, adminEventDetailBreadcrumb } from '../shell/state'
 
 	const { data } = $props<{ data: { user: unknown | null; eventId: string } }>()
 
