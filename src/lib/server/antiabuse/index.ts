@@ -1,4 +1,3 @@
-import { dev } from '$app/environment'
 import { checkRateLimit, compactRateLimitBuckets, keyForRateLimit } from './rate-limit'
 import { isDisposableEmailDomain, type DisposableMode } from './disposable-email'
 import { verifyTurnstileToken } from './turnstile'
@@ -51,8 +50,16 @@ function evaluateDisposablePolicy(modeRaw: string | undefined): DisposableMode {
 	return 'score'
 }
 
+function isDevelopmentRuntime(env: Record<string, string | undefined>) {
+	return env['NODE_ENV'] === 'development'
+}
+
 function shouldBypassTurnstileForLocalPreview(env: Record<string, string | undefined>) {
-	return dev && enabled(env['TURNSTILE_ENABLE_LOCALHOST'], false)
+	return isDevelopmentRuntime(env) && enabled(env['TURNSTILE_ENABLE_LOCALHOST'], false)
+}
+
+function shouldFailOpenTurnstile(env: Record<string, string | undefined>) {
+	return isDevelopmentRuntime(env) && enabled(env['TURNSTILE_FAIL_OPEN'], false)
 }
 
 function genericFailure(): RegisterAntiAbuseResult {
@@ -60,6 +67,19 @@ function genericFailure(): RegisterAntiAbuseResult {
 		ok: false,
 		reason: 'blocked',
 		message: 'We could not complete that request. Please try again later.',
+		requiresChallenge: true
+	}
+}
+
+function missingTurnstileSecretResult(env: Record<string, string | undefined>): RegisterAntiAbuseResult {
+	if (shouldFailOpenTurnstile(env)) {
+		return { ok: true, reason: 'allow', requiresChallenge: false }
+	}
+
+	return {
+		ok: false,
+		reason: 'challenge_required',
+		message: 'Please retry and complete the security check.',
 		requiresChallenge: true
 	}
 }
@@ -132,16 +152,7 @@ export async function runRegisterAntiAbuse(input: RegisterAntiAbuseInput): Promi
 
 	const secret = input.env['TURNSTILE_SECRET_KEY'] || ''
 	if (!secret) {
-		// If challenge is required but secret is absent, fail open only in dev-like mode.
-		if (enabled(input.env['TURNSTILE_FAIL_OPEN'], true)) {
-			return { ok: true, reason: 'allow', requiresChallenge: false }
-		}
-		return {
-			ok: false,
-			reason: 'challenge_required',
-			message: 'Please retry and complete the security check.',
-			requiresChallenge: true
-		}
+		return missingTurnstileSecretResult(input.env)
 	}
 
 	const verification = await verifyTurnstileToken({
@@ -228,15 +239,7 @@ export async function runContactAntiAbuse(input: ContactAntiAbuseInput): Promise
 
 	const secret = input.env['TURNSTILE_SECRET_KEY'] || ''
 	if (!secret) {
-		if (enabled(input.env['TURNSTILE_FAIL_OPEN'], true)) {
-			return { ok: true, reason: 'allow', requiresChallenge: false }
-		}
-		return {
-			ok: false,
-			reason: 'challenge_required',
-			message: 'Please retry and complete the security check.',
-			requiresChallenge: true
-		}
+		return missingTurnstileSecretResult(input.env)
 	}
 
 	const verification = await verifyTurnstileToken({

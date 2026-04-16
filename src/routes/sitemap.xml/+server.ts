@@ -4,7 +4,7 @@ import { getActiveReleaseStage } from '$lib/app/release'
 import { getPublicSitemapRoutes } from '$lib/app/routes/route-index.server'
 import { buildSitemapXml, getBaseUrl, getPlatformEnv, resolveSiteOrigin } from '@goobits/sitemap/server'
 
-export const prerender = true
+export const prerender = false
 
 export const GET: RequestHandler = async ({ cookies, platform, url }) => {
 	const baseUrl = getBaseUrl(getPlatformEnv(platform))

@@ -200,26 +200,26 @@ export const journalImageManifest = {
 		"fallbackSrc": "/journal/2011/11/colrd-image-dna/images/generated/hero-640.webp"
 	},
 	"/journal/2011/11/portland-ketchup/images/hero.jpeg": {
-		"width": 1,
-		"height": 1,
+		"width": 750,
+		"height": 970,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/11/portland-ketchup/images/generated/hero-1.webp 1w",
-			"defaultSrc": "/journal/2011/11/portland-ketchup/images/generated/hero-1.webp"
+			"srcset": "/journal/2011/11/portland-ketchup/images/generated/hero-640.webp 640w",
+			"defaultSrc": "/journal/2011/11/portland-ketchup/images/generated/hero-640.webp"
 		},
-		"fallbackSrc": "/journal/2011/11/portland-ketchup/images/generated/hero-1.webp"
+		"fallbackSrc": "/journal/2011/11/portland-ketchup/images/generated/hero-640.webp"
 	},
 	"/journal/2011/11/print-ready-graphics-in-canvas/images/hero.jpeg": {
-		"width": 1,
-		"height": 1,
+		"width": 750,
+		"height": 1014,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-1.webp 1w",
-			"defaultSrc": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-1.webp"
+			"srcset": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-640.webp 640w",
+			"defaultSrc": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-640.webp"
 		},
-		"fallbackSrc": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-1.webp"
+		"fallbackSrc": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-640.webp"
 	},
 	"/journal/2011/12/color-piano/images/hero.png": {
 		"width": 750,

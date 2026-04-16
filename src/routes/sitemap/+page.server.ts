@@ -10,7 +10,7 @@ import {
 } from '$lib/app/routes/route-index.server'
 import type { HumanSitemapVisibility } from '$lib/app/routes/route-index.server'
 
-export const prerender = true
+export const prerender = false
 
 function normalizeVisibility(value: string | null | undefined): HumanSitemapVisibility {
 	return value === 'internal' ? 'internal' : 'public'

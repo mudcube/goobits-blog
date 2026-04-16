@@ -1,7 +1,7 @@
-import { error } from '@sveltejs/kit'
+import { redirect } from '@sveltejs/kit'
 
 export const prerender = false
 
 export function load() {
-	throw error(404, 'Not found')
+	throw redirect(308, '/journal/rss.xml')
 }

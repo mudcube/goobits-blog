@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { execFileSync } from 'child_process'
+import { slugify } from '@goobits/blog/utils'
 import { getJournalPosts } from '$lib/blog/server'
 import type { JournalPost } from '$lib/blog/viewmodel'
 import { getConfiguredReleaseStage, isRouteReleased, type ReleaseStage } from '$lib/app/release'
@@ -127,11 +128,11 @@ function getGitLastModified(filePath: string) {
 
 function getContentLastModified(candidatePaths: string[], fallbackIso: string) {
 	const timestamps = candidatePaths
-		.filter(filePath => fs.existsSync(filePath))
-		.map(filePath => getGitLastModified(filePath))
+		.filter((filePath) => fs.existsSync(filePath))
+		.map((filePath) => getGitLastModified(filePath))
 		.filter((value): value is string => Boolean(value))
-		.map(value => new Date(value).getTime())
-		.filter(value => Number.isFinite(value))
+		.map((value) => new Date(value).getTime())
+		.filter((value) => Number.isFinite(value))
 
 	if (timestamps.length === 0) return fallbackIso
 	return new Date(Math.max(...timestamps)).toISOString()
@@ -264,7 +265,7 @@ function getRouteName(routePath: string) {
 
 	return lastPart
 		.split('-')
-		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 		.join(' ')
 }
 
@@ -276,6 +277,56 @@ function categorizeRoute(routePath: string) {
 	if (routePath.startsWith('/journal')) return 'Journal Pages'
 	if (routePath === '/health' || routePath === '/sitemap') return 'Utility Pages'
 	return 'Main Pages'
+}
+
+function readJournalTaxonomyValues(post: JournalPost, key: 'categories' | 'tags') {
+	const raw = post.metadata?.fm?.[key]
+	if (!Array.isArray(raw)) return []
+	return raw
+		.filter((value): value is string => typeof value === 'string')
+		.map((value) => value.trim())
+		.filter(Boolean)
+}
+
+function createJournalTaxonomyRoutes(posts: JournalPost[]): PageRoute[] {
+	const taxonomy = new Map<string, { name: string; timestamps: number[] }>()
+
+	for (const post of posts) {
+		for (const category of readJournalTaxonomyValues(post, 'categories')) {
+			const slug = slugify(category)
+			if (!slug) continue
+			const key = `/journal/category/${slug}`
+			const existing = taxonomy.get(key) ?? { name: `Category: ${category}`, timestamps: [] }
+			existing.timestamps.push(post.date.getTime())
+			taxonomy.set(key, existing)
+		}
+
+		for (const tag of readJournalTaxonomyValues(post, 'tags')) {
+			const slug = slugify(tag)
+			if (!slug) continue
+			const key = `/journal/tag/${slug}`
+			const existing = taxonomy.get(key) ?? { name: `Tag: ${tag}`, timestamps: [] }
+			existing.timestamps.push(post.date.getTime())
+			taxonomy.set(key, existing)
+		}
+	}
+
+	return [...taxonomy.entries()]
+		.sort(([a], [b]) => a.localeCompare(b))
+		.map(([routePath, entry]) => ({
+			path: routePath,
+			name: entry.name,
+			type: 'page',
+			hasServerLoad: true,
+			hasClientLoad: false,
+			hasLayout: true,
+			isDynamic: false,
+			hasAuth: false,
+			isNoIndex: false,
+			sitemap: 'public',
+			lastModified: new Date(Math.max(...entry.timestamps)).toISOString(),
+			category: 'Journal Pages'
+		}))
 }
 
 export async function getRouteInventory(options: RouteInventoryOptions = {}): Promise<RouteInventory> {
@@ -304,9 +355,11 @@ export async function getRouteInventory(options: RouteInventoryOptions = {}): Pr
 		}
 	})
 
-	let allRoutes: RouteEntry[] = [...routes, ...postRoutes]
+	const journalTaxonomyRoutes = createJournalTaxonomyRoutes(posts)
+
+	let allRoutes: RouteEntry[] = [...routes, ...postRoutes, ...journalTaxonomyRoutes]
 	if (!includeDevOnlyCategories) {
-		allRoutes = allRoutes.filter(route => !DEV_ONLY_CATEGORIES.includes(route.category))
+		allRoutes = allRoutes.filter((route) => !DEV_ONLY_CATEGORIES.includes(route.category))
 	}
 	allRoutes = allRoutes.filter((route) => route.type !== 'page' || isRouteReleased(route.path, activeStage))
 
@@ -316,9 +369,9 @@ export async function getRouteInventory(options: RouteInventoryOptions = {}): Pr
 		total: allRoutes.length,
 		pages: pageRoutes.length,
 		api: apiRoutes.length,
-		dynamic: allRoutes.filter(route => route.isDynamic).length,
-		ssr: pageRoutes.filter(route => route.hasServerLoad).length,
-		protected: pageRoutes.filter(route => route.hasAuth).length
+		dynamic: allRoutes.filter((route) => route.isDynamic).length,
+		ssr: pageRoutes.filter((route) => route.hasServerLoad).length,
+		protected: pageRoutes.filter((route) => route.hasAuth).length
 	}
 
 	const grouped: Record<string, RouteEntry[]> = {}

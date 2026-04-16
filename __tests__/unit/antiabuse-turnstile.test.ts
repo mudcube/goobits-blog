@@ -1,0 +1,70 @@
+import { describe, expect, it } from 'vitest'
+import { runContactAntiAbuse, runRegisterAntiAbuse } from '../../src/lib/server/antiabuse/index'
+
+function createEnv(overrides: Record<string, string | undefined> = {}) {
+	return {
+		ANTIABUSE_ENABLED: 'true',
+		TURNSTILE_REQUIRED: 'true',
+		NODE_ENV: 'production',
+		...overrides
+	}
+}
+
+describe('anti-abuse turnstile configuration', () => {
+	it('fails closed for register when the turnstile secret is missing by default', async () => {
+		const result = await runRegisterAntiAbuse({
+			email: 'person@example.com',
+			ip: '127.0.0.1',
+			asn: 'AS64500',
+			deviceId: 'device-register-default',
+			honeypot: '',
+			startedAtMs: Date.now() - 5000,
+			turnstileToken: '',
+			env: createEnv()
+		})
+
+		expect(result).toMatchObject({
+			ok: false,
+			reason: 'challenge_required',
+			requiresChallenge: true
+		})
+	})
+
+	it('fails closed for contact when the turnstile secret is missing by default', async () => {
+		const result = await runContactAntiAbuse({
+			email: 'person@example.com',
+			ip: '127.0.0.2',
+			asn: 'AS64501',
+			deviceId: 'device-contact-default',
+			honeypot: '',
+			startedAtMs: Date.now() - 1000,
+			turnstileToken: '',
+			env: createEnv()
+		})
+
+		expect(result).toMatchObject({
+			ok: false,
+			reason: 'challenge_required',
+			requiresChallenge: true
+		})
+	})
+
+	it('still allows explicit dev fail-open when configured', async () => {
+		const result = await runRegisterAntiAbuse({
+			email: 'person@example.com',
+			ip: '127.0.0.3',
+			asn: 'AS64502',
+			deviceId: 'device-register-fail-open',
+			honeypot: '',
+			startedAtMs: Date.now() - 5000,
+			turnstileToken: '',
+			env: createEnv({ NODE_ENV: 'development', TURNSTILE_FAIL_OPEN: 'true' })
+		})
+
+		expect(result).toMatchObject({
+			ok: true,
+			reason: 'allow',
+			requiresChallenge: false
+		})
+	})
+})
