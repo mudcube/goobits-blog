@@ -1,6 +1,7 @@
 <script lang="ts">
 import { goto } from '$app/navigation'
 import { page } from '$app/stores'
+import { withAdminRoute } from '@calendar/ui/config'
 import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 import { AdminEventDetailSheet, AdminLoginCard } from '@calendar/ui'
@@ -27,12 +28,13 @@ const adminMockCatalog = getAdminMockCatalog()
 	})
 
 	function openEventDetail(eventId: number) {
+		const detailHref = withAdminRoute(`events/detail/${eventId}/`)
 		if (mockMode) {
-			void goto(`/schedule/admin/events/detail/${eventId}/?mock=1`)
+			void goto(`${detailHref}?mock=1`)
 			return
 		}
 		if (isMobile) {
-			goto(`/schedule/admin/events/detail/${eventId}/`)
+			goto(detailHref)
 			return
 		}
 		openedDetailId = eventId
@@ -92,7 +94,13 @@ const adminMockCatalog = getAdminMockCatalog()
 					<button type="button" class="social-home__back" onclick={closeEventDetail}>← Back</button>
 					<AdminEventDetailSheet {dashboard} detail={dashboard.selectedEventDetail} />
 					<div class="social-home__detail-actions">
-						<button type="button" class="admin-ui-btn" onclick={() => dashboard.selectedEventDetail && goto(`/schedule/admin/events/detail/${dashboard.selectedEventDetail.event.id}/`)}>
+						<button
+							type="button"
+							class="admin-ui-btn"
+							onclick={() =>
+								dashboard.selectedEventDetail &&
+								goto(withAdminRoute(`events/detail/${dashboard.selectedEventDetail.event.id}/`))}
+						>
 							Edit Event
 						</button>
 					</div>

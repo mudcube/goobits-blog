@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { withAdminRoute } from '@calendar/ui/config'
+
 	type Participant = {
 		name?: string | null
 		displayName?: string | null
@@ -29,6 +31,7 @@
 		target: string
 		when: string
 		userId: string | null
+		href: string | null
 	}
 
 	function relativeWhen(iso: string) {
@@ -71,7 +74,8 @@
 					verb: 'joined',
 					target: event.title,
 					when: relativeWhen(event.startsAt),
-					userId: participantUserId
+					userId: participantUserId,
+					href: participantUserId ? withAdminRoute(`crew/${participantUserId}/`) : null
 				})
 			} else {
 				items.push({
@@ -81,7 +85,8 @@
 					verb: 'attended',
 					target: event.title,
 					when: relativeWhen(event.startsAt),
-					userId: null
+					userId: null,
+					href: null
 				})
 			}
 			if (items.length >= 6) break
@@ -102,8 +107,8 @@
 				<div class="admin-dashboard-recent__row">
 					<div class="admin-dashboard-recent__avatar">{item.initials}</div>
 					<div class="admin-dashboard-recent__text">
-						{#if item.userId}
-							<a class="admin-dashboard-recent__name-link" href={`/schedule/admin/crew/${item.userId}/${mockMode ? '?mock=1' : ''}`}>
+						{#if item.href}
+							<a class="admin-dashboard-recent__name-link" href={`${item.href}${mockMode ? '?mock=1' : ''}`}>
 								<strong>{item.name}</strong>
 							</a>
 						{:else}

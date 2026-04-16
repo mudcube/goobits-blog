@@ -10,6 +10,7 @@
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
+	import { withAdminRoute } from '@calendar/ui/config'
 	import { adminActionHandlers, adminEventDetailBreadcrumb } from '../shell/state'
 
 	const { data } = $props<{ data: { user: unknown | null; eventId: string } }>()
@@ -137,7 +138,7 @@
 	}
 
 	function crewMemberHref(userId: string) {
-		return hrefWithMock(`/schedule/admin/crew/${userId}/`)
+		return hrefWithMock(withAdminRoute(`crew/${userId}/`))
 	}
 
 	function attendeeBadge(attendee: { status: string; waitlistPosition: number | null; attendanceStatus: string }) {
@@ -160,7 +161,7 @@
 
 	function openEditor() {
 		if (!detail) return
-		void goto(hrefWithMock(`/schedule/admin/events/program/${detail.event.activitySlug || 'events'}/`))
+		void goto(hrefWithMock(withAdminRoute(`events/program/${detail.event.activitySlug || 'events'}/`)))
 	}
 
 	async function cancelEvent() {
@@ -175,7 +176,7 @@
 			flash(dashboard.error, true)
 			return
 		}
-		void goto(hrefWithMock('/schedule/admin/events/'))
+		void goto(hrefWithMock(withAdminRoute('events/')))
 	}
 
 	function handleEditRequest() {
@@ -198,7 +199,7 @@
 	$effect(() => {
 		if (!authed || mockMode || !attemptedLoad || loading) return
 		if (!dashboard.selectedEventDetail) {
-			goto(hrefWithMock('/schedule/admin/'), { replaceState: true })
+			goto(hrefWithMock(withAdminRoute()), { replaceState: true })
 		}
 	})
 
@@ -308,7 +309,7 @@
 				{/if}
 			</section>
 
-			<a class="admin-event-detail__editor-link" href={hrefWithMock(`/schedule/admin/events/program/${activitySlug || 'events'}/`)}>
+			<a class="admin-event-detail__editor-link" href={hrefWithMock(withAdminRoute(`events/program/${activitySlug || 'events'}/`))}>
 				<ArrowUpRight size={14} strokeWidth={2} />
 				Open {activityLabel || 'Program'} program page
 			</a>

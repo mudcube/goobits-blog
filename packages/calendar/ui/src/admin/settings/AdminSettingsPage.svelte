@@ -28,6 +28,7 @@
   let weekStartAutosaveTimer: ReturnType<typeof setTimeout> | null = null;
   let suspendPaymentAutosave = $state(true);
   let suspendWeekStartAutosave = $state(true);
+  let handledConnectedNotice = $state(false);
 
   type PaymentMethodKey = "venmo" | "zelle" | "cashapp";
   type PaymentMethodState = Record<
@@ -172,6 +173,17 @@
     if (!sameSyncConnections(syncConnections, normalized)) {
       syncConnections = normalized;
     }
+  });
+
+  $effect(() => {
+    if (!authed || mockMode || handledConnectedNotice) return;
+    if ($page.url.searchParams.get("connected") !== "1") return;
+    handledConnectedNotice = true;
+    showToast("Google Calendar connected");
+    if (typeof window === "undefined") return;
+    const next = new URL(window.location.href);
+    next.searchParams.delete("connected");
+    window.history.replaceState(window.history.state, "", `${next.pathname}${next.search}${next.hash}`);
   });
 
   $effect(() => {

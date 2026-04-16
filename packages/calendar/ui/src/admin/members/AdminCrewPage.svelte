@@ -14,6 +14,7 @@
 	import { getActivityEmoji } from '@calendar/ui/shared'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
+	import { withAdminRoute } from '@calendar/ui/config'
 	import { adminActionHandlers, type AdminInviteAnchorRect } from '../shell/state'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
@@ -435,11 +436,11 @@
 					badge={deriveBadge(user)}
 					initials={initials(displayName(user))}
 					isYou={isYou(user)}
-					href={hrefWithMock(`/schedule/admin/crew/${String(user['id'] || '').trim()}/`)}
+					href={hrefWithMock(withAdminRoute(`crew/${String(user['id'] || '').trim()}/`))}
 					onclick={() => {
 						const id = String(user['id'] || '').trim()
 						if (!id) return
-						void goto(hrefWithMock(`/schedule/admin/crew/${id}/`))
+						void goto(hrefWithMock(withAdminRoute(`crew/${id}/`)))
 					}}
 				/>
 			{/each}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
+	import { withAdminRoute } from '@calendar/ui/config'
 	import AdminWysiwygWorkspace from './AdminWysiwygWorkspace.svelte'
 	import { getActivityColor, getActivityEmoji } from '../../../shared'
 	import { getAdminMockCatalog } from '../../mock/catalog'
@@ -88,7 +89,7 @@
 		if (!selectedActivitySlug || !createTitle || !createStartsAt || !createEndsAt) return
 		if (mockMode) {
 			flash('Mock mode: event created in preview')
-			void goto(hrefWithMock(`/schedule/admin/events/program/${selectedActivitySlug}/`))
+			void goto(hrefWithMock(withAdminRoute(`events/program/${selectedActivitySlug}/`)))
 			return
 		}
 		dashboard.eventDraft = {
@@ -106,7 +107,7 @@
 			flash(dashboard.error, true)
 			return
 		}
-		void goto(hrefWithMock('/schedule/admin/events/'))
+		void goto(hrefWithMock(withAdminRoute('events/')))
 	}
 </script>
 
@@ -129,7 +130,7 @@
 			primaryLabel={dashboard.eventsCreating ? 'Creating…' : 'Create'}
 			primaryDisabled={!mockMode && dashboard.eventsCreating}
 			drawerOpen={!!selectedActivitySlug && drawerOpen}
-			onBack={() => goto(hrefWithMock('/schedule/admin/events/'))}
+			onBack={() => goto(hrefWithMock(withAdminRoute('events/')))}
 			onToggleSettings={() => (drawerOpen = !drawerOpen)}
 			onTogglePreview={() => (preview = !preview)}
 			onPrimary={() => {

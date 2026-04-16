@@ -1,4 +1,5 @@
 <script>
+  import { withCalendarRoute } from "@calendar/ui/config";
   import PillButton from "../../primitives/CalendarPillButton.svelte";
   const { dashboard, onClose } = $props();
   let advancedOpen = $state(false);
@@ -48,6 +49,10 @@
       )?.id ?? "custom"
     );
   }
+
+  function previewPath() {
+    return withCalendarRoute(dashboard.programDraft.slug || "program-slug");
+  }
 </script>
 
 <div class="admin-page__modal-overlay" role="dialog" aria-modal="true">
@@ -77,7 +82,7 @@
         {dashboard.programDraft.label || "Program name"}
       </div>
       <div class="admin-page__program-modal-url">
-        /schedule/{dashboard.programDraft.slug || "program-slug"}
+        {previewPath()}
       </div>
     </div>
 

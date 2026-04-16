@@ -10,6 +10,7 @@
 	import { formatEventDayLabel } from '@calendar/ui/shared'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
+	import { withAdminRoute } from '@calendar/ui/config'
 
 	const { data } = $props<{ data: { user: unknown | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
@@ -41,10 +42,10 @@
 	function eventRoute(ev: { id?: number | string | null; activitySlug?: string | null }) {
 		const idNum = Number(ev.id)
 		if (Number.isFinite(idNum) && idNum > 0) {
-			return `/schedule/admin/events/detail/${idNum}/`
+			return withAdminRoute(`events/detail/${idNum}/`)
 		}
-		if (ev.activitySlug) return `/schedule/admin/events/program/${ev.activitySlug}/`
-		return '/schedule/admin/events/'
+		if (ev.activitySlug) return withAdminRoute(`events/program/${ev.activitySlug}/`)
+		return withAdminRoute('events/')
 	}
 </script>
 
@@ -62,7 +63,7 @@
 				<button
 					type="button"
 					class="social-events__program-card calendar-ui-card calendar-ui-card--interactive"
-					onclick={() => goto(hrefWithMock(`/schedule/admin/events/program/${program.slug}/`))}
+					onclick={() => goto(hrefWithMock(withAdminRoute(`events/program/${program.slug}/`)))}
 				>
 					<div class="social-events__program-icon">{program.icon || emojiForActivity(program.label, program.slug)}</div>
 					<div class="social-events__program-label">{program.label}</div>
