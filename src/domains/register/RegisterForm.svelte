@@ -4,7 +4,9 @@
 	import { FormField, Hero, PillButton } from '@miko/ui'
 	import { superForm } from 'sveltekit-superforms'
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters'
-	import { initializeAntiAbuseFields } from '$lib/client/antiabuse'
+	import AntiAbuseFields from '$lib/forms/AntiAbuseFields.svelte'
+	import { seedAntiAbuseFields } from '$lib/forms/antiabuse'
+	import TurnstileScript from '$lib/forms/TurnstileScript.svelte'
 	import type { SuperValidated } from 'sveltekit-superforms'
 	import VerificationField from '$lib/forms/VerificationField.svelte'
 	import { registerSchema, type RegisterFormData } from './schema'
@@ -24,40 +26,26 @@
 	}
 
 	onMount(() => {
-		const fields = initializeAntiAbuseFields('miko_register_device_id')
-		formData.update((current) => ({
-			...current,
-			started_at: fields.startedAt,
-			device_id: fields.deviceId
-		}))
+		seedAntiAbuseFields('miko_register_device_id', formData.update)
 	})
 </script>
 
 <Seo title="Register" description="Account registration for MIKO.ART calendar features." path="/register/" noindex />
 
-<svelte:head>
-	{#if turnstileSiteKey}
-		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-	{/if}
-</svelte:head>
+<TurnstileScript siteKey={turnstileSiteKey} />
 
 <Hero title="Create account" subtitle="Create your account and confirm your email to continue." icon="/media/decor/emoji-herb.png" compact={true} />
 
 <section class="register-page ui-surface-card">
 	<form method="POST" class="register-page__form" use:enhance novalidate data-testid="register-form">
-		<input type="hidden" name="started_at" value={$formData.started_at} data-testid="register-started-at" />
-		<input type="hidden" name="device_id" value={$formData.device_id} />
-		<label class="register-page__hp" aria-hidden="true">
-			<span>Website</span>
-			<input
-				type="text"
-				name="website"
-				value={$formData.website}
-				tabindex="-1"
-				autocomplete="off"
-				oninput={(event) => updateField('website', event.currentTarget.value)}
-			/>
-		</label>
+		<AntiAbuseFields
+			startedAt={$formData.started_at}
+			deviceId={$formData.device_id}
+			website={$formData.website}
+			onWebsiteInput={(value) => updateField('website', value)}
+			honeypotClassName="register-page__hp"
+			startedAtTestId="register-started-at"
+		/>
 
 		<FormField className="register-page__field" label="Name" forId="register-name" error={Array.isArray($errors['name']) ? $errors['name'][0] : undefined} required>
 			<input
@@ -128,7 +116,7 @@
 		gap: var(--space-2);
 	}
 
-	.register-page__hp {
+	:global(.register-page__hp) {
 		position: absolute;
 		left: -100vw;
 		top: auto;

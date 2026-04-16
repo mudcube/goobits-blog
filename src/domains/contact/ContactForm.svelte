@@ -4,7 +4,9 @@
 	import { Hero, FormField, PageShell, PillButton } from '@miko/ui'
 	import { superForm } from 'sveltekit-superforms'
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters'
-	import { initializeAntiAbuseFields } from '$lib/client/antiabuse'
+	import AntiAbuseFields from '$lib/forms/AntiAbuseFields.svelte'
+	import { seedAntiAbuseFields } from '$lib/forms/antiabuse'
+	import TurnstileScript from '$lib/forms/TurnstileScript.svelte'
 	import VerificationField from '$lib/forms/VerificationField.svelte'
 	import { contactSchema, type ContactFormData } from './schema'
 	import { getContactMessagePlaceholder } from './viewmodel'
@@ -25,20 +27,11 @@
 	}
 
 	onMount(() => {
-		const fields = initializeAntiAbuseFields('miko_contact_device_id')
-		formData.update((current) => ({
-			...current,
-			started_at: fields.startedAt,
-			device_id: fields.deviceId
-		}))
+		seedAntiAbuseFields('miko_contact_device_id', formData.update)
 	})
 </script>
 
-<svelte:head>
-	{#if turnstileSiteKey}
-		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-	{/if}
-</svelte:head>
+<TurnstileScript siteKey={turnstileSiteKey} />
 
 <PageShell className="contact-page">
 	<Hero
@@ -57,19 +50,13 @@
 			<form method="POST" class="contact-page__form" use:enhance novalidate>
 				<input type="hidden" name="from" value={$formData.from} />
 				<input type="hidden" name="topic" value={$formData.topic} />
-				<input type="hidden" name="started_at" value={$formData.started_at} />
-				<input type="hidden" name="device_id" value={$formData.device_id} />
-				<label class="contact-page__hp" aria-hidden="true">
-					<span>Website</span>
-					<input
-						type="text"
-						name="website"
-						value={$formData.website}
-						tabindex="-1"
-						autocomplete="off"
-						oninput={(event) => updateField('website', event.currentTarget.value)}
-					/>
-				</label>
+				<AntiAbuseFields
+					startedAt={$formData.started_at}
+					deviceId={$formData.device_id}
+					website={$formData.website}
+					onWebsiteInput={(value) => updateField('website', value)}
+					honeypotClassName="contact-page__hp"
+				/>
 				<FormField className="contact-page__field" label="Name" forId="contact-name" error={Array.isArray($errors['name']) ? $errors['name'][0] : undefined} required>
 					<div class="contact-page__control">
 						<input
@@ -161,7 +148,7 @@
 </PageShell>
 
 <style lang="scss">
-	.contact-page__hp {
+	:global(.contact-page__hp) {
 		position: absolute;
 		left: -100vw;
 		top: auto;
