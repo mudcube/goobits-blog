@@ -142,6 +142,11 @@
       "sharp",
       "workerd"
     ],
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "typescript": "6"
+      }
+    },
     "patchedDependencies": {
       "svelte": "patches/svelte.patch"
     }
