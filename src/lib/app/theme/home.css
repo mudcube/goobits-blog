@@ -129,20 +129,6 @@
 		font-size: 5vw;
 	}
 
-	.home__projects {
-		gap: 2em 0.5em;
-	}
-
-	.home__project-description {
-		font-size: 0.82rem;
-		line-height: 1.35;
-		padding: 0.45em 0.25em;
-	}
-
-	.home__project-title {
-		font-size: 0.78rem;
-	}
-
 	.home__project-title-text {
 		padding: 0 0.5em;
 	}
