@@ -1,14 +1,28 @@
 <script lang="ts">
-	import { Mail, Menu, X } from '@lucide/svelte'
+	import { Menu, X } from '@lucide/svelte'
 	import { onMount } from 'svelte'
+	import type { Snippet } from 'svelte'
 	import type { NavItem } from '../types/nav'
 
 	type TopbarProps = {
 		items: NavItem[]
 		currentPath: string
+		logoSrc?: string
+		logoAlt?: string
+		logoHref?: string
+		disablePrefetchPrefixes?: string[]
+		utility?: Snippet
 	}
 
-	const { items, currentPath }: TopbarProps = $props()
+	const {
+		items,
+		currentPath,
+		logoSrc,
+		logoAlt = 'Home',
+		logoHref = '/',
+		disablePrefetchPrefixes = [],
+		utility
+	}: TopbarProps = $props()
 	let mobileMenuOpen = $state(false)
 	let compactMode = $state(false)
 	let headerInner: HTMLDivElement | null = null
@@ -30,8 +44,7 @@
 	}
 
 	function shouldDisablePrefetch(href: string) {
-		// Calendar/Admin pages load large route-level styling; avoid "hover prefetch" injecting it on other pages.
-		return href.startsWith('/schedule') || href.startsWith('/admin')
+		return disablePrefetchPrefixes.some((prefix) => href.startsWith(prefix))
 	}
 
 	function isSeparator(item: NavItem) {
@@ -45,8 +58,6 @@
 	function closeMobileMenu() {
 		mobileMenuOpen = false
 	}
-
-	const utilityItems: NavItem[] = [{ href: '/contact?from=topbar', label: 'Contact', matchPrefix: true }]
 
 	function updateCompactMode() {
 		if (!headerInner || !headerLogo || !headerUtilities || !navMeasure) return
@@ -101,8 +112,12 @@
 <header class:layout-header--compact={compactMode} class="layout-header">
 	<div class="layout-header__inner" bind:this={headerInner}>
 		<div class="layout-header__logo" bind:this={headerLogo}>
-			<a href="/" class="layout-header__logo-link">
-				<img src="/media/brand/logo.svg" alt="logo" class="layout-header__logo-image" />
+			<a href={logoHref} class="layout-header__logo-link">
+				{#if logoSrc}
+					<img src={logoSrc} alt={logoAlt} class="layout-header__logo-image" />
+				{:else}
+					<span class="layout-header__logo-fallback">{logoAlt}</span>
+				{/if}
 			</a>
 		</div>
 		<nav class="layout-header__nav">
@@ -123,19 +138,7 @@
 			{/each}
 		</nav>
 		<div class="layout-header__utilities" aria-label="Quick actions" bind:this={headerUtilities}>
-			{#each utilityItems as item}
-				<a
-					href={item.href}
-					class="layout-header__utility-link"
-					class:layout-header__utility-link--active={isActive(item)}
-					aria-label={item.label}
-					title={item.label}
-					data-sveltekit-preload-data={shouldDisablePrefetch(item.href) ? 'off' : undefined}
-					data-sveltekit-preload-code={shouldDisablePrefetch(item.href) ? 'off' : undefined}
-				>
-					<Mail size={24} strokeWidth={1.9} aria-hidden="true" />
-				</a>
-			{/each}
+			{@render utility?.()}
 		</div>
 
 		<button
@@ -189,6 +192,16 @@
 </header>
 
 <style>
+	.layout-header__logo-fallback {
+		display: inline-flex;
+		align-items: center;
+		font-size: 0.95rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--color-white);
+	}
+
 	.layout-header__nav-separator {
 		display: inline-flex;
 		align-items: center;
@@ -202,27 +215,6 @@
 		align-items: center;
 		gap: 0.7rem;
 		margin-left: 1.5rem;
-	}
-
-	.layout-header__utility-link {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.15rem;
-		color: var(--header-nav-color, var(--color-white));
-		text-decoration: none;
-		transition:
-			color 0.22s ease,
-			transform 0.22s ease;
-	}
-
-	.layout-header__utility-link:hover {
-		color: var(--header-nav-accent, var(--color-white));
-		transform: translateY(-1px);
-	}
-
-	.layout-header__utility-link--active {
-		color: var(--header-nav-accent, var(--color-white));
 	}
 
 	.layout-header__nav-measure {
@@ -318,21 +310,6 @@
 		display: inline-flex;
 		margin-left: auto;
 		gap: 0.45rem;
-	}
-
-	.layout-header--compact .layout-header__utility-link {
-		width: 2.35rem;
-		height: 2.35rem;
-		padding: 0;
-		border: 1px solid color-mix(in srgb, var(--color-white) 14%, transparent);
-		border-radius: var(--radius-pill);
-		background: color-mix(in srgb, var(--color-white) 5%, transparent);
-	}
-
-	.layout-header--compact .layout-header__utility-link:hover,
-	.layout-header--compact .layout-header__utility-link--active {
-		border-color: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 36%, transparent);
-		background: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 10%, transparent);
 	}
 
 	.layout-header--compact .layout-header__menu-button {

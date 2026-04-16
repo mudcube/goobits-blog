@@ -70,16 +70,14 @@
 {#if options}
 	<div
 		class={`${grouped ? 'ui-segmented' : 'ui-chip-group'} ${className}`.trim()}
-		role={multiple ? 'group' : 'tablist'}
+		role="group"
 		aria-label={ariaLabel}
 	>
 		{#each options as option}
 			<button
 				type="button"
 				class={`${grouped ? 'ui-segmented__button' : 'ui-chip-group__button'} ${isActive(option) ? grouped ? 'ui-segmented__button--active' : 'ui-chip-group__button--active' : ''}`}
-				role={multiple ? undefined : 'tab'}
-				aria-selected={multiple ? undefined : isActive(option)}
-				aria-pressed={multiple ? isActive(option) : undefined}
+				aria-pressed={isActive(option)}
 				disabled={disabled}
 				onclick={() => selectOption(option)}
 			>

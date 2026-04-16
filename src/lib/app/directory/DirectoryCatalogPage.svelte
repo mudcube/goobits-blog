@@ -131,15 +131,14 @@
 
         <div
           class="directory-page__chip-group"
-          role="tablist"
+          role="group"
           aria-label={`Sort ${title}`}
         >
           {#each sortOptions as option}
             <button
               type="button"
-              role="tab"
               class={`directory-page__chip ${sortBy === option.value ? "directory-page__chip--active" : ""}`}
-              aria-selected={sortBy === option.value}
+              aria-pressed={sortBy === option.value}
               onclick={() => (sortBy = option.value)}
             >
               {option.label}

@@ -38,11 +38,23 @@
     value = `${String(hours24).padStart(2, "0")}:${String(minuteNum).padStart(2, "0")}`;
   }
 
+  function getSafeMinuteStep(step: number) {
+    return Math.max(1, Math.min(60, Math.floor(step || 1)));
+  }
+
   const minuteOptions = $derived(
-    Array.from(
-      { length: Math.floor(60 / Math.max(1, minuteStep)) },
-      (_, index) => String(index * Math.max(1, minuteStep)).padStart(2, "0"),
-    ),
+    (() => {
+      const safeMinuteStep = getSafeMinuteStep(minuteStep);
+      const options = new Set<string>();
+
+      for (let value = 0; value < 60; value += safeMinuteStep) {
+        options.add(String(value).padStart(2, "0"));
+      }
+
+      options.add(minute);
+
+      return Array.from(options).sort((left, right) => Number(left) - Number(right));
+    })(),
   );
 </script>
 

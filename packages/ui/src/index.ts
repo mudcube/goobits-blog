@@ -26,7 +26,7 @@ export {
 	Section,
 	SectionLabel,
 } from "./layout";
-export { FooterNav, ShellNav, ThemeSelect, Topbar } from "./navigation";
+export { Breadcrumbs, FooterNav, ShellNav, ThemeSelect, Topbar } from "./navigation";
 export {
 	ShowcaseCard,
 	ShowcaseCTA,

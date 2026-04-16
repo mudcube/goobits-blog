@@ -83,13 +83,12 @@
 	</button>
 
 	{#if menuOpen}
-		<div class="ui-theme-select__menu" role="menu" aria-label="Theme options">
+		<div class="ui-theme-select__menu" role="group" aria-label="Theme options">
 			<button
 				type="button"
 				class={`ui-theme-select__option ${activePreset === 'light' ? 'active' : ''}`}
 				onclick={() => chooseTheme('light')}
-				role="menuitemradio"
-				aria-checked={activePreset === 'light'}
+				aria-pressed={activePreset === 'light'}
 			>
 				Light
 			</button>
@@ -97,8 +96,7 @@
 				type="button"
 				class={`ui-theme-select__option ${activePreset === 'dark' ? 'active' : ''}`}
 				onclick={() => chooseTheme('dark')}
-				role="menuitemradio"
-				aria-checked={activePreset === 'dark'}
+				aria-pressed={activePreset === 'dark'}
 			>
 				Dark
 			</button>
@@ -106,8 +104,7 @@
 				type="button"
 				class={`ui-theme-select__option ${activePreset === 'magic' ? 'active' : ''}`}
 				onclick={() => chooseTheme('magic')}
-				role="menuitemradio"
-				aria-checked={activePreset === 'magic'}
+				aria-pressed={activePreset === 'magic'}
 			>
 				Magic
 			</button>

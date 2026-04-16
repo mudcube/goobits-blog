@@ -9,6 +9,8 @@
 
 	type ShellNavProps = {
 		homeHref?: string
+		homeLogoSrc?: string
+		homeLogoAlt?: string
 		brandLabel?: string
 		brandHref?: string
 		links?: ShellNavLink[]
@@ -16,7 +18,16 @@
 		right?: Snippet
 	}
 
-	const { homeHref = '/', brandLabel, brandHref, links = [], currentPath, right }: ShellNavProps = $props()
+	const {
+		homeHref = '/',
+		homeLogoSrc,
+		homeLogoAlt = 'Home',
+		brandLabel,
+		brandHref,
+		links = [],
+		currentPath,
+		right
+	}: ShellNavProps = $props()
 
 	function isActive(href: string, exact = false) {
 		if (exact) return currentPath === href || currentPath === `${href}/`
@@ -27,7 +38,11 @@
 <nav class="shell-nav">
 	<div class="shell-nav__inner">
 		<a href={homeHref} class="shell-nav__home" aria-label="Home">
-			<img src="/media/brand/logo.svg" alt="MIKO.ART" class="shell-nav__home-logo" />
+			{#if homeLogoSrc}
+				<img src={homeLogoSrc} alt={homeLogoAlt} class="shell-nav__home-logo" />
+			{:else}
+				<span class="shell-nav__home-label">{homeLogoAlt}</span>
+			{/if}
 		</a>
 		{#if brandLabel && brandHref}
 			<a href={brandHref} class="shell-nav__brand">{brandLabel}</a>
@@ -68,11 +83,11 @@
 	.shell-nav__inner {
 		max-width: var(--max-width, 1060px);
 		margin: 0 auto;
-		width: var(--calendar-nav-inner-width);
-		height: var(--calendar-nav-height);
+		width: var(--shell-nav-inner-width, var(--calendar-nav-inner-width));
+		height: var(--shell-nav-height, var(--calendar-nav-height));
 		display: flex;
 		align-items: center;
-		gap: var(--calendar-nav-inner-gap);
+		gap: var(--shell-nav-inner-gap, var(--calendar-nav-inner-gap));
 	}
 
 	.shell-nav__home {
@@ -86,6 +101,16 @@
 		height: 28px;
 		width: auto;
 		filter: none;
+	}
+
+	.shell-nav__home-label {
+		display: inline-flex;
+		align-items: center;
+		font-size: 0.85rem;
+		font-weight: var(--font-weight-semibold);
+		color: var(--shell-nav-link-active, var(--color-white));
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
 	}
 
 	.shell-nav__brand {
@@ -103,7 +128,7 @@
 
 	.shell-nav__links {
 		display: flex;
-		gap: var(--calendar-nav-link-gap);
+		gap: var(--shell-nav-link-gap, var(--calendar-nav-link-gap));
 		flex: 1;
 		align-items: center;
 		min-width: 0;
@@ -116,7 +141,7 @@
 		text-decoration: none;
 		font-size: 13px;
 		font-weight: var(--font-weight-medium);
-		padding: var(--calendar-nav-link-padding);
+		padding: var(--shell-nav-link-padding, var(--calendar-nav-link-padding));
 		border-radius: var(--radius-pill);
 		transition: all 0.16s ease;
 	}

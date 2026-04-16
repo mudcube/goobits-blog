@@ -19,7 +19,7 @@
 		copy,
 		buttonHref,
 		buttonLabel,
-		imageSrc = '/media/page-icons/contact-thank-you.svg',
+		imageSrc,
 		imageAlt = 'Success illustration',
 		buttonIcon = 'none',
 		className = ''
@@ -29,7 +29,9 @@
 <PageShell className={`success-page ${className}`.trim()}>
 	<section class="success-page__section">
 		<div class="success-page__inner">
-			<img class="success-page__image" src={imageSrc} alt={imageAlt} />
+			{#if imageSrc}
+				<img class="success-page__image" src={imageSrc} alt={imageAlt} />
+			{/if}
 			<h1 class="success-page__title">{title}</h1>
 			<p class="success-page__copy">{copy}</p>
 			<div class="success-page__button-row">

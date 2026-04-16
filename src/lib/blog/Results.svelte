@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Breadcrumbs } from '@miko/ui'
 	import MetadataValues from '$lib/blog/MetadataValues.svelte'
 	import { formatJournalLabel, type JournalPost } from '$lib/blog/viewmodel'
 
@@ -14,13 +15,14 @@
 </script>
 
 {#if showBackButton}
-	<nav class="journal-results__breadcrumbs" aria-label="Breadcrumb">
-		<a href="/">Home</a>
-		<span>/</span>
-		<a href="/journal">Journal</a>
-		<span>/</span>
-		<span>{formatJournalLabel(category)}</span>
-	</nav>
+	<Breadcrumbs
+		className="journal-results__breadcrumbs"
+		items={[
+			{ href: '/', label: 'Home' },
+			{ href: '/journal', label: 'Journal' },
+			{ label: formatJournalLabel(category) }
+		]}
+	/>
 {/if}
 
 <div class="journal-results">
@@ -51,25 +53,6 @@
 	.journal-results {
 		max-width: var(--max-width);
 		margin: 0 auto;
-	}
-
-	.journal-results__breadcrumbs {
-		display: flex;
-		align-items: center;
-		gap: 0.45rem;
-		margin-bottom: 1rem;
-		font-family: var(--font-sans);
-		font-size: 0.8rem;
-		color: var(--muted);
-
-		a {
-			color: inherit;
-			text-decoration: none;
-		}
-
-		a:hover {
-			color: var(--text);
-		}
 	}
 
 	article {

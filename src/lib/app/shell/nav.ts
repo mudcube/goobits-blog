@@ -18,6 +18,10 @@ export const footerPrimaryItems: NavItem[] = [
 	{ href: '/labs', label: 'Labs' }
 ]
 
+export const footerSupplementalPrimaryItems: NavItem[] = [
+	{ href: '/sitemap', label: 'Sitemap' }
+]
+
 export const footerLegalItems: NavItem[] = [
 	{ href: '/cookies', label: 'Cookies' },
 	{ href: '/privacy', label: 'Privacy' },
@@ -30,3 +34,16 @@ export const footerElsewhereItems: NavItem[] = [
 	{ href: 'https://github.com/mudcube', label: 'GitHub', external: true, nofollow: true },
 	{ href: 'https://sketch.io', label: 'Sketch.IO', external: true, nofollow: false }
 ]
+
+export const headerUtilityLink: NavItem = {
+	href: '/contact?from=topbar',
+	label: 'Contact',
+	matchPrefix: true
+}
+
+export const footerBrand = {
+	name: 'Miko',
+	href: '/',
+	tagline: 'Developer, designer & musician',
+	copyrightLabel: 'Miko Meow™'
+}

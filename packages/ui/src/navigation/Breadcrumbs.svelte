@@ -13,17 +13,17 @@
 </script>
 
 {#if items.length}
-	<nav class={`public-breadcrumbs ${className}`.trim()} aria-label="Breadcrumbs">
-		<ol class="public-breadcrumbs__list">
+	<nav class={`ui-breadcrumbs ${className}`.trim()} aria-label="Breadcrumbs">
+		<ol class="ui-breadcrumbs__list">
 			{#each items as item, index}
-				<li class="public-breadcrumbs__item">
+				<li class="ui-breadcrumbs__item">
 					{#if item.href && index < items.length - 1}
-						<a href={item.href} class="public-breadcrumbs__link">{item.label}</a>
+						<a href={item.href} class="ui-breadcrumbs__link">{item.label}</a>
 					{:else}
-						<span class="public-breadcrumbs__current" aria-current="page">{item.label}</span>
+						<span class="ui-breadcrumbs__current" aria-current="page">{item.label}</span>
 					{/if}
 					{#if index < items.length - 1}
-						<span class="public-breadcrumbs__sep" aria-hidden="true">/</span>
+						<span class="ui-breadcrumbs__sep" aria-hidden="true">/</span>
 					{/if}
 				</li>
 			{/each}
@@ -32,11 +32,11 @@
 {/if}
 
 <style lang="scss">
-	.public-breadcrumbs {
+	.ui-breadcrumbs {
 		margin: 1rem auto 1rem;
 	}
 
-	.public-breadcrumbs__list {
+	.ui-breadcrumbs__list {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
@@ -46,15 +46,15 @@
 		list-style: none;
 	}
 
-	.public-breadcrumbs__item {
+	.ui-breadcrumbs__item {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.35rem;
 		min-width: 0;
 	}
 
-	.public-breadcrumbs__link,
-	.public-breadcrumbs__current {
+	.ui-breadcrumbs__link,
+	.ui-breadcrumbs__current {
 		font-family: var(--font-sans);
 		font-size: 0.82rem;
 		font-weight: 500;
@@ -62,7 +62,7 @@
 		line-height: 1.2;
 	}
 
-	.public-breadcrumbs__link {
+	.ui-breadcrumbs__link {
 		color: var(--muted);
 		text-decoration: none;
 		transition: color 0.15s ease;
@@ -72,11 +72,11 @@
 		}
 	}
 
-	.public-breadcrumbs__current {
+	.ui-breadcrumbs__current {
 		color: var(--text);
 	}
 
-	.public-breadcrumbs__sep {
+	.ui-breadcrumbs__sep {
 		color: var(--muted);
 		opacity: 0.7;
 	}

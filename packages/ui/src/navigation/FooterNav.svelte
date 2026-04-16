@@ -2,12 +2,26 @@
 	import type { NavItem } from '../types/nav'
 
 	type FooterNavProps = {
+		brandName?: string
+		brandHref?: string
+		tagline?: string
+		copyrightLabel?: string
 		primaryItems: NavItem[]
+		supplementalPrimaryItems?: NavItem[]
 		elsewhereItems?: NavItem[]
 		legalItems: NavItem[]
 	}
 
-	const { primaryItems, elsewhereItems = [], legalItems }: FooterNavProps = $props()
+	const {
+		brandName = '',
+		brandHref = '/',
+		tagline = '',
+		copyrightLabel = '',
+		primaryItems,
+		supplementalPrimaryItems = [],
+		elsewhereItems = [],
+		legalItems
+	}: FooterNavProps = $props()
 
 	const year = new Date().getFullYear()
 </script>
@@ -16,9 +30,13 @@
 	<div class="layout-footer__inner">
 		<div class="layout-footer__top">
 			<div class="layout-footer__brand">
-				<a href="/" class="layout-footer__brand-link">Miko</a>
-				<p class="layout-footer__tagline">Developer, designer &amp; musician 🦄</p>
-				<small class="layout-footer__copyright">© {year} Miko Meow™</small>
+				<a href={brandHref} class="layout-footer__brand-link">{brandName}</a>
+				{#if tagline}
+					<p class="layout-footer__tagline">{tagline}</p>
+				{/if}
+				{#if copyrightLabel}
+					<small class="layout-footer__copyright">© {year} {copyrightLabel}</small>
+				{/if}
 			</div>
 
 			<div class="layout-footer__columns" aria-label="Footer links">
@@ -28,7 +46,9 @@
 						{#each primaryItems as item}
 							<li><a class="layout-footer__col-link" href={item.href}>{item.label}</a></li>
 						{/each}
-						<li><a class="layout-footer__col-link" href="/sitemap">Sitemap</a></li>
+						{#each supplementalPrimaryItems as item}
+							<li><a class="layout-footer__col-link" href={item.href}>{item.label}</a></li>
+						{/each}
 					</ul>
 				</div>
 

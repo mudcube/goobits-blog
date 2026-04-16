@@ -1,6 +1,7 @@
 <script>
 	import '../app.scss'
 	import '@goobits/themes/themes/bundle.css'
+	import { Mail } from '@lucide/svelte'
 	import { ThemeProvider } from '@goobits/themes/svelte'
 	import { themeConfig } from '$lib/app/config/theme.js'
 	import { page } from '$app/stores'
@@ -9,7 +10,15 @@
 	import { Topbar, FooterNav } from '@miko/ui'
 	import { getCalendarConfig } from '@calendar/core'
 	import ReleaseTargetSwitcher from '$lib/app/release/ReleaseTargetSwitcher.svelte'
-	import { footerElsewhereItems, footerLegalItems, footerPrimaryItems, getHeaderNavItems } from '$lib/app/shell/nav'
+	import {
+		footerBrand,
+		footerElsewhereItems,
+		footerLegalItems,
+		footerPrimaryItems,
+		footerSupplementalPrimaryItems,
+		getHeaderNavItems,
+		headerUtilityLink
+	} from '$lib/app/shell/nav'
 	import { enableLayoutShiftDebug } from '$lib/client/debug/layoutShift'
 
 	const { data, children } = $props()
@@ -45,14 +54,37 @@
 		{#if isCalendarRoute}
 			{@render children()}
 		{:else}
-			<Topbar items={topbarItems} currentPath={$page.url.pathname} />
+			<Topbar
+				items={topbarItems}
+				currentPath={$page.url.pathname}
+				logoSrc="/media/brand/logo.svg"
+				logoAlt="MIKO.ART"
+				disablePrefetchPrefixes={[calendarConfig.routes.calendarBase, calendarConfig.routes.adminBase]}
+			>
+				{#snippet utility()}
+					<a
+						href={headerUtilityLink.href}
+						class="layout-header__utility-link"
+						class:layout-header__utility-link--active={$page.url.pathname.startsWith('/contact')}
+						aria-label={headerUtilityLink.label}
+						title={headerUtilityLink.label}
+					>
+						<Mail size={24} strokeWidth={1.9} aria-hidden="true" />
+					</a>
+				{/snippet}
+			</Topbar>
 
 			<main>
 				{@render children()}
 			</main>
 
 			<FooterNav
+				brandName={footerBrand.name}
+				brandHref={footerBrand.href}
+				tagline={footerBrand.tagline}
+				copyrightLabel={footerBrand.copyrightLabel}
 				primaryItems={footerPrimaryItems}
+				supplementalPrimaryItems={footerSupplementalPrimaryItems}
 				elsewhereItems={footerElsewhereItems}
 				legalItems={footerLegalItems}
 			/>
@@ -68,3 +100,41 @@
 		{/if}
 	</div>
 </ThemeProvider>
+
+<style>
+	:global(.layout-header__utility-link) {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.15rem;
+		color: var(--header-nav-color, var(--color-white));
+		text-decoration: none;
+		transition:
+			color 0.22s ease,
+			transform 0.22s ease;
+	}
+
+	:global(.layout-header__utility-link:hover) {
+		color: var(--header-nav-accent, var(--color-white));
+		transform: translateY(-1px);
+	}
+
+	:global(.layout-header__utility-link--active) {
+		color: var(--header-nav-accent, var(--color-white));
+	}
+
+	:global(.layout-header--compact .layout-header__utility-link) {
+		width: 2.35rem;
+		height: 2.35rem;
+		padding: 0;
+		border: 1px solid color-mix(in srgb, var(--color-white) 14%, transparent);
+		border-radius: var(--radius-pill);
+		background: color-mix(in srgb, var(--color-white) 5%, transparent);
+	}
+
+	:global(.layout-header--compact .layout-header__utility-link:hover),
+	:global(.layout-header--compact .layout-header__utility-link--active) {
+		border-color: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 36%, transparent);
+		background: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 10%, transparent);
+	}
+</style>
