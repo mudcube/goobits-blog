@@ -13,6 +13,7 @@
 	import AdminCrewInviteModal from '@calendar/ui/admin/members/AdminCrewInviteModal.svelte'
 	import { getActivityEmoji } from '@calendar/ui/shared'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
+	import { adminActionHandlers, type AdminInviteAnchorRect } from '$lib/app/schedule/admin/state'
 	import {
 		mockCrewInvites,
 		mockCrewUsers,
@@ -47,7 +48,7 @@
 	let inviteNameDraft = $state('')
 	let createdInviteId = $state('')
 	let createdInviteCode = $state('')
-	let inviteAnchorRect = $state<{ left: number; top: number; right: number; bottom: number; width: number; height: number } | null>(null)
+	let inviteAnchorRect = $state<AdminInviteAnchorRect | null>(null)
 
 	$effect(() => {
 		if (!authed) return
@@ -374,9 +375,8 @@
 		showToast('Invite deleted')
 	}
 
-	function onTopbarCreateInvite(event: Event) {
-		const custom = event as CustomEvent<{ anchorRect?: { left: number; top: number; right: number; bottom: number; width: number; height: number } }>
-		inviteAnchorRect = custom.detail?.anchorRect ?? null
+	function onTopbarCreateInvite(event: { detail?: { anchorRect?: AdminInviteAnchorRect } }) {
+		inviteAnchorRect = event.detail?.anchorRect ?? null
 		void openInviteModal()
 	}
 
@@ -411,8 +411,18 @@
 	}
 
 	onMount(() => {
-		window.addEventListener('admin-crew-create-invite', onTopbarCreateInvite)
-		return () => window.removeEventListener('admin-crew-create-invite', onTopbarCreateInvite)
+		adminActionHandlers.update((handlers) => ({
+			...handlers,
+			onCrewCreateInvite: (detail) => onTopbarCreateInvite(detail ? { detail } : {})
+		}))
+
+		return () => {
+			adminActionHandlers.update((handlers) => {
+				const next = { ...handlers }
+				delete next.onCrewCreateInvite
+				return next
+			})
+		}
 	})
 </script>
 

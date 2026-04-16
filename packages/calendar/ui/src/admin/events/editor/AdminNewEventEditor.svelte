@@ -87,7 +87,7 @@
 		if (!selectedActivitySlug || !createTitle || !createStartsAt || !createEndsAt) return
 		if (mockMode) {
 			flash('Mock mode: event created in preview')
-			void goto(hrefWithMock(`/schedule/admin/events/${selectedActivitySlug}/`))
+			void goto(hrefWithMock(`/schedule/admin/events/program/${selectedActivitySlug}/`))
 			return
 		}
 		dashboard.eventDraft = {

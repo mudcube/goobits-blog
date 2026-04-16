@@ -8,6 +8,7 @@
 	import AdminActionButton from '../../shared/AdminActionButton.svelte'
 	import { mockDashboardEvents, mockPrograms } from '../../mock/admin-mock-data'
 	import { createHistory } from '../../history/create-history'
+	import { adminActionHandlers } from '$lib/app/schedule/admin/state'
 
 	type DashboardController = ReturnType<typeof createAdminDashboardController>
 	type ProgramDraft = DashboardController['programDraft']
@@ -559,10 +560,23 @@
 	onMount(() => {
 		const now = new Date()
 		untilDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-30`
-		window.addEventListener('admin-program-editor-toggle-settings', onTopbarToggleSettings)
 		return () => {
 			if (autosaveTimer) clearTimeout(autosaveTimer)
-			window.removeEventListener('admin-program-editor-toggle-settings', onTopbarToggleSettings)
+		}
+	})
+
+	$effect(() => {
+		adminActionHandlers.update((handlers) => ({
+			...handlers,
+			onProgramEditorToggleSettings: onTopbarToggleSettings
+		}))
+
+		return () => {
+			adminActionHandlers.update((handlers) => {
+				const next = { ...handlers }
+				delete next.onProgramEditorToggleSettings
+				return next
+			})
 		}
 	})
 

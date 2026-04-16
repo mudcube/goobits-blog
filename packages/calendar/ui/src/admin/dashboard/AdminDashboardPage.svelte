@@ -27,11 +27,11 @@ const mockMode = $derived($page.url.searchParams.get('mock') === '1')
 
 	function openEventDetail(eventId: number) {
 		if (mockMode) {
-			void goto(`/schedule/admin/events/${eventId}/?mock=1`)
+			void goto(`/schedule/admin/events/detail/${eventId}/?mock=1`)
 			return
 		}
 		if (isMobile) {
-			goto(`/schedule/admin/events/${eventId}`)
+			goto(`/schedule/admin/events/detail/${eventId}/`)
 			return
 		}
 		openedDetailId = eventId
@@ -91,7 +91,7 @@ const mockMode = $derived($page.url.searchParams.get('mock') === '1')
 					<button type="button" class="social-home__back" onclick={closeEventDetail}>← Back</button>
 					<AdminEventDetailSheet {dashboard} detail={dashboard.selectedEventDetail} />
 					<div class="social-home__detail-actions">
-						<button type="button" class="admin-ui-btn" onclick={() => dashboard.selectedEventDetail && goto(`/schedule/admin/events/${dashboard.selectedEventDetail.event.id}`)}>
+						<button type="button" class="admin-ui-btn" onclick={() => dashboard.selectedEventDetail && goto(`/schedule/admin/events/detail/${dashboard.selectedEventDetail.event.id}/`)}>
 							Edit Event
 						</button>
 					</div>

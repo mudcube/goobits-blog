@@ -40,9 +40,9 @@
 	function eventRoute(ev: { id?: number | string | null; activitySlug?: string | null }) {
 		const idNum = Number(ev.id)
 		if (Number.isFinite(idNum) && idNum > 0) {
-			return `/schedule/admin/events/${idNum}`
+			return `/schedule/admin/events/detail/${idNum}/`
 		}
-		if (ev.activitySlug) return `/schedule/admin/events/${ev.activitySlug}/`
+		if (ev.activitySlug) return `/schedule/admin/events/program/${ev.activitySlug}/`
 		return '/schedule/admin/events/'
 	}
 </script>
@@ -61,7 +61,7 @@
 				<button
 					type="button"
 					class="social-events__program-card calendar-ui-card calendar-ui-card--interactive"
-					onclick={() => goto(hrefWithMock(`/schedule/admin/events/${program.slug}/`))}
+					onclick={() => goto(hrefWithMock(`/schedule/admin/events/program/${program.slug}/`))}
 				>
 					<div class="social-events__program-icon">{program.icon || emojiForActivity(program.label, program.slug)}</div>
 					<div class="social-events__program-label">{program.label}</div>

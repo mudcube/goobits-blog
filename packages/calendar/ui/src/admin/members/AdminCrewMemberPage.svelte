@@ -129,7 +129,7 @@
 						<div class="admin-crew-member-page__empty calendar-ui-card">No upcoming sessions.</div>
 					{:else}
 						{#each memberUpcoming as event (event.id)}
-							<ChevronRowCard href={hrefWithMock(`/schedule/admin/events/${event.id}/`)}>
+							<ChevronRowCard href={hrefWithMock(`/schedule/admin/events/detail/${event.id}/`)}>
 								<div class="admin-crew-member-page__event-title">{event.title}</div>
 								<div class="admin-crew-member-page__event-detail">{formatWhen(event.startsAt)}</div>
 							</ChevronRowCard>
@@ -145,7 +145,7 @@
 						<div class="admin-crew-member-page__empty calendar-ui-card">No recent sessions.</div>
 					{:else}
 						{#each memberRecent as event (event.id)}
-							<ChevronRowCard href={hrefWithMock(`/schedule/admin/events/${event.id}/`)}>
+							<ChevronRowCard href={hrefWithMock(`/schedule/admin/events/detail/${event.id}/`)}>
 								<div class="admin-crew-member-page__event-title">{event.title}</div>
 								<div class="admin-crew-member-page__event-detail">{formatWhen(event.startsAt)}</div>
 							</ChevronRowCard>

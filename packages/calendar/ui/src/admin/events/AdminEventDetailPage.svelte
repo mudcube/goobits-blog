@@ -10,7 +10,7 @@
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { mockDashboardEvents, mockDashboardRecentEvents } from '@calendar/ui/admin/mock/admin-mock-data'
-	import { adminEventDetailBreadcrumb } from '$lib/app/schedule/admin/breadcrumbs'
+	import { adminActionHandlers, adminEventDetailBreadcrumb } from '$lib/app/schedule/admin/state'
 
 	const { data } = $props<{ data: { user: unknown | null; eventId: string } }>()
 
@@ -158,7 +158,7 @@
 
 	function openEditor() {
 		if (!detail) return
-		void goto(hrefWithMock(`/schedule/admin/events/${detail.event.activitySlug || 'events'}/`))
+		void goto(hrefWithMock(`/schedule/admin/events/program/${detail.event.activitySlug || 'events'}/`))
 	}
 
 	async function cancelEvent() {
@@ -201,11 +201,19 @@
 	})
 
 	$effect(() => {
-		window.addEventListener('admin-event-detail-edit', handleEditRequest)
-		window.addEventListener('admin-event-detail-cancel', handleCancelRequest)
+		adminActionHandlers.update((handlers) => ({
+			...handlers,
+			onEventDetailEdit: handleEditRequest,
+			onEventDetailCancel: handleCancelRequest
+		}))
+
 		return () => {
-			window.removeEventListener('admin-event-detail-edit', handleEditRequest)
-			window.removeEventListener('admin-event-detail-cancel', handleCancelRequest)
+			adminActionHandlers.update((handlers) => {
+				const next = { ...handlers }
+				delete next.onEventDetailEdit
+				delete next.onEventDetailCancel
+				return next
+			})
 		}
 	})
 
@@ -298,7 +306,7 @@
 				{/if}
 			</section>
 
-			<a class="admin-event-detail__editor-link" href={hrefWithMock(`/schedule/admin/events/${activitySlug || 'events'}/`)}>
+			<a class="admin-event-detail__editor-link" href={hrefWithMock(`/schedule/admin/events/program/${activitySlug || 'events'}/`)}>
 				<ArrowUpRight size={14} strokeWidth={2} />
 				Open {activityLabel || 'Program'} program page
 			</a>
