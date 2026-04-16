@@ -34,7 +34,7 @@
 
 <TurnstileScript siteKey={turnstileSiteKey} />
 
-<Hero title="Create account" subtitle="Create your account and confirm your email to continue." icon="/media/decor/emoji-herb.png" compact={true} />
+<Hero title="Create account" subtitle="Set up your account and confirm your email to get started." icon="/media/decor/emoji-herb.png" compact={true} />
 
 <section class="register-page ui-surface-card">
 	<form method="POST" class="register-page__form" use:enhance novalidate data-testid="register-form">

@@ -56,7 +56,7 @@
 			<div class="apps-page__collection-head">
 				<div>
 					<h2 id="apps-collection-title" class="apps-page__section-title">Collection</h2>
-					<p class="apps-page__section-kicker">Creative software for drawing, music, mindfulness, color, and generative play</p>
+					<p class="apps-page__section-kicker">Creative software for drawing, music, mindfulness, color, and generative art</p>
 				</div>
 			</div>
 

@@ -31,7 +31,7 @@ export const mikoCalendarActivities: CalendarActivityDefinition[] = [
 		label: 'Gym',
 		activityName: 'Rainbow Gym',
 		eyebrow: 'Rainbow Gym',
-		heroTitleLines: ['Hang out. Work out.', 'Whatever.'] as [string, string],
+		heroTitleLines: ['Hang out. Work out.', 'Have fun.'] as [string, string],
 		heroSubtitle: "Grab a time slot and let's do something fun together.",
 		description: 'Book sessions and work out together',
 		icon: '💪',

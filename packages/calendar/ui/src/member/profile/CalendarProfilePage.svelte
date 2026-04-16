@@ -44,8 +44,8 @@
     eyebrowClass="calendar-page__eyebrow calendar-home__eyebrow"
     subtitleClass="calendar-page__subtitle calendar-home__sub"
     eyebrow="Profile"
-    title="Your member profile."
-    subtitle="Keep logistics in one place so sessions coordinate faster."
+    title="Your member profile"
+    subtitle="Keep your details in one place so sessions run smoother."
   />
 
   <section class="calendar-page__section calendar-home__section">

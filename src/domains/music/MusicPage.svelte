@@ -41,7 +41,7 @@
 			chips={musicPlatforms}
 		/>
 
-		<ShowcaseGrid title="Portfolio" kicker="A collection of audio-visual explorations" filterLabel="Filter // All">
+		<ShowcaseGrid title="Portfolio" kicker="Tracks, demos, and sound experiments" filterLabel="Filter // All">
 			{#each portfolioEntries as entry, idx}
 				<ShowcaseCard
 					href={entry.href}

@@ -15,12 +15,12 @@
 	const pageTitle = $derived.by(() => {
 		if (data.pageType === 'category') { return formatLabel(data.category) || 'Category' }
 		if (data.pageType === 'tag') { return `#${formatLabel(data.tag) || 'Tag'}` }
-		return 'Insights, artifacts, and'
+		return 'Insights, process notes, and'
 	})
 	const titleAccent = $derived.by(() => {
 		if (data.pageType === 'category') { return '' }
 		if (data.pageType === 'tag') { return '' }
-		return 'creative breakthroughs'
+		return 'creative artifacts'
 	})
 	const eyebrow = $derived.by(() => {
 		if (data.pageType === 'category') { return 'Category Archive' }
@@ -30,7 +30,7 @@
 	const description = $derived.by(() => {
 		if (data.pageType === 'category' && data.categoryDescription) { return data.categoryDescription }
 		if (data.pageType === 'tag' && data.tag) { return `Entries grouped under the ${data.tag} thread.` }
-		return blogConfig.description || 'A chronological mapping of digital synthesis and sensory explorations.'
+		return blogConfig.description || 'Notes on building software, making music, and exploring ideas along the way.'
 	})
 	const signalLabel = $derived(`Archive No. ${String(posts.length).padStart(3, '0')}`)
 
@@ -65,7 +65,7 @@
 			<div class="miko-blog__toolbar-head">
 				<h2 class="miko-blog__toolbar-title">The Archive</h2>
 				<p class="miko-blog__toolbar-kicker">
-					Showing {posts.length} recorded synthesis {posts.length === 1 ? 'log' : 'logs'}
+					Showing {posts.length} {posts.length === 1 ? 'entry' : 'entries'}
 					{#if currentCategory}— filtered by {formatLabel(currentCategory)}{:else if currentTag}— filtered by #{formatLabel(currentTag)}{/if}
 				</p>
 			</div>

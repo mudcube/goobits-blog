@@ -105,7 +105,7 @@
 
 
 	const firstName = $derived(data.user?.name?.split(' ')[0] || '')
-	const homeTitleLines = $derived(firstName ? [`Hey, ${firstName}.`, "What's the move?"] : ['Hey.', "What's the move?"])
+	const homeTitleLines = $derived(firstName ? [`Hey, ${firstName}.`, "What's on the schedule?"] : ['Hey.', "What's on the schedule?"])
 
 	function withMock(path) {
 		if (!mockMode) return path
@@ -138,7 +138,7 @@
 		subtitleClass="calendar-page__subtitle calendar-home__sub"
 		eyebrow="Members"
 		titleLines={homeTitleLines}
-		subtitle="Pick an activity and let's make something happen."
+		subtitle="Pick an activity and get on the schedule."
 	/>
 
 	<MonthEventCalendar
