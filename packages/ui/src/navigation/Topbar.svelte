@@ -3,6 +3,8 @@
 	import { onMount } from 'svelte'
 	import type { Snippet } from 'svelte'
 	import type { NavItem } from '../types/nav'
+	import TopbarDesktopNav from './topbar/TopbarDesktopNav.svelte'
+	import TopbarMobileMenu from './topbar/TopbarMobileMenu.svelte'
 
 	type TopbarProps = {
 		items: NavItem[]
@@ -29,27 +31,6 @@
 	let headerLogo: HTMLDivElement | null = null
 	let headerUtilities: HTMLDivElement | null = null
 	let navMeasure: HTMLDivElement | null = null
-
-	function normalizePath(path: string) {
-		if (!path || path === '/') return '/'
-		return path.endsWith('/') ? path.slice(0, -1) : path
-	}
-
-	function isActive(item: NavItem) {
-		const path = normalizePath(currentPath)
-		const href = normalizePath(item.href)
-		if (href === '/') return path === '/'
-		if (item.matchPrefix) return path === href || path.startsWith(`${href}/`)
-		return path === href
-	}
-
-	function shouldDisablePrefetch(href: string) {
-		return disablePrefetchPrefixes.some((prefix) => href.startsWith(prefix))
-	}
-
-	function isSeparator(item: NavItem) {
-		return item.href === ''
-	}
 
 	function toggleMobileMenu() {
 		mobileMenuOpen = !mobileMenuOpen
@@ -120,23 +101,7 @@
 				{/if}
 			</a>
 		</div>
-		<nav class="layout-header__nav">
-			{#each items as item}
-				{#if isSeparator(item)}
-					<span class="layout-header__nav-separator" aria-hidden="true">{item.label}</span>
-				{:else}
-					<a
-						href={item.href}
-						class="layout-header__nav-link"
-						class:layout-header__nav-link--active={isActive(item)}
-						data-sveltekit-preload-data={shouldDisablePrefetch(item.href) ? 'off' : undefined}
-						data-sveltekit-preload-code={shouldDisablePrefetch(item.href) ? 'off' : undefined}
-					>
-						{item.label}
-					</a>
-				{/if}
-			{/each}
-		</nav>
+		<TopbarDesktopNav {items} {currentPath} {disablePrefetchPrefixes} />
 		<div class="layout-header__utilities" aria-label="Quick actions" bind:this={headerUtilities}>
 			{@render utility?.()}
 		</div>
@@ -158,36 +123,11 @@
 	</div>
 
 	<div class="layout-header__nav-measure" bind:this={navMeasure} aria-hidden="true">
-		{#each items as item}
-			{#if isSeparator(item)}
-				<span class="layout-header__nav-separator">{item.label}</span>
-			{:else}
-				<span class="layout-header__nav-link">{item.label}</span>
-			{/if}
-		{/each}
+		<TopbarDesktopNav {items} {currentPath} measureOnly />
 	</div>
 
 	{#if mobileMenuOpen}
-		<div id="site-mobile-menu" class="layout-header__mobile-menu">
-			<nav class="layout-header__mobile-nav" aria-label="Mobile navigation">
-				{#each items as item}
-					{#if isSeparator(item)}
-						<div class="layout-header__mobile-separator" aria-hidden="true">{item.label}</div>
-					{:else}
-						<a
-							href={item.href}
-							class="layout-header__mobile-link"
-							class:layout-header__mobile-link--active={isActive(item)}
-							data-sveltekit-preload-data={shouldDisablePrefetch(item.href) ? 'off' : undefined}
-							data-sveltekit-preload-code={shouldDisablePrefetch(item.href) ? 'off' : undefined}
-							onclick={closeMobileMenu}
-						>
-							{item.label}
-						</a>
-					{/if}
-				{/each}
-			</nav>
-		</div>
+		<TopbarMobileMenu {items} {currentPath} {disablePrefetchPrefixes} onNavigate={closeMobileMenu} />
 	{/if}
 </header>
 
@@ -202,7 +142,7 @@
 		color: var(--color-white);
 	}
 
-	.layout-header__nav-separator {
+	:global(.layout-header__nav-separator) {
 		display: inline-flex;
 		align-items: center;
 		padding: 0 0.2rem;
@@ -255,12 +195,12 @@
 		transform: translateY(-1px);
 	}
 
-	.layout-header__mobile-menu {
+	:global(.layout-header__mobile-menu) {
 		grid-column: 1 / -1;
 		padding-top: 0.85rem;
 	}
 
-	.layout-header__mobile-nav {
+	:global(.layout-header__mobile-nav) {
 		display: grid;
 		gap: 0.5rem;
 		padding: 0.85rem;
@@ -271,7 +211,7 @@
 		box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
 	}
 
-	.layout-header__mobile-separator {
+	:global(.layout-header__mobile-separator) {
 		padding: 0.35rem 0.4rem 0.1rem;
 		color: color-mix(in srgb, var(--color-white) 52%, transparent);
 		font-size: 0.7rem;
@@ -280,7 +220,7 @@
 		text-transform: uppercase;
 	}
 
-	.layout-header__mobile-link {
+	:global(.layout-header__mobile-link) {
 		display: flex;
 		align-items: center;
 		min-height: 2.8rem;
@@ -295,14 +235,14 @@
 		background: color-mix(in srgb, var(--color-white) 3%, transparent);
 	}
 
-	.layout-header__mobile-link:hover,
-	.layout-header__mobile-link--active {
+	:global(.layout-header__mobile-link:hover),
+	:global(.layout-header__mobile-link--active) {
 		border-color: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 36%, transparent);
 		color: var(--header-nav-accent, var(--color-white));
 		background: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 10%, transparent);
 	}
 
-	.layout-header--compact .layout-header__nav {
+	:global(.layout-header--compact .layout-header__nav) {
 		display: none;
 	}
 
