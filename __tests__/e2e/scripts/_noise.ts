@@ -12,6 +12,7 @@ export function shouldIgnoreTurnstileNoise(url: string, detail: string) {
 	if (!url.includes('/contact') && !url.includes('/register')) return false
 	return (
 		detail.includes('[Cloudflare Turnstile] Error: 110200') ||
-		detail.includes('Failed to load resource: the server responded with a status of 400')
+		detail.includes('Failed to load resource: the server responded with a status of 400') ||
+		detail.includes('challenges.cloudflare.com') && detail.includes('was preloaded using link preload but not used')
 	)
 }

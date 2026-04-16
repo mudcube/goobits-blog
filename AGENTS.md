@@ -9,7 +9,7 @@ pnpm dev          # Start dev server (port 3610)
 pnpm dev:stop     # Stop dev server
 pnpm dev:restart  # Restart dev server
 pnpm build        # Production build
-pnpm build:patch  # Patch bump + build
+pnpm release:patch:build  # Patch bump + build
 pnpm check        # Types + svelte-check + lint + circular deps
 pnpm test         # Full e2e suite
 pnpm dev:wrangler # Dev with Cloudflare D1 runtime

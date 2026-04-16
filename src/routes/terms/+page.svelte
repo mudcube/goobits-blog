@@ -25,7 +25,7 @@
 	titleAccent="Use"
 	accentColor="#f9a8d4"
 	icon="/media/page-icons/terms-justice.png"
-	subtitle="A quick guide to using this site smoothly."
+	subtitle="What to expect when you use this site."
 	updatedAt="February 11, 2026"
 	className="legal--terms"
 	showNotice={true}

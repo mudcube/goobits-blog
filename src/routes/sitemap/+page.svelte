@@ -85,7 +85,7 @@
 			titleAccent="everything here"
 			icon="/media/page-icons/sitemap-compass.png"
 			iconAlt="Compass icon"
-			intro="A human-readable map of public pages, journal entries, and, when enabled locally, internal routes that shape the site."
+			intro="A human-readable map of public pages, journal entries, and the routes that shape this site."
 			signalLabel={`${data.stats.total} routes indexed`}
 		/>
 

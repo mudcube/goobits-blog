@@ -36,7 +36,7 @@
 			titleAccentNewLine
 			icon="/media/page-icons/music-notes-flow.png"
 			iconAlt="Music notes icon"
-			intro="Exploring the thin membrane between build sessions and sonic textures. Tracks, demos, and music-related experiments from Miko."
+			intro="Songs and sound experiments born from late-night build sessions. Tracks, demos, and process notes from Miko."
 			signalLabel="Sonic Explorer No. 042"
 			chips={musicPlatforms}
 		/>

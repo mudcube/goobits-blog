@@ -23,8 +23,8 @@
 		{ value: 'preview', label: 'Preview' }
 	]
 	const targets = [
-		{ value: 'staging', label: 'Staging' },
-		{ value: 'dev', label: 'Dev' }
+		{ value: 'dev', label: 'Dev' },
+		{ value: 'production', label: 'Production' }
 	]
 	const visibilityOptions = [
 		{ value: 'public', label: 'Public' },

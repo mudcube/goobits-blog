@@ -65,7 +65,7 @@ Run:
 ```bash
 pnpm ci:gate
 pnpm audit:css-vars
-pnpm e2e:sitemap
+pnpm build:verify
 ```
 
 For a broader manual confidence pass, run:

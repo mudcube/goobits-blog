@@ -42,7 +42,7 @@
 					</span>
 				</h1>
 				<p class="apps-page__intro">
-					Apps crafted for making, learning, and play. Browser-native tools for drawing, music, color, mindfulness, and generative exploration.
+					Apps crafted for making, learning, and play. Browser-native tools for drawing, music, color, mindfulness, and generative art.
 				</p>
 			</div>
 

@@ -31,7 +31,7 @@
 			titleAccentNewLine
 			icon="/media/page-icons/art-rainbow-imagination.png"
 			iconAlt="Art rainbow icon"
-			intro="A working gallery of t-shirt concepts, Portland Ketchup experiments, packaging directions, and other product-ready visuals."
+			intro="A working gallery of t-shirt concepts, Portland Ketchup experiments, packaging designs, and other product-ready visuals."
 			signalLabel="Studio Board No. 019"
 			chips={artWorkTypes}
 		/>

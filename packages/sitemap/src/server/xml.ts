@@ -13,6 +13,20 @@ function isLocalOrigin(origin: string) {
 	}
 }
 
+function normalizeConfiguredBaseUrl(value: string | undefined) {
+	if (typeof value !== 'string') return undefined
+	const trimmed = value.trim()
+	if (!trimmed) return undefined
+	if (trimmed === 'null' || trimmed === 'undefined') return undefined
+	return trimmed
+}
+
+function normalizeOrigin(value: string) {
+	const trimmed = trimTrailingSlash(value)
+	if (!trimmed || trimmed === 'null' || trimmed === 'undefined') return undefined
+	return trimmed
+}
+
 export function resolveSiteOrigin({
 	baseUrl,
 	requestUrl,
@@ -24,14 +38,16 @@ export function resolveSiteOrigin({
 }) {
 	if (baseUrl) {
 		try {
-			return trimTrailingSlash(new URL(baseUrl).origin)
+			const resolved = normalizeOrigin(new URL(baseUrl).origin)
+			if (resolved) return resolved
 		} catch {
 			// Ignore invalid BASE_URL and continue to fallback resolution.
 		}
 	}
 
 	if (requestUrl && !isLocalOrigin(requestUrl.origin)) {
-		return trimTrailingSlash(requestUrl.origin)
+		const resolved = normalizeOrigin(requestUrl.origin)
+		if (resolved) return resolved
 	}
 
 	return trimTrailingSlash(fallbackOrigin)
@@ -46,11 +62,11 @@ export function getPlatformEnv(platform: unknown): Record<string, string | undef
 }
 
 export function getBaseUrl(platformEnv: Record<string, string | undefined> | undefined) {
-	const processBaseUrl = process.env['PUBLIC_BASE_URL'] || process.env['BASE_URL']
+	const processBaseUrl = normalizeConfiguredBaseUrl(process.env['PUBLIC_BASE_URL']) || normalizeConfiguredBaseUrl(process.env['BASE_URL'])
 	if (processBaseUrl) return processBaseUrl
 
 	try {
-		return platformEnv?.['PUBLIC_BASE_URL'] || platformEnv?.['BASE_URL']
+		return normalizeConfiguredBaseUrl(platformEnv?.['PUBLIC_BASE_URL']) || normalizeConfiguredBaseUrl(platformEnv?.['BASE_URL'])
 	} catch {
 		return undefined
 	}
