@@ -151,103 +151,60 @@ export const scheduleMockPrograms: MockProgram[] = [
 	}
 ]
 
-export const scheduleMockUpcoming: MockCalendarEvent[] = [
-	{
-		id: 9001,
-		title: 'Morning Flow',
-		activityLabel: 'Yoga',
-		activitySlug: 'gym',
-		startsAt: isoFromWeekdayAt(1, 12, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(1, 12, 0), 90),
-		seatsTaken: 5,
-		capacity: 8,
-		seatsLeft: 3,
-		waitlistCount: 0,
-		userStatus: null,
-		userGuestCount: 0,
-		location: null,
-		note: null,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@rainbowgym',
-		paymentNoteTemplate: 'Rainbow Gym {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [participants[0]!, participants[1]!, participants[2]!]
-	},
-	{
-		id: 9004,
-		title: 'Aerial Fundamentals',
-		activityLabel: 'Circus',
-		activitySlug: 'circus',
-		startsAt: isoFromWeekdayAt(1, 13, 30),
-		endsAt: addMinutes(isoFromWeekdayAt(1, 13, 30), 120),
-		seatsTaken: 4,
-		capacity: 5,
-		seatsLeft: 1,
-		waitlistCount: 0,
-		userStatus: null,
-		userGuestCount: 0,
-		location: null,
-		note: null,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@rainbowgym',
-		paymentNoteTemplate: 'Rainbow Circus {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [participants[0]!, participants[1]!, participants[2]!]
-	},
-	{
-		id: 9007,
-		title: 'Trail Hike',
-		activityLabel: 'Adventure',
-		activitySlug: 'adventure',
-		startsAt: isoFromWeekdayAt(6, 9, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(6, 9, 0), 180),
-		seatsTaken: 3,
-		capacity: 6,
-		seatsLeft: 3,
-		waitlistCount: 0,
-		userStatus: null,
-		userGuestCount: 0,
-		location: null,
-		note: null,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@rainbowadventure',
-		paymentNoteTemplate: 'Rainbow Adventure {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [participants[0]!, participants[3]!]
-	},
-	{
-		id: 9009,
-		title: 'Studio Ghibli Night',
-		activityLabel: 'Movies',
-		activitySlug: 'movie-night',
-		startsAt: isoFromWeekdayAt(6, 19, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(6, 19, 0), 120),
-		seatsTaken: 4,
-		capacity: 8,
-		seatsLeft: 4,
-		waitlistCount: 0,
-		userStatus: null,
-		userGuestCount: 0,
-		location: null,
-		note: null,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@rainbowmovies',
-		paymentNoteTemplate: 'Rainbow Movies {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [...participants]
+const jen = participants[0]!
+const marco = participants[1]!
+const ava = participants[2]!
+const tyler = participants[3]!
+
+function mockEvent(id: number, slug: string, label: string, title: string, weekday: number, hour: number, minute: number, durationMin: number, weeksAhead: number, people: typeof participants[number][], taken: number, cap: number, handle = '@rainbowgym', template = ''): MockCalendarEvent {
+	const starts = isoFromWeekdayAt(weekday, hour, minute, weeksAhead)
+	return {
+		id, activitySlug: slug, activityLabel: label, title,
+		startsAt: starts, endsAt: addMinutes(starts, durationMin),
+		seatsTaken: taken, capacity: cap, seatsLeft: cap - taken, waitlistCount: 0,
+		userStatus: null, userGuestCount: 0, location: null, note: null,
+		costCents: 0, currency: 'USD', paymentProvider: 'venmo',
+		paymentHandle: handle, paymentNoteTemplate: template || `${label} {{title}}`,
+		recapText: null, heroImageUrl: null, participants: people.map(p => ({ ...p }))
 	}
+}
+
+export const scheduleMockUpcoming: MockCalendarEvent[] = [
+	// ── Gym: Mon/Wed/Fri, 3 weeks ──
+	mockEvent(9001, 'gym', 'Gym', 'Morning Flow',     1, 12, 0,  90, 0, [jen, marco, ava],    5, 8),
+	mockEvent(9002, 'gym', 'Gym', 'Open Gym',         3, 15, 0, 120, 0, [...participants],     6, 10),
+	mockEvent(9003, 'gym', 'Gym', 'Leg Day Crew',     5, 17, 0,  90, 0, [jen, marco, ava],     4, 8),
+	mockEvent(9011, 'gym', 'Gym', 'Morning Flow',     1, 12, 0,  90, 1, [jen, ava],            3, 8),
+	mockEvent(9012, 'gym', 'Gym', 'Open Gym',         3, 15, 0, 120, 1, [marco, tyler],        2, 10),
+	mockEvent(9013, 'gym', 'Gym', 'Upper Body',       5, 17, 0,  90, 1, [jen, tyler],          2, 8),
+	mockEvent(9014, 'gym', 'Gym', 'Saturday Stretch', 6, 10, 0,  60, 1, [ava],                 1, 6),
+	mockEvent(9015, 'gym', 'Gym', 'Morning Flow',     1, 12, 0,  90, 2, [marco],               1, 8),
+	mockEvent(9016, 'gym', 'Gym', 'Open Gym',         3, 15, 0, 120, 2, [jen, marco, ava],     3, 10),
+	mockEvent(9017, 'gym', 'Gym', 'Leg Day Crew',     5, 17, 0,  90, 2, [],                    0, 8),
+
+	// ── Circus: Tue/Thu, 3 weeks ──
+	mockEvent(9004, 'circus', 'Circus', 'Aerial Fundamentals', 2, 13, 30, 120, 0, [jen, marco, ava],   4, 5),
+	mockEvent(9005, 'circus', 'Circus', 'Silks Conditioning',  4, 16,  0,  90, 0, [jen, tyler],        3, 6),
+	mockEvent(9018, 'circus', 'Circus', 'Aerial Fundamentals', 2, 13, 30, 120, 1, [marco, ava],        2, 5),
+	mockEvent(9019, 'circus', 'Circus', 'Trapeze Basics',      4, 16,  0,  90, 1, [jen, marco, tyler], 3, 8),
+	mockEvent(9020, 'circus', 'Circus', 'Open Aerial',         6, 11,  0, 120, 1, [ava, tyler],        2, 6),
+	mockEvent(9021, 'circus', 'Circus', 'Aerial Fundamentals', 2, 13, 30, 120, 2, [jen],               1, 5),
+	mockEvent(9022, 'circus', 'Circus', 'Silks Conditioning',  4, 16,  0,  90, 2, [],                  0, 6),
+
+	// ── Adventure: weekends, 3 weeks ──
+	mockEvent(9007, 'adventure', 'Adventure', 'Trail Hike',            6,  9, 0, 180, 0, [jen, tyler],      3, 6, '@rainbowadventure'),
+	mockEvent(9008, 'adventure', 'Adventure', 'Forest Ridge Day Trip', 0, 13, 0, 240, 0, [jen, marco, ava], 4, 8, '@rainbowadventure'),
+	mockEvent(9023, 'adventure', 'Adventure', 'River Walk',            6, 10, 0, 150, 1, [marco, ava],      2, 8, '@rainbowadventure'),
+	mockEvent(9024, 'adventure', 'Adventure', 'Sunset Point Hike',     0,  8, 0, 240, 1, [jen, tyler],      2, 6, '@rainbowadventure'),
+	mockEvent(9025, 'adventure', 'Adventure', 'Waterfall Loop',        6,  9, 0, 210, 2, [],                0, 8, '@rainbowadventure'),
+
+	// ── Movies: Fri/Sat evenings, 3 weeks ──
+	mockEvent(9009, 'movie-night', 'Movies', 'Studio Ghibli Night',   6, 19, 0, 120, 0, [...participants],    4, 8, '@rainbowmovies'),
+	mockEvent(9010, 'movie-night', 'Movies', 'Movie Matinee',         0, 14, 0, 120, 0, [...participants],    6, 10, '@rainbowmovies'),
+	mockEvent(9026, 'movie-night', 'Movies', 'Sci-Fi Double Feature', 5, 19, 0, 180, 1, [jen, marco, tyler], 3, 8, '@rainbowmovies'),
+	mockEvent(9027, 'movie-night', 'Movies', 'Documentary Night',     6, 20, 0, 120, 1, [ava, marco],        2, 8, '@rainbowmovies'),
+	mockEvent(9028, 'movie-night', 'Movies', 'Anime Marathon',        6, 18, 0, 240, 2, [jen],               1, 10, '@rainbowmovies'),
+	mockEvent(9029, 'movie-night', 'Movies', 'Classic Cinema',        0, 15, 0, 120, 2, [],                  0, 8, '@rainbowmovies'),
 ]
 
 export const scheduleMockRecent: MockCalendarEvent[] = [

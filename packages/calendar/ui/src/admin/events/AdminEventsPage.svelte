@@ -92,7 +92,7 @@
 		<div class="social-events__past-list">
 			{#if recentEventsSource.length === 0}
 				<div class="social-events__past-row social-events__past-row--empty calendar-ui-card">
-					<div class="social-events__meta">Past adventures will show up here soon.</div>
+					<div class="social-events__meta">No past events yet.</div>
 				</div>
 			{:else}
 				{#each recentEventsSource.slice(0, 8) as recent}

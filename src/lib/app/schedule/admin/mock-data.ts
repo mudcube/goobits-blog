@@ -41,211 +41,102 @@ const marco = mockParticipants[1]!
 const ava = mockParticipants[2]!
 const tyler = mockParticipants[3]!
 
+function gymEvent(id: number, title: string, weekday: number, hour: number, minute: number, durationMin: number, weeksAhead: number, participants: MockParticipant[], taken: number, cap: number) {
+	const starts = isoFromWeekdayAt(weekday, hour, minute, weeksAhead)
+	return {
+		id, title, activityLabel: 'Gym', activitySlug: 'gym',
+		startsAt: starts, endsAt: addMinutes(starts, durationMin),
+		seatsTaken: taken, capacity: cap, seatsLeft: cap - taken, waitlistCount: 0,
+		costCents: 0, currency: 'USD', paymentProvider: 'venmo',
+		paymentHandle: '@community-gym', paymentNoteTemplate: 'Gym Sessions {{title}}',
+		recapText: null, heroImageUrl: null, participants
+	} satisfies AdminEventsResponse['upcoming'][number]
+}
+
+function circusEvent(id: number, title: string, weekday: number, hour: number, minute: number, durationMin: number, weeksAhead: number, participants: MockParticipant[], taken: number, cap: number) {
+	const starts = isoFromWeekdayAt(weekday, hour, minute, weeksAhead)
+	return {
+		id, title, activityLabel: 'Circus', activitySlug: 'circus',
+		startsAt: starts, endsAt: addMinutes(starts, durationMin),
+		seatsTaken: taken, capacity: cap, seatsLeft: cap - taken, waitlistCount: 0,
+		costCents: 0, currency: 'USD', paymentProvider: 'venmo',
+		paymentHandle: '@community-gym', paymentNoteTemplate: 'Circus Sessions {{title}}',
+		recapText: null, heroImageUrl: null, participants
+	} satisfies AdminEventsResponse['upcoming'][number]
+}
+
+function adventureEvent(id: number, title: string, weekday: number, hour: number, minute: number, durationMin: number, weeksAhead: number, participants: MockParticipant[], taken: number, cap: number) {
+	const starts = isoFromWeekdayAt(weekday, hour, minute, weeksAhead)
+	return {
+		id, title, activityLabel: 'Adventure', activitySlug: 'adventure',
+		startsAt: starts, endsAt: addMinutes(starts, durationMin),
+		seatsTaken: taken, capacity: cap, seatsLeft: cap - taken, waitlistCount: 0,
+		costCents: 0, currency: 'USD', paymentProvider: 'venmo',
+		paymentHandle: '@community-adventure', paymentNoteTemplate: 'Adventure Club {{title}}',
+		recapText: null, heroImageUrl: null, participants
+	} satisfies AdminEventsResponse['upcoming'][number]
+}
+
+function movieEvent(id: number, title: string, weekday: number, hour: number, minute: number, durationMin: number, weeksAhead: number, participants: MockParticipant[], taken: number, cap: number) {
+	const starts = isoFromWeekdayAt(weekday, hour, minute, weeksAhead)
+	return {
+		id, title, activityLabel: 'Movies', activitySlug: 'movie-night',
+		startsAt: starts, endsAt: addMinutes(starts, durationMin),
+		seatsTaken: taken, capacity: cap, seatsLeft: cap - taken, waitlistCount: 0,
+		costCents: 0, currency: 'USD', paymentProvider: 'venmo',
+		paymentHandle: '@community-movies', paymentNoteTemplate: 'Movie Nights {{title}}',
+		recapText: null, heroImageUrl: null, participants
+	} satisfies AdminEventsResponse['upcoming'][number]
+}
+
 export const mockDashboardEvents: AdminEventsResponse['upcoming'] = [
-	// Gym: Monday/Wednesday/Friday between 12 PM and 6 PM
-	{
-		id: 9001,
-		title: 'Morning Flow',
-		activityLabel: 'Yoga',
-		activitySlug: 'gym',
-		startsAt: isoFromWeekdayAt(1, 12, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(1, 12, 0), 90),
-		seatsTaken: 5,
-		capacity: 8,
-		seatsLeft: 3,
-		waitlistCount: 0,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@community-gym',
-		paymentNoteTemplate: 'Gym Sessions {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [jen, marco, ava]
-	},
-	{
-		id: 9002,
-		title: 'Open Gym',
-		activityLabel: 'Gym',
-		activitySlug: 'gym',
-		startsAt: isoFromWeekdayAt(3, 15, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(3, 15, 0), 120),
-		seatsTaken: 6,
-		capacity: 10,
-		seatsLeft: 4,
-		waitlistCount: 0,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@community-gym',
-		paymentNoteTemplate: 'Gym Sessions {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: mockParticipants
-	},
-	{
-		id: 9003,
-		title: 'Leg Day Crew',
-		activityLabel: 'Gym',
-		activitySlug: 'gym',
-		startsAt: isoFromWeekdayAt(5, 17, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(5, 17, 0), 90),
-		seatsTaken: 4,
-		capacity: 8,
-		seatsLeft: 4,
-		waitlistCount: 0,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@community-gym',
-		paymentNoteTemplate: 'Gym Sessions {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [jen, marco, ava]
-	},
-	// Circus: Monday/Wednesday/Friday between 12 PM and 6 PM
-	{
-		id: 9004,
-		title: 'Aerial Fundamentals',
-		activityLabel: 'Circus',
-		activitySlug: 'circus',
-		startsAt: isoFromWeekdayAt(1, 13, 30),
-		endsAt: addMinutes(isoFromWeekdayAt(1, 13, 30), 120),
-		seatsTaken: 4,
-		capacity: 5,
-		seatsLeft: 1,
-		waitlistCount: 0,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@community-gym',
-		paymentNoteTemplate: 'Circus Sessions {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [jen, marco, ava]
-	},
-	{
-		id: 9005,
-		title: 'Silks Conditioning',
-		activityLabel: 'Circus',
-		activitySlug: 'circus',
-		startsAt: isoFromWeekdayAt(3, 16, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(3, 16, 0), 90),
-		seatsTaken: 3,
-		capacity: 6,
-		seatsLeft: 3,
-		waitlistCount: 0,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@community-gym',
-		paymentNoteTemplate: 'Circus Sessions {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [jen, tyler]
-	},
-	{
-		id: 9006,
-		title: 'Trapeze Basics',
-		activityLabel: 'Circus',
-		activitySlug: 'circus',
-		startsAt: isoFromWeekdayAt(5, 12, 30),
-		endsAt: addMinutes(isoFromWeekdayAt(5, 12, 30), 90),
-		seatsTaken: 5,
-		capacity: 8,
-		seatsLeft: 3,
-		waitlistCount: 0,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@community-gym',
-		paymentNoteTemplate: 'Circus Sessions {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [marco, ava, tyler]
-	},
-	// Adventure: weekends, all day blocks
-	{
-		id: 9007,
-		title: 'Trail Hike',
-		activityLabel: 'Adventure',
-		activitySlug: 'adventure',
-		startsAt: isoFromWeekdayAt(6, 9, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(6, 9, 0), 180),
-		seatsTaken: 3,
-		capacity: 6,
-		seatsLeft: 3,
-		waitlistCount: 0,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@community-adventure',
-		paymentNoteTemplate: 'Adventure Club {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [jen, tyler]
-	},
-	{
-		id: 9008,
-		title: 'Forest Ridge Day Trip',
-		activityLabel: 'Adventure',
-		activitySlug: 'adventure',
-		startsAt: isoFromWeekdayAt(0, 13, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(0, 13, 0), 240),
-		seatsTaken: 4,
-		capacity: 8,
-		seatsLeft: 4,
-		waitlistCount: 0,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@community-adventure',
-		paymentNoteTemplate: 'Adventure Club {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: [jen, marco, ava]
-	},
-	// Movies: weekends only
-	{
-		id: 9009,
-		title: 'Studio Ghibli Night',
-		activityLabel: 'Movies',
-		activitySlug: 'movie-night',
-		startsAt: isoFromWeekdayAt(6, 19, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(6, 19, 0), 120),
-		seatsTaken: 4,
-		capacity: 8,
-		seatsLeft: 4,
-		waitlistCount: 0,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@community-movies',
-		paymentNoteTemplate: 'Movie Nights {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: mockParticipants
-	},
-	{
-		id: 9010,
-		title: 'Movie Matinee',
-		activityLabel: 'Movies',
-		activitySlug: 'movie-night',
-		startsAt: isoFromWeekdayAt(0, 14, 0),
-		endsAt: addMinutes(isoFromWeekdayAt(0, 14, 0), 120),
-		seatsTaken: 6,
-		capacity: 10,
-		seatsLeft: 4,
-		waitlistCount: 0,
-		costCents: 0,
-		currency: 'USD',
-		paymentProvider: 'venmo',
-		paymentHandle: '@community-movies',
-		paymentNoteTemplate: 'Movie Nights {{title}}',
-		recapText: null,
-		heroImageUrl: null,
-		participants: mockParticipants
-	}
+	// ── Gym: Mon/Wed/Fri, repeating 3 weeks ──
+	// Week 0
+	gymEvent(9001, 'Morning Flow',    1, 12, 0,  90, 0, [jen, marco, ava],           5, 8),
+	gymEvent(9002, 'Open Gym',        3, 15, 0, 120, 0, mockParticipants,             6, 10),
+	gymEvent(9003, 'Leg Day Crew',    5, 17, 0,  90, 0, [jen, marco, ava],            4, 8),
+	// Week 1
+	gymEvent(9011, 'Morning Flow',    1, 12, 0,  90, 1, [jen, ava],                   3, 8),
+	gymEvent(9012, 'Open Gym',        3, 15, 0, 120, 1, [marco, tyler],               2, 10),
+	gymEvent(9013, 'Upper Body',      5, 17, 0,  90, 1, [jen, tyler],                 2, 8),
+	gymEvent(9014, 'Saturday Stretch', 6, 10, 0, 60, 1, [ava],                        1, 6),
+	// Week 2
+	gymEvent(9015, 'Morning Flow',    1, 12, 0,  90, 2, [marco],                      1, 8),
+	gymEvent(9016, 'Open Gym',        3, 15, 0, 120, 2, [jen, marco, ava],            3, 10),
+	gymEvent(9017, 'Leg Day Crew',    5, 17, 0,  90, 2, [],                           0, 8),
+
+	// ── Circus: Tue/Thu, repeating 3 weeks ──
+	// Week 0
+	circusEvent(9004, 'Aerial Fundamentals', 2, 13, 30, 120, 0, [jen, marco, ava],    4, 5),
+	circusEvent(9005, 'Silks Conditioning',  4, 16,  0,  90, 0, [jen, tyler],         3, 6),
+	// Week 1
+	circusEvent(9018, 'Aerial Fundamentals', 2, 13, 30, 120, 1, [marco, ava],         2, 5),
+	circusEvent(9019, 'Trapeze Basics',      4, 16,  0,  90, 1, [jen, marco, tyler],  3, 8),
+	circusEvent(9020, 'Open Aerial',         6, 11,  0, 120, 1, [ava, tyler],         2, 6),
+	// Week 2
+	circusEvent(9021, 'Aerial Fundamentals', 2, 13, 30, 120, 2, [jen],                1, 5),
+	circusEvent(9022, 'Silks Conditioning',  4, 16,  0,  90, 2, [],                   0, 6),
+
+	// ── Adventure: weekends, various weeks ──
+	// Week 0
+	adventureEvent(9007, 'Trail Hike',            6,  9, 0, 180, 0, [jen, tyler],         3, 6),
+	adventureEvent(9008, 'Forest Ridge Day Trip', 0, 13, 0, 240, 0, [jen, marco, ava],    4, 8),
+	// Week 1
+	adventureEvent(9023, 'River Walk',            6, 10, 0, 150, 1, [marco, ava],          2, 8),
+	adventureEvent(9024, 'Sunset Point Hike',     0,  8, 0, 240, 1, [jen, tyler],          2, 6),
+	// Week 2
+	adventureEvent(9025, 'Waterfall Loop',        6,  9, 0, 210, 2, [],                    0, 8),
+
+	// ── Movies: Fri/Sat evenings, various weeks ──
+	// Week 0
+	movieEvent(9009, 'Studio Ghibli Night',   6, 19, 0, 120, 0, mockParticipants,    4, 8),
+	movieEvent(9010, 'Movie Matinee',         0, 14, 0, 120, 0, mockParticipants,    6, 10),
+	// Week 1
+	movieEvent(9026, 'Sci-Fi Double Feature', 5, 19, 0, 180, 1, [jen, marco, tyler], 3, 8),
+	movieEvent(9027, 'Documentary Night',     6, 20, 0, 120, 1, [ava, marco],        2, 8),
+	// Week 2
+	movieEvent(9028, 'Anime Marathon',        6, 18, 0, 240, 2, [jen],               1, 10),
+	movieEvent(9029, 'Classic Cinema',        0, 15, 0, 120, 2, [],                  0, 8),
 ]
 
 export const mockDashboardRecentEvents: AdminEventsResponse['recent'] = [

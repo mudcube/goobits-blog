@@ -43,15 +43,15 @@
 		},
 		{
 			title: 'Illustration & Painting',
-			description: 'Non-destructive editing tools and workflows for artists and designers.'
+			description: 'Flexible editing tools and workflows for artists and designers.'
 		},
 		{
 			title: 'Promotional Contests',
-			description: 'Tailored contest platforms for sports teams and businesses.'
+			description: 'Contest platforms for sports teams and brands.'
 		},
 		{
 			title: 'Realtime Collaboration',
-			description: 'Applications enabling seamless teamwork and shared creation.'
+			description: 'Tools for real-time collaboration and shared creative work.'
 		},
 		{
 			title: 'Product Customization',

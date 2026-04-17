@@ -15,7 +15,7 @@ type AppMeta = {
 }
 
 export const appsDescription =
-	'Playful tools, creative apps, and interactive software by Miko Meow for drawing, music, mindfulness, color, and generative exploration.'
+	'Playful tools, creative apps, and interactive software by Miko Meow for drawing, music, mindfulness, color, and generative art.'
 
 export const appsCollection = appProjects
 

@@ -34,7 +34,7 @@
 	let selectedTags = $state([])
 	let sortBy = $state('path')
 	let collapsedCategories = $state({ 'Journal Posts': true })
-	const description = 'A human-readable sitemap for MIKO.ART with public pages, journal entries, and optional internal routes.'
+	const description = 'A human-readable sitemap for MIKO.ART with public pages, journal entries, and site routes.'
 	const sortOptions = [
 		{ value: 'path', label: 'Path' },
 		{ value: 'name', label: 'Name' },

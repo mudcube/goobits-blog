@@ -22,7 +22,7 @@ export const appProjects: ProjectEntry[] = [
 	{
 		id: 'be-here-meow',
 		description:
-			'Where mindfulness meets creativity in a purr-fectly designed app for journaling and personal growth\u00A0😸',
+			'A mindfulness and journaling app designed for creative personal growth\u00A0😸',
 		title: 'Be Here Meow',
 		url: 'https://beheremeow.app/'
 	},
@@ -43,7 +43,7 @@ export const appProjects: ProjectEntry[] = [
 	{
 		id: 'zendala',
 		description:
-			'Generate hypnotic patterns & ambient tones with this colorful audio-visual interactive experience\u00A0🌈',
+			'Generate colorful patterns and ambient tones with this interactive audio-visual tool\u00A0🌈',
 		title: 'Zendala',
 		url: 'https://zendala.app/'
 	}

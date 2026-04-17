@@ -4,7 +4,7 @@
 	import { artWorks, artWorkTypes } from './content'
 
 	const description =
-		'Selected visual experiments, product concepts, merch ideas, packaging directions, and interactive art by Miko Meow.'
+		'Selected visual experiments, product concepts, merch ideas, packaging designs, and interactive art by Miko Meow.'
 </script>
 
 <Seo

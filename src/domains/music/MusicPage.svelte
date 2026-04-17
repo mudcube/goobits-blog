@@ -7,7 +7,7 @@
 	let { data }: { data: MusicPageData } = $props()
 
 	const description =
-		'Songs, demos, generative audio experiments, and music-related process notes from Miko Meow.'
+		'Songs, demos, and sound experiments from Miko Meow. Tracks, process notes, and generative audio.'
 
 	const portfolioEntries = $derived(getMusicPortfolioEntries(data.musicPosts))
 </script>
