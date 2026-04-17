@@ -74,6 +74,10 @@
 	let dragOffset = 0
 	let trackEl = $state<HTMLDivElement | null>(null)
 	let animKey = $state(0)
+	let direction = $state<'forward' | 'back'>('forward')
+
+	const STEPS: Step[] = ['calendar', 'day', 'confirm', 'done']
+	const stepIndex = $derived(STEPS.indexOf(step))
 
 	const activity = $derived(ACTIVITIES.find(a => a.slug === activeSlug)!)
 	const openDays = $derived(buildOpenDays(activity))
@@ -249,6 +253,8 @@
 	}
 
 	function transition(next: Step) {
+		const nextIdx = STEPS.indexOf(next)
+		direction = nextIdx >= stepIndex ? 'forward' : 'back'
 		animKey++
 		step = next
 	}
@@ -292,8 +298,31 @@
 		</div>
 
 		<div class="sbk__frame">
+			<!-- Breadcrumbs -->
+			<nav class="sbk__crumbs" aria-label="Booking steps">
+				<button type="button" class="sbk__crumb" class:sbk__crumb--active={step === 'calendar'} class:sbk__crumb--done={stepIndex > 0} disabled={step === 'calendar'} onclick={() => transition('calendar')}>
+					Calendar
+				</button>
+				{#if stepIndex >= 1}
+					<span class="sbk__crumb-sep">›</span>
+					<button type="button" class="sbk__crumb" class:sbk__crumb--active={step === 'day'} class:sbk__crumb--done={stepIndex > 1} disabled={step === 'day'} onclick={() => transition('day')}>
+						{selectedDay ? selectedDay.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Day'}
+					</button>
+				{/if}
+				{#if stepIndex >= 2}
+					<span class="sbk__crumb-sep">›</span>
+					<button type="button" class="sbk__crumb" class:sbk__crumb--active={step === 'confirm'} class:sbk__crumb--done={stepIndex > 2} disabled={step === 'confirm'} onclick={() => transition('confirm')}>
+						{ft(pickStart)} – {ft(pickEnd)}
+					</button>
+				{/if}
+				{#if stepIndex >= 3}
+					<span class="sbk__crumb-sep">›</span>
+					<span class="sbk__crumb sbk__crumb--active">Booked ✓</span>
+				{/if}
+			</nav>
+
 			{#key animKey}
-				<div class="sbk__step">
+				<div class="sbk__step" class:sbk__step--forward={direction === 'forward'} class:sbk__step--back={direction === 'back'}>
 
 					{#if step === 'calendar'}
 						<!-- ═══ STEP 1: CALENDAR ═══ -->
@@ -338,8 +367,6 @@
 
 					{:else if step === 'day' && selectedDay}
 						<!-- ═══ STEP 2: DAY VIEW ═══ -->
-						<button type="button" class="sbk__back" onclick={() => transition('calendar')}>← back to calendar</button>
-
 						<div class="sbk__day-head">
 							<h2 class="sbk__day-date">{formatDate(selectedDay.date)}</h2>
 							<p class="sbk__day-window">{activity.icon} {activity.label} · open {ft(activity.windowStart)} – {ft(activity.windowEnd)}</p>
@@ -440,8 +467,6 @@
 
 					{:else if step === 'confirm' && selectedDay}
 						<!-- ═══ STEP 3: CONFIRM ═══ -->
-						<button type="button" class="sbk__back" onclick={() => transition('day')}>← change time</button>
-
 						<div class="sbk__confirm-summary">
 							<span class="sbk__confirm-icon">{activity.icon}</span>
 							<h2>{activity.label}</h2>
@@ -512,10 +537,17 @@
 	.sbk__tab--active { background: var(--gradient-action); border-color: transparent; color: #fff; }
 	.sbk__tab-icon { font-size: 0.95rem; }
 	.sbk__frame { padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid color-mix(in srgb, var(--border) 60%, transparent); border-radius: 1.25rem; background: radial-gradient(circle at top, color-mix(in srgb, #3b82f6 6%, transparent), transparent 32%), linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 80%, transparent), color-mix(in srgb, var(--bg) 92%, transparent)); box-shadow: 0 24px 64px color-mix(in srgb, var(--text) 6%, transparent); min-height: 28rem; }
-	.sbk__step { animation: sbk-fade 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
-	@keyframes sbk-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-	.sbk__back { display: inline-block; margin-bottom: 1rem; padding: 0; border: none; background: none; color: color-mix(in srgb, var(--text) 50%, transparent); font: inherit; font-size: 0.78rem; font-weight: 500; cursor: pointer; }
-	.sbk__back:hover { color: var(--text); }
+	.sbk__step--forward { animation: sbk-slide-left 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
+	.sbk__step--back { animation: sbk-slide-right 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
+	@keyframes sbk-slide-left { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+	@keyframes sbk-slide-right { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+	.sbk__crumbs { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+	.sbk__crumb { padding: 0; border: none; background: none; font: inherit; font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); cursor: pointer; transition: color 150ms ease; }
+	.sbk__crumb:hover:not(:disabled) { color: color-mix(in srgb, var(--text) 70%, transparent); }
+	.sbk__crumb:disabled { cursor: default; }
+	.sbk__crumb--active { color: var(--text); }
+	.sbk__crumb--done { color: #a78bfa; }
+	.sbk__crumb-sep { font-size: 0.72rem; color: color-mix(in srgb, var(--text) 25%, transparent); }
 	.sbk__cal-head { margin-bottom: 1.25rem; }
 	.sbk__cal-month { margin: 0; font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 500; letter-spacing: -0.03em; }
 	.sbk__cal-hint { margin: 0.3rem 0 0; font-size: 0.78rem; color: color-mix(in srgb, var(--text) 50%, transparent); }
