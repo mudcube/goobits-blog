@@ -115,8 +115,8 @@ export function createMockWeatherProvider(): WeatherProvider {
 		getDay(date: string): DayWeather {
 			return {
 				date,
-				sunrise: 6.75,   // 6:45am — late February Portland
-				sunset: 18.25,   // 6:15pm
+				sunrise: 6.83,   // 6:50am — late February Portland, OR
+				sunset: 17.92,   // 5:55pm
 				hourly: dayPattern(date),
 			}
 		}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { GripVertical } from '@lucide/svelte'
+	import { Sun, CloudRain } from '@lucide/svelte'
 	import { Hero, PageShell } from '@miko/ui'
 	import { createMockWeatherProvider, describeWeatherCode, isPrecipitation } from '$lib/app/weather'
 
@@ -95,17 +95,54 @@
 	function fDur(d: number) { const h = Math.floor(d); const m = Math.round((d - h) * 60); if (h === 0) return `${m}m`; if (m === 0) return `${h}h`; return `${h}h ${m}m` }
 
 	function getHour(clientX: number) { if (!trackEl) return WINDOW_START; const rect = trackEl.getBoundingClientRect(); return snap(clamp(WINDOW_START + ((clientX - rect.left) / rect.width) * (WINDOW_END - WINDOW_START), WINDOW_START, WINDOW_END)) }
-	function onDown(event: PointerEvent, type: 'start' | 'end' | 'range') { event.preventDefault(); event.stopPropagation(); dragging = type; if (type === 'range') dragOffset = getHour(event.clientX) - start; (event.currentTarget as HTMLElement)?.setPointerCapture?.(event.pointerId) }
+	function onDown(event: PointerEvent, type: 'start' | 'end' | 'range') {
+		event.preventDefault(); event.stopPropagation(); dragging = type
+		const hour = getHour(event.clientX)
+		if (type === 'start') dragOffset = hour - start
+		else if (type === 'end') dragOffset = hour - end
+		else dragOffset = hour - start
+		;(event.currentTarget as HTMLElement)?.setPointerCapture?.(event.pointerId)
+	}
 	function onMove(event: PointerEvent) {
 		if (!dragging) return; const hour = getHour(event.clientX)
-		if (dragging === 'start') { start = snap(clamp(hour, WINDOW_START, end - 0.5)) }
-		else if (dragging === 'end') { end = snap(clamp(hour, start + 0.5, WINDOW_END)) }
+		if (dragging === 'start') { start = snap(clamp(hour - dragOffset, WINDOW_START, end - 0.25)) }
+		else if (dragging === 'end') { end = snap(clamp(hour - dragOffset, start + 0.25, WINDOW_END)) }
 		else { const dur = end - start; let ns = snap(hour - dragOffset); ns = clamp(ns, WINDOW_START, WINDOW_END - dur); start = ns; end = ns + dur }
 	}
 	function onUp() { dragging = null }
 
 	const HOUR_TICKS = [0, 3, 6, 9, 12, 15, 18, 21]
 	const hasAnyRain = $derived(HOURLY.some(w => w.precipitation > 0))
+
+	// Dynamic sky gradient based on actual sunrise/sunset
+	function skyGradient() {
+		const r = (h: number) => `${(h / 24) * 100}%`
+		const pre = SUNRISE - 1.5
+		const rise = SUNRISE
+		const riseEnd = SUNRISE + 0.75
+		const setStart = SUNSET - 0.75
+		const set = SUNSET
+		const post = SUNSET + 1.5
+		return `linear-gradient(90deg,
+			#0a0c1a 0%,
+			#0a0c1a ${r(pre)},
+			#2d1f42 ${r(rise - 0.5)},
+			#7a4a3a ${r(rise)},
+			#d4944a ${r(riseEnd)},
+			#8b7a55 ${r(riseEnd + 1)},
+			#4a5a6a ${r(riseEnd + 2)},
+			#344868 ${r(12 - 2)},
+			#3a5070 ${r(12)},
+			#344868 ${r(12 + 2)},
+			#4a5a6a ${r(setStart - 2)},
+			#8b7a55 ${r(setStart - 1)},
+			#d4944a ${r(setStart)},
+			#7a4a3a ${r(set)},
+			#2d1f42 ${r(set + 0.5)},
+			#0a0c1a ${r(post)},
+			#0a0c1a 100%
+		)`
+	}
 </script>
 
 <svelte:head><title>Time Picker v3 - Dev - MIKO.ART</title></svelte:head>
@@ -121,16 +158,7 @@
 				<h2 class="tp3__date">Feb 25</h2>
 			</div>
 
-			<!-- Hour ticks (top) — skip hours near rise/set to avoid overlap -->
-			<div class="tp3__ticks">
-				{#each HOUR_TICKS.filter(h => Math.abs(h - SUNRISE) > 1.5 && Math.abs(h - SUNSET) > 1.5) as h}
-					<span class="tp3__tick" style="left:{pct(h)}%;"><span class="tp3__tick-num">{ftShort(h)}</span><span class="tp3__tick-dot"></span></span>
-				{/each}
-				<span class="tp3__tick tp3__tick--sun" style="left:{pct(SUNRISE)}%;"><span class="tp3__tick-num tp3__tick-num--warm">{ft(SUNRISE)}</span><span class="tp3__tick-dot tp3__tick-dot--warm"></span></span>
-				<span class="tp3__tick tp3__tick--sun" style="left:{pct(SUNSET)}%;"><span class="tp3__tick-num tp3__tick-num--warm">{ft(SUNSET)}</span><span class="tp3__tick-dot tp3__tick-dot--warm"></span></span>
-			</div>
-
-			<!-- People strip (own bar above track) -->
+			<!-- People strip (above track) -->
 			{#if OTHERS.length > 0}
 				<div class="tp3__people-strip" style="--rows:{peopleRows.length};">
 					{#each peopleRows as row, rowIdx}
@@ -146,14 +174,14 @@
 			<!-- Track: two lanes -->
 			<div class="tp3__track-area">
 				<div class="tp3__labels">
-					<span class="tp3__label" style="grid-row: 1;">LIGHT<br/>TEMP</span>
-					<span class="tp3__label" style="grid-row: 2;">RAIN</span>
+					<span class="tp3__label" style="grid-row: 1;"><Sun size={12} strokeWidth={1.8} /></span>
+					<span class="tp3__label" style="grid-row: 2;"><CloudRain size={12} strokeWidth={1.8} /></span>
 				</div>
 
 				<div class="tp3__lanes" bind:this={trackEl}>
 					<!-- Lane 1: Sky + Temp (combined) -->
 					<div class="tp3__lane tp3__lane--main">
-						<div class="tp3__sky"></div>
+						<div class="tp3__sky" style="background:{skyGradient()};"></div>
 						<div class="tp3__horizon"></div>
 
 						<!-- Temp curve overlaid on sky -->
@@ -194,8 +222,8 @@
 
 					<!-- Selection -->
 					<div class="tp3__sel-vis">
-						<div class="tp3__handle" style="left:{pct(start)}%;"><GripVertical size={10} strokeWidth={2.5} /></div>
-						<div class="tp3__handle" style="left:{pct(end)}%;"><GripVertical size={10} strokeWidth={2.5} /></div>
+						<div class="tp3__handle tp3__handle--left" style="left:{pct(start)}%;"></div>
+						<div class="tp3__handle tp3__handle--right" style="left:{pct(end)}%;"></div>
 					</div>
 					<div class="tp3__mask tp3__mask--left" style="width:{pct(start)}%;"></div>
 					<div class="tp3__mask tp3__mask--right" style="left:{pct(end)}%; width:{100 - pct(end)}%;"></div>
@@ -204,6 +232,15 @@
 					<button type="button" class="tp3__hit" style="left:{pct(start)}%;" onpointerdown={(e) => onDown(e, 'start')} aria-label="Adjust start time"></button>
 					<button type="button" class="tp3__hit" style="left:{pct(end)}%;" onpointerdown={(e) => onDown(e, 'end')} aria-label="Adjust end time"></button>
 				</div>
+			</div>
+
+			<!-- Hour ticks (below rain) -->
+			<div class="tp3__ticks">
+				{#each HOUR_TICKS.filter(h => Math.abs(h - SUNRISE) > 1.5 && Math.abs(h - SUNSET) > 1.5) as h}
+					<span class="tp3__tick" style="left:{pct(h)}%;"><span class="tp3__tick-dot"></span><span class="tp3__tick-num">{ftShort(h)}</span></span>
+				{/each}
+				<span class="tp3__tick tp3__tick--sun" style="left:{pct(SUNRISE)}%;"><span class="tp3__tick-dot tp3__tick-dot--warm"></span><span class="tp3__tick-num tp3__tick-num--warm">{ft(SUNRISE)}</span></span>
+				<span class="tp3__tick tp3__tick--sun" style="left:{pct(SUNSET)}%;"><span class="tp3__tick-dot tp3__tick-dot--warm"></span><span class="tp3__tick-num tp3__tick-num--warm">{ft(SUNSET)}</span></span>
 			</div>
 
 			<!-- Readout -->
@@ -264,7 +301,7 @@
 	.tp3__date { margin: 0; font-family: var(--font-display); font-size: clamp(1.8rem, 5vw, 2.4rem); font-weight: 500; letter-spacing: -0.04em; line-height: 1; }
 
 	/* ── Ticks (top only) ── */
-	.tp3__ticks { position: relative; height: 1.2rem; margin-bottom: 0.15rem; margin-left: 2.2rem; }
+	.tp3__ticks { position: relative; height: 1.2rem; margin-bottom: 0.75rem; margin-left: 1.4rem; }
 	.tp3__tick { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.08rem; }
 	.tp3__tick-dot { width: 2px; height: 2px; border-radius: 999px; background: color-mix(in srgb, var(--text) 22%, transparent); }
 	.tp3__tick-num { font-size: 0.52rem; font-weight: 600; color: color-mix(in srgb, var(--text) 30%, transparent); }
@@ -272,13 +309,13 @@
 	.tp3__tick-num--warm { color: color-mix(in srgb, #c4794a 60%, transparent); font-size: 0.48rem; }
 
 	/* ── Track area: labels + lanes side by side ── */
-	.tp3__track-area { display: grid; grid-template-columns: 2.2rem 1fr; margin-bottom: 1rem; }
+	.tp3__track-area { display: grid; grid-template-columns: 1.4rem 1fr; margin-bottom: 0.25rem; }
 
 	/* ── People strip ── */
 	.tp3__people-strip {
 		position: relative;
 		height: calc(var(--rows, 1) * 1.1rem + 0.2rem);
-		margin-left: 2.2rem;
+		margin-left: 1.4rem;
 		margin-bottom: 3px;
 		border-radius: 0.4rem;
 		overflow: hidden;
@@ -290,13 +327,11 @@
 		display: grid;
 		grid-template-rows: 5.5rem 2.2rem;
 		gap: 1px;
-		padding-right: 0.35rem;
+		padding-right: 0.25rem;
 	}
 	.tp3__label {
-		font-size: 0.48rem; font-weight: 700; letter-spacing: 0.08em;
-		color: color-mix(in srgb, var(--text) 28%, transparent);
+		color: color-mix(in srgb, var(--text) 22%, transparent);
 		display: flex; align-items: center; justify-content: flex-end;
-		text-align: right; line-height: 1.3;
 	}
 
 	.tp3__lanes {
@@ -313,7 +348,7 @@
 	/* ── Combined sky+temp lane ── */
 	.tp3__lane--main { background: #080a14; }
 	.tp3__sky { position: absolute; inset: 0; background: linear-gradient(90deg, #0a0c1a 0%, #12132a 8%, #1a1535 14%, #2d1f42 18%, #4a2a4a 22%, #7a4a3a 26%, #c4794a 29%, #d4944a 31%, #8b7a55 34%, #4a5a6a 38%, #3a4a62 42%, #344868 48%, #3a5070 52%, #344868 58%, #3a4a62 62%, #4a5a6a 68%, #8b7a55 72%, #d4944a 74%, #c4794a 76%, #7a4a3a 79%, #4a2a4a 82%, #2d1f42 86%, #1a1535 90%, #12132a 94%, #0a0c1a 100%); }
-	.tp3__horizon { position: absolute; left: 0; right: 0; top: 58%; height: 1px; background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, #c4794a 15%, transparent) 20%, color-mix(in srgb, #d4a85a 22%, transparent) 35%, color-mix(in srgb, #d4a85a 18%, transparent) 50%, color-mix(in srgb, #d4a85a 22%, transparent) 65%, color-mix(in srgb, #c4794a 15%, transparent) 80%, transparent 100%); box-shadow: 0 0 6px color-mix(in srgb, #c4794a 10%, transparent); }
+	.tp3__horizon { position: absolute; left: 0; right: 0; top: 60%; height: 1px; background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, #c4794a 12%, transparent) 22%, color-mix(in srgb, #d4a85a 20%, transparent) 38%, color-mix(in srgb, #d4a85a 16%, transparent) 50%, color-mix(in srgb, #d4a85a 20%, transparent) 62%, color-mix(in srgb, #c4794a 12%, transparent) 78%, transparent 100%); box-shadow: 0 0 5px color-mix(in srgb, #c4794a 8%, transparent); }
 
 	.tp3__ppl {
 		position: absolute;
@@ -360,12 +395,23 @@
 	.tp3__sel-label { font-size: 0.68rem; font-weight: 600; color: color-mix(in srgb, white 65%, transparent); pointer-events: none; user-select: none; text-shadow: 0 1px 4px rgba(0,0,0,0.6); white-space: nowrap; overflow: hidden; }
 	.tp3__sel-vis { pointer-events: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 15; }
 	.tp3__handle {
-		position: absolute; top: 50%; width: 0.85rem; height: 0.85rem; border-radius: 999px;
-		background: color-mix(in srgb, var(--bg) 80%, white 20%);
-		border: 1.5px solid color-mix(in srgb, white 40%, transparent);
-		transform: translate(-50%, -50%); box-shadow: 0 1px 5px rgba(0,0,0,0.5);
-		display: flex; align-items: center; justify-content: center;
-		color: color-mix(in srgb, white 55%, transparent);
+		position: absolute; top: 50%; transform: translateY(-50%);
+		width: 0; height: 0;
+		border-top: 0.55rem solid transparent;
+		border-bottom: 0.55rem solid transparent;
+		filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+	}
+	.tp3__handle--left {
+		border-right: 0.4rem solid rgba(10, 10, 18, 0.85);
+		border-left: none;
+		transform: translate(-100%, -50%);
+		filter: drop-shadow(-1px 0 0 color-mix(in srgb, white 35%, transparent)) drop-shadow(0 -1px 0 color-mix(in srgb, white 18%, transparent)) drop-shadow(0 1px 0 color-mix(in srgb, white 18%, transparent));
+	}
+	.tp3__handle--right {
+		border-left: 0.4rem solid rgba(10, 10, 18, 0.85);
+		border-right: none;
+		transform: translate(0, -50%);
+		filter: drop-shadow(1px 0 0 color-mix(in srgb, white 35%, transparent)) drop-shadow(0 -1px 0 color-mix(in srgb, white 18%, transparent)) drop-shadow(0 1px 0 color-mix(in srgb, white 18%, transparent));
 	}
 	.tp3__hit { position: absolute; top: 0; bottom: 0; width: 1.5rem; transform: translateX(-50%); z-index: 25; cursor: ew-resize; background: none; border: none; padding: 0; font: inherit; }
 
@@ -420,11 +466,11 @@
 
 	@media (max-width: 30rem) {
 		.tp3__card { padding: 1rem; }
-		.tp3__track-area { grid-template-columns: 1.8rem 1fr; }
+		.tp3__track-area { grid-template-columns: 1.2rem 1fr; }
 		.tp3__lanes { grid-template-rows: 4.5rem 1.8rem; }
 		.tp3__labels { grid-template-rows: 4.5rem 1.8rem; }
-		.tp3__label { font-size: 0.42rem; }
-		.tp3__ticks { margin-left: 1.8rem; }
+		.tp3__ticks { margin-left: 1.2rem; }
+		.tp3__people-strip { margin-left: 1.2rem; }
 		.tp3__readout { gap: 0.3rem; }
 		.tp3__edge-time { font-size: 0.95rem; }
 	}
