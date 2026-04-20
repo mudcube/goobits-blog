@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Sun, CloudRain } from '@lucide/svelte'
+	import { CloudRain } from '@lucide/svelte'
 	import { Hero, PageShell } from '@miko/ui'
 	import { createMockWeatherProvider, describeWeatherCode, isPrecipitation } from '$lib/app/weather'
 
@@ -56,16 +56,6 @@
 	let confirmed = $state(false)
 
 	const duration = $derived(end - start)
-	const timeOfDay = $derived.by(() => {
-		const mid = (start + end) / 2
-		if (mid < SUNRISE + 1) return 'dawn'
-		if (mid < 12) return 'morning'
-		if (mid < 14) return 'midday'
-		if (mid < SUNSET - 1.5) return 'afternoon'
-		if (mid < SUNSET + 0.5) return 'evening'
-		return 'night'
-	})
-
 	const overlapping = $derived(OTHERS.filter(o => o.start < end && o.end > start))
 
 	function weatherAt(hour: number) {
@@ -171,15 +161,18 @@
 
 			<!-- Track -->
 			<div class="tp4__track-area">
-				<div class="tp4__labels">
-					<span class="tp4__label"><Sun size={12} strokeWidth={1.8} /></span>
-					{#if hasAnyRain}<span class="tp4__label"><CloudRain size={12} strokeWidth={1.8} /></span>{/if}
-				</div>
-
 				<div class="tp4__lanes" class:tp4__lanes--no-rain={!hasAnyRain} bind:this={trackEl}>
 					<!-- Sky + Temp -->
 					<div class="tp4__lane tp4__lane--main">
 						<div class="tp4__sky" style="background:{skyGradient()};"></div>
+						<!-- Stars in night portions -->
+						{#each [
+							{ x: 2, y: 22 }, { x: 5, y: 38 }, { x: 8, y: 15 }, { x: 3.5, y: 52 },
+							{ x: 88, y: 20 }, { x: 91, y: 42 }, { x: 95, y: 28 }, { x: 93, y: 55 },
+							{ x: 97, y: 18 }, { x: 1, y: 44 }, { x: 6, y: 60 }, { x: 90, y: 62 },
+						] as star}
+							<span class="tp4__star" style="left:{star.x}%; top:{star.y}%;"></span>
+						{/each}
 						<div class="tp4__horizon"></div>
 						<svg class="tp4__svg" viewBox="0 0 100 100" preserveAspectRatio="none">
 							<defs>
@@ -235,21 +228,16 @@
 				<span class="tp4__tick tp4__tick--sun" style="left:{pct(SUNSET)}%;"><span class="tp4__tick-dot tp4__tick-dot--warm"></span><span class="tp4__tick-num tp4__tick-num--warm">{ft(SUNSET)}</span></span>
 			</div>
 
-			<!-- Readout: simplified, no wind -->
+			<!-- Readout: two-line layout -->
 			<div class="tp4__readout">
-				<div class="tp4__readout-edge">
-					<span class="tp4__edge-time">{ft(start)}</span>
-					<span class="tp4__edge-temp">{wxStart.temperature}°</span>
-					<span class="tp4__edge-cond" class:tp4__edge-cond--rain={isPrecipitation(wxStart.weatherCode)}>{describeWeatherCode(wxStart.weatherCode)}</span>
+				<div class="tp4__readout-row1">
+					<span class="tp4__r-left"><span class="tp4__r-time">{ft(start)}</span><span class="tp4__r-line"></span></span>
+					<span class="tp4__r-dur">{fDur(duration)}</span>
+					<span class="tp4__r-right"><span class="tp4__r-line"></span><span class="tp4__r-time">{ft(end)}</span></span>
 				</div>
-				<div class="tp4__readout-center">
-					<span class="tp4__center-dur">{fDur(duration)}</span>
-					<span class="tp4__center-tod">{timeOfDay}{hasAnyRain && isPrecipitation(wxStart.weatherCode) ? ' · wet' : ''}</span>
-				</div>
-				<div class="tp4__readout-edge tp4__readout-edge--end">
-					<span class="tp4__edge-time">{ft(end)}</span>
-					<span class="tp4__edge-temp">{wxEnd.temperature}°</span>
-					<span class="tp4__edge-cond" class:tp4__edge-cond--rain={isPrecipitation(wxEnd.weatherCode)}>{describeWeatherCode(wxEnd.weatherCode)}</span>
+				<div class="tp4__readout-row2">
+					<span class="tp4__r-wx" class:tp4__r-wx--rain={isPrecipitation(wxStart.weatherCode)}>{wxStart.temperature}° {describeWeatherCode(wxStart.weatherCode).toLowerCase()}</span>
+					<span class="tp4__r-wx tp4__r-wx--end" class:tp4__r-wx--rain={isPrecipitation(wxEnd.weatherCode)}>{wxEnd.temperature}° {describeWeatherCode(wxEnd.weatherCode).toLowerCase()}</span>
 				</div>
 			</div>
 
@@ -302,23 +290,21 @@
 	.tp4__date-summary { font-size: 0.55em; font-weight: 500; color: color-mix(in srgb, var(--text) 42%, transparent); letter-spacing: -0.01em; }
 
 	/* People strip */
-	.tp4__people-strip { position: relative; height: calc(var(--rows, 1) * 1.1rem + 0.2rem); margin-left: 1.4rem; margin-bottom: 3px; border-radius: 0.4rem; overflow: hidden; background: #08090e; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); }
+	.tp4__people-strip { position: relative; height: calc(var(--rows, 1) * 1.1rem + 0.2rem); margin-bottom: 3px; border-radius: 0.4rem; overflow: hidden; background: #08090e; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); }
 	.tp4__ppl { position: absolute; top: calc(var(--row, 0) * 1.1rem + 0.1rem); height: calc(1.1rem - 0.15rem); border-radius: 0.25rem; background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 25%, transparent); display: flex; align-items: center; padding: 0 0.3rem; z-index: 5; opacity: 0.5; transition: opacity 150ms; cursor: default; }
 	.tp4__ppl--on { opacity: 1; }
 	.tp4__ppl-name { font-size: 0.48rem; font-weight: 700; color: color-mix(in srgb, var(--c) 80%, transparent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 	/* Track */
-	.tp4__track-area { display: grid; grid-template-columns: 1.4rem 1fr; margin-bottom: 0.25rem; }
-	.tp4__labels { display: grid; grid-template-rows: 5rem 2.2rem; gap: 1px; padding-right: 0.25rem; }
-	.tp4__label { color: color-mix(in srgb, var(--text) 22%, transparent); display: flex; align-items: center; justify-content: flex-end; }
+	.tp4__track-area { margin-bottom: 0.25rem; }
 
 	.tp4__lanes { position: relative; display: grid; grid-template-rows: 5rem 2.2rem; gap: 1px; border-radius: 0.65rem; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); touch-action: none; background: color-mix(in srgb, var(--text) 4%, transparent); }
 	.tp4__lanes--no-rain { grid-template-rows: 5rem; }
-	.tp4__lanes--no-rain + .tp4__labels { grid-template-rows: 1fr; }
 
 	.tp4__lane { position: relative; overflow: hidden; }
 	.tp4__lane--main { background: #080a14; }
 	.tp4__sky { position: absolute; inset: 0; }
+	.tp4__star { position: absolute; width: 1.5px; height: 1.5px; border-radius: 999px; background: white; opacity: 0.12; pointer-events: none; z-index: 1; }
 	.tp4__horizon { position: absolute; left: 0; right: 0; top: 60%; height: 1px; background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, #c4794a 12%, transparent) 22%, color-mix(in srgb, #d4a85a 20%, transparent) 38%, color-mix(in srgb, #d4a85a 16%, transparent) 50%, color-mix(in srgb, #d4a85a 20%, transparent) 62%, color-mix(in srgb, #c4794a 12%, transparent) 78%, transparent 100%); box-shadow: 0 0 5px color-mix(in srgb, #c4794a 8%, transparent); }
 	.tp4__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 	.tp4__temp-num { position: absolute; transform: translateX(-50%); font-size: 0.52rem; font-weight: 700; font-variant-numeric: tabular-nums; color: color-mix(in srgb, white 55%, transparent); z-index: 5; pointer-events: none; text-shadow: 0 0 4px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.6); }
@@ -336,24 +322,25 @@
 	.tp4__hit { position: absolute; top: 0; bottom: 0; width: 1.5rem; transform: translateX(-50%); z-index: 25; cursor: ew-resize; background: none; border: none; padding: 0; font: inherit; }
 
 	/* Ticks */
-	.tp4__ticks { position: relative; height: 1.2rem; margin-bottom: 0.75rem; margin-left: 1.4rem; }
+	.tp4__ticks { position: relative; height: 1.2rem; margin-bottom: 0.75rem; }
 	.tp4__tick { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.08rem; }
 	.tp4__tick-dot { width: 2px; height: 2px; border-radius: 999px; background: color-mix(in srgb, var(--text) 22%, transparent); }
 	.tp4__tick-num { font-size: 0.52rem; font-weight: 600; color: color-mix(in srgb, var(--text) 30%, transparent); }
 	.tp4__tick-dot--warm { background: #c4794a; width: 3px; height: 3px; }
 	.tp4__tick-num--warm { color: color-mix(in srgb, #c4794a 60%, transparent); font-size: 0.48rem; }
 
-	/* Readout (no wind) */
-	.tp4__readout { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.5rem; align-items: start; margin-bottom: 0; }
-	.tp4__readout-edge { display: grid; gap: 0.1rem; }
-	.tp4__readout-edge--end { text-align: right; }
-	.tp4__edge-time { font-family: var(--font-display); font-size: 1.15rem; font-weight: 500; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
-	.tp4__edge-temp { font-family: var(--font-display); font-size: 0.9rem; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: color-mix(in srgb, var(--text) 68%, transparent); }
-	.tp4__edge-cond { font-size: 0.65rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); }
-	.tp4__edge-cond--rain { color: #60a5fa; }
-	.tp4__readout-center { text-align: center; padding-top: 0.1rem; }
-	.tp4__center-dur { display: block; font-size: 0.8rem; font-weight: 600; color: color-mix(in srgb, var(--text) 52%, transparent); }
-	.tp4__center-tod { display: block; font-size: 0.58rem; font-weight: 500; color: color-mix(in srgb, var(--text) 30%, transparent); }
+	/* Readout */
+	.tp4__readout { display: grid; gap: 0.25rem; margin-bottom: 0; }
+	.tp4__readout-row1 { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.4rem; }
+	.tp4__r-left, .tp4__r-right { display: flex; align-items: center; gap: 0.4rem; }
+	.tp4__r-right { justify-content: flex-end; }
+	.tp4__r-time { font-family: var(--font-display); font-size: 1.15rem; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+	.tp4__r-line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 14%, transparent); min-width: 0.5rem; }
+	.tp4__r-dur { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 48%, transparent); white-space: nowrap; text-align: center; }
+	.tp4__readout-row2 { display: flex; justify-content: space-between; }
+	.tp4__r-wx { font-size: 0.72rem; font-weight: 500; color: color-mix(in srgb, var(--text) 48%, transparent); font-variant-numeric: tabular-nums; }
+	.tp4__r-wx--rain { color: #60a5fa; }
+	.tp4__r-wx--end { text-align: right; }
 
 	.tp4__divider { height: 1px; background: color-mix(in srgb, var(--text) 8%, transparent); margin: 0.75rem 0; }
 
@@ -382,12 +369,8 @@
 
 	@media (max-width: 30rem) {
 		.tp4__card { padding: 1rem; }
-		.tp4__track-area { grid-template-columns: 1.2rem 1fr; }
 		.tp4__lanes { grid-template-rows: 4rem 1.8rem; }
 		.tp4__lanes--no-rain { grid-template-rows: 4rem; }
-		.tp4__labels { grid-template-rows: 4rem 1.8rem; }
-		.tp4__ticks { margin-left: 1.2rem; }
-		.tp4__people-strip { margin-left: 1.2rem; }
 		.tp4__footer { flex-direction: column; align-items: stretch; gap: 0.5rem; }
 		.tp4__confirm-btn { width: 100%; text-align: center; }
 	}
