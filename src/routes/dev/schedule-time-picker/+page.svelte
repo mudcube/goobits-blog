@@ -123,13 +123,18 @@
 	<div class="schedule-time-picker__inner">
 		<Hero
 			eyebrow="Dev"
-			title="Schedule Time Picker"
-			titleClass="schedule-time-picker__hero-title"
+			title="Time Picker"
 			icon="/media/page-icons/labs-flask.png"
-			iconAlt="Flask icon"
-			subtitle="An interactive route prototype for dragging a training window across the day with daylight cues and a lightweight confirmation state."
+			iconAlt="Flask"
+			subtitle="Drag a time window across the day with weather and daylight cues."
 			compact
 		/>
+		<nav class="schedule-time-picker__versions">
+			<a href="/dev/schedule-time-picker/" aria-current="page">v1</a>
+			<a href="/dev/schedule-time-picker-v2/">v2</a>
+			<a href="/dev/schedule-time-picker-v3/">v3</a>
+			<a href="/dev/schedule-time-picker-v4/">v4</a>
+		</nav>
 
 		<div class="schedule-time-picker__frame">
 			<div class="schedule-time-picker__header">
@@ -306,6 +311,11 @@
 </PageShell>
 
 <style lang="scss">
+	.schedule-time-picker__versions { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; }
+	.schedule-time-picker__versions a { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); }
+	.schedule-time-picker__versions a:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 25%, transparent); }
+	.schedule-time-picker__versions a[aria-current="page"] { color: #a78bfa; border-color: color-mix(in srgb, #a78bfa 30%, transparent); background: color-mix(in srgb, #a78bfa 6%, transparent); }
+
 	.schedule-time-picker__frame {
 		max-width: 34rem;
 		margin: 0 auto;

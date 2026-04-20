@@ -121,7 +121,8 @@
 
 <PageShell className="tp2">
 	<div class="tp2__inner">
-		<Hero eyebrow="Dev" title="Time Picker v2" titleClass="tp2__hero-title" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Three-lane track: sky, temperature, precipitation." compact />
+		<Hero eyebrow="Dev" title="Time Picker" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Drag a time window across the day with weather and daylight cues." compact />
+		<nav class="tp2__versions"><a href="/dev/schedule-time-picker/">v1</a><a href="/dev/schedule-time-picker-v2/" aria-current="page">v2</a><a href="/dev/schedule-time-picker-v3/">v3</a><a href="/dev/schedule-time-picker-v4/">v4</a></nav>
 
 		<div class="tp2__card">
 			<div class="tp2__header">
@@ -268,6 +269,10 @@
 
 <style>
 	.tp2__inner { max-width: 30rem; margin: 0 auto; }
+	.tp2__versions { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; }
+	.tp2__versions a { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); }
+	.tp2__versions a:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 25%, transparent); }
+	.tp2__versions a[aria-current="page"] { color: #a78bfa; border-color: color-mix(in srgb, #a78bfa 30%, transparent); background: color-mix(in srgb, #a78bfa 6%, transparent); }
 	.tp2__card { padding: clamp(1.2rem, 3vw, 1.75rem); border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 1rem; background: linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 70%, transparent), color-mix(in srgb, var(--bg) 88%, transparent)); }
 	.tp2__header { margin-bottom: 1.25rem; }
 	.tp2__weekday { display: block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; color: color-mix(in srgb, var(--text) 40%, transparent); margin-bottom: 0.2rem; }
