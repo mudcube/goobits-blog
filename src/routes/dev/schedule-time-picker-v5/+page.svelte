@@ -169,18 +169,16 @@
 					</div>
 				{/if}
 
-				<!-- Selection with time labels at edges -->
+				<!-- Selection -->
 				<div class="tp5__sel-vis">
 					<div class="tp5__handle tp5__handle--left" style="left:{pct(start)}%;"></div>
 					<div class="tp5__handle tp5__handle--right" style="left:{pct(end)}%;"></div>
-					<span class="tp5__sel-time tp5__sel-time--start" style="left:{pct(start)}%;">{ft(start)}</span>
-					<span class="tp5__sel-time tp5__sel-time--end" style="left:{pct(end)}%;">{ft(end)}</span>
 				</div>
 				<div class="tp5__mask tp5__mask--left" style="width:{pct(start)}%;"></div>
 				<div class="tp5__mask tp5__mask--right" style="left:{pct(end)}%; width:{100 - pct(end)}%;"></div>
 				<button type="button" class="tp5__sel" style="left:{pct(start)}%; width:{pct(end) - pct(start)}%;" onpointerdown={(e) => onDown(e, 'range')}></button>
-				<button type="button" class="tp5__hit" style="left:{pct(start)}%;" onpointerdown={(e) => onDown(e, 'start')} aria-label="Start time"></button>
-				<button type="button" class="tp5__hit" style="left:{pct(end)}%;" onpointerdown={(e) => onDown(e, 'end')} aria-label="End time"></button>
+				<button type="button" class="tp5__hit" style="left:{pct(start)}%;" onpointerdown={(e) => onDown(e, 'start')} onkeydown={(e) => { if (e.key === 'ArrowLeft') { e.preventDefault(); start = snap(clamp(start - SNAP, WINDOW_START, end - 0.25)) } if (e.key === 'ArrowRight') { e.preventDefault(); start = snap(clamp(start + SNAP, WINDOW_START, end - 0.25)) } }} aria-label="Start time, use arrow keys to adjust"></button>
+				<button type="button" class="tp5__hit" style="left:{pct(end)}%;" onpointerdown={(e) => onDown(e, 'end')} onkeydown={(e) => { if (e.key === 'ArrowLeft') { e.preventDefault(); end = snap(clamp(end - SNAP, start + 0.25, WINDOW_END)) } if (e.key === 'ArrowRight') { e.preventDefault(); end = snap(clamp(end + SNAP, start + 0.25, WINDOW_END)) } }} aria-label="End time, use arrow keys to adjust"></button>
 			</div>
 
 			<!-- Ticks -->
@@ -246,7 +244,7 @@
 	.tp5__card { padding: clamp(1rem, 2.5vw, 1.5rem); border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 1rem; background: linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 70%, transparent), color-mix(in srgb, var(--bg) 88%, transparent)); }
 
 	/* Single-line header */
-	.tp5__header { margin: 0 0 0.75rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--text) 50%, transparent); }
+	.tp5__header { margin: 0 0 0.75rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--text) 62%, transparent); }
 
 	/* People */
 	.tp5__people { position: relative; height: calc(var(--rows, 1) * 1.1rem + 0.2rem); margin-bottom: 3px; border-radius: 0.4rem; overflow: hidden; background: #08090e; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); }
@@ -270,21 +268,21 @@
 	.tp5__mask { position: absolute; top: 0; bottom: 0; background: rgba(4, 4, 10, 0.55); z-index: 8; pointer-events: none; }
 	.tp5__mask--left { left: 0; border-radius: 0.65rem 0 0 0.65rem; }
 	.tp5__mask--right { border-radius: 0 0.65rem 0.65rem 0; }
-	.tp5__sel { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, white 3%, transparent); border-left: 1px solid color-mix(in srgb, white 20%, transparent); border-right: 1px solid color-mix(in srgb, white 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, white 3%, transparent), 0 0 20px color-mix(in srgb, #a78bfa 6%, transparent); cursor: grab; z-index: 12; padding: 0; font: inherit; border-radius: 0; }
+	.tp5__sel { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, white 3%, transparent); border-left: 1px solid color-mix(in srgb, white 20%, transparent); border-right: 1px solid color-mix(in srgb, white 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, white 3%, transparent), 0 0 20px color-mix(in srgb, #a78bfa 6%, transparent); cursor: grab; z-index: 12; padding: 0; font: inherit; border-radius: 0; transition: background 120ms; }
+	.tp5__sel:hover { background: color-mix(in srgb, white 6%, transparent); }
 	.tp5__sel-vis { pointer-events: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 15; }
 	.tp5__handle { position: absolute; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-top: 0.55rem solid transparent; border-bottom: 0.55rem solid transparent; }
 	.tp5__handle--left { border-right: 0.4rem solid rgba(10, 10, 18, 0.85); transform: translate(-100%, -50%); filter: drop-shadow(-1px 0 0 color-mix(in srgb, white 35%, transparent)) drop-shadow(0 -1px 0 color-mix(in srgb, white 18%, transparent)) drop-shadow(0 1px 0 color-mix(in srgb, white 18%, transparent)); }
 	.tp5__handle--right { border-left: 0.4rem solid rgba(10, 10, 18, 0.85); transform: translate(0, -50%); filter: drop-shadow(1px 0 0 color-mix(in srgb, white 35%, transparent)) drop-shadow(0 -1px 0 color-mix(in srgb, white 18%, transparent)) drop-shadow(0 1px 0 color-mix(in srgb, white 18%, transparent)); }
-	.tp5__sel-time { position: absolute; top: -0.1rem; transform: translateX(-50%); font-size: 0.52rem; font-weight: 700; color: color-mix(in srgb, white 55%, transparent); pointer-events: none; font-variant-numeric: tabular-nums; text-shadow: 0 0 4px rgba(0,0,0,0.8); }
-	.tp5__sel-time--start { transform: translateX(-50%); }
-	.tp5__sel-time--end { transform: translateX(-50%); }
 	.tp5__hit { position: absolute; top: 0; bottom: 0; width: 1.5rem; transform: translateX(-50%); z-index: 25; cursor: ew-resize; background: none; border: none; padding: 0; font: inherit; }
+	.tp5__hit:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; border-radius: 2px; }
+	@media (pointer: coarse) { .tp5__hit { width: 2.75rem; } }
 
 	/* Ticks */
 	.tp5__ticks { position: relative; height: 1.2rem; margin-bottom: 0.6rem; }
 	.tp5__tick { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.08rem; }
 	.tp5__tick-dot { width: 2px; height: 2px; border-radius: 999px; background: color-mix(in srgb, var(--text) 22%, transparent); }
-	.tp5__tick-num { font-size: 0.52rem; font-weight: 600; color: color-mix(in srgb, var(--text) 30%, transparent); }
+	.tp5__tick-num { font-size: 0.52rem; font-weight: 600; color: color-mix(in srgb, var(--text) 50%, transparent); }
 	.tp5__tick-dot--warm { background: #c4794a; width: 3px; height: 3px; }
 	.tp5__tick-num--warm { color: color-mix(in srgb, #c4794a 60%, transparent); font-size: 0.48rem; }
 
@@ -295,21 +293,21 @@
 	.tp5__r-right { justify-content: flex-end; }
 	.tp5__r-time { font-family: var(--font-display); font-size: 1.1rem; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; flex-shrink: 0; }
 	.tp5__r-line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 12%, transparent); min-width: 0.5rem; }
-	.tp5__r-dur { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); white-space: nowrap; text-align: center; }
+	.tp5__r-dur { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 60%, transparent); white-space: nowrap; text-align: center; }
 	.tp5__readout-row2 { display: flex; justify-content: space-between; }
-	.tp5__r-wx { font-size: 0.7rem; font-weight: 500; color: color-mix(in srgb, var(--text) 45%, transparent); font-variant-numeric: tabular-nums; }
+	.tp5__r-wx { font-size: 0.7rem; font-weight: 500; color: color-mix(in srgb, var(--text) 60%, transparent); font-variant-numeric: tabular-nums; }
 	.tp5__r-wx--rain { color: #60a5fa; }
 	.tp5__r-wx--end { text-align: right; }
 
 	/* Crew card */
 	.tp5__crew-card { padding: 0.55rem 0.7rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.6rem; background: color-mix(in srgb, var(--card-bg) 50%, transparent); display: grid; gap: 0.25rem; margin-bottom: 0.5rem; }
-	.tp5__crew-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: color-mix(in srgb, var(--text) 38%, transparent); transition: color 150ms; }
-	.tp5__crew-row--on { color: color-mix(in srgb, var(--text) 68%, transparent); }
+	.tp5__crew-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: color-mix(in srgb, var(--text) 52%, transparent); transition: color 150ms; }
+	.tp5__crew-row--on { color: color-mix(in srgb, var(--text) 78%, transparent); }
 	.tp5__crew-dot { width: 0.4rem; height: 0.4rem; border-radius: 999px; background: var(--c); opacity: 0.5; flex-shrink: 0; }
 	.tp5__crew-row--on .tp5__crew-dot { opacity: 1; }
 	.tp5__crew-name { font-weight: 600; }
-	.tp5__crew-time { margin-left: auto; font-size: 0.62rem; font-variant-numeric: tabular-nums; color: color-mix(in srgb, var(--text) 26%, transparent); }
-	.tp5__crew-row--on .tp5__crew-time { color: color-mix(in srgb, var(--text) 45%, transparent); }
+	.tp5__crew-time { margin-left: auto; font-size: 0.62rem; font-variant-numeric: tabular-nums; color: color-mix(in srgb, var(--text) 42%, transparent); }
+	.tp5__crew-row--on .tp5__crew-time { color: color-mix(in srgb, var(--text) 60%, transparent); }
 
 	.tp5__confirm { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.5rem; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.4rem; background: transparent; color: var(--text); font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 160ms; }
 	.tp5__confirm:hover { background: color-mix(in srgb, var(--text) 4%, transparent); border-color: color-mix(in srgb, var(--text) 20%, transparent); }
