@@ -133,7 +133,7 @@
 			<a href="/dev/schedule-time-picker/" aria-current="page">v1</a>
 			<a href="/dev/schedule-time-picker-v2/">v2</a>
 			<a href="/dev/schedule-time-picker-v3/">v3</a>
-			<a href="/dev/schedule-time-picker-v4/">v4</a>
+			<a href="/dev/schedule-time-picker-v4/">v4</a><a href="/dev/schedule-time-picker-v5/">v5</a>
 		</nav>
 
 		<div class="schedule-time-picker__frame">

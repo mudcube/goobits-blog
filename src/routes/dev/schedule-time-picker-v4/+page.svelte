@@ -132,7 +132,7 @@
 				<a href="/dev/schedule-time-picker/">v1</a>
 				<a href="/dev/schedule-time-picker-v2/">v2</a>
 				<a href="/dev/schedule-time-picker-v3/">v3</a>
-				<a href="/dev/schedule-time-picker-v4/" aria-current="page">v4</a>
+				<a href="/dev/schedule-time-picker-v4/">v4</a><a href="/dev/schedule-time-picker-v5/">v5</a>
 			</nav>
 			<button type="button" class="tp4__rain-toggle" class:tp4__rain-toggle--on={forceRainState} onclick={() => forceRainState = !forceRainState}>
 				<CloudRain size={11} strokeWidth={2} /> {forceRainState ? 'Rain on' : 'Rain off'}

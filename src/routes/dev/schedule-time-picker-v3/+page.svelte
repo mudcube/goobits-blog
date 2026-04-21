@@ -151,7 +151,7 @@
 <PageShell className="tp3">
 	<div class="tp3__inner">
 		<Hero eyebrow="Dev" title="Time Picker" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Drag a time window across the day with weather and daylight cues." compact />
-		<nav class="tp3__versions"><a href="/dev/schedule-time-picker/">v1</a><a href="/dev/schedule-time-picker-v2/">v2</a><a href="/dev/schedule-time-picker-v3/" aria-current="page">v3</a><a href="/dev/schedule-time-picker-v4/">v4</a></nav>
+		<nav class="tp3__versions"><a href="/dev/schedule-time-picker/">v1</a><a href="/dev/schedule-time-picker-v2/">v2</a><a href="/dev/schedule-time-picker-v3/" aria-current="page">v3</a><a href="/dev/schedule-time-picker-v4/">v4</a><a href="/dev/schedule-time-picker-v5/">v5</a></nav>
 
 		<div class="tp3__card">
 			<div class="tp3__header">
