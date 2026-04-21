@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { CloudRain } from '@lucide/svelte'
-	import { Hero, PageShell } from '@miko/ui'
 	import { createMockWeatherProvider, describeWeatherCode, isPrecipitation } from '$lib/app/weather'
+	import TimePickerHero from '../schedule-time-picker-hero/TimePickerHero.svelte'
 	import type { Person } from './types'
 	import { ft, fDur } from './time'
 	import SkyTrack from './SkyTrack.svelte'
@@ -49,23 +49,14 @@
 
 <svelte:head><title>Time Picker v5 - Dev - MIKO.ART</title></svelte:head>
 
-<PageShell className="tp5">
-	<div class="tp5__inner">
-		<Hero eyebrow="Dev" title="Time Picker" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Drag a time window across the day with weather and daylight cues." compact />
-		<div class="tp5__toolbar">
-			<nav class="tp5__versions">
-				<a href="/dev/schedule-time-picker/">v1</a>
-				<a href="/dev/schedule-time-picker-v2/">v2</a>
-				<a href="/dev/schedule-time-picker-v3/">v3</a>
-				<a href="/dev/schedule-time-picker-v4/">v4</a>
-				<a href="/dev/schedule-time-picker-v5/" aria-current="page">v5</a>
-			</nav>
-			<button type="button" class="tp5__rain-btn" class:tp5__rain-btn--on={forceRainState} onclick={() => forceRainState = !forceRainState}>
-				<CloudRain size={11} strokeWidth={2} /> {forceRainState ? 'Rain' : 'Dry'}
-			</button>
-		</div>
+<TimePickerHero currentVersion="v5">
+	{#snippet toolbar()}
+		<button type="button" class="tp5__rain-btn" class:tp5__rain-btn--on={forceRainState} onclick={() => forceRainState = !forceRainState}>
+			<CloudRain size={11} strokeWidth={2} /> {forceRainState ? 'Rain' : 'Dry'}
+		</button>
+	{/snippet}
 
-		<div class="tp5__card">
+	<div class="tp5__card">
 			<p class="tp5__header">SAT · APR 21 · {TEMP_HIGH}° · {daySummary}</p>
 
 			<SkyTrack
@@ -116,16 +107,9 @@
 				</div>
 			{/if}
 		</div>
-	</div>
-</PageShell>
+</TimePickerHero>
 
 <style>
-	.tp5__inner { max-width: 30rem; margin: 0 auto; }
-	.tp5__toolbar { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-	.tp5__versions { display: flex; gap: 0.5rem; }
-	.tp5__versions a { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); }
-	.tp5__versions a:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 25%, transparent); }
-	.tp5__versions a[aria-current="page"] { color: #a78bfa; border-color: color-mix(in srgb, #a78bfa 30%, transparent); background: color-mix(in srgb, #a78bfa 6%, transparent); }
 	.tp5__rain-btn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); background: transparent; color: color-mix(in srgb, var(--text) 45%, transparent); font: inherit; font-size: 0.68rem; font-weight: 600; cursor: pointer; }
 	.tp5__rain-btn:hover { border-color: color-mix(in srgb, var(--text) 25%, transparent); color: var(--text); }
 	.tp5__rain-btn--on { color: #60a5fa; border-color: color-mix(in srgb, #60a5fa 30%, transparent); background: color-mix(in srgb, #60a5fa 6%, transparent); }
