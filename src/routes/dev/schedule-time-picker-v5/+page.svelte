@@ -5,7 +5,7 @@
 
 	const weather = createMockWeatherProvider()
 	let forceRainState = $state(false)
-	const clearDay = weather.getDay('2026-04-21')!
+	const clearDay = weather.getDay('2026-04-22')!
 	const rainyDay = weather.getDay('2026-04-20')!
 	const day = $derived(forceRainState ? rainyDay : clearDay)
 
@@ -89,7 +89,19 @@
 		return `linear-gradient(90deg, #0a0c1a 0%, #0a0c1a ${r(SUNRISE - 1.5)}, #2d1f42 ${r(SUNRISE - 0.5)}, #7a4a3a ${r(SUNRISE)}, #d4944a ${r(SUNRISE + 0.75)}, #8b7a55 ${r(SUNRISE + 1.75)}, #4a5a6a ${r(SUNRISE + 2.75)}, #344868 ${r(12 - 2)}, #3a5070 ${r(12)}, #344868 ${r(12 + 2)}, #4a5a6a ${r(SUNSET - 2.75)}, #8b7a55 ${r(SUNSET - 1.75)}, #d4944a ${r(SUNSET - 0.75)}, #7a4a3a ${r(SUNSET)}, #2d1f42 ${r(SUNSET + 0.5)}, #0a0c1a ${r(SUNSET + 1.5)}, #0a0c1a 100%)`
 	}
 
-	const STARS = [ { x: 2, y: 20 }, { x: 5, y: 40 }, { x: 8, y: 14 }, { x: 3.5, y: 55 }, { x: 88, y: 18 }, { x: 91, y: 44 }, { x: 95, y: 26 }, { x: 93, y: 58 }, { x: 97, y: 16 }, { x: 1, y: 46 }, { x: 6, y: 62 }, { x: 90, y: 64 }, { x: 4, y: 30 }, { x: 94, y: 35 } ]
+	// Stars only in the night portions (before sunrise, after sunset)
+	const sunrisePct = $derived(pct(SUNRISE))
+	const sunsetPct = $derived(pct(SUNSET))
+	const STAR_SEEDS = [
+		// Pre-dawn stars (0% to sunrise)
+		{ xBase: 2, y: 20 }, { xBase: 5, y: 40 }, { xBase: 8, y: 14 }, { xBase: 3.5, y: 55 },
+		{ xBase: 1, y: 46 }, { xBase: 6, y: 62 }, { xBase: 4, y: 30 }, { xBase: 10, y: 35 },
+		{ xBase: 12, y: 22 }, { xBase: 15, y: 48 }, { xBase: 18, y: 16 }, { xBase: 7, y: 68 },
+		// Post-sunset stars (sunset to 100%)
+		{ xBase: 82, y: 18 }, { xBase: 85, y: 44 }, { xBase: 88, y: 26 }, { xBase: 90, y: 58 },
+		{ xBase: 93, y: 16 }, { xBase: 95, y: 46 }, { xBase: 97, y: 64 }, { xBase: 84, y: 35 },
+		{ xBase: 92, y: 22 }, { xBase: 98, y: 42 }, { xBase: 86, y: 55 }, { xBase: 96, y: 30 },
+	]
 </script>
 
 <svelte:head><title>Time Picker v5 - Dev - MIKO.ART</title></svelte:head>
@@ -132,8 +144,10 @@
 			<div class="tp5__lanes" class:tp5__lanes--dry={!hasAnyRain} bind:this={trackEl}>
 				<div class="tp5__lane tp5__lane--main">
 					<div class="tp5__sky" style="background:{skyGradient()};"></div>
-					{#each STARS as star, i}
-						<span class="tp5__star" style="left:{star.x}%; top:{star.y}%; animation-delay:{i * 0.4}s;"></span>
+					{#each STAR_SEEDS as star}
+						{#if star.xBase < sunrisePct || star.xBase > sunsetPct}
+							<span class="tp5__star" style="left:{star.xBase}%; top:{star.y}%;"></span>
+						{/if}
 					{/each}
 					<div class="tp5__horizon"></div>
 					<svg class="tp5__svg" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -191,31 +205,29 @@
 				</div>
 			</div>
 
-			<!-- Crew + Confirm merged card -->
-			<div class="tp5__footer">
-				{#if OTHERS.length > 0}
-					<div class="tp5__crew">
-						{#each OTHERS as other}
-							<div class="tp5__crew-row" class:tp5__crew-row--on={overlapping.includes(other)}>
-								<span class="tp5__crew-dot" style="--c:{other.color};"></span>
-								<span class="tp5__crew-name">{other.name}</span>
-								<span class="tp5__crew-time">{ft(other.start)}–{ft(other.end)}</span>
-							</div>
-						{/each}
-					</div>
-				{/if}
-				{#if !confirmed}
-					<button type="button" class="tp5__confirm" onclick={() => confirmed = true}>
-						<span>Confirm</span><span class="tp5__confirm-arrow">→</span>
-					</button>
-				{:else}
-					<div class="tp5__set">
-						<span class="tp5__set-check">✓</span>
-						<span class="tp5__set-text">{ft(start)}–{ft(end)}</span>
-						<button type="button" class="tp5__set-change" onclick={() => confirmed = false}>Change</button>
-					</div>
-				{/if}
-			</div>
+			{#if OTHERS.length > 0}
+				<div class="tp5__crew-card">
+					{#each OTHERS as other}
+						<div class="tp5__crew-row" class:tp5__crew-row--on={overlapping.includes(other)}>
+							<span class="tp5__crew-dot" style="--c:{other.color};"></span>
+							<span class="tp5__crew-name">{other.name}</span>
+							<span class="tp5__crew-time">{ft(other.start)}–{ft(other.end)}</span>
+						</div>
+					{/each}
+				</div>
+			{/if}
+
+			{#if !confirmed}
+				<button type="button" class="tp5__confirm" onclick={() => confirmed = true}>
+					<span>Confirm</span><span class="tp5__confirm-arrow">→</span>
+				</button>
+			{:else}
+				<div class="tp5__set">
+					<span class="tp5__set-check">✓</span>
+					<span class="tp5__set-text">{ft(start)}–{ft(end)}</span>
+					<button type="button" class="tp5__set-change" onclick={() => confirmed = false}>Change</button>
+				</div>
+			{/if}
 		</div>
 	</div>
 </PageShell>
@@ -249,8 +261,7 @@
 	.tp5__lane--main { background: #080a14; }
 	.tp5__lane--rain { background: #080a10; }
 	.tp5__sky { position: absolute; inset: 0; }
-	.tp5__star { position: absolute; width: 1.5px; height: 1.5px; border-radius: 999px; background: white; pointer-events: none; z-index: 1; animation: tp5-twinkle 3.5s ease-in-out infinite; }
-	@keyframes tp5-twinkle { 0%, 100% { opacity: 0.08; } 50% { opacity: 0.2; } }
+	.tp5__star { position: absolute; width: 1.5px; height: 1.5px; border-radius: 999px; background: white; opacity: 0.12; pointer-events: none; z-index: 1; }
 	.tp5__horizon { position: absolute; left: 0; right: 0; top: 60%; height: 1px; background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, #c4794a 12%, transparent) 22%, color-mix(in srgb, #d4a85a 20%, transparent) 38%, color-mix(in srgb, #d4a85a 16%, transparent) 50%, color-mix(in srgb, #d4a85a 20%, transparent) 62%, color-mix(in srgb, #c4794a 12%, transparent) 78%, transparent 100%); box-shadow: 0 0 5px color-mix(in srgb, #c4794a 8%, transparent); }
 	.tp5__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 	.tp5__temp { position: absolute; transform: translateX(-50%); font-size: 0.52rem; font-weight: 700; font-variant-numeric: tabular-nums; color: color-mix(in srgb, white 55%, transparent); z-index: 5; pointer-events: none; text-shadow: 0 0 4px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.6); }
@@ -290,9 +301,8 @@
 	.tp5__r-wx--rain { color: #60a5fa; }
 	.tp5__r-wx--end { text-align: right; }
 
-	/* Footer: crew + confirm in one card */
-	.tp5__footer { padding: 0.65rem 0.75rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.6rem; background: color-mix(in srgb, var(--card-bg) 50%, transparent); }
-	.tp5__crew { display: grid; gap: 0.25rem; margin-bottom: 0.55rem; }
+	/* Crew card */
+	.tp5__crew-card { padding: 0.55rem 0.7rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.6rem; background: color-mix(in srgb, var(--card-bg) 50%, transparent); display: grid; gap: 0.25rem; margin-bottom: 0.5rem; }
 	.tp5__crew-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: color-mix(in srgb, var(--text) 38%, transparent); transition: color 150ms; }
 	.tp5__crew-row--on { color: color-mix(in srgb, var(--text) 68%, transparent); }
 	.tp5__crew-dot { width: 0.4rem; height: 0.4rem; border-radius: 999px; background: var(--c); opacity: 0.5; flex-shrink: 0; }
