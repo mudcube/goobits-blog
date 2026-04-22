@@ -132,7 +132,8 @@
 				<a href="/dev/schedule-time-picker/">v1</a>
 				<a href="/dev/schedule-time-picker-v2/">v2</a>
 				<a href="/dev/schedule-time-picker-v3/">v3</a>
-				<a href="/dev/schedule-time-picker-v4/">v4</a><a href="/dev/schedule-time-picker-v5/">v5</a>
+				<a href="/dev/schedule-time-picker-v4/" aria-current="page">v4</a>
+				<a href="/dev/schedule-time-picker-v5/">v5</a>
 			</nav>
 			<button type="button" class="tp4__rain-toggle" class:tp4__rain-toggle--on={forceRainState} onclick={() => forceRainState = !forceRainState}>
 				<CloudRain size={11} strokeWidth={2} /> {forceRainState ? 'Rain on' : 'Rain off'}
@@ -213,7 +214,7 @@
 					</div>
 					<div class="tp4__mask tp4__mask--left" style="width:{pct(start)}%;"></div>
 					<div class="tp4__mask tp4__mask--right" style="left:{pct(end)}%; width:{100 - pct(end)}%;"></div>
-					<button type="button" class="tp4__sel" style="left:{pct(start)}%; width:{pct(end) - pct(start)}%;" onpointerdown={(e) => onDown(e, 'range')}></button>
+					<button type="button" class="tp4__sel" style="left:{pct(start)}%; width:{pct(end) - pct(start)}%;" onpointerdown={(e) => onDown(e, 'range')} aria-label="Move selected time range"></button>
 					<button type="button" class="tp4__hit" style="left:{pct(start)}%;" onpointerdown={(e) => onDown(e, 'start')} aria-label="Adjust start time"></button>
 					<button type="button" class="tp4__hit" style="left:{pct(end)}%;" onpointerdown={(e) => onDown(e, 'end')} aria-label="Adjust end time"></button>
 				</div>
@@ -371,7 +372,6 @@
 		.tp4__card { padding: 1rem; }
 		.tp4__lanes { grid-template-rows: 4rem 1.8rem; }
 		.tp4__lanes--no-rain { grid-template-rows: 4rem; }
-		.tp4__footer { flex-direction: column; align-items: stretch; gap: 0.5rem; }
 		.tp4__confirm-btn { width: 100%; text-align: center; }
 	}
 </style>

@@ -228,7 +228,7 @@
 					</div>
 					<div class="tp3__mask tp3__mask--left" style="width:{pct(start)}%;"></div>
 					<div class="tp3__mask tp3__mask--right" style="left:{pct(end)}%; width:{100 - pct(end)}%;"></div>
-					<button type="button" class="tp3__sel" style="left:{pct(start)}%; width:{pct(end) - pct(start)}%;" onpointerdown={(e) => onDown(e, 'range')}>
+					<button type="button" class="tp3__sel" style="left:{pct(start)}%; width:{pct(end) - pct(start)}%;" onpointerdown={(e) => onDown(e, 'range')} aria-label="Move selected time range">
 						</button>
 					<button type="button" class="tp3__hit" style="left:{pct(start)}%;" onpointerdown={(e) => onDown(e, 'start')} aria-label="Adjust start time"></button>
 					<button type="button" class="tp3__hit" style="left:{pct(end)}%;" onpointerdown={(e) => onDown(e, 'end')} aria-label="Adjust end time"></button>
@@ -397,7 +397,6 @@
 		cursor: grab; z-index: 12; display: flex; align-items: center; justify-content: center;
 		padding: 0; font: inherit; border-radius: 0;
 	}
-	.tp3__sel-label { font-size: 0.68rem; font-weight: 600; color: color-mix(in srgb, white 65%, transparent); pointer-events: none; user-select: none; text-shadow: 0 1px 4px rgba(0,0,0,0.6); white-space: nowrap; overflow: hidden; }
 	.tp3__sel-vis { pointer-events: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 15; }
 	.tp3__handle {
 		position: absolute; top: 50%; transform: translateY(-50%);
