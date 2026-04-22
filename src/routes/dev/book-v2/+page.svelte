@@ -2,28 +2,24 @@
 	import { Hero, PageShell } from '@miko/ui'
 	import DevBreadcrumb from '../DevBreadcrumb.svelte'
 	import { GYM, buildOpenDays, weather } from './mock-data'
-	import { ft, formatDate } from './time'
-	import type { OpenDay, Person, Step } from './types'
-	import SkyTrack from '../schedule-time-picker-v5/SkyTrack.svelte'
-	import InlineClaim from './InlineClaim.svelte'
-	import CrewCard from './CrewCard.svelte'
-	import TimeReadout from './TimeReadout.svelte'
-	import DoneScreen from './DoneScreen.svelte'
+	import type { OpenDay, Person } from './types'
+	import StepIndicator from './StepIndicator.svelte'
+	import CalendarStep from './CalendarStep.svelte'
+	import TimeStep from './TimeStep.svelte'
+	import BookedStep from './BookedStep.svelte'
 
 	const activity = GYM
 	const openDays = buildOpenDays(activity)
 
-	let step = $state<Step>('calendar')
+	let stepNum = $state(0)
 	let selectedDay = $state<OpenDay | null>(null)
 	let start = $state(12)
 	let end = $state(14)
-	let claimed = $state(false)
+	let claimed = $state(true) // auto-filled for dev
 	let pendingDay = $state<OpenDay | null>(null)
 	let animKey = $state(0)
 	let direction = $state<'forward' | 'back'>('forward')
 
-	const STEPS: Step[] = ['calendar', 'claim', 'day', 'done']
-	const stepIndex = $derived(STEPS.indexOf(step))
 	const overlapping = $derived(selectedDay ? selectedDay.bookings.filter(o => o.start < end && o.end > start) : [])
 
 	const dayWeather = $derived.by(() => {
@@ -31,7 +27,6 @@
 		return weather.getDay(selectedDay.date.toISOString().split('T')[0]!)
 	})
 	const HOURLY = $derived(dayWeather?.hourly ?? [])
-	const TEMP_HIGH = $derived(Math.max(...(HOURLY.length ? HOURLY.map(w => w.temperature) : [0])))
 	const hasAnyRain = $derived(HOURLY.some(w => w.precipitation > 0))
 
 	const peopleRows = $derived.by(() => {
@@ -45,7 +40,6 @@
 		return rows
 	})
 
-	// Calendar
 	const calMonth = $derived.by(() => { const n = new Date(); return { year: n.getFullYear(), month: n.getMonth() } })
 	const calDays = $derived.by(() => {
 		const { year, month } = calMonth
@@ -63,31 +57,33 @@
 		return cells
 	})
 	const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-	function go(next: Step) { direction = STEPS.indexOf(next) >= stepIndex ? 'forward' : 'back'; animKey++; step = next }
 
-	function tapDay(day: OpenDay) {
-		pendingDay = day
-		if (!claimed) return // claim form will slide open
-		enterDay(day)
+	function goStep(n: number) {
+		direction = n >= stepNum ? 'forward' : 'back'
+		animKey++
+		stepNum = n
 	}
 
-	function enterDay(day: OpenDay) {
+	function onSelectDay(day: OpenDay) {
 		selectedDay = day
 		start = activity.windowStart + 2
 		end = Math.min(start + 2, activity.windowEnd)
-		go('day')
+		goStep(1)
 	}
 
 	function onClaim(_name: string) {
 		claimed = true
-		if (pendingDay) { enterDay(pendingDay); pendingDay = null }
+		if (pendingDay) { onSelectDay(pendingDay); pendingDay = null }
 	}
 
 	function joinPerson(person: Person) {
 		start = person.start; end = person.end
-		go('done')
+		goStep(2)
 	}
 
+	function onStepNav(step: number) {
+		if (step < stepNum) { pendingDay = null; goStep(step) }
+	}
 </script>
 
 <svelte:head><title>Book v2 - Dev - MIKO.ART</title></svelte:head>
@@ -98,73 +94,19 @@
 		<Hero eyebrow="Dev" title="Book" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="No login wall. Calendar first. Crew tap = done." compact />
 		<nav class="bk2__versions"><a href="/dev/book/">v1</a><a href="/dev/book-v2/" aria-current="page">v2</a></nav>
 
+		<StepIndicator current={stepNum} onNavigate={onStepNav} />
+
 		{#key animKey}
 		<div class="bk2__step" class:bk2__step--fwd={direction === 'forward'} class:bk2__step--back={direction === 'back'}>
 
-		{#if step === 'calendar' || (step === 'claim' && !claimed)}
-			<!-- Activity + Calendar -->
-			<div class="bk2__hero">
-				<span class="bk2__icon">{activity.icon}</span>
-				<h2 class="bk2__name">{activity.label}</h2>
-				<p class="bk2__tagline">{activity.tagline}</p>
-			</div>
+		{#if stepNum === 0}
+			<CalendarStep {activity} {calDays} weekdays={WEEKDAYS} {openDays} {claimed} bind:pendingDay {onSelectDay} {onClaim} />
 
-			<div class="bk2__cal-head">{#each WEEKDAYS as w}<span>{w}</span>{/each}</div>
-			<div class="bk2__cal" class:bk2__cal--dimmed={!!pendingDay && !claimed}>
-				{#each calDays as cell}
-					<button type="button" class="bk2__cell" class:bk2__cell--other={!cell.inMonth} class:bk2__cell--past={cell.isPast} class:bk2__cell--today={cell.isToday} class:bk2__cell--open={cell.isOpen} class:bk2__cell--picked={pendingDay && cell.date.getTime() === pendingDay.date.getTime()} disabled={!cell.isOpen || cell.isPast} onclick={() => { const m = openDays.find(od => od.date.getTime() === cell.date.getTime()); if (m) tapDay(m) }}>
-						<span class="bk2__num">{cell.date.getDate()}</span>
-						{#if cell.isOpen && !cell.isPast}
-							<span class="bk2__dots"><span class="bk2__dot"></span>{#if cell.bookingCount > 0}<span class="bk2__dot bk2__dot--grn"></span>{/if}</span>
-						{/if}
-					</button>
-				{/each}
-			</div>
+		{:else if stepNum === 1 && selectedDay && dayWeather}
+			<TimeStep day={selectedDay} hourly={HOURLY} sunrise={dayWeather.sunrise} sunset={dayWeather.sunset} hasRain={hasAnyRain} {peopleRows} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={() => goStep(2)} />
 
-			<!-- Claim: slides open when pendingDay exists and not claimed -->
-			{#if !claimed}
-				<InlineClaim day={pendingDay?.date ?? null} {onClaim} />
-			{/if}
-
-		{:else if step === 'day' && selectedDay && dayWeather}
-			<!-- Day header with back nav -->
-			<button type="button" class="bk2__day-header" onclick={() => { pendingDay = null; go('calendar') }}>
-				<span class="bk2__day-back">←</span>
-				<span class="bk2__day-info">
-					<span class="bk2__day-date">{formatDate(selectedDay.date)}</span>
-					<span class="bk2__day-meta">{TEMP_HIGH}° · {hasAnyRain ? 'Rain' : 'Dry'}</span>
-				</span>
-			</button>
-
-			<SkyTrack
-				sunrise={dayWeather.sunrise}
-				sunset={dayWeather.sunset}
-				hourly={HOURLY}
-				hasRain={hasAnyRain}
-				{peopleRows}
-				{overlapping}
-				bind:start
-				bind:end
-			/>
-
-			<TimeReadout {start} {end} hourly={HOURLY} />
-
-			<CrewCard bookings={selectedDay.bookings} {overlapping} onJoin={joinPerson} />
-
-			<!-- Always show confirm for custom time -->
-			<button type="button" class="bk2__confirm" onclick={() => go('done')}>
-				<span>I'm in · {ft(start)}–{ft(end)}</span><span class="bk2__arrow">→</span>
-			</button>
-
-		{:else if step === 'done' && selectedDay}
-			<DoneScreen
-				activityIcon={activity.icon}
-				activityLabel={activity.label}
-				date={selectedDay.date}
-				{start} {end}
-				{overlapping}
-				onBack={() => { pendingDay = null; go('calendar') }}
-			/>
+		{:else if stepNum === 2 && selectedDay}
+			<BookedStep activityIcon={activity.icon} activityLabel={activity.label} date={selectedDay.date} {start} {end} {overlapping} onBack={() => goStep(0)} />
 		{/if}
 
 		</div>
@@ -174,53 +116,12 @@
 
 <style>
 	.bk2__inner { max-width: 28rem; margin: 0 auto; }
-	.bk2__versions { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; }
+	.bk2__versions { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; }
 	.bk2__versions a { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); }
 	.bk2__versions a:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 25%, transparent); }
 	.bk2__versions a[aria-current="page"] { color: #a78bfa; border-color: color-mix(in srgb, #a78bfa 30%, transparent); background: color-mix(in srgb, #a78bfa 6%, transparent); }
-
 	.bk2__step--fwd { animation: bk2-fwd 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	.bk2__step--back { animation: bk2-back 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	@keyframes bk2-fwd { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 	@keyframes bk2-back { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-
-	/* Activity hero */
-	.bk2__hero { text-align: center; margin-bottom: 1.25rem; }
-	.bk2__icon { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
-	.bk2__name { margin: 0; font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; letter-spacing: -0.03em; }
-	.bk2__tagline { margin: 0.2rem 0 0; font-size: 0.8rem; color: color-mix(in srgb, var(--text) 52%, transparent); }
-
-	/* Calendar */
-	.bk2__cal-head { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 0.2rem; }
-	.bk2__cal-head span { text-align: center; font-size: 0.58rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: color-mix(in srgb, var(--text) 40%, transparent); }
-	.bk2__cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.22rem; transition: opacity 0.25s; }
-	.bk2__cal--dimmed { opacity: 0.5; }
-	.bk2__cell { position: relative; aspect-ratio: 1; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.55rem; background: color-mix(in srgb, var(--panel-bg) 75%, transparent); font: inherit; cursor: pointer; padding: 0; transition: all 140ms; }
-	.bk2__cell:hover:not(:disabled) { border-color: color-mix(in srgb, var(--text) 18%, transparent); transform: translateY(-1px); }
-	.bk2__cell:disabled { cursor: default; }
-	.bk2__cell--other { opacity: 0.2; }
-	.bk2__cell--past { opacity: 0.3; }
-	.bk2__cell--today { border-color: color-mix(in srgb, var(--text) 25%, transparent); }
-	.bk2__cell--open { border-color: color-mix(in srgb, #a78bfa 28%, transparent); background: color-mix(in srgb, #a78bfa 5%, var(--panel-bg) 95%); }
-	.bk2__cell--picked { border-color: #a78bfa; background: color-mix(in srgb, #a78bfa 12%, var(--panel-bg) 88%); opacity: 1 !important; }
-	.bk2__num { position: absolute; top: 0.35rem; right: 0.4rem; font-size: 0.75rem; font-weight: 600; }
-	.bk2__dots { position: absolute; bottom: 0.32rem; left: 0.4rem; display: flex; gap: 0.16rem; }
-	.bk2__dot { width: 0.26rem; height: 0.26rem; border-radius: 999px; background: #a78bfa; }
-	.bk2__dot--grn { background: #4ade80; }
-
-	/* Day header */
-	.bk2__day-header { display: flex; align-items: center; gap: 0.5rem; width: 100%; padding: 0.5rem 0.6rem; margin-bottom: 0.65rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.5rem; background: color-mix(in srgb, var(--card-bg) 40%, transparent); font: inherit; color: inherit; cursor: pointer; text-align: left; transition: all 150ms; }
-	.bk2__day-header:hover { border-color: color-mix(in srgb, var(--text) 16%, transparent); background: color-mix(in srgb, var(--card-bg) 55%, transparent); }
-	.bk2__day-back { font-size: 0.85rem; color: color-mix(in srgb, var(--text) 50%, transparent); flex-shrink: 0; }
-	.bk2__day-info { display: flex; flex-direction: column; gap: 0.05rem; }
-	.bk2__day-date { font-size: 0.82rem; font-weight: 600; }
-	.bk2__day-meta { font-size: 0.62rem; color: color-mix(in srgb, var(--text) 48%, transparent); }
-
-	/* Confirm (only when dragged) */
-	.bk2__confirm { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.6rem; border: none; border-radius: 0.5rem; background: var(--gradient-action); color: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 14px color-mix(in srgb, #7a5af8 20%, transparent); transition: all 150ms; margin-top: 0.35rem; animation: bk2-fwd 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-	.bk2__confirm:hover { box-shadow: 0 4px 20px color-mix(in srgb, #7a5af8 30%, transparent); transform: translateY(-1px); }
-	.bk2__arrow { transition: transform 150ms; }
-	.bk2__confirm:hover .bk2__arrow { transform: translateX(3px); }
-
-	@media (max-width: 30rem) { .bk2__cell { border-radius: 0.4rem; } .bk2__num { font-size: 0.65rem; top: 0.25rem; right: 0.3rem; } }
 </style>
