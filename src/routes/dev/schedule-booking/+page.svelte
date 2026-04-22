@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { GripVertical } from '@lucide/svelte'
-	import DevBreadcrumb from '../DevBreadcrumb.svelte'
-	import { Hero, PageShell } from '@miko/ui'
+	import { PageShell } from '@miko/ui'
+	import DevHero from '../DevHero.svelte'
 
 	// ── Types ──
 	type Activity = {
@@ -63,6 +63,17 @@
 		}
 		return days
 	}
+
+	const breadcrumbItems = [
+		{ label: 'Dev', href: '/dev/' },
+		{ label: 'Schedule Booking', href: '/dev/schedule-booking/' },
+		{ label: 'v1' }
+	]
+
+	const versions = [
+		{ label: 'v1', href: '/dev/schedule-booking/', current: true },
+		{ label: 'v2', href: '/dev/schedule-booking-v2/' }
+	]
 
 	// ── State ──
 	let activeSlug = $state('gym')
@@ -273,15 +284,11 @@
 
 <PageShell className="sbk">
 	<div class="sbk__inner">
-		<DevBreadcrumb />
-		<Hero
-			eyebrow="Dev"
+		<DevHero
 			title="Schedule Booking"
-			titleClass="sbk__hero-title"
-			icon="/media/page-icons/labs-flask.png"
-			iconAlt="Flask"
 			subtitle="Open slot booking flow: calendar → day → time → confirm."
-			compact
+			{breadcrumbItems}
+			{versions}
 		/>
 
 		<!-- Activity tabs -->

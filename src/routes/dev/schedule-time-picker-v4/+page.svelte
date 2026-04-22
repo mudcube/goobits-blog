@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { CloudRain } from '@lucide/svelte'
-	import DevBreadcrumb from '../DevBreadcrumb.svelte'
-	import { Hero, PageShell } from '@miko/ui'
+	import { PageShell } from '@miko/ui'
+	import DevHero from '../DevHero.svelte'
 	import { createMockWeatherProvider, describeWeatherCode, isPrecipitation } from '$lib/app/weather'
 
 	const weather = createMockWeatherProvider()
@@ -120,6 +120,20 @@
 			#d4944a ${r(SUNSET - 0.75)}, #7a4a3a ${r(SUNSET)}, #2d1f42 ${r(SUNSET + 0.5)},
 			#0a0c1a ${r(SUNSET + 1.5)}, #0a0c1a 100%)`
 	}
+
+	const breadcrumbItems = [
+		{ label: 'Dev', href: '/dev/' },
+		{ label: 'Schedule Time Picker', href: '/dev/schedule-time-picker/' },
+		{ label: 'v4' }
+	]
+
+	const versions = [
+		{ label: 'v1', href: '/dev/schedule-time-picker/' },
+		{ label: 'v2', href: '/dev/schedule-time-picker-v2/' },
+		{ label: 'v3', href: '/dev/schedule-time-picker-v3/' },
+		{ label: 'v4', href: '/dev/schedule-time-picker-v4/', current: true },
+		{ label: 'v5', href: '/dev/schedule-time-picker-v5/' }
+	]
 </script>
 
 <svelte:head><title>Time Picker v4 - Dev - MIKO.ART</title></svelte:head>
@@ -127,20 +141,18 @@
 
 <PageShell className="tp4">
 	<div class="tp4__inner">
-		<DevBreadcrumb />
-		<Hero eyebrow="Dev" title="Time Picker" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Drag a time window across the day with weather and daylight cues." compact />
-		<div class="tp4__toolbar">
-			<nav class="tp4__versions">
-				<a href="/dev/schedule-time-picker/">v1</a>
-				<a href="/dev/schedule-time-picker-v2/">v2</a>
-				<a href="/dev/schedule-time-picker-v3/">v3</a>
-				<a href="/dev/schedule-time-picker-v4/" aria-current="page">v4</a>
-				<a href="/dev/schedule-time-picker-v5/">v5</a>
-			</nav>
-			<button type="button" class="tp4__rain-toggle" class:tp4__rain-toggle--on={forceRainState} onclick={() => forceRainState = !forceRainState}>
-				<CloudRain size={11} strokeWidth={2} /> {forceRainState ? 'Rain on' : 'Rain off'}
-			</button>
-		</div>
+		<DevHero
+			title="Time Picker"
+			subtitle="Drag a time window across the day with weather and daylight cues."
+			{breadcrumbItems}
+			{versions}
+		>
+			{#snippet toolbar()}
+				<button type="button" class="tp4__rain-toggle" class:tp4__rain-toggle--on={forceRainState} onclick={() => forceRainState = !forceRainState}>
+					<CloudRain size={11} strokeWidth={2} /> {forceRainState ? 'Rain on' : 'Rain off'}
+				</button>
+			{/snippet}
+		</DevHero>
 
 		<div class="tp4__card">
 			<!-- Date header with day summary -->
@@ -276,11 +288,6 @@
 
 <style>
 	.tp4__inner { max-width: 30rem; margin: 0 auto; }
-	.tp4__toolbar { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-	.tp4__versions { display: flex; gap: 0.5rem; }
-	.tp4__versions a { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); }
-	.tp4__versions a:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 25%, transparent); }
-	.tp4__versions a[aria-current="page"] { color: #a78bfa; border-color: color-mix(in srgb, #a78bfa 30%, transparent); background: color-mix(in srgb, #a78bfa 6%, transparent); }
 	.tp4__rain-toggle { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); background: transparent; color: color-mix(in srgb, var(--text) 45%, transparent); font: inherit; font-size: 0.68rem; font-weight: 600; cursor: pointer; }
 	.tp4__rain-toggle:hover { border-color: color-mix(in srgb, var(--text) 25%, transparent); color: var(--text); }
 	.tp4__rain-toggle--on { color: #60a5fa; border-color: color-mix(in srgb, #60a5fa 30%, transparent); background: color-mix(in srgb, #60a5fa 6%, transparent); }

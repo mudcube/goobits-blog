@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { GripVertical } from '@lucide/svelte'
-	import DevBreadcrumb from '../DevBreadcrumb.svelte'
-	import { Hero, PageShell } from '@miko/ui'
+	import { PageShell } from '@miko/ui'
+	import DevHero from '../DevHero.svelte'
 
 	type Activity = { slug: string; label: string; icon: string; maxDuration: number; capacity: number; windowStart: number; windowEnd: number }
 	type Booking = { userId: string; name: string; color: string; start: number; end: number; guests: number }
@@ -132,6 +132,17 @@
 		}
 		return labels
 	}
+
+	const breadcrumbItems = [
+		{ label: 'Dev', href: '/dev/' },
+		{ label: 'Schedule Booking', href: '/dev/schedule-booking/' },
+		{ label: 'v2' }
+	]
+
+	const versions = [
+		{ label: 'v1', href: '/dev/schedule-booking/' },
+		{ label: 'v2', href: '/dev/schedule-booking-v2/', current: true }
+	]
 </script>
 
 <svelte:head><title>Schedule Booking v2 - Dev - MIKO.ART</title></svelte:head>
@@ -139,8 +150,12 @@
 
 <PageShell className="sbk">
 	<div class="sbk__inner">
-		<DevBreadcrumb />
-		<Hero eyebrow="Dev" title="Booking v2" titleClass="sbk__hero-title" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Join-first flow with hero track." compact />
+		<DevHero
+			title="Booking v2"
+			subtitle="Join-first flow with hero track."
+			{breadcrumbItems}
+			{versions}
+		/>
 
 		<div class="sbk__tabs">
 			{#each ACTIVITIES as act}

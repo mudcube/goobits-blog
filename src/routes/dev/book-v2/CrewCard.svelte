@@ -15,7 +15,7 @@
 
 {#if hasBookings}
 	<div class="cc">
-		<p class="cc__label">Join someone</p>
+		<div class="cc__header"><span class="cc__header-line"></span><span class="cc__header-text">Join someone</span><span class="cc__header-line"></span></div>
 		{#each bookings as person, i}
 			{#if i > 0}<div class="cc__divider"></div>{/if}
 			<div class="cc__row">
@@ -35,7 +35,9 @@
 
 <style>
 	.cc { margin-bottom: 0.6rem; }
-	.cc__label { margin: 0 0 0.35rem; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: color-mix(in srgb, var(--text) 38%, transparent); }
+	.cc__header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
+	.cc__header-line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 10%, transparent); }
+	.cc__header-text { font-size: 0.6rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); white-space: nowrap; }
 	.cc__divider { height: 1px; background: color-mix(in srgb, var(--text) 7%, transparent); }
 	.cc__row { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0; }
 	.cc__dot { width: 0.38rem; height: 0.38rem; border-radius: 999px; background: var(--c); flex-shrink: 0; }

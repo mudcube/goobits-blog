@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ArrowRight, GripVertical } from '@lucide/svelte'
-	import DevBreadcrumb from '../DevBreadcrumb.svelte'
-	import { Hero, PageShell, PillButton } from '@miko/ui'
+	import { PageShell, PillButton } from '@miko/ui'
+	import DevHero from '../DevHero.svelte'
 
 	const SNAP = 0.25
 	const MIN_DUR = 0.5
@@ -112,6 +112,20 @@
 		if (hour === 18) return '6p'
 		return hour < 12 ? `${hour}a` : `${hour - 12}p`
 	}
+
+	const breadcrumbItems = [
+		{ label: 'Dev', href: '/dev/' },
+		{ label: 'Schedule Time Picker', href: '/dev/schedule-time-picker/' },
+		{ label: 'v1' }
+	]
+
+	const versions = [
+		{ label: 'v1', href: '/dev/schedule-time-picker/', current: true },
+		{ label: 'v2', href: '/dev/schedule-time-picker-v2/' },
+		{ label: 'v3', href: '/dev/schedule-time-picker-v3/' },
+		{ label: 'v4', href: '/dev/schedule-time-picker-v4/' },
+		{ label: 'v5', href: '/dev/schedule-time-picker-v5/' }
+	]
 </script>
 
 <svelte:head>
@@ -122,21 +136,12 @@
 
 <PageShell className="schedule-time-picker">
 	<div class="schedule-time-picker__inner">
-		<DevBreadcrumb />
-		<Hero
-			eyebrow="Dev"
+		<DevHero
 			title="Time Picker"
-			icon="/media/page-icons/labs-flask.png"
-			iconAlt="Flask"
 			subtitle="Drag a time window across the day with weather and daylight cues."
-			compact
+			{breadcrumbItems}
+			{versions}
 		/>
-		<nav class="schedule-time-picker__versions">
-			<a href="/dev/schedule-time-picker/" aria-current="page">v1</a>
-			<a href="/dev/schedule-time-picker-v2/">v2</a>
-			<a href="/dev/schedule-time-picker-v3/">v3</a>
-			<a href="/dev/schedule-time-picker-v4/">v4</a><a href="/dev/schedule-time-picker-v5/">v5</a>
-		</nav>
 
 		<div class="schedule-time-picker__frame">
 			<div class="schedule-time-picker__header">
@@ -313,10 +318,6 @@
 </PageShell>
 
 <style lang="scss">
-	.schedule-time-picker__versions { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; }
-	.schedule-time-picker__versions a { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); }
-	.schedule-time-picker__versions a:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 25%, transparent); }
-	.schedule-time-picker__versions a[aria-current="page"] { color: #a78bfa; border-color: color-mix(in srgb, #a78bfa 30%, transparent); background: color-mix(in srgb, #a78bfa 6%, transparent); }
 
 	.schedule-time-picker__frame {
 		max-width: 34rem;

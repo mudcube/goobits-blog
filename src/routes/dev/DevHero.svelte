@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Hero } from '@miko/ui'
+	import { Breadcrumbs, Hero } from '@miko/ui'
+	import type { Snippet } from 'svelte'
 
 	type BreadcrumbItem = {
 		label: string
@@ -16,19 +17,18 @@
 		title,
 		subtitle,
 		breadcrumbItems = [],
-		versions = []
+		versions = [],
+		toolbar
 	}: {
 		title: string
 		subtitle: string
 		breadcrumbItems?: BreadcrumbItem[]
 		versions?: VersionItem[]
+		toolbar?: Snippet
 	} = $props()
-
-	const eyebrow = $derived(breadcrumbItems.map((item) => item.label).join(' / '))
 </script>
 
 <Hero
-	{eyebrow}
 	{title}
 	icon="/media/page-icons/labs-flask.png"
 	iconAlt="Flask"
@@ -36,17 +36,21 @@
 	compact
 	className="dev-hero"
 >
-	<div class="dev-hero__meta">
-		{#if versions.length}
-			<nav class="dev-hero__versions" aria-label={`${title} versions`}>
-				{#each versions as version}
-					<a href={version.href} aria-current={version.current ? 'page' : undefined}>
-						{version.label}
-					</a>
-				{/each}
-			</nav>
-		{/if}
-	</div>
+	<Breadcrumbs items={breadcrumbItems} className="dev-hero__breadcrumbs" />
+	{#if versions.length}
+		<nav class="dev-hero__versions" aria-label={`${title} versions`}>
+			{#each versions as version}
+				<a href={version.href} aria-current={version.current ? 'page' : undefined}>
+					{version.label}
+				</a>
+			{/each}
+		</nav>
+	{/if}
+	{#if toolbar}
+		<div class="dev-hero__toolbar">
+			{@render toolbar()}
+		</div>
+	{/if}
 </Hero>
 
 <style>
@@ -54,20 +58,19 @@
 		margin-bottom: var(--space-6);
 	}
 
-	.dev-hero__meta {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: flex-start;
-		gap: 0.85rem;
-		margin-top: 1rem;
-		padding-top: 0.85rem;
-		border-top: 1px solid color-mix(in srgb, var(--border) 32%, transparent);
+	:global(.dev-hero.ui-hero .dev-hero__breadcrumbs.ui-breadcrumbs) {
+		order: -2;
+		margin: 0 0 0.85rem;
 	}
 
 	.dev-hero__versions {
 		display: flex;
 		flex-wrap: wrap;
+		justify-content: center;
 		gap: 0.5rem;
+		margin-top: 1rem;
+		padding-top: 0.85rem;
+		border-top: 1px solid color-mix(in srgb, var(--border) 32%, transparent);
 	}
 
 	.dev-hero__versions a {
@@ -91,9 +94,11 @@
 		background: color-mix(in srgb, #a78bfa 6%, transparent);
 	}
 
-	@media (min-width: 760px) {
-		.dev-hero__meta {
-			justify-content: flex-end;
-		}
+	.dev-hero__toolbar {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.75rem;
+		margin-top: 0.75rem;
 	}
 </style>

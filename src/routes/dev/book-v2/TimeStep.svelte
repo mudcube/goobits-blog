@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { HourlyWeather } from '$lib/app/weather'
 	import type { OpenDay, Person } from './types'
-	import { ft } from './time'
+	import { ft, formatDate } from './time'
 	import SkyTrack from '../schedule-time-picker-v5/SkyTrack.svelte'
 	import TimeReadout from './TimeReadout.svelte'
 	import CrewCard from './CrewCard.svelte'
@@ -40,7 +40,7 @@
 <CrewCard bookings={day.bookings} {onJoin} />
 
 <button type="button" class="ts__confirm" onclick={onConfirm}>
-	I'm in · {ft(start)}–{ft(end)}
+	I'm in · {formatDate(day.date)} · {ft(start)}–{ft(end)}
 </button>
 
 <style>

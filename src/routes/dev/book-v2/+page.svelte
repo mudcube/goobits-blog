@@ -2,6 +2,7 @@
 	import { PageShell } from '@miko/ui'
 	import DevHero from '../DevHero.svelte'
 	import { GYM, buildOpenDays, weather } from './mock-data'
+	import { ft, formatDate } from './time'
 	import type { OpenDay, Person } from './types'
 	import StepIndicator from './StepIndicator.svelte'
 	import CalendarStep from './CalendarStep.svelte'
@@ -85,6 +86,12 @@
 		if (step < stepNum) { pendingDay = null; goStep(step) }
 	}
 
+	const stepLabels = $derived.by((): [string, string, string] => {
+		const dayLabel = selectedDay ? formatDate(selectedDay.date) : 'Day'
+		const timeLabel = stepNum >= 2 ? `${ft(start)}–${ft(end)}` : 'Time'
+		return [dayLabel, timeLabel, 'Booked']
+	})
+
 	const breadcrumbItems = [
 		{ label: 'Dev', href: '/dev/' },
 		{ label: 'Book', href: '/dev/book/' },
@@ -108,7 +115,7 @@
 			{versions}
 		/>
 
-		<StepIndicator current={stepNum} onNavigate={onStepNav} />
+		<StepIndicator current={stepNum} labels={stepLabels} onNavigate={onStepNav} />
 
 		{#key animKey}
 		<div class="bk2__step" class:bk2__step--fwd={direction === 'forward'} class:bk2__step--back={direction === 'back'}>
