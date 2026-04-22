@@ -1,4 +1,5 @@
 import type { DirectoryItem, DirectorySort } from '$lib/app/directory/viewmodel'
+import type { ShowcaseCollectionEntry } from '@src/domains/showcase/types'
 
 export type LabItem = DirectoryItem
 export type LabSort = DirectorySort
@@ -70,7 +71,7 @@ function formatBadgeDate(date?: string) {
 	})
 }
 
-export const labEntries = labsCatalog.map((item) => ({
+export const labEntries: ShowcaseCollectionEntry[] = labsCatalog.map((item) => ({
 	...item,
 	image: getLabImage(item.href),
 	meta: getLabMeta(item.href),

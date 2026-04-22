@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import type { DirectoryItem } from '$lib/app/directory/viewmodel'
+import type { ShowcaseCollectionEntry } from '@src/domains/showcase/types'
 
 const DEV_ROUTES_DIR = path.join(process.cwd(), 'src/routes/dev')
 
@@ -16,10 +16,16 @@ function summarizeFromSlug(slug: string) {
 	return `${titleFromSlug(slug)} prototype and internal design playground.`
 }
 
-export function getDevEntries(): DirectoryItem[] {
+function getMetaFromSlug(slug: string) {
+	if (slug.startsWith('schedule-')) return 'Scheduling Prototype'
+	if (slug.startsWith('book')) return 'Booking Prototype'
+	return 'Internal Prototype'
+}
+
+export function getDevEntries(): ShowcaseCollectionEntry[] {
 	if (!fs.existsSync(DEV_ROUTES_DIR)) return []
 
-	const items: DirectoryItem[] = []
+	const items: ShowcaseCollectionEntry[] = []
 	const entries = fs.readdirSync(DEV_ROUTES_DIR, { withFileTypes: true })
 
 	for (const entry of entries) {
@@ -32,7 +38,11 @@ export function getDevEntries(): DirectoryItem[] {
 		items.push({
 			href: `/dev/${entry.name}`,
 			title: titleFromSlug(entry.name),
-			vibe: summarizeFromSlug(entry.name)
+			vibe: summarizeFromSlug(entry.name),
+			image: '/media/page-icons/labs-flask.png',
+			meta: getMetaFromSlug(entry.name),
+			badge: 'Internal',
+			badgeTone: 'warm'
 		})
 	}
 
