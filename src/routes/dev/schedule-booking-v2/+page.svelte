@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { GripVertical } from '@lucide/svelte'
+	import DevBreadcrumb from '../DevBreadcrumb.svelte'
 	import { Hero, PageShell } from '@miko/ui'
 
 	type Activity = { slug: string; label: string; icon: string; maxDuration: number; capacity: number; windowStart: number; windowEnd: number }
@@ -138,6 +139,7 @@
 
 <PageShell className="sbk">
 	<div class="sbk__inner">
+		<DevBreadcrumb />
 		<Hero eyebrow="Dev" title="Booking v2" titleClass="sbk__hero-title" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Join-first flow with hero track." compact />
 
 		<div class="sbk__tabs">

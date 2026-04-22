@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { GripVertical } from '@lucide/svelte'
+	import DevBreadcrumb from '../DevBreadcrumb.svelte'
 	import { Hero, PageShell } from '@miko/ui'
 
 	// ── Types ──
@@ -272,6 +273,7 @@
 
 <PageShell className="sbk">
 	<div class="sbk__inner">
+		<DevBreadcrumb />
 		<Hero
 			eyebrow="Dev"
 			title="Schedule Booking"

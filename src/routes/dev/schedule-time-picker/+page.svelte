@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ArrowRight, GripVertical } from '@lucide/svelte'
+	import DevBreadcrumb from '../DevBreadcrumb.svelte'
 	import { Hero, PageShell, PillButton } from '@miko/ui'
 
 	const SNAP = 0.25
@@ -121,6 +122,7 @@
 
 <PageShell className="schedule-time-picker">
 	<div class="schedule-time-picker__inner">
+		<DevBreadcrumb />
 		<Hero
 			eyebrow="Dev"
 			title="Time Picker"

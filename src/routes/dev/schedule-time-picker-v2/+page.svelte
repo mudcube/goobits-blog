@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { GripVertical } from '@lucide/svelte'
+	import DevBreadcrumb from '../DevBreadcrumb.svelte'
 	import { Hero, PageShell } from '@miko/ui'
 	import { createMockWeatherProvider, describeWeatherCode, isPrecipitation } from '$lib/app/weather'
 
@@ -121,6 +122,7 @@
 
 <PageShell className="tp2">
 	<div class="tp2__inner">
+		<DevBreadcrumb />
 		<Hero eyebrow="Dev" title="Time Picker" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Drag a time window across the day with weather and daylight cues." compact />
 		<nav class="tp2__versions"><a href="/dev/schedule-time-picker/">v1</a><a href="/dev/schedule-time-picker-v2/" aria-current="page">v2</a><a href="/dev/schedule-time-picker-v3/">v3</a><a href="/dev/schedule-time-picker-v4/">v4</a><a href="/dev/schedule-time-picker-v5/">v5</a></nav>
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Hero, PageShell } from '@miko/ui'
 	import type { Snippet } from 'svelte'
+	import DevBreadcrumb from '../DevBreadcrumb.svelte'
 
 	let {
 		currentVersion = '',
@@ -23,6 +24,7 @@
 
 <PageShell className="tp-hero">
 	<div class="tp-hero__inner">
+		<DevBreadcrumb />
 		<Hero eyebrow="Dev" title="Time Picker" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Drag a time window across the day with weather and daylight cues." compact />
 		<div class="tp-hero__toolbar">
 			<nav class="tp-hero__versions">

@@ -16,7 +16,7 @@ function summarizeFromSlug(slug: string) {
 	return `${titleFromSlug(slug)} prototype and internal design playground.`
 }
 
-export function getDevDirectoryItems(): DirectoryItem[] {
+export function getDevEntries(): DirectoryItem[] {
 	if (!fs.existsSync(DEV_ROUTES_DIR)) return []
 
 	const items: DirectoryItem[] = []

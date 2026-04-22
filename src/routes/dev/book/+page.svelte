@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Hero, PageShell } from '@miko/ui'
+	import DevBreadcrumb from '../DevBreadcrumb.svelte'
 	import { describeWeatherCode, isPrecipitation } from '$lib/app/weather'
 	import { GYM, buildOpenDays, getWeatherForDate, type OpenDay, type Person } from './mock-data'
 	import { ft, fDur, formatDate } from './time'
@@ -109,6 +110,7 @@
 
 <PageShell className="bk">
 	<div class="bk__inner">
+		<DevBreadcrumb />
 		<Hero eyebrow="Dev" title="Book" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Complete flow: link → calendar → time → booked." compact />
 		<nav class="bk__versions"><a href="/dev/book/" aria-current="page">v1</a><a href="/dev/book-v2/">v2</a></nav>
 

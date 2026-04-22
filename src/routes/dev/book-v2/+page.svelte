@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Hero, PageShell } from '@miko/ui'
+	import DevBreadcrumb from '../DevBreadcrumb.svelte'
 	import { GYM, buildOpenDays, weather } from './mock-data'
 	import { ft, formatDate } from './time'
 	import type { OpenDay, Person, Step } from './types'
@@ -90,9 +91,14 @@
 	}
 
 	// Track when user drags (to show/hide confirm button)
-	let prevStart = $state(start)
-	let prevEnd = $state(end)
+	let prevStart = $state<number | null>(null)
+	let prevEnd = $state<number | null>(null)
 	$effect(() => {
+		if (prevStart === null || prevEnd === null) {
+			prevStart = start
+			prevEnd = end
+			return
+		}
 		if (step === 'day' && (start !== prevStart || end !== prevEnd)) {
 			hasDragged = true
 			prevStart = start
@@ -105,6 +111,7 @@
 
 <PageShell className="bk2">
 	<div class="bk2__inner">
+		<DevBreadcrumb />
 		<Hero eyebrow="Dev" title="Book" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="No login wall. Calendar first. Crew tap = done." compact />
 		<nav class="bk2__versions"><a href="/dev/book/">v1</a><a href="/dev/book-v2/" aria-current="page">v2</a></nav>
 

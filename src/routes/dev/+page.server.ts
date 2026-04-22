@@ -1,8 +1,8 @@
 import type { PageServerLoad } from './$types'
-import { getDevDirectoryItems } from '$lib/app/dev/dev-directory.server'
+import { getDevEntries } from '@src/domains/dev/catalog.server'
 
 export const load: PageServerLoad = async () => {
 	return {
-		items: getDevDirectoryItems()
+		items: getDevEntries()
 	}
 }

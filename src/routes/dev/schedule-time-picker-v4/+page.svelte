@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { CloudRain } from '@lucide/svelte'
+	import DevBreadcrumb from '../DevBreadcrumb.svelte'
 	import { Hero, PageShell } from '@miko/ui'
 	import { createMockWeatherProvider, describeWeatherCode, isPrecipitation } from '$lib/app/weather'
 
@@ -126,6 +127,7 @@
 
 <PageShell className="tp4">
 	<div class="tp4__inner">
+		<DevBreadcrumb />
 		<Hero eyebrow="Dev" title="Time Picker" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Drag a time window across the day with weather and daylight cues." compact />
 		<div class="tp4__toolbar">
 			<nav class="tp4__versions">
