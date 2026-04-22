@@ -56,10 +56,10 @@
   }
 </script>
 
-<div class="admin-page__modal-overlay" role="dialog" aria-modal="true">
+<div class="admin-page__modal-overlay" role="dialog" aria-modal="true" aria-labelledby="admin-edit-program-title">
   <div class="admin-page__modal-card admin-page__program-modal-card">
     <div class="admin-page__section-head admin-page__program-modal-header">
-      <h3 class="admin-page__modal-title">
+      <h3 id="admin-edit-program-title" class="admin-page__modal-title">
         {dashboard.selectedProgramSlug ? "Edit program" : "Create program"}
       </h3>
       {#if dashboard.selectedProgramSlug}

@@ -17,13 +17,13 @@
 	const thumbAlt = $derived(post.metadata?.fm?.image?.alt || title || 'Journal cover image')
 </script>
 
-<article class="miko-blog__row">
-	<div class="miko-blog__cell miko-blog__cell--date">
+<div class="miko-blog__row" role="row">
+	<div class="miko-blog__cell miko-blog__cell--date" role="cell">
 		<div class="miko-blog__row-date-day">{formatDate(post.date)}</div>
 		<div class="miko-blog__row-date-meta">{readTime} min read</div>
 	</div>
 
-	<div class="miko-blog__cell miko-blog__cell--detail">
+	<div class="miko-blog__cell miko-blog__cell--detail" role="cell">
 		{#if coverImage}
 			<div class="miko-blog__row-thumb-wrap" aria-hidden="true">
 				{#if coverVariants}
@@ -71,7 +71,7 @@
 		</div>
 	</div>
 
-	<div class="miko-blog__cell miko-blog__cell--tax">
+	<div class="miko-blog__cell miko-blog__cell--tax" role="cell">
 		<div class="miko-blog__row-pills">
 			{#if primaryCategory}
 				<a
@@ -92,7 +92,7 @@
 		</div>
 	</div>
 
-	<div class="miko-blog__cell miko-blog__cell--arrow" aria-hidden="true">
+	<div class="miko-blog__cell miko-blog__cell--arrow" role="cell" aria-hidden="true">
 		<span class="miko-blog__row-arrow">
 			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 				<line x1="7" y1="17" x2="17" y2="7"></line>
@@ -100,4 +100,4 @@
 			</svg>
 		</span>
 	</div>
-</article>
+</div>

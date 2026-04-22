@@ -18,8 +18,8 @@
 	]
 
 	const HOURLY = $derived(day.hourly)
-	const TEMP_HIGH = $derived(Math.max(...HOURLY.map(w => w.temperature)))
-	const hasAnyRain = $derived(HOURLY.some(w => w.precipitation > 0))
+	const TEMP_HIGH = $derived(Math.max(...HOURLY.map((w) => w.temperature)))
+	const hasAnyRain = $derived(HOURLY.some((w) => w.precipitation > 0))
 	const daySummary = $derived(hasAnyRain ? 'Rain' : 'Dry')
 
 	let start = $state(12)
@@ -27,20 +27,53 @@
 	let confirmed = $state(false)
 
 	const duration = $derived(end - start)
-	const overlapping = $derived(OTHERS.filter(o => o.start < end && o.end > start))
+	const overlapping = $derived(OTHERS.filter((o) => o.start < end && o.end > start))
+	const dayLabel = $derived(formatDayLabel(day.date))
+
+	function formatDayLabel(date: string) {
+		const value = new Date(`${date}T12:00:00`)
+		return value
+			.toLocaleDateString(undefined, {
+				weekday: 'short',
+				month: 'short',
+				day: 'numeric'
+			})
+			.toUpperCase()
+	}
 
 	function weatherAt(hour: number) {
-		const exact = HOURLY.find(w => w.hour === Math.floor(hour))
-		return exact ?? HOURLY.reduce((a, b) => Math.abs(a.hour - hour) < Math.abs(b.hour - hour) ? a : b)
+		const sorted = [...HOURLY].sort((a, b) => a.hour - b.hour)
+		const lower = [...sorted].reverse().find((entry) => entry.hour <= hour) ?? sorted[0]
+		const upper = sorted.find((entry) => entry.hour >= hour) ?? sorted[sorted.length - 1]
+
+		if (!lower || !upper) return HOURLY[0]!
+		if (lower.hour === upper.hour) return lower
+
+		const ratio = (hour - lower.hour) / (upper.hour - lower.hour)
+		return {
+			...lower,
+			temperature: Math.round(lower.temperature + (upper.temperature - lower.temperature) * ratio),
+			precipitation: lower.precipitation + (upper.precipitation - lower.precipitation) * ratio,
+			weatherCode: ratio < 0.5 ? lower.weatherCode : upper.weatherCode,
+			windSpeed: lower.windSpeed + (upper.windSpeed - lower.windSpeed) * ratio,
+			humidity: Math.round(lower.humidity + (upper.humidity - lower.humidity) * ratio)
+		}
 	}
+
 	const wxStart = $derived(weatherAt(start))
-	const wxEnd = $derived(weatherAt(end > start ? end - 1 : end))
+	const wxEnd = $derived(weatherAt(end > start ? end - 0.25 : end))
 
 	const peopleRows = $derived.by(() => {
 		const rows: Person[][] = []
 		for (const person of OTHERS) {
 			let placed = false
-			for (const row of rows) { if (!row.some(p => p.start < person.end && p.end > person.start)) { row.push(person); placed = true; break } }
+			for (const row of rows) {
+				if (!row.some((p) => p.start < person.end && p.end > person.start)) {
+					row.push(person)
+					placed = true
+					break
+				}
+			}
 			if (!placed) rows.push([person])
 		}
 		return rows
@@ -51,62 +84,61 @@
 
 <TimePickerHero currentVersion="v5">
 	{#snippet toolbar()}
-		<button type="button" class="tp5__rain-btn" class:tp5__rain-btn--on={forceRainState} onclick={() => forceRainState = !forceRainState}>
+		<button type="button" class="tp5__rain-btn" class:tp5__rain-btn--on={forceRainState} onclick={() => (forceRainState = !forceRainState)}>
 			<CloudRain size={11} strokeWidth={2} /> {forceRainState ? 'Rain' : 'Dry'}
 		</button>
 	{/snippet}
 
 	<div class="tp5__card">
-			<p class="tp5__header">SAT · APR 21 · {TEMP_HIGH}° · {daySummary}</p>
+		<p class="tp5__header">{dayLabel} · {TEMP_HIGH}° · {daySummary}</p>
 
-			<SkyTrack
-				sunrise={day.sunrise}
-				sunset={day.sunset}
-				hourly={HOURLY}
-				hasRain={hasAnyRain}
-				peopleRows={peopleRows}
-				{overlapping}
-				bind:start
-				bind:end
-			/>
+		<SkyTrack
+			sunrise={day.sunrise}
+			sunset={day.sunset}
+			hourly={HOURLY}
+			hasRain={hasAnyRain}
+			peopleRows={peopleRows}
+			{overlapping}
+			bind:start
+			bind:end
+		/>
 
-			<!-- Readout -->
-			<div class="tp5__readout">
-				<div class="tp5__readout-row1">
-					<span class="tp5__r-left"><span class="tp5__r-time">{ft(start)}</span><span class="tp5__r-line"></span></span>
-					<span class="tp5__r-dur">{fDur(duration)}</span>
-					<span class="tp5__r-right"><span class="tp5__r-line"></span><span class="tp5__r-time">{ft(end)}</span></span>
-				</div>
-				<div class="tp5__readout-row2">
-					<span class="tp5__r-wx" class:tp5__r-wx--rain={isPrecipitation(wxStart.weatherCode)}>{wxStart.temperature}° {describeWeatherCode(wxStart.weatherCode).toLowerCase()}</span>
-					<span class="tp5__r-wx tp5__r-wx--end" class:tp5__r-wx--rain={isPrecipitation(wxEnd.weatherCode)}>{wxEnd.temperature}° {describeWeatherCode(wxEnd.weatherCode).toLowerCase()}</span>
-				</div>
+		<div class="tp5__readout">
+			<div class="tp5__readout-row1">
+				<span class="tp5__r-left"><span class="tp5__r-time">{ft(start)}</span><span class="tp5__r-line"></span></span>
+				<span class="tp5__r-dur">{fDur(duration)}</span>
+				<span class="tp5__r-right"><span class="tp5__r-line"></span><span class="tp5__r-time">{ft(end)}</span></span>
 			</div>
-
-			{#if OTHERS.length > 0}
-				<div class="tp5__crew-card">
-					{#each OTHERS as other}
-						<div class="tp5__crew-row" class:tp5__crew-row--on={overlapping.includes(other)}>
-							<span class="tp5__crew-dot" style="--c:{other.color};"></span>
-							<span class="tp5__crew-name">{other.name}</span>
-							<span class="tp5__crew-time">{ft(other.start)}–{ft(other.end)}</span>
-						</div>
-					{/each}
-				</div>
-			{/if}
-
-			{#if !confirmed}
-				<button type="button" class="tp5__confirm" onclick={() => confirmed = true}>
-					<span>Confirm</span><span class="tp5__confirm-arrow">→</span>
-				</button>
-			{:else}
-				<div class="tp5__set">
-					<span class="tp5__set-check">✓</span>
-					<span class="tp5__set-text">{ft(start)}–{ft(end)}</span>
-					<button type="button" class="tp5__set-change" onclick={() => confirmed = false}>Change</button>
-				</div>
-			{/if}
+			<div class="tp5__readout-row2">
+				<span class="tp5__r-wx" class:tp5__r-wx--rain={isPrecipitation(wxStart.weatherCode)}>{wxStart.temperature}° {describeWeatherCode(wxStart.weatherCode).toLowerCase()}</span>
+				<span class="tp5__r-wx tp5__r-wx--end" class:tp5__r-wx--rain={isPrecipitation(wxEnd.weatherCode)}>{wxEnd.temperature}° {describeWeatherCode(wxEnd.weatherCode).toLowerCase()}</span>
+			</div>
 		</div>
+
+		{#if OTHERS.length > 0}
+			<div class="tp5__crew-card">
+				{#each OTHERS as other}
+					<div class="tp5__crew-row" class:tp5__crew-row--on={overlapping.includes(other)}>
+						<span class="tp5__crew-dot" style="--c:{other.color};"></span>
+						<span class="tp5__crew-name">{other.name}</span>
+						<span class="tp5__crew-time">{ft(other.start)}–{ft(other.end)}</span>
+					</div>
+				{/each}
+			</div>
+		{/if}
+
+		{#if !confirmed}
+			<button type="button" class="tp5__confirm" onclick={() => (confirmed = true)}>
+				<span>Confirm</span><span class="tp5__confirm-arrow">→</span>
+			</button>
+		{:else}
+			<div class="tp5__set">
+				<span class="tp5__set-check">✓</span>
+				<span class="tp5__set-text">{ft(start)}–{ft(end)}</span>
+				<button type="button" class="tp5__set-change" onclick={() => (confirmed = false)}>Change</button>
+			</div>
+		{/if}
+	</div>
 </TimePickerHero>
 
 <style>
@@ -117,7 +149,6 @@
 	.tp5__card { padding: clamp(1rem, 2.5vw, 1.5rem); border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 1rem; background: linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 70%, transparent), color-mix(in srgb, var(--bg) 88%, transparent)); }
 	.tp5__header { margin: 0 0 0.75rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--text) 62%, transparent); }
 
-	/* Readout */
 	.tp5__readout { display: grid; gap: 0.2rem; margin-bottom: 0.6rem; }
 	.tp5__readout-row1 { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.4rem; }
 	.tp5__r-left, .tp5__r-right { display: flex; align-items: center; gap: 0.4rem; }
@@ -130,7 +161,6 @@
 	.tp5__r-wx--rain { color: #60a5fa; }
 	.tp5__r-wx--end { text-align: right; }
 
-	/* Crew card */
 	.tp5__crew-card { padding: 0.55rem 0.7rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.6rem; background: color-mix(in srgb, var(--card-bg) 50%, transparent); display: grid; gap: 0.25rem; margin-bottom: 0.5rem; }
 	.tp5__crew-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: color-mix(in srgb, var(--text) 52%, transparent); transition: color 150ms; }
 	.tp5__crew-row--on { color: color-mix(in srgb, var(--text) 78%, transparent); }

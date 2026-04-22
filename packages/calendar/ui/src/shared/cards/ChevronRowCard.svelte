@@ -72,7 +72,10 @@
 		padding: 0.625rem 0.875rem;
 	}
 
-	.chevron-row-card:focus-visible { outline: none; }
+	.chevron-row-card:focus-visible {
+		outline: 2px solid color-mix(in srgb, var(--text) 78%, transparent);
+		outline-offset: 2px;
+	}
 
 	.chevron-row-card__start {
 		flex-shrink: 0;

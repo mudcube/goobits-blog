@@ -124,7 +124,7 @@
 		<svg class="st__svg" viewBox="0 0 100 100" preserveAspectRatio="none">
 			<defs><linearGradient id="st-tg" x1="0" x2="0" y1="1" y2="0"><stop offset="0%" stop-color="#3b6fa880" /><stop offset="40%" stop-color="#5a8ab080" /><stop offset="65%" stop-color="#b0906080" /><stop offset="100%" stop-color="#d4944a80" /></linearGradient></defs>
 			<path d={tempAreaPath()} fill="url(#st-tg)" />
-			<polyline d={tempLinePath()} fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.35" />
+			<path d={tempLinePath()} fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.35" />
 		</svg>
 		{#each hourly.filter(w => w.hour % 4 === 0) as w}
 			<span class="st__temp" style="left:{pct(w.hour)}%; bottom:{((w.temperature - tempMin) / tempRange) * 50 + 18}%;">{w.temperature}°</span>
@@ -147,7 +147,7 @@
 	</div>
 	<div class="st__mask st__mask--left" style="width:{pct(start)}%;"></div>
 	<div class="st__mask st__mask--right" style="left:{pct(end)}%; width:{100 - pct(end)}%;"></div>
-	<button type="button" class="st__sel" style="left:{pct(start)}%; width:{pct(end) - pct(start)}%;" onpointerdown={(e) => onDown(e, 'range')}></button>
+	<button type="button" class="st__sel" style="left:{pct(start)}%; width:{pct(end) - pct(start)}%;" onpointerdown={(e) => onDown(e, 'range')} aria-label="Selected time range, drag to move"></button>
 	<button type="button" class="st__hit" style="left:{pct(start)}%;" onpointerdown={(e) => onDown(e, 'start')} onkeydown={(e) => { if (e.key === 'ArrowLeft') { e.preventDefault(); start = snap(clamp(start - SNAP, windowStart, end - 0.25)) } if (e.key === 'ArrowRight') { e.preventDefault(); start = snap(clamp(start + SNAP, windowStart, end - 0.25)) } }} aria-label="Start time, use arrow keys to adjust"></button>
 	<button type="button" class="st__hit" style="left:{pct(end)}%;" onpointerdown={(e) => onDown(e, 'end')} onkeydown={(e) => { if (e.key === 'ArrowLeft') { e.preventDefault(); end = snap(clamp(end - SNAP, start + 0.25, windowEnd)) } if (e.key === 'ArrowRight') { e.preventDefault(); end = snap(clamp(end + SNAP, start + 0.25, windowEnd)) } }} aria-label="End time, use arrow keys to adjust"></button>
 </div>

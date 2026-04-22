@@ -81,7 +81,7 @@ const adminMockCatalog = getAdminMockCatalog()
 				tabindex="0"
 				aria-label="Close event detail"
 				onclick={closeEventDetail}
-				onkeydown={(event) => (event.key === 'Escape' || event.key === 'Enter') && closeEventDetail()}
+				onkeydown={(event) => { if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') { event.preventDefault(); closeEventDetail() } }}
 			>
 				<div
 					class="social-home__detail-sheet"

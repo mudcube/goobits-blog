@@ -311,13 +311,14 @@
           <div class="calendar-login__divider-line"></div>
         </div>
 
-        {#if !inviteCode}
+        {#if !hasValidInvite}
           <form class="calendar-login__invite-form" onsubmit={joinWithInvite}>
             <div class="ui-inline-field calendar-login__invite-row">
               <label
                 class="calendar-login__invite-input-shell"
                 for="calendar-invite-code"
               >
+                <span class="calendar-login__invite-label">Invite code</span>
                 <input
                   id="calendar-invite-code"
                   class="ui-form-control calendar-login__invite-input"
@@ -371,10 +372,16 @@
     gap: 0.35rem;
   }
 
-  .calendar-login__claim-field > span {
+  .calendar-login__claim-field > span,
+  .calendar-login__invite-label {
     font-size: 0.76rem;
     font-weight: 600;
     color: color-mix(in srgb, var(--text) 68%, transparent);
+  }
+
+  .calendar-login__invite-input-shell {
+    display: grid;
+    gap: 0.35rem;
   }
 
 </style>

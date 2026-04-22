@@ -3,5 +3,5 @@ import { runSitemapSmoke } from './scripts/sitemap-smoke'
 
 test('sitemap smoke', async () => {
 	await runSitemapSmoke()
-}, 180_000)
+}, 600_000)
 

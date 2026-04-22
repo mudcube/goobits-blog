@@ -15,6 +15,8 @@ export default {
 					'/admin/*',
 					'/calendar',
 					'/calendar/*',
+					'/blog',
+					'/blog/*',
 					'/contact',
 					'/contact/*',
 					'/register',

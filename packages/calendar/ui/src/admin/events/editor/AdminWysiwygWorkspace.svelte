@@ -66,7 +66,7 @@
 			tabindex="0"
 			aria-label="Close settings drawer"
 			onclick={onCloseDrawer}
-			onkeydown={(event) => (event.key === 'Escape' || event.key === 'Enter') && onCloseDrawer()}
+			onkeydown={(event) => { if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onCloseDrawer() } }}
 		></div>
 		<aside class="admin-wysiwyg__drawer">
 			{@render drawer()}

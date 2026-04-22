@@ -192,11 +192,12 @@ async function getSitemapPaths() {
 }
 
 async function checkUrlStatus(url) {
+  const signal = AbortSignal.timeout(10_000)
   // Prefer HEAD; fall back to GET for servers that don't implement HEAD correctly.
   try {
-    let res = await fetch(url, { method: 'HEAD', redirect: 'follow' })
+    let res = await fetch(url, { method: 'HEAD', redirect: 'follow', signal })
     if (res.status === 405 || res.status === 400) {
-      res = await fetch(url, { method: 'GET', redirect: 'follow' })
+      res = await fetch(url, { method: 'GET', redirect: 'follow', signal })
     }
     return res.status
   } catch {
@@ -207,23 +208,35 @@ async function checkUrlStatus(url) {
 async function collectPageImagesWithPlaywright(paths) {
   const browser = await chromium.launch({ headless: true })
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } })
-
+  const statusCache = new Map()
   const findings = []
-  try {
-    for (const p of paths) {
-      const page = await context.newPage()
-      const url = new URL(p, BASE_URL).toString()
+  const base = new URL(BASE_URL)
+  const workerCount = Math.max(1, Math.min(Number(process.env.E2E_LINK_WORKERS || 4), paths.length || 1))
+  const queue = [...paths]
 
+  async function getCachedStatus(url) {
+    let pending = statusCache.get(url)
+    if (!pending) {
+      pending = checkUrlStatus(url)
+      statusCache.set(url, pending)
+    }
+    return await pending
+  }
+
+  async function crawlPath(p) {
+    const page = await context.newPage()
+    const url = new URL(p, BASE_URL).toString()
+
+    try {
       const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 })
       const status = res?.status() ?? 0
       if (!res || status >= 400) {
         findings.push({ type: 'page', page: p, url, status })
-        await page.close()
-        continue
+        return
       }
 
-      // Ensure hydration + fonts settle a bit so images with JS-added attributes appear.
-      await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {})
+      // Give client-side image markup a brief chance to settle without stalling the crawl.
+      await page.waitForLoadState('networkidle', { timeout: 2000 }).catch(() => {})
       await page.evaluate(async () => {
         if (document?.fonts?.ready) await document.fonts.ready
       }).catch(() => {})
@@ -265,27 +278,35 @@ async function collectPageImagesWithPlaywright(paths) {
       })
 
       for (const raw of imgUrls) {
-        let u
+        let imageUrl
         try {
-          u = new URL(raw, url)
+          imageUrl = new URL(raw, url)
         } catch {
           continue
         }
 
-        // Only report same-origin by default (journal content should be local static).
-        const base = new URL(BASE_URL)
-        if (u.origin !== base.origin) continue
+        if (imageUrl.origin !== base.origin) continue
 
-        const status = await checkUrlStatus(u.toString())
-        if (status === 404) {
-          findings.push({ type: 'image', page: p, url: u.pathname, status })
-        } else if (status === 0) {
-          findings.push({ type: 'image', page: p, url: u.pathname, status })
+        const imageStatus = await getCachedStatus(imageUrl.toString())
+        if (imageStatus === 404 || imageStatus === 0) {
+          findings.push({ type: 'image', page: p, url: imageUrl.pathname, status: imageStatus })
         }
       }
-
+    } finally {
       await page.close()
     }
+  }
+
+  async function worker() {
+    while (queue.length > 0) {
+      const next = queue.shift()
+      if (!next) return
+      await crawlPath(next)
+    }
+  }
+
+  try {
+    await Promise.all(Array.from({ length: workerCount }, () => worker()))
   } finally {
     await context.close()
     await browser.close()

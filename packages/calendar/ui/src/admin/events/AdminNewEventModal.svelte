@@ -3,9 +3,9 @@
   const { dashboard, onClose } = $props();
 </script>
 
-<div class="admin-page__modal-overlay" role="dialog" aria-modal="true">
+<div class="admin-page__modal-overlay" role="dialog" aria-modal="true" aria-labelledby="admin-new-event-title">
   <div class="admin-page__modal-card" style="max-width: 52rem;">
-    <h3 class="admin-page__modal-title">New Event</h3>
+    <h3 id="admin-new-event-title" class="admin-page__modal-title">New Event</h3>
     <p class="admin-page__modal-subtitle">
       Create one event or a weekly series.
     </p>

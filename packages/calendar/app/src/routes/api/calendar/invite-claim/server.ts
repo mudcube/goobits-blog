@@ -6,6 +6,7 @@ import {
 } from '@calendar/core'
 import { apiError, apiOk, apiValidationError, buildEnv } from '@calendar/kit'
 import type { RequestEvent } from '@sveltejs/kit'
+import { enforceSameOrigin } from '../../../../admin-api-helpers'
 import { ensureCalendarUserByEmail, setCalendarSessionCookie } from '../../../../server/auth/calendar-session'
 
 function createGuestEmail() {
@@ -44,6 +45,9 @@ export async function POST(event: RequestEvent) {
 	let consumedInviteId: number | null = null
 	let consumedUserId: string | null = null
 	try {
+		const csrf = enforceSameOrigin(event)
+		if (csrf) return csrf
+
 		const env = await buildEnv(event.platform)
 		const secureCookies = env['NODE_ENV'] !== 'development'
 		const { code, name, email } = parseCalendarInviteClaimInput(
@@ -74,9 +78,9 @@ export async function POST(event: RequestEvent) {
 		})
 
 		if (!user.ok) {
-			return apiError('An account already exists for that email. Use Google or Apple sign-in instead.', {
+			return apiError('Could not claim this invite. Use Google or Apple sign-in instead.', {
 				status: 409,
-				code: 'account_exists'
+				code: 'invite_claim_unavailable'
 			})
 		}
 		if (user.created) createdUserId = String(user.userId)
@@ -92,7 +96,7 @@ export async function POST(event: RequestEvent) {
 				createdUserId = null
 			}
 			return apiError('This invite can no longer be claimed.', {
-				status: consumed.reason === 'expired' ? 409 : 409,
+				status: 409,
 				code: `invite_${consumed.reason}`
 			})
 		}

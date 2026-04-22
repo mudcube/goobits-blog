@@ -30,5 +30,8 @@ jobs:
       - name: Type, lint, and critical e2e
         run: pnpm ci:gate
 
+      - name: Build verification
+        run: pnpm build:verify
+
       - name: CSS variable audit
         run: pnpm audit:css-vars

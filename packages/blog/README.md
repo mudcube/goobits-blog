@@ -28,9 +28,9 @@ npm install @goobits/blog
 
 ### 1. Configure Your Blog
 
-Create a configuration file at `src/lib/blog-config.js`:
+Create a configuration file at `src/lib/blog/config.ts`:
 
-```js
+```ts
 export const blogConfig = {
   // Basic Information
   name: 'My Blog',
@@ -58,15 +58,18 @@ export function buildPostsApiUrl(params) {
 
 ### 2. Initialize the Configuration
 
-```js
-// src/app.js
-import { initBlogConfig } from '@goobits/blog/config'
-import { blogConfig, getBlogPostFiles } from '$lib/blog-config.js'
+In this repo, the journal integration is centralized in `src/lib/blog/config.ts` and initialized via `ensureJournalBlogConfig()`. A minimal setup looks like this:
 
-initBlogConfig(blogConfig, {
-  getBlogPostFiles,
-  buildPostsApiUrl
-})
+```ts
+// src/lib/blog/config.ts
+import { initBlogConfig } from '@goobits/blog/config'
+
+export function ensureJournalBlogConfig() {
+  initBlogConfig(blogConfig, {
+    getBlogPostFiles,
+    buildPostsApiUrl
+  })
+}
 ```
 
 ### 3. Create Blog Routes
@@ -87,7 +90,7 @@ src/routes/blog/
 
 Use the route handlers from `@goobits/blog/handlers` to load blog data in your server files.
 
-If your markdown lives outside the package defaults, add a client loader:
+If your markdown lives outside the package defaults, add a client loader. This repo keeps that wiring in `src/lib/blog/config.ts`, then calls `ensureJournalBlogConfig()` before route handlers run:
 
 ```js
 // src/routes/blog/[...slug]/+page.js
