@@ -23,7 +23,7 @@
 				<span class="cc__dot" style="--c:{person.color};"></span>
 				<span class="cc__info">
 					<span class="cc__name">{person.name}</span>
-					<span class="cc__time">{ft(person.start)} – {ft(person.end)}</span>
+					<span class="cc__time">{ft(person.start)}–{ft(person.end)}</span>
 				</span>
 				<button type="button" class="cc__action" onclick={() => onJoin(person)}>Join →</button>
 			</div>
@@ -39,10 +39,10 @@
 <style>
 	.cc { display: grid; gap: 0.3rem; margin-bottom: 0.5rem; }
 	.cc__label { margin: 0 0 0.2rem; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: color-mix(in srgb, var(--text) 42%, transparent); }
-	.cc__row { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.65rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.5rem; background: color-mix(in srgb, var(--card-bg) 50%, transparent); }
-	.cc__row--on { border-color: color-mix(in srgb, #a78bfa 22%, transparent); }
-	.cc__dot { width: 0.5rem; height: 0.5rem; border-radius: 999px; background: var(--c); flex-shrink: 0; }
-	.cc__info { flex: 1; display: flex; flex-direction: column; gap: 0.1rem; }
+	.cc__row { display: flex; align-items: center; gap: 0.45rem; padding: 0.35rem 0; }
+	.cc__row--on { }
+	.cc__dot { width: 0.42rem; height: 0.42rem; border-radius: 999px; background: var(--c); flex-shrink: 0; }
+	.cc__info { flex: 1; display: flex; align-items: baseline; gap: 0.35rem; }
 	.cc__name { font-size: 0.8rem; font-weight: 600; }
 	.cc__time { font-size: 0.68rem; color: color-mix(in srgb, var(--text) 50%, transparent); font-variant-numeric: tabular-nums; }
 	.cc__action { font: inherit; font-size: 0.72rem; font-weight: 600; color: #a78bfa; flex-shrink: 0; padding: 0.3rem 0.65rem; border: 1px solid color-mix(in srgb, #a78bfa 25%, transparent); border-radius: 0.35rem; background: color-mix(in srgb, #a78bfa 5%, transparent); cursor: pointer; transition: all 150ms; }

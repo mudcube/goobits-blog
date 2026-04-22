@@ -25,8 +25,8 @@
 </nav>
 
 <style>
-	.si { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 1rem; }
-	.si__line { width: 1.5rem; height: 1px; background: color-mix(in srgb, var(--text) 14%, transparent); flex-shrink: 0; }
+	.si { display: flex; align-items: center; gap: 0; margin-bottom: 1rem; }
+	.si__line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 14%, transparent); }
 	.si__line--done { background: #a78bfa; }
 	.si__step { display: flex; align-items: center; gap: 0.3rem; padding: 0; border: none; background: none; font: inherit; cursor: pointer; transition: opacity 150ms; }
 	.si__step:disabled { cursor: default; }

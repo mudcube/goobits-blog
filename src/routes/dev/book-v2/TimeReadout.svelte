@@ -40,7 +40,7 @@
 </div>
 
 <style>
-	.tr { display: grid; gap: 0.2rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+	.tr { display: grid; gap: 0.2rem; margin-top: 0.65rem; margin-bottom: 0.5rem; }
 	.tr__row1 { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.4rem; }
 	.tr__left, .tr__right { display: flex; align-items: center; gap: 0.4rem; }
 	.tr__right { justify-content: flex-end; }

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Hero, PageShell } from '@miko/ui'
-	import DevBreadcrumb from '../DevBreadcrumb.svelte'
+	import { PageShell } from '@miko/ui'
+	import DevHero from '../DevHero.svelte'
 	import { GYM, buildOpenDays, weather } from './mock-data'
 	import type { OpenDay, Person } from './types'
 	import StepIndicator from './StepIndicator.svelte'
@@ -84,15 +84,29 @@
 	function onStepNav(step: number) {
 		if (step < stepNum) { pendingDay = null; goStep(step) }
 	}
+
+	const breadcrumbItems = [
+		{ label: 'Dev', href: '/dev/' },
+		{ label: 'Book', href: '/dev/book/' },
+		{ label: 'v2' }
+	]
+
+	const versions = [
+		{ label: 'v1', href: '/dev/book/' },
+		{ label: 'v2', href: '/dev/book-v2/', current: true }
+	]
 </script>
 
 <svelte:head><title>Book v2 - Dev - MIKO.ART</title></svelte:head>
 
 <PageShell className="bk2">
 	<div class="bk2__inner">
-		<DevBreadcrumb />
-		<Hero eyebrow="Dev" title="Book" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="No login wall. Calendar first. Crew tap = done." compact />
-		<nav class="bk2__versions"><a href="/dev/book/">v1</a><a href="/dev/book-v2/" aria-current="page">v2</a></nav>
+		<DevHero
+			title="Book"
+			subtitle="No login wall. Calendar first. Crew tap = done."
+			{breadcrumbItems}
+			{versions}
+		/>
 
 		<StepIndicator current={stepNum} onNavigate={onStepNav} />
 
@@ -116,10 +130,6 @@
 
 <style>
 	.bk2__inner { max-width: 28rem; margin: 0 auto; }
-	.bk2__versions { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; }
-	.bk2__versions a { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); }
-	.bk2__versions a:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 25%, transparent); }
-	.bk2__versions a[aria-current="page"] { color: #a78bfa; border-color: color-mix(in srgb, #a78bfa 30%, transparent); background: color-mix(in srgb, #a78bfa 6%, transparent); }
 	.bk2__step--fwd { animation: bk2-fwd 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	.bk2__step--back { animation: bk2-back 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	@keyframes bk2-fwd { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
