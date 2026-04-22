@@ -1,29 +1,7 @@
 <script lang="ts">
 	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero } from '@miko/ui'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
-	import type { ShowcaseCollectionEntry } from './types'
-
-	type Props = {
-		path: string
-		seoTitle: string
-		description: string
-		eyebrow: string
-		title: string
-		titleAccent: string
-		icon: string
-		iconAlt: string
-		intro: string
-		signalLabel: string
-		gridTitle: string
-		gridKicker: string
-		gridFilterLabel: string
-		entries: ShowcaseCollectionEntry[]
-		ctaTitle: string
-		ctaTitleAccent: string
-		ctaCopy: string
-		ctaHref: string
-		ctaLinkLabel: string
-	}
+	import type { ShowcaseCollectionPageProps } from './config'
 
 	const {
 		path,
@@ -45,7 +23,7 @@
 		ctaCopy,
 		ctaHref,
 		ctaLinkLabel
-	}: Props = $props()
+	}: ShowcaseCollectionPageProps = $props()
 </script>
 
 <Seo

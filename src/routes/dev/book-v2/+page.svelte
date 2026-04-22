@@ -21,7 +21,6 @@
 	let pendingDay = $state<OpenDay | null>(null)
 	let animKey = $state(0)
 	let direction = $state<'forward' | 'back'>('forward')
-	let hasDragged = $state(false)
 
 	const STEPS: Step[] = ['calendar', 'claim', 'day', 'done']
 	const stepIndex = $derived(STEPS.indexOf(step))
@@ -76,7 +75,6 @@
 		selectedDay = day
 		start = activity.windowStart + 2
 		end = Math.min(start + 2, activity.windowEnd)
-		hasDragged = false
 		go('day')
 	}
 
@@ -90,21 +88,6 @@
 		go('done')
 	}
 
-	// Track when user drags (to show/hide confirm button)
-	let prevStart = $state<number | null>(null)
-	let prevEnd = $state<number | null>(null)
-	$effect(() => {
-		if (prevStart === null || prevEnd === null) {
-			prevStart = start
-			prevEnd = end
-			return
-		}
-		if (step === 'day' && (start !== prevStart || end !== prevEnd)) {
-			hasDragged = true
-			prevStart = start
-			prevEnd = end
-		}
-	})
 </script>
 
 <svelte:head><title>Book v2 - Dev - MIKO.ART</title></svelte:head>
@@ -144,10 +127,14 @@
 			{/if}
 
 		{:else if step === 'day' && selectedDay && dayWeather}
-			<!-- Day view -->
-			<button type="button" class="bk2__back" onclick={() => { pendingDay = null; go('calendar') }}>← {formatDate(selectedDay.date)}</button>
-
-			<p class="bk2__day-summary">{formatDate(selectedDay.date).toUpperCase()} · {TEMP_HIGH}° · {hasAnyRain ? 'RAIN' : 'DRY'}</p>
+			<!-- Day header with back nav -->
+			<button type="button" class="bk2__day-header" onclick={() => { pendingDay = null; go('calendar') }}>
+				<span class="bk2__day-back">←</span>
+				<span class="bk2__day-info">
+					<span class="bk2__day-date">{formatDate(selectedDay.date)}</span>
+					<span class="bk2__day-meta">{TEMP_HIGH}° · {hasAnyRain ? 'Rain' : 'Dry'}</span>
+				</span>
+			</button>
 
 			<SkyTrack
 				sunrise={dayWeather.sunrise}
@@ -164,12 +151,10 @@
 
 			<CrewCard bookings={selectedDay.bookings} {overlapping} onJoin={joinPerson} />
 
-			<!-- Confirm only if user dragged their own time -->
-			{#if hasDragged}
-				<button type="button" class="bk2__confirm" onclick={() => go('done')}>
-					<span>I'm in · {ft(start)}–{ft(end)}</span><span class="bk2__arrow">→</span>
-				</button>
-			{/if}
+			<!-- Always show confirm for custom time -->
+			<button type="button" class="bk2__confirm" onclick={() => go('done')}>
+				<span>I'm in · {ft(start)}–{ft(end)}</span><span class="bk2__arrow">→</span>
+			</button>
 
 		{:else if step === 'done' && selectedDay}
 			<DoneScreen
@@ -223,10 +208,13 @@
 	.bk2__dot { width: 0.26rem; height: 0.26rem; border-radius: 999px; background: #a78bfa; }
 	.bk2__dot--grn { background: #4ade80; }
 
-	/* Day view */
-	.bk2__back { display: inline-block; margin-bottom: 0.5rem; padding: 0; border: none; background: none; color: color-mix(in srgb, var(--text) 55%, transparent); font: inherit; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: color 140ms; }
-	.bk2__back:hover { color: var(--text); }
-	.bk2__day-summary { margin: 0 0 0.65rem; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; color: color-mix(in srgb, var(--text) 58%, transparent); }
+	/* Day header */
+	.bk2__day-header { display: flex; align-items: center; gap: 0.5rem; width: 100%; padding: 0.5rem 0.6rem; margin-bottom: 0.65rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.5rem; background: color-mix(in srgb, var(--card-bg) 40%, transparent); font: inherit; color: inherit; cursor: pointer; text-align: left; transition: all 150ms; }
+	.bk2__day-header:hover { border-color: color-mix(in srgb, var(--text) 16%, transparent); background: color-mix(in srgb, var(--card-bg) 55%, transparent); }
+	.bk2__day-back { font-size: 0.85rem; color: color-mix(in srgb, var(--text) 50%, transparent); flex-shrink: 0; }
+	.bk2__day-info { display: flex; flex-direction: column; gap: 0.05rem; }
+	.bk2__day-date { font-size: 0.82rem; font-weight: 600; }
+	.bk2__day-meta { font-size: 0.62rem; color: color-mix(in srgb, var(--text) 48%, transparent); }
 
 	/* Confirm (only when dragged) */
 	.bk2__confirm { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.6rem; border: none; border-radius: 0.5rem; background: var(--gradient-action); color: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 14px color-mix(in srgb, #7a5af8 20%, transparent); transition: all 150ms; margin-top: 0.35rem; animation: bk2-fwd 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
