@@ -110,6 +110,7 @@
 <PageShell className="bk">
 	<div class="bk__inner">
 		<Hero eyebrow="Dev" title="Book" icon="/media/page-icons/labs-flask.png" iconAlt="Flask" subtitle="Complete flow: link → calendar → time → booked." compact />
+		<nav class="bk__versions"><a href="/dev/book/" aria-current="page">v1</a><a href="/dev/book-v2/">v2</a></nav>
 
 		{#key animKey}
 		<div class="bk__step" class:bk__step--fwd={direction === 'forward'} class:bk__step--back={direction === 'back'}>
@@ -218,6 +219,10 @@
 
 <style>
 	.bk__inner { max-width: 28rem; margin: 0 auto; }
+	.bk__versions { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; }
+	.bk__versions a { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); }
+	.bk__versions a:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 25%, transparent); }
+	.bk__versions a[aria-current="page"] { color: #a78bfa; border-color: color-mix(in srgb, #a78bfa 30%, transparent); background: color-mix(in srgb, #a78bfa 6%, transparent); }
 
 	.bk__step--fwd { animation: bk-fwd 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	.bk__step--back { animation: bk-back 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
