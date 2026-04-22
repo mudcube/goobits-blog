@@ -164,18 +164,42 @@ export async function loadPost(year, month, postSlug, lang, config = null) {
 			includeContent: true,
 			config: finalConfig
 		})
+		const normalizedSlug = slugify(postSlug)
 
 		const foundPost = allPosts.find(p => {
-			if (!p.urlPath) {
+			const postDate = p?.metadata?.fm?.date || p?.date
+			const metadataSlug = p?.metadata?.fm?.slug
+			if (!p.urlPath && (!postDate || !metadataSlug)) {
 				return false
 			}
 
-			const urlParts = p.urlPath.split('/').filter(part => part)
+			if (p.urlPath) {
+				const urlParts = p.urlPath.split('/').filter(part => part)
+				if (
+					urlParts.length === 3 &&
+					urlParts[0] === year &&
+					urlParts[1] === month &&
+					(urlParts[2] === postSlug || slugify(urlParts[2]) === normalizedSlug)
+				) {
+					return true
+				}
+			}
+
+			if (!postDate || !metadataSlug) {
+				return false
+			}
+
+			const parsedDate = new Date(`${ postDate }T00:00:00Z`)
+			if (Number.isNaN(parsedDate.getTime())) {
+				return false
+			}
+
+			const metadataYear = String(parsedDate.getUTCFullYear())
+			const metadataMonth = String(parsedDate.getUTCMonth() + 1).padStart(2, '0')
 			return (
-				urlParts.length === 3 &&
-				urlParts[0] === year &&
-				urlParts[1] === month &&
-				(urlParts[2] === postSlug || slugify(urlParts[2]) === slugify(postSlug))
+				metadataYear === year &&
+				metadataMonth === month &&
+				slugify(metadataSlug) === normalizedSlug
 			)
 		})
 

@@ -54,19 +54,19 @@
 	}
 
 	// Merge provided language names with defaults
-	const languages = { ...defaultLanguageNames, ...languageNames }
+	const languages = $derived({ ...defaultLanguageNames, ...languageNames })
 
 	// Create language options array
-	const languageOptions = locales.map(code => ({
+	const languageOptions = $derived(locales.map((code) => ({
 		code,
 		name: languages[code] || code
-	}))
+	})))
 
 	// State for dropdown
 	let isOpen = $state(false)
 
 	// Current language
-	let currentLanguage = $state(currentLocale)
+	let currentLanguage = $state('')
 
 	// Update current language when prop changes
 	$effect(() => {
@@ -106,31 +106,31 @@
 	}
 
 	// Create modifier classes
-	const switcherModifiers = []
-	if (variant) switcherModifiers.push(variant)
-	if (showLabels) switcherModifiers.push('display-labels')
+	const switcherModifiers = $derived.by(() => {
+		const modifiers = []
+		if (variant) modifiers.push(variant)
+		if (showLabels) modifiers.push('display-labels')
+		return modifiers
+	})
 
 	// Get component text from messages or use defaults
-	const switchLanguageLabel = messages.switchLanguage || 'Switch Language'
-	const selectLanguageLabel = messages.selectLanguage || 'Select language'
+	const switchLanguageLabel = $derived(messages.switchLanguage || 'Switch Language')
+	const selectLanguageLabel = $derived(messages.selectLanguage || 'Select language')
 </script>
 
 <div
 	class={bemClasses(ClassNames.langSwitcher, { modifiers: switcherModifiers, className })}
-	role="combobox"
-	tabindex="0"
+	role="group"
 	onblur={handleBlur}
-	onkeydown={handleKeydown}
 	aria-label={switchLanguageLabel}
-	aria-expanded={isOpen}
-	aria-controls="language-listbox"
 >
 	{#if variant === 'dropdown'}
 		<button
 			class="goo__lang-selected"
-			aria-haspopup="listbox"
+			aria-haspopup="menu"
 			aria-expanded={isOpen}
 			onclick={toggleDropdown}
+			onkeydown={handleKeydown}
 		>
 			<span class="goo__lang-code">{currentLanguage}</span>
 			{#if showLabels}
@@ -155,15 +155,17 @@
 			<div
 				id="language-listbox"
 				class="goo__lang-dropdown"
-				role="listbox"
+				role="menu"
+				tabindex="-1"
 				aria-label={selectLanguageLabel}
+				onkeydown={handleKeydown}
 			>
 				{#each languageOptions as { code, name }}
 					<button
 						class="goo__lang-option"
 						class:goo__lang-option--state-active={code === currentLanguage}
-						role="option"
-						aria-selected={code === currentLanguage}
+						role="menuitemradio"
+						aria-checked={code === currentLanguage}
 						onclick={() => handleLanguageChange(code)}
 					>
 						<span class="goo__lang-code">{code}</span>

@@ -66,10 +66,10 @@
 	} = $props()
 
 	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived(createMessageGetter({ ...defaultMessages, ...messages }))
 
 	// Define state variables
-	let visiblePosts = $state(posts)
+	let visiblePosts = $state([])
 	let totalPages = $state(1)
 
 	// Calculate what posts to display based on pagination
@@ -269,4 +269,3 @@
 		</div>
 	{/if}
 </div>
-

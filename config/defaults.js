@@ -92,7 +92,7 @@ export const defaultBlogConfig = {
 		},
 		defaults: {
 			coverImage: '/images/default-cover.jpg',
-			authorAvatar: '/images/default-avatar.jpg',
+			authorAvatar: '/favicon.png',
 			blogPath: '@content/Blog',
 			authorsPath: '/images/authors'
 		}

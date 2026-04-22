@@ -21,7 +21,7 @@
 	let { data, messages = {}, locale = 'en' } = $props()
 	
 	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived(createMessageGetter({ ...defaultMessages, ...messages }))
 
 	/**
 	 * Safely retrieves the read time for the current post.
@@ -74,7 +74,7 @@
 		}
 	}
 
-	let postContentComponent = $state(data.postContent || null)
+	let postContentComponent = $state(null)
 	let loadingError = $state(null)
 	let isImporting = $state(false)
 	let contentLoaded = $state(false)
@@ -83,7 +83,7 @@
 	// Log initial state
 	// Create constant values for the initial state to avoid reactivity warnings
 	// Don't capture reactive values in closures
-	const hasInitialPostContent = !!data.postContent
+	const hasInitialPostContent = $derived(!!data.postContent)
 	const isContentLoadedInitially = false
 	const hasInitialComponent = false
 
@@ -158,38 +158,36 @@
 	})
 
 	// Initialize metadata values directly (not as reactive state) for SSR
-	const isPostPage = data.pageType === 'post' && data.post
+	const isPostPage = $derived(data.pageType === 'post' && data.post)
 
 	// Initialize values only once at component creation time, not as reactive state
-	let readTime = isPostPage ? getReadTime() : undefined
-	let formattedDate = isPostPage ? getFormattedDate() : undefined
-	let postTitle = isPostPage ? data.post.metadata.fm.title : undefined
-	let postExcerpt = isPostPage ? (data.post.metadata.fm.excerpt || '') : ''
-	let postTags = isPostPage ? (data.post.metadata.fm.tags?.join(',') || '') : ''
-	let coverImage = isPostPage ? getCoverImageUrl(data.post) : undefined
-	let authorAvatar = isPostPage ? 
-		getAuthorAvatarUrl(data.post, '/static/images/authors/marcus-fleming.jpg') : undefined
-	let primaryCategory = isPostPage ? getPrimaryCategory() : undefined
-	let titleEmoji = isPostPage ? 
-		getEmojiFromTitle(data.post.metadata.fm.title || '', '🐝') : undefined
+	const readTime = $derived(isPostPage ? getReadTime() : undefined)
+	const formattedDate = $derived(isPostPage ? getFormattedDate() : undefined)
+	const postTitle = $derived(isPostPage ? data.post.metadata.fm.title : undefined)
+	const postExcerpt = $derived(isPostPage ? (data.post.metadata.fm.excerpt || '') : '')
+	const postTags = $derived(isPostPage ? (data.post.metadata.fm.tags?.join(',') || '') : '')
+	const coverImage = $derived(isPostPage ? getCoverImageUrl(data.post) : undefined)
+	const authorAvatar = $derived(
+		isPostPage ? getAuthorAvatarUrl(data.post, '/favicon.png') : undefined
+	)
+	const primaryCategory = $derived(isPostPage ? getPrimaryCategory() : undefined)
+	const titleEmoji = $derived(
+		isPostPage ? getEmojiFromTitle(data.post.metadata.fm.title || '', '🐝') : undefined
+	)
 
-	let currentPostId = isPostPage ? data.post.path : undefined
-	let currentCategory = isPostPage ? 
-		(data.post.metadata.fm.category || (data.post.metadata.fm.categories?.[0] || null)) : undefined
-	let currentTags = isPostPage ? (data.post.metadata.fm.tags || []) : []
+	const currentPostId = $derived(isPostPage ? data.post.path : undefined)
+	const currentCategory = $derived(
+		isPostPage
+			? data.post.metadata.fm.category || data.post.metadata.fm.categories?.[0] || null
+			: undefined
+	)
+	const currentTags = $derived(isPostPage ? data.post.metadata.fm.tags || [] : [])
 
-	let similarPosts = isPostPage && data.allPosts && Array.isArray(data.allPosts) ? 
-		getSimilarPosts(data.allPosts, currentPostId, currentCategory, currentTags, 3) : []
-
-	// Log metadata values
-	if (isPostPage) {
-		// Post metadata:
-		// {
-		//   readTime,
-		//   coverImage,
-		//   postTitle
-		// }
-	}
+	const similarPosts = $derived(
+		isPostPage && data.allPosts && Array.isArray(data.allPosts)
+			? getSimilarPosts(data.allPosts, currentPostId, currentCategory, currentTags, 3)
+			: []
+	)
 
 	/**
 	 * Gets the cover image URL for a related post.
@@ -363,4 +361,3 @@
 			</div>
 	</article>
 </div>
-

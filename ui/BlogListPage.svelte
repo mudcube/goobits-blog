@@ -13,15 +13,15 @@
 	let { data, messages = {}, locale = 'en' } = $props()
 	
 	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived(createMessageGetter({ ...defaultMessages, ...messages }))
 
 	const POSTS_PER_BATCH = blogConfig.pagination.postsPerBatch
 
 	// State for infinite scroll
-	let allPosts = $state([...data.posts]) // Start with SSR posts
+	let allPosts = $state([]) // Start with SSR posts
 	let isLoading = $state(false)
 	let currentPage = $state(1) // Track current page for API calls
-	let hasMorePosts = $state(data.hasMorePosts !== false) // Use server data or default to true
+	let hasMorePosts = $state(true) // Use server data or default to true
 
 	// Use allPosts as the visible posts (no more slicing)
 	let visiblePosts = $derived(allPosts)
@@ -200,4 +200,3 @@
 		/>
 	</div>
 </div>
-

@@ -52,46 +52,56 @@
 	} = $props()
 	
 	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived(createMessageGetter({ ...defaultMessages, ...messages }))
 
 	// Get image data using the utility function
-	const { src: imageSource, alt: imageAlt } = getPostImageData(post)
+	const imageData = $derived(getPostImageData(post))
+	const imageSource = $derived(imageData.src)
+	const imageAlt = $derived(imageData.alt)
 
 	// Get emoji for placeholder from post metadata or generate from title,
 	// falling back to configured default emoji
-	const emoji = post?.metadata?.fm?.emoji ||
-		getEmojiFromTitle(post?.metadata?.fm?.title, blogConfig.pageContent.emptyStateEmoji)
+	const emoji = $derived(
+		post?.metadata?.fm?.emoji ||
+			getEmojiFromTitle(post?.metadata?.fm?.title, blogConfig.pageContent.emptyStateEmoji)
+	)
 
 	// Get categories using the utility function
-	const categories = getPostCategories(post)
+	const categories = $derived(getPostCategories(post))
 
 	// Get primary category
-	const primaryCategory = categories[0] || getMessage('uncategorized', 'Uncategorized')
+	const primaryCategory = $derived(categories[0] || getMessage('uncategorized', 'Uncategorized'))
 
 	// Set dynamic classes based on props using BEM conventions
-	const cardModifiers = []
-	if (isCompact) cardModifiers.push('size-compact')
-	if (isHighlighted) cardModifiers.push('highlighted')
+	const cardModifiers = $derived.by(() => {
+		const modifiers = []
+		if (isCompact) modifiers.push('size-compact')
+		if (isHighlighted) modifiers.push('highlighted')
+		return modifiers
+	})
 
 	// Filter out the current tag if it exists
-	const filteredTags = currentTag && post?.metadata?.fm?.tags
-		? post.metadata.fm.tags.filter(tag => tag !== currentTag)
-		: post?.metadata?.fm?.tags || []
+	const filteredTags = $derived(
+		currentTag && post?.metadata?.fm?.tags
+			? post.metadata.fm.tags.filter((tag) => tag !== currentTag)
+			: post?.metadata?.fm?.tags || []
+	)
 
 	// Get primary category and handle current category
-	let displayCategories = categories || []
-	if (currentCategory && categories.includes(currentCategory)) {
-		displayCategories = categories.filter(cat => cat !== currentCategory)
-	}
+	const displayCategories = $derived(
+		currentCategory && categories.includes(currentCategory)
+			? categories.filter((cat) => cat !== currentCategory)
+			: categories || []
+	)
 
 	// Default excerpt text from i18n
-	const defaultExcerpt = getMessage('noPosts', 'No posts available')
+	const defaultExcerpt = $derived(getMessage('noPosts', 'No posts available'))
 
 	// Read more text from i18n
-	const readMoreText = getMessage('readMore', 'Read more')
+	const readMoreText = $derived(getMessage('readMore', 'Read more'))
 	
 	// Read time for the post
-	const readTime = post?.metadata?.fm?.readTime || blogConfig.posts.readTime.defaultTime
+	const readTime = $derived(post?.metadata?.fm?.readTime || blogConfig.posts.readTime.defaultTime)
 </script>
 
 <article class={bemClasses(ClassNames.blogCard, { modifiers: cardModifiers, className })}>

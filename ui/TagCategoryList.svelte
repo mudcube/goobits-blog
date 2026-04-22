@@ -55,13 +55,15 @@
 	} = $props()
 	
 	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived(createMessageGetter({ ...defaultMessages, ...messages }))
 
 	// Determine the actual URL base path
-	const urlBase = baseUrl || (type === 'categories' ? `${ blogConfig.uri }/category` : `${ blogConfig.uri }/tag`)
+	const urlBase = $derived(
+		baseUrl || (type === 'categories' ? `${blogConfig.uri}/category` : `${blogConfig.uri}/tag`)
+	)
 
 	// Use either activeItem or currentItem, with priority given to activeItem if both are provided
-	let selectedItem = $state(activeItem || currentItem)
+	let selectedItem = $state('')
 
 	// Track URL changes to update selected state
 	$effect(() => {
@@ -71,11 +73,13 @@
 		if ((type === 'tags' && urlPath.includes('/tag/')) ||
 			(type === 'categories' && urlPath.includes('/category/'))) {
 			selectedItem = activeItem || currentItem
+		} else {
+			selectedItem = activeItem || currentItem
 		}
 	})
 
 	// Determine component class name based on type
-	const componentClass = type === 'categories' ? 'categories' : 'tags'
+	const componentClass = $derived(type === 'categories' ? 'categories' : 'tags')
 </script>
 
 {#if items?.length}

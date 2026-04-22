@@ -64,19 +64,42 @@ if (blogConfig.debug) {
  * @returns {string} The formatted date string
  */
 export function formatDate(dateString, shortFormat = false) {
-	const date = new Date(dateString)
+	const date = parseBlogDate(dateString)
 	if (shortFormat) {
 		return date.toLocaleDateString('en-US', {
 			month: 'numeric',
 			day: 'numeric',
-			year: 'numeric'
+			year: 'numeric',
+			timeZone: 'UTC'
 		})
 	}
 	return date.toLocaleDateString('en-US', {
 		month: 'long',
 		day: 'numeric',
-		year: 'numeric'
+		year: 'numeric',
+		timeZone: 'UTC'
 	})
+}
+
+/**
+ * Parse YYYY-MM-DD frontmatter dates without local-time rollover.
+ * @param {string|Date} value
+ * @returns {Date}
+ */
+function parseBlogDate(value) {
+	if (value instanceof Date) {
+		return value
+	}
+
+	if (typeof value === 'string') {
+		const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+		if (dateOnlyMatch) {
+			const [ , year, month, day ] = dateOnlyMatch
+			return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)))
+		}
+	}
+
+	return new Date(value)
 }
 
 /**
@@ -545,9 +568,10 @@ export function getCoverImageUrl(post, fallbackImage = blogConfig.images.default
  */
 export function getAuthorAvatarUrl(post, fallbackImage = blogConfig.images.defaults.authorAvatar) {
 	const avatar = post?.metadata?.fm?.author?.avatar
-	// Fix missing author avatar by using static path
+	// Legacy author avatar references point at files that are not present in this app.
+	// Fall back to a known-good public asset instead of emitting 404s in the browser.
 	if (avatar && avatar.includes('authors/')) {
-		return `/static${ avatar }`
+		return fallbackImage
 	}
 	return processImagePath(avatar, blogConfig.images.defaults.authorsPath, fallbackImage)
 }
@@ -782,7 +806,7 @@ export async function getAllPosts(options = {}) {
 			}
 
 			// Validate date format
-			const postDate = new Date(postModule.metadata.date)
+			const postDate = parseBlogDate(postModule.metadata.date)
 			if (isNaN(postDate.getTime())) {
 				if (blogConfig.debug) {
 					logger.warn('[BlogUtils] Skipping post due to invalid date:', filePath)
@@ -791,8 +815,8 @@ export async function getAllPosts(options = {}) {
 			}
 
 			// Generate URL path components
-			const year = postDate.getFullYear()
-			const month = (postDate.getMonth() + 1).toString().padStart(2, '0')
+			const year = postDate.getUTCFullYear()
+			const month = (postDate.getUTCMonth() + 1).toString().padStart(2, '0')
 			const filename = filePath.split('/').pop().replace('.md', '')
 			const slug = postModule.metadata.slug || filename
 			const urlPath = `/${ year }/${ month }/${ slug }`

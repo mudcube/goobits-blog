@@ -37,7 +37,7 @@
 	} = $props()
 
 	// Create message getter
-	const getMessage = createMessageGetter({ ...defaultMessages, ...messages })
+	const getMessage = $derived(createMessageGetter({ ...defaultMessages, ...messages }))
 
 	// Use provided values or fall back to internationalized messages
 	const finalTitle = $derived(title || getMessage('newsletterTitle', 'Stay Updated'))
