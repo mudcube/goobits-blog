@@ -46,6 +46,18 @@ wait_for_stop() {
 	fi
 }
 
+cleanup_failed_start() {
+	local pid="$1"
+	if [[ -n "${pid}" ]] && kill -0 "${pid}" 2>/dev/null; then
+		kill "${pid}" 2>/dev/null || true
+		sleep 1
+		if kill -0 "${pid}" 2>/dev/null; then
+			kill -9 "${pid}" 2>/dev/null || true
+		fi
+	fi
+	rm -f "${PID_FILE}"
+}
+
 start_server() {
 	if is_running; then
 		echo "dev server already running on port ${PORT}"
@@ -91,6 +103,7 @@ start_server() {
 
 	echo "dev server failed to become ready within ${START_TIMEOUT}s."
 	tail -n 80 "${LOG_FILE}" || true
+	cleanup_failed_start "${daemon_pid}"
 	return 1
 }
 
