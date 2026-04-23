@@ -40,10 +40,13 @@
 <CrewCard bookings={day.bookings} {onJoin} />
 
 <button type="button" class="ts__confirm" onclick={onConfirm}>
-	I'm in · {formatDate(day.date)} · {ft(start)}–{ft(end)}
+	<span class="ts__action">I'm in</span>
+	<span class="ts__meta">{formatDate(day.date)} · {ft(start)}–{ft(end)}</span>
 </button>
 
 <style>
-	.ts__confirm { width: 100%; padding: 0.65rem; border: none; border-radius: 0.5rem; background: var(--gradient-action); color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; box-shadow: 0 3px 16px color-mix(in srgb, #7a5af8 22%, transparent); transition: all 150ms; text-align: center; }
-	.ts__confirm:hover { box-shadow: 0 5px 24px color-mix(in srgb, #7a5af8 32%, transparent); transform: translateY(-1px); }
+	.ts__confirm { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.7rem 1rem; border: 1px solid color-mix(in srgb, #a78bfa 25%, transparent); border-radius: 0.5rem; background: color-mix(in srgb, #7a5af8 12%, transparent); color: #fff; font: inherit; cursor: pointer; transition: all 180ms; }
+	.ts__confirm:hover { background: color-mix(in srgb, #7a5af8 20%, transparent); border-color: color-mix(in srgb, #a78bfa 45%, transparent); transform: translateY(-1px); }
+	.ts__action { font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; letter-spacing: -0.02em; }
+	.ts__meta { font-size: 0.58rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: color-mix(in srgb, #fff 65%, transparent); }
 </style>
