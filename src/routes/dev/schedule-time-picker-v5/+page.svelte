@@ -63,21 +63,6 @@
 	const wxStart = $derived(weatherAt(start))
 	const wxEnd = $derived(weatherAt(end > start ? end - 0.25 : end))
 
-	const peopleRows = $derived.by(() => {
-		const rows: Person[][] = []
-		for (const person of OTHERS) {
-			let placed = false
-			for (const row of rows) {
-				if (!row.some((p) => p.start < person.end && p.end > person.start)) {
-					row.push(person)
-					placed = true
-					break
-				}
-			}
-			if (!placed) rows.push([person])
-		}
-		return rows
-	})
 </script>
 
 <svelte:head><title>Time Picker v5 - Dev - MIKO.ART</title></svelte:head>
@@ -97,8 +82,6 @@
 			sunset={day.sunset}
 			hourly={HOURLY}
 			hasRain={hasAnyRain}
-			peopleRows={peopleRows}
-			{overlapping}
 			bind:start
 			bind:end
 		/>

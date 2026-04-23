@@ -43,17 +43,6 @@
 	const wxStart = $derived(weatherAt(start))
 	const wxEnd = $derived(weatherAt(end > start ? end - 1 : end))
 
-	// People rows
-	const peopleRows = $derived.by(() => {
-		if (!selectedDay) return []
-		const rows: Person[][] = []
-		for (const person of selectedDay.bookings) {
-			let placed = false
-			for (const row of rows) { if (!row.some(p => p.start < person.end && p.end > person.start)) { row.push(person); placed = true; break } }
-			if (!placed) rows.push([person])
-		}
-		return rows
-	})
 
 	// Calendar
 	const calendarMonth = $derived.by(() => { const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() } })
@@ -175,8 +164,6 @@
 				sunset={dayWeather.sunset}
 				hourly={HOURLY}
 				hasRain={hasAnyRain}
-				{peopleRows}
-				{overlapping}
 				bind:start
 				bind:end
 			/>

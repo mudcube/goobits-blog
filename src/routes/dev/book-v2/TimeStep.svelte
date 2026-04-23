@@ -12,7 +12,6 @@
 		sunrise,
 		sunset,
 		hasRain,
-		peopleRows,
 		overlapping,
 		start = $bindable(12),
 		end = $bindable(14),
@@ -24,7 +23,6 @@
 		sunrise: number
 		sunset: number
 		hasRain: boolean
-		peopleRows: Person[][]
 		overlapping: Person[]
 		start?: number
 		end?: number
@@ -35,7 +33,7 @@
 
 <TimeReadout {start} {end} {hourly} />
 
-<SkyTrack {sunrise} {sunset} {hourly} {hasRain} {peopleRows} {overlapping} bind:start bind:end />
+<SkyTrack {sunrise} {sunset} {hourly} {hasRain} bind:start bind:end />
 
 <CrewCard bookings={day.bookings} {overlapping} {onJoin} />
 

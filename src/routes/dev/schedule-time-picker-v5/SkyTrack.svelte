@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { HourlyWeather } from '$lib/app/weather'
-	import type { PersonRow } from './types'
 	import { SNAP, snap, clamp, pct as pctFn, ft, ftShort } from './time'
 
 	let {
@@ -10,8 +9,6 @@
 		sunset,
 		hourly,
 		hasRain = false,
-		peopleRows = [],
-		overlapping = [],
 		start = $bindable(12),
 		end = $bindable(14),
 	}: {
@@ -21,8 +18,6 @@
 		sunset: number
 		hourly: HourlyWeather[]
 		hasRain?: boolean
-		peopleRows?: PersonRow[]
-		overlapping?: Array<{ name: string; color: string; start: number; end: number }>
 		start?: number
 		end?: number
 	} = $props()

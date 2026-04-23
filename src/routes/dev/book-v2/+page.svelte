@@ -30,17 +30,6 @@
 	const HOURLY = $derived(dayWeather?.hourly ?? [])
 	const hasAnyRain = $derived(HOURLY.some(w => w.precipitation > 0))
 
-	const peopleRows = $derived.by(() => {
-		if (!selectedDay) return []
-		const rows: Person[][] = []
-		for (const person of selectedDay.bookings) {
-			let placed = false
-			for (const row of rows) { if (!row.some(p => p.start < person.end && p.end > person.start)) { row.push(person); placed = true; break } }
-			if (!placed) rows.push([person])
-		}
-		return rows
-	})
-
 	const calMonth = $derived.by(() => { const n = new Date(); return { year: n.getFullYear(), month: n.getMonth() } })
 	const calDays = $derived.by(() => {
 		const { year, month } = calMonth
@@ -79,7 +68,6 @@
 
 	function joinPerson(person: Person) {
 		start = person.start; end = person.end
-		goStep(2)
 	}
 
 	function onStepNav(step: number) {
@@ -124,7 +112,7 @@
 			<CalendarStep {activity} {calDays} weekdays={WEEKDAYS} {openDays} {claimed} bind:pendingDay {onSelectDay} {onClaim} />
 
 		{:else if stepNum === 1 && selectedDay && dayWeather}
-			<TimeStep day={selectedDay} hourly={HOURLY} sunrise={dayWeather.sunrise} sunset={dayWeather.sunset} hasRain={hasAnyRain} {peopleRows} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={() => goStep(2)} />
+			<TimeStep day={selectedDay} hourly={HOURLY} sunrise={dayWeather.sunrise} sunset={dayWeather.sunset} hasRain={hasAnyRain} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={() => goStep(2)} />
 
 		{:else if stepNum === 2 && selectedDay}
 			<BookedStep activityIcon={activity.icon} activityLabel={activity.label} date={selectedDay.date} {start} {end} {overlapping} onBack={() => goStep(0)} />
