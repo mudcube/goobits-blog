@@ -44,6 +44,6 @@
 </button>
 
 <style>
-	.ts__confirm { width: 100%; padding: 0.65rem; border: none; border-radius: 0.5rem; background: var(--gradient-action); color: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; box-shadow: 0 3px 16px color-mix(in srgb, #7a5af8 22%, transparent); transition: all 150ms; text-align: center; }
+	.ts__confirm { width: 100%; padding: 0.65rem; border: none; border-radius: 0.5rem; background: var(--gradient-action); color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; box-shadow: 0 3px 16px color-mix(in srgb, #7a5af8 22%, transparent); transition: all 150ms; text-align: center; }
 	.ts__confirm:hover { box-shadow: 0 5px 24px color-mix(in srgb, #7a5af8 32%, transparent); transform: translateY(-1px); }
 </style>

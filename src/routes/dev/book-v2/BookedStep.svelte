@@ -57,10 +57,10 @@
 	.bs__sparkle--4 { right: -6px; top: 50%; animation: bs-spark 0.6s 0.45s ease-out both; }
 	@keyframes bs-spark { 0% { opacity: 0; transform: scale(0); } 50% { opacity: 1; transform: scale(1.5); } 100% { opacity: 0; transform: scale(0.5) translateY(-8px); } }
 
-	.bs__title { margin: 0; font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; letter-spacing: -0.03em; }
-	.bs__detail { margin: 0.35rem 0 0; font-size: 0.82rem; color: color-mix(in srgb, var(--text) 60%, transparent); }
-	.bs__time { margin: 0.1rem 0 0; font-family: var(--font-display); font-size: 1.15rem; font-weight: 500; }
-	.bs__crew { margin: 0.55rem 0 1.1rem; font-size: 0.82rem; color: color-mix(in srgb, var(--text) 55%, transparent); }
-	.bs__back { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.6rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); border-radius: 0.5rem; background: transparent; color: var(--text); font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
+	.bs__title { margin: 0; font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; letter-spacing: -0.03em; }
+	.bs__detail { margin: 0.35rem 0 0; font-size: 0.78rem; color: color-mix(in srgb, var(--text) 60%, transparent); }
+	.bs__time { margin: 0.1rem 0 0; font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; }
+	.bs__crew { margin: 0.55rem 0 1rem; font-size: 0.78rem; color: color-mix(in srgb, var(--text) 55%, transparent); }
+	.bs__back { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.65rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); border-radius: 0.5rem; background: transparent; color: var(--text); font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
 	.bs__back:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
 </style>

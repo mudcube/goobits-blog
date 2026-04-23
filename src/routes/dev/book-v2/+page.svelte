@@ -136,7 +136,7 @@
 </PageShell>
 
 <style>
-	.bk2__inner { max-width: 28rem; margin: 0 auto; }
+	.bk2__inner { max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%; }
 	.bk2__step--fwd { animation: bk2-fwd 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	.bk2__step--back { animation: bk2-back 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	@keyframes bk2-fwd { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }

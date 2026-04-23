@@ -26,29 +26,26 @@
 </script>
 
 <div class="tr">
-	<div class="tr__row1">
-		<span class="tr__left"><span class="tr__time">{ft(start)}</span><span class="tr__line"></span></span>
+	<div class="tr__times">
+		<span class="tr__time">{ft(start)}</span>
 		<span class="tr__dur">{fDur(duration)}</span>
-		<span class="tr__right"><span class="tr__line"></span><span class="tr__time">{ft(end)}</span></span>
+		<span class="tr__time tr__time--end">{ft(end)}</span>
 	</div>
 	{#if wxS && wxE}
-		<div class="tr__row2">
-			<span class="tr__wx" class:tr__wx--rain={isPrecipitation(wxS.weatherCode)}>{wxS.temperature}° {describeWeatherCode(wxS.weatherCode).toLowerCase()}</span>
-			<span class="tr__wx tr__wx--end" class:tr__wx--rain={isPrecipitation(wxE.weatherCode)}>{wxE.temperature}° {describeWeatherCode(wxE.weatherCode).toLowerCase()}</span>
+		<div class="tr__wx">
+			<span class:tr__rain={isPrecipitation(wxS.weatherCode)}>{wxS.temperature}° {describeWeatherCode(wxS.weatherCode).toLowerCase()}</span>
+			<span class="tr__wx--end" class:tr__rain={isPrecipitation(wxE.weatherCode)}>{wxE.temperature}° {describeWeatherCode(wxE.weatherCode).toLowerCase()}</span>
 		</div>
 	{/if}
 </div>
 
 <style>
-	.tr { display: grid; gap: 0.2rem; margin-top: 0.75rem; margin-bottom: 0.75rem; }
-	.tr__row1 { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.4rem; }
-	.tr__left, .tr__right { display: flex; align-items: center; gap: 0.4rem; }
-	.tr__right { justify-content: flex-end; }
-	.tr__time { font-family: var(--font-display); font-size: 1.1rem; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; flex-shrink: 0; }
-	.tr__line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 12%, transparent); min-width: 0.5rem; }
-	.tr__dur { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 60%, transparent); white-space: nowrap; text-align: center; }
-	.tr__row2 { display: flex; justify-content: space-between; }
-	.tr__wx { font-size: 0.7rem; font-weight: 500; color: color-mix(in srgb, var(--text) 60%, transparent); font-variant-numeric: tabular-nums; }
-	.tr__wx--rain { color: #60a5fa; }
+	.tr { display: grid; gap: 0.15rem; margin: 0.75rem 0; }
+	.tr__times { display: flex; align-items: baseline; justify-content: space-between; }
+	.tr__time { font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+	.tr__time--end { text-align: right; }
+	.tr__dur { font-size: 0.78rem; font-weight: 600; color: color-mix(in srgb, var(--text) 55%, transparent); }
+	.tr__wx { display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 500; color: color-mix(in srgb, var(--text) 55%, transparent); font-variant-numeric: tabular-nums; }
 	.tr__wx--end { text-align: right; }
+	.tr__rain { color: #60a5fa; }
 </style>
