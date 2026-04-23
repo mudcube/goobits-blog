@@ -40,11 +40,11 @@
 
 <style>
 	.cc { margin-bottom: 0.75rem; }
-	.cc__header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+	.cc__header { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.35rem; margin-bottom: 0.1rem; }
 	.cc__line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 10%, transparent); }
 	.cc__label { font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); white-space: nowrap; }
-	.cc__divider { height: 1px; background: color-mix(in srgb, var(--text) 7%, transparent); }
-	.cc__row { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.1rem; width: 100%; background: none; border: none; color: var(--text); font: inherit; cursor: pointer; opacity: 0.45; transition: all 180ms; text-align: left; border-radius: 0.35rem; }
+	.cc__divider { height: 1px; background: color-mix(in srgb, var(--text) 7%, transparent); margin: 0 0.5rem; }
+	.cc__row { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem; width: 100%; background: none; border: none; color: var(--text); font: inherit; cursor: pointer; opacity: 0.45; transition: all 180ms; text-align: left; border-radius: 0.5rem; }
 	.cc__row--on { opacity: 1; }
 	.cc__row:hover { opacity: 1; background: color-mix(in srgb, var(--text) 4%, transparent); }
 	.cc__dot { width: 0.38rem; height: 0.38rem; border-radius: 999px; background: var(--c); flex-shrink: 0; }

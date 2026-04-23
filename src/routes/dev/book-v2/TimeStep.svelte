@@ -31,14 +31,15 @@
 	} = $props()
 </script>
 
-<TimeReadout {start} {end} {hourly} />
+<TimeReadout bind:start bind:end {hourly} />
 
 <SkyTrack {sunrise} {sunset} {hourly} {hasRain} bind:start bind:end />
 
 <CrewCard bookings={day.bookings} {overlapping} {onJoin} />
 
 <button type="button" class="ts__confirm" onclick={onConfirm}>
-	<CalendarCheck size={16} strokeWidth={2.2} /> I'm in
+	<CalendarCheck size={16} strokeWidth={2.2} />
+	<span>Confirm</span>
 </button>
 
 <style>
