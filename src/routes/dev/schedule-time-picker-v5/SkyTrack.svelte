@@ -163,13 +163,13 @@
 
 <style>
 	/* People */
-	.st__people { position: relative; height: calc(var(--rows, 1) * 1.1rem + 0.2rem); margin-bottom: 3px; border-radius: 0.4rem; overflow: hidden; background: #08090e; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); }
+	.st__people { position: relative; height: calc(var(--rows, 1) * 1.1rem + 0.2rem); margin-bottom: 0.25rem; border-radius: 0.4rem; overflow: hidden; background: #08090e; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); }
 	.st__ppl { position: absolute; top: calc(var(--row, 0) * 1.1rem + 0.1rem); height: calc(1.1rem - 0.15rem); border-radius: 0.25rem; background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 25%, transparent); display: flex; align-items: center; padding: 0 0.3rem; z-index: 5; opacity: 0.5; transition: opacity 150ms; cursor: default; }
 	.st__ppl--on { opacity: 1; }
 	.st__ppl-name { font-size: 0.48rem; font-weight: 700; color: color-mix(in srgb, var(--c) 80%, transparent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 	/* Track */
-	.st__lanes { position: relative; display: grid; grid-template-rows: 6rem 2rem; gap: 1px; border-radius: 0.65rem; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); touch-action: none; background: color-mix(in srgb, var(--text) 4%, transparent); margin-bottom: 0.25rem; }
+	.st__lanes { position: relative; display: grid; grid-template-rows: 6rem 2rem; gap: 1px; border-radius: 0.65rem; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); touch-action: none; background: color-mix(in srgb, var(--text) 4%, transparent); margin-bottom: 0.15rem; }
 	.st__lanes--dry { grid-template-rows: 6rem; }
 	.st__lane { position: relative; overflow: hidden; }
 	.st__lane--main { background: #080a14; }
@@ -195,7 +195,7 @@
 	@media (pointer: coarse) { .st__hit { width: 2.75rem; } }
 
 	/* Ticks */
-	.st__ticks { position: relative; height: 1.2rem; margin-bottom: 0.6rem; }
+	.st__ticks { position: relative; height: 1.2rem; margin-bottom: 0; }
 	.st__tick { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.08rem; }
 	.st__tick-dot { width: 2px; height: 2px; border-radius: 999px; background: color-mix(in srgb, var(--text) 35%, transparent); }
 	.st__tick-num { font-size: 0.52rem; font-weight: 600; color: color-mix(in srgb, var(--text) 50%, transparent); }

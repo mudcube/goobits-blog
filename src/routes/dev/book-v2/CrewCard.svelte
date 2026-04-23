@@ -34,7 +34,7 @@
 {/if}
 
 <style>
-	.cc { margin-bottom: 0.6rem; }
+	.cc { margin-bottom: 0.75rem; }
 	.cc__header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
 	.cc__header-line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 10%, transparent); }
 	.cc__header-text { font-size: 0.6rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); white-space: nowrap; }

@@ -25,15 +25,15 @@
 </nav>
 
 <style>
-	.si { display: flex; align-items: center; gap: 0; margin-bottom: 1rem; }
-	.si__line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 14%, transparent); }
+	.si { display: flex; align-items: flex-start; gap: 0; margin-bottom: 0.75rem; }
+	.si__line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 14%, transparent); margin-top: 0.7rem; }
 	.si__line--done { background: #a78bfa; }
-	.si__step { display: flex; align-items: center; gap: 0.25rem; padding: 0; border: none; background: none; font: inherit; cursor: pointer; transition: opacity 150ms; }
+	.si__step { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0; border: none; background: none; font: inherit; cursor: pointer; min-width: 2.5rem; }
 	.si__step:disabled { cursor: default; }
 	.si__dot { width: 1.4rem; height: 1.4rem; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 700; flex-shrink: 0; border: 1.5px solid color-mix(in srgb, var(--text) 18%, transparent); color: color-mix(in srgb, var(--text) 40%, transparent); background: transparent; transition: all 150ms; }
 	.si__step--active .si__dot { border-color: #a78bfa; color: #a78bfa; background: color-mix(in srgb, #a78bfa 8%, transparent); }
 	.si__step--done .si__dot { border-color: #a78bfa; background: #a78bfa; color: #fff; }
-	.si__label { font-size: 0.6rem; font-weight: 600; color: color-mix(in srgb, var(--text) 35%, transparent); white-space: nowrap; }
-	.si__step--active .si__label { color: color-mix(in srgb, var(--text) 72%, transparent); }
-	.si__step--done .si__label { color: color-mix(in srgb, #a78bfa 65%, transparent); }
+	.si__label { font-size: 0.55rem; font-weight: 600; color: color-mix(in srgb, var(--text) 32%, transparent); white-space: nowrap; max-width: 5rem; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+	.si__step--active .si__label { color: color-mix(in srgb, var(--text) 68%, transparent); }
+	.si__step--done .si__label { color: color-mix(in srgb, #a78bfa 60%, transparent); }
 </style>
