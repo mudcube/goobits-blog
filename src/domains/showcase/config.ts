@@ -4,6 +4,7 @@ export type ShowcaseCollectionConfig = {
 	path: string
 	seoTitle: string
 	description: string
+	layout?: 'grid' | 'list'
 	eyebrow: string
 	title: string
 	titleAccent: string

@@ -32,6 +32,7 @@ export {
 	ShowcaseCTA,
 	ShowcaseGrid,
 	ShowcaseHero,
+	ShowcaseList,
 	ShowcaseSection,
 } from "./showcase";
 

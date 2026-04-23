@@ -10,6 +10,7 @@
 		path: '/dev/',
 		seoTitle: 'Dev Prototypes',
 		description: 'Browse internal prototypes, schedule experiments, booking flows, and route-level design explorations.',
+		layout: 'list',
 		eyebrow: 'Dev',
 		title: 'Internal routes, sketches, and',
 		titleAccent: 'prototype iterations',

@@ -43,6 +43,6 @@
 </button>
 
 <style>
-	.ts__confirm { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.65rem 1rem; border: 1px solid color-mix(in srgb, #a78bfa 25%, transparent); border-radius: 0.5rem; background: color-mix(in srgb, #7a5af8 12%, transparent); color: #fff; font: inherit; font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; letter-spacing: -0.02em; cursor: pointer; transition: all 180ms; }
-	.ts__confirm:hover { background: color-mix(in srgb, #7a5af8 20%, transparent); border-color: color-mix(in srgb, #a78bfa 45%, transparent); transform: translateY(-1px); }
+	.ts__confirm { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.65rem 1rem; border: none; border-radius: 0.5rem; background: #22c55e; color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 180ms; box-shadow: 0 2px 10px color-mix(in srgb, #22c55e 25%, transparent); }
+	.ts__confirm:hover { background: #16a34a; box-shadow: 0 4px 16px color-mix(in srgb, #22c55e 35%, transparent); }
 </style>

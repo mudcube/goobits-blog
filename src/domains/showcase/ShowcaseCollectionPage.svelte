@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero } from '@miko/ui'
+	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero, ShowcaseList } from '@miko/ui'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 	import type { ShowcaseCollectionPageProps } from './config'
+	import ShowcaseCollectionListRow from './ShowcaseCollectionListRow.svelte'
 
 	const {
 		path,
 		seoTitle,
 		description,
+		layout = 'grid',
 		eyebrow,
 		title,
 		titleAccent,
@@ -53,27 +55,39 @@
 			{signalLabel}
 		/>
 
-		<ShowcaseGrid
-			title={gridTitle}
-			kicker={gridKicker}
-			filterLabel={gridFilterLabel}
-		>
-			{#each entries as entry, idx}
-				<ShowcaseCard
-					href={entry.href}
-					image={entry.image}
-					alt={entry.title}
-					badge={entry.badge ?? ''}
-					badgeTone={entry.badgeTone ?? 'cool'}
-					title={entry.title}
-					meta={entry.meta}
-					description={entry.vibe}
-					playLabel="Open"
-					loading={idx < 3 ? 'eager' : 'lazy'}
-					fetchpriority={idx < 3 ? 'high' : 'auto'}
-				/>
-			{/each}
-		</ShowcaseGrid>
+		{#if layout === 'list'}
+			<ShowcaseList
+				title={gridTitle}
+				kicker={gridKicker}
+				filterLabel={gridFilterLabel}
+			>
+				{#each entries as entry}
+					<ShowcaseCollectionListRow {entry} />
+				{/each}
+			</ShowcaseList>
+		{:else}
+			<ShowcaseGrid
+				title={gridTitle}
+				kicker={gridKicker}
+				filterLabel={gridFilterLabel}
+			>
+				{#each entries as entry, idx}
+					<ShowcaseCard
+						href={entry.href}
+						image={entry.image}
+						alt={entry.title}
+						badge={entry.badge ?? ''}
+						badgeTone={entry.badgeTone ?? 'cool'}
+						title={entry.title}
+						meta={entry.meta}
+						description={entry.vibe}
+						playLabel="Open"
+						loading={idx < 3 ? 'eager' : 'lazy'}
+						fetchpriority={idx < 3 ? 'high' : 'auto'}
+					/>
+				{/each}
+			</ShowcaseGrid>
+		{/if}
 
 		<ShowcaseCTA
 			title={ctaTitle}
