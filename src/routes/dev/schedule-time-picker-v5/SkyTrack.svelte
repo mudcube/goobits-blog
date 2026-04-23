@@ -98,19 +98,6 @@
 
 <svelte:window onpointermove={onMove} onpointerup={onUp} />
 
-<!-- People strip -->
-{#if peopleRows.length > 0}
-	<div class="st__people" style="--rows:{peopleRows.length};">
-		{#each peopleRows as row, rowIdx}
-			{#each row as person}
-				<div class="st__ppl" class:st__ppl--on={overlapping.some(o => o.name === person.name)} style="left:{pct(person.start)}%; width:{pct(person.end) - pct(person.start)}%; --c:{person.color}; --row:{rowIdx};" title="{person.name} · {ft(person.start)}–{ft(person.end)}">
-					<span class="st__ppl-name">{person.name}</span>
-				</div>
-			{/each}
-		{/each}
-	</div>
-{/if}
-
 <!-- Track -->
 <div class="st__lanes" class:st__lanes--dry={!hasRain} bind:this={trackEl}>
 	<div class="st__lane st__lane--main">
@@ -161,12 +148,28 @@
 	<span class="st__tick st__tick--sun" style="left:{pct(sunset)}%;"><span class="st__tick-dot st__tick-dot--warm"></span><span class="st__tick-num st__tick-num--warm">{ft(sunset)}</span></span>
 </div>
 
+{#if peopleRows.flat().length > 0}
+	<div class="st__ranges">
+		{#each peopleRows.flat() as person}
+			<div class="st__range" class:st__range--on={overlapping.some(o => o.name === person.name)} style="--c:{person.color};">
+				<div class="st__range-bar" style="left:{pct(person.start)}%; width:{pct(person.end) - pct(person.start)}%;"></div>
+				<span class="st__range-dot" style="left:{pct(person.start)}%;"></span>
+				<span class="st__range-dot st__range-dot--end" style="left:{pct(person.end)}%;"></span>
+				<span class="st__range-name" style="left:{pct(person.start)}%;">{person.name}</span>
+			</div>
+		{/each}
+	</div>
+{/if}
+
 <style>
-	/* People */
-	.st__people { position: relative; height: calc(var(--rows, 1) * 1.1rem + 0.2rem); margin-bottom: 0.25rem; border-radius: 0.4rem; overflow: hidden; background: #08090e; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); }
-	.st__ppl { position: absolute; top: calc(var(--row, 0) * 1.1rem + 0.1rem); height: calc(1.1rem - 0.15rem); border-radius: 0.25rem; background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 25%, transparent); display: flex; align-items: center; padding: 0 0.3rem; z-index: 5; opacity: 0.5; transition: opacity 150ms; cursor: default; }
-	.st__ppl--on { opacity: 1; }
-	.st__ppl-name { font-size: 0.48rem; font-weight: 700; color: color-mix(in srgb, var(--c) 80%, transparent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	/* People ranges */
+	.st__ranges { position: relative; display: flex; flex-direction: column; gap: 0.2rem; padding-top: 0.15rem; }
+	.st__range { position: relative; height: 1rem; }
+	.st__range-bar { position: absolute; top: 0.35rem; height: 2px; background: var(--c); border-radius: 1px; opacity: 0.4; }
+	.st__range--on .st__range-bar { opacity: 0.7; }
+	.st__range-dot { position: absolute; top: 50%; width: 0.32rem; height: 0.32rem; border-radius: 999px; background: var(--c); transform: translate(-50%, -50%); }
+	.st__range-dot--end { /* positioned via style */ }
+	.st__range-name { position: absolute; top: 0; transform: translateX(0.35rem); font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--c) 85%, white); white-space: nowrap; line-height: 1rem; }
 
 	/* Track */
 	.st__lanes { position: relative; display: grid; grid-template-rows: 6rem 2rem; gap: 1px; border-radius: 0.65rem; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); touch-action: none; background: color-mix(in srgb, var(--text) 4%, transparent); margin-bottom: 0.15rem; }
