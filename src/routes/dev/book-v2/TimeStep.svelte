@@ -2,7 +2,6 @@
 	import type { HourlyWeather } from '$lib/app/weather'
 	import type { OpenDay, Person } from './types'
 	import { CalendarCheck } from '@lucide/svelte'
-	import { ft, formatDate } from './time'
 	import SkyTrack from '../schedule-time-picker-v5/SkyTrack.svelte'
 	import TimeReadout from './TimeReadout.svelte'
 	import CrewCard from './CrewCard.svelte'
