@@ -33,11 +33,11 @@
 	} = $props()
 </script>
 
-<SkyTrack {sunrise} {sunset} {hourly} {hasRain} {peopleRows} {overlapping} bind:start bind:end />
-
 <TimeReadout {start} {end} {hourly} />
 
-<CrewCard bookings={day.bookings} {onJoin} />
+<SkyTrack {sunrise} {sunset} {hourly} {hasRain} {peopleRows} {overlapping} bind:start bind:end />
+
+<CrewCard bookings={day.bookings} {overlapping} {onJoin} />
 
 <button type="button" class="ts__confirm" onclick={onConfirm}>
 	<span class="ts__action">I'm in</span>

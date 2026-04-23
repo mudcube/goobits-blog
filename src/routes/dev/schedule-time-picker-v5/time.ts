@@ -7,14 +7,14 @@ export function pct(h: number, windowStart: number, windowEnd: number) { return 
 export function ft(h: number) {
 	const hr = Math.floor(h) % 24
 	const min = Math.round((h - Math.floor(h)) * 60)
-	const sfx = hr >= 12 ? 'p' : 'a'
+	const sfx = hr >= 12 ? 'pm' : 'am'
 	const display = hr === 0 ? 12 : hr > 12 ? hr - 12 : hr
 	return min === 0 ? `${display}${sfx}` : `${display}:${String(min).padStart(2, '0')}${sfx}`
 }
 
 export function ftShort(h: number) {
 	const hr = Math.floor(h) % 24
-	if (hr === 0 || hr === 24) return '12a'
+	if (hr === 0 || hr === 24) return '12am'
 	if (hr < 12) return `${hr}`
 	if (hr === 12) return '12'
 	return `${hr - 12}`

@@ -28,7 +28,9 @@
 <div class="tr">
 	<div class="tr__times">
 		<span class="tr__time">{ft(start)}</span>
+		<span class="tr__line"></span>
 		<span class="tr__dur">{fDur(duration)}</span>
+		<span class="tr__line"></span>
 		<span class="tr__time tr__time--end">{ft(end)}</span>
 	</div>
 	{#if wxS && wxE}
@@ -40,11 +42,12 @@
 </div>
 
 <style>
-	.tr { display: grid; gap: 0.15rem; margin: 0.75rem 0; }
-	.tr__times { display: flex; align-items: baseline; justify-content: space-between; }
-	.tr__time { font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
-	.tr__time--end { text-align: right; }
-	.tr__dur { font-size: 0.78rem; font-weight: 600; color: color-mix(in srgb, var(--text) 55%, transparent); }
+	.tr { display: grid; gap: 0.15rem; margin: 0.25rem 0 0.75rem; }
+	.tr__times { display: flex; align-items: center; gap: 0.4rem; }
+	.tr__time { font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+	.tr__time--end { margin-left: auto; }
+	.tr__line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 12%, transparent); min-width: 0.5rem; }
+	.tr__dur { font-size: 0.78rem; font-weight: 600; color: color-mix(in srgb, var(--text) 55%, transparent); flex-shrink: 0; }
 	.tr__wx { display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 500; color: color-mix(in srgb, var(--text) 55%, transparent); font-variant-numeric: tabular-nums; }
 	.tr__wx--end { text-align: right; }
 	.tr__rain { color: #60a5fa; }

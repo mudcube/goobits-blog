@@ -7,7 +7,7 @@ export function pct(h: number, windowStart = 0, windowEnd = 24) { return ((h - w
 export function ft(h: number) {
 	const hr = Math.floor(h) % 24
 	const min = Math.round((h - Math.floor(h)) * 60)
-	const sfx = hr >= 12 ? 'p' : 'a'
+	const sfx = hr >= 12 ? 'pm' : 'am'
 	const d = hr === 0 ? 12 : hr > 12 ? hr - 12 : hr
 	return min === 0 ? `${d}${sfx}` : `${d}:${String(min).padStart(2, '0')}${sfx}`
 }
