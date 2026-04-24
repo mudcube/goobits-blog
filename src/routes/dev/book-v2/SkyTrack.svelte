@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { HourlyWeather } from '$lib/app/weather'
-	import { Thermometer, CloudRain } from '@lucide/svelte'
+	import { Thermometer, CloudRain, GripVertical } from '@lucide/svelte'
 	import { SNAP, snap, clamp, pct as pctFn, ft, ftShort } from './sky-time'
 
 	let {
@@ -186,8 +186,8 @@
 
 	<!-- Selection -->
 	<div class="st__sel-vis">
-		<div class="st__handle" style="left:{pct(start)}%;"></div>
-		<div class="st__handle" style="left:{pct(end)}%;"></div>
+		<div class="st__handle" style="left:{pct(start)}%;"><GripVertical size={10} strokeWidth={2.5} /></div>
+		<div class="st__handle" style="left:{pct(end)}%;"><GripVertical size={10} strokeWidth={2.5} /></div>
 	</div>
 	<div class="st__mask st__mask--left" style="width:{pct(start)}%;"></div>
 	<div class="st__mask st__mask--right" style="left:{pct(end)}%; width:{100 - pct(end)}%;"></div>
@@ -236,7 +236,7 @@
 	.st__sel { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, white 3%, transparent); border-left: 1px solid color-mix(in srgb, white 20%, transparent); border-right: 1px solid color-mix(in srgb, white 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, white 3%, transparent), 0 0 20px color-mix(in srgb, #a78bfa 6%, transparent); cursor: grab; z-index: 10; padding: 0; font: inherit; border-radius: 0; transition: background 120ms; }
 	.st__sel:hover { background: color-mix(in srgb, white 6%, transparent); }
 	.st__sel-vis { pointer-events: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 12; }
-	.st__handle { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 0.75rem; height: 0.75rem; border-radius: 999px; background: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4), 0 0 8px color-mix(in srgb, #a78bfa 15%, transparent); }
+	.st__handle { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 0.9rem; height: 0.9rem; border-radius: 999px; background: #fff; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; color: rgba(0, 0, 0, 0.35); }
 	.st__hit { position: absolute; top: 0; bottom: 0; width: 0.7rem; transform: translateX(-50%); z-index: 15; cursor: ew-resize; background: none; border: none; padding: 0; font: inherit; }
 	.st__hit:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; border-radius: 2px; }
 	@media (pointer: coarse) { .st__hit { width: 1.2rem; } }

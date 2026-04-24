@@ -32,8 +32,8 @@
 
 {#if hasBookings}
 	<div class="cc">
-		<p class="cc__title">Others going {#if dayLabel}{dayLabel}{/if}</p>
-		<div class="cc__card">
+		<fieldset class="cc__card">
+			<legend class="cc__legend">Others going {#if dayLabel}{dayLabel}{/if}</legend>
 			{#each bookings as person, i}
 				{#if i > 0}<div class="cc__divider"></div>{/if}
 				<button type="button" class="cc__row" class:cc__row--on={isOverlapping(person)} class:cc__row--flash={flashIdx === i} data-tip="Join {person.name}" onclick={() => tapPerson(person, i)}>
@@ -42,7 +42,7 @@
 					<span class="cc__time">{ft(person.start)}–{ft(person.end)}</span>
 				</button>
 			{/each}
-		</div>
+		</fieldset>
 	</div>
 {:else}
 	<div class="cc__empty">
@@ -53,8 +53,8 @@
 
 <style>
 	.cc { margin-top: 1rem; margin-bottom: 0.75rem; }
-	.cc__title { margin: 0 0 0.35rem; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 40%, transparent); text-transform: uppercase; letter-spacing: 0.04em; }
-	.cc__card { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.6rem; overflow: hidden; }
+	.cc__card { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.6rem; margin: 0; padding: 0; }
+	.cc__legend { margin: 0 auto; padding: 0 0.5rem; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); white-space: nowrap; }
 	.cc__divider { height: 1px; background: color-mix(in srgb, var(--text) 7%, transparent); margin: 0; }
 	.cc__row { display: flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.65rem; width: 100%; background: none; border: none; color: var(--text); font: inherit; cursor: pointer; opacity: 0.45; transition: all 180ms; text-align: left; }
 	.cc__row--on { opacity: 1; }
