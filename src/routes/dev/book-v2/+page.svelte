@@ -132,10 +132,7 @@
 			{versions}
 		/>
 
-		<div class="bk2__topbar">
-			<StepIndicator current={stepNum} labels={stepLabels} onNavigate={onStepNav} />
-			<button type="button" class="bk2__tour-btn" data-tip="Take the tour" onclick={() => tourRef.showPrompt()}>?</button>
-		</div>
+		<StepIndicator current={stepNum} labels={stepLabels} onNavigate={onStepNav} />
 
 		{#key animKey}
 		<div class="bk2__step bk2__panel" class:bk2__step--fwd={direction === 'forward'} class:bk2__step--back={direction === 'back'}>
@@ -152,6 +149,8 @@
 
 		</div>
 		{/key}
+
+		<button type="button" class="bk2__tour-link" onclick={() => tourRef.showPrompt()}>Take the tour</button>
 	</div>
 </PageShell>
 
@@ -159,10 +158,8 @@
 
 <style>
 	.bk2__inner { max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%; }
-	.bk2__topbar { display: flex; align-items: flex-start; gap: 0.5rem; }
-	.bk2__topbar :global(.si) { flex: 1; }
-	.bk2__tour-btn { flex-shrink: 0; width: 1.4rem; height: 1.4rem; border-radius: 999px; border: 1.5px solid color-mix(in srgb, var(--text) 18%, transparent); background: transparent; color: color-mix(in srgb, var(--text) 40%, transparent); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 180ms; padding: 0; font: inherit; font-size: 0.55rem; font-weight: 700; }
-	.bk2__tour-btn:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 30%, transparent); }
+	.bk2__tour-link { display: block; margin: 0.5rem 0 0 auto; padding: 0; border: none; background: none; font: inherit; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 30%, transparent); cursor: pointer; transition: color 150ms; }
+	.bk2__tour-link:hover { color: color-mix(in srgb, var(--text) 55%, transparent); }
 	.bk2__panel { padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.75rem; background: color-mix(in srgb, var(--panel-bg, var(--bg)) 60%, transparent); }
 	.bk2__step--fwd { animation: bk2-fwd 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	.bk2__step--back { animation: bk2-back 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
