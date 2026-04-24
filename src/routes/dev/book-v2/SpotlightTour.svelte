@@ -139,7 +139,7 @@
 
 	const message = $derived(current >= 0 && current < steps.length ? steps[current]!.message : '')
 	const isLast = $derived(current === steps.length - 1)
-	const stepLabel = $derived(`${current + 1} of ${steps.length}`)
+	const progress = $derived(steps.length > 0 ? ((current + 1) / steps.length) * 100 : 0)
 </script>
 
 {#if mode === 'prompt'}
@@ -150,8 +150,8 @@
 		</svg>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div class="st-prompt" onpointerdown={(e) => e.stopPropagation()}>
-			<p class="st-prompt__title">First time here?</p>
-			<p class="st-prompt__copy">Quick tour — see how booking works in a few seconds.</p>
+			<p class="st-prompt__title">Want a quick walkthrough?</p>
+			<p class="st-prompt__copy">See how booking works — takes about 10 seconds.</p>
 			<div class="st-prompt__actions">
 				<button type="button" class="st-prompt__skip" onclick={dismissPrompt}>Skip</button>
 				<button type="button" class="st-prompt__go" onclick={startTour}>Show me around</button>
@@ -188,8 +188,8 @@
 			<div class="st-tip" class:st-tip--hidden={transitioning} class:st-tip--above={pos === 'bottom'} class:st-tip--below={pos === 'top'} style={tipStyle} onpointerdown={(e) => e.stopPropagation()}>
 				<p class="st-tip__msg">{message}</p>
 				<div class="st-tip__footer">
-					<span class="st-tip__count">{stepLabel}</span>
-					<button type="button" class="st-tip__btn" onclick={advance}>{isLast ? 'Done' : 'Next'}</button>
+					<div class="st-tip__progress"><div class="st-tip__bar" style="width:{progress}%;"></div></div>
+					<button type="button" class="st-tip__btn" class:st-tip__btn--done={isLast} onclick={advance}>{isLast ? 'Done' : 'Next'}</button>
 				</div>
 			</div>
 		{/if}
@@ -210,18 +210,21 @@
 	.st-prompt__go { padding: 0.4rem 0.85rem; border: none; border-radius: 0.4rem; background: #a78bfa; color: #fff; font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: background 150ms; }
 	.st-prompt__go:hover { background: #8b5cf6; }
 
-	.st-ring { position: absolute; border: 1.5px solid rgba(167, 139, 250, 0.5); pointer-events: none; animation: st-pulse 2s ease-in-out infinite; opacity: 1; transition: opacity 0.2s ease; }
+	.st-ring { position: absolute; border: 1.5px solid rgba(167, 139, 250, 0.6); pointer-events: none; animation: st-pulse 2s ease-in-out infinite; opacity: 1; transition: opacity 0.2s ease; box-shadow: 0 0 12px rgba(167, 139, 250, 0.15); }
 	.st-ring--hidden { opacity: 0; }
-	@keyframes st-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.25); } 50% { box-shadow: 0 0 0 6px rgba(167, 139, 250, 0); } }
+	@keyframes st-pulse { 0% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.35); } 25% { box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1); } 50% { box-shadow: 0 0 0 8px rgba(167, 139, 250, 0); } 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); } }
 
 	.st-tip { position: fixed; width: max-content; max-width: min(20rem, calc(100vw - 2rem)); padding: 0.75rem 1rem; border-radius: 0.65rem; background: rgba(16, 16, 28, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(167, 139, 250, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); pointer-events: auto; opacity: 1; transition: opacity 0.2s ease; }
 	.st-tip--hidden { opacity: 0; pointer-events: none; }
-	.st-tip::before { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; }
-	.st-tip--above::before { top: -6px; border-bottom: 6px solid rgba(16, 16, 28, 0.95); }
-	.st-tip--below::before { bottom: -6px; border-top: 6px solid rgba(16, 16, 28, 0.95); }
-	.st-tip__msg { margin: 0 0 0.55rem; font-size: 0.82rem; font-weight: 500; color: rgba(255, 255, 255, 0.9); line-height: 1.45; }
+	.st-tip::before { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; filter: drop-shadow(0 0 3px rgba(167, 139, 250, 0.15)); }
+	.st-tip--above::before { top: -8px; border-bottom: 8px solid rgba(16, 16, 28, 0.95); }
+	.st-tip--below::before { bottom: -8px; border-top: 8px solid rgba(16, 16, 28, 0.95); }
+	.st-tip__msg { margin: 0 0 0.6rem; font-size: 0.82rem; font-weight: 500; color: rgba(255, 255, 255, 0.9); line-height: 1.45; }
 	.st-tip__footer { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
-	.st-tip__count { font-size: 0.58rem; font-weight: 600; color: rgba(255, 255, 255, 0.3); }
-	.st-tip__btn { padding: 0.3rem 0.75rem; border: none; border-radius: 0.35rem; background: #a78bfa; color: #fff; font: inherit; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; cursor: pointer; transition: background 150ms; }
+	.st-tip__progress { flex: 1; height: 2px; background: rgba(255, 255, 255, 0.1); border-radius: 1px; overflow: hidden; }
+	.st-tip__bar { height: 100%; background: #a78bfa; border-radius: 1px; transition: width 0.3s ease; }
+	.st-tip__btn { padding: 0.3rem 0.75rem; border: none; border-radius: 0.35rem; background: #a78bfa; color: #fff; font: inherit; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; cursor: pointer; transition: all 150ms; }
 	.st-tip__btn:hover { background: #8b5cf6; }
+	.st-tip__btn--done { background: #22c55e; }
+	.st-tip__btn--done:hover { background: #16a34a; }
 </style>

@@ -14,12 +14,12 @@
 	let tourRef: SpotlightTour
 
 	const tourSteps: TourStep[] = [
-		{ phase: 0, selector: '.cs__grid', message: 'Choose a day. Purple dots mean it\'s open.' },
-		{ phase: 1, selector: '.tr__times', message: 'Edit your time. Tap any value to type a new one.' },
-		{ phase: 1, selector: '.st__lanes', message: 'Drag to adjust. Handles move the edges, center moves the whole block.' },
-		{ phase: 1, selector: '.cc', message: 'Join someone. Tap a name to match their time.' },
-		{ phase: 1, selector: '.ts__confirm', message: 'Confirm to lock in your time.', position: 'top' },
-		{ phase: 2, selector: '.bs__card', message: 'Done! Add it to your calendar or pick a different day.' },
+		{ phase: 0, selector: '.cs__grid', message: 'Pick a day that works — purple dots are open.' },
+		{ phase: 1, selector: '.tr__times', message: 'This is your time — tap to type, or use arrow keys.' },
+		{ phase: 1, selector: '.st__lanes', message: 'Drag the handles to resize, or grab the middle to slide.' },
+		{ phase: 1, selector: '.cc__card', message: 'Tap a name to match their time.' },
+		{ phase: 1, selector: '.ts__confirm', message: 'Happy with your time? Lock it in.', position: 'top' },
+		{ phase: 2, selector: '.bs__card', message: 'You\'re all set! Add it to your calendar if you\'d like.' },
 	]
 
 	function handleTourPhase(phase: number) {
