@@ -68,8 +68,8 @@
 		else el.textContent = fDur(end - start)
 	}
 
-	function nudge(field: 'start' | 'end' | 'dur', dir: 1 | -1) {
-		const step = SNAP * dir
+	function nudge(field: 'start' | 'end' | 'dur', dir: 1 | -1, fast = false) {
+		const step = (fast ? 1 : SNAP) * dir
 		if (field === 'start') {
 			const dur = end - start
 			const ns = snap(clamp(start + step, 0, 24 - dur))
@@ -97,13 +97,13 @@
 		if (e.key === 'ArrowUp') {
 			e.preventDefault()
 			onNudge?.()
-			nudge(field, 1)
+			nudge(field, 1, e.shiftKey)
 			;(e.currentTarget as HTMLElement).textContent = field === 'start' ? ft(start) : field === 'end' ? ft(end) : fDur(end - start)
 		}
 		if (e.key === 'ArrowDown') {
 			e.preventDefault()
 			onNudge?.()
-			nudge(field, -1)
+			nudge(field, -1, e.shiftKey)
 			;(e.currentTarget as HTMLElement).textContent = field === 'start' ? ft(start) : field === 'end' ? ft(end) : fDur(end - start)
 		}
 		if (e.key === 'Enter') {
