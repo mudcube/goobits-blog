@@ -48,7 +48,7 @@
 	let claimed = $state(true) // auto-filled for dev
 	let pendingDay = $state<OpenDay | null>(null)
 	let animKey = $state(0)
-	let direction = $state<'forward' | 'back'>('forward')
+	let direction = $state<'forward' | 'back' | 'none'>('none')
 
 	const overlapping = $derived(selectedDay ? selectedDay.bookings.filter(o => o.start < end && o.end > start) : [])
 
