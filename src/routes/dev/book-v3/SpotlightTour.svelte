@@ -31,13 +31,17 @@
 
 	function startTour() {
 		mode = 'touring'
+		transitioning = true
 		if (currentPhase !== 0 && onPhaseRequest) onPhaseRequest(0)
 		const firstIdx = steps.findIndex(s => s.phase === 0)
 		if (firstIdx >= 0) {
 			current = firstIdx
-			transitioning = true
-			setTimeout(() => { transitioning = false; highlight() }, 300)
+			setTimeout(() => { transitioning = false; highlight() }, 350)
 		}
+	}
+
+	export function showPrompt() {
+		mode = 'prompt'
 	}
 
 	function highlight() {
@@ -55,41 +59,41 @@
 		const nextStep = steps[nextIdx]!
 		const currentStep = steps[current]!
 
+		// Fade out spotlight elements
+		transitioning = true
+
 		if (nextStep.phase !== currentStep.phase && onPhaseRequest) {
-			// Phase change: fade out → switch → fade in
-			transitioning = true
-			rect = null
+			// Phase change: fade out → switch page → fade in
 			setTimeout(() => {
 				onPhaseRequest!(nextStep.phase)
 				current = nextIdx
 				setTimeout(() => {
-					transitioning = false
 					highlight()
+					transitioning = false
 				}, 450)
-			}, 200)
+			}, 250)
 		} else {
-			// Same phase: quick transition
-			transitioning = true
+			// Same phase: quick crossfade
 			setTimeout(() => {
 				current = nextIdx
-				transitioning = false
 				highlight()
-			}, 150)
+				transitioning = false
+			}, 200)
 		}
 	}
 
 	function finish() {
 		transitioning = true
-		rect = null
 		setTimeout(() => {
 			mode = 'idle'
 			current = -1
+			rect = null
 			transitioning = false
 			if (typeof localStorage !== 'undefined') {
 				localStorage.setItem(storageKey, '1')
 			}
 			if (onPhaseRequest) onPhaseRequest(0)
-		}, 200)
+		}, 250)
 	}
 
 	function dismissPrompt() {
@@ -136,15 +140,14 @@
 	const message = $derived(current >= 0 && current < steps.length ? steps[current]!.message : '')
 	const isLast = $derived(current === steps.length - 1)
 	const stepLabel = $derived(`${current + 1} of ${steps.length}`)
-
-	export function showPrompt() {
-		mode = 'prompt'
-	}
 </script>
 
 {#if mode === 'prompt'}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div class="st-overlay" onpointerdown={dismissPrompt}>
+		<svg class="st-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+			<rect width="100" height="100" fill="rgba(4, 4, 12, 0.7)" />
+		</svg>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div class="st-prompt" onpointerdown={(e) => e.stopPropagation()}>
 			<p class="st-prompt__title">First time here?</p>
@@ -159,9 +162,10 @@
 
 {#if mode === 'touring'}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div class="st-overlay" class:st-overlay--fade={transitioning} onpointerdown={dismissOverlay}>
-		{#if cutout && !transitioning}
-			<svg class="st-svg" viewBox="0 0 {window.innerWidth} {window.innerHeight}">
+	<div class="st-overlay" onpointerdown={dismissOverlay}>
+		<!-- Dark overlay is always present -->
+		<svg class="st-svg" viewBox="0 0 {window.innerWidth} {window.innerHeight}">
+			{#if cutout && !transitioning}
 				<defs>
 					<mask id="st-mask">
 						<rect width="100%" height="100%" fill="white" />
@@ -169,30 +173,32 @@
 					</mask>
 				</defs>
 				<rect width="100%" height="100%" fill="rgba(4, 4, 12, 0.7)" mask="url(#st-mask)" />
-			</svg>
+			{:else}
+				<rect width="100%" height="100%" fill="rgba(4, 4, 12, 0.7)" />
+			{/if}
+		</svg>
 
-			<div class="st-ring" style="left:{cutout.x}px; top:{cutout.y}px; width:{cutout.w}px; height:{cutout.h}px; border-radius:{cutout.r}px;"></div>
+		<!-- Ring and tooltip fade in/out -->
+		{#if cutout}
+			<div class="st-ring" class:st-ring--hidden={transitioning} style="left:{cutout.x}px; top:{cutout.y}px; width:{cutout.w}px; height:{cutout.h}px; border-radius:{cutout.r}px;"></div>
+		{/if}
 
+		{#if rect}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div class="st-tip" style={tipStyle} onpointerdown={(e) => e.stopPropagation()}>
+			<div class="st-tip" class:st-tip--hidden={transitioning} class:st-tip--above={pos === 'bottom'} class:st-tip--below={pos === 'top'} style={tipStyle} onpointerdown={(e) => e.stopPropagation()}>
 				<p class="st-tip__msg">{message}</p>
 				<div class="st-tip__footer">
 					<span class="st-tip__count">{stepLabel}</span>
 					<button type="button" class="st-tip__btn" onclick={advance}>{isLast ? 'Done' : 'Next'}</button>
 				</div>
 			</div>
-		{:else}
-			<svg class="st-svg" viewBox="0 0 {window.innerWidth} {window.innerHeight}">
-				<rect width="100%" height="100%" fill="rgba(4, 4, 12, 0.7)" />
-			</svg>
 		{/if}
 	</div>
 {/if}
 
 <style>
-	.st-overlay { position: fixed; inset: 0; z-index: 9999; opacity: 1; transition: opacity 0.2s ease; }
-	.st-overlay--fade { opacity: 0.4; }
-	.st-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+	.st-overlay { position: fixed; inset: 0; z-index: 9999; }
+	.st-svg { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity 0.25s ease; }
 
 	.st-prompt { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(20rem, calc(100vw - 2.5rem)); padding: 1.25rem 1.25rem 1rem; border-radius: 0.75rem; background: rgba(16, 16, 28, 0.95); backdrop-filter: blur(16px); border: 1px solid rgba(167, 139, 250, 0.2); box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5); animation: st-prompt-in 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: auto; }
 	@keyframes st-prompt-in { from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
@@ -204,11 +210,15 @@
 	.st-prompt__go { padding: 0.4rem 0.85rem; border: none; border-radius: 0.4rem; background: #a78bfa; color: #fff; font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: background 150ms; }
 	.st-prompt__go:hover { background: #8b5cf6; }
 
-	.st-ring { position: absolute; border: 1.5px solid rgba(167, 139, 250, 0.5); pointer-events: none; animation: st-pulse 2s ease-in-out infinite; }
+	.st-ring { position: absolute; border: 1.5px solid rgba(167, 139, 250, 0.5); pointer-events: none; animation: st-pulse 2s ease-in-out infinite; opacity: 1; transition: opacity 0.2s ease; }
+	.st-ring--hidden { opacity: 0; }
 	@keyframes st-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.25); } 50% { box-shadow: 0 0 0 6px rgba(167, 139, 250, 0); } }
 
-	.st-tip { position: fixed; width: max-content; max-width: min(20rem, calc(100vw - 2rem)); padding: 0.75rem 1rem; border-radius: 0.65rem; background: rgba(16, 16, 28, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(167, 139, 250, 0.2); border-top: 2px solid rgba(167, 139, 250, 0.4); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); animation: st-tip-in 0.25s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: auto; }
-	@keyframes st-tip-in { from { opacity: 0; transform: translateX(-50%) translateY(4px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+	.st-tip { position: fixed; width: max-content; max-width: min(20rem, calc(100vw - 2rem)); padding: 0.75rem 1rem; border-radius: 0.65rem; background: rgba(16, 16, 28, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(167, 139, 250, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); pointer-events: auto; opacity: 1; transition: opacity 0.2s ease; }
+	.st-tip--hidden { opacity: 0; pointer-events: none; }
+	.st-tip::before { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; }
+	.st-tip--above::before { top: -6px; border-bottom: 6px solid rgba(16, 16, 28, 0.95); }
+	.st-tip--below::before { bottom: -6px; border-top: 6px solid rgba(16, 16, 28, 0.95); }
 	.st-tip__msg { margin: 0 0 0.55rem; font-size: 0.82rem; font-weight: 500; color: rgba(255, 255, 255, 0.9); line-height: 1.45; }
 	.st-tip__footer { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
 	.st-tip__count { font-size: 0.58rem; font-weight: 600; color: rgba(255, 255, 255, 0.3); }

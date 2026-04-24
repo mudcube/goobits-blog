@@ -7,10 +7,12 @@
 		start = $bindable(12),
 		end = $bindable(14),
 		hourly,
+		onNudge,
 	}: {
 		start?: number
 		end?: number
 		hourly: HourlyWeather[]
+		onNudge?: () => void
 	} = $props()
 
 	const duration = $derived(end - start)
@@ -94,11 +96,13 @@
 	function onKeydown(e: KeyboardEvent, field: 'start' | 'end' | 'dur') {
 		if (e.key === 'ArrowUp') {
 			e.preventDefault()
+			onNudge?.()
 			nudge(field, 1)
 			;(e.currentTarget as HTMLElement).textContent = field === 'start' ? ft(start) : field === 'end' ? ft(end) : fDur(end - start)
 		}
 		if (e.key === 'ArrowDown') {
 			e.preventDefault()
+			onNudge?.()
 			nudge(field, -1)
 			;(e.currentTarget as HTMLElement).textContent = field === 'start' ? ft(start) : field === 'end' ? ft(end) : fDur(end - start)
 		}

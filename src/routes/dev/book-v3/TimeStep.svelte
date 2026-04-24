@@ -30,16 +30,30 @@
 		onJoin: (person: Person) => void
 		onConfirm: () => void
 	} = $props()
+
+	let animating = $state(false)
+	let animTimer: ReturnType<typeof setTimeout>
+
+	function animateChange(fn: () => void) {
+		animating = true
+		fn()
+		clearTimeout(animTimer)
+		animTimer = setTimeout(() => { animating = false }, 300)
+	}
+
+	function handleJoin(person: Person) {
+		animateChange(() => onJoin(person))
+	}
 </script>
 
 <p class="ts__instruction">Pick your time</p>
 
-<TimeReadout bind:start bind:end {hourly} />
+<TimeReadout bind:start bind:end {hourly} onNudge={() => animateChange(() => {})} />
 
 <p class="ts__track-label">Weather & daylight</p>
-<SkyTrack {sunrise} {sunset} {hourly} {hasRain} bind:start bind:end />
+<SkyTrack {sunrise} {sunset} {hourly} {hasRain} animate={animating} bind:start bind:end />
 
-<CrewCard bookings={day.bookings} {overlapping} {onJoin} dayLabel={formatDate(day.date)} />
+<CrewCard bookings={day.bookings} {overlapping} onJoin={handleJoin} dayLabel={formatDate(day.date)} />
 
 <button type="button" class="ts__confirm" onclick={onConfirm}>
 	<CalendarCheck size={16} strokeWidth={2.2} />

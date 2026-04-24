@@ -10,6 +10,7 @@
 		sunset,
 		hourly,
 		hasRain = false,
+		animate = false,
 		start = $bindable(12),
 		end = $bindable(14),
 	}: {
@@ -19,6 +20,7 @@
 		sunset: number
 		hourly: HourlyWeather[]
 		hasRain?: boolean
+		animate?: boolean
 		start?: number
 		end?: number
 	} = $props()
@@ -149,7 +151,7 @@
 <svelte:window onpointermove={onMove} onpointerup={onUp} />
 
 <!-- Track -->
-<div class="st__lanes" class:st__lanes--dry={!hasRain} bind:this={trackEl}>
+<div class="st__lanes" class:st__lanes--dry={!hasRain} class:st__lanes--anim={animate && !dragging} bind:this={trackEl}>
 	<div class="st__lane st__lane--main">
 		<div class="st__sky" style="background:{skyGradient()};"></div>
 		{#each STAR_SEEDS as star}
@@ -236,9 +238,15 @@
 	.st__sel-vis { pointer-events: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 12; }
 	.st__handle { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 0.35rem; height: 1.4rem; border-radius: 999px; background: rgba(255, 255, 255, 0.85); box-shadow: 0 0 4px rgba(0, 0, 0, 0.35), 0 0 8px color-mix(in srgb, #a78bfa 12%, transparent); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5px; }
 	.st__grip { width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(0, 0, 0, 0.25); }
-	.st__hit { position: absolute; top: 0; bottom: 0; width: 1.5rem; transform: translateX(-50%); z-index: 15; cursor: ew-resize; background: none; border: none; padding: 0; font: inherit; }
+	.st__hit { position: absolute; top: 0; bottom: 0; width: 0.7rem; transform: translateX(-50%); z-index: 15; cursor: ew-resize; background: none; border: none; padding: 0; font: inherit; }
 	.st__hit:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; border-radius: 2px; }
-	@media (pointer: coarse) { .st__hit { width: 2.75rem; } }
+	@media (pointer: coarse) { .st__hit { width: 1.2rem; } }
+
+	/* Animated transitions (crew tap, arrow keys) */
+	.st__lanes--anim .st__sel,
+	.st__lanes--anim .st__mask,
+	.st__lanes--anim .st__hit,
+	.st__lanes--anim .st__handle { transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
 
 	/* Ticks */
 	.st__ticks { position: relative; height: 1.4rem; margin-bottom: 0; }
