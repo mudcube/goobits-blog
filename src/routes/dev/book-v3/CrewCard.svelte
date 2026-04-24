@@ -51,7 +51,7 @@
 
 <style>
 	.cc { margin-bottom: 0.75rem; }
-	.cc__header { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.35rem; margin-bottom: 0.1rem; }
+	.cc__header { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; margin-bottom: 0; }
 	.cc__line { flex: 1; height: 1px; background: color-mix(in srgb, var(--text) 10%, transparent); }
 	.cc__label { font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); white-space: nowrap; }
 	.cc__divider { height: 1px; background: color-mix(in srgb, var(--text) 7%, transparent); margin: 0 0.5rem; }

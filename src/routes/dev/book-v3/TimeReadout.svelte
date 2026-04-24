@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { HourlyWeather } from '$lib/app/weather'
 	import { describeWeatherCode, isPrecipitation } from '$lib/app/weather'
-	import { ft, fDur, snap, clamp } from './time'
+	import { ft, fDur, snap, clamp, SNAP } from './time'
 
 	let {
 		start = $bindable(12),
@@ -66,7 +66,35 @@
 		else el.textContent = fDur(end - start)
 	}
 
+	function nudge(field: 'start' | 'end' | 'dur', dir: 1 | -1) {
+		const step = SNAP * dir
+		if (field === 'start') {
+			// Slide the whole window: start + end move together
+			const dur = end - start
+			const ns = snap(clamp(start + step, 0, 24 - dur))
+			start = ns
+			end = ns + dur
+		} else if (field === 'end') {
+			// Extend/shrink from the right edge
+			end = snap(clamp(end + step, start + SNAP, 24))
+		} else {
+			// Duration: extend/shrink from the end
+			const nd = snap(clamp(duration + step, SNAP, 24 - start))
+			end = start + nd
+		}
+	}
+
 	function onKeydown(e: KeyboardEvent, field: 'start' | 'end' | 'dur') {
+		if (e.key === 'ArrowUp') {
+			e.preventDefault()
+			nudge(field, 1)
+			;(e.currentTarget as HTMLElement).textContent = field === 'start' ? ft(start) : field === 'end' ? ft(end) : fDur(end - start)
+		}
+		if (e.key === 'ArrowDown') {
+			e.preventDefault()
+			nudge(field, -1)
+			;(e.currentTarget as HTMLElement).textContent = field === 'start' ? ft(start) : field === 'end' ? ft(end) : fDur(end - start)
+		}
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			commitField(e.currentTarget as HTMLElement, field)
@@ -93,11 +121,11 @@
 
 <div class="tr">
 	<div class="tr__times">
-		<span class="tr__time" contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Edit start time" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'start')} onkeydown={(e) => onKeydown(e, 'start')}>{ft(start)}</span>
+		<span class="tr__time" contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Type or ↑↓ to adjust" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'start')} onkeydown={(e) => onKeydown(e, 'start')}>{ft(start)}</span>
 		<span class="tr__line"></span>
-		<span class="tr__dur" contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Edit duration" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'dur')} onkeydown={(e) => onKeydown(e, 'dur')}>{fDur(duration)}</span>
+		<span class="tr__dur" contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Type or ↑↓ to adjust" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'dur')} onkeydown={(e) => onKeydown(e, 'dur')}>{fDur(duration)}</span>
 		<span class="tr__line"></span>
-		<span class="tr__time tr__time--end" contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Edit end time" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'end')} onkeydown={(e) => onKeydown(e, 'end')}>{ft(end)}</span>
+		<span class="tr__time tr__time--end" contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Type or ↑↓ to adjust" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'end')} onkeydown={(e) => onKeydown(e, 'end')}>{ft(end)}</span>
 	</div>
 	{#if wxS && wxE}
 		<div class="tr__wx">

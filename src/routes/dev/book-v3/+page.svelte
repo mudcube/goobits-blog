@@ -11,6 +11,8 @@
 	import SpotlightTour from './SpotlightTour.svelte'
 	import type { TourStep } from './SpotlightTour.svelte'
 
+	let tourRef: SpotlightTour
+
 	const tourSteps: TourStep[] = [
 		{ phase: 0, selector: '.cs__grid', message: 'Choose a day. Purple dots mean it\'s open.' },
 		{ phase: 1, selector: '.tr__times', message: 'Edit your time. Tap any value to type a new one.' },
@@ -131,7 +133,10 @@
 			{versions}
 		/>
 
-		<StepIndicator current={stepNum} labels={stepLabels} onNavigate={onStepNav} />
+		<div class="bk2__topbar">
+			<StepIndicator current={stepNum} labels={stepLabels} onNavigate={onStepNav} />
+			<button type="button" class="bk2__tour-btn" data-tip="Take the tour" onclick={() => tourRef.showPrompt()}>?</button>
+		</div>
 
 		{#key animKey}
 		<div class="bk2__step bk2__panel" class:bk2__step--fwd={direction === 'forward'} class:bk2__step--back={direction === 'back'}>
@@ -151,10 +156,14 @@
 	</div>
 </PageShell>
 
-<SpotlightTour steps={tourSteps} storageKey="book-v3-tour" currentPhase={stepNum} onPhaseRequest={handleTourPhase} />
+<SpotlightTour bind:this={tourRef} steps={tourSteps} storageKey="book-v3-tour" currentPhase={stepNum} onPhaseRequest={handleTourPhase} />
 
 <style>
 	.bk2__inner { max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%; }
+	.bk2__topbar { display: flex; align-items: flex-start; gap: 0.5rem; }
+	.bk2__topbar :global(.si) { flex: 1; }
+	.bk2__tour-btn { flex-shrink: 0; width: 1.4rem; height: 1.4rem; border-radius: 999px; border: 1.5px solid color-mix(in srgb, var(--text) 18%, transparent); background: transparent; color: color-mix(in srgb, var(--text) 40%, transparent); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 180ms; padding: 0; font: inherit; font-size: 0.55rem; font-weight: 700; }
+	.bk2__tour-btn:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 30%, transparent); }
 	.bk2__panel { padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.75rem; background: color-mix(in srgb, var(--panel-bg, var(--bg)) 60%, transparent); }
 	.bk2__step--fwd { animation: bk2-fwd 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	.bk2__step--back { animation: bk2-back 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -163,7 +172,8 @@
 
 	/* Tooltip system */
 	:global([data-tip]) { position: relative; }
-	:global([data-tip])::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(0.2rem); padding: 0.25rem 0.5rem; border-radius: 0.35rem; background: rgba(10, 10, 18, 0.9); color: #fff; font-size: 0.58rem; font-weight: 600; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 150ms, transform 150ms; z-index: 50; }
-	:global([data-tip]):hover::after { opacity: 1; transform: translateX(-50%) translateY(-0.25rem); }
+	:global([data-tip])::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(0.1rem); padding: 0.3rem 0.55rem; border-radius: 0.4rem; background: rgba(10, 10, 18, 0.92); backdrop-filter: blur(6px); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.85); font-size: 0.58rem; font-weight: 600; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s ease 0.4s, transform 0.2s ease 0.4s; z-index: 50; }
+	:global([data-tip]):hover::after { opacity: 1; transform: translateX(-50%) translateY(-0.3rem); }
+	:global([data-tip]):active::after { opacity: 0; transition-delay: 0s; }
 	@media (pointer: coarse) { :global([data-tip])::after { display: none; } }
 </style>

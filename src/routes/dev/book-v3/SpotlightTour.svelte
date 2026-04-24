@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { CircleHelp } from '@lucide/svelte'
-
 	export type TourStep = {
 		selector: string
 		message: string
@@ -138,12 +136,11 @@
 	const message = $derived(current >= 0 && current < steps.length ? steps[current]!.message : '')
 	const isLast = $derived(current === steps.length - 1)
 	const stepLabel = $derived(`${current + 1} of ${steps.length}`)
-</script>
 
-<button type="button" class="st-help" onclick={() => { mode = 'prompt' }} aria-label="Take the tour">
-	<CircleHelp size={16} strokeWidth={1.8} />
-	<span class="st-help__label">Tour</span>
-</button>
+	export function showPrompt() {
+		mode = 'prompt'
+	}
+</script>
 
 {#if mode === 'prompt'}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -193,10 +190,6 @@
 {/if}
 
 <style>
-	.st-help { position: fixed; top: 0.75rem; right: 0.75rem; z-index: 100; height: 1.6rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--text) 14%, transparent); background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(8px); color: color-mix(in srgb, var(--text) 45%, transparent); display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer; transition: all 180ms; padding: 0 0.5rem 0 0.4rem; font: inherit; }
-	.st-help:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 25%, transparent); }
-	.st-help__label { font-size: 0.52rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
-
 	.st-overlay { position: fixed; inset: 0; z-index: 9999; opacity: 1; transition: opacity 0.2s ease; }
 	.st-overlay--fade { opacity: 0.4; }
 	.st-svg { position: absolute; inset: 0; width: 100%; height: 100%; }

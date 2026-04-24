@@ -15,7 +15,7 @@
 <nav class="si">
 	{#each labels as label, i}
 		{#if i > 0}<span class="si__line" class:si__line--done={current > i - 1}></span>{/if}
-		<button type="button" class="si__step" class:si__step--active={current === i} class:si__step--done={current > i} disabled={i >= current} onclick={() => onNavigate?.(i)}>
+		<button type="button" class="si__step" class:si__step--active={current === i} class:si__step--done={current > i} disabled={i >= current} data-tip={current > i ? `Back to ${label}` : undefined} onclick={() => onNavigate?.(i)}>
 			<span class="si__dot">
 				{#if current > i}<Check size={11} strokeWidth={3} />{:else}{i + 1}{/if}
 			</span>
