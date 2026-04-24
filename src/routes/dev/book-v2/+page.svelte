@@ -136,6 +136,7 @@
 
 		{#key animKey}
 		<div class="bk2__step bk2__panel" class:bk2__step--fwd={direction === 'forward'} class:bk2__step--back={direction === 'back'}>
+		<button type="button" class="bk2__help" data-tip="Take the tour" onclick={() => tourRef.showPrompt()}>?</button>
 
 		{#if stepNum === 0}
 			<CalendarStep {activity} {calDays} weekdays={WEEKDAYS} {openDays} {claimed} bind:pendingDay {onSelectDay} {onClaim} />
@@ -149,8 +150,6 @@
 
 		</div>
 		{/key}
-
-		<button type="button" class="bk2__tour-link" onclick={() => tourRef.showPrompt()}>Take the tour</button>
 	</div>
 </PageShell>
 
@@ -158,9 +157,9 @@
 
 <style>
 	.bk2__inner { max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%; }
-	.bk2__tour-link { display: block; margin: 0.5rem 0 0 auto; padding: 0; border: none; background: none; font: inherit; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 30%, transparent); cursor: pointer; transition: color 150ms; }
-	.bk2__tour-link:hover { color: color-mix(in srgb, var(--text) 55%, transparent); }
-	.bk2__panel { padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.75rem; background: color-mix(in srgb, var(--panel-bg, var(--bg)) 60%, transparent); }
+	.bk2__panel { position: relative; padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.75rem; background: color-mix(in srgb, var(--panel-bg, var(--bg)) 60%, transparent); }
+	.bk2__help { position: absolute; top: 0.6rem; right: 0.6rem; width: 1.2rem; height: 1.2rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); background: transparent; color: color-mix(in srgb, var(--text) 30%, transparent); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 180ms; padding: 0; font: inherit; font-size: 0.5rem; font-weight: 700; z-index: 2; }
+	.bk2__help:hover { color: color-mix(in srgb, var(--text) 55%, transparent); border-color: color-mix(in srgb, var(--text) 22%, transparent); }
 	.bk2__step--fwd { animation: bk2-fwd 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	.bk2__step--back { animation: bk2-back 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	@keyframes bk2-fwd { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
