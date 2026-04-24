@@ -33,11 +33,11 @@
 <div class="cs__hero">
 	<span class="cs__icon">{activity.icon}</span>
 	<h2 class="cs__name">{activity.label}</h2>
-	<p class="cs__tagline">{activity.tagline}</p>
 </div>
 
-<p class="cs__instruction">Pick a day that works for you</p>
-
+<div class="cs__cal-header">
+	<span class="cs__cal-label">Pick a day</span>
+</div>
 <div class="cs__weekdays">{#each weekdays as w}<span>{w}</span>{/each}</div>
 <div class="cs__grid" class:cs__grid--dimmed={!!pendingDay && !claimed}>
 	{#each calDays as cell}
@@ -60,10 +60,11 @@
 {/if}
 
 <style>
-	.cs__hero { text-align: center; margin-bottom: 1rem; }
-	.cs__icon { font-size: 1.8rem; display: block; margin-bottom: 0.2rem; }
-	.cs__name { margin: 0; font-family: var(--font-display); font-size: 1.4rem; font-weight: 500; letter-spacing: -0.03em; }
-	.cs__tagline { margin: 0.15rem 0 0; font-size: 0.78rem; color: color-mix(in srgb, var(--text) 50%, transparent); }
+	.cs__hero { text-align: center; margin-bottom: 0.75rem; }
+	.cs__icon { font-size: 1.5rem; display: block; margin-bottom: 0.1rem; }
+	.cs__name { margin: 0; font-family: var(--font-display); font-size: 1.2rem; font-weight: 500; letter-spacing: -0.03em; }
+	.cs__cal-header { display: flex; align-items: center; margin-bottom: 0.4rem; }
+	.cs__cal-label { font-size: 0.58rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: color-mix(in srgb, var(--text) 40%, transparent); }
 	.cs__weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 0.2rem; }
 	.cs__weekdays span { text-align: center; font-size: 0.58rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: color-mix(in srgb, var(--text) 40%, transparent); }
 	.cs__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.22rem; transition: opacity 0.25s; }
@@ -79,7 +80,6 @@
 	.cs__dots { position: absolute; bottom: 0.32rem; left: 0.4rem; display: flex; gap: 0.16rem; }
 	.cs__dot { width: 0.26rem; height: 0.26rem; border-radius: 999px; background: #a78bfa; }
 	.cs__dot--grn { background: #4ade80; }
-	.cs__instruction { margin: 0 0 0.75rem; font-size: 0.78rem; color: color-mix(in srgb, var(--text) 55%, transparent); text-align: center; }
 	.cs__legend { display: flex; justify-content: center; gap: 1rem; margin-top: 0.5rem; }
 	.cs__legend-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); }
 	.cs__legend .cs__dot { position: static; }

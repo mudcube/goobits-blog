@@ -16,8 +16,17 @@
 
 	const hasBookings = $derived(bookings.length > 0)
 
+	let flashIdx = $state(-1)
+
 	function isOverlapping(person: Person) {
 		return overlapping.some(o => o.name === person.name)
+	}
+
+	function tapPerson(person: Person, idx: number) {
+		flashIdx = -1
+		// Force re-trigger by waiting a tick
+		requestAnimationFrame(() => { flashIdx = idx })
+		onJoin(person)
 	}
 </script>
 
@@ -26,7 +35,7 @@
 		<div class="cc__header"><span class="cc__line"></span><span class="cc__label">Others going {#if dayLabel}{dayLabel}{/if}</span><span class="cc__line"></span></div>
 		{#each bookings as person, i}
 			{#if i > 0}<div class="cc__divider"></div>{/if}
-			<button type="button" class="cc__row" class:cc__row--on={isOverlapping(person)} data-tip="Join {person.name}" onclick={() => onJoin(person)}>
+			<button type="button" class="cc__row" class:cc__row--on={isOverlapping(person)} class:cc__row--flash={flashIdx === i} data-tip="Join {person.name}" onclick={() => tapPerson(person, i)}>
 				<span class="cc__dot" style="--c:{person.color};"></span>
 				<span class="cc__name">{person.name}</span>
 				<span class="cc__time">{ft(person.start)}–{ft(person.end)}</span>
@@ -48,6 +57,8 @@
 	.cc__divider { height: 1px; background: color-mix(in srgb, var(--text) 7%, transparent); margin: 0 0.5rem; }
 	.cc__row { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem; width: 100%; background: none; border: none; color: var(--text); font: inherit; cursor: pointer; opacity: 0.45; transition: all 180ms; text-align: left; border-radius: 0.5rem; }
 	.cc__row--on { opacity: 1; }
+	.cc__row--flash { animation: cc-flash 0.4s ease; }
+	@keyframes cc-flash { 0% { background: transparent; } 30% { background: color-mix(in srgb, #a78bfa 15%, transparent); } 100% { background: transparent; } }
 	.cc__row:hover { opacity: 1; background: color-mix(in srgb, var(--text) 4%, transparent); }
 	.cc__dot { width: 0.38rem; height: 0.38rem; border-radius: 999px; background: var(--c); flex-shrink: 0; }
 	.cc__name { font-size: 0.78rem; font-weight: 600; }

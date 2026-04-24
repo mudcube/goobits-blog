@@ -48,10 +48,28 @@
 		return `M ${pts[0]!.x},100 ` + pts.map(p => `L ${p.x},${p.y}`).join(' ') + ` L ${pts[pts.length-1]!.x},100 Z`
 	}
 
-	// Sky gradient
+	// Sky gradient — modeled after real sky colors
 	function skyGradient() {
 		const r = (h: number) => `${(h / 24) * 100}%`
-		return `linear-gradient(90deg, #0a0c1a 0%, #0a0c1a ${r(sunrise - 1.5)}, #2d1f42 ${r(sunrise - 0.5)}, #7a4a3a ${r(sunrise)}, #d4944a ${r(sunrise + 0.75)}, #8b7a55 ${r(sunrise + 1.75)}, #4a5a6a ${r(sunrise + 2.75)}, #344868 ${r(12 - 2)}, #3a5070 ${r(12)}, #344868 ${r(12 + 2)}, #4a5a6a ${r(sunset - 2.75)}, #8b7a55 ${r(sunset - 1.75)}, #d4944a ${r(sunset - 0.75)}, #7a4a3a ${r(sunset)}, #2d1f42 ${r(sunset + 0.5)}, #0a0c1a ${r(sunset + 1.5)}, #0a0c1a 100%)`
+		return `linear-gradient(90deg,` +
+			// Night
+			`#0b1026 0%, #0b1026 ${r(sunrise - 2)},` +
+			// Pre-dawn: indigo → purple
+			`#1a1040 ${r(sunrise - 1.2)}, #3b2066 ${r(sunrise - 0.5)},` +
+			// Sunrise: rose → peach-gold
+			`#c4627a ${r(sunrise)}, #e8a565 ${r(sunrise + 0.6)},` +
+			// Morning: pale warm → pale blue → blue
+			`#d4b07a ${r(sunrise + 1.2)}, #7ab0d4 ${r(sunrise + 2.5)},` +
+			// Midday: vivid blue
+			`#4a90d9 ${r(12 - 1.5)}, #3a7bd5 ${r(12)}, #4a90d9 ${r(12 + 1.5)},` +
+			// Afternoon → golden hour: blue → pale blue → warm
+			`#7ab0d4 ${r(sunset - 2.5)}, #d4b07a ${r(sunset - 1.2)},` +
+			// Sunset: peach-gold → rose
+			`#e8a565 ${r(sunset - 0.6)}, #c4627a ${r(sunset)},` +
+			// Twilight: purple → indigo
+			`#5c3478 ${r(sunset + 0.5)}, #1a1040 ${r(sunset + 1.2)},` +
+			// Night
+			`#0b1026 ${r(sunset + 2)}, #0b1026 100%)`
 	}
 
 	// Stars in night portions
@@ -66,7 +84,8 @@
 		{ xBase: 92, y: 22 }, { xBase: 98, y: 42 }, { xBase: 86, y: 55 }, { xBase: 96, y: 30 },
 	]
 
-	const HOUR_TICKS = [0, 3, 6, 9, 12, 15, 18, 21, 24]
+	const ALL_HOURS = Array.from({ length: 25 }, (_, i) => i)
+	const MAJOR_HOURS = new Set([0, 3, 6, 9, 12, 15, 18, 21, 24])
 
 	// Drag
 	function getHour(clientX: number) {
@@ -103,13 +122,14 @@
 			{/if}
 		{/each}
 		<div class="st__horizon"></div>
+		<div class="st__ground"></div>
 		<svg class="st__svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-			<defs><linearGradient id="st-tg" x1="0" x2="0" y1="1" y2="0"><stop offset="0%" stop-color="#3b6fa880" /><stop offset="40%" stop-color="#5a8ab080" /><stop offset="65%" stop-color="#b0906080" /><stop offset="100%" stop-color="#d4944a80" /></linearGradient></defs>
+			<defs><linearGradient id="st-tg" x1="0" x2="0" y1="1" y2="0"><stop offset="0%" stop-color="rgba(8, 10, 20, 0.9)" /><stop offset="30%" stop-color="rgba(12, 18, 35, 0.7)" /><stop offset="70%" stop-color="rgba(40, 60, 90, 0.3)" /><stop offset="100%" stop-color="rgba(60, 80, 110, 0.15)" /></linearGradient></defs>
 			<path d={tempAreaPath()} fill="url(#st-tg)" />
-			<path d={tempLinePath()} fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.35" />
+			<path d={tempLinePath()} fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.4" />
 		</svg>
 		{#each hourly.filter(w => w.hour % 4 === 0) as w}
-			<span class="st__temp" style="left:{pct(w.hour)}%; bottom:{((w.temperature - tempMin) / tempRange) * 50 + 18}%;">{w.temperature}°</span>
+			<span class="st__temp" style="left:{pct(w.hour)}%; bottom:{((w.temperature - tempMin) / tempRange) * 70 + 8}%;">{w.temperature}°</span>
 		{/each}
 	</div>
 
@@ -136,11 +156,17 @@
 
 <!-- Ticks -->
 <div class="st__ticks">
-	{#each HOUR_TICKS.filter(h => Math.abs(h - sunrise) > 1.5 && Math.abs(h - sunset) > 1.5) as h}
-		<span class="st__tick" style="left:{pct(h)}%;"><span class="st__tick-dot"></span><span class="st__tick-num">{ftShort(h)}</span></span>
+	{#each ALL_HOURS as h}
+		{@const nearSun = Math.abs(h - sunrise) < 1.5 || Math.abs(h - sunset) < 1.5}
+		{#if !nearSun}
+			<span class="st__tick" style="left:{pct(h)}%;">
+				<span class="st__tick-line" class:st__tick-line--major={MAJOR_HOURS.has(h)}></span>
+				{#if MAJOR_HOURS.has(h)}<span class="st__tick-num">{ftShort(h)}</span>{/if}
+			</span>
+		{/if}
 	{/each}
-	<span class="st__tick st__tick--sun" style="left:{pct(sunrise)}%;"><span class="st__tick-dot st__tick-dot--warm"></span><span class="st__tick-num st__tick-num--warm">{ft(sunrise)}</span></span>
-	<span class="st__tick st__tick--sun" style="left:{pct(sunset)}%;"><span class="st__tick-dot st__tick-dot--warm"></span><span class="st__tick-num st__tick-num--warm">{ft(sunset)}</span></span>
+	<span class="st__tick st__tick--sun" style="left:{pct(sunrise)}%;"><span class="st__tick-line st__tick-line--sun"></span><span class="st__tick-num st__tick-num--warm">{ft(sunrise)}</span></span>
+	<span class="st__tick st__tick--sun" style="left:{pct(sunset)}%;"><span class="st__tick-line st__tick-line--sun"></span><span class="st__tick-num st__tick-num--warm">{ft(sunset)}</span></span>
 </div>
 
 <style>
@@ -153,11 +179,12 @@
 	.st__sky { position: absolute; inset: 0; }
 	.st__star { position: absolute; width: 1.5px; height: 1.5px; border-radius: 999px; background: white; opacity: 0.12; pointer-events: none; z-index: 1; }
 	.st__horizon { position: absolute; left: 0; right: 0; top: 60%; height: 1px; background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, #c4794a 12%, transparent) 22%, color-mix(in srgb, #d4a85a 20%, transparent) 38%, color-mix(in srgb, #d4a85a 16%, transparent) 50%, color-mix(in srgb, #d4a85a 20%, transparent) 62%, color-mix(in srgb, #c4794a 12%, transparent) 78%, transparent 100%); box-shadow: 0 0 5px color-mix(in srgb, #c4794a 8%, transparent); }
+	.st__ground { position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: linear-gradient(to top, rgba(6, 8, 16, 0.6) 0%, rgba(6, 8, 16, 0.2) 40%, transparent 100%); z-index: 2; pointer-events: none; }
 	.st__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 	.st__temp { position: absolute; transform: translateX(-50%); font-size: 0.52rem; font-weight: 700; font-variant-numeric: tabular-nums; color: color-mix(in srgb, white 55%, transparent); z-index: 5; pointer-events: none; text-shadow: 0 0 4px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.6); }
 
 	/* Masks + Selection */
-	.st__mask { position: absolute; top: 0; bottom: 0; background: rgba(4, 4, 10, 0.55); z-index: 8; pointer-events: none; }
+	.st__mask { position: absolute; top: 0; bottom: 0; background: rgba(4, 4, 10, 0.4); z-index: 8; pointer-events: none; }
 	.st__mask--left { left: 0; border-radius: 0.65rem 0 0 0.65rem; }
 	.st__mask--right { border-radius: 0 0.65rem 0.65rem 0; }
 	.st__sel { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, white 3%, transparent); border-left: 1px solid color-mix(in srgb, white 20%, transparent); border-right: 1px solid color-mix(in srgb, white 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, white 3%, transparent), 0 0 20px color-mix(in srgb, #a78bfa 6%, transparent); cursor: grab; z-index: 12; padding: 0; font: inherit; border-radius: 0; transition: background 120ms; }
@@ -170,12 +197,13 @@
 	@media (pointer: coarse) { .st__hit { width: 2.75rem; } }
 
 	/* Ticks */
-	.st__ticks { position: relative; height: 1.2rem; margin-bottom: 0; }
-	.st__tick { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.08rem; }
-	.st__tick-dot { width: 2px; height: 2px; border-radius: 999px; background: color-mix(in srgb, var(--text) 35%, transparent); }
-	.st__tick-num { font-size: 0.52rem; font-weight: 600; color: color-mix(in srgb, var(--text) 50%, transparent); }
-	.st__tick-dot--warm { background: #c4794a; width: 3px; height: 3px; }
-	.st__tick-num--warm { color: color-mix(in srgb, #c4794a 60%, transparent); font-size: 0.48rem; }
+	.st__ticks { position: relative; height: 1.4rem; margin-bottom: 0; }
+	.st__tick { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+	.st__tick-line { width: 1px; height: 0.25rem; background: color-mix(in srgb, var(--text) 18%, transparent); }
+	.st__tick-line--major { height: 0.4rem; background: color-mix(in srgb, var(--text) 30%, transparent); }
+	.st__tick-line--sun { height: 0.4rem; background: color-mix(in srgb, #c4794a 50%, transparent); }
+	.st__tick-num { font-size: 0.48rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); margin-top: 0.08rem; }
+	.st__tick-num--warm { color: color-mix(in srgb, #c4794a 55%, transparent); }
 
 	@media (max-width: 30rem) { .st__lanes { grid-template-rows: 5rem 1.8rem; } .st__lanes--dry { grid-template-rows: 5rem; } }
 </style>

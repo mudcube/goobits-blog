@@ -8,6 +8,33 @@
 	import CalendarStep from './CalendarStep.svelte'
 	import TimeStep from './TimeStep.svelte'
 	import BookedStep from './BookedStep.svelte'
+	import SpotlightTour from './SpotlightTour.svelte'
+	import type { TourStep } from './SpotlightTour.svelte'
+
+	const tourSteps: TourStep[] = [
+		{ phase: 0, selector: '.cs__grid', message: 'Choose a day. Purple dots mean it\'s open.' },
+		{ phase: 1, selector: '.tr__times', message: 'Edit your time. Tap any value to type a new one.' },
+		{ phase: 1, selector: '.st__lanes', message: 'Drag to adjust. Handles move the edges, center moves the whole block.' },
+		{ phase: 1, selector: '.cc', message: 'Join someone. Tap a name to match their time.' },
+		{ phase: 1, selector: '.ts__confirm', message: 'Confirm to lock in your time.', position: 'top' },
+		{ phase: 2, selector: '.bs__card', message: 'Done! Add it to your calendar or pick a different day.' },
+	]
+
+	function handleTourPhase(phase: number) {
+		if (phase === 0) {
+			goStep(0)
+		} else if (phase === 1) {
+			// Auto-select a day for the tour
+			if (!selectedDay) {
+				const day = openDays[2] ?? openDays[0]
+				if (day) onSelectDay(day)
+			} else {
+				goStep(1)
+			}
+		} else if (phase === 2) {
+			goStep(2)
+		}
+	}
 
 	const activity = GYM
 	const openDays = buildOpenDays(activity)
@@ -123,6 +150,8 @@
 		{/key}
 	</div>
 </PageShell>
+
+<SpotlightTour steps={tourSteps} storageKey="book-v3-tour" currentPhase={stepNum} onPhaseRequest={handleTourPhase} />
 
 <style>
 	.bk2__inner { max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%; }
