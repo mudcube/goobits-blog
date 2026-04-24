@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { HourlyWeather } from '$lib/app/weather'
+	import { Thermometer, CloudRain } from '@lucide/svelte'
 	import { SNAP, snap, clamp, pct as pctFn, ft, ftShort } from './sky-time'
 
 	let {
@@ -47,6 +48,41 @@
 		if (pts.length === 0) return ''
 		return `M ${pts[0]!.x},100 ` + pts.map(p => `L ${p.x},${p.y}`).join(' ') + ` L ${pts[pts.length-1]!.x},100 Z`
 	}
+
+	// Smart temperature label placement
+	const tempLabels = $derived.by(() => {
+		if (hourly.length < 3) return hourly.map(w => w.hour)
+		const candidates: Array<{ hour: number; temp: number; priority: number }> = []
+
+		// Find peaks, valleys, and endpoints
+		for (let i = 0; i < hourly.length; i++) {
+			const prev = hourly[i - 1]?.temperature ?? hourly[i]!.temperature
+			const curr = hourly[i]!.temperature
+			const next = hourly[i + 1]?.temperature ?? curr
+			const isPeak = curr >= prev && curr >= next
+			const isValley = curr <= prev && curr <= next
+			const isEndpoint = i === 0 || i === hourly.length - 1
+			const isMax = curr === tempMax
+			const isMin = curr === tempMin
+
+			if (isMax) candidates.push({ hour: hourly[i]!.hour, temp: curr, priority: 3 })
+			else if (isMin) candidates.push({ hour: hourly[i]!.hour, temp: curr, priority: 3 })
+			else if (isPeak || isValley) candidates.push({ hour: hourly[i]!.hour, temp: curr, priority: 2 })
+			else if (isEndpoint) candidates.push({ hour: hourly[i]!.hour, temp: curr, priority: 1 })
+		}
+
+		// Sort by priority (highest first), then deduplicate by min distance
+		candidates.sort((a, b) => b.priority - a.priority)
+		const MIN_PCT_GAP = 10 // minimum % distance between labels
+		const chosen: typeof candidates = []
+		for (const c of candidates) {
+			const xPct = pct(c.hour)
+			const tooClose = chosen.some(ch => Math.abs(pct(ch.hour) - xPct) < MIN_PCT_GAP)
+			if (!tooClose) chosen.push(c)
+		}
+
+		return chosen.map(c => c.hour).sort((a, b) => a - b)
+	})
 
 	// Sky gradient — modeled after real sky colors
 	function skyGradient() {
@@ -115,6 +151,7 @@
 <!-- Track -->
 <div class="st__lanes" class:st__lanes--dry={!hasRain} bind:this={trackEl}>
 	<div class="st__lane st__lane--main">
+		<span class="st__lane-label"><Thermometer size={9} strokeWidth={2} /> Temp</span>
 		<div class="st__sky" style="background:{skyGradient()};"></div>
 		{#each STAR_SEEDS as star}
 			{#if star.xBase < sunrisePct || star.xBase > sunsetPct}
@@ -128,16 +165,17 @@
 			<path d={tempAreaPath()} fill="url(#st-tg)" />
 			<path d={tempLinePath()} fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.4" />
 		</svg>
-		{#each hourly.filter(w => w.hour % 4 === 0) as w}
-			<span class="st__temp" style="left:{pct(w.hour)}%; bottom:{((w.temperature - tempMin) / tempRange) * 70 + 8}%;">{w.temperature}°</span>
+		{#each hourly.filter(w => tempLabels.includes(w.hour)) as w}
+			<span class="st__temp" style="left:{pct(w.hour)}%; bottom:{((w.temperature - tempMin) / tempRange) * 70 + 6}%;">{w.temperature}°</span>
 		{/each}
 	</div>
 
 	{#if hasRain}
 		<div class="st__lane st__lane--rain">
+			<span class="st__rain-label"><CloudRain size={9} strokeWidth={2} /> Rain</span>
 			<svg class="st__svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-				<defs><linearGradient id="st-rg" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#60a5fa" /><stop offset="100%" stop-color="#2563eb" /></linearGradient></defs>
-				<path d={rainAreaPath()} fill="url(#st-rg)" opacity="0.55" />
+				<defs><linearGradient id="st-rg" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#60a5fa" /><stop offset="100%" stop-color="#3b82f6" /></linearGradient></defs>
+				<path d={rainAreaPath()} fill="url(#st-rg)" opacity="0.65" />
 			</svg>
 		</div>
 	{/if}
@@ -171,11 +209,12 @@
 
 <style>
 	/* Track */
-	.st__lanes { position: relative; display: grid; grid-template-rows: 6rem 2rem; gap: 1px; border-radius: 0.65rem; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); touch-action: none; background: color-mix(in srgb, var(--text) 4%, transparent); margin-bottom: 0.15rem; }
+	.st__lanes { position: relative; display: grid; grid-template-rows: 6rem 2.5rem; gap: 1px; border-radius: 0.65rem; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); touch-action: none; background: color-mix(in srgb, var(--text) 4%, transparent); margin-bottom: 0.15rem; }
 	.st__lanes--dry { grid-template-rows: 6rem; }
 	.st__lane { position: relative; overflow: hidden; }
 	.st__lane--main { background: #080a14; }
 	.st__lane--rain { background: #080a10; }
+	.st__lane-label, .st__rain-label { position: absolute; top: 0.3rem; left: 0.4rem; display: inline-flex; align-items: center; gap: 0.15rem; font-size: 0.42rem; font-weight: 700; color: rgba(255, 255, 255, 0.45); z-index: 10; pointer-events: none; letter-spacing: 0.04em; text-transform: uppercase; }
 	.st__sky { position: absolute; inset: 0; }
 	.st__star { position: absolute; width: 1.5px; height: 1.5px; border-radius: 999px; background: white; opacity: 0.12; pointer-events: none; z-index: 1; }
 	.st__horizon { position: absolute; left: 0; right: 0; top: 60%; height: 1px; background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, #c4794a 12%, transparent) 22%, color-mix(in srgb, #d4a85a 20%, transparent) 38%, color-mix(in srgb, #d4a85a 16%, transparent) 50%, color-mix(in srgb, #d4a85a 20%, transparent) 62%, color-mix(in srgb, #c4794a 12%, transparent) 78%, transparent 100%); box-shadow: 0 0 5px color-mix(in srgb, #c4794a 8%, transparent); }
@@ -205,5 +244,5 @@
 	.st__tick-num { font-size: 0.48rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); margin-top: 0.08rem; }
 	.st__tick-num--warm { color: color-mix(in srgb, #c4794a 55%, transparent); }
 
-	@media (max-width: 30rem) { .st__lanes { grid-template-rows: 5rem 1.8rem; } .st__lanes--dry { grid-template-rows: 5rem; } }
+	@media (max-width: 30rem) { .st__lanes { grid-template-rows: 5rem 2.2rem; } .st__lanes--dry { grid-template-rows: 5rem; } }
 </style>
