@@ -190,7 +190,7 @@
 	<div class="st__mask st__mask--left" style="width:{pct(start)}%;"></div>
 	<div class="st__mask st__mask--right" style="left:{pct(end)}%; width:{100 - pct(end)}%;"></div>
 	<button type="button" class="st__sel" style="left:{pct(start)}%; width:{pct(end) - pct(start)}%;" data-tip="Drag to move" onpointerdown={(e) => onDown(e, 'range')} aria-label="Selected time range, drag to move"></button>
-	<button type="button" class="st__hit" data-tip="Drag to resize" style="left:{pct(start)}%;" onpointerdown={(e) => onDown(e, 'start')} onkeydown={(e) => { if (e.key === 'ArrowLeft') { e.preventDefault(); start = snap(clamp(start - SNAP, windowStart, end - 0.25)) } if (e.key === 'ArrowRight') { e.preventDefault(); start = snap(clamp(start + SNAP, windowStart, end - 0.25)) } }} aria-label="Start time, use arrow keys to adjust"></button>
+	<button type="button" class="st__hit" data-tip="Drag to resize" style="left:{pct(start)}%; z-index:{pct(end) - pct(start) < 5 ? 16 : 15};" onpointerdown={(e) => onDown(e, 'start')} onkeydown={(e) => { if (e.key === 'ArrowLeft') { e.preventDefault(); start = snap(clamp(start - SNAP, windowStart, end - 0.25)) } if (e.key === 'ArrowRight') { e.preventDefault(); start = snap(clamp(start + SNAP, windowStart, end - 0.25)) } }} aria-label="Start time, use arrow keys to adjust"></button>
 	<button type="button" class="st__hit" data-tip="Drag to resize" style="left:{pct(end)}%;" onpointerdown={(e) => onDown(e, 'end')} onkeydown={(e) => { if (e.key === 'ArrowLeft') { e.preventDefault(); end = snap(clamp(end - SNAP, start + 0.25, windowEnd)) } if (e.key === 'ArrowRight') { e.preventDefault(); end = snap(clamp(end + SNAP, start + 0.25, windowEnd)) } }} aria-label="End time, use arrow keys to adjust"></button>
 </div>
 

@@ -69,18 +69,25 @@
 	function nudge(field: 'start' | 'end' | 'dur', dir: 1 | -1) {
 		const step = SNAP * dir
 		if (field === 'start') {
-			// Slide the whole window: start + end move together
 			const dur = end - start
 			const ns = snap(clamp(start + step, 0, 24 - dur))
 			start = ns
 			end = ns + dur
 		} else if (field === 'end') {
-			// Extend/shrink from the right edge
 			end = snap(clamp(end + step, start + SNAP, 24))
 		} else {
-			// Duration: extend/shrink from the end
-			const nd = snap(clamp(duration + step, SNAP, 24 - start))
-			end = start + nd
+			// Duration: try extending from end, if blocked extend from start
+			const target = duration + step
+			if (target < SNAP) return
+			let ne = snap(start + target)
+			if (ne <= 24) {
+				end = ne
+			} else {
+				// End is capped — push start earlier
+				const ns = snap(clamp(24 - target, 0, start))
+				start = ns
+				end = 24
+			}
 		}
 	}
 
@@ -117,15 +124,32 @@
 		sel?.removeAllRanges()
 		sel?.addRange(range)
 	}
+
+	let startEl = $state<HTMLElement | null>(null)
+	let durEl = $state<HTMLElement | null>(null)
+	let endEl = $state<HTMLElement | null>(null)
+
+	// Sync contenteditable text when values change (e.g. from drag)
+	$effect(() => {
+		if (startEl && document.activeElement !== startEl) startEl.textContent = ft(start)
+	})
+	$effect(() => {
+		// Access both start and end to track duration changes
+		const d = fDur(end - start)
+		if (durEl && document.activeElement !== durEl) durEl.textContent = d
+	})
+	$effect(() => {
+		if (endEl && document.activeElement !== endEl) endEl.textContent = ft(end)
+	})
 </script>
 
 <div class="tr">
 	<div class="tr__times">
-		<span class="tr__time" contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Type or ↑↓ to adjust" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'start')} onkeydown={(e) => onKeydown(e, 'start')}>{ft(start)}</span>
+		<span class="tr__time" bind:this={startEl} contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Type or ↑↓ to adjust" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'start')} onkeydown={(e) => onKeydown(e, 'start')}>{ft(start)}</span>
 		<span class="tr__line"></span>
-		<span class="tr__dur" contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Type or ↑↓ to adjust" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'dur')} onkeydown={(e) => onKeydown(e, 'dur')}>{fDur(duration)}</span>
+		<span class="tr__dur" bind:this={durEl} contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Type or ↑↓ to adjust" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'dur')} onkeydown={(e) => onKeydown(e, 'dur')}>{fDur(duration)}</span>
 		<span class="tr__line"></span>
-		<span class="tr__time tr__time--end" contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Type or ↑↓ to adjust" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'end')} onkeydown={(e) => onKeydown(e, 'end')}>{ft(end)}</span>
+		<span class="tr__time tr__time--end" bind:this={endEl} contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Type or ↑↓ to adjust" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'end')} onkeydown={(e) => onKeydown(e, 'end')}>{ft(end)}</span>
 	</div>
 	{#if wxS && wxE}
 		<div class="tr__wx">
