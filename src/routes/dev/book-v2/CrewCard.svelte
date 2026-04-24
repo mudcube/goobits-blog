@@ -52,9 +52,9 @@
 {/if}
 
 <style>
-	.cc { margin-top: 1rem; margin-bottom: 0.75rem; }
-	.cc__card { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.6rem; margin: 0; padding: 0; }
-	.cc__legend { margin: 0 auto; padding: 0 0.5rem; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); white-space: nowrap; }
+	.cc { margin-top: 1rem; margin-bottom: 1.25rem; }
+	.cc__card { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.6rem; margin: 1.5rem 0 0; padding: 0; }
+	.cc__legend { margin: 0 auto; padding: 0 0.5rem; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); white-space: nowrap; line-height: 0; }
 	.cc__divider { height: 1px; background: color-mix(in srgb, var(--text) 7%, transparent); margin: 0; }
 	.cc__row { display: flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.65rem; width: 100%; background: none; border: none; color: var(--text); font: inherit; cursor: pointer; opacity: 0.45; transition: all 180ms; text-align: left; }
 	.cc__row--on { opacity: 1; }
