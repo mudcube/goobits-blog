@@ -158,8 +158,8 @@
 <style>
 	.bk2__inner { max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%; }
 	.bk2__panel { position: relative; padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.75rem; background: color-mix(in srgb, var(--panel-bg, var(--bg)) 60%, transparent); }
-	.bk2__help { position: absolute; top: 0.6rem; right: 0.6rem; width: 1.2rem; height: 1.2rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); background: transparent; color: color-mix(in srgb, var(--text) 30%, transparent); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 180ms; padding: 0; font: inherit; font-size: 0.5rem; font-weight: 700; z-index: 2; }
-	.bk2__help:hover { color: color-mix(in srgb, var(--text) 55%, transparent); border-color: color-mix(in srgb, var(--text) 22%, transparent); }
+	.bk2__help { position: absolute; top: 0.6rem; right: 0.6rem; width: 1.2rem; height: 1.2rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); background: transparent; color: color-mix(in srgb, var(--text) 50%, transparent); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 180ms; padding: 0; font: inherit; font-size: 0.5rem; font-weight: 700; z-index: 2; }
+	.bk2__help:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 35%, transparent); }
 	.bk2__step--fwd { animation: bk2-fwd 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	.bk2__step--back { animation: bk2-back 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	@keyframes bk2-fwd { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
