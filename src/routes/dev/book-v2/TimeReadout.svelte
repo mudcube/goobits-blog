@@ -26,6 +26,10 @@
 	const wxS = $derived(weatherAt(start))
 	const wxE = $derived(weatherAt(end > start ? end - 1 : end))
 
+	let startText = $state(ft(start))
+	let durText = $state(fDur(duration))
+	let endText = $state(ft(end))
+
 	function parseTime(input: string): number | null {
 		const s = input.trim().toLowerCase().replace(/\s+/g, '')
 		const m = s.match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm|a|p)?$/i)
@@ -50,6 +54,17 @@
 		return null
 	}
 
+	function formattedField(field: 'start' | 'end' | 'dur') {
+		return field === 'start' ? ft(start) : field === 'end' ? ft(end) : fDur(duration)
+	}
+
+	function syncFieldText(field: 'start' | 'end' | 'dur') {
+		const text = formattedField(field)
+		if (field === 'start') startText = text
+		else if (field === 'end') endText = text
+		else durText = text
+	}
+
 	function commitField(el: HTMLElement, field: 'start' | 'end' | 'dur') {
 		const text = el.textContent?.trim() ?? ''
 		if (field === 'start') {
@@ -62,10 +77,7 @@
 			const d = parseDuration(text)
 			if (d !== null && d > 0) end = snap(clamp(start + d, start + 0.25, 24))
 		}
-		// Reset display to formatted value
-		if (field === 'start') el.textContent = ft(start)
-		else if (field === 'end') el.textContent = ft(end)
-		else el.textContent = fDur(end - start)
+		syncFieldText(field)
 	}
 
 	function nudge(field: 'start' | 'end' | 'dur', dir: 1 | -1, fast = false) {
@@ -98,13 +110,13 @@
 			e.preventDefault()
 			onNudge?.()
 			nudge(field, 1, e.shiftKey)
-			;(e.currentTarget as HTMLElement).textContent = field === 'start' ? ft(start) : field === 'end' ? ft(end) : fDur(end - start)
+			syncFieldText(field)
 		}
 		if (e.key === 'ArrowDown') {
 			e.preventDefault()
 			onNudge?.()
 			nudge(field, -1, e.shiftKey)
-			;(e.currentTarget as HTMLElement).textContent = field === 'start' ? ft(start) : field === 'end' ? ft(end) : fDur(end - start)
+			syncFieldText(field)
 		}
 		if (e.key === 'Enter') {
 			e.preventDefault()
@@ -113,9 +125,7 @@
 		}
 		if (e.key === 'Escape') {
 			const el = e.currentTarget as HTMLElement
-			if (field === 'start') el.textContent = ft(start)
-			else if (field === 'end') el.textContent = ft(end)
-			else el.textContent = fDur(duration)
+			syncFieldText(field)
 			el.blur()
 		}
 	}
@@ -135,25 +145,25 @@
 
 	// Sync contenteditable text when values change (e.g. from drag)
 	$effect(() => {
-		if (startEl && document.activeElement !== startEl) startEl.textContent = ft(start)
+		if (startEl && document.activeElement !== startEl) startText = ft(start)
 	})
 	$effect(() => {
 		// Access both start and end to track duration changes
 		const d = fDur(end - start)
-		if (durEl && document.activeElement !== durEl) durEl.textContent = d
+		if (durEl && document.activeElement !== durEl) durText = d
 	})
 	$effect(() => {
-		if (endEl && document.activeElement !== endEl) endEl.textContent = ft(end)
+		if (endEl && document.activeElement !== endEl) endText = ft(end)
 	})
 </script>
 
 <div class="tr">
 	<div class="tr__times">
-		<span class="tr__time" bind:this={startEl} contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Start time" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'start')} onkeydown={(e) => onKeydown(e, 'start')}>{ft(start)}</span>
+		<span class="tr__time" bind:this={startEl} bind:textContent={startText} contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Start time" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'start')} onkeydown={(e) => onKeydown(e, 'start')}></span>
 		<span class="tr__line"></span>
-		<span class="tr__dur" bind:this={durEl} contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Duration" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'dur')} onkeydown={(e) => onKeydown(e, 'dur')}>{fDur(duration)}</span>
+		<span class="tr__dur" bind:this={durEl} bind:textContent={durText} contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="Duration" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'dur')} onkeydown={(e) => onKeydown(e, 'dur')}></span>
 		<span class="tr__line"></span>
-		<span class="tr__time tr__time--end" bind:this={endEl} contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="End time" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'end')} onkeydown={(e) => onKeydown(e, 'end')}>{ft(end)}</span>
+		<span class="tr__time tr__time--end" bind:this={endEl} bind:textContent={endText} contenteditable="true" spellcheck="false" role="textbox" tabindex="0" data-tip="End time" onfocus={selectAll} onblur={(e) => commitField(e.currentTarget as HTMLElement, 'end')} onkeydown={(e) => onKeydown(e, 'end')}></span>
 	</div>
 	{#if wxS && wxE}
 		<div class="tr__wx">
