@@ -5,7 +5,7 @@ import {
 } from '@calendar/core'
 import { apiError, apiOk, apiValidationError, buildEnv } from '@calendar/kit'
 import type { RequestEvent } from '@sveltejs/kit'
-import { enforceSameOrigin } from '../../../../admin-api-helpers'
+import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
 
 export async function GET(event: RequestEvent) {
 	try {

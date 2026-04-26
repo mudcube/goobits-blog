@@ -2,9 +2,12 @@ import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { enqueueCalendarSyncJob, joinEvent, parseCalendarJoinEventInput, processCalendarSyncQueue, TransportValidationError } from '@calendar/core'
 import { apiError, apiOk, apiValidationError, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
+import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
 
 export async function POST(event: RequestEvent) {
 	return runCalendarRequest('calendar.events.join', async () => {
+		const csrf = enforceSameOrigin(event)
+		if (csrf) return csrf
 		const user = requireCalendarUserId(event)
 		if (user.response) return user.response
 		const userId = user.userId
@@ -47,7 +50,7 @@ export async function POST(event: RequestEvent) {
 		} catch (error) {
 			console.warn('Failed to enqueue calendar sync after join:', error)
 		}
-		return apiOk({ status: result.status, state: result.state })
+		return apiOk({ status: result.status, confirmationId: result.confirmationId, state: result.state })
 	}, {
 		onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
 	})

@@ -2,9 +2,12 @@ import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { enqueueCalendarSyncJob, leaveEvent, processCalendarSyncQueue } from '@calendar/core'
 import { apiError, apiOk, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
+import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
 
 export async function POST(event: RequestEvent) {
 	return runCalendarRequest('calendar.events.leave', async () => {
+		const csrf = enforceSameOrigin(event)
+		if (csrf) return csrf
 		const user = requireCalendarUserId(event)
 		if (user.response) return user.response
 		const userId = user.userId

@@ -6,7 +6,7 @@ import {
 } from '@calendar/core'
 import { apiError, apiOk, apiValidationError, buildEnv } from '@calendar/kit'
 import type { RequestEvent } from '@sveltejs/kit'
-import { enforceSameOrigin } from '../../../../admin-api-helpers'
+import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
 import { ensureCalendarUserByEmail, setCalendarSessionCookie } from '../../../../server/auth/calendar-session'
 
 function createGuestEmail() {

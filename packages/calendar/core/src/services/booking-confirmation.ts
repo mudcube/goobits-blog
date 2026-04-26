@@ -9,11 +9,20 @@ export async function setConfirmationId(
 	db: D1DatabaseLike,
 	participantId: number
 ): Promise<string> {
-	const confirmationId = generateConfirmationId()
-	await db.prepare(
-		`UPDATE calendar_event_participants SET confirmation_id = ? WHERE id = ?`
-	).bind(confirmationId, participantId).run()
-	return confirmationId
+	for (let attempt = 0; attempt < 3; attempt++) {
+		const confirmationId = generateConfirmationId()
+		try {
+			await db.prepare(
+				`UPDATE calendar_event_participants SET confirmation_id = ? WHERE id = ?`
+			).bind(confirmationId, participantId).run()
+			return confirmationId
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : ''
+			if (msg.includes('UNIQUE') && attempt < 2) continue
+			throw err
+		}
+	}
+	throw new Error('Failed to generate unique confirmation ID after retries')
 }
 
 export async function getBookingByConfirmation(
@@ -63,10 +72,12 @@ export async function cancelBookingByConfirmation(
 	const booking = await getBookingByConfirmation(db, confirmationId)
 	if (!booking) return { ok: false, code: 'not_found' }
 	if (booking.user_id !== userId) return { ok: false, code: 'forbidden' }
-	if (booking.status === 'cancelled' || booking.status === 'canceled') return { ok: false, code: 'already_cancelled' }
+	if (booking.status === 'left' || booking.status === 'cancelled' || booking.status === 'canceled') {
+		return { ok: false, code: 'already_cancelled' }
+	}
 
 	await db.prepare(
-		`UPDATE calendar_event_participants SET status = 'cancelled', updated_at = unixepoch() WHERE id = ?`
+		`UPDATE calendar_event_participants SET status = 'left', guest_count = 0, updated_at = unixepoch() WHERE id = ?`
 	).bind(booking.id).run()
 
 	return { ok: true }
