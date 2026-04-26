@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CalendarPlus, ChevronLeft } from '@lucide/svelte'
+	import { ChevronLeft, ChevronDown } from '@lucide/svelte'
 	import type { Person } from './types'
 	import { ft, formatDate } from './time'
 
@@ -34,6 +34,27 @@
 	const tz = $derived(Intl.DateTimeFormat().resolvedOptions().timeZone.replace(/_/g, ' ').replace(/.*\//, ''))
 
 	const spotsLabel = $derived(capacity > 0 ? ` · ${overlapping.length + 1} of ${capacity} spots` : '')
+
+	let calOpen = $state(false)
+
+	function toggleCal() { calOpen = !calOpen }
+
+	function googleCalUrl() {
+		const pad = (n: number) => String(n).padStart(2, '0')
+		const y = date.getFullYear(); const m = pad(date.getMonth() + 1); const d = pad(date.getDate())
+		const sh = pad(Math.floor(start)); const sm = pad(Math.round((start % 1) * 60))
+		const eh = pad(Math.floor(end)); const em = pad(Math.round((end % 1) * 60))
+		const dates = `${y}${m}${d}T${sh}${sm}00/${y}${m}${d}T${eh}${em}00`
+		return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activityLabel)}&dates=${dates}&details=${encodeURIComponent('Booked via miko.art')}`
+	}
+
+	function outlookUrl() {
+		const pad = (n: number) => String(n).padStart(2, '0')
+		const y = date.getFullYear(); const m = pad(date.getMonth() + 1); const d = pad(date.getDate())
+		const sh = pad(Math.floor(start)); const sm = pad(Math.round((start % 1) * 60))
+		const eh = pad(Math.floor(end)); const em = pad(Math.round((end % 1) * 60))
+		return `https://outlook.live.com/calendar/0/action/compose?subject=${encodeURIComponent(activityLabel)}&startdt=${y}-${m}-${d}T${sh}:${sm}:00&enddt=${y}-${m}-${d}T${eh}:${em}:00&body=${encodeURIComponent('Booked via miko.art')}`
+	}
 
 	function downloadIcs() {
 		const pad = (n: number) => String(n).padStart(2, '0')
@@ -87,10 +108,28 @@
 	{/if}
 
 	<div class="bs__actions">
-		<button type="button" class="bs__add-cal" onclick={downloadIcs}>
-			<CalendarPlus size={15} strokeWidth={2} />
-			<span>Add to Calendar</span>
-		</button>
+		<div class="bs__cal-wrap">
+			<button type="button" class="bs__add-cal" onclick={toggleCal}>
+				<span>Add to Calendar</span>
+				<ChevronDown size={14} strokeWidth={2} style="transition:transform 0.2s;{calOpen ? 'transform:rotate(180deg);' : ''}" />
+			</button>
+			{#if calOpen}
+				<div class="bs__cal-menu">
+					<a class="bs__cal-option" href={googleCalUrl()} target="_blank" rel="noopener">
+						<svg class="bs__cal-icon" viewBox="0 0 24 24" width="16" height="16"><path fill="#4285F4" d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12s4.48 10 10 10c1.73 0 3.36-.44 4.78-1.21l-2.12-3.67A5.96 5.96 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L18.36 5.64A9.953 9.953 0 0 0 12 2"/><path fill="#34A853" d="M6 12c0 3.31 2.69 6 6 6 1.08 0 2.09-.29 2.96-.78l2.12 3.67C15.36 22.56 13.73 23 12 23 6.48 23 2 18.52 2 13"/><path fill="#FBBC05" d="M12 6c-1.66 0-3.14.69-4.22 1.78L5.64 5.64A9.953 9.953 0 0 1 12 2v4"/><path fill="#EA4335" d="M18.36 5.64 16.22 7.78A5.96 5.96 0 0 1 18 12h4c0-2.76-1.12-5.26-2.93-7.07"/></svg>
+						<span>Google Calendar</span>
+					</a>
+					<button type="button" class="bs__cal-option" onclick={() => { downloadIcs(); calOpen = false }}>
+						<svg class="bs__cal-icon" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><text x="12" y="18" text-anchor="middle" font-size="8" font-weight="700" fill="currentColor">29</text></svg>
+						<span>Apple Calendar</span>
+					</button>
+					<a class="bs__cal-option" href={outlookUrl()} target="_blank" rel="noopener">
+						<svg class="bs__cal-icon" viewBox="0 0 24 24" width="16" height="16"><path fill="#0078D4" d="M21.17 2H8.83A1.83 1.83 0 0 0 7 3.83v4.34l7.5 3.33L22 7.83V3.83A1.83 1.83 0 0 0 21.17 2z"/><path fill="#0364B8" d="M22 7.83 14.5 12 7 7.83v8.34A1.83 1.83 0 0 0 8.83 18h12.34A1.83 1.83 0 0 0 23 16.17V7.83z" opacity="0.8"/><path fill="#0078D4" d="M7 8v10l-5-3V6z" opacity="0.6"/><rect x="2" y="6" width="10" height="12" rx="1.5" fill="#0078D4"/><text x="7" y="15" text-anchor="middle" font-size="7" font-weight="700" fill="#fff">O</text></svg>
+						<span>Outlook</span>
+					</a>
+				</div>
+			{/if}
+		</div>
 		{#if onEdit}
 			<button type="button" class="bs__secondary" onclick={onEdit}>
 				<ChevronLeft size={14} strokeWidth={2} />
@@ -132,8 +171,15 @@
 	.bs__crew-text { margin: 0; font-size: 0.78rem; color: color-mix(in srgb, var(--text) 55%, transparent); }
 
 	.bs__actions { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.85rem; }
+	.bs__cal-wrap { position: relative; }
 	.bs__add-cal { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.65rem; border: 1px solid color-mix(in srgb, #a78bfa 25%, transparent); border-radius: 0.5rem; background: color-mix(in srgb, #7a5af8 12%, transparent); color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 180ms; }
 	.bs__add-cal:hover { background: color-mix(in srgb, #7a5af8 20%, transparent); border-color: color-mix(in srgb, #a78bfa 45%, transparent); }
+	.bs__cal-menu { display: flex; flex-direction: column; margin-top: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); border-radius: 0.5rem; overflow: hidden; animation: bs-menu-in 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+	@keyframes bs-menu-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+	.bs__cal-option { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.75rem; background: transparent; border: none; color: var(--text); font: inherit; font-size: 0.78rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 150ms; text-align: left; }
+	.bs__cal-option:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
+	.bs__cal-option + .bs__cal-option { border-top: 1px solid color-mix(in srgb, var(--text) 7%, transparent); }
+	.bs__cal-icon { flex-shrink: 0; }
 	.bs__secondary { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.55rem; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; background: transparent; color: color-mix(in srgb, var(--text) 55%, transparent); font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
 	.bs__secondary:hover { background: color-mix(in srgb, var(--text) 4%, transparent); color: var(--text); }
 </style>
