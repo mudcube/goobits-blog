@@ -123,16 +123,13 @@
 
 	const breadcrumbItems = [
 		{ label: 'Dev', href: '/dev/' },
-		{ label: 'Schedule Time Picker', href: '/dev/schedule-time-picker/' },
-		{ label: 'v4' }
+		{ label: 'Book' }
 	]
 
 	const versions = [
-		{ label: 'v1', href: '/dev/schedule-time-picker/' },
-		{ label: 'v2', href: '/dev/schedule-time-picker-v2/' },
-		{ label: 'v3', href: '/dev/schedule-time-picker-v3/' },
-		{ label: 'v4', href: '/dev/schedule-time-picker-v4/', current: true },
-		{ label: 'v5', href: '/dev/schedule-time-picker-v5/' }
+		{ label: 'v1', href: '/dev/book/', current: true },
+		{ label: 'v2', href: '/dev/book-v2/' },
+		{ label: 'v3', href: '/dev/book-v3/' }
 	]
 </script>
 
@@ -142,8 +139,8 @@
 <PageShell className="tp4">
 	<div class="tp4__inner">
 		<DevHero
-			title="Time Picker"
-			subtitle="Drag a time window across the day with weather and daylight cues."
+			title="Book"
+			subtitle="No login wall. Calendar first. Crew tap = done."
 			{breadcrumbItems}
 			{versions}
 		>
