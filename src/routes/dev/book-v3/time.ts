@@ -12,6 +12,14 @@ export function ft(h: number) {
 	return min === 0 ? `${d}${sfx}` : `${d}:${String(min).padStart(2, '0')}${sfx}`
 }
 
+export function ftShort(h: number) {
+	const hr = Math.floor(h) % 24
+	if (hr === 0 || hr === 24) return '12am'
+	if (hr < 12) return `${hr}`
+	if (hr === 12) return '12'
+	return `${hr - 12}`
+}
+
 export function fDur(d: number) {
 	const h = Math.floor(d)
 	const m = Math.round((d - h) * 60)

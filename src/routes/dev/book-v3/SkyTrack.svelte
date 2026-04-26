@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { HourlyWeather } from '$lib/app/weather'
 	import { Thermometer, CloudRain, GripVertical } from '@lucide/svelte'
-	import { SNAP, snap, clamp, pct as pctFn, ft, ftShort } from './sky-time'
+	import { SNAP, snap, clamp, pct as pctFn, ft, ftShort } from './time'
 
 	let {
 		windowStart = 0,
@@ -235,7 +235,7 @@
 
 <style>
 	/* Track */
-	.st__lanes { position: relative; display: grid; grid-template-rows: 6rem 2rem; gap: 2px; border-radius: 0.65rem; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); touch-action: none; background: color-mix(in srgb, var(--text) 8%, transparent); margin-bottom: 0.15rem; }
+	.st__lanes { position: relative; display: grid; grid-template-rows: 6rem 2rem; gap: 2px; border-radius: 0.5rem; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); touch-action: none; background: color-mix(in srgb, var(--text) 8%, transparent); margin-bottom: 0.15rem; }
 	.st__lanes--dry { grid-template-rows: 6rem; }
 	.st__lane { position: relative; overflow: hidden; }
 	.st__lane--main { background: #080a14; }
@@ -253,7 +253,7 @@
 
 	/* Masks + Selection */
 	.st__mask { position: absolute; top: 0; bottom: 0; background: rgba(4, 4, 10, 0.4); z-index: 5; pointer-events: none; }
-	.st__mask--left { left: 0; border-radius: 0.65rem 0 0 0.65rem; }
+	.st__mask--left { left: 0; border-radius: 0.5rem 0 0 0.65rem; }
 	.st__mask--right { border-radius: 0 0.65rem 0.65rem 0; }
 	.st__sel { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, white 3%, transparent); border-left: 1px solid color-mix(in srgb, white 20%, transparent); border-right: 1px solid color-mix(in srgb, white 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, white 3%, transparent), 0 0 20px color-mix(in srgb, #a78bfa 6%, transparent); cursor: grab; z-index: 10; padding: 0; font: inherit; border-radius: 0; transition: background 120ms; }
 	.st__sel:hover { background: color-mix(in srgb, white 6%, transparent); }

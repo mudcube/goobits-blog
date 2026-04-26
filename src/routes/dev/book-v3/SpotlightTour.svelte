@@ -228,16 +228,16 @@
 	.st-prompt__title { margin: 0 0 0.35rem; font-family: var(--font-display); font-size: 1.15rem; font-weight: 500; color: #fff; letter-spacing: -0.02em; }
 	.st-prompt__copy { margin: 0 0 1rem; font-size: 0.78rem; color: rgba(255, 255, 255, 0.6); line-height: 1.5; }
 	.st-prompt__actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
-	.st-prompt__skip { padding: 0.4rem 0.85rem; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 0.4rem; background: transparent; color: rgba(255, 255, 255, 0.5); font: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
+	.st-prompt__skip { padding: 0.4rem 0.85rem; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 0.5rem; background: transparent; color: rgba(255, 255, 255, 0.5); font: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
 	.st-prompt__skip:hover { color: rgba(255, 255, 255, 0.8); border-color: rgba(255, 255, 255, 0.25); }
-	.st-prompt__go { padding: 0.4rem 0.85rem; border: none; border-radius: 0.4rem; background: #a78bfa; color: #fff; font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: background 150ms; }
+	.st-prompt__go { padding: 0.4rem 0.85rem; border: none; border-radius: 0.5rem; background: #a78bfa; color: #fff; font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: background 150ms; }
 	.st-prompt__go:hover { background: #8b5cf6; }
 
 	.st-ring { position: absolute; border: 1.5px solid rgba(167, 139, 250, 0.6); pointer-events: none; animation: st-pulse 2s ease-in-out infinite; opacity: 1; transition: opacity 0.2s ease; box-shadow: 0 0 12px rgba(167, 139, 250, 0.15); }
 	.st-ring--hidden { opacity: 0; }
 	@keyframes st-pulse { 0% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.35); } 25% { box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1); } 50% { box-shadow: 0 0 0 8px rgba(167, 139, 250, 0); } 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); } }
 
-	.st-tip { position: fixed; width: max-content; max-width: min(20rem, calc(100vw - 2rem)); padding: 0.75rem 1rem; border-radius: 0.65rem; background: rgba(16, 16, 28, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(167, 139, 250, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); pointer-events: auto; opacity: 1; transition: opacity 0.2s ease; }
+	.st-tip { position: fixed; width: max-content; max-width: min(20rem, calc(100vw - 2rem)); padding: 0.75rem 1rem; border-radius: 0.5rem; background: rgba(16, 16, 28, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(167, 139, 250, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); pointer-events: auto; opacity: 1; transition: opacity 0.2s ease; }
 	.st-tip--hidden { opacity: 0; pointer-events: none; }
 	.st-tip::before { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; filter: drop-shadow(0 0 3px rgba(167, 139, 250, 0.15)); }
 	.st-tip--above::before { top: -8px; border-bottom: 8px solid rgba(16, 16, 28, 0.95); }
@@ -246,7 +246,7 @@
 	.st-tip__footer { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
 	.st-tip__progress { flex: 1; height: 2px; background: rgba(255, 255, 255, 0.1); border-radius: 1px; overflow: hidden; }
 	.st-tip__bar { height: 100%; background: #a78bfa; border-radius: 1px; transition: width 0.3s ease; }
-	.st-tip__btn { padding: 0.3rem 0.75rem; border: none; border-radius: 0.35rem; background: #a78bfa; color: #fff; font: inherit; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; cursor: pointer; transition: all 150ms; }
+	.st-tip__btn { padding: 0.3rem 0.75rem; border: none; border-radius: 0.5rem; background: #a78bfa; color: #fff; font: inherit; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; cursor: pointer; transition: all 150ms; }
 	.st-tip__btn:hover { background: #8b5cf6; }
 	.st-tip__btn--done { background: #22c55e; }
 	.st-tip__btn--done:hover { background: #16a34a; }

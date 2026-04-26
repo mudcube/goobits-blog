@@ -83,7 +83,7 @@
 	.cs__icon { font-size: 1.5rem; display: block; margin-bottom: 0.1rem; }
 	.cs__name { margin: 0; font-family: var(--font-display); font-size: 1.2rem; font-weight: 500; letter-spacing: -0.03em; }
 	.cs__month-nav { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.5rem; }
-	.cs__month-btn { padding: 0.25rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); border-radius: 0.35rem; background: transparent; color: color-mix(in srgb, var(--text) 45%, transparent); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 150ms; font: inherit; }
+	.cs__month-btn { padding: 0.25rem; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); border-radius: 0.5rem; background: transparent; color: color-mix(in srgb, var(--text) 45%, transparent); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 150ms; font: inherit; }
 	.cs__month-btn:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 25%, transparent); }
 	.cs__month-label { font-size: 0.78rem; font-weight: 600; color: var(--text); min-width: 8rem; text-align: center; }
 	.cs__weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 0.2rem; }

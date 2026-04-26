@@ -173,7 +173,16 @@
 <SpotlightTour bind:this={tourRef} steps={tourSteps} storageKey="book-v3-tour" currentPhase={stepNum} onPhaseRequest={handleTourPhase} />
 
 <style>
-	.bk2__inner { max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%; }
+	.bk2__inner {
+		--book-accent: #a78bfa;
+		--book-accent-dim: #8b5cf6;
+		--book-success: #3cbf8a;
+		--book-confirm: #22c55e;
+		--book-confirm-hover: #16a34a;
+		--book-danger: #f87171;
+		--book-night: #0b1026;
+		max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%;
+	}
 	.bk2__panel { position: relative; padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.75rem; background: color-mix(in srgb, var(--panel-bg, var(--bg)) 60%, transparent); }
 	.bk2__help { position: absolute; top: 0.6rem; right: 0.6rem; width: 1.2rem; height: 1.2rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); background: transparent; color: color-mix(in srgb, var(--text) 50%, transparent); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 180ms; padding: 0; font: inherit; font-size: 0.5rem; font-weight: 700; z-index: 2; }
 	.bk2__help:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 35%, transparent); }
@@ -184,7 +193,7 @@
 
 	/* Tooltip system */
 	:global([data-tip]) { position: relative; }
-	:global([data-tip])::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(0.1rem); padding: 0.3rem 0.55rem; border-radius: 0.4rem; background: rgba(10, 10, 18, 0.92); backdrop-filter: blur(6px); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.85); font-size: 0.58rem; font-weight: 600; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s ease 0.4s, transform 0.2s ease 0.4s; z-index: 50; }
+	:global([data-tip])::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(0.1rem); padding: 0.3rem 0.55rem; border-radius: 0.5rem; background: rgba(10, 10, 18, 0.92); backdrop-filter: blur(6px); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.85); font-size: 0.58rem; font-weight: 600; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s ease 0.4s, transform 0.2s ease 0.4s; z-index: 50; }
 	:global([data-tip]):hover::after { opacity: 1; transform: translateX(-50%) translateY(-0.3rem); }
 	:global([data-tip]):active::after { opacity: 0; transition-delay: 0s; }
 	@media (pointer: coarse) { :global([data-tip])::after { display: none; } }
