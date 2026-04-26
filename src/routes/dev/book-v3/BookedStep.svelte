@@ -1,0 +1,173 @@
+<script lang="ts">
+	import { CalendarPlus, Pencil, X, ChevronLeft } from '@lucide/svelte'
+	import type { Person } from './types'
+	import { ft, formatDate } from './time'
+
+	let {
+		activityIcon,
+		activityLabel,
+		date,
+		start,
+		end,
+		overlapping = [],
+		allBookings = [],
+		capacity = 8,
+		onBack,
+		onEdit,
+		onCancel,
+	}: {
+		activityIcon: string
+		activityLabel: string
+		date: Date
+		start: number
+		end: number
+		overlapping?: Person[]
+		allBookings?: Person[]
+		capacity?: number
+		onBack: () => void
+		onEdit?: () => void
+		onCancel?: () => void
+	} = $props()
+
+	const crewNames = $derived(
+		overlapping.length === 0 ? '' :
+		overlapping.length === 1 ? overlapping[0]!.name :
+		overlapping.slice(0, -1).map(p => p.name).join(', ') + ' and ' + overlapping[overlapping.length - 1]!.name
+	)
+
+	const tz = $derived(Intl.DateTimeFormat().resolvedOptions().timeZone.replace(/_/g, ' ').replace(/.*\//, ''))
+
+	function downloadIcs() {
+		const pad = (n: number) => String(n).padStart(2, '0')
+		const y = date.getFullYear(); const m = pad(date.getMonth() + 1); const d = pad(date.getDate())
+		const sh = pad(Math.floor(start)); const sm = pad(Math.round((start % 1) * 60))
+		const eh = pad(Math.floor(end)); const em = pad(Math.round((end % 1) * 60))
+		const dtStart = `${y}${m}${d}T${sh}${sm}00`
+		const dtEnd = `${y}${m}${d}T${eh}${em}00`
+		const uid = `${dtStart}-${Math.random().toString(36).slice(2, 8)}@miko.art`
+		const ics = [
+			'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//miko.art//book//EN',
+			'BEGIN:VEVENT', `UID:${uid}`, `DTSTART:${dtStart}`, `DTEND:${dtEnd}`,
+			`SUMMARY:${activityLabel}`, `DESCRIPTION:Booked via miko.art`,
+			'END:VEVENT', 'END:VCALENDAR'
+		].join('\r\n')
+		const blob = new Blob([ics], { type: 'text/calendar' })
+		const url = URL.createObjectURL(blob)
+		const a = document.createElement('a')
+		a.href = url; a.download = `${activityLabel.toLowerCase().replace(/\s+/g, '-')}.ics`
+		a.click(); URL.revokeObjectURL(url)
+	}
+</script>
+
+<div class="bs">
+	<div class="bs__badge">
+		<span class="bs__check">✓</span>
+		<div class="bs__sparkle bs__sparkle--1"></div>
+		<div class="bs__sparkle bs__sparkle--2"></div>
+		<div class="bs__sparkle bs__sparkle--3"></div>
+		<div class="bs__sparkle bs__sparkle--4"></div>
+	</div>
+	<h2 class="bs__title">You're booked.</h2>
+
+	<div class="bs__card">
+		<p class="bs__activity">{activityIcon} {activityLabel}</p>
+		<p class="bs__date">{formatDate(date)} · {ft(start)} – {ft(end)}</p>
+		<p class="bs__tz">{tz}</p>
+	</div>
+
+	{#if overlapping.length > 0}
+		<div class="bs__crew-summary">
+			<div class="bs__crew-dots">
+				{#each overlapping as person}
+					<span class="bs__crew-dot" style="background:{person.color};"></span>
+				{/each}
+			</div>
+			<p class="bs__crew-text">{crewNames} will be there too</p>
+		</div>
+	{/if}
+
+	<div class="bs__actions">
+		<button type="button" class="bs__add-cal" onclick={downloadIcs}>
+			<CalendarPlus size={15} strokeWidth={2} />
+			<span>Add to Calendar</span>
+		</button>
+		{#if onEdit}
+			<button type="button" class="bs__secondary" onclick={onEdit}>
+				<Pencil size={13} strokeWidth={2} />
+				<span>Change my time</span>
+			</button>
+		{/if}
+		{#if onCancel}
+			<button type="button" class="bs__secondary bs__secondary--danger" onclick={onCancel}>
+				<X size={14} strokeWidth={2} />
+				<span>Cancel booking</span>
+			</button>
+		{/if}
+		<button type="button" class="bs__secondary" onclick={onBack}>
+			<ChevronLeft size={14} strokeWidth={2} />
+			<span>Pick a different day</span>
+		</button>
+	</div>
+
+	{#if allBookings.length > 0}
+		<div class="bs__guest-list">
+			<p class="bs__guest-title">Who's going</p>
+			<div class="bs__guest-card">
+				{#each allBookings as person, i}
+					{#if i > 0}<div class="bs__guest-divider"></div>{/if}
+					<div class="bs__guest-row">
+						<span class="bs__guest-dot" style="background:{person.color};"></span>
+						<span class="bs__guest-name">{person.name}</span>
+						<span class="bs__guest-time">{ft(person.start)}–{ft(person.end)}</span>
+					</div>
+				{/each}
+			</div>
+			<p class="bs__capacity">{allBookings.length} of {capacity} spots filled</p>
+		</div>
+	{/if}
+</div>
+
+<style>
+	.bs { text-align: center; animation: bs-in 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+	@keyframes bs-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+	.bs__badge { position: relative; width: 3.2rem; height: 3.2rem; margin: 0 auto 0.85rem; }
+	.bs__check { width: 3.2rem; height: 3.2rem; border-radius: 999px; background: color-mix(in srgb, #3cbf8a 10%, transparent); border: 1.5px solid color-mix(in srgb, #3cbf8a 28%, transparent); color: #3cbf8a; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700; animation: bs-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+	@keyframes bs-pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+	.bs__sparkle { position: absolute; width: 4px; height: 4px; border-radius: 999px; background: #3cbf8a; opacity: 0; }
+	.bs__sparkle--1 { top: -6px; left: 50%; animation: bs-spark 0.6s 0.3s ease-out both; }
+	.bs__sparkle--2 { bottom: -6px; left: 50%; animation: bs-spark 0.6s 0.4s ease-out both; }
+	.bs__sparkle--3 { left: -6px; top: 50%; animation: bs-spark 0.6s 0.35s ease-out both; }
+	.bs__sparkle--4 { right: -6px; top: 50%; animation: bs-spark 0.6s 0.45s ease-out both; }
+	@keyframes bs-spark { 0% { opacity: 0; transform: scale(0); } 50% { opacity: 1; transform: scale(1.5); } 100% { opacity: 0; transform: scale(0.5) translateY(-8px); } }
+
+	.bs__title { margin: 0 0 0.75rem; font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; letter-spacing: -0.03em; }
+
+	.bs__card { padding: 0.65rem 0; border-top: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--text) 8%, transparent); }
+	.bs__activity { margin: 0; font-size: 0.78rem; color: color-mix(in srgb, var(--text) 60%, transparent); }
+	.bs__date { margin: 0.15rem 0 0; font-size: 0.78rem; color: color-mix(in srgb, var(--text) 60%, transparent); }
+	.bs__tz { margin: 0.1rem 0 0; font-size: 0.58rem; color: color-mix(in srgb, var(--text) 35%, transparent); }
+
+	.bs__crew-summary { margin-top: 0.65rem; }
+	.bs__crew-dots { display: flex; justify-content: center; gap: 0.25rem; margin-bottom: 0.25rem; }
+	.bs__crew-dot { width: 0.5rem; height: 0.5rem; border-radius: 999px; }
+	.bs__crew-text { margin: 0; font-size: 0.78rem; color: color-mix(in srgb, var(--text) 55%, transparent); }
+
+	.bs__actions { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.85rem; }
+	.bs__add-cal { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.65rem; border: 1px solid color-mix(in srgb, #a78bfa 25%, transparent); border-radius: 0.5rem; background: color-mix(in srgb, #7a5af8 12%, transparent); color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 180ms; }
+	.bs__add-cal:hover { background: color-mix(in srgb, #7a5af8 20%, transparent); border-color: color-mix(in srgb, #a78bfa 45%, transparent); }
+	.bs__secondary { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.55rem; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; background: transparent; color: color-mix(in srgb, var(--text) 55%, transparent); font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
+	.bs__secondary:hover { background: color-mix(in srgb, var(--text) 4%, transparent); color: var(--text); }
+	.bs__secondary--danger:hover { color: #f87171; border-color: color-mix(in srgb, #f87171 20%, transparent); }
+
+	.bs__guest-list { margin-top: 1.25rem; text-align: left; }
+	.bs__guest-title { margin: 0 0 0.35rem; font-size: 0.58rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: color-mix(in srgb, var(--text) 40%, transparent); text-align: center; }
+	.bs__guest-card { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.6rem; overflow: hidden; }
+	.bs__guest-divider { height: 1px; background: color-mix(in srgb, var(--text) 7%, transparent); }
+	.bs__guest-row { display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.65rem; }
+	.bs__guest-dot { width: 0.38rem; height: 0.38rem; border-radius: 999px; flex-shrink: 0; }
+	.bs__guest-name { font-size: 0.78rem; font-weight: 600; }
+	.bs__guest-time { font-size: 0.78rem; color: color-mix(in srgb, var(--text) 48%, transparent); font-variant-numeric: tabular-nums; margin-left: auto; }
+	.bs__capacity { margin: 0.35rem 0 0; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); text-align: center; }
+</style>
