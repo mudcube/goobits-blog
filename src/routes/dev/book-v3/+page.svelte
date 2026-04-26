@@ -49,6 +49,7 @@
 	let pendingDay = $state<OpenDay | null>(null)
 	let animKey = $state(0)
 	let direction = $state<'forward' | 'back' | 'none'>('none')
+	let maxReached = $state(0)
 
 	const overlapping = $derived(selectedDay ? selectedDay.bookings.filter(o => o.start < end && o.end > start) : [])
 
@@ -87,6 +88,7 @@
 		direction = n >= stepNum ? 'forward' : 'back'
 		animKey++
 		stepNum = n
+		if (n > maxReached) maxReached = n
 	}
 
 	function onSelectDay(day: OpenDay) {
@@ -106,7 +108,9 @@
 	}
 
 	function onStepNav(step: number) {
-		if (step < stepNum) { pendingDay = null; goStep(step) }
+		if (step === stepNum) return
+		if (step < stepNum) pendingDay = null
+		goStep(step)
 	}
 
 	const stepLabels = $derived.by((): [string, string, string] => {
@@ -137,7 +141,7 @@
 			{versions}
 		/>
 
-		<StepIndicator current={stepNum} labels={stepLabels} onNavigate={onStepNav} />
+		<StepIndicator current={stepNum} {maxReached} labels={stepLabels} onNavigate={onStepNav} />
 
 		{#key animKey}
 		<div class="bk2__step bk2__panel" class:bk2__step--fwd={direction === 'forward'} class:bk2__step--back={direction === 'back'}>

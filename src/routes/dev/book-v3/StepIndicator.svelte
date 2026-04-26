@@ -3,10 +3,12 @@
 
 	let {
 		current = 0,
+		maxReached = 0,
 		labels = ['Day', 'Time', 'Booked'],
 		onNavigate,
 	}: {
 		current?: number
+		maxReached?: number
 		labels?: [string, string, string]
 		onNavigate?: (step: number) => void
 	} = $props()
@@ -14,8 +16,8 @@
 
 <nav class="si">
 	{#each labels as label, i}
-		{#if i > 0}<span class="si__line" class:si__line--done={current > i - 1}></span>{/if}
-		<button type="button" class="si__step" class:si__step--active={current === i} class:si__step--done={current > i} disabled={i >= current} data-tip={current > i ? `Back to ${label}` : undefined} onclick={() => onNavigate?.(i)}>
+		{#if i > 0}<span class="si__line" class:si__line--done={maxReached >= i}></span>{/if}
+		<button type="button" class="si__step" class:si__step--active={current === i} class:si__step--done={current > i} class:si__step--visited={i <= maxReached && i !== current} disabled={i > maxReached} data-tip={i !== current && i <= maxReached ? `Go to ${label}` : undefined} onclick={() => onNavigate?.(i)}>
 			<span class="si__dot">
 				{#if current > i}<Check size={11} strokeWidth={3} />{:else}{i + 1}{/if}
 			</span>
@@ -36,4 +38,6 @@
 	.si__label { font-size: 0.55rem; font-weight: 600; color: color-mix(in srgb, var(--text) 32%, transparent); white-space: nowrap; max-width: 5rem; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 	.si__step--active .si__label { color: color-mix(in srgb, var(--text) 68%, transparent); }
 	.si__step--done .si__label { color: color-mix(in srgb, #a78bfa 60%, transparent); }
+	.si__step--visited .si__dot { border-color: color-mix(in srgb, #a78bfa 40%, transparent); color: color-mix(in srgb, #a78bfa 50%, transparent); cursor: pointer; }
+	.si__step--visited .si__label { color: color-mix(in srgb, #a78bfa 40%, transparent); }
 </style>
