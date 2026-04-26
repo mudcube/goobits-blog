@@ -1,6 +1,9 @@
 import {
 	getBookingByConfirmation,
 	cancelBookingByConfirmation,
+	bumpWaitlist,
+	enqueueCalendarSyncJob,
+	processCalendarSyncQueue,
 	TransportValidationError
 } from '@calendar/core'
 import { apiError, apiOk, apiValidationError, buildEnv } from '@calendar/kit'
@@ -57,6 +60,21 @@ export async function DELETE(event: RequestEvent) {
 		if (!result.ok) {
 			const status = result.code === 'not_found' ? 404 : result.code === 'forbidden' ? 403 : 400
 			return apiError(`Booking ${result.code}`, { status, code: `booking_${result.code}` })
+		}
+
+		const eventId = result.eventId!
+		await bumpWaitlist(env.DB, eventId)
+		try {
+			await enqueueCalendarSyncJob(env.DB, {
+				eventId,
+				trigger: 'member_leave',
+				requestedByUserId: userId
+			})
+			void processCalendarSyncQueue(env.DB, env, 2).catch((err) => {
+				console.warn('Best-effort sync after booking cancel failed:', err)
+			})
+		} catch (err) {
+			console.warn('Failed to enqueue sync after booking cancel:', err)
 		}
 
 		return apiOk({ ok: true })

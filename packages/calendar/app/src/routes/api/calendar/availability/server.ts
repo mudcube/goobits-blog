@@ -18,17 +18,17 @@ export async function GET(event: RequestEvent) {
 			return apiError('Missing or invalid date parameter (YYYY-MM-DD)', { status: 400, code: 'invalid_date' })
 		}
 		const activitySlug = event.url.searchParams.get('activity')
-
-		// If filtering by activity, verify user has program access
-		if (activitySlug) {
-			const { hasUserProgramAccess } = await import('@calendar/core')
-			const hasAccess = await hasUserProgramAccess(env.DB, String(user.id), activitySlug)
-			if (!hasAccess) {
-				return apiError('Access denied for this program', { status: 403, code: 'forbidden' })
-			}
+		if (!activitySlug) {
+			return apiError('Missing activity parameter', { status: 400, code: 'missing_activity' })
 		}
 
-		const slots = await getSlotAvailability(env.DB, { date, ...(activitySlug ? { activitySlug } : {}) })
+		const { hasUserProgramAccess } = await import('@calendar/core')
+		const hasAccess = await hasUserProgramAccess(env.DB, String(user.id), activitySlug)
+		if (!hasAccess) {
+			return apiError('Access denied for this program', { status: 403, code: 'forbidden' })
+		}
+
+		const slots = await getSlotAvailability(env.DB, { date, activitySlug })
 		return apiOk({ slots })
 	} catch (error) {
 		if (error instanceof TransportValidationError) return apiValidationError(error)

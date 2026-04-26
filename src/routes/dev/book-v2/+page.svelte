@@ -15,8 +15,8 @@
 
 	const tourSteps: TourStep[] = [
 		{ phase: 0, selector: '.cs__grid', message: 'Pick a day that works — purple dots are open.' },
-		{ phase: 1, selector: '.tr__times', message: 'This is your time — tap to type, or use arrow keys.' },
-		{ phase: 1, selector: '.st__lanes', message: 'Drag the handles to resize, or grab the middle to slide.' },
+		{ phase: 1, selector: '.tr__times', message: 'This is your time — tap any value to change it.' },
+		{ phase: 1, selector: '.st__lanes', message: 'Drag to pick your window.' },
 		{ phase: 1, selector: '.cc__card', message: 'Tap a name to match their time.' },
 		{ phase: 1, selector: '.ts__confirm', message: 'Happy with your time? Lock it in.', position: 'top' },
 		{ phase: 2, selector: '.bs__card', message: 'You\'re all set! Add it to your calendar if you\'d like.' },

@@ -68,7 +68,7 @@ export async function cancelBookingByConfirmation(
 	db: D1DatabaseLike,
 	confirmationId: string,
 	userId: string
-): Promise<{ ok: boolean; code?: string }> {
+): Promise<{ ok: boolean; code?: string; eventId?: number }> {
 	const booking = await getBookingByConfirmation(db, confirmationId)
 	if (!booking) return { ok: false, code: 'not_found' }
 	if (booking.user_id !== userId) return { ok: false, code: 'forbidden' }
@@ -80,5 +80,5 @@ export async function cancelBookingByConfirmation(
 		`UPDATE calendar_event_participants SET status = 'left', guest_count = 0, updated_at = unixepoch() WHERE id = ?`
 	).bind(booking.id).run()
 
-	return { ok: true }
+	return { ok: true, eventId: booking.event_id }
 }
