@@ -313,32 +313,25 @@
 
         {#if !hasValidInvite}
           <form class="calendar-login__invite-form" onsubmit={joinWithInvite}>
-            <div class="ui-inline-field calendar-login__invite-row">
-              <label
-                class="calendar-login__invite-input-shell"
-                for="calendar-invite-code"
-              >
-                <span class="calendar-login__invite-label">Invite code</span>
-                <input
-                  id="calendar-invite-code"
-                  class="ui-form-control calendar-login__invite-input"
-                  type="text"
-                  maxlength="24"
-                  spellcheck="false"
-                  autocomplete="off"
-                  placeholder="Invite code"
-                  bind:value={inviteInput}
-                />
-              </label>
-              <PillButton
-                className="ui-inline-field__action calendar-login__invite-button"
+            <label class="calendar-login__invite-label" for="calendar-invite-code">Invite code</label>
+            <div class="calendar-login__invite-row">
+              <input
+                id="calendar-invite-code"
+                class="calendar-login__invite-input"
+                type="text"
+                maxlength="24"
+                spellcheck="false"
+                autocomplete="off"
+                placeholder="Enter code"
+                bind:value={inviteInput}
+              />
+              <button
                 type="submit"
-                size="lg"
-                variant="primary"
+                class="calendar-login__invite-submit"
                 disabled={loading}
               >
                 Continue
-              </PillButton>
+              </button>
             </div>
           </form>
         {/if}
@@ -379,9 +372,67 @@
     color: color-mix(in srgb, var(--text) 68%, transparent);
   }
 
-  .calendar-login__invite-input-shell {
+  .calendar-login__invite-form {
     display: grid;
-    gap: 0.35rem;
+    gap: 0.4rem;
+  }
+
+  .calendar-login__invite-row {
+    display: flex;
+    border: 1px solid color-mix(in srgb, var(--calendar-shell-text, var(--text)) 22%, transparent);
+    border-radius: 999px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--calendar-shell-text, var(--text)) 6%, transparent);
+    transition: border-color 140ms ease;
+  }
+
+  .calendar-login__invite-row:focus-within {
+    border-color: color-mix(in srgb, var(--calendar-shell-text, var(--text)) 45%, transparent);
+  }
+
+  .calendar-login__invite-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.65rem 1.15rem;
+    border: none;
+    background: transparent;
+    color: var(--calendar-shell-text, var(--text));
+    font: inherit;
+    font-size: 0.88rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: 0.06em;
+  }
+
+  .calendar-login__invite-input::placeholder {
+    color: color-mix(in srgb, var(--calendar-shell-text, var(--text)) 35%, transparent);
+  }
+
+  .calendar-login__invite-input:focus {
+    outline: none;
+  }
+
+  .calendar-login__invite-submit {
+    padding: 0.65rem 1.25rem;
+    border: none;
+    border-left: 1px solid color-mix(in srgb, var(--calendar-shell-text, var(--text)) 15%, transparent);
+    border-radius: 0;
+    background: var(--gradient-action);
+    color: #fff;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 140ms ease;
+  }
+
+  .calendar-login__invite-submit:hover:not(:disabled) {
+    opacity: 0.88;
+  }
+
+  .calendar-login__invite-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
 </style>
