@@ -11,6 +11,7 @@
 		hourly,
 		hasRain = false,
 		animate = false,
+		maxDuration = 24,
 		start = $bindable(12),
 		end = $bindable(14),
 	}: {
@@ -21,6 +22,7 @@
 		hourly: HourlyWeather[]
 		hasRain?: boolean
 		animate?: boolean
+		maxDuration?: number
 		start?: number
 		end?: number
 	} = $props()
@@ -141,8 +143,8 @@
 	}
 	function onMove(event: PointerEvent) {
 		if (!dragging) return; const hour = getHour(event.clientX)
-		if (dragging === 'start') { start = snap(clamp(hour - dragOffset, windowStart, end - 0.25)) }
-		else if (dragging === 'end') { end = snap(clamp(hour - dragOffset, start + 0.25, windowEnd)) }
+		if (dragging === 'start') { start = snap(clamp(hour - dragOffset, Math.max(windowStart, end - maxDuration), end - 0.25)) }
+		else if (dragging === 'end') { end = snap(clamp(hour - dragOffset, start + 0.25, Math.min(windowEnd, start + maxDuration))) }
 		else { const dur = end - start; let ns = snap(hour - dragOffset); ns = clamp(ns, windowStart, windowEnd - dur); start = ns; end = ns + dur }
 	}
 	function onUp() { dragging = null }
@@ -257,6 +259,8 @@
 	.st__tick-line--sun { height: 0.4rem; background: color-mix(in srgb, #c4794a 50%, transparent); }
 	.st__tick-num { font-size: 0.48rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); margin-top: 0.08rem; }
 	.st__tick-num--warm { color: color-mix(in srgb, #c4794a 55%, transparent); }
+
+	.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 	@media (max-width: 30rem) { .st__lanes { grid-template-rows: 5rem 1.65rem; } .st__lanes--dry { grid-template-rows: 5rem; } }
 </style>

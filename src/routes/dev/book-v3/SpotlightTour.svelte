@@ -44,11 +44,14 @@
 		mode = 'prompt'
 	}
 
-	function highlight() {
+	function highlight(retries = 3) {
 		if (current < 0 || current >= steps.length) return
 		const step = steps[current]!
 		const el = document.querySelector(step.selector)
-		if (!el) { advance(); return }
+		if (!el) {
+			if (retries > 0) { setTimeout(() => highlight(retries - 1), 200); return }
+			advance(); return
+		}
 		rect = el.getBoundingClientRect()
 		pos = step.position ?? (rect.top > window.innerHeight / 2 ? 'top' : 'bottom')
 	}
@@ -110,9 +113,22 @@
 		transitioning = false
 	}
 
+	function onKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			if (mode === 'prompt') dismissPrompt()
+			else if (mode === 'touring') dismissOverlay()
+		}
+	}
+
 	$effect(() => {
 		const t = setTimeout(autoPrompt, 600)
 		return () => clearTimeout(t)
+	})
+
+	$effect(() => {
+		if (mode === 'idle') return
+		window.addEventListener('keydown', onKeydown)
+		return () => window.removeEventListener('keydown', onKeydown)
 	})
 
 	$effect(() => {
@@ -122,6 +138,13 @@
 				setTimeout(() => highlight(), 150)
 			}
 		}
+	})
+
+	$effect(() => {
+		if (mode !== 'touring') return
+		const onResize = () => { if (!transitioning) highlight() }
+		window.addEventListener('resize', onResize)
+		return () => window.removeEventListener('resize', onResize)
 	})
 
 	const PAD = 8

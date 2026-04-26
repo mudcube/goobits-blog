@@ -53,7 +53,7 @@
 <div class="cs__weekdays">{#each weekdays as w}<span>{w}</span>{/each}</div>
 <div class="cs__grid" class:cs__grid--dimmed={!!pendingDay && !claimed}>
 	{#each calDays as cell}
-		<button type="button" class="cs__cell" class:cs__cell--other={!cell.inMonth} class:cs__cell--past={cell.isPast} class:cs__cell--today={cell.isToday} class:cs__cell--open={cell.isOpen} class:cs__cell--picked={pendingDay && cell.date.getTime() === pendingDay.date.getTime()} disabled={!cell.isOpen || cell.isPast} onclick={() => tapDay(cell)}>
+		<button type="button" class="cs__cell" class:cs__cell--other={!cell.inMonth} class:cs__cell--past={cell.isPast} class:cs__cell--today={cell.isToday} class:cs__cell--open={cell.isOpen} class:cs__cell--picked={pendingDay && cell.date.getTime() === pendingDay.date.getTime()} disabled={!cell.isOpen || cell.isPast} aria-label="{cell.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}{cell.isOpen && !cell.isPast ? ', available' : ''}" onclick={() => tapDay(cell)}>
 			<span class="cs__num">{cell.date.getDate()}</span>
 			{#if cell.isOpen && !cell.isPast}
 				<span class="cs__dots"><span class="cs__dot"></span>{#if cell.bookingCount > 0}<span class="cs__dot cs__dot--grn"></span>{/if}</span>

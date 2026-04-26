@@ -147,11 +147,19 @@
 		{#if stepNum === 0}
 			<CalendarStep {activity} {calDays} weekdays={WEEKDAYS} {openDays} {claimed} bind:pendingDay {onSelectDay} {onClaim} monthLabel={calMonthLabel} {prevMonth} {nextMonth} />
 
-		{:else if stepNum === 1 && selectedDay && dayWeather}
-			<TimeStep day={selectedDay} hourly={HOURLY} sunrise={dayWeather.sunrise} sunset={dayWeather.sunset} hasRain={hasAnyRain} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={() => goStep(2)} />
+		{:else if stepNum === 1 && selectedDay}
+			{#if dayWeather}
+				<TimeStep day={selectedDay} hourly={HOURLY} sunrise={dayWeather.sunrise} sunset={dayWeather.sunset} hasRain={hasAnyRain} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={() => goStep(2)} />
+			{:else}
+				<div class="bk2__error">
+					<p>Weather data unavailable for this day.</p>
+					<p>You can still pick your time — just without the forecast.</p>
+					<TimeStep day={selectedDay} hourly={[]} sunrise={6} sunset={20} hasRain={false} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={() => goStep(2)} />
+				</div>
+			{/if}
 
 		{:else if stepNum === 2 && selectedDay}
-			<BookedStep activityIcon={activity.icon} activityLabel={activity.label} date={selectedDay.date} {start} {end} {overlapping} capacity={8} onBack={() => goStep(0)} />
+			<BookedStep activityIcon={activity.icon} activityLabel={activity.label} date={selectedDay.date} {start} {end} {overlapping} capacity={8} onBack={() => goStep(0)} onEdit={() => goStep(1)} />
 		{/if}
 
 		</div>

@@ -12,6 +12,7 @@
 		overlapping = [],
 		capacity = 0,
 		onBack,
+		onEdit,
 	}: {
 		activityIcon: string
 		activityLabel: string
@@ -21,6 +22,7 @@
 		overlapping?: Person[]
 		capacity?: number
 		onBack: () => void
+		onEdit?: () => void
 	} = $props()
 
 	const crewNames = $derived(
@@ -38,12 +40,14 @@
 		const y = date.getFullYear(); const m = pad(date.getMonth() + 1); const d = pad(date.getDate())
 		const sh = pad(Math.floor(start)); const sm = pad(Math.round((start % 1) * 60))
 		const eh = pad(Math.floor(end)); const em = pad(Math.round((end % 1) * 60))
+		const tzId = Intl.DateTimeFormat().resolvedOptions().timeZone
 		const dtStart = `${y}${m}${d}T${sh}${sm}00`
 		const dtEnd = `${y}${m}${d}T${eh}${em}00`
 		const uid = `${dtStart}-${Math.random().toString(36).slice(2, 8)}@miko.art`
 		const ics = [
 			'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//miko.art//book//EN',
-			'BEGIN:VEVENT', `UID:${uid}`, `DTSTART:${dtStart}`, `DTEND:${dtEnd}`,
+			'BEGIN:VEVENT', `UID:${uid}`,
+			`DTSTART;TZID=${tzId}:${dtStart}`, `DTEND;TZID=${tzId}:${dtEnd}`,
 			`SUMMARY:${activityLabel}`, `DESCRIPTION:Booked via miko.art`,
 			'END:VEVENT', 'END:VCALENDAR'
 		].join('\r\n')
@@ -87,6 +91,12 @@
 			<CalendarPlus size={15} strokeWidth={2} />
 			<span>Add to Calendar</span>
 		</button>
+		{#if onEdit}
+			<button type="button" class="bs__secondary" onclick={onEdit}>
+				<ChevronLeft size={14} strokeWidth={2} />
+				<span>Adjust my time</span>
+			</button>
+		{/if}
 		<button type="button" class="bs__secondary" onclick={onBack}>
 			<ChevronLeft size={14} strokeWidth={2} />
 			<span>Pick a different day</span>

@@ -51,7 +51,7 @@
 <TimeReadout bind:start bind:end {hourly} onNudge={() => animateChange(() => {})} />
 
 <p class="ts__track-label">Weather & daylight</p>
-<SkyTrack {sunrise} {sunset} {hourly} {hasRain} animate={animating} bind:start bind:end />
+<SkyTrack {sunrise} {sunset} {hourly} {hasRain} animate={animating} maxDuration={day.maxDuration ?? 24} bind:start bind:end />
 
 <CrewCard bookings={day.bookings} {overlapping} onJoin={handleJoin} dayLabel={formatDate(day.date)} capacity={8} />
 

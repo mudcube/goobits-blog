@@ -52,15 +52,20 @@
 
 	function commitField(el: HTMLElement, field: 'start' | 'end' | 'dur') {
 		const text = el.textContent?.trim() ?? ''
+		let valid = false
 		if (field === 'start') {
 			const t = parseTime(text)
-			if (t !== null) start = snap(clamp(t, 0, end - 0.25))
+			if (t !== null) { start = snap(clamp(t, 0, end - 0.25)); valid = true }
 		} else if (field === 'end') {
 			const t = parseTime(text)
-			if (t !== null) end = snap(clamp(t, start + 0.25, 24))
+			if (t !== null) { end = snap(clamp(t, start + 0.25, 24)); valid = true }
 		} else {
 			const d = parseDuration(text)
-			if (d !== null && d > 0) end = snap(clamp(start + d, start + 0.25, 24))
+			if (d !== null && d > 0) { end = snap(clamp(start + d, start + 0.25, 24)); valid = true }
+		}
+		if (!valid && text !== '') {
+			el.classList.add('tr__shake')
+			setTimeout(() => el.classList.remove('tr__shake'), 400)
 		}
 		// Reset display to formatted value
 		if (field === 'start') el.textContent = ft(start)
@@ -175,4 +180,6 @@
 	.tr__wx { display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 500; color: color-mix(in srgb, var(--text) 55%, transparent); font-variant-numeric: tabular-nums; }
 	.tr__wx--end { text-align: right; }
 	.tr__rain { color: #60a5fa; }
+	:global(.tr__shake) { animation: tr-shake 0.4s ease; }
+	@keyframes tr-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-3px); } 40% { transform: translateX(3px); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
 </style>
