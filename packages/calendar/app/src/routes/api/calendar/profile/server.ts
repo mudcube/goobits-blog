@@ -2,6 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { getCalendarProfile, parseCalendarProfileInput, saveCalendarProfile, TransportValidationError } from '@calendar/core'
 import { apiOk, apiValidationError, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
+import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
 
 export async function GET(event: RequestEvent) {
 	return runCalendarRequest('calendar.profile.get', async () => {
@@ -16,6 +17,8 @@ export async function GET(event: RequestEvent) {
 
 export async function POST(event: RequestEvent) {
 	return runCalendarRequest('calendar.profile.save', async () => {
+		const csrf = enforceSameOrigin(event)
+		if (csrf) return csrf
 		const user = requireCalendarUserId(event)
 		if (user.response) return user.response
 		const userId = user.userId

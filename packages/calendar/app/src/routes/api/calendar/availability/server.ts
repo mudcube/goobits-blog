@@ -19,6 +19,15 @@ export async function GET(event: RequestEvent) {
 		}
 		const activitySlug = event.url.searchParams.get('activity')
 
+		// If filtering by activity, verify user has program access
+		if (activitySlug) {
+			const { hasUserProgramAccess } = await import('@calendar/core')
+			const hasAccess = await hasUserProgramAccess(env.DB, String(user.id), activitySlug)
+			if (!hasAccess) {
+				return apiError('Access denied for this program', { status: 403, code: 'forbidden' })
+			}
+		}
+
 		const slots = await getSlotAvailability(env.DB, { date, ...(activitySlug ? { activitySlug } : {}) })
 		return apiOk({ slots })
 	} catch (error) {
