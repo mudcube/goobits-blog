@@ -30,6 +30,8 @@
 	let dragging = $state<'start' | 'end' | 'range' | null>(null)
 	let trackEl = $state<HTMLDivElement | null>(null)
 	let dragOffset = 0
+	let hitLimit = $state(false)
+	let limitTimer: ReturnType<typeof setTimeout>
 
 	function pct(h: number) { return pctFn(h, windowStart, windowEnd) }
 
@@ -143,9 +145,21 @@
 	}
 	function onMove(event: PointerEvent) {
 		if (!dragging) return; const hour = getHour(event.clientX)
-		if (dragging === 'start') { start = snap(clamp(hour - dragOffset, Math.max(windowStart, end - maxDuration), end - 0.25)) }
-		else if (dragging === 'end') { end = snap(clamp(hour - dragOffset, start + 0.25, Math.min(windowEnd, start + maxDuration))) }
-		else { const dur = end - start; let ns = snap(hour - dragOffset); ns = clamp(ns, windowStart, windowEnd - dur); start = ns; end = ns + dur }
+		if (dragging === 'start') {
+			const clamped = snap(clamp(hour - dragOffset, Math.max(windowStart, end - maxDuration), end - 0.25))
+			if (end - clamped >= maxDuration && !hitLimit) showLimit()
+			start = clamped
+		} else if (dragging === 'end') {
+			const clamped = snap(clamp(hour - dragOffset, start + 0.25, Math.min(windowEnd, start + maxDuration)))
+			if (clamped - start >= maxDuration && !hitLimit) showLimit()
+			end = clamped
+		} else { const dur = end - start; let ns = snap(hour - dragOffset); ns = clamp(ns, windowStart, windowEnd - dur); start = ns; end = ns + dur }
+	}
+
+	function showLimit() {
+		hitLimit = true
+		clearTimeout(limitTimer)
+		limitTimer = setTimeout(() => { hitLimit = false }, 2000)
 	}
 	function onUp() { dragging = null }
 </script>
@@ -187,6 +201,10 @@
 	<!-- Lane labels (above masks) -->
 	<span class="st__label st__label--temp"><Thermometer size={9} strokeWidth={2} /> Temp</span>
 	{#if hasRain}<span class="st__label st__label--rain"><CloudRain size={9} strokeWidth={2} /> Rain</span>{/if}
+
+	{#if hitLimit && maxDuration < 24}
+		<span class="st__limit">{maxDuration}h max</span>
+	{/if}
 
 	<!-- Selection -->
 	<div class="st__sel-vis">
@@ -259,6 +277,10 @@
 	.st__tick-line--sun { height: 0.4rem; background: color-mix(in srgb, #c4794a 50%, transparent); }
 	.st__tick-num { font-size: 0.48rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); margin-top: 0.08rem; }
 	.st__tick-num--warm { color: color-mix(in srgb, #c4794a 55%, transparent); }
+
+	.st__limit { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 7; padding: 0.2rem 0.5rem; border-radius: 0.3rem; background: rgba(248, 113, 113, 0.9); color: #fff; font-size: 0.58rem; font-weight: 700; pointer-events: none; animation: st-limit-in 0.2s ease, st-limit-out 0.3s ease 1.7s forwards; }
+	@keyframes st-limit-in { from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+	@keyframes st-limit-out { to { opacity: 0; } }
 
 	.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
