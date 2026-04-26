@@ -1,18 +1,45 @@
-import { getConfiguredReleaseStage } from '$lib/app/release'
-import { getPublicHumanSitemapInventory } from '$lib/app/routes/route-index.server'
+import { dev } from '$app/environment'
+import { getActiveReleaseStage } from '$lib/app/release'
+import { getTarget } from '$lib/app/target'
+import { isLocalPreviewHost } from '$lib/app/is-local-preview-host'
+import {
+	filterRouteInventoryBySitemapAudiences,
+	getPublicHumanSitemapInventory,
+	getRouteInventory,
+	getSitemapAudiencesForVisibility,
+	type HumanSitemapVisibility
+} from '$lib/app/routes/route-index.server'
 
-export const prerender = true
+export const prerender = false
 
-export async function load() {
-	const activeStage = getConfiguredReleaseStage()
-	const inventory = await getPublicHumanSitemapInventory(activeStage)
+function normalizeVisibility(value: string | null): HumanSitemapVisibility | null {
+	return value === 'internal' || value === 'public' ? value : null
+}
+
+export async function load({ cookies, url }: { cookies: import('@sveltejs/kit').Cookies; url: URL }) {
+	const canViewInternalRoutes = dev && isLocalPreviewHost(url.hostname)
+	const activeStage = getActiveReleaseStage({
+		cookies,
+		enablePreview: canViewInternalRoutes
+	})
+	const activeTarget = getTarget(cookies)
+	const requestedVisibility = normalizeVisibility(url.searchParams.get('visibility'))
+	const activeVisibility: HumanSitemapVisibility = canViewInternalRoutes
+		? requestedVisibility ?? (activeTarget === 'dev' ? 'internal' : 'public')
+		: 'public'
+	const inventory = activeVisibility === 'internal'
+		? filterRouteInventoryBySitemapAudiences(
+			await getRouteInventory({ includeDevOnlyCategories: true, activeStage }),
+			getSitemapAudiencesForVisibility('internal')
+		)
+		: await getPublicHumanSitemapInventory(activeStage)
 
 	return {
 		routes: inventory.routes,
 		grouped: inventory.grouped,
 		stats: inventory.stats,
-		canViewInternalRoutes: false,
-		activeVisibility: 'public' as const,
+		canViewInternalRoutes,
+		activeVisibility,
 		activeStage
 	}
 }
