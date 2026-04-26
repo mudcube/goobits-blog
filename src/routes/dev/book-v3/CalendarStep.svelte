@@ -30,6 +30,7 @@
 	} = $props()
 
 	const hasOpenDays = $derived(calDays.some(c => c.isOpen && !c.isPast))
+	const isEntireMonthPast = $derived(calDays.filter(c => c.inMonth).every(c => c.isPast))
 
 	function tapDay(cell: { date: Date }) {
 		const match = openDays.find(od => od.date.getTime() === cell.date.getTime())
@@ -69,8 +70,13 @@
 	</div>
 {:else}
 	<div class="cs__empty">
-		<p class="cs__empty-title">No open days this month</p>
-		<p class="cs__empty-sub">Try checking next month, or ask the organizer to open more days.</p>
+		{#if isEntireMonthPast}
+			<p class="cs__empty-title">This month has passed</p>
+			<p class="cs__empty-sub">Navigate forward to find upcoming open days.</p>
+		{:else}
+			<p class="cs__empty-title">No open days this month</p>
+			<p class="cs__empty-sub">Try checking next month, or ask the organizer to open more days.</p>
+		{/if}
 	</div>
 {/if}
 
@@ -91,16 +97,16 @@
 	.cs__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.22rem; transition: opacity 0.25s; }
 	.cs__grid--dimmed { opacity: 0.5; }
 	.cs__cell { position: relative; aspect-ratio: 1; border: 1px solid transparent; border-radius: 0.5rem; background: transparent; font: inherit; cursor: default; padding: 0; transition: all 140ms; color: color-mix(in srgb, var(--text) 35%, transparent); }
-	.cs__cell--open { border-color: color-mix(in srgb, #a78bfa 28%, transparent); background: color-mix(in srgb, #a78bfa 5%, var(--panel-bg) 95%); cursor: pointer; color: var(--text); }
-	.cs__cell--open:hover:not(:disabled) { border-color: color-mix(in srgb, #a78bfa 50%, transparent); transform: translateY(-1px); }
+	.cs__cell--open { border-color: color-mix(in srgb, var(--book-accent) 28%, transparent); background: color-mix(in srgb, var(--book-accent) 5%, var(--panel-bg) 95%); cursor: pointer; color: var(--text); }
+	.cs__cell--open:hover:not(:disabled) { border-color: color-mix(in srgb, var(--book-accent) 50%, transparent); transform: translateY(-1px); }
 	.cs__cell--other { opacity: 0.15; }
 	.cs__cell--past { opacity: 0.25; }
 	.cs__cell--today { border-color: color-mix(in srgb, var(--text) 18%, transparent); }
-	.cs__cell--picked { border-color: #a78bfa; background: color-mix(in srgb, #a78bfa 12%, var(--panel-bg) 88%); opacity: 1 !important; }
+	.cs__cell--picked { border-color: var(--book-accent); background: color-mix(in srgb, var(--book-accent) 12%, var(--panel-bg) 88%); opacity: 1 !important; }
 	.cs__num { position: absolute; top: 0.35rem; right: 0.4rem; font-size: 0.78rem; font-weight: 600; }
 	.cs__dots { position: absolute; bottom: 0.32rem; left: 0.4rem; display: flex; gap: 0.16rem; }
-	.cs__dot { width: 0.26rem; height: 0.26rem; border-radius: 999px; background: #a78bfa; }
-	.cs__dot--grn { background: #4ade80; }
+	.cs__dot { width: 0.26rem; height: 0.26rem; border-radius: 999px; background: var(--book-accent); }
+	.cs__dot--grn { background: var(--book-dot-green); }
 	.cs__legend { display: flex; justify-content: center; gap: 1rem; margin-top: 0.5rem; }
 	.cs__legend-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); }
 	.cs__legend .cs__dot { position: static; }

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Person } from './types'
-	import { ft } from './time'
+	import { ft, pct } from './time'
 
 	let {
 		bookings,
@@ -36,6 +36,11 @@
 	<div class="cc">
 		<fieldset class="cc__card">
 			<legend class="cc__legend">Others going {#if dayLabel}{dayLabel}{/if}</legend>
+			<div class="cc__ranges">
+				{#each bookings as person}
+					<div class="cc__range" class:cc__range--on={isOverlapping(person)} style="left:{pct(person.start)}%; width:{pct(person.end) - pct(person.start)}%; --c:{person.color};"></div>
+				{/each}
+			</div>
 			{#each bookings as person, i}
 				{#if i > 0}<div class="cc__divider"></div>{/if}
 				<button type="button" class="cc__row" class:cc__row--on={isOverlapping(person)} class:cc__row--flash={flashIdx === i} data-tip="Join {person.name}" onclick={() => tapPerson(person, i)}>
@@ -64,11 +69,14 @@
 	.cc { margin-top: 1rem; margin-bottom: 1rem; }
 	.cc__card { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; margin: 0; padding: 0; }
 	.cc__legend { margin: 0 auto; padding: 0 0.5rem; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); white-space: nowrap; line-height: 0; }
+	.cc__ranges { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 0.65rem 0 0.25rem; }
+	.cc__range { position: relative; height: 2px; border-radius: 1px; background: var(--c); opacity: 0.3; transition: opacity 180ms; }
+	.cc__range--on { opacity: 0.7; }
 	.cc__divider { height: 1px; background: color-mix(in srgb, var(--text) 7%, transparent); margin: 0; }
 	.cc__row { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.65rem; width: 100%; background: none; border: none; color: var(--text); font: inherit; cursor: pointer; opacity: 0.45; transition: all 180ms; text-align: left; }
 	.cc__row--on { opacity: 1; }
 	.cc__row--flash { animation: cc-flash 0.4s ease; }
-	@keyframes cc-flash { 0% { background: transparent; } 30% { background: color-mix(in srgb, #a78bfa 15%, transparent); } 100% { background: transparent; } }
+	@keyframes cc-flash { 0% { background: transparent; } 30% { background: color-mix(in srgb, var(--book-accent) 15%, transparent); } 100% { background: transparent; } }
 	.cc__row:hover { opacity: 1; background: color-mix(in srgb, var(--text) 4%, transparent); }
 	.cc__dot { width: 0.38rem; height: 0.38rem; border-radius: 999px; background: var(--c); flex-shrink: 0; }
 	.cc__name { font-size: 0.78rem; font-weight: 600; }

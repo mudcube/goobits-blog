@@ -54,6 +54,7 @@
 		{#if isCalendarRoute}
 			{@render children()}
 		{:else}
+			<a href="#main-content" class="layout-skip-link">Skip to main content</a>
 			<Topbar
 				items={topbarItems}
 				currentPath={$page.url.pathname}
@@ -74,7 +75,7 @@
 				{/snippet}
 			</Topbar>
 
-			<main>
+			<main id="main-content">
 				{@render children()}
 			</main>
 
@@ -102,6 +103,32 @@
 </ThemeProvider>
 
 <style>
+	.layout-skip-link {
+		position: absolute;
+		left: -9999px;
+		top: auto;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		z-index: 10000;
+		padding: 0.75rem 1.25rem;
+		background: var(--bg, #fff);
+		color: var(--text, #000);
+		font-weight: 600;
+		font-size: 0.875rem;
+		text-decoration: none;
+		border-radius: 0 0 0.5rem 0;
+	}
+
+	.layout-skip-link:focus {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: auto;
+		height: auto;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+	}
+
 	:global(.layout-header__utility-link) {
 		display: inline-flex;
 		align-items: center;

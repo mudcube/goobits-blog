@@ -145,7 +145,7 @@
 
 		{#key animKey}
 		<div class="bk2__step bk2__panel" class:bk2__step--fwd={direction === 'forward'} class:bk2__step--back={direction === 'back'}>
-		<button type="button" class="bk2__help" data-tip="Take the tour" onclick={() => tourRef.showPrompt()}>?</button>
+		<button type="button" class="bk2__help" data-tip="Take the tour" aria-label="Take a guided tour" onclick={() => tourRef.showPrompt()}>?</button>
 
 		{#if stepNum === 0}
 			<CalendarStep {activity} {calDays} weekdays={WEEKDAYS} {openDays} {claimed} bind:pendingDay {onSelectDay} {onClaim} monthLabel={calMonthLabel} {prevMonth} {nextMonth} />
@@ -176,11 +176,16 @@
 	.bk2__inner {
 		--book-accent: #a78bfa;
 		--book-accent-dim: #8b5cf6;
+		--book-accent-deep: #7a5af8;
 		--book-success: #3cbf8a;
 		--book-confirm: #22c55e;
 		--book-confirm-hover: #16a34a;
 		--book-danger: #f87171;
 		--book-night: #0b1026;
+		--book-night-deep: #080a14;
+		--book-dot-green: #4ade80;
+		--book-horizon-warm: #c4794a;
+		--book-horizon-gold: #d4a85a;
 		max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%;
 	}
 	.bk2__panel { position: relative; padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.75rem; background: color-mix(in srgb, var(--panel-bg, var(--bg)) 60%, transparent); }

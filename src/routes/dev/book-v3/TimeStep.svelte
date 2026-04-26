@@ -63,6 +63,6 @@
 <style>
 	.ts__instruction { margin: 0 0 0.15rem; font-size: 0.78rem; color: color-mix(in srgb, var(--text) 55%, transparent); text-align: center; }
 	.ts__track-label { margin: 0 0 0.25rem; font-size: 0.58rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: color-mix(in srgb, var(--text) 35%, transparent); }
-	.ts__confirm { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.7rem 1rem; border: none; border-radius: 999px; background: #22c55e; color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 180ms; box-shadow: 0 2px 10px color-mix(in srgb, #22c55e 25%, transparent); }
-	.ts__confirm:hover { background: #16a34a; box-shadow: 0 4px 16px color-mix(in srgb, #22c55e 35%, transparent); }
+	.ts__confirm { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.7rem 1rem; border: none; border-radius: 999px; background: var(--book-confirm); color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 180ms; box-shadow: 0 2px 10px color-mix(in srgb, var(--book-confirm) 25%, transparent); }
+	.ts__confirm:hover { background: var(--book-confirm-hover); box-shadow: 0 4px 16px color-mix(in srgb, var(--book-confirm) 35%, transparent); }
 </style>

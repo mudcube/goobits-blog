@@ -146,7 +146,7 @@
 
 <svelte:head>
   <title
-    >Sign In | {calendarConfig.brand.calendarName} | {calendarConfig.brand
+    >Sign in | {calendarConfig.brand.calendarName} | {calendarConfig.brand
       .siteName}</title
   >
 </svelte:head>

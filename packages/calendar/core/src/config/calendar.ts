@@ -48,7 +48,7 @@ const DEFAULT_CALENDAR_CONFIG: CalendarConfig = {
 		authBase: '/auth',
 		apiCalendarBase: '/api/calendar',
 		apiAdminBase: '/api/admin',
-		apiCalendarAdminBase: '/api/calendar/admin',
+		apiCalendarAdminBase: '/api/admin',
 		calendarLoginPath: '/schedule/login',
 		calendarLoginRedirectPath: '/schedule/login/redirect'
 	},

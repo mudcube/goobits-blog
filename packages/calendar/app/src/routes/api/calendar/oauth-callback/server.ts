@@ -1,5 +1,5 @@
 import type { RequestEvent } from "@sveltejs/kit";
-import { buildEnv } from "@calendar/kit";
+import { buildEnv, apiError, logApiError } from "@calendar/kit";
 import {
   consumeOauthState,
   exchangeGoogleCode,
@@ -19,7 +19,7 @@ export async function GET(event: RequestEvent) {
     const code = url.searchParams.get("code");
     const state = url.searchParams.get("state");
     if (!code || !state) {
-      return new Response("Invalid OAuth callback request", { status: 400 });
+      return apiError("Invalid OAuth callback request", { status: 400, code: "invalid_request" });
     }
 
     const isAdminOauthState =
@@ -27,13 +27,13 @@ export async function GET(event: RequestEvent) {
         state,
       );
     if (!isAdminOauthState) {
-      return new Response("Invalid OAuth state", { status: 400 });
+      return apiError("Invalid OAuth state", { status: 400, code: "invalid_state" });
     }
 
     const env = await buildEnv(event.platform);
     const validState = await consumeOauthState({ db: env.DB, state });
     if (!validState) {
-      return new Response("Invalid OAuth state", { status: 400 });
+      return apiError("Invalid OAuth state", { status: 400, code: "invalid_state" });
     }
 
     const token = await exchangeGoogleCode({ env, code });
@@ -49,7 +49,7 @@ export async function GET(event: RequestEvent) {
       302,
     );
   } catch (err) {
-    console.error("OAuth callback error:", err);
-    return new Response("OAuth callback failed", { status: 500 });
+    logApiError("calendar.oauth-callback", err);
+    return apiError("OAuth callback failed", { status: 500 });
   }
 }

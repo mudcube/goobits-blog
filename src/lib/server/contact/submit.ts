@@ -33,14 +33,10 @@ export async function submitContactData(
 			}
 		},
 		deliver: async (payload) => {
-			const envWebhook = event.platform?.env?.['CONTACT_WEBHOOK_URL']
-			const processWebhook = process.env['CONTACT_WEBHOOK_URL']
 			const webhook =
-				typeof envWebhook === 'string'
-					? envWebhook
-					: typeof processWebhook === 'string'
-						? processWebhook
-						: ''
+				typeof env['CONTACT_WEBHOOK_URL'] === 'string'
+					? env['CONTACT_WEBHOOK_URL']
+					: ''
 
 			return deliverContactMessage(payload, {
 				webhook,

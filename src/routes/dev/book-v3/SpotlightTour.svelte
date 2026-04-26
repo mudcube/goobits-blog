@@ -230,8 +230,8 @@
 	.st-prompt__actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
 	.st-prompt__skip { padding: 0.4rem 0.85rem; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 0.5rem; background: transparent; color: rgba(255, 255, 255, 0.5); font: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
 	.st-prompt__skip:hover { color: rgba(255, 255, 255, 0.8); border-color: rgba(255, 255, 255, 0.25); }
-	.st-prompt__go { padding: 0.4rem 0.85rem; border: none; border-radius: 0.5rem; background: #a78bfa; color: #fff; font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: background 150ms; }
-	.st-prompt__go:hover { background: #8b5cf6; }
+	.st-prompt__go { padding: 0.4rem 0.85rem; border: none; border-radius: 0.5rem; background: var(--book-accent); color: #fff; font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: background 150ms; }
+	.st-prompt__go:hover { background: var(--book-accent-dim); }
 
 	.st-ring { position: absolute; border: 1.5px solid rgba(167, 139, 250, 0.6); pointer-events: none; animation: st-pulse 2s ease-in-out infinite; opacity: 1; transition: opacity 0.2s ease; box-shadow: 0 0 12px rgba(167, 139, 250, 0.15); }
 	.st-ring--hidden { opacity: 0; }
@@ -245,9 +245,9 @@
 	.st-tip__msg { margin: 0 0 0.6rem; font-size: 0.82rem; font-weight: 500; color: rgba(255, 255, 255, 0.9); line-height: 1.45; }
 	.st-tip__footer { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
 	.st-tip__progress { flex: 1; height: 2px; background: rgba(255, 255, 255, 0.1); border-radius: 1px; overflow: hidden; }
-	.st-tip__bar { height: 100%; background: #a78bfa; border-radius: 1px; transition: width 0.3s ease; }
-	.st-tip__btn { padding: 0.3rem 0.75rem; border: none; border-radius: 0.5rem; background: #a78bfa; color: #fff; font: inherit; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; cursor: pointer; transition: all 150ms; }
-	.st-tip__btn:hover { background: #8b5cf6; }
-	.st-tip__btn--done { background: #22c55e; }
-	.st-tip__btn--done:hover { background: #16a34a; }
+	.st-tip__bar { height: 100%; background: var(--book-accent); border-radius: 1px; transition: width 0.3s ease; }
+	.st-tip__btn { padding: 0.3rem 0.75rem; border: none; border-radius: 0.5rem; background: var(--book-accent); color: #fff; font: inherit; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; cursor: pointer; transition: all 150ms; }
+	.st-tip__btn:hover { background: var(--book-accent-dim); }
+	.st-tip__btn--done { background: var(--book-confirm); }
+	.st-tip__btn--done:hover { background: var(--book-confirm-hover); }
 </style>

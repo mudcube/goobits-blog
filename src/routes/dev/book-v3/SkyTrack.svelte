@@ -94,7 +94,7 @@
 	function skyGradient() {
 		const r = (h: number) => `${(h / 24) * 100}%`
 		return `linear-gradient(90deg,` +
-			// Night
+			// Night (hardcoded — CSS vars not available in JS template literals)
 			`#0b1026 0%, #0b1026 ${r(sunrise - 2)},` +
 			// Pre-dawn: indigo → purple
 			`#1a1040 ${r(sunrise - 1.2)}, #3b2066 ${r(sunrise - 0.5)},` +
@@ -238,15 +238,15 @@
 	.st__lanes { position: relative; display: grid; grid-template-rows: 6rem 2rem; gap: 2px; border-radius: 0.5rem; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 6%, transparent); touch-action: none; background: color-mix(in srgb, var(--text) 8%, transparent); margin-bottom: 0.15rem; }
 	.st__lanes--dry { grid-template-rows: 6rem; }
 	.st__lane { position: relative; overflow: hidden; }
-	.st__lane--main { background: #080a14; }
-	.st__lane--rain { background: #080a10; }
+	.st__lane--main { background: var(--book-night-deep); }
+	.st__lane--rain { background: #080a10; /* slightly different from night-deep */ }
 	/* Lane labels — siblings of masks, z above masks */
 	.st__label { position: absolute; left: 0.4rem; display: inline-flex; align-items: center; gap: 0.15rem; font-size: 0.42rem; font-weight: 700; color: rgba(255, 255, 255, 0.5); z-index: 6; pointer-events: none; letter-spacing: 0.04em; text-transform: uppercase; }
 	.st__label--temp { top: 0.3rem; }
 	.st__label--rain { bottom: 0.35rem; }
 	.st__sky { position: absolute; inset: 0; }
 	.st__star { position: absolute; width: 1.5px; height: 1.5px; border-radius: 999px; background: white; opacity: 0.12; pointer-events: none; z-index: 1; }
-	.st__horizon { position: absolute; left: 0; right: 0; top: 60%; height: 1px; background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, #c4794a 12%, transparent) 22%, color-mix(in srgb, #d4a85a 20%, transparent) 38%, color-mix(in srgb, #d4a85a 16%, transparent) 50%, color-mix(in srgb, #d4a85a 20%, transparent) 62%, color-mix(in srgb, #c4794a 12%, transparent) 78%, transparent 100%); box-shadow: 0 0 5px color-mix(in srgb, #c4794a 8%, transparent); }
+	.st__horizon { position: absolute; left: 0; right: 0; top: 60%; height: 1px; background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--book-horizon-warm) 12%, transparent) 22%, color-mix(in srgb, var(--book-horizon-gold) 20%, transparent) 38%, color-mix(in srgb, var(--book-horizon-gold) 16%, transparent) 50%, color-mix(in srgb, var(--book-horizon-gold) 20%, transparent) 62%, color-mix(in srgb, var(--book-horizon-warm) 12%, transparent) 78%, transparent 100%); box-shadow: 0 0 5px color-mix(in srgb, var(--book-horizon-warm) 8%, transparent); }
 	.st__ground { position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: linear-gradient(to top, rgba(6, 8, 16, 0.6) 0%, rgba(6, 8, 16, 0.2) 40%, transparent 100%); z-index: 2; pointer-events: none; }
 	.st__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 	.st__temp { position: absolute; transform: translateX(-50%); font-size: 0.52rem; font-weight: 700; font-variant-numeric: tabular-nums; color: color-mix(in srgb, white 55%, transparent); z-index: 5; pointer-events: none; text-shadow: 0 0 4px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.6); }
@@ -255,12 +255,12 @@
 	.st__mask { position: absolute; top: 0; bottom: 0; background: rgba(4, 4, 10, 0.4); z-index: 5; pointer-events: none; }
 	.st__mask--left { left: 0; border-radius: 0.5rem 0 0 0.65rem; }
 	.st__mask--right { border-radius: 0 0.65rem 0.65rem 0; }
-	.st__sel { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, white 3%, transparent); border-left: 1px solid color-mix(in srgb, white 20%, transparent); border-right: 1px solid color-mix(in srgb, white 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, white 3%, transparent), 0 0 20px color-mix(in srgb, #a78bfa 6%, transparent); cursor: grab; z-index: 10; padding: 0; font: inherit; border-radius: 0; transition: background 120ms; }
+	.st__sel { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, white 3%, transparent); border-left: 1px solid color-mix(in srgb, white 20%, transparent); border-right: 1px solid color-mix(in srgb, white 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, white 3%, transparent), 0 0 20px color-mix(in srgb, var(--book-accent) 6%, transparent); cursor: grab; z-index: 10; padding: 0; font: inherit; border-radius: 0; transition: background 120ms; }
 	.st__sel:hover { background: color-mix(in srgb, white 6%, transparent); }
 	.st__sel-vis { pointer-events: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 12; }
 	.st__handle { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 0.9rem; height: 0.9rem; border-radius: 999px; background: #fff; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; color: rgba(0, 0, 0, 0.35); }
 	.st__hit { position: absolute; top: 0; bottom: 0; width: 0.7rem; transform: translateX(-50%); z-index: 15; cursor: ew-resize; background: none; border: none; padding: 0; font: inherit; }
-	.st__hit:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; border-radius: 2px; }
+	.st__hit:focus-visible { outline: 2px solid var(--book-accent); outline-offset: 2px; border-radius: 2px; }
 	@media (pointer: coarse) { .st__hit { width: 1.2rem; } }
 
 	/* Animated transitions (crew tap, arrow keys) */
@@ -274,9 +274,9 @@
 	.st__tick { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
 	.st__tick-line { width: 1px; height: 0.25rem; background: color-mix(in srgb, var(--text) 18%, transparent); }
 	.st__tick-line--major { height: 0.4rem; background: color-mix(in srgb, var(--text) 30%, transparent); }
-	.st__tick-line--sun { height: 0.4rem; background: color-mix(in srgb, #c4794a 50%, transparent); }
+	.st__tick-line--sun { height: 0.4rem; background: color-mix(in srgb, var(--book-horizon-warm) 50%, transparent); }
 	.st__tick-num { font-size: 0.48rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); margin-top: 0.08rem; }
-	.st__tick-num--warm { color: color-mix(in srgb, #c4794a 55%, transparent); }
+	.st__tick-num--warm { color: color-mix(in srgb, var(--book-horizon-warm) 55%, transparent); }
 
 	.st__limit { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 7; padding: 0.2rem 0.5rem; border-radius: 0.3rem; background: rgba(248, 113, 113, 0.9); color: #fff; font-size: 0.58rem; font-weight: 700; pointer-events: none; animation: st-limit-in 0.2s ease, st-limit-out 0.3s ease 1.7s forwards; }
 	@keyframes st-limit-in { from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }

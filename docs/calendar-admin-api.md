@@ -4,7 +4,7 @@ Living reference for calendar admin endpoints used by the admin UI and e2e smoke
 
 ## People Access
 
-### `GET /api/calendar/admin/users/:id/access`
+### `GET /api/admin/users/:id/access`
 
 Returns per-program access for a calendar user.
 
@@ -17,7 +17,7 @@ Response:
 }
 ```
 
-### `PUT /api/calendar/admin/users/:id/access`
+### `PUT /api/admin/users/:id/access`
 
 Updates per-program access for a calendar user.
 
@@ -37,7 +37,7 @@ Response:
 
 ## Waitlist Promotion
 
-### `POST /api/calendar/admin/events/:id/waitlist/:entryId/promote`
+### `POST /api/admin/events/:id/waitlist/:entryId/promote`
 
 Promotes a waitlisted participant when capacity allows.
 
@@ -52,7 +52,7 @@ Response:
 
 ## Payment Defaults
 
-### `GET /api/calendar/admin/settings/payment`
+### `GET /api/admin/settings/payment`
 
 Returns global payment defaults used when an event does not override payment settings.
 
@@ -65,7 +65,7 @@ Response:
 }
 ```
 
-### `PUT /api/calendar/admin/settings/payment`
+### `PUT /api/admin/settings/payment`
 
 Updates global payment defaults.
 
@@ -86,7 +86,7 @@ Response:
 
 ## Event Templates
 
-### `GET /api/calendar/admin/events/templates`
+### `GET /api/admin/events/templates`
 
 Returns recent events that can be used as copy-from templates.
 
@@ -113,7 +113,7 @@ Response:
 
 ## Event Detail
 
-### `GET /api/calendar/admin/events/:id/detail`
+### `GET /api/admin/events/:id/detail`
 
 Returns full event detail for the admin event detail sheet.
 
