@@ -18,8 +18,7 @@ export async function GET(event: RequestEvent) {
 		return apiOk({ slots })
 	} catch (error) {
 		if (error instanceof TransportValidationError) return apiValidationError(error)
-		const msg = error instanceof Error ? error.message : String(error)
-		console.error('Calendar availability query failed:', msg, error)
-		return apiError(`Server error: ${msg}`)
+		console.error('Calendar availability query failed:', error)
+		return apiError('Internal server error')
 	}
 }

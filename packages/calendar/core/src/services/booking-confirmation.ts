@@ -34,7 +34,7 @@ export async function getBookingByConfirmation(
 	const row = await db.prepare(
 		`SELECT
 			p.id, p.event_id, p.user_id, p.status, p.guest_count, p.confirmation_id,
-			e.title AS event_title, e.start_at AS event_start, e.end_at AS event_end, e.activity_slug
+			e.title AS event_title, e.starts_at AS event_start, e.ends_at AS event_end, e.activity_slug
 		 FROM calendar_event_participants p
 		 JOIN calendar_events e ON e.id = p.event_id
 		 WHERE p.confirmation_id = ?
