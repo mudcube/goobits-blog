@@ -150,7 +150,7 @@
 			<TimeStep day={selectedDay} hourly={HOURLY} sunrise={dayWeather.sunrise} sunset={dayWeather.sunset} hasRain={hasAnyRain} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={() => goStep(2)} />
 
 		{:else if stepNum === 2 && selectedDay}
-			<BookedStep activityIcon={activity.icon} activityLabel={activity.label} date={selectedDay.date} {start} {end} {overlapping} allBookings={selectedDay.bookings} capacity={8} onBack={() => goStep(0)} onEdit={() => goStep(1)} onCancel={() => goStep(0)} />
+			<BookedStep activityIcon={activity.icon} activityLabel={activity.label} date={selectedDay.date} {start} {end} {overlapping} capacity={8} onBack={() => goStep(0)} />
 		{/if}
 
 		</div>

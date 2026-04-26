@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CalendarPlus, Pencil, X, ChevronLeft } from '@lucide/svelte'
+	import { CalendarPlus, ChevronLeft } from '@lucide/svelte'
 	import type { Person } from './types'
 	import { ft, formatDate } from './time'
 
@@ -10,11 +10,8 @@
 		start,
 		end,
 		overlapping = [],
-		allBookings = [],
-		capacity = 8,
+		capacity = 0,
 		onBack,
-		onEdit,
-		onCancel,
 	}: {
 		activityIcon: string
 		activityLabel: string
@@ -22,11 +19,8 @@
 		start: number
 		end: number
 		overlapping?: Person[]
-		allBookings?: Person[]
 		capacity?: number
 		onBack: () => void
-		onEdit?: () => void
-		onCancel?: () => void
 	} = $props()
 
 	const crewNames = $derived(
@@ -36,6 +30,8 @@
 	)
 
 	const tz = $derived(Intl.DateTimeFormat().resolvedOptions().timeZone.replace(/_/g, ' ').replace(/.*\//, ''))
+
+	const spotsLabel = $derived(capacity > 0 ? ` · ${overlapping.length + 1} of ${capacity} spots` : '')
 
 	function downloadIcs() {
 		const pad = (n: number) => String(n).padStart(2, '0')
@@ -72,7 +68,7 @@
 	<div class="bs__card">
 		<p class="bs__activity">{activityIcon} {activityLabel}</p>
 		<p class="bs__date">{formatDate(date)} · {ft(start)} – {ft(end)}</p>
-		<p class="bs__tz">{tz}</p>
+		<p class="bs__tz">{tz}{spotsLabel}</p>
 	</div>
 
 	{#if overlapping.length > 0}
@@ -91,40 +87,11 @@
 			<CalendarPlus size={15} strokeWidth={2} />
 			<span>Add to Calendar</span>
 		</button>
-		{#if onEdit}
-			<button type="button" class="bs__secondary" onclick={onEdit}>
-				<Pencil size={13} strokeWidth={2} />
-				<span>Change my time</span>
-			</button>
-		{/if}
-		{#if onCancel}
-			<button type="button" class="bs__secondary bs__secondary--danger" onclick={onCancel}>
-				<X size={14} strokeWidth={2} />
-				<span>Cancel booking</span>
-			</button>
-		{/if}
 		<button type="button" class="bs__secondary" onclick={onBack}>
 			<ChevronLeft size={14} strokeWidth={2} />
 			<span>Pick a different day</span>
 		</button>
 	</div>
-
-	{#if allBookings.length > 0}
-		<div class="bs__guest-list">
-			<p class="bs__guest-title">Who's going</p>
-			<div class="bs__guest-card">
-				{#each allBookings as person, i}
-					{#if i > 0}<div class="bs__guest-divider"></div>{/if}
-					<div class="bs__guest-row">
-						<span class="bs__guest-dot" style="background:{person.color};"></span>
-						<span class="bs__guest-name">{person.name}</span>
-						<span class="bs__guest-time">{ft(person.start)}–{ft(person.end)}</span>
-					</div>
-				{/each}
-			</div>
-			<p class="bs__capacity">{allBookings.length} of {capacity} spots filled</p>
-		</div>
-	{/if}
 </div>
 
 <style>
@@ -159,15 +126,4 @@
 	.bs__add-cal:hover { background: color-mix(in srgb, #7a5af8 20%, transparent); border-color: color-mix(in srgb, #a78bfa 45%, transparent); }
 	.bs__secondary { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.55rem; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; background: transparent; color: color-mix(in srgb, var(--text) 55%, transparent); font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
 	.bs__secondary:hover { background: color-mix(in srgb, var(--text) 4%, transparent); color: var(--text); }
-	.bs__secondary--danger:hover { color: #f87171; border-color: color-mix(in srgb, #f87171 20%, transparent); }
-
-	.bs__guest-list { margin-top: 1.25rem; text-align: left; }
-	.bs__guest-title { margin: 0 0 0.35rem; font-size: 0.58rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: color-mix(in srgb, var(--text) 40%, transparent); text-align: center; }
-	.bs__guest-card { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.6rem; overflow: hidden; }
-	.bs__guest-divider { height: 1px; background: color-mix(in srgb, var(--text) 7%, transparent); }
-	.bs__guest-row { display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.65rem; }
-	.bs__guest-dot { width: 0.38rem; height: 0.38rem; border-radius: 999px; flex-shrink: 0; }
-	.bs__guest-name { font-size: 0.78rem; font-weight: 600; }
-	.bs__guest-time { font-size: 0.78rem; color: color-mix(in srgb, var(--text) 48%, transparent); font-variant-numeric: tabular-nums; margin-left: auto; }
-	.bs__capacity { margin: 0.35rem 0 0; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 38%, transparent); text-align: center; }
 </style>
