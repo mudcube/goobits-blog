@@ -261,9 +261,16 @@ export {
 	parseCalendarInviteCreateInput,
 	parseCalendarInviteClaimInput,
 	parseCalendarSessionBootstrapInput,
+	parseCalendarAvailabilityInput,
+	parseCalendarBookingLookupInput,
 	parseDiscordWebhookTextInput,
 	TransportValidationError,
-	asTransportErrorMessage
+	asTransportErrorMessage,
+	generateConfirmationId,
+	setConfirmationId,
+	getBookingByConfirmation,
+	cancelBookingByConfirmation,
+	getSlotAvailability
 }
 
 export type {
@@ -298,6 +305,9 @@ export type {
 	CalendarInviteCreateInput,
 	CalendarInviteClaimInput,
 	CalendarSessionBootstrapInput,
+	CalendarAvailabilityInput,
+	CalendarBookingLookupInput,
+	SlotAvailabilityResult,
 	CalendarUserProgramAccess,
 	AdminPaymentDefaults,
 	CalendarEventTemplate,

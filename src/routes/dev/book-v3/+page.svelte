@@ -117,18 +117,16 @@
 
 	const breadcrumbItems = [
 		{ label: 'Dev', href: '/dev/' },
-		{ label: 'Book', href: '/dev/book/' },
-		{ label: 'v3' }
+		{ label: 'Book' }
 	]
 
 	const versions = [
-		{ label: 'v1', href: '/dev/book/' },
-		{ label: 'v2', href: '/dev/book-v2/' },
-		{ label: 'v3', href: '/dev/book-v3/', current: true }
+		{ label: 'v1', href: '/dev/book-v1/' },
+		{ label: 'v2', href: '/dev/book-v3/', current: true }
 	]
 </script>
 
-<svelte:head><title>Book v3 - Dev - MIKO.ART</title></svelte:head>
+<svelte:head><title>Book v2 - Dev - MIKO.ART</title></svelte:head>
 
 <PageShell className="bk2">
 	<div class="bk2__inner">

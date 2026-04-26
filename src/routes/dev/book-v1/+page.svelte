@@ -111,17 +111,16 @@
 
 	const breadcrumbItems = [
 		{ label: 'Dev', href: '/dev/' },
-		{ label: 'Book', href: '/dev/book/' },
-		{ label: 'v2' }
+		{ label: 'Book' }
 	]
 
 	const versions = [
-		{ label: 'v1', href: '/dev/book/' },
-		{ label: 'v2', href: '/dev/book-v2/', current: true }
+		{ label: 'v1', href: '/dev/book-v1/', current: true },
+		{ label: 'v2', href: '/dev/book-v3/' }
 	]
 </script>
 
-<svelte:head><title>Book v2 - Dev - MIKO.ART</title></svelte:head>
+<svelte:head><title>Book v1 - Dev - MIKO.ART</title></svelte:head>
 
 <PageShell className="bk2">
 	<div class="bk2__inner">
@@ -153,7 +152,7 @@
 	</div>
 </PageShell>
 
-<SpotlightTour bind:this={tourRef} steps={tourSteps} storageKey="book-v2-tour" currentPhase={stepNum} onPhaseRequest={handleTourPhase} />
+<SpotlightTour bind:this={tourRef} steps={tourSteps} storageKey="book-v1-tour" currentPhase={stepNum} onPhaseRequest={handleTourPhase} />
 
 <style>
 	.bk2__inner { max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%; }
