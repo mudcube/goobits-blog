@@ -279,8 +279,8 @@ export async function createEventsBatch(
 
 async function getParticipant(db: D1DatabaseLike, eventId: number, userId: string) {
 	return db.prepare(
-		`SELECT id, guest_count, status FROM calendar_event_participants WHERE event_id = ? AND user_id = ? LIMIT 1`
-	).bind(eventId, userId).first<{ id: number; guest_count: number; status: 'joined' | 'waitlist' | 'left' }>()
+		`SELECT id, guest_count, status, confirmation_id FROM calendar_event_participants WHERE event_id = ? AND user_id = ? LIMIT 1`
+	).bind(eventId, userId).first<{ id: number; guest_count: number; status: 'joined' | 'waitlist' | 'left'; confirmation_id: string | null }>()
 }
 
 async function getEventCapacity(db: D1DatabaseLike, eventId: number) {
@@ -378,11 +378,22 @@ export async function joinEvent(
 
 	const participant = await getParticipant(db, input.eventId, input.userId)
 	const status: 'joined' | 'waitlist' = participant?.status === 'waitlist' ? 'waitlist' : 'joined'
+
+	// Assign confirmation ID if not already set
+	let confirmationId: string | null = null
+	if (participant && !participant.confirmation_id) {
+		const { setConfirmationId } = await import('./booking-confirmation.ts')
+		confirmationId = await setConfirmationId(db, participant.id)
+	} else if (participant?.confirmation_id) {
+		confirmationId = participant.confirmation_id as string
+	}
+
 	const state = await getEventMutationState(db, { eventId: input.eventId, userId: input.userId })
 
 	return {
 		ok: true as const,
 		status,
+		confirmationId,
 		state
 	}
 }
