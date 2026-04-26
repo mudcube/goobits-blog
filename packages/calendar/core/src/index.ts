@@ -120,6 +120,16 @@ import { promoteWaitlistedParticipant, type PromoteWaitlistResult } from './even
 import { getAdminEventDetail, type AdminEventDetail } from './events/event-detail.ts'
 import { fetchWeatherForEvent, type WeatherSnapshot } from './weather/weather-provider.ts'
 import {
+	generateConfirmationId,
+	setConfirmationId,
+	getBookingByConfirmation,
+	cancelBookingByConfirmation
+} from './services/booking-confirmation.ts'
+import {
+	getSlotAvailability,
+	type SlotAvailabilityResult
+} from './services/slot-availability.ts'
+import {
 	parseAdminRulesInput,
 	parseAdminProgramMutationInput,
 	parseAdminCreateEventsBatchInput,
@@ -143,12 +153,16 @@ import {
 	parseCalendarInviteCreateInput,
 	parseCalendarInviteClaimInput,
 	parseCalendarSessionBootstrapInput,
+	parseCalendarAvailabilityInput,
+	parseCalendarBookingLookupInput,
 	parseDiscordWebhookTextInput,
 	type CalendarJoinEventInput,
 	type CalendarProfileInput,
 	type CalendarInviteCreateInput,
 	type CalendarInviteClaimInput,
-	type CalendarSessionBootstrapInput
+	type CalendarSessionBootstrapInput,
+	type CalendarAvailabilityInput,
+	type CalendarBookingLookupInput
 } from './transport/calendar.ts'
 import { TransportValidationError, asTransportErrorMessage } from './transport/errors.ts'
 

@@ -1,0 +1,61 @@
+import type { D1DatabaseLike } from '../storage/d1.ts'
+
+export function generateConfirmationId(): string {
+	const bytes = crypto.getRandomValues(new Uint8Array(8))
+	return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
+}
+
+export async function setConfirmationId(
+	db: D1DatabaseLike,
+	participantId: number
+): Promise<string> {
+	const confirmationId = generateConfirmationId()
+	await db.prepare(
+		`UPDATE calendar_event_participants SET confirmation_id = ? WHERE id = ?`
+	).bind(confirmationId, participantId).run()
+	return confirmationId
+}
+
+export async function getBookingByConfirmation(
+	db: D1DatabaseLike,
+	confirmationId: string
+): Promise<{
+	id: number
+	event_id: number
+	user_id: string
+	status: string
+	guest_count: number
+	confirmation_id: string
+	event_title: string | null
+	event_start: string | null
+	event_end: string | null
+	activity_slug: string | null
+} | null> {
+	const row = await db.prepare(
+		`SELECT
+			p.id, p.event_id, p.user_id, p.status, p.guest_count, p.confirmation_id,
+			e.title AS event_title, e.start_at AS event_start, e.end_at AS event_end, e.activity_slug
+		 FROM calendar_event_participants p
+		 JOIN calendar_events e ON e.id = p.event_id
+		 WHERE p.confirmation_id = ?
+		 LIMIT 1`
+	).bind(confirmationId).first()
+	return row as typeof row & { confirmation_id: string } | null
+}
+
+export async function cancelBookingByConfirmation(
+	db: D1DatabaseLike,
+	confirmationId: string,
+	userId: string
+): Promise<{ ok: boolean; code?: string }> {
+	const booking = await getBookingByConfirmation(db, confirmationId)
+	if (!booking) return { ok: false, code: 'not_found' }
+	if (booking.user_id !== userId) return { ok: false, code: 'forbidden' }
+	if (booking.status === 'cancelled') return { ok: false, code: 'already_cancelled' }
+
+	await db.prepare(
+		`UPDATE calendar_event_participants SET status = 'cancelled', updated_at = unixepoch() WHERE id = ?`
+	).bind(booking.id).run()
+
+	return { ok: true }
+}

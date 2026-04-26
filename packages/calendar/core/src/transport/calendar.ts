@@ -77,6 +77,32 @@ export function parseCalendarInviteClaimInput(input: unknown): CalendarInviteCla
 	}
 }
 
+export type CalendarAvailabilityInput = {
+	date: string
+	activitySlug: string | null
+}
+
+export function parseCalendarAvailabilityInput(input: unknown): CalendarAvailabilityInput {
+	const body = input == null ? {} : asJsonObject(input)
+	const date = readRequiredString(body, 'date', { maxLength: 10 })
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new TransportValidationError('Invalid date format, expected YYYY-MM-DD')
+	return {
+		date,
+		activitySlug: readOptionalString(body, 'activitySlug', { maxLength: 60 })
+	}
+}
+
+export type CalendarBookingLookupInput = {
+	confirmationId: string
+}
+
+export function parseCalendarBookingLookupInput(input: unknown): CalendarBookingLookupInput {
+	const body = asJsonObject(input)
+	return {
+		confirmationId: readRequiredString(body, 'confirmationId', { maxLength: 32 })
+	}
+}
+
 export function parseDiscordWebhookTextInput(input: unknown) {
 	const body = asJsonObject(input)
 	const text = readOptionalString(body, 'text', { maxLength: 1500 }) ?? ''
