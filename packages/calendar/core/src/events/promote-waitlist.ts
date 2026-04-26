@@ -30,23 +30,19 @@ export async function promoteWaitlistedParticipant(
 	).bind(input.eventId).first<{ capacity: number }>()
 	if (!event) return { status: 'not_found' }
 
-	const joinedSummary = await db.prepare(
-		`SELECT COALESCE(SUM(1 + guest_count), 0) AS seats_taken
-		 FROM calendar_event_participants
-		 WHERE event_id = ? AND status = 'joined'`
-	).bind(input.eventId).first<{ seats_taken: number }>()
-
-	const seatsTaken = joinedSummary?.seats_taken ?? 0
 	const seatsNeeded = 1 + Math.max(0, participant.guest_count ?? 0)
-	if (seatsTaken + seatsNeeded > event.capacity) {
-		return { status: 'full' }
-	}
-
-	await db.prepare(
+	const result = await db.prepare(
 		`UPDATE calendar_event_participants
 		 SET status = 'joined', updated_at = unixepoch()
-		 WHERE id = ? AND event_id = ? AND status = 'waitlist'`
-	).bind(input.entryId, input.eventId).run()
+		 WHERE id = ? AND event_id = ? AND status = 'waitlist'
+		   AND (
+		     SELECT COALESCE(SUM(1 + guest_count), 0)
+		     FROM calendar_event_participants
+		     WHERE event_id = ? AND status = 'joined'
+		   ) + ? <= ?`
+	).bind(input.entryId, input.eventId, input.eventId, seatsNeeded, event.capacity).run()
+
+	if ((result.meta?.changes ?? 0) === 0) return { status: 'full' }
 
 	return { status: 'promoted' }
 }

@@ -106,6 +106,7 @@ const CalendarAdminEventDetailResponseSchema = z.object({
 		name: z.union([z.string(), z.null()]),
 		email: z.union([z.string(), z.null()]),
 		status: z.union([z.literal('joined'), z.literal('waitlist')]),
+		guestCount: z.number(),
 		waitlistPosition: z.union([z.number(), z.null()]),
 		attendanceStatus: z.union([z.literal('unknown'), z.literal('attended'), z.literal('flaked')])
 	})),
@@ -168,6 +169,7 @@ const CalendarEventsResponseSchema = z.object({
 const CalendarJoinResponseSchema = z.object({
 	ok: z.literal(true),
 	status: z.union([z.literal('joined'), z.literal('waitlist')]),
+	confirmationId: z.union([z.string(), z.null()]).optional(),
 	state: z.object({
 		seatsTaken: z.number(),
 		seatsLeft: z.number(),
@@ -254,19 +256,19 @@ export async function saveCalendarAdminUserAccess(userId: string, access: Array<
 
 export async function createCalendarInvite(input: CreateInviteInput) {
 	const base = getCalendarUiConfig().routes.apiCalendarAdminBase
-	return requestApi<CalendarInvitesResponse>(`${base}/invites`, {
+	return requestApi<CalendarMutationOk>(`${base}/invites`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(input),
-		parse: (payload) => CalendarInvitesResponseSchema.parse(payload)
+		parse: (payload) => CalendarMutationOkSchema.parse(payload)
 	})
 }
 
 export async function deleteCalendarInvite(id: string) {
 	const base = getCalendarUiConfig().routes.apiCalendarAdminBase
-	return requestApi<CalendarInvitesResponse>(`${base}/invites?id=${encodeURIComponent(id)}`, {
+	return requestApi<CalendarMutationOk>(`${base}/invites?id=${encodeURIComponent(id)}`, {
 		method: 'DELETE',
-		parse: (payload) => CalendarInvitesResponseSchema.parse(payload)
+		parse: (payload) => CalendarMutationOkSchema.parse(payload)
 	})
 }
 

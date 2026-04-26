@@ -128,8 +128,7 @@
 
 	const versions = [
 		{ label: 'v1', href: '/dev/book/', current: true },
-		{ label: 'v2', href: '/dev/book-v2/' },
-		{ label: 'v3', href: '/dev/book-v3/' }
+		{ label: 'v2', href: '/dev/book-v3/' }
 	]
 </script>
 

@@ -3,6 +3,10 @@ import { BASE_URL, bootstrapAdminSession, getAdminPasscode, getE2ETestToken, wit
 import { requireFeedEvent, requireFeedEventById, waitForAttendanceCount } from './_ui-waits'
 
 const ADMIN_URL = `${BASE_URL}/schedule/admin/`
+const MEMBER_SAME_ORIGIN_HEADERS = {
+	origin: BASE_URL,
+	referer: `${BASE_URL}/schedule`
+}
 
 async function createAdminEvent(
 	request: import('playwright').APIRequestContext,
@@ -96,7 +100,10 @@ async function assertJoinLeaveFlow(
 
 	const joinApi = await withRequestRetry(
 		`join main event ${mainEventId}`,
-		() => request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/join`, { data: { guestCount: 1 } })
+		() => request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/join`, {
+			headers: MEMBER_SAME_ORIGIN_HEADERS,
+			data: { guestCount: 1 }
+		})
 	)
 	if (!joinApi.ok()) throw new Error(`join API failed: ${joinApi.status()}`)
 	await page.reload({ waitUntil: 'domcontentloaded' })
@@ -104,7 +111,9 @@ async function assertJoinLeaveFlow(
 
 	const leaveApi = await withRequestRetry(
 		`leave main event ${mainEventId}`,
-		() => request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/leave`)
+		() => request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/leave`, {
+			headers: MEMBER_SAME_ORIGIN_HEADERS
+		})
 	)
 	if (!leaveApi.ok()) throw new Error(`leave API failed: ${leaveApi.status()}`)
 	await page.reload({ waitUntil: 'domcontentloaded' })
@@ -118,7 +127,10 @@ async function assertWaitlistFlow(
 	await requireFeedEventById(request, eventId)
 	const waitlistJoinRes = await withRequestRetry(
 		`join waitlist event ${eventId}`,
-		() => request.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, { data: { guestCount: 1 } })
+		() => request.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, {
+			headers: MEMBER_SAME_ORIGIN_HEADERS,
+			data: { guestCount: 1 }
+		})
 	)
 	if (!waitlistJoinRes.ok()) throw new Error(`waitlist join failed: ${waitlistJoinRes.status()}`)
 
@@ -133,7 +145,9 @@ async function assertWaitlistFlow(
 
 	const waitlistLeaveRes = await withRequestRetry(
 		`leave waitlist event ${eventId}`,
-		() => request.post(`${BASE_URL}/api/calendar/events/${eventId}/leave`)
+		() => request.post(`${BASE_URL}/api/calendar/events/${eventId}/leave`, {
+			headers: MEMBER_SAME_ORIGIN_HEADERS
+		})
 	)
 	if (!waitlistLeaveRes.ok()) throw new Error(`waitlist leave failed: ${waitlistLeaveRes.status()}`)
 
@@ -158,11 +172,17 @@ async function assertContentionFlow(
 	const [joinARes, joinBRes] = await Promise.all([
 		withRequestRetry(
 			`contention join A ${eventId}`,
-			() => requestA.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, { data: { guestCount: 0 } })
+			() => requestA.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, {
+				headers: MEMBER_SAME_ORIGIN_HEADERS,
+				data: { guestCount: 0 }
+			})
 		),
 		withRequestRetry(
 			`contention join B ${eventId}`,
-			() => requestB.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, { data: { guestCount: 0 } })
+			() => requestB.post(`${BASE_URL}/api/calendar/events/${eventId}/join`, {
+				headers: MEMBER_SAME_ORIGIN_HEADERS,
+				data: { guestCount: 0 }
+			})
 		)
 	])
 	if (!joinARes.ok()) throw new Error(`contention join A failed: ${joinARes.status()}`)

@@ -26,6 +26,7 @@ export type AdminEventDetail = {
 		name: string | null
 		email: string | null
 		status: 'joined' | 'waitlist'
+		guestCount: number
 		waitlistPosition: number | null
 		attendanceStatus: 'unknown' | 'attended' | 'flaked'
 	}>
@@ -62,7 +63,7 @@ export async function getAdminEventDetail(
 	if (!row) return null
 
 	const participants = await db.prepare(
-		`SELECT p.id, CAST(p.user_id AS TEXT) AS user_id, p.status, p.attendance_status, u.name, u.email
+		`SELECT p.id, CAST(p.user_id AS TEXT) AS user_id, p.guest_count, p.status, p.attendance_status, u.name, u.email
 		 FROM calendar_event_participants p
 		 LEFT JOIN calendar_users u ON CAST(u.id AS TEXT) = CAST(p.user_id AS TEXT)
 		 WHERE p.event_id = ? AND p.status IN ('joined','waitlist')
@@ -70,6 +71,7 @@ export async function getAdminEventDetail(
 	).bind(eventId).all<{
 		id: number
 		user_id: string
+		guest_count: number
 		status: 'joined' | 'waitlist'
 		attendance_status: 'unknown' | 'attended' | 'flaked' | null
 		name: string | null
@@ -89,6 +91,7 @@ export async function getAdminEventDetail(
 			name: item.name,
 			email: item.email,
 			status: item.status,
+			guestCount: Math.max(0, item.guest_count ?? 0),
 			waitlistPosition: item.status === 'waitlist' ? waitlistCounter : null,
 			attendanceStatus
 		}
@@ -96,7 +99,7 @@ export async function getAdminEventDetail(
 
 	const seatsTaken = attendees
 		.filter((item) => item.status === 'joined')
-		.length
+		.reduce((sum, item) => sum + 1 + item.guestCount, 0)
 	const waitlistCount = attendees.filter((item) => item.status === 'waitlist').length
 
 	return {

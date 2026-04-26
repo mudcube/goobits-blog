@@ -20,6 +20,7 @@ type EventForSync = {
 	starts_at: string
 	ends_at: string
 	capacity: number
+	status: string
 	location: string | null
 	note: string | null
 }
@@ -37,6 +38,7 @@ type JobQueueHealth = {
 
 const MAX_SYNC_ATTEMPTS = 8
 const STALE_PENDING_SECONDS = 10 * 60
+const STALE_PROCESSING_SECONDS = 10 * 60
 
 function isMockSyncMode(env: Record<string, unknown>) {
 	const mode = String(getEnv(env, 'CALENDAR_SYNC_MODE', 'live') || '')
@@ -129,19 +131,31 @@ async function claimDueJobs(db: D1DatabaseLike, limit = 10) {
 	const result = await db.prepare(
 		`SELECT id, event_id, trigger, requested_by_user_id, payload_json, status, attempt_count, created_at
 		 FROM calendar_sync_jobs
-		 WHERE status IN ('pending', 'failed')
+		 WHERE (
+		   status IN ('pending', 'failed')
 		   AND next_attempt_at <= unixepoch()
+		 ) OR (
+		   status = 'processing'
+		   AND locked_at IS NOT NULL
+		   AND locked_at <= unixepoch() - ?
+		 )
 		 ORDER BY id ASC
 		 LIMIT ?`
-	).bind(limit).all<SyncJobRow>()
+	).bind(STALE_PROCESSING_SECONDS, limit).all<SyncJobRow>()
 	const jobs = result?.results ?? []
 	const claimed: SyncJobRow[] = []
 	for (const job of jobs) {
 		const lock = await db.prepare(
 			`UPDATE calendar_sync_jobs
 			 SET status = 'processing', locked_at = unixepoch(), locked_by = ?, updated_at = unixepoch()
-			 WHERE id = ? AND status IN ('pending', 'failed')`
-		).bind('admin-sync-worker', job.id).run()
+			 WHERE id = ? AND (
+			   status IN ('pending', 'failed') OR (
+			     status = 'processing'
+			     AND locked_at IS NOT NULL
+			     AND locked_at <= unixepoch() - ?
+			   )
+			 )`
+		).bind('admin-sync-worker', job.id, STALE_PROCESSING_SECONDS).run()
 		if ((lock.meta?.changes ?? 0) > 0) claimed.push(job)
 	}
 	return claimed
@@ -193,10 +207,22 @@ async function moveJobToDeadLetter(db: D1DatabaseLike, job: SyncJobRow, attemptC
 
 async function fetchEventForSync(db: D1DatabaseLike, eventId: number) {
 	return db.prepare(
-		`SELECT id, title, starts_at, ends_at, capacity, location, note
+		`SELECT id, title, starts_at, ends_at, capacity, status, location, note
 		 FROM calendar_events
 		 WHERE id = ? LIMIT 1`
 	).bind(eventId).first<EventForSync>()
+}
+
+async function clearCalendarEventSync(db: D1DatabaseLike, eventId: number) {
+	await db.prepare(
+		`UPDATE calendar_event_sync
+		 SET google_event_id = NULL,
+		     google_html_link = NULL,
+		     last_synced_at = unixepoch(),
+		     last_error = NULL,
+		     updated_at = unixepoch()
+		 WHERE event_id = ?`
+	).bind(eventId).run()
 }
 
 async function fetchSeatSummary(db: D1DatabaseLike, eventId: number) {
@@ -244,6 +270,14 @@ async function processSingleJob(
 		return
 	}
 
+	const oldGoogleEventId = await getPreviousGoogleEventId(db, job.event_id)
+
+	if ((event.status === 'canceled' || event.status === 'cancelled') && isMockSyncMode(env)) {
+		await clearCalendarEventSync(db, job.event_id)
+		await markJobDone(db, job.id)
+		return
+	}
+
 	// In mock mode (used by E2E), we exercise the queue plumbing but never touch external providers.
 	if (isMockSyncMode(env)) {
 		await upsertCalendarEventSync(db, {
@@ -270,6 +304,19 @@ async function processSingleJob(
 		await saveConnection({ db, provider: 'google', token, base64Key })
 	}
 
+	if (event.status === 'canceled' || event.status === 'cancelled') {
+		if (oldGoogleEventId) {
+			await googleDeleteEvent({
+				accessToken: token.accessToken,
+				calendarId,
+				eventId: oldGoogleEventId
+			})
+		}
+		await clearCalendarEventSync(db, job.event_id)
+		await markJobDone(db, job.id)
+		return
+	}
+
 	const summary = await fetchSeatSummary(db, job.event_id)
 	const seatsTaken = summary?.seats_taken ?? 0
 	const waitlist = summary?.waitlist_count ?? 0
@@ -279,15 +326,6 @@ async function processSingleJob(
 		waitlist > 0 ? `Waitlist: ${waitlist}` : '',
 		event.note ? `Note: ${event.note}` : ''
 	].filter(Boolean)
-
-	const oldGoogleEventId = await getPreviousGoogleEventId(db, job.event_id)
-	if (oldGoogleEventId) {
-		await googleDeleteEvent({
-			accessToken: token.accessToken,
-			calendarId,
-			eventId: oldGoogleEventId
-		})
-	}
 
 	const created = await googleCreateEvent({
 		accessToken: token.accessToken,
@@ -300,6 +338,14 @@ async function processSingleJob(
 			...(event.location ? { location: event.location } : {})
 		}
 	})
+
+	if (oldGoogleEventId) {
+		await googleDeleteEvent({
+			accessToken: token.accessToken,
+			calendarId,
+			eventId: oldGoogleEventId
+		})
+	}
 
 	await upsertCalendarEventSync(db, {
 		eventId: job.event_id,

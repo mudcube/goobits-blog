@@ -27,7 +27,7 @@
 	const wxE = $derived(weatherAt(end > start ? end - 1 : end))
 
 	let startText = $state(ft(start))
-	let durText = $state(fDur(duration))
+	let durText = $state(fDur(end - start))
 	let endText = $state(ft(end))
 	let shakingField = $state<'start' | 'end' | 'dur' | null>(null)
 

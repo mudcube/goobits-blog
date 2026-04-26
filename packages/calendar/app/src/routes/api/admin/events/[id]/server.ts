@@ -1,8 +1,19 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { cancelEvent, parseAdminEventUpdateInput, setAttendanceStatus, TransportValidationError, updateEventCapacity, updateEventDetails, updateEventMemory } from '@calendar/core'
+import { cancelEvent, enqueueCalendarSyncJob, parseAdminEventUpdateInput, processCalendarSyncQueue, setAttendanceStatus, TransportValidationError, updateEventCapacity, updateEventDetails, updateEventMemory } from '@calendar/core'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
+
+async function enqueueEventSync(env: Awaited<ReturnType<typeof buildEnv>>, eventId: number, trigger: string) {
+	try {
+		await enqueueCalendarSyncJob(env.DB, { eventId, trigger, requestedByUserId: null })
+		void processCalendarSyncQueue(env.DB, env, 2).catch((error) => {
+			console.warn(`Best-effort calendar sync processing failed after ${trigger}:`, error)
+		})
+	} catch (error) {
+		console.warn(`Failed to enqueue calendar sync after ${trigger}:`, error)
+	}
+}
 
 export async function POST(event: RequestEvent) {
 	return runApiRequest('admin.events.update', async () => {
@@ -22,6 +33,7 @@ export async function POST(event: RequestEvent) {
 		const input = parseAdminEventUpdateInput(await event.request.json().catch(() => null))
 		if (input.action === 'capacity') {
 			await updateEventCapacity(env.DB, { eventId, capacity: input.capacity })
+			await enqueueEventSync(env, eventId, 'admin_event_capacity')
 			logAdminEvent(event, 'event_capacity_update', { eventId, capacity: input.capacity })
 			return apiOk({})
 		}
@@ -39,6 +51,7 @@ export async function POST(event: RequestEvent) {
 				startsAt: input.startsAt,
 				endsAt: input.endsAt
 			})
+			await enqueueEventSync(env, eventId, 'admin_event_update')
 			logAdminEvent(event, 'event_update', { eventId })
 			return apiOk({})
 		}
@@ -55,6 +68,7 @@ export async function POST(event: RequestEvent) {
 
 		if (input.action === 'delete') {
 			await cancelEvent(env.DB, { eventId })
+			await enqueueEventSync(env, eventId, 'admin_event_cancel')
 			logAdminEvent(event, 'event_delete', { eventId })
 			return apiOk({})
 		}

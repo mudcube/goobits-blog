@@ -1,9 +1,24 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { createEventsBatch, getAdminPaymentDefaults, listEventsFeed } from '@calendar/core'
+import { createEventsBatch, enqueueCalendarSyncJob, getAdminPaymentDefaults, listEventsFeed, processCalendarSyncQueue } from '@calendar/core'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { getCalendarProgramBySlug, parseAdminCreateEventsBatchInput, TransportValidationError } from '@calendar/core'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
+
+async function enqueueCreatedEventsSync(env: Awaited<ReturnType<typeof buildEnv>>, eventIds: number[]) {
+	try {
+		await Promise.all(eventIds.map((eventId) => enqueueCalendarSyncJob(env.DB, {
+			eventId,
+			trigger: 'admin_event_create',
+			requestedByUserId: null
+		})))
+		void processCalendarSyncQueue(env.DB, env, Math.min(10, eventIds.length)).catch((error) => {
+			console.warn('Best-effort calendar sync processing failed after event create:', error)
+		})
+	} catch (error) {
+		console.warn('Failed to enqueue calendar sync after event create:', error)
+	}
+}
 
 export async function GET(event: RequestEvent) {
 	return runApiRequest('admin.events.list', async () => {
@@ -43,6 +58,7 @@ export async function POST(event: RequestEvent) {
 			note: input.note,
 			repeatWeeks: input.repeatWeeks
 		})
+		await enqueueCreatedEventsSync(env, ids)
 
 		logAdminEvent(event, 'events_create_batch', { count: ids.length, activitySlug: input.activitySlug })
 		return apiOk({ ids })
