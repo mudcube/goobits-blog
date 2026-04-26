@@ -12,9 +12,9 @@ export async function GET(event: RequestEvent) {
 		if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
 			return apiError('Missing or invalid date parameter (YYYY-MM-DD)', { status: 400, code: 'invalid_date' })
 		}
-		const activitySlug = event.url.searchParams.get('activity') ?? undefined
+		const activitySlug = event.url.searchParams.get('activity')
 
-		const slots = await getSlotAvailability(env.DB, { date, activitySlug })
+		const slots = await getSlotAvailability(env.DB, { date, ...(activitySlug ? { activitySlug } : {}) })
 		return apiOk({ slots })
 	} catch (error) {
 		if (error instanceof TransportValidationError) return apiValidationError(error)

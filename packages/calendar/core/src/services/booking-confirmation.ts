@@ -40,7 +40,19 @@ export async function getBookingByConfirmation(
 		 WHERE p.confirmation_id = ?
 		 LIMIT 1`
 	).bind(confirmationId).first()
-	return row as typeof row & { confirmation_id: string } | null
+	if (!row) return null
+	return {
+		id: row['id'] as number,
+		event_id: row['event_id'] as number,
+		user_id: row['user_id'] as string,
+		status: row['status'] as string,
+		guest_count: row['guest_count'] as number,
+		confirmation_id: row['confirmation_id'] as string,
+		event_title: row['event_title'] as string | null,
+		event_start: row['event_start'] as string | null,
+		event_end: row['event_end'] as string | null,
+		activity_slug: row['activity_slug'] as string | null
+	}
 }
 
 export async function cancelBookingByConfirmation(
