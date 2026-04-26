@@ -1,7 +1,7 @@
 import type { D1DatabaseLike } from '../storage/d1.ts'
 
 export function generateConfirmationId(): string {
-	const bytes = crypto.getRandomValues(new Uint8Array(8))
+	const bytes = crypto.getRandomValues(new Uint8Array(16))
 	return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
 }
 
@@ -63,7 +63,7 @@ export async function cancelBookingByConfirmation(
 	const booking = await getBookingByConfirmation(db, confirmationId)
 	if (!booking) return { ok: false, code: 'not_found' }
 	if (booking.user_id !== userId) return { ok: false, code: 'forbidden' }
-	if (booking.status === 'cancelled') return { ok: false, code: 'already_cancelled' }
+	if (booking.status === 'cancelled' || booking.status === 'canceled') return { ok: false, code: 'already_cancelled' }
 
 	await db.prepare(
 		`UPDATE calendar_event_participants SET status = 'cancelled', updated_at = unixepoch() WHERE id = ?`

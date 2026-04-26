@@ -10,12 +10,9 @@ export type SlotAvailabilityResult = {
 	joined: number
 	remaining: number
 	available: boolean
-	participants: Array<{
-		userId: string
-		name: string | null
-		status: string
-	}>
 }
+
+const MAX_SLOTS_PER_DAY = 50
 
 export async function getSlotAvailability(
 	db: D1DatabaseLike,
@@ -32,7 +29,8 @@ export async function getSlotAvailability(
 				 WHERE event_id = e.id AND status = 'joined'), 0
 			) AS joined_count
 		FROM calendar_events e
-		WHERE e.starts_at >= ? AND e.starts_at <= ? AND e.status != 'cancelled'
+		WHERE e.starts_at >= ? AND e.starts_at <= ?
+		  AND e.status NOT IN ('cancelled', 'canceled')
 	`
 	const binds: (string | number)[] = [dayStart, dayEnd]
 
@@ -41,27 +39,15 @@ export async function getSlotAvailability(
 		binds.push(input.activitySlug)
 	}
 
-	query += ` ORDER BY e.starts_at ASC`
+	query += ` ORDER BY e.starts_at ASC LIMIT ${MAX_SLOTS_PER_DAY}`
 
 	const { results } = await db.prepare(query).bind(...binds).all()
 
-	const slots: SlotAvailabilityResult[] = []
-
-	for (const row of results ?? []) {
-		const eventId = row['id'] as number
+	return (results ?? []).map(row => {
 		const capacity = row['capacity'] as number
 		const joined = row['joined_count'] as number
-
-		const { results: participantRows } = await db.prepare(
-			`SELECT p.user_id, u.name, p.status
-			 FROM calendar_event_participants p
-			 LEFT JOIN calendar_users u ON u.id = p.user_id
-			 WHERE p.event_id = ? AND p.status = 'joined'
-			 ORDER BY p.created_at ASC`
-		).bind(eventId).all()
-
-		slots.push({
-			eventId,
+		return {
+			eventId: row['id'] as number,
 			title: row['title'] as string | null,
 			activitySlug: row['activity_slug'] as string | null,
 			startAt: row['starts_at'] as string,
@@ -70,13 +56,6 @@ export async function getSlotAvailability(
 			joined,
 			remaining: Math.max(0, capacity - joined),
 			available: joined < capacity,
-			participants: (participantRows ?? []).map(p => ({
-				userId: p['user_id'] as string,
-				name: p['name'] as string | null,
-				status: p['status'] as string
-			}))
-		})
-	}
-
-	return slots
+		}
+	})
 }

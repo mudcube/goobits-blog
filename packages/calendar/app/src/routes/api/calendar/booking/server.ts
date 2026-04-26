@@ -47,10 +47,11 @@ export async function DELETE(event: RequestEvent) {
 			return apiError('Missing confirmation id', { status: 400, code: 'missing_id' })
 		}
 
-		const userId = (event.locals as { user?: { id: string } }).user?.id
-		if (!userId) {
+		const user = (event.locals as { user?: { id: string | number } }).user
+		if (!user?.id) {
 			return apiError('Not authenticated', { status: 401, code: 'unauthorized' })
 		}
+		const userId = String(user.id)
 
 		const result = await cancelBookingByConfirmation(env.DB, confirmationId, userId)
 		if (!result.ok) {

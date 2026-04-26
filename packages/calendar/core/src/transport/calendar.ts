@@ -99,7 +99,7 @@ export type CalendarBookingLookupInput = {
 export function parseCalendarBookingLookupInput(input: unknown): CalendarBookingLookupInput {
 	const body = asJsonObject(input)
 	return {
-		confirmationId: readRequiredString(body, 'confirmationId', { maxLength: 32 })
+		confirmationId: readRequiredString(body, 'confirmationId', { maxLength: 64 })
 	}
 }
 

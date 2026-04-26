@@ -124,6 +124,14 @@
 		}
 	})
 
+	// Re-highlight on resize/rotation
+	$effect(() => {
+		if (mode !== 'touring') return
+		const onResize = () => { if (!transitioning) highlight() }
+		window.addEventListener('resize', onResize)
+		return () => window.removeEventListener('resize', onResize)
+	})
+
 	const PAD = 8
 	const cutout = $derived(rect ? {
 		x: rect.x - PAD, y: rect.y - PAD,
