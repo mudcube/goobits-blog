@@ -4,8 +4,13 @@
 		ft, formatDate,
 	} from '@calendar/ui'
 	import type { OpenDay, Person, TourStep } from '@calendar/ui'
-	// TODO: Replace mock data with API data from page.server.ts
-	import { GYM, buildOpenDays, weather } from '../../dev/book-v3/mock-data'
+	import { createMockWeatherProvider } from '$lib/app/weather'
+	import { GYM, buildOpenDays } from '../../dev/book-v3/mock-data'
+
+	const { data } = $props()
+
+	const weather = createMockWeatherProvider()
+	const mockOpenDays = data.useMockData ? buildOpenDays(GYM) : []
 
 	let tourRef: SpotlightTour
 
@@ -26,8 +31,8 @@
 		} else if (phase === 2) goStep(2)
 	}
 
-	const activity = GYM
-	const openDays = buildOpenDays(activity)
+	const activity = data.useMockData ? GYM : data.activity
+	const openDays = (data.useMockData ? mockOpenDays : data.openDays) as OpenDay[]
 
 	let stepNum = $state(0)
 	let selectedDay = $state<OpenDay | null>(null)
