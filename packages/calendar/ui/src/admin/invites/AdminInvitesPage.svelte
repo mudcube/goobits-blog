@@ -202,21 +202,21 @@
 	.ai__muted { color: color-mix(in srgb, var(--text) 45%, transparent); font-size: 0.82rem; }
 
 	/* Create form */
-	.ai__form { display: grid; gap: 0.75rem; padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; background: color-mix(in srgb, var(--text) 2%, transparent); }
+	.ai__form { display: grid; gap: 0.75rem; padding: 1rem; border: 1px solid var(--admin-card-border); border-radius: 0.5rem; background: var(--admin-card-bg); max-width: 42rem; }
 	.ai__form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 	.ai__field { display: grid; gap: 0.25rem; }
 	.ai__field-label { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 55%, transparent); }
-	.ai__input { padding: 0.5rem 0.7rem; border: 1px solid color-mix(in srgb, var(--text) 14%, transparent); border-radius: 0.5rem; background: transparent; color: var(--text); font: inherit; font-size: 0.82rem; }
-	.ai__input:focus { outline: none; border-color: color-mix(in srgb, var(--text) 30%, transparent); }
+	.ai__input { padding: 0.5rem 0.7rem; border: 1px solid var(--admin-border); border-radius: 0.5rem; background: transparent; color: var(--text); font: inherit; font-size: 0.82rem; }
+	.ai__input:focus { outline: none; border-color: color-mix(in srgb, var(--admin-border) 180%, transparent); }
 	.ai__submit { padding: 0.55rem 1rem; border: none; border-radius: 0.5rem; background: var(--gradient-action, #7a5af8); color: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
 	.ai__submit:disabled { opacity: 0.5; }
 
 	/* Table */
-	.ai__table { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; overflow: hidden; max-width: 42rem; }
+	.ai__table { border: 1px solid var(--admin-card-border); border-radius: 0.5rem; overflow: hidden; max-width: 42rem; background: var(--admin-card-bg); }
 	.ai__table-header, .ai__table-row { display: grid; grid-template-columns: 1.5rem 1fr 1fr 4.5rem 5.5rem 4rem; gap: 0.5rem; align-items: center; padding: 0.5rem 0.75rem; }
 	.ai__table-header input[type="checkbox"], .ai__table-row input[type="checkbox"] { margin: 0; vertical-align: middle; }
-	.ai__table-header { background: color-mix(in srgb, var(--text) 4%, transparent); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: color-mix(in srgb, var(--text) 45%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--text) 8%, transparent); }
-	.ai__table-row { font-size: 0.78rem; border-top: 1px solid color-mix(in srgb, var(--text) 6%, transparent); transition: background 150ms; }
+	.ai__table-header { background: color-mix(in srgb, var(--admin-card-bg-hover) 50%, transparent); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--admin-muted); border-bottom: 1px solid var(--admin-border); }
+	.ai__table-row { font-size: 0.78rem; border-top: 1px solid color-mix(in srgb, var(--admin-border) 50%, transparent); transition: background 150ms; }
 	.ai__table-row:first-child { border-top: none; }
 	.ai__table-row--selected { background: color-mix(in srgb, var(--text) 3%, transparent); }
 	.ai__col--code code { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em; }
@@ -224,8 +224,8 @@
 	.ai__col--uses { font-size: 0.72rem; color: color-mix(in srgb, var(--text) 60%, transparent); font-variant-numeric: tabular-nums; }
 	.ai__col--expires { font-size: 0.72rem; color: color-mix(in srgb, var(--text) 50%, transparent); }
 	.ai__col--actions { display: flex; gap: 0.2rem; justify-content: flex-end; }
-	.ai__icon-btn { padding: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; background: transparent; color: color-mix(in srgb, var(--text) 40%, transparent); cursor: pointer; display: flex; transition: all 150ms; font: inherit; }
-	.ai__icon-btn:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 20%, transparent); }
+	.ai__icon-btn { padding: 0.3rem; border: 1px solid var(--admin-border); border-radius: 0.5rem; background: transparent; color: var(--admin-muted); cursor: pointer; display: flex; transition: all 150ms; font: inherit; }
+	.ai__icon-btn:hover { color: var(--text); background: var(--admin-card-bg-hover); }
 	.ai__icon-btn--danger:hover { color: #f87171; border-color: color-mix(in srgb, #f87171 25%, transparent); }
 
 	@media (max-width: 720px) {
