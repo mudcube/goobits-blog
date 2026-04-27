@@ -14,10 +14,19 @@ async function resolveInviteConsumeFailure(db: D1DatabaseLike, inviteId: number)
 	return { ok: false as const, reason: 'exhausted' as const }
 }
 
+import { INVITE_ADJECTIVES, INVITE_NOUNS } from './invite-words'
+
+const INVITE_SEPARATORS = ['-', '-', '-', '.', '~', '!']
+
 export function generateInviteCode() {
-	const bytes = new Uint8Array(12)
+	const bytes = new Uint8Array(6)
 	crypto.getRandomValues(bytes)
-	return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
+	const adj = INVITE_ADJECTIVES[bytes[0]! % INVITE_ADJECTIVES.length]
+	const noun = INVITE_NOUNS[bytes[1]! % INVITE_NOUNS.length]
+	const num = ((bytes[2]! << 8 | bytes[3]!) % 9000) + 1000 // 1000–9999
+	const sep = INVITE_SEPARATORS[bytes[4]! % INVITE_SEPARATORS.length]
+	const sep2 = INVITE_SEPARATORS[bytes[5]! % INVITE_SEPARATORS.length]
+	return `${adj}${sep}${noun}${sep2}${num}`
 }
 
 export async function createInvite({

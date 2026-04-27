@@ -4,6 +4,7 @@ import { compile } from 'mdsvex'
 import { getAllPosts, type ProcessedPost } from '@goobits/blog/utils'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import { remarkTableOfContents } from '$lib/blog/remark-table-of-contents'
+// @ts-ignore — JS rehype plugin, no type declarations
 import { rehypeWebpPicture } from '$lib/blog/rehype-webp-picture'
 import type { JournalMetadata, JournalPost } from '$lib/blog/viewmodel'
 

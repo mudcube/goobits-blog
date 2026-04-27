@@ -298,7 +298,12 @@
 	async function createInviteFromModal() {
 		const inviteName = inviteNameDraft.trim() || 'friend'
 		if (mockMode) {
-			const code = Math.random().toString(36).slice(2, 7)
+			const words = ['sunny','cozy','happy','brave','merry','lucky','golden','gentle','sparkly','cheery']
+			const animals = ['fox','owl','bear','swan','bunny','otter','panda','robin','kitten','dolphin']
+			const w = words[Math.floor(Math.random() * words.length)]
+			const a = animals[Math.floor(Math.random() * animals.length)]
+			const n = Math.floor(Math.random() * 9000) + 1000
+			const code = `${w}-${a}-${n}`
 			const id = `inv-${Date.now()}`
 			mockInvitesState = [
 				{

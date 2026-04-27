@@ -385,14 +385,14 @@ export const mockCrewUsers: MockCrewUser[] = [
 export const mockCrewInvites: MockCrewInvite[] = [
 	{
 		id: 'inv-sarah',
-		code: 'a3x8f',
+		code: 'sunny-otter-4217',
 		email: 'sarah@example.com',
 		created_at: nowUnix - 3 * 24 * 60 * 60,
 		expires_in_days: 4
 	},
 	{
 		id: 'inv-dev',
-		code: 'z9q2r',
+		code: 'cozy-owl-8803',
 		email: 'dev@example.com',
 		created_at: nowUnix - 1 * 60 * 60,
 		expires_in_days: 7

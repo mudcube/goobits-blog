@@ -19,3 +19,14 @@ export type TourStep = {
 	position?: 'top' | 'bottom'
 	phase: number
 }
+
+export type CalendarDay = {
+	date: Date
+	inMonth: boolean
+	isToday: boolean
+	isActive: boolean
+	isPast: boolean
+	dotCount?: number
+	dotColor?: string
+	ariaLabel?: string
+}

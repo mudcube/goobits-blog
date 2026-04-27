@@ -1,3 +1,5 @@
+export { default as CalendarGrid } from './CalendarGrid.svelte'
+export type { CalendarDay } from './types'
 export { default as SkyTrack } from './SkyTrack.svelte'
 export { default as SpotlightTour } from './SpotlightTour.svelte'
 export { default as StepIndicator } from './StepIndicator.svelte'
