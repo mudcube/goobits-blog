@@ -131,9 +131,19 @@
 		nextMonth={onNext}
 		onSelect={handleSelect}
 	/>
+	{#if gridDays.some(d => d.isActive && !d.isPast)}
+		<div class="ac__legend">
+			<span class="ac__legend-item"><span class="ac__dot"></span> Has events</span>
+			<span class="ac__legend-item"><span class="ac__dot ac__dot--today"></span> Today</span>
+		</div>
+	{/if}
 </div>
 
 <style>
-	.ac { --cg-accent: var(--admin-accent, #a78bfa); padding: 1rem; border: 1px solid var(--admin-card-border); border-radius: 0.875rem; background: var(--admin-card-bg); }
+	.ac { --cg-accent: var(--admin-accent, #a78bfa); padding: 1rem; border: 1px solid var(--admin-card-border); border-radius: 0.875rem; background: var(--admin-card-bg); margin-top: 1rem; }
 	.ac--compact { font-size: 0.9em; }
+	.ac__legend { display: flex; justify-content: center; gap: 1rem; margin-top: 0.5rem; }
+	.ac__legend-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.58rem; font-weight: 600; color: color-mix(in srgb, var(--text) 45%, transparent); }
+	.ac__dot { width: 0.26rem; height: 0.26rem; border-radius: 999px; background: var(--admin-accent, #a78bfa); }
+	.ac__dot--today { background: color-mix(in srgb, var(--text) 40%, transparent); border: 1px solid color-mix(in srgb, var(--text) 25%, transparent); }
 </style>
