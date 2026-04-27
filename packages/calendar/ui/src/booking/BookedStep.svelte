@@ -2,6 +2,11 @@
 	import { ChevronLeft, ChevronDown, Calendar, Apple, Mail } from '@lucide/svelte'
 	import type { Person } from './types'
 	import { ft, formatDate } from './time'
+	import { getCalendarConfig } from '@calendar/core'
+
+	const { brand, ics } = getCalendarConfig()
+	const siteName = brand.siteName
+	const uidDomain = ics.uidDomain
 
 	let {
 		activityIcon,
@@ -45,7 +50,7 @@
 		const sh = pad(Math.floor(start)); const sm = pad(Math.round((start % 1) * 60))
 		const eh = pad(Math.floor(end)); const em = pad(Math.round((end % 1) * 60))
 		const dates = `${y}${m}${d}T${sh}${sm}00/${y}${m}${d}T${eh}${em}00`
-		return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activityLabel)}&dates=${dates}&details=${encodeURIComponent('Booked via miko.art')}`
+		return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activityLabel)}&dates=${dates}&details=${encodeURIComponent('Booked via ' + siteName)}`
 	}
 
 	function outlookUrl() {
@@ -53,7 +58,7 @@
 		const y = date.getFullYear(); const m = pad(date.getMonth() + 1); const d = pad(date.getDate())
 		const sh = pad(Math.floor(start)); const sm = pad(Math.round((start % 1) * 60))
 		const eh = pad(Math.floor(end)); const em = pad(Math.round((end % 1) * 60))
-		return `https://outlook.live.com/calendar/0/action/compose?subject=${encodeURIComponent(activityLabel)}&startdt=${y}-${m}-${d}T${sh}:${sm}:00&enddt=${y}-${m}-${d}T${eh}:${em}:00&body=${encodeURIComponent('Booked via miko.art')}`
+		return `https://outlook.live.com/calendar/0/action/compose?subject=${encodeURIComponent(activityLabel)}&startdt=${y}-${m}-${d}T${sh}:${sm}:00&enddt=${y}-${m}-${d}T${eh}:${em}:00&body=${encodeURIComponent('Booked via ' + siteName)}`
 	}
 
 	function downloadIcs() {
@@ -64,12 +69,12 @@
 		const tzId = Intl.DateTimeFormat().resolvedOptions().timeZone
 		const dtStart = `${y}${m}${d}T${sh}${sm}00`
 		const dtEnd = `${y}${m}${d}T${eh}${em}00`
-		const uid = `${dtStart}-${Math.random().toString(36).slice(2, 8)}@miko.art`
+		const uid = `${dtStart}-${Math.random().toString(36).slice(2, 8)}@${uidDomain}`
 		const ics = [
-			'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//miko.art//book//EN',
+			'BEGIN:VCALENDAR', 'VERSION:2.0', `PRODID:-//${uidDomain}//book//EN`,
 			'BEGIN:VEVENT', `UID:${uid}`,
 			`DTSTART;TZID=${tzId}:${dtStart}`, `DTEND;TZID=${tzId}:${dtEnd}`,
-			`SUMMARY:${activityLabel}`, `DESCRIPTION:Booked via miko.art`,
+			`SUMMARY:${activityLabel}`, `DESCRIPTION:Booked via ${siteName}`,
 			'END:VEVENT', 'END:VCALENDAR'
 		].join('\r\n')
 		const blob = new Blob([ics], { type: 'text/calendar' })

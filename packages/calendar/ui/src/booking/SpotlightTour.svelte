@@ -1,10 +1,5 @@
 <script lang="ts">
-	export type TourStep = {
-		selector: string
-		message: string
-		position?: 'top' | 'bottom'
-		phase: number
-	}
+	import type { TourStep } from './types'
 
 	let {
 		steps,

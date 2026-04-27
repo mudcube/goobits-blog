@@ -12,3 +12,10 @@ export type OpenDay = {
 }
 
 export type Step = 'calendar' | 'claim' | 'day' | 'done'
+
+export type TourStep = {
+	selector: string
+	message: string
+	position?: 'top' | 'bottom'
+	phase: number
+}

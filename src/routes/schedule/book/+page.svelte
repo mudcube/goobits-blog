@@ -1,15 +1,24 @@
 <script lang="ts">
 	import {
 		StepIndicator, CalendarStep, TimeStep, BookedStep, SpotlightTour,
-		ft, formatDate, GYM, buildOpenDays,
+		ft, formatDate, buildMockOpenDays,
 	} from '@calendar/ui'
-	import type { OpenDay, Person, TourStep } from '@calendar/ui'
+	import type { OpenDay, Person, TourStep, Activity } from '@calendar/ui'
 	import { createMockWeatherProvider } from '$lib/app/weather'
 
 	const { data } = $props()
 
+	const GYM: Activity = {
+		slug: 'gym', label: 'Rainbow Gym', icon: '💪',
+		tagline: 'Hang out. Work out. Whatever.',
+		windowStart: 10, windowEnd: 20, maxDuration: 2, capacity: 8,
+	}
+	const DEMO_PEOPLE: Person[] = [
+		{ name: 'Jen', color: '#d4748c', start: 12, end: 14 },
+		{ name: 'Tyler', color: '#d8944a', start: 13, end: 15 },
+	]
 	const weather = createMockWeatherProvider()
-	const mockOpenDays = data.useMockData ? buildOpenDays(GYM) : []
+	const mockOpenDays = data.useMockData ? buildMockOpenDays(GYM, DEMO_PEOPLE) : []
 
 	let tourRef: SpotlightTour
 
