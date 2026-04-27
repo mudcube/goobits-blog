@@ -110,11 +110,20 @@
 	<h2 class="bs__title">Booked.</h2>
 
 	<div class="bs__card">
+		<p class="bs__activity">{activityIcon} {activityLabel}</p>
 		<p class="bs__detail">{formatDate(date)} &middot; {ft(start)}–{ft(end)}</p>
-		{#if crewNames}
-			<p class="bs__crew">with {crewNames}</p>
-		{/if}
 	</div>
+
+	{#if overlapping.length > 0}
+		<div class="bs__crew-summary">
+			<div class="bs__crew-dots">
+				{#each overlapping as person}
+					<span class="bs__crew-dot" style="background:{person.color};"></span>
+				{/each}
+			</div>
+			<p class="bs__crew-text">{crewNames} will be there too</p>
+		</div>
+	{/if}
 
 	<p class="bs__greeting">See you there <img src="/media/page-icons/holidays-party.png" alt="" class="bs__greeting-icon" loading="eager" decoding="async" /></p>
 
@@ -212,28 +221,30 @@
 		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 	}
 
+	.bs__activity { margin: 0 0 0.15rem; font-size: 0.78rem; color: rgba(255, 255, 255, 0.45); }
 	.bs__detail { margin: 0; font-size: 0.82rem; color: rgba(255, 255, 255, 0.55); }
-	.bs__crew { margin: 0.1rem 0 0; font-size: 0.78rem; color: rgba(255, 255, 255, 0.35); }
+
+	.bs__crew-summary { margin-top: 0.65rem; }
+	.bs__crew-dots { display: flex; justify-content: center; gap: 0.3rem; margin-bottom: 0.25rem; }
+	.bs__crew-dot { width: 0.5rem; height: 0.5rem; border-radius: 999px; }
+	.bs__crew-text { margin: 0; font-size: 0.78rem; color: rgba(255, 255, 255, 0.45); }
 
 	/* Greeting */
 	.bs__greeting {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 0.35rem;
+		gap: 0.4rem;
 		margin: 0.75rem 0 0;
 		font-family: var(--font-display, Georgia);
 		font-size: 0.95rem; font-weight: 400; font-style: italic;
-		background: linear-gradient(135deg, #a78bfa, #6ee7b7);
-		-webkit-background-clip: text; -webkit-text-fill-color: transparent;
-		background-clip: text;
+		color: rgba(255, 255, 255, 0.45);
 	}
 
 	:global(.bs__greeting-icon) {
-		width: 1.1rem;
-		height: 1.1rem;
-		vertical-align: -0.1em;
-		-webkit-text-fill-color: initial;
+		width: 1.4rem;
+		height: 1.4rem;
+		vertical-align: -0.15em;
 	}
 
 	/* Calendar list */
