@@ -1,4 +1,9 @@
-/** WMO Weather interpretation codes (https://open-meteo.com/en/docs) */
+/**
+ * Weather types aligned with Open-Meteo API schema.
+ * https://open-meteo.com/en/docs
+ */
+
+/** WMO Weather interpretation codes */
 export type WmoCode =
 	| 0 | 1 | 2 | 3 | 45 | 48
 	| 51 | 53 | 55 | 61 | 63 | 65
@@ -12,6 +17,13 @@ export type HourlyWeather = {
 	weatherCode: WmoCode
 	windSpeed: number
 	humidity: number
+}
+
+export type DayWeather = {
+	date: string
+	sunrise: number
+	sunset: number
+	hourly: HourlyWeather[]
 }
 
 export function describeWeatherCode(code: WmoCode): string {
@@ -28,4 +40,14 @@ export function describeWeatherCode(code: WmoCode): string {
 
 export function isPrecipitation(code: WmoCode): boolean {
 	return code >= 51
+}
+
+export function precipLabel(code: WmoCode): string | null {
+	if (code >= 95) return 'Thunder'
+	if (code >= 80) return 'Showers'
+	if (code >= 71) return 'Snow'
+	if (code === 65 || code === 55) return 'Heavy'
+	if (code === 63 || code === 53) return 'Moderate'
+	if (code === 61 || code === 51) return 'Light'
+	return null
 }

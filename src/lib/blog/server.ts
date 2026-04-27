@@ -1,9 +1,10 @@
-import { readFileSync } from 'fs'
-import { join } from 'path'
+import { readFileSync, accessSync } from 'fs'
+import { join, dirname } from 'path'
 import { compile } from 'mdsvex'
 import { getAllPosts, type ProcessedPost } from '@goobits/blog/utils'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import { remarkTableOfContents } from '$lib/blog/remark-table-of-contents'
+import { rehypeWebpPicture } from '$lib/blog/rehype-webp-picture'
 import type { JournalMetadata, JournalPost } from '$lib/blog/viewmodel'
 
 type Frontmatter = Record<string, unknown> & {
@@ -50,6 +51,54 @@ function resolvePostDate(value: unknown, fallback: () => Date): Date {
 
 function stripScriptTags(html: string) {
 	return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+}
+
+/**
+ * Wrap <img> tags in <picture> elements with WebP sources when a .webp
+ * sibling file exists on disk. Preserves the original <img> as fallback
+ * for older browsers.
+ */
+function upgradeImagesToWebpPicture(html: string, postDir: string) {
+	return html.replace(/<img\b([^>]*)>/gi, (imgTag, attrs: string) => {
+		const srcMatch = attrs.match(/\bsrc=["']([^"']+)["']/)
+		if (!srcMatch?.[1]) return imgTag
+
+		const src = srcMatch[1]
+
+		// Skip images that are already WebP, SVGs, data URIs, or external URLs
+		if (/\.webp$/i.test(src) || /\.svg$/i.test(src) || /^data:/i.test(src) || /^https?:\/\//i.test(src)) {
+			return imgTag
+		}
+
+		// Build the WebP sibling path
+		const ext = src.substring(src.lastIndexOf('.'))
+		const webpSrc = src.substring(0, src.length - ext.length) + '.webp'
+
+		// Check if the WebP file exists on disk
+		const webpDiskPath = src.startsWith('/')
+			? join(process.cwd(), 'static', webpSrc)
+			: join(postDir, webpSrc)
+
+		try {
+			accessSync(webpDiskPath)
+		} catch {
+			return imgTag
+		}
+
+		// Resolve public path for the WebP source
+		const webpPublicPath = src.startsWith('/') ? webpSrc : webpSrc
+
+		// Add loading="lazy" and decoding="async" if not already present
+		let enhancedAttrs = attrs
+		if (!/\bloading=/i.test(enhancedAttrs)) {
+			enhancedAttrs += ' loading="lazy"'
+		}
+		if (!/\bdecoding=/i.test(enhancedAttrs)) {
+			enhancedAttrs += ' decoding="async"'
+		}
+
+		return `<picture><source type="image/webp" srcset="${webpPublicPath}"><img${enhancedAttrs}></picture>`
+	})
 }
 
 function upgradeInsecureMediaUrls(html: string) {
@@ -143,11 +192,17 @@ export async function getPost({
 
 		const mdContent = readFileSync(getJournalPostFilePath(year, month, slug), 'utf-8')
 		const compiled = (await compile(mdContent, {
-			remarkPlugins: [remarkTableOfContents]
+			remarkPlugins: [remarkTableOfContents],
+			rehypePlugins: [rehypeWebpPicture]
 		})) as MdsvexCompileResult
 		const renderedContent = (compiled?.code ?? '').replace(/{@html `(.*?)`}/gs, '$1')
-		const strippedContent = normalizeExternalAnchorRel(
-			stripScriptTags(upgradeInsecureMediaUrls(renderedContent))
+		const postFilePath = getJournalPostFilePath(year, month, slug)
+		const postDir = dirname(postFilePath)
+		const strippedContent = upgradeImagesToWebpPicture(
+			normalizeExternalAnchorRel(
+				stripScriptTags(upgradeInsecureMediaUrls(renderedContent))
+			),
+			postDir
 		)
 		const fallbackDate = () => new Date(`${year}-${month}-01`)
 		const postDate = resolvePostDate(compiled?.data?.date, fallbackDate)

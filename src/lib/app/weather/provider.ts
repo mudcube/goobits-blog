@@ -1,12 +1,2 @@
-import type { DayWeather } from './types'
-
-/**
- * Weather data provider interface.
- *
- * Implementations:
- *   - mock: ./mock-provider.ts (hardcoded, no network)
- *   - live: TODO — fetch from Open-Meteo API
- */
-export type WeatherProvider = {
-	getDay(date: string): DayWeather | null
-}
+// Re-export from calendar package (single source of truth)
+export type { WeatherProvider } from '@calendar/core'

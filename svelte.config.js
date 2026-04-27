@@ -3,6 +3,7 @@ import adapterCloudflare from '@sveltejs/adapter-cloudflare'
 import { mdsvex } from 'mdsvex'
 import { handlePrerenderHttpError } from './src/lib/app/config/runtime/sveltekit.runtime.js'
 import { remarkTableOfContents } from './src/lib/blog/remark-table-of-contents.js'
+import { rehypeWebpPicture } from './src/lib/blog/rehype-webp-picture.js'
 
 export default {
 	kit: {
@@ -70,6 +71,7 @@ export default {
 		mdsvex({
 			extensions: [ '.md' ],
 			remarkPlugins: [ remarkTableOfContents ],
+			rehypePlugins: [ rehypeWebpPicture ],
 			smartypants: {
 				dashes: 'oldschool'
 			}
