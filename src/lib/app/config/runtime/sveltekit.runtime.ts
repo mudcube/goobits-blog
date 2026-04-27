@@ -26,7 +26,10 @@ export function handlePrerenderHttpError(pathname: string, message: string) {
 	if (pathname.includes('[') && pathname.includes(']')) {
 		return
 	}
-	if (pathname.includes('/images/generated/')) {
+	if (/\.(webp|png|jpe?g|gif|svg|ico)(\b|\/)/i.test(pathname)) {
+		return
+	}
+	if (pathname.includes('/images/')) {
 		return
 	}
 	throw new Error(message)

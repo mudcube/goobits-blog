@@ -14,6 +14,9 @@ export function getViteRuntimeConfig(
 		open: false,
 		port: runtime.port,
 		proxy: {},
+		watch: {
+			ignored: ['**/.svelte-kit-old/**']
+		},
 		// Vite blocks dot-directories by default. SvelteKit dev client dynamically imports
 		// from `/.svelte-kit/...`, so explicitly allow it to avoid 403s and broken hydration.
 		fs: {

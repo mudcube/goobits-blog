@@ -30,6 +30,13 @@ export function rehypeWebpPicture() {
 		const filePath = vFile?.filename || vFile?.path || vFile?.history?.[0] || ''
 		const fileDir = filePath ? dirname(filePath) : ''
 
+		// Compute the public URL prefix from the file path
+		// e.g. /workspace/static/journal/2010/08/slug/index.md → /journal/2010/08/slug/
+		const staticRoot = join(process.cwd(), 'static')
+		const publicPrefix = fileDir.startsWith(staticRoot)
+			? fileDir.substring(staticRoot.length) + '/'
+			: ''
+
 		walkNodes(tree.children, (node, index, siblings) => {
 			if (node.tagName !== 'img') return
 
@@ -44,14 +51,17 @@ export function rehypeWebpPicture() {
 			if (SKIP_EXTENSIONS.has(ext.toLowerCase())) return
 
 			// Build WebP sibling path (same name, .webp extension)
-			const webpSrc = src.substring(0, dotIdx) + '.webp'
+			const webpRelative = src.substring(0, dotIdx) + '.webp'
 
 			// Resolve disk path — relative to source markdown file's directory
 			let diskPath
+			let webpPublicPath
 			if (src.startsWith('/')) {
-				diskPath = join(process.cwd(), 'static', webpSrc)
+				diskPath = join(staticRoot, webpRelative)
+				webpPublicPath = webpRelative
 			} else if (fileDir) {
-				diskPath = join(fileDir, webpSrc)
+				diskPath = join(fileDir, webpRelative)
+				webpPublicPath = publicPrefix + webpRelative
 			} else {
 				return
 			}
@@ -78,7 +88,7 @@ export function rehypeWebpPicture() {
 						tagName: 'source',
 						properties: {
 							type: 'image/webp',
-							srcSet: webpSrc
+							srcSet: webpPublicPath
 						},
 						children: []
 					},

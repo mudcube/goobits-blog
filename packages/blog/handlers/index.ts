@@ -191,7 +191,7 @@ export function createBlogSlugHandler(options: BlogSlugHandlerOptions = {}): Blo
 			const routeParts = normalizedSlug ? normalizedSlug.split('/') : []
 
 			// Skip static asset requests (CSS, SCSS, JS, images, etc.)
-			if (normalizedSlug.match(/\.(css|scss|js|ts|jsx|tsx|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i)) {
+			if (normalizedSlug.match(/\.(css|scss|js|ts|jsx|tsx|png|jpg|jpeg|gif|svg|ico|webp|avif|woff|woff2|ttf|eot|mp3|mp4|pdf)$/i)) {
 				throw createHttpError('Not a blog route', 404)
 			}
 
