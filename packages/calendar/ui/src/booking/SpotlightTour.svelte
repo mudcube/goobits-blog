@@ -225,8 +225,8 @@
 	.st-prompt__actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
 	.st-prompt__skip { padding: 0.4rem 0.85rem; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 0.5rem; background: transparent; color: rgba(255, 255, 255, 0.5); font: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
 	.st-prompt__skip:hover { color: rgba(255, 255, 255, 0.8); border-color: rgba(255, 255, 255, 0.25); }
-	.st-prompt__go { padding: 0.4rem 0.85rem; border: none; border-radius: 0.5rem; background: var(--book-accent); color: #fff; font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: background 150ms; }
-	.st-prompt__go:hover { background: var(--book-accent-dim); }
+	.st-prompt__go { padding: 0.4rem 0.85rem; border: none; border-radius: 0.5rem; background: var(--book-confirm, #22c55e); color: #fff; font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: background 150ms; }
+	.st-prompt__go:hover { background: var(--book-confirm-hover, #16a34a); }
 
 	.st-ring { position: absolute; border: 1.5px solid rgba(167, 139, 250, 0.6); pointer-events: none; animation: st-pulse 2s ease-in-out infinite; opacity: 1; transition: opacity 0.2s ease; box-shadow: 0 0 12px rgba(167, 139, 250, 0.15); }
 	.st-ring--hidden { opacity: 0; }

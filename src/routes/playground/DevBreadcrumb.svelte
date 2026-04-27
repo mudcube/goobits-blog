@@ -3,10 +3,10 @@
 
 	const crumbs = $derived.by(() => {
 		const path = $page.url.pathname
-		if (path === '/dev' || path === '/dev/') return []
+		if (path === '/playground' || path === '/playground/') return []
 		const segments = path.replace(/^\/dev\/?/, '').replace(/\/$/, '').split('/')
-		const result: Array<{ label: string; href: string }> = [{ label: 'Dev', href: '/dev/' }]
-		let href = '/dev'
+		const result: Array<{ label: string; href: string }> = [{ label: 'Playground', href: '/playground/' }]
+		let href = '/playground'
 		for (const seg of segments) {
 			href += `/${seg}`
 			result.push({ label: seg, href: `${href}/` })

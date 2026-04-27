@@ -212,8 +212,9 @@
 	.ai__submit:disabled { opacity: 0.5; }
 
 	/* Table */
-	.ai__table { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; overflow: hidden; }
-	.ai__table-header, .ai__table-row { display: grid; grid-template-columns: 2rem 1fr 1fr 5rem 6rem 4.5rem; gap: 0.5rem; align-items: center; padding: 0.5rem 0.75rem; }
+	.ai__table { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; overflow: hidden; max-width: 42rem; }
+	.ai__table-header, .ai__table-row { display: grid; grid-template-columns: 1.5rem 1fr 1fr 4.5rem 5.5rem 4rem; gap: 0.5rem; align-items: center; padding: 0.5rem 0.75rem; }
+	.ai__table-header input[type="checkbox"], .ai__table-row input[type="checkbox"] { margin: 0; vertical-align: middle; }
 	.ai__table-header { background: color-mix(in srgb, var(--text) 4%, transparent); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: color-mix(in srgb, var(--text) 45%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--text) 8%, transparent); }
 	.ai__table-row { font-size: 0.78rem; border-top: 1px solid color-mix(in srgb, var(--text) 6%, transparent); transition: background 150ms; }
 	.ai__table-row:first-child { border-top: none; }

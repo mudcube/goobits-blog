@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import type { ShowcaseCollectionEntry } from '@src/domains/showcase/types'
 
-const DEV_ROUTES_DIR = path.join(process.cwd(), 'src/routes/dev')
+const DEV_ROUTES_DIR = path.join(process.cwd(), 'src/routes/playground')
 
 function titleFromSlug(slug: string) {
 	return slug
@@ -36,7 +36,7 @@ export function getDevEntries(): ShowcaseCollectionEntry[] {
 		if (!fs.existsSync(pagePath)) continue
 
 		items.push({
-			href: `/dev/${entry.name}`,
+			href: `/playground/${entry.name}`,
 			title: titleFromSlug(entry.name),
 			vibe: summarizeFromSlug(entry.name),
 			image: '/media/page-icons/labs-flask.png',

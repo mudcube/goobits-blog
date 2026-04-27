@@ -7,11 +7,11 @@
 	const signalLabel = $derived(`Prototype Shelf No. ${String(items.length).padStart(3, '0')}`)
 
 	const config: ShowcaseCollectionConfig = {
-		path: '/dev/',
-		seoTitle: 'Dev Prototypes',
+		path: '/playground/',
+		seoTitle: 'Playground',
 		description: 'Browse internal prototypes, schedule experiments, booking flows, and route-level design explorations.',
 		layout: 'list',
-		eyebrow: 'Dev',
+		eyebrow: 'Playground',
 		title: 'Internal routes, sketches, and',
 		titleAccent: 'prototype iterations',
 		icon: '/media/page-icons/labs-flask.png',

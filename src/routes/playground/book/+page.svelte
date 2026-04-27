@@ -122,13 +122,13 @@
 	}
 
 	const breadcrumbItems = [
-		{ label: 'Dev', href: '/dev/' },
+		{ label: 'Playground', href: '/playground/' },
 		{ label: 'Book' }
 	]
 
 	const versions = [
-		{ label: 'v1', href: '/dev/book/', current: true },
-		{ label: 'v2', href: '/dev/book-v3/' }
+		{ label: 'v1', href: '/playground/book/', current: true },
+		{ label: 'v2', href: '/playground/book-v3/' }
 	]
 </script>
 

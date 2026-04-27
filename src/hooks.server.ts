@@ -136,7 +136,7 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 		'/api',
 		'/auth',
 		'/contact/thank-you',
-		'/dev',
+		'/playground',
 		'/health',
 		'/register',
 		'/schedule',
