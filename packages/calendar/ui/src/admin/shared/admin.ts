@@ -27,7 +27,7 @@ import {
 } from '../../api/calendar'
 import { getCalendarUiConfig } from '../../config'
 
-export type AdminTabId = 'dashboard' | 'events' | 'rules' | 'programs' | 'people' | 'connections'
+export type AdminTabId = 'dashboard' | 'events' | 'rules' | 'programs' | 'people' | 'invites' | 'connections'
 
 export type AdminNavItem = {
 	label: string
@@ -58,6 +58,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
 	{ label: 'Rules', id: 'rules', section: 'settings' },
 	{ label: 'Programs', id: 'programs', section: 'settings' },
 	{ label: 'People', id: 'people', section: 'settings' },
+	{ label: 'Invites', id: 'invites', section: 'settings' },
 	{ label: 'Connections', id: 'connections', section: 'settings' }
 ]
 
@@ -67,6 +68,7 @@ const ADMIN_TAB_SEGMENTS: Record<AdminTabId, string> = {
 	rules: 'availability',
 	programs: 'programs',
 	people: 'members',
+	invites: 'invites',
 	connections: 'integrations'
 }
 
@@ -82,6 +84,7 @@ export function isAdminTabId(value: string): value is AdminTabId {
 		value === 'rules' ||
 		value === 'programs' ||
 		value === 'people' ||
+		value === 'invites' ||
 		value === 'connections'
 }
 
@@ -109,8 +112,7 @@ export function formatAdminDate(timestamp?: number | null) {
 }
 
 export function buildInviteLink(origin: string, code: string) {
-	const calendarLoginPath = getCalendarUiConfig().routes.calendarLoginPath
-	return `${origin}${calendarLoginPath}?invite=${code}`
+	return `${origin}/invite/${code}`
 }
 
 export function normalizeRulesInput(state: AdminRulesState): AdminRulesInput {
