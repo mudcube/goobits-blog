@@ -436,9 +436,9 @@
 
 {#if authed}
 	<div class="social-crew admin-content">
-		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Manage member access & invites." />
+		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Manage access & send invites." />
 
-		<h4>ACTIVE MEMBERS ({users.length})</h4>
+		<h4>MEMBERS ({users.length})</h4>
 		<div class="social-crew__list">
 			{#each sortedUsers as user (String(user['id'] || user['email'] || user['name']))}
 				<AdminCrewMemberCard
@@ -457,7 +457,7 @@
 			{/each}
 		</div>
 
-		<h4>PENDING INVITES ({inviteItems.length})</h4>
+		<h4>INVITES ({inviteItems.length})</h4>
 		<AdminMetaCards
 			items={inviteItems.map((invite) => ({
 				id: invite.id,
@@ -479,7 +479,7 @@
 					}
 				]
 			}))}
-			emptyText="No pending invites."
+			emptyText="No active invites. Tap Create Invite to share a link."
 		/>
 
 		{#if expandedUserId}
