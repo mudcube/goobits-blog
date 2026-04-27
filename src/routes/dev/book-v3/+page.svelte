@@ -1,15 +1,12 @@
 <script lang="ts">
 	import { PageShell } from '@miko/ui'
+	import {
+		StepIndicator, CalendarStep, TimeStep, BookedStep, SpotlightTour,
+		ft, formatDate,
+	} from '@calendar/ui'
+	import type { OpenDay, Person, TourStep } from '@calendar/ui'
 	import DevHero from '../DevHero.svelte'
 	import { GYM, buildOpenDays, weather } from './mock-data'
-	import { ft, formatDate } from './time'
-	import type { OpenDay, Person } from './types'
-	import StepIndicator from './StepIndicator.svelte'
-	import CalendarStep from './CalendarStep.svelte'
-	import TimeStep from './TimeStep.svelte'
-	import BookedStep from './BookedStep.svelte'
-	import SpotlightTour from './SpotlightTour.svelte'
-	import type { TourStep } from './SpotlightTour.svelte'
 
 	let tourRef: SpotlightTour
 

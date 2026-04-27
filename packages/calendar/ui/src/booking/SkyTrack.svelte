@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HourlyWeather } from '$lib/app/weather'
+	import type { HourlyWeather } from './weather'
 	import { Thermometer, CloudRain, GripVertical } from '@lucide/svelte'
 	import { SNAP, snap, clamp, pct as pctFn, ft, ftShort } from './time'
 

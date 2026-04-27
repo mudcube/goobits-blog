@@ -70,7 +70,7 @@
 	.cc__range-divider { position: relative; height: 2px; background: color-mix(in srgb, var(--text) 6%, transparent); }
 	.cc__range-fill { position: absolute; top: 0; height: 100%; background: var(--c); opacity: 0.35; border-radius: 1px; transition: opacity 180ms; }
 	.cc__range-fill--on { opacity: 0.7; }
-	.cc__row { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.65rem; width: 100%; background: none; border: none; color: var(--text); font: inherit; cursor: pointer; opacity: 0.45; transition: all 180ms; text-align: left; }
+	.cc__row { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.65rem; width: 100%; background: none; border: none; color: var(--text); font: inherit; cursor: pointer; opacity: 0.45; transition: all 180ms; text-align: left; }
 	.cc__row--on { opacity: 1; }
 	.cc__row--flash { animation: cc-flash 0.4s ease; }
 	@keyframes cc-flash { 0% { background: transparent; } 30% { background: color-mix(in srgb, var(--book-accent) 15%, transparent); } 100% { background: transparent; } }

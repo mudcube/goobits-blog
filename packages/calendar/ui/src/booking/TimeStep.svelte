@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HourlyWeather } from '$lib/app/weather'
+	import type { HourlyWeather } from './weather'
 	import type { OpenDay, Person } from './types'
 	import { ChevronRight } from '@lucide/svelte'
 	import { formatDate } from './time'

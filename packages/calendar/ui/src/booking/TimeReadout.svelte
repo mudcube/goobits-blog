@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { HourlyWeather } from '$lib/app/weather'
-	import { describeWeatherCode, isPrecipitation } from '$lib/app/weather'
+	import type { HourlyWeather } from './weather'
+	import { describeWeatherCode, isPrecipitation } from './weather'
 	import { ft, fDur, snap, clamp, SNAP } from './time'
 
 	let {
