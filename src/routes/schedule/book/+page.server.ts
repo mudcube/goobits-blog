@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 import { buildEnv } from '@calendar/kit'
-import { listUpcomingEvents, fetchWeatherForEvent } from '@calendar/core'
+import { listUpcomingEvents, fetchDayForecast } from '@calendar/core'
 import type { CalendarFeedEvent } from '@calendar/core'
 import type { OpenDay, Person } from '@calendar/ui'
 
@@ -47,6 +47,7 @@ function eventToOpenDay(events: CalendarFeedEvent[], activitySlug: string): Open
 
 		days.push({
 			date: new Date(dateStr + 'T00:00:00'),
+			eventId: first.id,
 			bookings,
 			windowStart,
 			windowEnd,
@@ -95,21 +96,25 @@ export const load: PageServerLoad = async ({ locals, url, platform }) => {
 		const events = await listUpcomingEvents(db, user.id)
 		const openDays = eventToOpenDay(events, activitySlug)
 
-		// Fetch weather for each day (best-effort, don't block on failure)
+		// Fetch weather for each day (best-effort, parallel, don't block on failure)
+		// Portland, OR coordinates as default
+		const lat = 45.52
+		const lon = -122.68
 		const weatherMap: Record<string, { sunrise: number; sunset: number; hourly: unknown[] }> = {}
-		for (const day of openDays.slice(0, 7)) {
+		const weatherPromises = openDays.slice(0, 7).map(async (day) => {
 			const dateStr = day.date.toISOString().split('T')[0]!
 			try {
-				const snapshot = await fetchWeatherForEvent({ startsAt: `${dateStr}T12:00:00` })
-				if (snapshot) {
+				const forecast = await fetchDayForecast({ date: dateStr, lat, lon })
+				if (forecast) {
 					weatherMap[dateStr] = {
-						sunrise: 6.5,  // TODO: get from Open-Meteo daily data
-						sunset: 20.0,
-						hourly: [],    // TODO: get hourly forecast
+						sunrise: forecast.sunrise,
+						sunset: forecast.sunset,
+						hourly: forecast.hourly,
 					}
 				}
 			} catch { /* weather is best-effort */ }
-		}
+		})
+		await Promise.all(weatherPromises)
 
 		return {
 			activity: {

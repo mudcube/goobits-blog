@@ -3,6 +3,7 @@ export type PersonRow = Person[]
 
 export type OpenDay = {
 	date: Date
+	eventId?: number
 	bookings: Person[]
 	windowStart: number
 	windowEnd: number

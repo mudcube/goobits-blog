@@ -100,6 +100,35 @@
 		start = person.start; end = person.end
 	}
 
+	let bookingError = $state('')
+
+	async function confirmBooking() {
+		if (!selectedDay) return
+
+		// In mock mode, just go to booked step
+		if (data.useMockData || !selectedDay.eventId) {
+			goStep(2)
+			return
+		}
+
+		bookingError = ''
+		try {
+			const res = await fetch(`/api/calendar/events/${selectedDay.eventId}/join`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ guestCount: 0 }),
+			})
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}))
+				bookingError = err.message ?? 'Failed to book. Try again.'
+				return
+			}
+			goStep(2)
+		} catch {
+			bookingError = 'Network error. Check your connection.'
+		}
+	}
+
 	function onStepNav(step: number) {
 		if (step === stepNum) return
 		if (step < stepNum) pendingDay = null
@@ -128,10 +157,11 @@
 
 		{:else if stepNum === 1 && selectedDay}
 			{#if dayWeather}
-				<TimeStep day={selectedDay} hourly={HOURLY} sunrise={dayWeather.sunrise} sunset={dayWeather.sunset} hasRain={hasAnyRain} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={() => goStep(2)} />
+				<TimeStep day={selectedDay} hourly={HOURLY} sunrise={dayWeather.sunrise} sunset={dayWeather.sunset} hasRain={hasAnyRain} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={confirmBooking} />
 			{:else}
-				<TimeStep day={selectedDay} hourly={[]} sunrise={6} sunset={20} hasRain={false} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={() => goStep(2)} />
+				<TimeStep day={selectedDay} hourly={[]} sunrise={6} sunset={20} hasRain={false} {overlapping} bind:start bind:end onJoin={joinPerson} onConfirm={confirmBooking} />
 			{/if}
+			{#if bookingError}<p class="book__error">{bookingError}</p>{/if}
 
 		{:else if stepNum === 2 && selectedDay}
 			<BookedStep activityIcon={activity.icon} activityLabel={activity.label} date={selectedDay.date} {start} {end} {overlapping} capacity={8} onBack={() => goStep(0)} onEdit={() => goStep(1)} />
@@ -167,6 +197,8 @@
 	.book__step--back { animation: book-back 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	@keyframes book-fwd { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 	@keyframes book-back { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+
+	.book__error { margin: 0.5rem 0 0; padding: 0.5rem; border-radius: 0.5rem; background: color-mix(in srgb, var(--book-danger) 10%, transparent); border: 1px solid color-mix(in srgb, var(--book-danger) 25%, transparent); color: var(--book-danger); font-size: 0.78rem; font-weight: 600; text-align: center; }
 
 	:global([data-tip]) { position: relative; }
 	:global([data-tip])::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(0.1rem); padding: 0.3rem 0.55rem; border-radius: 0.5rem; background: rgba(10, 10, 18, 0.92); backdrop-filter: blur(6px); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.85); font-size: 0.58rem; font-weight: 600; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s ease 0.4s, transform 0.2s ease 0.4s; z-index: 50; }

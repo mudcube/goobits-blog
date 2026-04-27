@@ -118,7 +118,7 @@ import {
 import { listEventTemplates, type CalendarEventTemplate } from './events/event-templates.ts'
 import { promoteWaitlistedParticipant, type PromoteWaitlistResult } from './events/promote-waitlist.ts'
 import { getAdminEventDetail, type AdminEventDetail } from './events/event-detail.ts'
-import { fetchWeatherForEvent, type WeatherSnapshot } from './weather/weather-provider.ts'
+import { fetchWeatherForEvent, fetchDayForecast, type WeatherSnapshot, type DayForecast } from './weather/weather-provider.ts'
 import {
 	generateConfirmationId,
 	setConfirmationId,
@@ -248,6 +248,7 @@ export {
 	promoteWaitlistedParticipant,
 	getAdminEventDetail,
 	fetchWeatherForEvent,
+	fetchDayForecast,
 	parseAdminRulesInput,
 	parseAdminProgramMutationInput,
 	parseAdminCreateEventsBatchInput,
@@ -313,5 +314,6 @@ export type {
 	CalendarEventTemplate,
 	PromoteWaitlistResult,
 	AdminEventDetail,
-	WeatherSnapshot
+	WeatherSnapshot,
+	DayForecast
 }
