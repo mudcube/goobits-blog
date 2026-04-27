@@ -16,7 +16,7 @@ async function resolveInviteConsumeFailure(db: D1DatabaseLike, inviteId: number)
 
 import { INVITE_ADJECTIVES, INVITE_NOUNS } from './invite-words'
 
-const INVITE_SEPARATORS = ['-', '-', '-', '.', '~', '!']
+const INVITE_SEPARATORS = ['-', '-', '-', '.', '!']
 
 export function generateInviteCode() {
 	const bytes = new Uint8Array(6)
