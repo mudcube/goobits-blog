@@ -2,6 +2,7 @@ $admin-sidebar-width: 13.75rem;
 $admin-mobile-breakpoint: 820px;
 
 .social-admin {
+  a, a:visited { color: inherit; }
   --admin-muted: var(--muted);
   --admin-border: var(--border);
   --admin-panel: var(--panel-bg);

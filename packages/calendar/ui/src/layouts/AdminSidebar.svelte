@@ -1,5 +1,5 @@
 <script>
-	import { Clock, Calendar, CalendarClock, LayoutGrid, Users, Link2 } from '@lucide/svelte'
+	import { Clock, Calendar, CalendarClock, LayoutGrid, Users, Link2, Ticket } from '@lucide/svelte'
 	import { ADMIN_NAV, getAdminTabHref } from '../admin/shared/admin'
 	import PillButton from '../primitives/CalendarPillButton.svelte'
 	const { tab, onSelect } = $props()
@@ -34,6 +34,8 @@
 					<LayoutGrid size={16} strokeWidth={1.8} />
 				{:else if n.id === 'events'}
 					<CalendarClock size={16} strokeWidth={1.8} />
+				{:else if n.id === 'invites'}
+					<Ticket size={16} strokeWidth={1.8} />
 				{:else if n.id === 'connections'}
 					<Link2 size={16} strokeWidth={1.8} />
 				{/if}
