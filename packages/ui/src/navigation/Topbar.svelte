@@ -42,7 +42,7 @@
 <header class="layout-header">
 	<div class="layout-header__inner">
 		<div class="layout-header__logo">
-			<a href={logoHref} class="layout-header__logo-link">
+			<a href={logoHref} class="layout-header__logo-link" aria-label="{logoAlt} — Home">
 				{#if logoSrc}
 					<img src={logoSrc} alt={logoAlt} class="layout-header__logo-image" />
 				{:else}
@@ -109,9 +109,9 @@
 		width: 2.35rem;
 		height: 2.35rem;
 		padding: 0;
-		border: 1px solid color-mix(in srgb, var(--color-white) 14%, transparent);
+		border: 1px solid rgba(255, 255, 255, 0.14);
 		border-radius: var(--radius-pill);
-		background: color-mix(in srgb, var(--color-white) 5%, transparent);
+		background: rgba(255, 255, 255, 0.05);
 		color: var(--header-nav-color, var(--color-white));
 		cursor: pointer;
 		transition:
@@ -122,9 +122,9 @@
 	}
 
 	.layout-header__menu-button:hover {
-		border-color: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 36%, transparent);
+		border-color: rgba(255, 255, 255, 0.36);
 		color: var(--header-nav-accent, var(--color-white));
-		background: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 10%, transparent);
+		background: rgba(255, 255, 255, 0.1);
 		transform: translateY(-1px);
 	}
 
@@ -137,7 +137,7 @@
 		display: grid;
 		gap: 0.5rem;
 		padding: 0.85rem;
-		border: 1px solid color-mix(in srgb, var(--color-white) 14%, transparent);
+		border: 1px solid rgba(255, 255, 255, 0.14);
 		border-radius: 1rem;
 		background:
 			linear-gradient(180deg, rgba(6, 14, 32, 0.92) 0%, rgba(6, 14, 32, 0.82) 100%);
@@ -146,7 +146,7 @@
 
 	:global(.layout-header__mobile-separator) {
 		padding: 0.35rem 0.4rem 0.1rem;
-		color: color-mix(in srgb, var(--color-white) 52%, transparent);
+		color: rgba(255, 255, 255, 0.52);
 		font-size: 0.7rem;
 		font-weight: var(--font-weight-semibold);
 		letter-spacing: 0.12em;
@@ -165,14 +165,14 @@
 		font-size: 1rem;
 		line-height: 1.3;
 		text-decoration: none;
-		background: color-mix(in srgb, var(--color-white) 3%, transparent);
+		background: rgba(255, 255, 255, 0.03);
 	}
 
 	:global(.layout-header__mobile-link:hover),
 	:global(.layout-header__mobile-link--active) {
-		border-color: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 36%, transparent);
+		border-color: rgba(255, 255, 255, 0.36);
 		color: var(--header-nav-accent, var(--color-white));
-		background: color-mix(in srgb, var(--header-nav-accent, var(--color-white)) 10%, transparent);
+		background: rgba(255, 255, 255, 0.1);
 	}
 
 	@media (max-width: 50em) {

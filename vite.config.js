@@ -23,7 +23,7 @@ export default defineConfig({
 			]
 		},
 		strict: false,
-		target: 'esnext'
+		target: 'es2020'
 	},
 	define: runtimeConfig.define,
 	envDir: './config/env',

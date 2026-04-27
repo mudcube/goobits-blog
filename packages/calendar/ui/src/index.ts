@@ -71,4 +71,4 @@ export {
 	InlineClaim,
 } from './booking'
 export type { TourStep, Person, OpenDay, HourlyWeather } from './booking'
-export { ft, fDur, formatDate } from './booking'
+export { ft, fDur, formatDate, GYM, buildOpenDays } from './booking'

@@ -2,6 +2,7 @@
 	type ShowcaseCardProps = {
 		href: string
 		image: string
+		imageWebp?: string
 		alt: string
 		badge?: string
 		badgeTone?: 'cool' | 'warm'
@@ -18,6 +19,7 @@
 	const {
 		href,
 		image,
+		imageWebp = '',
 		alt,
 		badge = '',
 		badgeTone = 'cool',
@@ -34,7 +36,14 @@
 
 <a href={href} class="showcase-card">
 	<div class="showcase-card__art">
-		<img src={image} alt={alt} {loading} {fetchpriority} decoding="async" />
+		{#if imageWebp}
+			<picture>
+				<source type="image/webp" srcset={imageWebp} />
+				<img src={image} alt={alt} {loading} {fetchpriority} decoding="async" />
+			</picture>
+		{:else}
+			<img src={image} alt={alt} {loading} {fetchpriority} decoding="async" />
+		{/if}
 		<div class="showcase-card__shade"></div>
 		{#if badge}
 			<span class={`showcase-card__badge ${badgeTone === 'warm' ? 'showcase-card__badge--warm' : ''}`}>{badge}</span>
@@ -79,6 +88,24 @@
 		background:
 			linear-gradient(180deg, var(--showcase-surface-bright) 0%, var(--showcase-surface-highest) 100%);
 		box-shadow: var(--showcase-card-shadow, 0 25px 50px -12px rgba(0, 0, 0, 0.45));
+	}
+
+	/* Fallback for browsers without aspect-ratio support */
+	@supports not (aspect-ratio: 4 / 3) {
+		.showcase-card__art {
+			padding-top: 75%; /* 3/4 = 75% */
+		}
+
+		.showcase-card__art img,
+		.showcase-card__art picture {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+	}
+
+	.showcase-card__art picture {
+		display: contents;
 	}
 
 	.showcase-card__art img {

@@ -1,11 +1,10 @@
 <script lang="ts">
 	import {
 		StepIndicator, CalendarStep, TimeStep, BookedStep, SpotlightTour,
-		ft, formatDate,
+		ft, formatDate, GYM, buildOpenDays,
 	} from '@calendar/ui'
 	import type { OpenDay, Person, TourStep } from '@calendar/ui'
 	import { createMockWeatherProvider } from '$lib/app/weather'
-	import { GYM, buildOpenDays } from '../../dev/book-v3/mock-data'
 
 	const { data } = $props()
 

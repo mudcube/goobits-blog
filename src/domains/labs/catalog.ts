@@ -37,21 +37,25 @@ export const labsCatalog: LabItem[] = [
 	{ href: '/labs/zen-bg/', title: 'Zen BG', vibe: 'Build ambient, textured backgrounds with a few sliders.', date: '2011-01-06' }
 ]
 
-const labImageByHref: Record<string, string> = {
-	'/labs/color-galaxy/': '/media/labs/color-galaxy-card.png',
-	'/labs/js1k/BreathingGalaxies.html': '/journal/2010/08/what-can-1kb-of-javascript-do/images/BreathingGalaxies.jpeg',
-	'/labs/js1k/Daltonize.html': '/journal/2011/10/color-accessibility-on-digital-displays/images/hero.png',
-	'/labs/js1k/MicroSketchpad.html': '/journal/2010/08/what-can-1kb-of-javascript-do/images/MicroSketchpad.jpeg',
-	'/labs/js1k/SpectrumDJ.html': '/journal/2010/08/what-can-1kb-of-javascript-do/images/SpectrumDJ.jpeg',
-	'/labs/midi-js/': '/journal/2012/02/midi-js/images/hero.png',
-	'/labs/sketch-js/': '/media/labs/sketch-js-card.png',
-	'/labs/sketchpad-1.0/': '/media/labs/sketchpad-v1-card.webp',
-	'/labs/thumbnailer/': '/journal/2011/11/batch-thumbnail-generator/images/hero.png',
-	'/labs/zen-bg/': '/media/labs/zen-bg-card.webp'
+const labImageByHref: Record<string, { src: string; webp?: string }> = {
+	'/labs/color-galaxy/': { src: '/media/labs/color-galaxy-card.png', webp: '/media/labs/color-galaxy-card.webp' },
+	'/labs/js1k/BreathingGalaxies.html': { src: '/journal/2010/08/what-can-1kb-of-javascript-do/images/BreathingGalaxies.jpeg', webp: '/journal/2010/08/what-can-1kb-of-javascript-do/images/generated/BreathingGalaxies-28.webp' },
+	'/labs/js1k/Daltonize.html': { src: '/journal/2011/10/color-accessibility-on-digital-displays/images/hero.png', webp: '/journal/2011/10/color-accessibility-on-digital-displays/images/generated/hero-640.webp' },
+	'/labs/js1k/MicroSketchpad.html': { src: '/journal/2010/08/what-can-1kb-of-javascript-do/images/MicroSketchpad.jpeg', webp: '/journal/2010/08/what-can-1kb-of-javascript-do/images/generated/MicroSketchpad-640.webp' },
+	'/labs/js1k/SpectrumDJ.html': { src: '/journal/2010/08/what-can-1kb-of-javascript-do/images/SpectrumDJ.jpeg', webp: '/journal/2010/08/what-can-1kb-of-javascript-do/images/generated/SpectrumDJ-640.webp' },
+	'/labs/midi-js/': { src: '/journal/2012/02/midi-js/images/hero.png', webp: '/journal/2012/02/midi-js/images/generated/hero-640.webp' },
+	'/labs/sketch-js/': { src: '/media/labs/sketch-js-card.png', webp: '/media/labs/sketch-js-card.webp' },
+	'/labs/sketchpad-1.0/': { src: '/media/labs/sketchpad-v1-card.webp' },
+	'/labs/thumbnailer/': { src: '/journal/2011/11/batch-thumbnail-generator/images/hero.png', webp: '/journal/2011/11/batch-thumbnail-generator/images/generated/hero-640.webp' },
+	'/labs/zen-bg/': { src: '/media/labs/zen-bg-card.webp' }
 }
 
 function getLabImage(href: string) {
-	return labImageByHref[href] || '/media/page-icons/labs-flask.png'
+	return labImageByHref[href]?.src || '/media/page-icons/labs-flask.png'
+}
+
+function getLabImageWebp(href: string) {
+	return labImageByHref[href]?.webp || ''
 }
 
 function getLabMeta(href: string) {
@@ -74,6 +78,7 @@ function formatBadgeDate(date?: string) {
 export const labEntries: ShowcaseCollectionEntry[] = labsCatalog.map((item) => ({
 	...item,
 	image: getLabImage(item.href),
+	imageWebp: getLabImageWebp(item.href),
 	meta: getLabMeta(item.href),
 	badge: formatBadgeDate(item.date),
 	badgeTone: item.date ? 'cool' : 'warm'

@@ -75,6 +75,7 @@
 					<ShowcaseCard
 						href={entry.href}
 						image={entry.image}
+						imageWebp={entry.imageWebp}
 						alt={entry.title}
 						badge={entry.badge ?? ''}
 						badgeTone={entry.badgeTone ?? 'cool'}

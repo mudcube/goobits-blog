@@ -1,4 +1,3 @@
-import { createMockWeatherProvider } from '$lib/app/weather'
 import type { OpenDay, Person } from './types'
 
 export type Activity = {
@@ -30,4 +29,3 @@ export function buildOpenDays(activity: Activity): OpenDay[] {
 	return days
 }
 
-export const weather = createMockWeatherProvider()

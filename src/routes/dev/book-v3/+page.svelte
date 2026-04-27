@@ -2,11 +2,13 @@
 	import { PageShell } from '@miko/ui'
 	import {
 		StepIndicator, CalendarStep, TimeStep, BookedStep, SpotlightTour,
-		ft, formatDate,
+		ft, formatDate, GYM, buildOpenDays,
 	} from '@calendar/ui'
 	import type { OpenDay, Person, TourStep } from '@calendar/ui'
+	import { createMockWeatherProvider } from '$lib/app/weather'
 	import DevHero from '../DevHero.svelte'
-	import { GYM, buildOpenDays, weather } from './mock-data'
+
+	const weather = createMockWeatherProvider()
 
 	let tourRef: SpotlightTour
 
