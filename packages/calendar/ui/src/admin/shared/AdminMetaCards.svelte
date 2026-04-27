@@ -79,9 +79,8 @@
 		align-items: center;
 		gap: 0.875rem;
 		padding: 0.75rem 0.875rem;
-		min-height: 4rem;
 		border-radius: 0.875rem;
-		border: 1px dashed var(--admin-card-border);
+		border: 1px solid var(--admin-card-border);
 		background: var(--admin-card-bg);
 	}
 
