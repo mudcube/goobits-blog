@@ -146,9 +146,14 @@
 
 <svelte:head>
   <title
-    >Sign in | {calendarConfig.brand.calendarName} | {calendarConfig.brand
+    >{hasValidInvite ? "You're invited" : "Sign in"} | {calendarConfig.brand.calendarName} | {calendarConfig.brand
       .siteName}</title
   >
+  {#if hasValidInvite}
+    <meta property="og:title" content="You're invited to {calendarConfig.brand.calendarName}" />
+    <meta property="og:description" content="Join instantly — no account needed. Tap to pick your time." />
+    <meta property="og:type" content="website" />
+  {/if}
 </svelte:head>
 
 <div class="calendar-page calendar-login">
