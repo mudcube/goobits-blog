@@ -6,7 +6,7 @@
 		variant = 'subtle',
 		disabled = false,
 		href = null,
-		icon = null,
+		icon: Icon = null,
 		iconSize = 14,
 		ariaLabel = undefined,
 		onclick = undefined,
@@ -35,12 +35,12 @@
 			onclick?.(event as MouseEvent)
 		}}
 	>
-		{#if icon}<icon size={iconSize} strokeWidth={2}></icon>{/if}
+		{#if Icon}<Icon size={iconSize} strokeWidth={2} />{/if}
 		{@render children?.()}
 	</a>
 {:else}
 	<button class={`admin-ui-btn admin-ui-btn--${variant} admin-action-btn admin-action-btn--${variant}`} {type} {disabled} aria-label={ariaLabel} {onclick}>
-		{#if icon}<icon size={iconSize} strokeWidth={2}></icon>{/if}
+		{#if Icon}<Icon size={iconSize} strokeWidth={2} />{/if}
 		{@render children?.()}
 	</button>
 {/if}
