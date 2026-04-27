@@ -2,7 +2,7 @@
 	type ShowcaseCardProps = {
 		href: string
 		image: string
-		imageWebp?: string
+		imageWebp?: string | undefined
 		alt: string
 		badge?: string
 		badgeTone?: 'cool' | 'warm'

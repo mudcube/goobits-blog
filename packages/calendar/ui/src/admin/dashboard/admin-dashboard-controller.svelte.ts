@@ -433,7 +433,7 @@ export function createAdminDashboardController(options: DashboardControllerOptio
 			formGlowClass: '',
 			serviceStatusNote: '',
 			enabled: true,
-			sortOrder: (programs.length ? programs[programs.length - 1].sortOrder : 0) + 10
+			sortOrder: (programs.length ? programs[programs.length - 1]!.sortOrder : 0) + 10
 		}
 	}
 

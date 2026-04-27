@@ -41,3 +41,6 @@ vm.yaml
 
 # Local Playwright probes
 tmp_playwright_*.mjs
+
+# Lighthouse audit artifacts
+.lighthouse/

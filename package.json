@@ -148,6 +148,9 @@
         "typescript": "6"
       }
     },
+    "overrides": {
+      "svelte": "^5.55.4"
+    },
     "patchedDependencies": {
       "svelte": "patches/svelte.patch"
     }
