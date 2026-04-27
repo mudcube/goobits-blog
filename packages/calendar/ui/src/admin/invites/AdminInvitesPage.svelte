@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Copy, Plus, Trash2, Check } from '@lucide/svelte'
+	import { Copy, Plus, Trash2, Check, Ticket } from '@lucide/svelte'
+	import AdminPageHero from '../shared/AdminPageHero.svelte'
 	import {
 		getCalendarAdminInvites,
 		createCalendarInvite,
@@ -34,11 +35,7 @@
 		creating = true
 		error = ''
 		try {
-			await createCalendarInvite({
-				email: email.trim() || null,
-				uses,
-				expiresInDays,
-			})
+			await createCalendarInvite({ email: email.trim() || null, uses, expiresInDays })
 			showForm = false
 			email = ''
 			uses = DEFAULT_INVITE_DRAFT.uses
@@ -54,18 +51,17 @@
 			invites = invites.filter(i => i.id !== id)
 			selected.delete(id)
 			selected = new Set(selected)
-		} catch { error = `Failed to delete invite ${id}` }
+		} catch { error = `Failed to delete invite` }
 		confirmDeleteId = null
 	}
 
 	async function removeSelected() {
 		confirmBulkDelete = false
-		const ids = [...selected]
-		for (const id of ids) {
+		for (const id of [...selected]) {
 			try {
 				await deleteCalendarInvite(String(id))
 				invites = invites.filter(i => i.id !== id)
-			} catch { error = `Failed to delete some invites` }
+			} catch { error = 'Failed to delete some invites' }
 		}
 		selected = new Set()
 	}
@@ -91,60 +87,54 @@
 	$effect(() => { loadInvites() })
 </script>
 
-<div class="ai">
-	<div class="ai__header">
-		<h2 class="ai__title">Invites</h2>
-		<div class="ai__header-actions">
-			{#if selected.size > 0}
-				<button type="button" class="ai__bulk-btn" onclick={() => { confirmBulkDelete = true }}>
-					<Trash2 size={13} strokeWidth={2} />
-					<span>Delete {selected.size}</span>
-				</button>
-			{/if}
-			<button type="button" class="ai__create-btn" onclick={() => { showForm = !showForm }}>
-				<Plus size={14} strokeWidth={2.2} />
-				<span>Create</span>
+<AdminPageHero
+	eyebrow="Sharing"
+	title="Invites"
+	subtitle="Create invite codes to share with friends. They can join instantly without creating an account."
+>
+	{#snippet actions()}
+		{#if selected.size > 0}
+			<button type="button" class="ai__bulk-btn" onclick={() => { confirmBulkDelete = true }}>
+				<Trash2 size={13} strokeWidth={2} />
+				Delete {selected.size}
 			</button>
+		{/if}
+		<button type="button" class="ai__create-btn" onclick={() => { showForm = !showForm }}>
+			<Plus size={14} strokeWidth={2.2} />
+			Create invite
+		</button>
+	{/snippet}
+</AdminPageHero>
+
+{#if error}
+	<div class="ai__error">{error}</div>
+{/if}
+
+{#if confirmBulkDelete || confirmDeleteId !== null}
+	<div class="ai__confirm">
+		<p>{confirmBulkDelete ? `Delete ${selected.size} invite${selected.size > 1 ? 's' : ''}?` : 'Delete this invite?'}</p>
+		<div class="ai__confirm-actions">
+			<button type="button" class="ai__confirm-cancel" onclick={() => { confirmBulkDelete = false; confirmDeleteId = null }}>Cancel</button>
+			<button type="button" class="ai__confirm-delete" onclick={() => confirmBulkDelete ? removeSelected() : remove(confirmDeleteId!)}>Delete</button>
 		</div>
 	</div>
+{/if}
 
-	{#if error}
-		<p class="ai__error">{error}</p>
-	{/if}
-
-	{#if confirmBulkDelete}
-		<div class="ai__confirm">
-			<p>Delete {selected.size} invite{selected.size > 1 ? 's' : ''}?</p>
-			<div class="ai__confirm-actions">
-				<button type="button" class="ai__confirm-cancel" onclick={() => { confirmBulkDelete = false }}>Cancel</button>
-				<button type="button" class="ai__confirm-delete" onclick={removeSelected}>Delete</button>
-			</div>
-		</div>
-	{/if}
-
-	{#if confirmDeleteId !== null}
-		<div class="ai__confirm">
-			<p>Delete this invite?</p>
-			<div class="ai__confirm-actions">
-				<button type="button" class="ai__confirm-cancel" onclick={() => { confirmDeleteId = null }}>Cancel</button>
-				<button type="button" class="ai__confirm-delete" onclick={() => remove(confirmDeleteId!)}>Delete</button>
-			</div>
-		</div>
-	{/if}
-
-	{#if showForm}
+{#if showForm}
+	<section class="ai__section">
+		<h3 class="ai__section-title">New invite</h3>
 		<form class="ai__form" onsubmit={(e) => { e.preventDefault(); create() }}>
 			<label class="ai__field">
-				<span>Email (optional — leave blank for anyone)</span>
+				<span class="ai__field-label">Email (optional — leave blank for anyone)</span>
 				<input type="email" class="ai__input" placeholder="friend@example.com" bind:value={email} />
 			</label>
-			<div class="ai__row">
-				<label class="ai__field ai__field--half">
-					<span>Uses</span>
+			<div class="ai__form-row">
+				<label class="ai__field">
+					<span class="ai__field-label">Uses</span>
 					<input type="number" class="ai__input" min="1" max="100" bind:value={uses} />
 				</label>
-				<label class="ai__field ai__field--half">
-					<span>Expires in (days)</span>
+				<label class="ai__field">
+					<span class="ai__field-label">Expires in (days)</span>
 					<input type="number" class="ai__input" min="1" max="365" bind:value={expiresInDays} />
 				</label>
 			</div>
@@ -152,92 +142,93 @@
 				{creating ? 'Creating...' : 'Create invite'}
 			</button>
 		</form>
-	{/if}
+	</section>
+{/if}
+
+<section class="ai__section">
+	<h3 class="ai__section-title">Active invites</h3>
 
 	{#if loading}
-		<p class="ai__loading">Loading invites...</p>
+		<p class="ai__muted">Loading...</p>
 	{:else if invites.length === 0}
-		<p class="ai__empty">No invites yet. Create one to share with friends.</p>
+		<p class="ai__muted">No invites yet. Create one to share with friends.</p>
 	{:else}
-		<div class="ai__list">
-			<div class="ai__list-header">
-				<label class="ai__checkbox-wrap">
-					<input type="checkbox" checked={selected.size === invites.length} onchange={toggleAll} />
-				</label>
-				<span class="ai__list-count">{invites.length} invite{invites.length !== 1 ? 's' : ''}</span>
+		<div class="ai__table">
+			<div class="ai__table-header">
+				<input type="checkbox" checked={selected.size === invites.length} onchange={toggleAll} />
+				<span class="ai__col ai__col--code">Code</span>
+				<span class="ai__col ai__col--email">Email</span>
+				<span class="ai__col ai__col--uses">Uses</span>
+				<span class="ai__col ai__col--expires">Expires</span>
+				<span class="ai__col ai__col--actions"></span>
 			</div>
 			{#each invites as invite}
-				<div class="ai__invite" class:ai__invite--selected={selected.has(invite.id)}>
-					<label class="ai__checkbox-wrap">
-						<input type="checkbox" checked={selected.has(invite.id)} onchange={() => toggleSelect(invite.id)} />
-					</label>
-					<div class="ai__invite-main">
-						<code class="ai__code">{invite.code}</code>
-						{#if invite.email}
-							<span class="ai__email">{invite.email}</span>
-						{/if}
-						<span class="ai__meta">
-							{invite.uses_remaining ?? '∞'} uses left · {typeof invite.times_used === 'number' ? invite.times_used : 0} used · expires {formatAdminDate(invite.expires_at)}
-						</span>
-					</div>
-					<div class="ai__invite-actions">
-						<button type="button" class="ai__icon-btn" onclick={() => copyLink(invite.code, invite.id)} title="Copy invite link">
-							{#if copiedId === invite.id}
-								<Check size={14} strokeWidth={2} />
-							{:else}
-								<Copy size={14} strokeWidth={2} />
-							{/if}
+				<div class="ai__table-row" class:ai__table-row--selected={selected.has(invite.id)}>
+					<input type="checkbox" checked={selected.has(invite.id)} onchange={() => toggleSelect(invite.id)} />
+					<span class="ai__col ai__col--code"><code>{invite.code}</code></span>
+					<span class="ai__col ai__col--email">{invite.email ?? '—'}</span>
+					<span class="ai__col ai__col--uses">{typeof invite.times_used === 'number' ? invite.times_used : 0} / {invite.uses_remaining != null ? (Number(invite.times_used ?? 0) + invite.uses_remaining) : '∞'}</span>
+					<span class="ai__col ai__col--expires">{formatAdminDate(invite.expires_at)}</span>
+					<span class="ai__col ai__col--actions">
+						<button type="button" class="ai__icon-btn" onclick={() => copyLink(invite.code, invite.id)} title="Copy link">
+							{#if copiedId === invite.id}<Check size={13} strokeWidth={2} />{:else}<Copy size={13} strokeWidth={2} />{/if}
 						</button>
-						<button type="button" class="ai__icon-btn ai__icon-btn--danger" onclick={() => { confirmDeleteId = invite.id }} title="Delete invite">
-							<Trash2 size={14} strokeWidth={2} />
+						<button type="button" class="ai__icon-btn ai__icon-btn--danger" onclick={() => { confirmDeleteId = invite.id }} title="Delete">
+							<Trash2 size={13} strokeWidth={2} />
 						</button>
-					</div>
+					</span>
 				</div>
 			{/each}
 		</div>
 	{/if}
-</div>
+</section>
 
 <style>
-	.ai__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
-	.ai__title { margin: 0; font-family: var(--font-display, var(--font-serif)); font-size: 1.3rem; font-weight: 500; }
-	.ai__header-actions { display: flex; gap: 0.4rem; }
-	.ai__create-btn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.45rem 0.85rem; border: 1px solid color-mix(in srgb, var(--text) 15%, transparent); border-radius: 0.5rem; background: transparent; color: var(--text); font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
-	.ai__create-btn:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
-	.ai__bulk-btn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.45rem 0.85rem; border: 1px solid color-mix(in srgb, #f87171 25%, transparent); border-radius: 0.5rem; background: color-mix(in srgb, #f87171 8%, transparent); color: #f87171; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 150ms; }
-	.ai__bulk-btn:hover { background: color-mix(in srgb, #f87171 15%, transparent); }
+	/* Buttons */
+	.ai__create-btn { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; background: var(--gradient-action, #7a5af8); color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+	.ai__bulk-btn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.5rem 0.85rem; border: 1px solid color-mix(in srgb, #f87171 25%, transparent); border-radius: 0.5rem; background: transparent; color: #f87171; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
 
-	.ai__error { margin: 0 0 1rem; padding: 0.5rem; border-radius: 0.5rem; background: color-mix(in srgb, #f87171 10%, transparent); border: 1px solid color-mix(in srgb, #f87171 25%, transparent); color: #f87171; font-size: 0.78rem; }
-	.ai__loading, .ai__empty { color: color-mix(in srgb, var(--text) 50%, transparent); font-size: 0.78rem; }
-
-	.ai__confirm { margin: 0 0 1rem; padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid color-mix(in srgb, #f87171 20%, transparent); background: color-mix(in srgb, #f87171 5%, transparent); }
-	.ai__confirm p { margin: 0 0 0.5rem; font-size: 0.78rem; font-weight: 600; }
+	/* Error + Confirm */
+	.ai__error { margin: 0 0 1rem; padding: 0.6rem 0.85rem; border-radius: 0.5rem; background: color-mix(in srgb, #f87171 8%, transparent); border: 1px solid color-mix(in srgb, #f87171 20%, transparent); color: #f87171; font-size: 0.78rem; }
+	.ai__confirm { margin: 0 0 1rem; padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid color-mix(in srgb, #f87171 18%, transparent); background: color-mix(in srgb, #f87171 4%, transparent); }
+	.ai__confirm p { margin: 0 0 0.5rem; font-size: 0.82rem; font-weight: 600; }
 	.ai__confirm-actions { display: flex; gap: 0.4rem; justify-content: flex-end; }
-	.ai__confirm-cancel { padding: 0.35rem 0.75rem; border: 1px solid color-mix(in srgb, var(--text) 15%, transparent); border-radius: 0.5rem; background: transparent; color: var(--text); font: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
-	.ai__confirm-delete { padding: 0.35rem 0.75rem; border: none; border-radius: 0.5rem; background: #f87171; color: #fff; font: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+	.ai__confirm-cancel { padding: 0.4rem 0.85rem; border: 1px solid color-mix(in srgb, var(--text) 15%, transparent); border-radius: 0.5rem; background: transparent; color: var(--text); font: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+	.ai__confirm-delete { padding: 0.4rem 0.85rem; border: none; border-radius: 0.5rem; background: #f87171; color: #fff; font: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
 
-	.ai__form { display: grid; gap: 0.75rem; padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; margin-bottom: 1.25rem; }
+	/* Sections */
+	.ai__section { margin-bottom: 1.5rem; }
+	.ai__section-title { margin: 0 0 0.65rem; font-family: var(--font-display, var(--font-serif)); font-size: 1.15rem; font-weight: 500; letter-spacing: -0.02em; }
+	.ai__muted { color: color-mix(in srgb, var(--text) 45%, transparent); font-size: 0.82rem; }
+
+	/* Create form */
+	.ai__form { display: grid; gap: 0.75rem; padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; background: color-mix(in srgb, var(--text) 2%, transparent); }
+	.ai__form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 	.ai__field { display: grid; gap: 0.25rem; }
-	.ai__field > span { font-size: 0.68rem; font-weight: 600; color: color-mix(in srgb, var(--text) 60%, transparent); }
-	.ai__field--half { flex: 1; }
-	.ai__row { display: flex; gap: 0.75rem; }
-	.ai__input { padding: 0.45rem 0.65rem; border: 1px solid color-mix(in srgb, var(--text) 15%, transparent); border-radius: 0.5rem; background: transparent; color: var(--text); font: inherit; font-size: 0.78rem; }
-	.ai__input:focus { outline: none; border-color: color-mix(in srgb, var(--text) 35%, transparent); }
-	.ai__submit { padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; background: var(--gradient-action, #7a5af8); color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+	.ai__field-label { font-size: 0.72rem; font-weight: 600; color: color-mix(in srgb, var(--text) 55%, transparent); }
+	.ai__input { padding: 0.5rem 0.7rem; border: 1px solid color-mix(in srgb, var(--text) 14%, transparent); border-radius: 0.5rem; background: transparent; color: var(--text); font: inherit; font-size: 0.82rem; }
+	.ai__input:focus { outline: none; border-color: color-mix(in srgb, var(--text) 30%, transparent); }
+	.ai__submit { padding: 0.55rem 1rem; border: none; border-radius: 0.5rem; background: var(--gradient-action, #7a5af8); color: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
 	.ai__submit:disabled { opacity: 0.5; }
 
-	.ai__list { display: grid; gap: 0; }
-	.ai__list-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.75rem; }
-	.ai__list-count { font-size: 0.62rem; font-weight: 600; color: color-mix(in srgb, var(--text) 40%, transparent); text-transform: uppercase; letter-spacing: 0.04em; }
-	.ai__checkbox-wrap { display: flex; align-items: center; flex-shrink: 0; }
-	.ai__invite { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.75rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.5rem; margin-top: -1px; transition: background 150ms; }
-	.ai__invite--selected { background: color-mix(in srgb, var(--text) 4%, transparent); }
-	.ai__invite-main { display: grid; gap: 0.1rem; flex: 1; min-width: 0; }
-	.ai__code { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; }
-	.ai__email { font-size: 0.68rem; color: color-mix(in srgb, var(--text) 55%, transparent); }
-	.ai__meta { font-size: 0.58rem; color: color-mix(in srgb, var(--text) 40%, transparent); }
-	.ai__invite-actions { display: flex; gap: 0.25rem; flex-shrink: 0; }
-	.ai__icon-btn { padding: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; background: transparent; color: color-mix(in srgb, var(--text) 45%, transparent); cursor: pointer; display: flex; transition: all 150ms; font: inherit; }
-	.ai__icon-btn:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 22%, transparent); }
+	/* Table */
+	.ai__table { border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; overflow: hidden; }
+	.ai__table-header, .ai__table-row { display: grid; grid-template-columns: 2rem 1fr 1fr 5rem 6rem 4.5rem; gap: 0.5rem; align-items: center; padding: 0.5rem 0.75rem; }
+	.ai__table-header { background: color-mix(in srgb, var(--text) 4%, transparent); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: color-mix(in srgb, var(--text) 45%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--text) 8%, transparent); }
+	.ai__table-row { font-size: 0.78rem; border-top: 1px solid color-mix(in srgb, var(--text) 6%, transparent); transition: background 150ms; }
+	.ai__table-row:first-child { border-top: none; }
+	.ai__table-row--selected { background: color-mix(in srgb, var(--text) 3%, transparent); }
+	.ai__col--code code { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em; }
+	.ai__col--email { color: color-mix(in srgb, var(--text) 55%, transparent); font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; }
+	.ai__col--uses { font-size: 0.72rem; color: color-mix(in srgb, var(--text) 60%, transparent); font-variant-numeric: tabular-nums; }
+	.ai__col--expires { font-size: 0.72rem; color: color-mix(in srgb, var(--text) 50%, transparent); }
+	.ai__col--actions { display: flex; gap: 0.2rem; justify-content: flex-end; }
+	.ai__icon-btn { padding: 0.3rem; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); border-radius: 0.5rem; background: transparent; color: color-mix(in srgb, var(--text) 40%, transparent); cursor: pointer; display: flex; transition: all 150ms; font: inherit; }
+	.ai__icon-btn:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 20%, transparent); }
 	.ai__icon-btn--danger:hover { color: #f87171; border-color: color-mix(in srgb, #f87171 25%, transparent); }
+
+	@media (max-width: 720px) {
+		.ai__table-header, .ai__table-row { grid-template-columns: 2rem 1fr 4rem 4rem; }
+		.ai__col--email, .ai__col--expires { display: none; }
+	}
 </style>
