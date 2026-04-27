@@ -112,15 +112,15 @@ export const journalImageManifest = {
 		"fallbackSrc": "/journal/2011/08/webgl-music-box/images/generated/hero-640.webp"
 	},
 	"/journal/2011/10/background-generator/images/hero.jpeg": {
-		"width": 750,
-		"height": 468,
+		"width": 1,
+		"height": 1,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/10/background-generator/images/generated/hero-640.webp 640w",
-			"defaultSrc": "/journal/2011/10/background-generator/images/generated/hero-640.webp"
+			"srcset": "/journal/2011/10/background-generator/images/generated/hero-1.webp 1w",
+			"defaultSrc": "/journal/2011/10/background-generator/images/generated/hero-1.webp"
 		},
-		"fallbackSrc": "/journal/2011/10/background-generator/images/generated/hero-640.webp"
+		"fallbackSrc": "/journal/2011/10/background-generator/images/generated/hero-1.webp"
 	},
 	"/journal/2011/10/color-accessibility-on-digital-displays/images/hero.png": {
 		"width": 750,
@@ -145,15 +145,15 @@ export const journalImageManifest = {
 		"fallbackSrc": "/journal/2011/10/colrd-gradient-creator/images/generated/hero-640.webp"
 	},
 	"/journal/2011/10/portlandia-foods-uploader/images/hero.jpeg": {
-		"width": 750,
-		"height": 548,
+		"width": 1,
+		"height": 1,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-640.webp 640w",
-			"defaultSrc": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-640.webp"
+			"srcset": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-1.webp 1w",
+			"defaultSrc": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-1.webp"
 		},
-		"fallbackSrc": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-640.webp"
+		"fallbackSrc": "/journal/2011/10/portlandia-foods-uploader/images/generated/hero-1.webp"
 	},
 	"/journal/2011/11/base64-soundfonts/images/hero.webp": {
 		"width": 1344,
@@ -200,26 +200,26 @@ export const journalImageManifest = {
 		"fallbackSrc": "/journal/2011/11/colrd-image-dna/images/generated/hero-640.webp"
 	},
 	"/journal/2011/11/portland-ketchup/images/hero.jpeg": {
-		"width": 750,
-		"height": 970,
+		"width": 1,
+		"height": 1,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/11/portland-ketchup/images/generated/hero-640.webp 640w",
-			"defaultSrc": "/journal/2011/11/portland-ketchup/images/generated/hero-640.webp"
+			"srcset": "/journal/2011/11/portland-ketchup/images/generated/hero-1.webp 1w",
+			"defaultSrc": "/journal/2011/11/portland-ketchup/images/generated/hero-1.webp"
 		},
-		"fallbackSrc": "/journal/2011/11/portland-ketchup/images/generated/hero-640.webp"
+		"fallbackSrc": "/journal/2011/11/portland-ketchup/images/generated/hero-1.webp"
 	},
 	"/journal/2011/11/print-ready-graphics-in-canvas/images/hero.jpeg": {
-		"width": 750,
-		"height": 1014,
+		"width": 1,
+		"height": 1,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-640.webp 640w",
-			"defaultSrc": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-640.webp"
+			"srcset": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-1.webp 1w",
+			"defaultSrc": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-1.webp"
 		},
-		"fallbackSrc": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-640.webp"
+		"fallbackSrc": "/journal/2011/11/print-ready-graphics-in-canvas/images/generated/hero-1.webp"
 	},
 	"/journal/2011/12/color-piano/images/hero.png": {
 		"width": 750,
@@ -319,5 +319,313 @@ export const journalImageManifest = {
 			"defaultSrc": "/journal/2026/04/color-piano-reintroduced/images/generated/hero-1600.webp"
 		},
 		"fallbackSrc": "/journal/2026/04/color-piano-reintroduced/images/generated/hero-1600.webp"
+	},
+	"/journal/2006/03/mad-bomber-w-audio/images/526714268_26e4d25818_m.jpg": {
+		"width": 240,
+		"height": 180,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-240.webp 240w",
+			"defaultSrc": "/journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-240.webp"
+		},
+		"fallbackSrc": "/journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-240.webp"
+	},
+	"/journal/2007/02/sphere-widget/images/colortheory.jpeg": {
+		"width": 100,
+		"height": 100,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2007/02/sphere-widget/images/generated/colortheory-100.webp 100w",
+			"defaultSrc": "/journal/2007/02/sphere-widget/images/generated/colortheory-100.webp"
+		},
+		"fallbackSrc": "/journal/2007/02/sphere-widget/images/generated/colortheory-100.webp"
+	},
+	"/journal/2007/03/piano-theory-widget/images/Screen-shot-2010-08-25-at-11.29.30-PM.png": {
+		"width": 548,
+		"height": 155,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2007/03/piano-theory-widget/images/generated/Screen-shot-2010-08-25-at-11.29.30-PM-320.webp 320w",
+			"defaultSrc": "/journal/2007/03/piano-theory-widget/images/generated/Screen-shot-2010-08-25-at-11.29.30-PM-320.webp"
+		},
+		"fallbackSrc": "/journal/2007/03/piano-theory-widget/images/generated/Screen-shot-2010-08-25-at-11.29.30-PM-320.webp"
+	},
+	"/journal/2007/03/sphere-plugin/images/dhtml+color+sphere.png": {
+		"width": 150,
+		"height": 165,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2007/03/sphere-plugin/images/generated/dhtml+color+sphere-150.webp 150w",
+			"defaultSrc": "/journal/2007/03/sphere-plugin/images/generated/dhtml+color+sphere-150.webp"
+		},
+		"fallbackSrc": "/journal/2007/03/sphere-plugin/images/generated/dhtml+color+sphere-150.webp"
+	},
+	"/journal/2009/10/sketchpad-beta/images/13.webp": {
+		"width": 910,
+		"height": 636,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2009/10/sketchpad-beta/images/generated/13-320.webp 320w, /journal/2009/10/sketchpad-beta/images/generated/13-640.webp 640w",
+			"defaultSrc": "/journal/2009/10/sketchpad-beta/images/generated/13-640.webp"
+		},
+		"fallbackSrc": "/journal/2009/10/sketchpad-beta/images/generated/13-640.webp"
+	},
+	"/journal/2010/08/dynamic-midi-generation-in-the-browser/images/midi-js-demo.png": {
+		"width": 400,
+		"height": 70,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2010/08/dynamic-midi-generation-in-the-browser/images/generated/midi-js-demo-320.webp 320w",
+			"defaultSrc": "/journal/2010/08/dynamic-midi-generation-in-the-browser/images/generated/midi-js-demo-320.webp"
+		},
+		"fallbackSrc": "/journal/2010/08/dynamic-midi-generation-in-the-browser/images/generated/midi-js-demo-320.webp"
+	},
+	"/journal/2010/08/what-can-1kb-of-javascript-do/images/BreathingGalaxies.jpeg": {
+		"width": 28,
+		"height": 28,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2010/08/what-can-1kb-of-javascript-do/images/generated/BreathingGalaxies-28.webp 28w",
+			"defaultSrc": "/journal/2010/08/what-can-1kb-of-javascript-do/images/generated/BreathingGalaxies-28.webp"
+		},
+		"fallbackSrc": "/journal/2010/08/what-can-1kb-of-javascript-do/images/generated/BreathingGalaxies-28.webp"
+	},
+	"/journal/2010/11/unicode-profiling-project/images/Screen-shot-2010-11-10-at-7.39.11-PM.png": {
+		"width": 400,
+		"height": 200,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2010/11/unicode-profiling-project/images/generated/Screen-shot-2010-11-10-at-7.39.11-PM-320.webp 320w",
+			"defaultSrc": "/journal/2010/11/unicode-profiling-project/images/generated/Screen-shot-2010-11-10-at-7.39.11-PM-320.webp"
+		},
+		"fallbackSrc": "/journal/2010/11/unicode-profiling-project/images/generated/Screen-shot-2010-11-10-at-7.39.11-PM-320.webp"
+	},
+	"/journal/2011/01/color-piano-theory/images/250px-Number_Form-colored.jpeg": {
+		"width": 334,
+		"height": 334,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2011/01/color-piano-theory/images/generated/250px-Number_Form-colored-320.webp 320w",
+			"defaultSrc": "/journal/2011/01/color-piano-theory/images/generated/250px-Number_Form-colored-320.webp"
+		},
+		"fallbackSrc": "/journal/2011/01/color-piano-theory/images/generated/250px-Number_Form-colored-320.webp"
+	},
+	"/journal/2011/03/html5-typographic-effects/images/Screen-shot-2011-05-15-at-10.57.14-PM.png": {
+		"width": 568,
+		"height": 214,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2011/03/html5-typographic-effects/images/generated/Screen-shot-2011-05-15-at-10.57.14-PM-320.webp 320w",
+			"defaultSrc": "/journal/2011/03/html5-typographic-effects/images/generated/Screen-shot-2011-05-15-at-10.57.14-PM-320.webp"
+		},
+		"fallbackSrc": "/journal/2011/03/html5-typographic-effects/images/generated/Screen-shot-2011-05-15-at-10.57.14-PM-320.webp"
+	},
+	"/journal/2011/04/globalcompositeoperation/images/Screen-shot-2011-05-14-at-10.30.24-PM.png": {
+		"width": 162,
+		"height": 152,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2011/04/globalcompositeoperation/images/generated/Screen-shot-2011-05-14-at-10.30.24-PM-162.webp 162w",
+			"defaultSrc": "/journal/2011/04/globalcompositeoperation/images/generated/Screen-shot-2011-05-14-at-10.30.24-PM-162.webp"
+		},
+		"fallbackSrc": "/journal/2011/04/globalcompositeoperation/images/generated/Screen-shot-2011-05-14-at-10.30.24-PM-162.webp"
+	},
+	"/journal/2011/07/orange-honey-epilogue/images/pastedGraphic_9.png": {
+		"width": 241,
+		"height": 234,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2011/07/orange-honey-epilogue/images/generated/pastedGraphic_9-241.webp 241w",
+			"defaultSrc": "/journal/2011/07/orange-honey-epilogue/images/generated/pastedGraphic_9-241.webp"
+		},
+		"fallbackSrc": "/journal/2011/07/orange-honey-epilogue/images/generated/pastedGraphic_9-241.webp"
+	},
+	"/journal/2011/08/colrd-color-extractor/images/Screen-Shot-2011-07-31-at-11.51.52-PM.png": {
+		"width": 1006,
+		"height": 447,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2011/08/colrd-color-extractor/images/generated/Screen-Shot-2011-07-31-at-11.51.52-PM-320.webp 320w, /journal/2011/08/colrd-color-extractor/images/generated/Screen-Shot-2011-07-31-at-11.51.52-PM-640.webp 640w",
+			"defaultSrc": "/journal/2011/08/colrd-color-extractor/images/generated/Screen-Shot-2011-07-31-at-11.51.52-PM-640.webp"
+		},
+		"fallbackSrc": "/journal/2011/08/colrd-color-extractor/images/generated/Screen-Shot-2011-07-31-at-11.51.52-PM-640.webp"
+	},
+	"/journal/2011/08/colrd-life-more-colorful/images/Screen-Shot-2011-08-14-at-9.00.14-PM.png": {
+		"width": 995,
+		"height": 566,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2011/08/colrd-life-more-colorful/images/generated/Screen-Shot-2011-08-14-at-9.00.14-PM-320.webp 320w, /journal/2011/08/colrd-life-more-colorful/images/generated/Screen-Shot-2011-08-14-at-9.00.14-PM-640.webp 640w",
+			"defaultSrc": "/journal/2011/08/colrd-life-more-colorful/images/generated/Screen-Shot-2011-08-14-at-9.00.14-PM-640.webp"
+		},
+		"fallbackSrc": "/journal/2011/08/colrd-life-more-colorful/images/generated/Screen-Shot-2011-08-14-at-9.00.14-PM-640.webp"
+	},
+	"/journal/2011/10/background-generator/images/5760241519_bf63304f0a.jpeg": {
+		"width": 28,
+		"height": 28,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2011/10/background-generator/images/generated/5760241519_bf63304f0a-28.webp 28w",
+			"defaultSrc": "/journal/2011/10/background-generator/images/generated/5760241519_bf63304f0a-28.webp"
+		},
+		"fallbackSrc": "/journal/2011/10/background-generator/images/generated/5760241519_bf63304f0a-28.webp"
+	},
+	"/journal/2011/11/bitwise-gems-and-other-optimizations/images/1320621615_emerald-theme-manager1.png": {
+		"width": 140,
+		"height": 140,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2011/11/bitwise-gems-and-other-optimizations/images/generated/1320621615_emerald-theme-manager1-140.webp 140w",
+			"defaultSrc": "/journal/2011/11/bitwise-gems-and-other-optimizations/images/generated/1320621615_emerald-theme-manager1-140.webp"
+		},
+		"fallbackSrc": "/journal/2011/11/bitwise-gems-and-other-optimizations/images/generated/1320621615_emerald-theme-manager1-140.webp"
+	},
+	"/journal/2011/11/colrd-image-dna/images/128x128.png": {
+		"width": 128,
+		"height": 128,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2011/11/colrd-image-dna/images/generated/128x128-128.webp 128w",
+			"defaultSrc": "/journal/2011/11/colrd-image-dna/images/generated/128x128-128.webp"
+		},
+		"fallbackSrc": "/journal/2011/11/colrd-image-dna/images/generated/128x128-128.webp"
+	},
+	"/journal/2012/04/color-picker/images/Screen-Shot-2012-04-28-at-12.59.58-PM.png": {
+		"width": 275,
+		"height": 270,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2012/04/color-picker/images/generated/Screen-Shot-2012-04-28-at-12.59.58-PM-275.webp 275w",
+			"defaultSrc": "/journal/2012/04/color-picker/images/generated/Screen-Shot-2012-04-28-at-12.59.58-PM-275.webp"
+		},
+		"fallbackSrc": "/journal/2012/04/color-picker/images/generated/Screen-Shot-2012-04-28-at-12.59.58-PM-275.webp"
+	},
+	"/journal/2012/07/sketch-mobile/images/Screen-Shot-2012-05-17-at-4.29.13-PM.png": {
+		"width": 1680,
+		"height": 1050,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2012/07/sketch-mobile/images/generated/Screen-Shot-2012-05-17-at-4.29.13-PM-320.webp 320w, /journal/2012/07/sketch-mobile/images/generated/Screen-Shot-2012-05-17-at-4.29.13-PM-640.webp 640w",
+			"defaultSrc": "/journal/2012/07/sketch-mobile/images/generated/Screen-Shot-2012-05-17-at-4.29.13-PM-640.webp"
+		},
+		"fallbackSrc": "/journal/2012/07/sketch-mobile/images/generated/Screen-Shot-2012-05-17-at-4.29.13-PM-640.webp"
+	},
+	"/journal/2013/07/filterstack-webcam-effects/images/unnamed1.jpg": {
+		"width": 72,
+		"height": 72,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2013/07/filterstack-webcam-effects/images/generated/unnamed1-72.webp 72w",
+			"defaultSrc": "/journal/2013/07/filterstack-webcam-effects/images/generated/unnamed1-72.webp"
+		},
+		"fallbackSrc": "/journal/2013/07/filterstack-webcam-effects/images/generated/unnamed1-72.webp"
+	},
+	"/journal/2013/07/sketchpad-3-0/images/sketch-3-copy-3.png": {
+		"width": 2048,
+		"height": 1280,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2013/07/sketchpad-3-0/images/generated/sketch-3-copy-3-320.webp 320w, /journal/2013/07/sketchpad-3-0/images/generated/sketch-3-copy-3-640.webp 640w",
+			"defaultSrc": "/journal/2013/07/sketchpad-3-0/images/generated/sketch-3-copy-3-640.webp"
+		},
+		"fallbackSrc": "/journal/2013/07/sketchpad-3-0/images/generated/sketch-3-copy-3-640.webp"
+	},
+	"/journal/2013/10/custom-print/images/Screen-Shot-2013-10-28-at-3.55.16-PM.png": {
+		"width": 889,
+		"height": 719,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2013/10/custom-print/images/generated/Screen-Shot-2013-10-28-at-3.55.16-PM-320.webp 320w, /journal/2013/10/custom-print/images/generated/Screen-Shot-2013-10-28-at-3.55.16-PM-640.webp 640w",
+			"defaultSrc": "/journal/2013/10/custom-print/images/generated/Screen-Shot-2013-10-28-at-3.55.16-PM-640.webp"
+		},
+		"fallbackSrc": "/journal/2013/10/custom-print/images/generated/Screen-Shot-2013-10-28-at-3.55.16-PM-640.webp"
+	},
+	"/journal/2014/06/made-with-code/images/bracelet-1024x512.jpg": {
+		"width": 1024,
+		"height": 512,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2014/06/made-with-code/images/generated/bracelet-1024x512-320.webp 320w, /journal/2014/06/made-with-code/images/generated/bracelet-1024x512-640.webp 640w",
+			"defaultSrc": "/journal/2014/06/made-with-code/images/generated/bracelet-1024x512-640.webp"
+		},
+		"fallbackSrc": "/journal/2014/06/made-with-code/images/generated/bracelet-1024x512-640.webp"
+	},
+	"/journal/2015/02/sketchpad-3-7/images/Sketchpad-5-copy.jpg": {
+		"width": 72,
+		"height": 72,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2015/02/sketchpad-3-7/images/generated/Sketchpad-5-copy-72.webp 72w",
+			"defaultSrc": "/journal/2015/02/sketchpad-3-7/images/generated/Sketchpad-5-copy-72.webp"
+		},
+		"fallbackSrc": "/journal/2015/02/sketchpad-3-7/images/generated/Sketchpad-5-copy-72.webp"
+	},
+	"/journal/2015/10/c-a-r-d-s-project/images/perlin-noise_19805217380_o.png": {
+		"width": 1772,
+		"height": 882,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2015/10/c-a-r-d-s-project/images/generated/perlin-noise_19805217380_o-320.webp 320w, /journal/2015/10/c-a-r-d-s-project/images/generated/perlin-noise_19805217380_o-640.webp 640w",
+			"defaultSrc": "/journal/2015/10/c-a-r-d-s-project/images/generated/perlin-noise_19805217380_o-640.webp"
+		},
+		"fallbackSrc": "/journal/2015/10/c-a-r-d-s-project/images/generated/perlin-noise_19805217380_o-640.webp"
+	},
+	"/journal/2016/06/sketchpad-4-0/images/120e5b61-e808-4ffa-bcfd-b06b2d188479-2.jpeg": {
+		"width": 1,
+		"height": 1,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2016/06/sketchpad-4-0/images/generated/120e5b61-e808-4ffa-bcfd-b06b2d188479-2-1.webp 1w",
+			"defaultSrc": "/journal/2016/06/sketchpad-4-0/images/generated/120e5b61-e808-4ffa-bcfd-b06b2d188479-2-1.webp"
+		},
+		"fallbackSrc": "/journal/2016/06/sketchpad-4-0/images/generated/120e5b61-e808-4ffa-bcfd-b06b2d188479-2-1.webp"
+	},
+	"/journal/2017/01/sketchpad-4-1/images/Sketchpad-12-copy-2.jpg": {
+		"width": 72,
+		"height": 72,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2017/01/sketchpad-4-1/images/generated/Sketchpad-12-copy-2-72.webp 72w",
+			"defaultSrc": "/journal/2017/01/sketchpad-4-1/images/generated/Sketchpad-12-copy-2-72.webp"
+		},
+		"fallbackSrc": "/journal/2017/01/sketchpad-4-1/images/generated/Sketchpad-12-copy-2-72.webp"
+	},
+	"/journal/2018/01/sketchpad-5-0/images/Screen-Shot-2017-08-14-at-4.31.34-PM_1200x800.png": {
+		"width": 1200,
+		"height": 800,
+		"sizes": "160px",
+		"webp": {
+			"type": "image/webp",
+			"srcset": "/journal/2018/01/sketchpad-5-0/images/generated/Screen-Shot-2017-08-14-at-4.31.34-PM_1200x800-320.webp 320w, /journal/2018/01/sketchpad-5-0/images/generated/Screen-Shot-2017-08-14-at-4.31.34-PM_1200x800-640.webp 640w",
+			"defaultSrc": "/journal/2018/01/sketchpad-5-0/images/generated/Screen-Shot-2017-08-14-at-4.31.34-PM_1200x800-640.webp"
+		},
+		"fallbackSrc": "/journal/2018/01/sketchpad-5-0/images/generated/Screen-Shot-2017-08-14-at-4.31.34-PM_1200x800-640.webp"
 	}
 } as const

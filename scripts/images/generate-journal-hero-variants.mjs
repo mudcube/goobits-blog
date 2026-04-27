@@ -8,6 +8,7 @@ const JOURNAL_DIR = path.join(ROOT, 'static', 'journal')
 const OUTPUT_DIR_NAME = 'generated'
 const OUTPUT_BASENAME = 'hero'
 const WIDTH_CANDIDATES = [640, 960, 1280, 1600]
+const COVER_WIDTH_CANDIDATES = [320, 640]
 const MANIFEST_PATH = path.join(ROOT, 'packages', 'blog-theme-miko', 'utils', 'generated', 'journal-image-manifest.ts')
 
 async function walk(dir) {
@@ -38,7 +39,7 @@ function hasCommand(command, args = ['--version']) {
 async function canGenerateVariants() {
 	const missing = []
 	if (!hasCommand('file')) missing.push('file')
-	if (!hasCommand('ffmpeg')) missing.push('ffmpeg')
+	if (!hasCommand('ffmpeg', ['-version'])) missing.push('ffmpeg')
 
 	if (missing.length === 0) return true
 
@@ -119,6 +120,31 @@ async function emptyGeneratedDirs(heroSources) {
 	}
 }
 
+function parseFrontmatterCoverImage(markdownPath) {
+	try {
+		const content = execFileSync('head', ['-30', markdownPath], { encoding: 'utf8' })
+		const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---/)
+		if (!fmMatch) return null
+
+		const fm = fmMatch[1]
+
+		// Match coverImage, image.src, or thumbnail.src
+		const coverMatch = fm.match(/coverImage:\s*["']?([^\s"'\n]+)["']?/)
+		const imageMatch = fm.match(/image:\s*\n\s+src:\s*["']?([^\s"'\n]+)["']?/)
+		const thumbMatch = fm.match(/thumbnail:\s*\n\s+src:\s*["']?([^\s"'\n]+)["']?/)
+
+		return thumbMatch?.[1] || imageMatch?.[1] || coverMatch?.[1] || null
+	} catch {
+		return null
+	}
+}
+
+function createCoverOutputPath(sourcePath, width) {
+	const outputDir = path.join(path.dirname(sourcePath), OUTPUT_DIR_NAME)
+	const baseName = path.basename(sourcePath, path.extname(sourcePath))
+	return path.join(outputDir, `${baseName}-${width}.webp`)
+}
+
 async function run() {
 	if (!(await canGenerateVariants())) return
 
@@ -127,10 +153,36 @@ async function run() {
 		.filter((file) => /\/images\/hero\.(png|jpe?g|webp)$/i.test(toPosix(file)))
 		.sort()
 
-	await emptyGeneratedDirs(heroSources)
+	// Find cover images from frontmatter that aren't hero files
+	const markdownFiles = files.filter((file) => file.endsWith('/index.md'))
+	const coverSources = []
+	const heroSourceSet = new Set(heroSources.map(toPosix))
+
+	for (const mdPath of markdownFiles) {
+		const coverRef = parseFrontmatterCoverImage(mdPath)
+		if (!coverRef) continue
+
+		const postDir = path.dirname(mdPath)
+		const coverPath = path.join(postDir, coverRef)
+		const coverPosix = toPosix(coverPath)
+
+		// Skip if this is already a hero file or doesn't exist
+		if (heroSourceSet.has(coverPosix)) continue
+		if (!/\.(png|jpe?g|webp|gif)$/i.test(coverRef)) continue
+
+		try {
+			await fs.access(coverPath)
+			coverSources.push(coverPath)
+		} catch {
+			// File doesn't exist, skip
+		}
+	}
+
+	await emptyGeneratedDirs([...heroSources, ...coverSources])
 
 	const manifest = {}
 
+	// Generate hero variants (full sizes for detail pages)
 	for (const sourcePath of heroSources) {
 		const { width, height } = getImageDimensions(sourcePath)
 		const targetWidths = getEligibleWidths(width)
@@ -161,10 +213,43 @@ async function run() {
 		}
 	}
 
+	// Generate cover image variants (thumbnail sizes for listing pages)
+	for (const sourcePath of coverSources) {
+		const { width, height } = getImageDimensions(sourcePath)
+		const targetWidths = COVER_WIDTH_CANDIDATES.filter((w) => w <= width)
+		if (targetWidths.length === 0) targetWidths.push(width)
+		const outputs = []
+		const outputDir = path.join(path.dirname(sourcePath), OUTPUT_DIR_NAME)
+
+		await fs.mkdir(outputDir, { recursive: true })
+
+		for (const targetWidth of targetWidths) {
+			const outputPath = createCoverOutputPath(sourcePath, targetWidth)
+			generateWebpVariant(sourcePath, targetWidth, outputPath)
+			outputs.push({
+				src: toPublicPath(outputPath),
+				width: targetWidth
+			})
+		}
+
+		manifest[toPublicPath(sourcePath)] = {
+			width,
+			height,
+			sizes: '160px',
+			webp: {
+				type: 'image/webp',
+				srcset: outputs.map((entry) => `${entry.src} ${entry.width}w`).join(', '),
+				defaultSrc: outputs[outputs.length - 1].src
+			},
+			fallbackSrc: outputs[outputs.length - 1].src
+		}
+	}
+
 	await fs.mkdir(path.dirname(MANIFEST_PATH), { recursive: true })
 	await fs.writeFile(MANIFEST_PATH, buildManifestModule(manifest), 'utf8')
 
-	console.log(`Generated journal hero variants for ${heroSources.length} source image(s).`)
+	const total = heroSources.length + coverSources.length
+	console.log(`Generated journal image variants for ${total} source image(s) (${heroSources.length} hero, ${coverSources.length} cover).`)
 	console.log(`Manifest: ${toPosix(path.relative(ROOT, MANIFEST_PATH))}`)
 }
 
