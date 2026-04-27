@@ -134,6 +134,6 @@
 </div>
 
 <style>
-	.ac { --cg-accent: var(--admin-accent, #a78bfa); }
+	.ac { --cg-accent: var(--admin-accent, #a78bfa); padding: 1rem; border: 1px solid var(--admin-card-border); border-radius: 0.875rem; background: var(--admin-card-bg); }
 	.ac--compact { font-size: 0.9em; }
 </style>
