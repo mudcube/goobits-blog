@@ -6,6 +6,7 @@
 		CalendarPlus,
 		Eye,
 		Pencil,
+		Send,
 		Settings,
 		Trash2,
 		UserPlus
@@ -85,6 +86,16 @@
 			onclick={(event) => $adminActionHandlers.onCrewCreateInvite?.(crewInvitePayload(event))}
 		>
 			Create Invite
+		</AdminActionButton>
+	{/if}
+
+	{#if actions.includes('create-invite')}
+		<AdminActionButton
+			variant="primary"
+			icon={Send}
+			onclick={() => $adminActionHandlers.onInvitesCreateInvite?.()}
+		>
+			New Invite
 		</AdminActionButton>
 	{/if}
 

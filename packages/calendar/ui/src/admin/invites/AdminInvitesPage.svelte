@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Copy, Plus, Trash2, Check, Ticket } from '@lucide/svelte'
+	import { onMount } from 'svelte'
+	import { Copy, Trash2, Check, Ticket } from '@lucide/svelte'
 	import AdminPageHero from '../shared/AdminPageHero.svelte'
 	import AdminMetaCards from '../shared/AdminMetaCards.svelte'
 	import {
@@ -8,6 +9,7 @@
 		deleteCalendarInvite,
 	} from '../../api/calendar'
 	import { buildInviteLink, formatAdminDate, DEFAULT_INVITE_DRAFT } from '../shared/admin'
+	import { adminActionHandlers } from '../shell/state'
 	import type { CalendarAdminInvite } from '../../api/calendar'
 
 	let invites = $state<CalendarAdminInvite[]>([])
@@ -81,21 +83,28 @@
 	})))
 
 	$effect(() => { loadInvites() })
+
+	onMount(() => {
+		adminActionHandlers.update((handlers) => ({
+			...handlers,
+			onInvitesCreateInvite: () => { showForm = !showForm }
+		}))
+		return () => {
+			adminActionHandlers.update((handlers) => {
+				const next = { ...handlers }
+				delete next.onInvitesCreateInvite
+				return next
+			})
+		}
+	})
 </script>
 
 <div class="admin-content">
 	<AdminPageHero
 		eyebrow="Sharing"
 		title="Invites"
-		subtitle="Create invite codes to share with friends. They can join instantly without creating an account."
-	>
-		{#snippet actions()}
-			<button type="button" class="admin-ui-btn admin-ui-btn--primary" onclick={() => { showForm = !showForm }}>
-				<Plus size={14} strokeWidth={2.2} />
-				Create invite
-			</button>
-		{/snippet}
-	</AdminPageHero>
+		subtitle="Share invite links so friends can join instantly."
+	/>
 
 	{#if error}
 		<div class="ai__notice ai__notice--error">{error}</div>
@@ -136,7 +145,7 @@
 		</div>
 	{/if}
 
-	<h4>Active invites</h4>
+	<h4>ACTIVE INVITES</h4>
 
 	{#if loading}
 		<p class="ai__muted">Loading...</p>
@@ -149,8 +158,6 @@
 </div>
 
 <style>
-	h4 { margin: 1.25rem 0 0.5rem; font-family: var(--font-display, var(--font-serif)); font-size: 1.05rem; font-weight: 500; letter-spacing: -0.01em; }
-
 	.ai__notice { margin: 0 0 1rem; padding: 0.65rem 0.85rem; border-radius: 0.875rem; font-size: 0.82rem; }
 	.ai__notice--error { background: color-mix(in srgb, #f87171 8%, transparent); border: 1px solid color-mix(in srgb, #f87171 18%, transparent); color: #f87171; }
 	.ai__notice--warn { background: color-mix(in srgb, #f87171 4%, transparent); border: 1px solid color-mix(in srgb, #f87171 14%, transparent); }

@@ -201,12 +201,14 @@ $admin-mobile-breakpoint: 820px;
 }
 
 .social-admin .admin-content {
+  display: grid;
+  gap: 1rem;
   width: 100%;
   max-width: var(--admin-content-max);
 }
 
 .social-admin .admin-content > h4 {
-  margin: 0 0 0.35rem;
+  margin: 0;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   font-weight: 700;

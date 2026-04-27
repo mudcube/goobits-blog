@@ -13,6 +13,7 @@ export type AdminRouteActionId =
 	| 'new-event'
 	| 'back-to-events'
 	| 'crew-invite'
+	| 'create-invite'
 	| 'view-calendar'
 	| 'event-edit'
 	| 'event-cancel'
@@ -168,7 +169,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 			currentSection: 'invites',
 			title: 'Invites',
 			breadcrumbs: [...baseCrumbs, { label: 'Invites' }],
-			actions: []
+			actions: ['create-invite']
 		}
 	}
 

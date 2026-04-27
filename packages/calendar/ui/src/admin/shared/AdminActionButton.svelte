@@ -22,11 +22,13 @@
 		onclick?: ((event: MouseEvent) => void) | undefined
 		children?: Snippet
 	} = $props()
+
+	const iconOnly = $derived(Icon && !children)
 </script>
 
 {#if href}
 	<a
-		class={`admin-ui-btn admin-ui-btn--${variant} admin-action-btn admin-action-btn--${variant} ${disabled ? 'admin-action-btn--disabled' : ''}`}
+		class={`admin-ui-btn admin-ui-btn--${variant} admin-action-btn admin-action-btn--${variant} ${iconOnly ? 'admin-action-btn--icon-only' : ''} ${disabled ? 'admin-action-btn--disabled' : ''}`}
 		aria-label={ariaLabel}
 		aria-disabled={disabled}
 		href={disabled ? undefined : href}
@@ -39,7 +41,7 @@
 		{@render children?.()}
 	</a>
 {:else}
-	<button class={`admin-ui-btn admin-ui-btn--${variant} admin-action-btn admin-action-btn--${variant}`} {type} {disabled} aria-label={ariaLabel} {onclick}>
+	<button class={`admin-ui-btn admin-ui-btn--${variant} admin-action-btn admin-action-btn--${variant} ${iconOnly ? 'admin-action-btn--icon-only' : ''}`} {type} {disabled} aria-label={ariaLabel} {onclick}>
 		{#if Icon}<Icon size={iconSize} strokeWidth={2} />{/if}
 		{@render children?.()}
 	</button>
@@ -58,6 +60,11 @@
 			flex-shrink: 0;
 			vector-effect: non-scaling-stroke;
 			shape-rendering: geometricPrecision;
+		}
+
+		&.admin-action-btn--icon-only {
+			width: 32px;
+			padding: 0;
 		}
 
 		&.admin-action-btn--disabled {

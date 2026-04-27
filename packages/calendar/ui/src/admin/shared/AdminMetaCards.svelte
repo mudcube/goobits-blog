@@ -48,12 +48,21 @@
 				{#if item.actions?.length}
 					<div class="admin-meta-cards__actions">
 						{#each item.actions as action}
+							{#if action.label}
 							<AdminActionButton
 								variant={action.variant || 'subtle'}
 								icon={action.icon}
 								ariaLabel={action.ariaLabel}
 								onclick={action.onclick}
-							>{action.label || ''}</AdminActionButton>
+							>{action.label}</AdminActionButton>
+						{:else}
+							<AdminActionButton
+								variant={action.variant || 'subtle'}
+								icon={action.icon}
+								ariaLabel={action.ariaLabel}
+								onclick={action.onclick}
+							/>
+						{/if}
 						{/each}
 					</div>
 				{/if}

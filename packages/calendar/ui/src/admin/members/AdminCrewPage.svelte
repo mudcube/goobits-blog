@@ -531,10 +531,7 @@
 {/if}
 
 <style>
-	.social-crew {
-		display: grid;
-		gap: 1rem;
-	}
+	/* Layout handled by parent .admin-content grid */
 
 	.social-crew__list {
 		display: grid;
