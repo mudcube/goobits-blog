@@ -58,7 +58,7 @@
 		if (!selectedDay) return null
 		return weather.getDay(selectedDay.date.toISOString().split('T')[0]!)
 	})
-	const HOURLY = $derived(dayWeather?.hourly ?? [])
+	const HOURLY = $derived((dayWeather?.hourly ?? []) as import('@calendar/ui').HourlyWeather[])
 	const hasAnyRain = $derived(HOURLY.some(w => w.precipitation > 0))
 
 	let calYear = $state(new Date().getFullYear())

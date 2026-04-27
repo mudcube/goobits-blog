@@ -3,7 +3,7 @@
 	import { Lightbulb } from '@lucide/svelte'
 	import { onMount } from 'svelte'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
-	import AdminCalendarWidget from '../../dashboard/AdminCalendarWidget.svelte'
+	import AdminCalendar from '../../dashboard/AdminCalendar.svelte'
 	import ProgramDayPopover from './ProgramDayPopover.svelte'
 	import ProgramSettingsDrawer from './ProgramSettingsDrawer.svelte'
 	import { getAdminMockCatalog } from '../../mock/catalog'
@@ -688,16 +688,16 @@
 						</div>
 					</section>
 
-					<AdminCalendarWidget
+					<AdminCalendar
 						{currentMonth}
 						selectedDateIso={selectedDayDate ? isoDay(selectedDayDate) : null}
 						onPrev={prevMonth}
 						onNext={nextMonth}
-						onSelect={(date: Date, element: HTMLButtonElement) => openDay(date, element)}
+						onSelect={(date, element) => openDay(date, element)}
 						{isPast}
 						{isToday}
-						isActive={(date: Date) => !!activeDays[isoDay(date)]}
-						eventCount={(date: Date) => activeDays[isoDay(date)]?.count || 0}
+						isActive={(date) => !!activeDays[isoDay(date)]}
+						eventCount={(date) => activeDays[isoDay(date)]?.count || 0}
 						eventTone={() => slug}
 						compact={true}
 					/>

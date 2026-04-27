@@ -15,8 +15,8 @@
 		weekdays: string[]
 		monthLabel?: string
 		selectedDate?: Date | null
-		prevMonth?: () => void
-		nextMonth?: () => void
+		prevMonth?: (() => void) | undefined
+		nextMonth?: (() => void) | undefined
 		onSelect?: (day: CalendarDay, element: HTMLButtonElement) => void
 	} = $props()
 

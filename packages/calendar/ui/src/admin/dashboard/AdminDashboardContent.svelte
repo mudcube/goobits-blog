@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AdminCalendarWidget from '@calendar/ui/admin/dashboard/AdminCalendarWidget.svelte'
+	import AdminCalendar from '@calendar/ui/admin/dashboard/AdminCalendar.svelte'
 	import AdminDashboardTodayTimeline from '@calendar/ui/admin/dashboard/AdminDashboardTodayTimeline.svelte'
 	import AdminDashboardRecentFeed from '@calendar/ui/admin/dashboard/AdminDashboardRecentFeed.svelte'
 	import { ChevronRowCard } from '@calendar/ui/shared'
@@ -98,7 +98,7 @@
 	<AdminDashboardTodayTimeline {events} {onOpenEvent} />
 	<AdminDashboardRecentFeed {recentEvents} {mockMode} />
 
-	<AdminCalendarWidget
+	<AdminCalendar
 		currentMonth={currentMonth}
 		selectedDateIso={selectedDateIso}
 		onPrev={prevMonth}
