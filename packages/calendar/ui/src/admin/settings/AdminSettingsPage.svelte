@@ -741,7 +741,7 @@
 
   .admin-settings__sync-list {
     display: grid;
-    gap: 0.55rem;
+    gap: 0.5rem;
   }
 
   .admin-settings__sync-top-actions {
@@ -768,11 +768,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.62rem 0.72rem;
+    gap: 0.875rem;
+    padding: 0.75rem 0.875rem;
     border: 1px solid var(--admin-card-border);
-    background: color-mix(in srgb, var(--admin-card-bg) 88%, var(--bg) 12%);
-    border-radius: 0.75rem;
+    background: var(--admin-card-bg);
+    border-radius: 0.875rem;
   }
 
   .admin-settings__sync-action {
@@ -840,19 +840,18 @@
   .admin-settings__platform-options {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.45rem;
+    gap: 0.5rem;
   }
 
   .admin-settings__platform-option {
     position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 0.42rem;
-    min-height: 2.05rem;
-    padding: 0 0.62rem;
-    border-radius: 0.75rem;
+    gap: 0.5rem;
+    padding: 0.75rem 0.875rem;
+    border-radius: 0.875rem;
     border: 1px solid var(--admin-card-border);
-    background: color-mix(in srgb, var(--admin-card-bg) 86%, var(--bg) 14%);
+    background: var(--admin-card-bg);
     color: color-mix(in srgb, var(--text) 70%, transparent);
     cursor: pointer;
     transition:
@@ -900,13 +899,13 @@
 
   .admin-settings__payment-cards {
     display: grid;
-    gap: 0.55rem;
+    gap: 0.5rem;
   }
 
   .admin-settings__payment-card {
     border: 1px solid var(--admin-card-border);
-    background: color-mix(in srgb, var(--admin-card-bg) 86%, var(--bg) 14%);
-    border-radius: 0.75rem;
+    background: var(--admin-card-bg);
+    border-radius: 0.875rem;
     overflow: clip;
   }
 
@@ -917,12 +916,11 @@
 
   .admin-settings__payment-toggle {
     width: 100%;
-    min-height: 2.4rem;
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.55rem 0.7rem;
+    gap: 0.875rem;
+    padding: 0.75rem 0.875rem;
     border: none;
     background: transparent;
     color: inherit;
