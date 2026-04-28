@@ -1,5 +1,5 @@
 ---
-title: "Be Here Meow 1.0"
+title: "Be Here Meow v1.0"
 date: "2024-07-29"
 categories:
   - "apps"
@@ -8,26 +8,39 @@ tags:
   - "journaling"
   - "mindfulness"
 coverImage: "images/hero.jpeg"
-excerpt: "A retrospective on launching Be Here Meow, a mindful journaling companion shaped around calm, reflection, and gentle AI support."
+excerpt: "Pause, reflect, and discover calm."
 ---
 
-Released July 29, 2024. Last year I launched [Be Here Meow](https://beheremeow.app/), a mindful journaling companion built around a simple idea: reflection software should help you slow down, not speed up.
+<script>
+	import { Lede, PullQuote, Divider, Byline } from '@goobits/blog/ui/elements'
+</script>
 
-The goal was never to make another blank notes app. I wanted something softer and more intentional. Be Here Meow was designed to support morning and evening reflections, gratitude practice, dream journaling, and a calmer relationship with your own thoughts. The interface leans warm and gentle, but under the hood the project pushed into some of the areas I care about most: structured writing flows, private personal archives, and AI features that feel supportive instead of noisy.
+<Lede>A quiet place to put your thoughts and occasionally be surprised by what comes back.</Lede>
 
-The first public release already included a surprisingly ambitious set of tools:
+Be Here Meow is officially here. After months of building, testing, and listening to the kind people who walked through beta with us, we're stepping into v1.0. If you're new, welcome. If you've been with us since the beginning, thank you for staying.
 
-- AI-generated insights for entries
-- AI-generated imagery based on journal writing
-- AI-generated haiku and dream interpretation
-- Editable entry titles
-- Light and dark themes
-- Export support for your journal data
+Here's what you'll find inside.
 
-What made the project feel real to me was not just the feature list, but the shape of the product. It had a point of view. The app was built to feel like a mindful companion rather than a productivity dashboard, and that distinction mattered. The design language, pacing, and copy were all trying to protect a quieter state of mind.
+<Divider />
 
-The release did not stop at 1.0, either. The public changelog shows a fast follow-on cycle through the rest of 2024 and into January 2025: calendar and browse views, stronger search, tags and mentions, responsive layouts, end-to-end encryption, bulk actions, auto-generated titles, and a much more expressive Markdown system. In other words, the app quickly grew from a reflective prototype into a more mature personal archive.
+When you write about a dream, the app notices and offers an interpretation. Most of us forget our dreams by the time we've poured coffee, and the ones we remember we never do anything with. We wanted to give those fragments somewhere to land.
 
-Looking back, Be Here Meow feels like one of those projects where the product category and the emotional tone had to be invented together. The software needed to be technically capable, yes, but it also needed to feel safe, unhurried, and a little bit magical.
+Every entry generates an image based on what you wrote. Not a stock photo, not a generic mood. An actual visual response to your actual words. Over time, your journal becomes a kind of gallery of the days you've lived.
 
-That was the launch. The deeper work has been learning how to make journaling software that meets people where they are, without overwhelming them.
+You can export everything you've ever written, whenever you want, in full.
+
+<PullQuote>Your words belong to you.</PullQuote>
+
+If you want to take them somewhere else someday, you can.
+
+There's a haiku feature too. The people in beta loved it, so we kept it.
+
+The calendar view, light and dark mode, search, tags, all of that works the way you'd hope. Quietly, in the background, while you write.
+
+<Divider />
+
+What we set out to build was a quiet place to put your thoughts and occasionally be surprised by what comes back. We think we got close.
+
+<PullQuote>Write. Reflect. Rest.</PullQuote>
+
+<Byline preface="Paws and reflect," name="Zora" />
