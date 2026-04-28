@@ -347,10 +347,20 @@ export async function loadPost(
 			throw createHttpError(`Article not found: ${ year }/${ month }/${ postSlug }`, 404)
 		}
 
+		// Ship full markdown content only on the current post. The rest of
+		// allPosts is used by the entry page for similar-posts navigation
+		// (title/excerpt/tags/cover) and doesn't need bodies — stripping
+		// `content` keeps the inline hydration script small.
+		const navPosts: ProcessedPost[] = allPosts.map((p: ProcessedPost) => {
+			if (p === foundPost) return p
+			const { content: _content, ...rest } = p
+			return rest as ProcessedPost
+		})
+
 		return {
 			pageType: 'post',
 			post: foundPost,
-			allPosts,
+			allPosts: navPosts,
 			lang
 		}
 	} catch (err: unknown) {
