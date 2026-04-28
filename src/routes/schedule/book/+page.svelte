@@ -172,7 +172,7 @@
 			{#if bookingError}<p class="book__error">{bookingError}</p>{/if}
 
 		{:else if stepNum === 2 && selectedDay}
-			<BookedStep activityIcon={activity.icon} activityLabel={activity.label} date={selectedDay.date} {start} {end} {overlapping} capacity={8} onBack={() => goStep(0)} onEdit={() => goStep(1)} />
+			<BookedStep activityIcon={activity.icon} activityLabel={activity.label} date={selectedDay.date} {start} {end} {overlapping} onBack={() => goStep(0)} onEdit={() => goStep(1)} />
 		{/if}
 
 		</div>
