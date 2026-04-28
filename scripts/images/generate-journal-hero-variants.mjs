@@ -58,7 +58,11 @@ async function canGenerateVariants() {
 
 function getImageDimensions(filePath) {
 	const output = execFileSync('file', [filePath], { encoding: 'utf8' })
-	const match = output.match(/(\d+)\s*x\s*(\d+)/)
+	// JPEGs with JFIF density markers print "density 1x1" before the real
+	// dimensions, so we take the last NxN occurrence — actual dimensions
+	// always come last in `file` output for image formats.
+	const matches = [...output.matchAll(/(\d+)\s*x\s*(\d+)/g)]
+	const match = matches.at(-1)
 	if (!match) {
 		throw new Error(`Unable to determine dimensions for ${filePath}`)
 	}

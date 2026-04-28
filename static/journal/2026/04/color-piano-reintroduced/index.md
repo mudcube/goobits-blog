@@ -1,5 +1,5 @@
 ---
-title: "Color Piano: A Reintroduction"
+title: "Color Piano, Reintroduced"
 date: "2026-04-16"
 categories:
   - "apps"
