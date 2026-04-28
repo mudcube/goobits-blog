@@ -128,7 +128,16 @@ function setIfMissing(headers: Headers, key: string, value: string) {
 }
 
 const securityHeadersHandle: Handle = async ({ event, resolve }) => {
-	let response = await resolve(event)
+	// Generate a unique nonce per request for CSP script-src
+	const nonce = crypto.randomUUID()
+	event.locals.cspNonce = nonce
+
+	let response = await resolve(event, {
+		transformPageChunk: ({ html }) => {
+			// Add nonce attribute to all <script> tags in the rendered HTML
+			return html.replace(/<script(?=[\s>])/g, `<script nonce="${nonce}"`)
+		}
+	})
 
 	const url = event.url
 	const isHttps = url?.protocol === 'https:'
@@ -151,7 +160,7 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 		"frame-ancestors 'none'",
 		"img-src 'self' data: https:",
 		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
-		`script-src 'self' https://challenges.cloudflare.com 'unsafe-inline'${dev ? " 'unsafe-eval'" : ''}`,
+		`script-src 'self' https://challenges.cloudflare.com 'nonce-${nonce}'${dev ? " 'unsafe-eval'" : ''}`,
 		"frame-src 'self' https://challenges.cloudflare.com",
 		"connect-src 'self' https://challenges.cloudflare.com https:",
 		"font-src 'self' data: https:"

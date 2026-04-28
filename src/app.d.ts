@@ -13,6 +13,7 @@ declare global {
 		interface Locals {
 			user?: User | null
 			session?: Session | null
+			cspNonce?: string
 		}
 	}
 }
