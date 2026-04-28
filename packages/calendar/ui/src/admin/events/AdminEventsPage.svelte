@@ -4,7 +4,7 @@
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
-	import { getActivityEmoji, getActivityColor } from '@calendar/ui/shared'
+	import { getActivityEmoji, getActivityColor, getActivityIcon } from '@calendar/ui/shared'
 	import { formatEventDayLabel } from '@calendar/ui/shared'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
@@ -109,6 +109,7 @@
 						label: ev.title,
 						detail: `${dayLabel(ev.startsAt)} · ${ev.activityLabel} · ${past ? 'finished' : `${spotsLeft} spots left`}`,
 						dotColor: getActivityColor(ev.activityLabel, ev.activitySlug || undefined),
+						dotIcon: getActivityIcon(ev.activityLabel, ev.activitySlug || undefined),
 						dimmed: past,
 						onClick: () => goto(hrefWithMock(eventRoute(ev))),
 						ariaLabel: `Open ${ev.title}`,
@@ -140,6 +141,7 @@
 				label: recent.title,
 				detail: `${dayLabel(recent.startsAt)} · ${recent.seatsTaken} went`,
 				dotColor: getActivityColor(recent.activityLabel, recent.activitySlug),
+				dotIcon: getActivityIcon(recent.activityLabel, recent.activitySlug),
 			}))}
 			emptyText="No past events yet."
 		/>

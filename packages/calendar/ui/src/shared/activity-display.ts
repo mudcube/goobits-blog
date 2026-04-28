@@ -1,4 +1,9 @@
 import { getCalendarActivityDefinitions } from '@calendar/core'
+import {
+	Dumbbell, Film, Tent, Mountain, Music, Coffee, Utensils, Bike, Waves,
+	Palette, Gamepad2, Sparkles, BookOpen, Camera, Flower2
+} from '@lucide/svelte'
+import type { Component } from 'svelte'
 
 function normalize(value: string) {
 	return value.trim().toLowerCase()
@@ -62,4 +67,46 @@ export function getActivityEmoji(label = '', slug = '') {
 export function getActivityColor(label = '', slug = '') {
 	const key = fallbackKey(label, slug)
 	return genericActivityPalette[hashString(key) % genericActivityPalette.length] || '#64748b'
+}
+
+const activityIconMap: Record<string, Component> = {
+	gym: Dumbbell,
+	movie: Film,
+	movies: Film,
+	circus: Tent,
+	adventure: Mountain,
+	hike: Mountain,
+	hiking: Mountain,
+	music: Music,
+	coffee: Coffee,
+	dinner: Utensils,
+	food: Utensils,
+	bike: Bike,
+	cycling: Bike,
+	swim: Waves,
+	yoga: Flower2,
+	art: Palette,
+	game: Gamepad2,
+	games: Gamepad2,
+	book: BookOpen,
+	books: BookOpen,
+	photo: Camera,
+	photography: Camera,
+}
+
+export function getActivityIcon(label = '', slug = ''): Component {
+	const normalizedSlug = slugify(slug)
+	const normalizedLabel = normalize(label)
+
+	// Try exact slug match
+	if (activityIconMap[normalizedSlug]) return activityIconMap[normalizedSlug]!
+
+	// Try keyword match in slug or label
+	for (const [keyword, icon] of Object.entries(activityIconMap)) {
+		if (normalizedSlug.includes(keyword) || normalizedLabel.includes(keyword)) {
+			return icon
+		}
+	}
+
+	return Sparkles
 }

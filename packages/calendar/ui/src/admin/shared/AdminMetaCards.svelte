@@ -17,6 +17,7 @@
 		detail: string
 		icon?: Component | null
 		dotColor?: string
+		dotIcon?: Component | null
 		dimmed?: boolean
 		onClick?: () => void
 		ariaLabel?: string
@@ -46,7 +47,11 @@
 					aria-label={item.ariaLabel || item.label}
 					onclick={item.onClick}
 				>
-					{#if item.dotColor}
+					{#if item.dotIcon}
+						<div class="admin-meta-cards__activity" style={item.dotColor ? `--activity-color:${item.dotColor};` : ''} aria-hidden="true">
+							<item.dotIcon size={14} strokeWidth={2.2} />
+						</div>
+					{:else if item.dotColor}
 						<span class="admin-meta-cards__dot" style="background:{item.dotColor};" aria-hidden="true"></span>
 					{:else}
 						<div class="admin-meta-cards__icon" aria-hidden="true">
@@ -71,7 +76,11 @@
 				</button>
 			{:else}
 				<div class="admin-meta-cards__card" class:admin-meta-cards__card--dimmed={item.dimmed}>
-					{#if item.dotColor}
+					{#if item.dotIcon}
+						<div class="admin-meta-cards__activity" style={item.dotColor ? `--activity-color:${item.dotColor};` : ''} aria-hidden="true">
+							<item.dotIcon size={14} strokeWidth={2.2} />
+						</div>
+					{:else if item.dotColor}
 						<span class="admin-meta-cards__dot" style="background:{item.dotColor};" aria-hidden="true"></span>
 					{:else}
 						<div class="admin-meta-cards__icon" aria-hidden="true">
@@ -188,6 +197,19 @@
 		border-radius: 999px;
 		flex-shrink: 0;
 		margin-left: 0.5rem;
+	}
+
+	.admin-meta-cards__activity {
+		--activity-color: var(--admin-accent);
+		width: 2rem;
+		height: 2rem;
+		border-radius: 999px;
+		display: grid;
+		place-items: center;
+		flex-shrink: 0;
+		background: color-mix(in srgb, var(--activity-color) 14%, transparent);
+		color: color-mix(in srgb, var(--activity-color) 88%, var(--text) 12%);
+		border: 1px solid color-mix(in srgb, var(--activity-color) 28%, transparent);
 	}
 
 	.admin-meta-cards__body {
