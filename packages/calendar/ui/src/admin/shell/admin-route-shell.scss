@@ -75,7 +75,7 @@ $admin-mobile-breakpoint: 820px;
   min-width: 0;
   display: grid;
   grid-template-columns: $admin-sidebar-width 1fr;
-  grid-template-rows: auto auto;
+  grid-template-rows: 3rem auto;
   flex: 1;
   background: var(--bg);
   color: var(--text);
