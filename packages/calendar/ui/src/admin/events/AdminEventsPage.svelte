@@ -4,7 +4,6 @@
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
-	import { EventSessionCard } from '@calendar/ui/shared'
 	import { getActivityEmoji, getActivityColor } from '@calendar/ui/shared'
 	import { formatEventDayLabel } from '@calendar/ui/shared'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
@@ -47,6 +46,28 @@
 		if (ev.activitySlug) return withAdminRoute(`events/program/${ev.activitySlug}/`)
 		return withAdminRoute('events/')
 	}
+
+	function timeLabel(iso: string) {
+		const date = new Date(iso)
+		const minutes = date.getMinutes()
+		if (minutes === 0) {
+			return date.toLocaleTimeString(undefined, { hour: 'numeric' })
+		}
+		return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+	}
+
+	function isPast(iso: string) {
+		return new Date(iso).getTime() < Date.now()
+	}
+
+	function initialsFor(participant: { name?: string | null; displayName?: string | null } | undefined, index: number) {
+		const raw = participant?.displayName || participant?.name
+		if (!raw) return `#${index + 1}`
+		const parts = raw.trim().split(/\s+/).filter(Boolean)
+		const first = parts[0]?.charAt(0) ?? ''
+		const second = parts[1]?.charAt(0) ?? ''
+		return `${first}${second}`.toUpperCase() || raw.slice(0, 2).toUpperCase()
+	}
 </script>
 
 {#if authed}
@@ -78,14 +99,38 @@
 		<h4>UPCOMING</h4>
 		{#if !mockMode && dashboard.eventsLoading}
 			<p class="social-events__meta">Loading events...</p>
-		{:else if eventsSource.length === 0}
-			<p class="social-events__meta">No upcoming events.</p>
 		{:else}
-			<div class="social-events__upcoming-grid">
-				{#each eventsSource as ev}
-					<EventSessionCard event={ev} onOpenEvent={() => goto(hrefWithMock(eventRoute(ev)))} />
-				{/each}
-			</div>
+			<AdminMetaCards
+				items={eventsSource.map((ev) => {
+					const past = isPast(ev.startsAt)
+					const spotsLeft = Math.max(ev.capacity - ev.seatsTaken, 0)
+					return {
+						id: String(ev.id),
+						label: ev.title,
+						detail: `${dayLabel(ev.startsAt)} · ${ev.activityLabel} · ${past ? 'finished' : `${spotsLeft} spots left`}`,
+						dotColor: getActivityColor(ev.activityLabel, ev.activitySlug || undefined),
+						dimmed: past,
+						onClick: () => goto(hrefWithMock(eventRoute(ev))),
+						ariaLabel: `Open ${ev.title}`,
+						_event: ev,
+					}
+				})}
+				emptyText="No upcoming events."
+			>
+				{#snippet right(item)}
+					{@const ev = item._event}
+					<div class="social-events__time">{timeLabel(ev.startsAt)}</div>
+					<div class="social-events__people">
+						<span class="social-events__avatar social-events__avatar--you" title="You">You</span>
+						{#each (ev.participants || []).slice(0, 3) as participant, i (i)}
+							<span class="social-events__avatar" title={participant.displayName || participant.name || ''}>{initialsFor(participant, i)}</span>
+						{/each}
+						<span class="social-events__count">
+							{ev.seatsTaken}{isPast(ev.startsAt) ? '' : ''}
+						</span>
+					</div>
+				{/snippet}
+			</AdminMetaCards>
 		{/if}
 
 		<h4>PAST</h4>
@@ -155,20 +200,43 @@
 		background: var(--status-success-text);
 	}
 
-	.social-events__upcoming-grid {
+	.social-events__time {
+		font-size: 0.78rem;
+		font-weight: 600;
+		color: color-mix(in srgb, var(--text) 60%, transparent);
+		white-space: nowrap;
+	}
+
+	.social-events__people {
+		display: flex;
+		align-items: center;
+		gap: 0.2rem;
+	}
+
+	:global(.social-events__avatar) {
+		width: 1.3rem;
+		height: 1.3rem;
+		border-radius: 999px;
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.5rem;
-		margin-bottom: 0.75rem;
+		place-items: center;
+		font-size: 0.48rem;
+		font-weight: 700;
+		background: color-mix(in srgb, var(--text) 8%, transparent);
+		color: color-mix(in srgb, var(--text) 65%, transparent);
+		flex-shrink: 0;
 	}
 
-	.social-events__event-sub {
-		font-size: 0.74rem;
-		line-height: 1;
-		color: color-mix(in srgb, var(--text) 64%, transparent);
-		margin-top: 0.1rem;
+	:global(.social-events__avatar--you) {
+		background: color-mix(in srgb, var(--admin-accent) 20%, transparent);
+		color: color-mix(in srgb, var(--admin-accent) 86%, var(--text) 14%);
 	}
 
+	:global(.social-events__count) {
+		margin-left: 0.25rem;
+		font-size: 0.68rem;
+		font-weight: 600;
+		color: color-mix(in srgb, var(--text) 45%, transparent);
+	}
 
 	.social-events__meta {
 		margin: 0;
@@ -177,8 +245,7 @@
 	}
 
 	@media (max-width: 720px) {
-		.social-events__program-grid,
-		.social-events__upcoming-grid {
+		.social-events__program-grid {
 			grid-template-columns: 1fr;
 		}
 	}

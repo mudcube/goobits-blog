@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Component } from 'svelte'
+	import type { Component, Snippet } from 'svelte'
 	import { Mail } from '@lucide/svelte'
 	import AdminActionButton from '@calendar/ui/admin/shared/AdminActionButton.svelte'
 
@@ -17,14 +17,18 @@
 		detail: string
 		icon?: Component | null
 		dotColor?: string
+		dimmed?: boolean
+		onClick?: () => void
+		ariaLabel?: string
 		actions?: MetaAction[]
 	}
 
-	const { items, emptyText = 'No items.', singleLine = false } = $props<{
+	const { items, emptyText = 'No items.', singleLine = false, right }: {
 		items: MetaItem[]
 		emptyText?: string
 		singleLine?: boolean
-	}>()
+		right?: Snippet<[MetaItem]>
+	} = $props()
 </script>
 
 <div class="admin-meta-cards" class:admin-meta-cards--single-line={singleLine}>
@@ -34,46 +38,84 @@
 		<div class="admin-meta-cards__container">
 		{#each items as item, i (item.id)}
 			{#if i > 0}<div class="admin-meta-cards__divider"></div>{/if}
-			<div class="admin-meta-cards__card">
-				{#if item.dotColor}
-					<span class="admin-meta-cards__dot" style="background:{item.dotColor};" aria-hidden="true"></span>
-				{:else}
-					<div class="admin-meta-cards__icon" aria-hidden="true">
-						{#if item.icon}
-							<item.icon size={16} strokeWidth={2} />
-						{:else}
-							<Mail size={16} strokeWidth={2} />
+			{#if item.onClick}
+				<button
+					type="button"
+					class="admin-meta-cards__card admin-meta-cards__card--clickable"
+					class:admin-meta-cards__card--dimmed={item.dimmed}
+					aria-label={item.ariaLabel || item.label}
+					onclick={item.onClick}
+				>
+					{#if item.dotColor}
+						<span class="admin-meta-cards__dot" style="background:{item.dotColor};" aria-hidden="true"></span>
+					{:else}
+						<div class="admin-meta-cards__icon" aria-hidden="true">
+							{#if item.icon}
+								<item.icon size={16} strokeWidth={2} />
+							{:else}
+								<Mail size={16} strokeWidth={2} />
+							{/if}
+						</div>
+					{/if}
+					<div class="admin-meta-cards__body">
+						<div class="admin-meta-cards__label">{item.label}</div>
+						{#if item.detail}
+							<div class="admin-meta-cards__detail">{item.detail}</div>
 						{/if}
 					</div>
-				{/if}
-				<div class="admin-meta-cards__body">
-					<div class="admin-meta-cards__label">{item.label}</div>
-					{#if item.detail}
-						<div class="admin-meta-cards__detail">{item.detail}</div>
+					{#if right}
+						<div class="admin-meta-cards__right">
+							{@render right(item)}
+						</div>
+					{/if}
+				</button>
+			{:else}
+				<div class="admin-meta-cards__card" class:admin-meta-cards__card--dimmed={item.dimmed}>
+					{#if item.dotColor}
+						<span class="admin-meta-cards__dot" style="background:{item.dotColor};" aria-hidden="true"></span>
+					{:else}
+						<div class="admin-meta-cards__icon" aria-hidden="true">
+							{#if item.icon}
+								<item.icon size={16} strokeWidth={2} />
+							{:else}
+								<Mail size={16} strokeWidth={2} />
+							{/if}
+						</div>
+					{/if}
+					<div class="admin-meta-cards__body">
+						<div class="admin-meta-cards__label">{item.label}</div>
+						{#if item.detail}
+							<div class="admin-meta-cards__detail">{item.detail}</div>
+						{/if}
+					</div>
+					{#if right}
+						<div class="admin-meta-cards__right">
+							{@render right(item)}
+						</div>
+					{/if}
+					{#if item.actions?.length}
+						<div class="admin-meta-cards__actions">
+							{#each item.actions as action}
+								{#if action.label}
+									<AdminActionButton
+										variant={action.variant || 'subtle'}
+										icon={action.icon}
+										ariaLabel={action.ariaLabel}
+										onclick={action.onclick}
+									>{action.label}</AdminActionButton>
+								{:else}
+									<AdminActionButton
+										variant={action.variant || 'subtle'}
+										icon={action.icon}
+										ariaLabel={action.ariaLabel}
+										onclick={action.onclick}
+									/>
+								{/if}
+							{/each}
+						</div>
 					{/if}
 				</div>
-				{#if item.actions?.length}
-					<div class="admin-meta-cards__actions">
-						{#each item.actions as action}
-							{#if action.label}
-							<AdminActionButton
-								variant={action.variant || 'subtle'}
-								icon={action.icon}
-								ariaLabel={action.ariaLabel}
-								onclick={action.onclick}
-							>{action.label}</AdminActionButton>
-						{:else}
-							<AdminActionButton
-								variant={action.variant || 'subtle'}
-								icon={action.icon}
-								ariaLabel={action.ariaLabel}
-								onclick={action.onclick}
-							/>
-						{/if}
-						{/each}
-					</div>
-				{/if}
-			</div>
+			{/if}
 		{/each}
 		</div>
 	{/if}
@@ -108,6 +150,25 @@
 		gap: 0.875rem;
 		padding: 0.75rem 0.875rem;
 		min-height: 4rem;
+		width: 100%;
+		text-align: left;
+		font: inherit;
+		color: inherit;
+	}
+
+	.admin-meta-cards__card--clickable {
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		transition: background 140ms;
+	}
+
+	.admin-meta-cards__card--clickable:hover {
+		background: color-mix(in srgb, var(--admin-accent) 6%, transparent);
+	}
+
+	.admin-meta-cards__card--dimmed {
+		opacity: 0.55;
 	}
 
 	.admin-meta-cards__icon {
@@ -151,6 +212,14 @@
 	.admin-meta-cards--single-line .admin-meta-cards__body {
 		display: flex;
 		align-items: center;
+	}
+
+	.admin-meta-cards__right {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0.3rem;
+		flex-shrink: 0;
 	}
 
 	.admin-meta-cards__actions {
