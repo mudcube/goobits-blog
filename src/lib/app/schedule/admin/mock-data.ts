@@ -391,11 +391,18 @@ export const mockCrewInvites: MockCrewInvite[] = [
 		expires_in_days: 4
 	},
 	{
-		id: 'inv-dev',
-		code: 'cozy-owl-8803',
-		email: 'dev@example.com',
-		created_at: nowUnix - 1 * 60 * 60,
+		id: 'inv-jamie',
+		code: 'cozy.firefly.8803',
+		email: 'jamie@example.com',
+		created_at: nowUnix - 6 * 60 * 60,
 		expires_in_days: 7
+	},
+	{
+		id: 'inv-noor',
+		code: 'sparkly!robin!2190',
+		email: 'noor@example.com',
+		created_at: nowUnix - 30 * 60,
+		expires_in_days: 14
 	}
 ]
 
