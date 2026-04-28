@@ -242,9 +242,10 @@
 	}
 
 	:global(.bs__greeting-icon) {
+		display: block;
 		width: 1.4rem;
 		height: 1.4rem;
-		vertical-align: -0.15em;
+		flex-shrink: 0;
 	}
 
 	/* Calendar list */
