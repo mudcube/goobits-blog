@@ -2,8 +2,8 @@
 	import AdminCalendar from '@calendar/ui/admin/dashboard/AdminCalendar.svelte'
 	import AdminDashboardTodayTimeline from '@calendar/ui/admin/dashboard/AdminDashboardTodayTimeline.svelte'
 	import AdminDashboardRecentFeed from '@calendar/ui/admin/dashboard/AdminDashboardRecentFeed.svelte'
-	import { ChevronRowCard } from '@calendar/ui/shared'
-	import { getActivityEmoji } from '../../shared'
+	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
+	import { getActivityColor, getActivityIcon } from '../../shared'
 	import { formatEventDayLabel, formatEventTimeLabel } from '../../shared'
 
 	type Participant = {
@@ -115,19 +115,18 @@
 	{#if selectedDateIso && selectedDateEvents.length > 0}
 		<div class="admin-dashboard__selected-day">
 			<h4>{selectedDateLabel}</h4>
-			<div class="admin-dashboard__selected-day-list">
-				{#each selectedDateEvents as event}
-					<ChevronRowCard compact={true} onclick={() => onOpenEvent(event.id)} ariaLabel={`Open ${event.title}`}>
-						{#snippet start()}
-							<span class="admin-dashboard__selected-day-emoji">{getActivityEmoji(event.activityLabel, event.activitySlug || undefined)}</span>
-						{/snippet}
-						<div>
-							<div class="admin-dashboard__selected-day-title">{event.title}</div>
-							<div class="admin-dashboard__selected-day-sub">{formatEventDayLabel(event.startsAt)} · {timeLabel(event.startsAt)}</div>
-						</div>
-					</ChevronRowCard>
-				{/each}
-			</div>
+			<AdminMetaCards
+				items={selectedDateEvents.map((event) => ({
+					id: String(event.id),
+					label: event.title,
+					detail: `${formatEventDayLabel(event.startsAt)} · ${timeLabel(event.startsAt)}`,
+					dotColor: getActivityColor(event.activityLabel, event.activitySlug || undefined),
+					dotIcon: getActivityIcon(event.activityLabel, event.activitySlug || undefined),
+					onClick: () => onOpenEvent(event.id),
+					ariaLabel: `Open ${event.title}`,
+				}))}
+				emptyText="No events on this day."
+			/>
 		</div>
 	{/if}
 </section>
@@ -143,27 +142,4 @@
 		gap: 0.4rem;
 	}
 
-	.admin-dashboard__selected-day-list {
-		display: grid;
-		gap: 0.375rem;
-	}
-
-	.admin-dashboard__selected-day-emoji {
-		font-size: 1rem;
-		line-height: 1;
-		flex-shrink: 0;
-	}
-
-	.admin-dashboard__selected-day-title {
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: color-mix(in srgb, var(--text) 78%, transparent);
-	}
-
-	.admin-dashboard__selected-day-sub {
-		font-size: 0.74rem;
-		line-height: 1;
-		color: color-mix(in srgb, var(--text) 64%, transparent);
-		margin-top: 0.1rem;
-	}
 </style>
