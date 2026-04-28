@@ -62,6 +62,7 @@
 		align-items: center;
 		gap: 0.875rem;
 		padding: 0.75rem 0.875rem;
+		min-height: 4rem;
 		text-align: left;
 		color: inherit;
 		font: inherit;
