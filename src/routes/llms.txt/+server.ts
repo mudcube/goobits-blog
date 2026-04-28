@@ -66,7 +66,7 @@ export const GET: RequestHandler = async () => {
 		'## Primary pages',
 		'',
 		`- [About Miko](${SITE_ORIGIN}/about/): Creator biography, background, and contact details.`,
-		`- [Apps collection](${SITE_ORIGIN}/apps/): Full catalog of browser-native creative tools — drawing, music, color, mindfulness, and generative exploration.`,
+		`- [Apps collection](${SITE_ORIGIN}/): Full catalog of browser-native creative tools — drawing, music, color, mindfulness, and generative exploration.`,
 		`- [Music](${SITE_ORIGIN}/music/): Tracks, demos, and sound experiments.`,
 		`- [Art](${SITE_ORIGIN}/art/): Visual art archive and showcases.`,
 		`- [Labs](${SITE_ORIGIN}/labs/): Experimental projects and works in progress.`,

@@ -9,11 +9,11 @@
 <Seo
 	title="Apps, Tools & Interactive Software"
 	description={appsDescription}
-	path="/apps/"
+	path="/"
 	image={heroImage}
 	jsonLd={[
 		buildWebPageJsonLd({
-			path: '/apps/',
+			path: '/',
 			title: 'Apps, Tools & Interactive Software',
 			description: appsDescription,
 			type: 'CollectionPage'
