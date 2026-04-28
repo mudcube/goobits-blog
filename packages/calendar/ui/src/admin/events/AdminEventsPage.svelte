@@ -5,7 +5,7 @@
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import { EventSessionCard } from '@calendar/ui/shared'
-	import { getActivityEmoji } from '@calendar/ui/shared'
+	import { getActivityEmoji, getActivityColor } from '@calendar/ui/shared'
 	import { formatEventDayLabel } from '@calendar/ui/shared'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
@@ -94,6 +94,7 @@
 				id: String(recent.id || recent.title),
 				label: recent.title,
 				detail: `${dayLabel(recent.startsAt)} · ${recent.seatsTaken} went`,
+				dotColor: getActivityColor(recent.activityLabel, recent.activitySlug),
 			}))}
 			emptyText="No past events yet."
 		/>

@@ -399,7 +399,7 @@ body {
 	background: var(--bg);
 	font-family: var(--font-sans);
 	font-size: var(--font-size-body);
-	min-height: 100vh;
+	min-height: 100dvh;
 	margin: 0;
 	color: var(--text);
 	display: flex;
@@ -442,7 +442,7 @@ body {
 body > div[style="display: contents"] > div {
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh;
+	min-height: 100dvh;
 }
 
 /* Override bundle's body background which uses --color-background */

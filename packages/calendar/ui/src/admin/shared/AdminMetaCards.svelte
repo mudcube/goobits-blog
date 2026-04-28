@@ -16,6 +16,7 @@
 		label: string
 		detail: string
 		icon?: Component | null
+		dotColor?: string
 		actions?: MetaAction[]
 	}
 
@@ -34,13 +35,17 @@
 		{#each items as item, i (item.id)}
 			{#if i > 0}<div class="admin-meta-cards__divider"></div>{/if}
 			<div class="admin-meta-cards__card">
-				<div class="admin-meta-cards__icon" aria-hidden="true">
-					{#if item.icon}
-						<item.icon size={16} strokeWidth={2} />
-					{:else}
-						<Mail size={16} strokeWidth={2} />
-					{/if}
-				</div>
+				{#if item.dotColor}
+					<span class="admin-meta-cards__dot" style="background:{item.dotColor};" aria-hidden="true"></span>
+				{:else}
+					<div class="admin-meta-cards__icon" aria-hidden="true">
+						{#if item.icon}
+							<item.icon size={16} strokeWidth={2} />
+						{:else}
+							<Mail size={16} strokeWidth={2} />
+						{/if}
+					</div>
+				{/if}
 				<div class="admin-meta-cards__body">
 					<div class="admin-meta-cards__label">{item.label}</div>
 					{#if item.detail}
@@ -114,6 +119,14 @@
 		flex-shrink: 0;
 		background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
 		color: color-mix(in srgb, var(--admin-accent) 76%, var(--text) 24%);
+	}
+
+	.admin-meta-cards__dot {
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 999px;
+		flex-shrink: 0;
+		margin-left: 0.5rem;
 	}
 
 	.admin-meta-cards__body {
