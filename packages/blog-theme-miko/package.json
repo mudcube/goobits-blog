@@ -16,6 +16,10 @@
     "./components/*": {
       "svelte": "./components/*",
       "default": "./components/*"
+    },
+    "./utils/*": {
+      "svelte": "./utils/*",
+      "default": "./utils/*"
     }
   },
   "sideEffects": [

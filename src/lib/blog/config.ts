@@ -1,5 +1,16 @@
 import { initBlogConfig, type BlogConfig } from '@goobits/blog/config'
 
+export const OWNED_EXTERNAL_DOMAINS = [
+	'miko.art',
+	'sketch.io',
+	'sketchpad.com',
+	'colorpiano.com',
+	'colorsphere.app',
+	'sandart.app',
+	'zendala.app',
+	'beheremeow.app'
+]
+
 let initialized = false
 
 const journalBlogConfig = {

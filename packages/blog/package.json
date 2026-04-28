@@ -33,6 +33,7 @@
       "default": "./utils/index.ts"
     },
     "./utils/*": {
+      "types": "./utils/*",
       "svelte": "./utils/*",
       "default": "./utils/*"
     },

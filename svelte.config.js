@@ -2,8 +2,8 @@ import 'dotenv/config'
 import adapterCloudflare from '@sveltejs/adapter-cloudflare'
 import { mdsvex } from 'mdsvex'
 import { handlePrerenderHttpError } from './src/lib/app/config/runtime/sveltekit.runtime.js'
-import { remarkTableOfContents } from './src/lib/blog/remark-table-of-contents.js'
-import { rehypeWebpPicture } from './src/lib/blog/rehype-webp-picture.js'
+import { remarkTableOfContents } from './packages/blog/utils/remark-table-of-contents.js'
+import { rehypeWebpPicture } from './packages/blog/utils/rehype-webp-picture.js'
 
 export default {
 	kit: {

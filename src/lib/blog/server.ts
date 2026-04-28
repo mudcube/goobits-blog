@@ -2,10 +2,10 @@ import { readFileSync, accessSync } from 'fs'
 import { join, dirname } from 'path'
 import { compile } from 'mdsvex'
 import { getAllPosts, type ProcessedPost } from '@goobits/blog/utils'
-import { ensureJournalBlogConfig } from '$lib/blog/config'
-import { remarkTableOfContents } from '$lib/blog/remark-table-of-contents'
+import { ensureJournalBlogConfig, OWNED_EXTERNAL_DOMAINS } from '$lib/blog/config'
+import { remarkTableOfContents } from '@goobits/blog/utils/remark-table-of-contents.ts'
 // @ts-ignore — JS rehype plugin, no type declarations
-import { rehypeWebpPicture } from '$lib/blog/rehype-webp-picture'
+import { rehypeWebpPicture } from '@goobits/blog/utils/rehype-webp-picture.js'
 import type { JournalMetadata, JournalPost } from '$lib/blog/viewmodel'
 
 type Frontmatter = Record<string, unknown> & {
@@ -105,17 +105,6 @@ function upgradeImagesToWebpPicture(html: string, postDir: string) {
 function upgradeInsecureMediaUrls(html: string) {
 	return html.replace(/(<(?:img|source)\b[^>]*\b(?:src|srcset)=["'])http:\/\//gi, '$1https://')
 }
-
-const OWNED_EXTERNAL_DOMAINS = [
-	'miko.art',
-	'sketch.io',
-	'sketchpad.com',
-	'colorpiano.com',
-	'colorsphere.app',
-	'sandart.app',
-	'zendala.app',
-	'beheremeow.app'
-]
 
 function isOwnedExternalUrl(href: string) {
 	try {
