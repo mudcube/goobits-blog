@@ -144,6 +144,10 @@ export async function deleteInvite({ db, inviteId }: { db: D1DatabaseLike; invit
 	await db.prepare(`DELETE FROM calendar_invites WHERE id = ?`).bind(inviteId).run()
 }
 
+export async function deleteInviteByCode({ db, code }: { db: D1DatabaseLike; code: string }) {
+	await db.prepare(`DELETE FROM calendar_invites WHERE code = ?`).bind(code).run()
+}
+
 export async function hasUserRedeemedAnyInvite({ db, userId }: { db: D1DatabaseLike; userId: string }) {
 	const row = await db.prepare(
 		`SELECT id FROM calendar_invite_redemptions WHERE user_id = ? LIMIT 1`

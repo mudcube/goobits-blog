@@ -46,10 +46,11 @@
 		creating = false
 	}
 
-	async function remove(id: string | number) {
+	async function remove(idOrCode: string | number) {
 		try {
-			await deleteCalendarInvite(String(id))
-			invites = invites.filter(i => i.id !== id)
+			await deleteCalendarInvite(String(idOrCode))
+			invites = invites.filter(i => (i.id ?? i.code) !== idOrCode)
+			error = ''
 		} catch { error = 'Failed to delete invite' }
 		confirmDeleteId = null
 	}
@@ -62,22 +63,23 @@
 	}
 
 	const metaItems = $derived(invites.map(invite => ({
-		id: String(invite.id),
+		id: String(invite.id ?? invite.code),
 		label: invite.code,
 		detail: `${typeof invite.times_used === 'number' ? invite.times_used : 0} used · ${invite.uses_remaining ?? '∞'} remaining · expires ${formatAdminDate(invite.expires_at)}${invite.email ? ` · ${invite.email}` : ''}`,
-		icon: Ticket,
+		dotIcon: Ticket,
+		dotColor: '#a78bfa',
 		actions: [
 			{
 				variant: 'subtle' as const,
-				icon: copiedId === invite.id ? Check : Copy,
+				icon: copiedId === (invite.id ?? invite.code) ? Check : Copy,
 				ariaLabel: 'Copy invite link',
-				onclick: () => copyLink(invite.code, invite.id),
+				onclick: () => copyLink(invite.code, invite.id ?? invite.code),
 			},
 			{
 				variant: 'danger' as const,
 				icon: Trash2,
 				ariaLabel: 'Delete invite',
-				onclick: () => { confirmDeleteId = invite.id },
+				onclick: () => { confirmDeleteId = invite.id ?? invite.code },
 			},
 		],
 	})))

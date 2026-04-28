@@ -4,6 +4,7 @@ import { getAdminAuth } from '@calendar/kit'
 import {
 	createInvite,
 	deleteInvite,
+	deleteInviteByCode,
 	listInvites,
 	parseCalendarInviteCreateInput,
 	TransportValidationError
@@ -50,14 +51,21 @@ export async function DELETE(event: RequestEvent) {
 	return runApiRequest('admin.invites.delete', async () => {
 		const guard = requireAdminRequest(event, { csrf: true })
 		if (guard) return guard
-		const inviteId = Number(event.url.searchParams.get('id'))
-		if (!inviteId) {
+		const rawId = event.url.searchParams.get('id')
+		if (!rawId) {
 			return apiError('Missing invite id', { status: 400 })
 		}
 
 		const { db } = await getAdminAuth({ event })
-		await deleteInvite({ db, inviteId })
-		logAdminEvent(event, 'invite_delete', { inviteId })
+		const numericId = Number(rawId)
+		if (Number.isFinite(numericId) && numericId > 0) {
+			await deleteInvite({ db, inviteId: numericId })
+			logAdminEvent(event, 'invite_delete', { inviteId: numericId })
+		} else {
+			// Fallback: delete by code (handles legacy/non-numeric IDs)
+			await deleteInviteByCode({ db, code: rawId })
+			logAdminEvent(event, 'invite_delete', { inviteCode: rawId })
+		}
 		return apiOk({})
 	})
 }

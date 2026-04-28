@@ -102,6 +102,7 @@ import {
 	consumeInvite,
 	listInvites,
 	deleteInvite,
+	deleteInviteByCode,
 	hasUserRedeemedAnyInvite
 } from './calendar/invites.ts'
 import {
@@ -240,6 +241,7 @@ export {
 	consumeInvite,
 	listInvites,
 	deleteInvite,
+	deleteInviteByCode,
 	hasUserRedeemedAnyInvite,
 	listUserProgramAccess,
 	setUserProgramAccess,
