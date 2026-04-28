@@ -4,10 +4,10 @@
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
-	import { ChevronRowCard } from '@calendar/ui/shared'
 	import { EventSessionCard } from '@calendar/ui/shared'
 	import { getActivityEmoji } from '@calendar/ui/shared'
 	import { formatEventDayLabel } from '@calendar/ui/shared'
+	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { withAdminRoute } from '@calendar/ui/config'
@@ -89,25 +89,14 @@
 		{/if}
 
 		<h4>PAST</h4>
-		<div class="social-events__past-list">
-			{#if recentEventsSource.length === 0}
-				<div class="social-events__past-row social-events__past-row--empty calendar-ui-card">
-					<div class="social-events__meta">No past events yet.</div>
-				</div>
-			{:else}
-				{#each recentEventsSource.slice(0, 8) as recent}
-					<ChevronRowCard compact={true} onclick={() => goto(hrefWithMock(eventRoute(recent)))} ariaLabel={`Open ${recent.title}`}>
-						{#snippet start()}
-							<span class="social-events__past-emoji">{emojiForActivity(recent.activityLabel, recent.activitySlug)}</span>
-						{/snippet}
-						<div>
-							<div class="social-events__past-title">{recent.title}</div>
-							<div class="social-events__event-sub">{dayLabel(recent.startsAt)} · {recent.seatsTaken} went</div>
-						</div>
-					</ChevronRowCard>
-				{/each}
-			{/if}
-		</div>
+		<AdminMetaCards
+			items={recentEventsSource.slice(0, 8).map((recent) => ({
+				id: String(recent.id || recent.title),
+				label: recent.title,
+				detail: `${dayLabel(recent.startsAt)} · ${recent.seatsTaken} went`,
+			}))}
+			emptyText="No past events yet."
+		/>
 	</div>
 {/if}
 
@@ -179,27 +168,6 @@
 		margin-top: 0.1rem;
 	}
 
-	.social-events__past-list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.375rem;
-	}
-
-	.social-events__past-row--empty {
-		justify-content: flex-start;
-	}
-
-	.social-events__past-title {
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: color-mix(in srgb, var(--text) 78%, transparent);
-	}
-
-	.social-events__past-emoji {
-		font-size: 1rem;
-		line-height: 1;
-		flex-shrink: 0;
-	}
 
 	.social-events__meta {
 		margin: 0;
