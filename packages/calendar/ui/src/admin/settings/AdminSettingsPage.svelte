@@ -5,6 +5,7 @@
   import { handleUnauthorizedSessionError } from "@calendar/ui/routing/auth";
   import { createAdminDashboardController } from "@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte";
   import AdminPageHero from "@calendar/ui/admin/shared/AdminPageHero.svelte";
+  import AdminGroupedCard from "@calendar/ui/admin/shared/AdminGroupedCard.svelte";
   import {
     getAdminCalendarWeekStart,
     setAdminCalendarWeekStart,
@@ -458,7 +459,7 @@
           </button>
         </div>
       {/if}
-      <div class="admin-settings__sync-list admin-settings__grouped-card">
+      <AdminGroupedCard>
         {#each visibleSyncProviders() as provider}
           <div class="admin-settings__sync-card">
             <div class="admin-settings__sync-main">
@@ -548,7 +549,7 @@
             </button>
           </div>
         {/each}
-      </div>
+      </AdminGroupedCard>
       {#if primaryConnectedProvider() && syncOptionsExpanded}
         <div class="admin-settings__sync-top-actions">
           <button
@@ -605,11 +606,7 @@
         </div>
       </div>
 
-      <div
-        class="admin-settings__payment-cards admin-settings__grouped-card"
-        role="group"
-        aria-label="Payment platforms"
-      >
+      <AdminGroupedCard>
         {#each paymentProviders as provider}
           <div
             class="admin-settings__payment-card"
@@ -662,7 +659,7 @@
             {/if}
           </div>
         {/each}
-      </div>
+      </AdminGroupedCard>
     </section>
   </div>
 {/if}
@@ -730,18 +727,6 @@
     background: var(--admin-status-success-dot);
   }
 
-  .admin-settings__grouped-card {
-    border: 1px solid var(--admin-card-border);
-    border-radius: 0.875rem;
-    background: var(--admin-card-bg);
-    overflow: hidden;
-  }
-
-  .admin-settings__sync-list {
-    display: grid;
-    gap: 0;
-  }
-
   .admin-settings__sync-top-actions {
     display: flex;
     justify-content: flex-end;
@@ -769,10 +754,6 @@
     gap: 0.875rem;
     padding: 0.75rem 0.875rem;
     min-height: 4rem;
-  }
-
-  .admin-settings__sync-card + .admin-settings__sync-card {
-    border-top: 1px solid color-mix(in srgb, var(--admin-card-border) 60%, transparent);
   }
 
   .admin-settings__sync-action {
@@ -897,17 +878,8 @@
     letter-spacing: -0.005em;
   }
 
-  .admin-settings__payment-cards {
-    display: grid;
-    gap: 0;
-  }
-
   .admin-settings__payment-card {
     overflow: clip;
-  }
-
-  .admin-settings__payment-card + .admin-settings__payment-card {
-    border-top: 1px solid color-mix(in srgb, var(--admin-card-border) 60%, transparent);
   }
 
   .admin-settings__payment-card--active {
