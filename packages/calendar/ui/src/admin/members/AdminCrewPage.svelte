@@ -484,7 +484,7 @@
 					}
 				]
 			}))}
-			emptyText="No active invites. Tap Create Invite to share a link."
+			emptyText="No active invites yet."
 		/>
 
 		{#if expandedUserId}

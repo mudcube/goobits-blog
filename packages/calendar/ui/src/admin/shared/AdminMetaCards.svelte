@@ -247,13 +247,12 @@
 
 	:global(.admin-meta-cards__chevron) {
 		flex-shrink: 0;
-		opacity: 0.3;
-		color: var(--text);
-		transition: opacity 140ms, transform 140ms;
+		color: color-mix(in srgb, var(--text) 36%, transparent);
+		transition: color 140ms, transform 140ms;
 	}
 
 	.admin-meta-cards__card--clickable:hover :global(.admin-meta-cards__chevron) {
-		opacity: 0.65;
+		color: color-mix(in srgb, var(--text) 52%, transparent);
 		transform: translateX(2px);
 	}
 

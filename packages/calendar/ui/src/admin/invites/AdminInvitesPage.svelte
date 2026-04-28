@@ -3,6 +3,7 @@
 	import { Copy, Trash2, Check, Ticket } from '@lucide/svelte'
 	import AdminPageHero from '../shared/AdminPageHero.svelte'
 	import AdminMetaCards from '../shared/AdminMetaCards.svelte'
+	import AdminLoadingText from '../shared/AdminLoadingText.svelte'
 	import {
 		getCalendarAdminInvites,
 		createCalendarInvite,
@@ -150,11 +151,11 @@
 	<h4>ACTIVE INVITES</h4>
 
 	{#if loading}
-		<p class="ai__muted">Loading...</p>
+		<AdminLoadingText text="Loading invites…" />
 	{:else}
 		<AdminMetaCards
 			items={metaItems}
-			emptyText="No invites yet. Create one to share with friends."
+			emptyText="No active invites yet."
 		/>
 	{/if}
 </div>

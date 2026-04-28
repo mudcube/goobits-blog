@@ -41,13 +41,13 @@
 
 <style>
 	.admin-crew-member__avatar {
-		width: 2.5rem;
-		height: 2.5rem;
+		width: 2.25rem;
+		height: 2.25rem;
 		border-radius: 999px;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 0.72rem;
+		font-size: 0.66rem;
 		font-weight: 700;
 		letter-spacing: 0.02em;
 		flex-shrink: 0;

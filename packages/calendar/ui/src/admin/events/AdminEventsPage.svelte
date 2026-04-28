@@ -7,6 +7,7 @@
 	import { getActivityColor, getActivityIcon } from '@calendar/ui/shared'
 	import { formatEventDayLabel } from '@calendar/ui/shared'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
+	import AdminLoadingText from '@calendar/ui/admin/shared/AdminLoadingText.svelte'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { withAdminRoute } from '@calendar/ui/config'
@@ -90,7 +91,7 @@
 
 		<h4>UPCOMING</h4>
 		{#if !mockMode && dashboard.eventsLoading}
-			<p class="social-events__meta">Loading events...</p>
+			<AdminLoadingText text="Loading events…" />
 		{:else}
 			<AdminMetaCards
 				items={eventsSource.map((ev) => {
@@ -108,7 +109,7 @@
 						_event: ev,
 					}
 				})}
-				emptyText="No upcoming events."
+				emptyText="No upcoming events yet."
 			>
 				{#snippet right(item)}
 					{@const ev = item._event}

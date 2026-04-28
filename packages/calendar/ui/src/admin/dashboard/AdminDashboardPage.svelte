@@ -7,6 +7,7 @@ import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/adm
 import { AdminEventDetailSheet, AdminLoginCard } from '@calendar/ui'
 import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 import AdminDashboardContent from '@calendar/ui/admin/dashboard/AdminDashboardContent.svelte'
+import AdminLoadingText from '@calendar/ui/admin/shared/AdminLoadingText.svelte'
 import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 
 	const { data, form } = $props<{ data: { user: unknown | null }; form: unknown }>()
@@ -63,7 +64,7 @@ const adminMockCatalog = getAdminMockCatalog()
 			/>
 
 			{#if !mockMode && dashboard.eventsLoading}
-				<p class="social-home__loading">Loading dashboard…</p>
+				<AdminLoadingText text="Loading dashboard…" />
 			{:else}
 				<AdminDashboardContent
 					events={mockMode ? adminMockCatalog.dashboardEvents : dashboard.events}

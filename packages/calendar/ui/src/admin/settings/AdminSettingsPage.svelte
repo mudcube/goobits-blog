@@ -443,7 +443,7 @@
     <section class="admin-settings__section">
       <div class="admin-settings__section-head">
         <div>
-          <h3 class="admin-settings__section-label">Calendar sync</h3>
+          <h4>CALENDAR SYNC</h4>
         </div>
       </div>
 
@@ -565,7 +565,7 @@
     <section class="admin-settings__section">
       <div class="admin-settings__section-head">
         <div>
-          <h3 class="admin-settings__section-label">Calendar view</h3>
+          <h4>CALENDAR VIEW</h4>
         </div>
       </div>
 
@@ -601,7 +601,7 @@
     <section class="admin-settings__section">
       <div class="admin-settings__section-head">
         <div>
-          <h3 class="admin-settings__section-label">Payment info</h3>
+          <h4>PAYMENT INFO</h4>
         </div>
       </div>
 
@@ -690,15 +690,6 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
-  }
-
-  .admin-settings__section-label {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    color: var(--text);
   }
 
   .admin-settings__status {
