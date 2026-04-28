@@ -195,10 +195,7 @@
 		{ label: 'Book' }
 	]
 
-	const versions = [
-		{ label: 'v1', href: '/playground/book/' },
-		{ label: 'v2', href: '/playground/book-v6/', current: true }
-	]
+	const versions: { label: string; href: string; current?: boolean }[] = []
 </script>
 
 <svelte:head><title>Book v6 - Dev - MIKO.ART</title></svelte:head>
