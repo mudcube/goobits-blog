@@ -6,6 +6,7 @@
   import { createAdminDashboardController } from "@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte";
   import AdminPageHero from "@calendar/ui/admin/shared/AdminPageHero.svelte";
   import AdminGroupedCard from "@calendar/ui/admin/shared/AdminGroupedCard.svelte";
+  import AdminMetaCards from "@calendar/ui/admin/shared/AdminMetaCards.svelte";
   import {
     getAdminCalendarWeekStart,
     setAdminCalendarWeekStart,
@@ -459,97 +460,48 @@
           </button>
         </div>
       {/if}
-      <AdminGroupedCard>
-        {#each visibleSyncProviders() as provider}
-          <div class="admin-settings__sync-card">
-            <div class="admin-settings__sync-main">
-              <span class="admin-settings__sync-icon" aria-hidden="true">
-                {#if provider.value === "google"}
-                  <svg viewBox="0 0 24 24">
-                    <path
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-                      fill="#4285F4"
-                    ></path>
-                    <path
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      fill="#34A853"
-                    ></path>
-                    <path
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      fill="#FBBC05"
-                    ></path>
-                    <path
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      fill="#EA4335"
-                    ></path>
-                  </svg>
-                {:else if provider.value === "apple"}
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M16.37 12.45c.02 2.25 1.97 3 2 3.01-.02.05-.31 1.08-1.02 2.13-.61.91-1.25 1.82-2.25 1.84-.98.02-1.3-.58-2.43-.58-1.13 0-1.49.56-2.41.6-.96.04-1.69-.97-2.31-1.87-1.26-1.82-2.22-5.14-.93-7.38.64-1.11 1.79-1.82 3.04-1.84.95-.02 1.84.64 2.43.64.59 0 1.7-.79 2.86-.67.49.02 1.87.2 2.76 1.5-.07.04-1.65.96-1.64 2.62zM14.81 4.35c.51-.62.86-1.48.77-2.35-.74.03-1.64.49-2.18 1.1-.48.55-.9 1.42-.79 2.26.82.06 1.69-.42 2.2-1.01z"
-                    />
-                  </svg>
-                {:else}
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M3 5.5A1.5 1.5 0 0 1 4.5 4h15A1.5 1.5 0 0 1 21 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5v-13Zm1.8.3v12.4h14.4V5.8H4.8Zm1.7 2.2h10.9v1.8H6.5V8Zm0 3.2h10.9V13H6.5v-1.8Zm0 3.2h7.1v1.8H6.5v-1.8Z"
-                    />
-                  </svg>
-                {/if}
-              </span>
-              <div class="admin-settings__sync-info">
-                <div class="admin-settings__sync-name">{provider.label}</div>
-                <span
-                  class="admin-settings__status"
-                  class:admin-settings__status--ok={providerConnected(
-                    provider.value,
-                  )}
-                  class:admin-settings__status--warn={!providerConnected(
-                    provider.value,
-                  )}
-                >
-                  <span class="admin-settings__status-dot"></span>
-                  {providerConnected(provider.value)
-                    ? "CONNECTED"
-                    : "NOT CONNECTED"}
-                </span>
-              </div>
-            </div>
-            <button
-              type="button"
-              class="admin-ui-btn admin-settings__sync-action"
-              class:admin-ui-btn--danger={providerConnected(provider.value)}
-              onclick={() => void toggleSyncProvider(provider.value)}
-              disabled={syncBusy[provider.value] ||
-                (provider.value === "google" ? dashboard.disconnecting : false)}
-              aria-label={syncBusy[provider.value] ||
-              (provider.value === "google" && dashboard.disconnecting)
-                ? providerConnected(provider.value)
-                  ? `Disconnecting ${provider.label}`
-                  : `Connecting ${provider.label}`
-                : providerConnected(provider.value)
-                  ? `Disconnect ${provider.label}`
-                  : `Connect ${provider.label}`}
-              title={syncBusy[provider.value] ||
-              (provider.value === "google" && dashboard.disconnecting)
-                ? providerConnected(provider.value)
-                  ? `Disconnecting ${provider.label}`
-                  : `Connecting ${provider.label}`
-                : providerConnected(provider.value)
-                  ? `Disconnect ${provider.label}`
-                  : `Connect ${provider.label}`}
-            >
-              {#if syncBusy[provider.value] || (provider.value === "google" && dashboard.disconnecting)}
-                <span aria-hidden="true">…</span>
-              {:else if providerConnected(provider.value)}
-                <X size={16} strokeWidth={2} />
-              {:else}
-                <Plus size={16} strokeWidth={2} />
-              {/if}
-            </button>
-          </div>
-        {/each}
-      </AdminGroupedCard>
+      <AdminMetaCards
+        items={visibleSyncProviders().map((provider) => {
+          const connected = providerConnected(provider.value)
+          const busy = !!syncBusy[provider.value] || (provider.value === 'google' && dashboard.disconnecting)
+          const actionLabel = busy
+            ? (connected ? `Disconnecting ${provider.label}` : `Connecting ${provider.label}`)
+            : (connected ? `Disconnect ${provider.label}` : `Connect ${provider.label}`)
+          return {
+            id: provider.value,
+            label: provider.label,
+            statusBadge: { text: connected ? 'Connected' : 'Not connected', tone: connected ? 'success' as const : 'warn' as const },
+            extra: { providerValue: provider.value, busy },
+            actions: [{
+              variant: connected ? 'danger' as const : 'subtle' as const,
+              icon: busy ? null : (connected ? X : Plus),
+              ariaLabel: actionLabel,
+              onclick: () => void toggleSyncProvider(provider.value),
+            }],
+          }
+        })}
+      >
+        {#snippet customIcon(item)}
+          <span class="admin-settings__sync-icon" aria-hidden="true">
+            {#if (item.extra as { providerValue: string }).providerValue === 'google'}
+              <svg viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"></path>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+              </svg>
+            {:else if (item.extra as { providerValue: string }).providerValue === 'apple'}
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16.37 12.45c.02 2.25 1.97 3 2 3.01-.02.05-.31 1.08-1.02 2.13-.61.91-1.25 1.82-2.25 1.84-.98.02-1.3-.58-2.43-.58-1.13 0-1.49.56-2.41.6-.96.04-1.69-.97-2.31-1.87-1.26-1.82-2.22-5.14-.93-7.38.64-1.11 1.79-1.82 3.04-1.84.95-.02 1.84.64 2.43.64.59 0 1.7-.79 2.86-.67.49.02 1.87.2 2.76 1.5-.07.04-1.65.96-1.64 2.62zM14.81 4.35c.51-.62.86-1.48.77-2.35-.74.03-1.64.49-2.18 1.1-.48.55-.9 1.42-.79 2.26.82.06 1.69-.42 2.2-1.01z" />
+              </svg>
+            {:else}
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 5.5A1.5 1.5 0 0 1 4.5 4h15A1.5 1.5 0 0 1 21 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5v-13Zm1.8.3v12.4h14.4V5.8H4.8Zm1.7 2.2h10.9v1.8H6.5V8Zm0 3.2h10.9V13H6.5v-1.8Zm0 3.2h7.1v1.8H6.5v-1.8Z" />
+              </svg>
+            {/if}
+          </span>
+        {/snippet}
+      </AdminMetaCards>
       {#if primaryConnectedProvider() && syncOptionsExpanded}
         <div class="admin-settings__sync-top-actions">
           <button

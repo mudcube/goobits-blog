@@ -11,10 +11,12 @@
 		onclick: () => void
 	}
 
+	type StatusTone = 'success' | 'warn' | 'neutral'
+
 	type MetaItem = {
 		id: string
 		label: string
-		detail: string
+		detail?: string
 		icon?: Component | null
 		dotColor?: string
 		dotIcon?: Component | null
@@ -22,15 +24,57 @@
 		onClick?: () => void
 		ariaLabel?: string
 		actions?: MetaAction[]
+		statusBadge?: { text: string; tone: StatusTone }
+		extra?: unknown // arbitrary payload accessible from snippets
 	}
 
-	const { items, emptyText = 'No items.', singleLine = false, right }: {
+	const { items, emptyText = 'No items.', singleLine = false, right, customIcon, body }: {
 		items: MetaItem[]
 		emptyText?: string
 		singleLine?: boolean
 		right?: Snippet<[MetaItem]>
+		customIcon?: Snippet<[MetaItem]>
+		body?: Snippet<[MetaItem]>
 	} = $props()
 </script>
+
+{#snippet renderIcon(item: MetaItem)}
+	{#if customIcon}
+		{@render customIcon(item)}
+	{:else if item.dotIcon}
+		<div class="admin-meta-cards__activity" style={item.dotColor ? `--activity-color:${item.dotColor};` : ''} aria-hidden="true">
+			<item.dotIcon size={14} strokeWidth={2.2} />
+		</div>
+	{:else if item.dotColor}
+		<span class="admin-meta-cards__dot" style="background:{item.dotColor};" aria-hidden="true"></span>
+	{:else}
+		<div class="admin-meta-cards__icon" aria-hidden="true">
+			{#if item.icon}
+				<item.icon size={16} strokeWidth={2} />
+			{:else}
+				<Mail size={16} strokeWidth={2} />
+			{/if}
+		</div>
+	{/if}
+{/snippet}
+
+{#snippet renderBody(item: MetaItem)}
+	{#if body}
+		{@render body(item)}
+	{:else}
+		<div class="admin-meta-cards__body">
+			<div class="admin-meta-cards__label">{item.label}</div>
+			{#if item.statusBadge}
+				<span class="admin-meta-cards__badge admin-meta-cards__badge--{item.statusBadge.tone}">
+					<span class="admin-meta-cards__badge-dot"></span>
+					{item.statusBadge.text}
+				</span>
+			{:else if item.detail}
+				<div class="admin-meta-cards__detail">{item.detail}</div>
+			{/if}
+		</div>
+	{/if}
+{/snippet}
 
 <div class="admin-meta-cards" class:admin-meta-cards--single-line={singleLine}>
 	{#if items.length === 0}
@@ -47,27 +91,8 @@
 					aria-label={item.ariaLabel || item.label}
 					onclick={item.onClick}
 				>
-					{#if item.dotIcon}
-						<div class="admin-meta-cards__activity" style={item.dotColor ? `--activity-color:${item.dotColor};` : ''} aria-hidden="true">
-							<item.dotIcon size={14} strokeWidth={2.2} />
-						</div>
-					{:else if item.dotColor}
-						<span class="admin-meta-cards__dot" style="background:{item.dotColor};" aria-hidden="true"></span>
-					{:else}
-						<div class="admin-meta-cards__icon" aria-hidden="true">
-							{#if item.icon}
-								<item.icon size={16} strokeWidth={2} />
-							{:else}
-								<Mail size={16} strokeWidth={2} />
-							{/if}
-						</div>
-					{/if}
-					<div class="admin-meta-cards__body">
-						<div class="admin-meta-cards__label">{item.label}</div>
-						{#if item.detail}
-							<div class="admin-meta-cards__detail">{item.detail}</div>
-						{/if}
-					</div>
+					{@render renderIcon(item)}
+					{@render renderBody(item)}
 					{#if right}
 						<div class="admin-meta-cards__right">
 							{@render right(item)}
@@ -77,27 +102,8 @@
 				</button>
 			{:else}
 				<div class="admin-meta-cards__card" class:admin-meta-cards__card--dimmed={item.dimmed}>
-					{#if item.dotIcon}
-						<div class="admin-meta-cards__activity" style={item.dotColor ? `--activity-color:${item.dotColor};` : ''} aria-hidden="true">
-							<item.dotIcon size={14} strokeWidth={2.2} />
-						</div>
-					{:else if item.dotColor}
-						<span class="admin-meta-cards__dot" style="background:{item.dotColor};" aria-hidden="true"></span>
-					{:else}
-						<div class="admin-meta-cards__icon" aria-hidden="true">
-							{#if item.icon}
-								<item.icon size={16} strokeWidth={2} />
-							{:else}
-								<Mail size={16} strokeWidth={2} />
-							{/if}
-						</div>
-					{/if}
-					<div class="admin-meta-cards__body">
-						<div class="admin-meta-cards__label">{item.label}</div>
-						{#if item.detail}
-							<div class="admin-meta-cards__detail">{item.detail}</div>
-						{/if}
-					</div>
+					{@render renderIcon(item)}
+					{@render renderBody(item)}
 					{#if right}
 						<div class="admin-meta-cards__right">
 							{@render right(item)}
@@ -230,6 +236,52 @@
 		font-size: 0.6875rem;
 		line-height: 1.35;
 		color: color-mix(in srgb, var(--text) 42%, transparent);
+	}
+
+	.admin-meta-cards__badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		margin-top: 0.25rem;
+		padding: 0.15rem 0.45rem;
+		border-radius: 999px;
+		font-size: 0.62rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.admin-meta-cards__badge-dot {
+		width: 5px;
+		height: 5px;
+		border-radius: 999px;
+	}
+
+	.admin-meta-cards__badge--success {
+		background: var(--admin-status-success-bg);
+		color: var(--admin-status-success-fg);
+	}
+
+	.admin-meta-cards__badge--success .admin-meta-cards__badge-dot {
+		background: var(--admin-status-success-dot);
+	}
+
+	.admin-meta-cards__badge--warn {
+		background: var(--admin-status-warn-bg);
+		color: var(--admin-status-warn-fg);
+	}
+
+	.admin-meta-cards__badge--warn .admin-meta-cards__badge-dot {
+		background: var(--admin-status-warn-dot);
+	}
+
+	.admin-meta-cards__badge--neutral {
+		background: color-mix(in srgb, var(--text) 8%, transparent);
+		color: color-mix(in srgb, var(--text) 68%, transparent);
+	}
+
+	.admin-meta-cards__badge--neutral .admin-meta-cards__badge-dot {
+		background: color-mix(in srgb, var(--text) 50%, transparent);
 	}
 
 	.admin-meta-cards--single-line .admin-meta-cards__body {
