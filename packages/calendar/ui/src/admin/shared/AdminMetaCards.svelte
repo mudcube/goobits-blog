@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Component, Snippet } from 'svelte'
-	import { Mail } from '@lucide/svelte'
+	import { Mail, ChevronRight } from '@lucide/svelte'
 	import AdminActionButton from '@calendar/ui/admin/shared/AdminActionButton.svelte'
 
 	type MetaAction = {
@@ -73,6 +73,7 @@
 							{@render right(item)}
 						</div>
 					{/if}
+					<ChevronRight class="admin-meta-cards__chevron" size={16} strokeWidth={2} />
 				</button>
 			{:else}
 				<div class="admin-meta-cards__card" class:admin-meta-cards__card--dimmed={item.dimmed}>
@@ -242,6 +243,18 @@
 		align-items: flex-end;
 		gap: 0.3rem;
 		flex-shrink: 0;
+	}
+
+	:global(.admin-meta-cards__chevron) {
+		flex-shrink: 0;
+		opacity: 0.3;
+		color: var(--text);
+		transition: opacity 140ms, transform 140ms;
+	}
+
+	.admin-meta-cards__card--clickable:hover :global(.admin-meta-cards__chevron) {
+		opacity: 0.65;
+		transform: translateX(2px);
 	}
 
 	.admin-meta-cards__actions {

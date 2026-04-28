@@ -4,7 +4,7 @@
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
-	import { getActivityEmoji, getActivityColor, getActivityIcon } from '@calendar/ui/shared'
+	import { getActivityColor, getActivityIcon } from '@calendar/ui/shared'
 	import { formatEventDayLabel } from '@calendar/ui/shared'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
@@ -29,10 +29,6 @@
 		dashboard.loadPrograms()
 		dashboard.loadEvents()
 	})
-
-	function emojiForActivity(label: string, slug?: string) {
-		return getActivityEmoji(label, slug)
-	}
 
 	function dayLabel(iso: string) {
 		return formatEventDayLabel(iso)
@@ -78,23 +74,19 @@
 			subtitle="Manage program pages & upcoming sessions."
 		/>
 
-		<h4>ACTIVITY PAGES</h4>
-			<div class="social-events__program-grid">
-			{#each programsSource as program}
-				<button
-					type="button"
-					class="social-events__program-card calendar-ui-card calendar-ui-card--interactive"
-					onclick={() => goto(hrefWithMock(withAdminRoute(`events/program/${program.slug}/`)))}
-				>
-					<div class="social-events__program-icon">{program.icon || emojiForActivity(program.label, program.slug)}</div>
-					<div class="social-events__program-label">{program.label}</div>
-					<div class="social-events__program-status">
-						<span class:social-events__dot--live={program.enabled} class="social-events__dot"></span>
-						{program.enabled ? 'Live' : 'Draft'}
-					</div>
-				</button>
-			{/each}
-		</div>
+		<h4>ACTIVITY PAGES ({programsSource.length})</h4>
+		<AdminMetaCards
+			items={programsSource.map((program) => ({
+				id: String(program.slug),
+				label: program.label,
+				detail: program.enabled ? 'Live' : 'Draft',
+				dotColor: getActivityColor(program.label, program.slug),
+				dotIcon: getActivityIcon(program.label, program.slug),
+				onClick: () => goto(hrefWithMock(withAdminRoute(`events/program/${program.slug}/`))),
+				ariaLabel: `Open ${program.label}`,
+			}))}
+			emptyText="No activity pages yet."
+		/>
 
 		<h4>UPCOMING</h4>
 		{#if !mockMode && dashboard.eventsLoading}
@@ -154,54 +146,6 @@
 		gap: 1rem;
 	}
 
-	.social-events__program-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.75rem;
-		margin-bottom: 1rem;
-	}
-
-	.social-events__program-card {
-		padding: 1.1rem 1rem;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.55rem;
-		text-align: left;
-	}
-
-	.social-events__program-icon {
-		font-size: 1.6rem;
-		line-height: 1;
-	}
-
-	.social-events__program-label {
-		font-family: var(--font-display);
-		font-size: 0.95rem;
-		font-weight: 500;
-		letter-spacing: -0.01em;
-		color: var(--text);
-	}
-
-	.social-events__program-status {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.3rem;
-		font-size: 0.6875rem;
-		color: var(--text-3);
-	}
-
-	.social-events__dot {
-		width: 6px;
-		height: 6px;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--text) 42%, transparent);
-	}
-
-	.social-events__dot--live {
-		background: var(--status-success-text);
-	}
-
 	.social-events__time {
 		font-size: 0.78rem;
 		font-weight: 600;
@@ -246,9 +190,4 @@
 		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
 
-	@media (max-width: 720px) {
-		.social-events__program-grid {
-			grid-template-columns: 1fr;
-		}
-	}
 </style>
