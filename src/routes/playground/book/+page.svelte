@@ -128,7 +128,7 @@
 
 	const versions = [
 		{ label: 'v1', href: '/playground/book/', current: true },
-		{ label: 'v2', href: '/playground/book-v3/' }
+		{ label: 'v2', href: '/playground/book-v6/' }
 	]
 </script>
 

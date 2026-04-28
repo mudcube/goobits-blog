@@ -197,8 +197,7 @@
 
 	const versions = [
 		{ label: 'v1', href: '/playground/book/' },
-		{ label: 'v2', href: '/playground/book-v3/' },
-		{ label: 'v3', href: '/playground/book-v6/', current: true }
+		{ label: 'v2', href: '/playground/book-v6/', current: true }
 	]
 </script>
 
@@ -303,9 +302,9 @@
 		--book-horizon-gold: #d4a85a;
 		max-width: 28rem; margin: 0 auto; padding: 0 0.75rem; box-sizing: border-box; width: 100%;
 	}
-	.bk6__panel { position: relative; padding: 1rem; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 0.75rem; background: rgba(255, 255, 255, 0.02); }
-	.bk6__help { position: absolute; top: 0.6rem; right: 0.6rem; width: 1.2rem; height: 1.2rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.22); background: transparent; color: rgba(255, 255, 255, 0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 180ms; padding: 0; font: inherit; font-size: 0.5rem; font-weight: 700; z-index: 2; }
-	.bk6__help:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.35); }
+	.bk6__panel { position: relative; padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.75rem; background: color-mix(in srgb, var(--panel-bg, var(--bg)) 60%, transparent); }
+	.bk6__help { position: absolute; top: 0.6rem; right: 0.6rem; width: 1.2rem; height: 1.2rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); background: transparent; color: color-mix(in srgb, var(--text) 50%, transparent); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 180ms; padding: 0; font: inherit; font-size: 0.5rem; font-weight: 700; z-index: 2; }
+	.bk6__help:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 35%, transparent); }
 	.bk6__step--fwd { animation: bk6-fwd 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	.bk6__step--back { animation: bk6-back 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 	@keyframes bk6-fwd { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
