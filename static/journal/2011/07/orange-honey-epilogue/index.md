@@ -7,7 +7,7 @@ tags:
   - "canvas"
   - "creative-tools"
   - "typography"
-coverImage: "images/pastedGraphic_9.png"
+coverImage: "images/Screen-shot-2011-03-26-at-9.37.34-PM.png"
 ---
 
 The past four years (2007-2011) much of my energy and capital has been focused into building the Mugtug graphics suite; [Sketchpad](https://sketch.io/sketchpad/), [Darkroom on the Wayback Machine](https://web.archive.org/web/*/http://mugtug.com/darkroom/), and Lightbox. The suite has come a long way since I developed Sketchpad during a seven month work binge of Red-Bulls! Through the collaboration of many developers we’ve moved forwards to create an entire framework that blurs the line between “web-app” and “desktop-app”…

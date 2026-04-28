@@ -10,7 +10,7 @@ tags:
   - "midi"
   - "piano"
   - "web-audio"
-coverImage: "images/250px-Number_Form-colored.jpeg"
+coverImage: "images/Screen-shot-2011-01-26-at-1.51.10-PM.png"
 ---
 
 **UPDATE:** There is a more recent post on [Color Piano](/journal/2011/12/color-piano/).

@@ -6,7 +6,7 @@ categories:
 tags: 
   - "canvas"
   - "color"
-coverImage: "images/Screen-shot-2011-05-14-at-10.30.24-PM.png"
+coverImage: "images/Untitled.png"
 ---
 
 The [standard chart](https://developer.mozilla.org/samples/canvas-tutorial/6_1_canvas_composite.html) (a great resource provided by Mozilla) describing the effects of the globalCompositeOperation is incomplete, as it leaves us to extrapolate how 99% of the color-spectrum, and multiple levels of opacity, will affect the composite operation. The [following chart](/labs/html5rocks/globalCompositeOperation.html) allows you to see what the globalCompositeOperation’s is doing on a pixel-to-pixel basis.

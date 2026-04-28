@@ -8,7 +8,7 @@ tags:
   - "shaders"
   - "webcam-effects"
   - "webgl"
-coverImage: "images/unnamed1.jpg"
+coverImage: "images/sketch-3-copy-3.png"
 ---
 
 Take photos with your webcam: mix and match combinations of filters to come up with your own unique effects. FilterStack includes a large collection of filter combinations to help get you started.
