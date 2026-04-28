@@ -453,15 +453,15 @@ export const journalImageManifest = {
 		"fallbackSrc": "/journal/2026/04/color-piano-reintroduced/images/generated/hero-1600.webp"
 	},
 	"/journal/2006/03/mad-bomber-w-audio/images/526714268_26e4d25818_m.jpg": {
-		"width": 240,
-		"height": 180,
+		"width": 1024,
+		"height": 768,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-240.webp 240w",
-			"defaultSrc": "/journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-240.webp"
+			"srcset": "/journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-320.webp 320w, /journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-640.webp 640w, /journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-960.webp 960w",
+			"defaultSrc": "/journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-960.webp"
 		},
-		"fallbackSrc": "/journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-240.webp"
+		"fallbackSrc": "/journal/2006/03/mad-bomber-w-audio/images/generated/526714268_26e4d25818_m-960.webp"
 	},
 	"/journal/2007/02/sphere-widget/images/colortheory.jpeg": {
 		"width": 427,
@@ -540,49 +540,49 @@ export const journalImageManifest = {
 		},
 		"fallbackSrc": "/journal/2010/11/unicode-profiling-project/images/generated/Screen-shot-2010-11-10-at-7.39.11-PM-320.webp"
 	},
-	"/journal/2011/01/color-piano-theory/images/250px-Number_Form-colored.jpeg": {
-		"width": 250,
-		"height": 182,
+	"/journal/2011/01/color-piano-theory/images/Screen-shot-2011-01-26-at-1.51.10-PM.png": {
+		"width": 386,
+		"height": 253,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/01/color-piano-theory/images/generated/250px-Number_Form-colored-250.webp 250w",
-			"defaultSrc": "/journal/2011/01/color-piano-theory/images/generated/250px-Number_Form-colored-250.webp"
+			"srcset": "/journal/2011/01/color-piano-theory/images/generated/Screen-shot-2011-01-26-at-1.51.10-PM-320.webp 320w",
+			"defaultSrc": "/journal/2011/01/color-piano-theory/images/generated/Screen-shot-2011-01-26-at-1.51.10-PM-320.webp"
 		},
-		"fallbackSrc": "/journal/2011/01/color-piano-theory/images/generated/250px-Number_Form-colored-250.webp"
+		"fallbackSrc": "/journal/2011/01/color-piano-theory/images/generated/Screen-shot-2011-01-26-at-1.51.10-PM-320.webp"
 	},
-	"/journal/2011/03/html5-typographic-effects/images/Screen-shot-2011-05-15-at-10.57.14-PM.png": {
-		"width": 568,
-		"height": 214,
+	"/journal/2011/03/html5-typographic-effects/images/Screen-shot-2011-05-15-at-11.00.49-PM.png": {
+		"width": 945,
+		"height": 383,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/03/html5-typographic-effects/images/generated/Screen-shot-2011-05-15-at-10.57.14-PM-320.webp 320w",
-			"defaultSrc": "/journal/2011/03/html5-typographic-effects/images/generated/Screen-shot-2011-05-15-at-10.57.14-PM-320.webp"
+			"srcset": "/journal/2011/03/html5-typographic-effects/images/generated/Screen-shot-2011-05-15-at-11.00.49-PM-320.webp 320w, /journal/2011/03/html5-typographic-effects/images/generated/Screen-shot-2011-05-15-at-11.00.49-PM-640.webp 640w",
+			"defaultSrc": "/journal/2011/03/html5-typographic-effects/images/generated/Screen-shot-2011-05-15-at-11.00.49-PM-640.webp"
 		},
-		"fallbackSrc": "/journal/2011/03/html5-typographic-effects/images/generated/Screen-shot-2011-05-15-at-10.57.14-PM-320.webp"
+		"fallbackSrc": "/journal/2011/03/html5-typographic-effects/images/generated/Screen-shot-2011-05-15-at-11.00.49-PM-640.webp"
 	},
-	"/journal/2011/04/globalcompositeoperation/images/Screen-shot-2011-05-14-at-10.30.24-PM.png": {
-		"width": 162,
-		"height": 152,
+	"/journal/2011/04/globalcompositeoperation/images/Untitled.png": {
+		"width": 767,
+		"height": 1468,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/04/globalcompositeoperation/images/generated/Screen-shot-2011-05-14-at-10.30.24-PM-162.webp 162w",
-			"defaultSrc": "/journal/2011/04/globalcompositeoperation/images/generated/Screen-shot-2011-05-14-at-10.30.24-PM-162.webp"
+			"srcset": "/journal/2011/04/globalcompositeoperation/images/generated/Untitled-320.webp 320w, /journal/2011/04/globalcompositeoperation/images/generated/Untitled-640.webp 640w",
+			"defaultSrc": "/journal/2011/04/globalcompositeoperation/images/generated/Untitled-640.webp"
 		},
-		"fallbackSrc": "/journal/2011/04/globalcompositeoperation/images/generated/Screen-shot-2011-05-14-at-10.30.24-PM-162.webp"
+		"fallbackSrc": "/journal/2011/04/globalcompositeoperation/images/generated/Untitled-640.webp"
 	},
-	"/journal/2011/07/orange-honey-epilogue/images/pastedGraphic_9.png": {
-		"width": 241,
-		"height": 234,
+	"/journal/2011/07/orange-honey-epilogue/images/Screen-shot-2011-03-26-at-9.37.34-PM.png": {
+		"width": 1049,
+		"height": 499,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2011/07/orange-honey-epilogue/images/generated/pastedGraphic_9-241.webp 241w",
-			"defaultSrc": "/journal/2011/07/orange-honey-epilogue/images/generated/pastedGraphic_9-241.webp"
+			"srcset": "/journal/2011/07/orange-honey-epilogue/images/generated/Screen-shot-2011-03-26-at-9.37.34-PM-320.webp 320w, /journal/2011/07/orange-honey-epilogue/images/generated/Screen-shot-2011-03-26-at-9.37.34-PM-640.webp 640w, /journal/2011/07/orange-honey-epilogue/images/generated/Screen-shot-2011-03-26-at-9.37.34-PM-960.webp 960w",
+			"defaultSrc": "/journal/2011/07/orange-honey-epilogue/images/generated/Screen-shot-2011-03-26-at-9.37.34-PM-960.webp"
 		},
-		"fallbackSrc": "/journal/2011/07/orange-honey-epilogue/images/generated/pastedGraphic_9-241.webp"
+		"fallbackSrc": "/journal/2011/07/orange-honey-epilogue/images/generated/Screen-shot-2011-03-26-at-9.37.34-PM-960.webp"
 	},
 	"/journal/2011/08/colrd-color-extractor/images/Screen-Shot-2011-07-31-at-11.51.52-PM.png": {
 		"width": 1006,
@@ -594,17 +594,6 @@ export const journalImageManifest = {
 			"defaultSrc": "/journal/2011/08/colrd-color-extractor/images/generated/Screen-Shot-2011-07-31-at-11.51.52-PM-960.webp"
 		},
 		"fallbackSrc": "/journal/2011/08/colrd-color-extractor/images/generated/Screen-Shot-2011-07-31-at-11.51.52-PM-960.webp"
-	},
-	"/journal/2011/10/background-generator/images/5760241519_bf63304f0a.jpeg": {
-		"width": 500,
-		"height": 313,
-		"sizes": "(min-width: 1100px) 1100px, 100vw",
-		"webp": {
-			"type": "image/webp",
-			"srcset": "/journal/2011/10/background-generator/images/generated/5760241519_bf63304f0a-320.webp 320w",
-			"defaultSrc": "/journal/2011/10/background-generator/images/generated/5760241519_bf63304f0a-320.webp"
-		},
-		"fallbackSrc": "/journal/2011/10/background-generator/images/generated/5760241519_bf63304f0a-320.webp"
 	},
 	"/journal/2011/11/bitwise-gems-and-other-optimizations/images/1320621615_emerald-theme-manager1.png": {
 		"width": 140,
@@ -639,16 +628,16 @@ export const journalImageManifest = {
 		},
 		"fallbackSrc": "/journal/2012/07/sketch-mobile/images/generated/Screen-Shot-2012-05-17-at-4.29.13-PM-1600.webp"
 	},
-	"/journal/2013/07/filterstack-webcam-effects/images/unnamed1.jpg": {
-		"width": 640,
-		"height": 400,
+	"/journal/2013/07/filterstack-webcam-effects/images/sketch-3-copy-3.png": {
+		"width": 2048,
+		"height": 1280,
 		"sizes": "(min-width: 1100px) 1100px, 100vw",
 		"webp": {
 			"type": "image/webp",
-			"srcset": "/journal/2013/07/filterstack-webcam-effects/images/generated/unnamed1-320.webp 320w, /journal/2013/07/filterstack-webcam-effects/images/generated/unnamed1-640.webp 640w",
-			"defaultSrc": "/journal/2013/07/filterstack-webcam-effects/images/generated/unnamed1-640.webp"
+			"srcset": "/journal/2013/07/filterstack-webcam-effects/images/generated/sketch-3-copy-3-320.webp 320w, /journal/2013/07/filterstack-webcam-effects/images/generated/sketch-3-copy-3-640.webp 640w, /journal/2013/07/filterstack-webcam-effects/images/generated/sketch-3-copy-3-960.webp 960w, /journal/2013/07/filterstack-webcam-effects/images/generated/sketch-3-copy-3-1280.webp 1280w, /journal/2013/07/filterstack-webcam-effects/images/generated/sketch-3-copy-3-1600.webp 1600w",
+			"defaultSrc": "/journal/2013/07/filterstack-webcam-effects/images/generated/sketch-3-copy-3-1600.webp"
 		},
-		"fallbackSrc": "/journal/2013/07/filterstack-webcam-effects/images/generated/unnamed1-640.webp"
+		"fallbackSrc": "/journal/2013/07/filterstack-webcam-effects/images/generated/sketch-3-copy-3-1600.webp"
 	},
 	"/journal/2013/07/sketchpad-3-0/images/sketch-3-copy-3.png": {
 		"width": 2048,
