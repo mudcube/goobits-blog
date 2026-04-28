@@ -1,16 +1,5 @@
 import { initBlogConfig, type BlogConfig } from '@goobits/blog/config'
 
-export const OWNED_EXTERNAL_DOMAINS = [
-	'miko.art',
-	'sketch.io',
-	'sketchpad.com',
-	'colorpiano.com',
-	'colorsphere.app',
-	'sandart.app',
-	'zendala.app',
-	'beheremeow.app'
-]
-
 let initialized = false
 
 const journalBlogConfig = {
@@ -31,7 +20,17 @@ const journalBlogConfig = {
 	pagination: {
 		postsPerPage: 50,
 		postsPerBatch: 50
-	}
+	},
+	ownedDomains: [
+		'miko.art',
+		'sketch.io',
+		'sketchpad.com',
+		'colorpiano.com',
+		'colorsphere.app',
+		'sandart.app',
+		'zendala.app',
+		'beheremeow.app'
+	]
 } as unknown as Partial<BlogConfig>
 
 export function ensureJournalBlogConfig() {

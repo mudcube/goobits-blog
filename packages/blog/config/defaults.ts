@@ -197,6 +197,8 @@ export interface BlogConfig {
 	theme: ThemeConfig
 	i18n: I18nConfig
 	debug: boolean
+	/** Domains owned by the site operator — external links to these won't get rel="nofollow" */
+	ownedDomains: string[]
 }
 
 /**
@@ -368,5 +370,8 @@ export const defaultBlogConfig: BlogConfig = {
 	},
 
 	// --- Debug ---
-	debug: false
+	debug: false,
+
+	// --- Owned Domains ---
+	ownedDomains: []
 }

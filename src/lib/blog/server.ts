@@ -2,7 +2,8 @@ import { readFileSync, accessSync } from 'fs'
 import { join, dirname } from 'path'
 import { compile } from 'mdsvex'
 import { getAllPosts, type ProcessedPost } from '@goobits/blog/utils'
-import { ensureJournalBlogConfig, OWNED_EXTERNAL_DOMAINS } from '$lib/blog/config'
+import { getBlogConfig } from '@goobits/blog/config'
+import { ensureJournalBlogConfig } from '$lib/blog/config'
 import { remarkTableOfContents } from '@goobits/blog/utils/remark-table-of-contents.ts'
 // @ts-ignore — JS rehype plugin, no type declarations
 import { rehypeWebpPicture } from '@goobits/blog/utils/rehype-webp-picture.js'
@@ -109,7 +110,8 @@ function upgradeInsecureMediaUrls(html: string) {
 function isOwnedExternalUrl(href: string) {
 	try {
 		const url = new URL(href)
-		return OWNED_EXTERNAL_DOMAINS.some(
+		const ownedDomains = getBlogConfig().ownedDomains ?? []
+		return ownedDomains.some(
 			(domain) => url.hostname === domain || url.hostname.endsWith(`.${domain}`)
 		)
 	} catch {
