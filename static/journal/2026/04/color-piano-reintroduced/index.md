@@ -9,7 +9,7 @@ tags:
   - "piano"
   - "web-audio"
 coverImage: "images/hero.webp"
-excerpt: "Music theory, made visible."
+excerpt: "Music theory for visual learners."
 ---
 
 <script>

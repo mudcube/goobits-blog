@@ -570,6 +570,7 @@
 /* ---------- Cover image ---------- */
 .miko-blog__entry-hero-image-wrap {
 	position: relative;
+	width: 100%;
 	margin-top: var(--space-10);
 	aspect-ratio: 16 / 9;
 	max-height: 32rem;
@@ -579,6 +580,12 @@
 	box-shadow:
 		0 30px 70px -20px rgba(0, 0, 0, 0.55),
 		0 0 60px -20px color-mix(in srgb, var(--showcase-primary) 30%, transparent);
+}
+
+.miko-blog__entry-hero-image-wrap > picture {
+	display: block;
+	width: 100%;
+	height: 100%;
 }
 
 .miko-blog__entry-hero-image {
@@ -627,8 +634,9 @@
 }
 
 .miko-blog__entry-body {
-	width: min(100%, 760px);
-	margin: 0 auto;
+	width: 100%;
+	max-width: 48rem;
+	margin: 0;
 	color: var(--showcase-text);
 }
 
