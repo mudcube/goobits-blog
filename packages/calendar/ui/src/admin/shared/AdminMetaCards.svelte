@@ -106,8 +106,8 @@
 	}
 
 	.admin-meta-cards__icon {
-		width: 2.5rem;
-		height: 2.5rem;
+		width: 2.25rem;
+		height: 2.25rem;
 		border-radius: 999px;
 		display: grid;
 		place-items: center;
@@ -122,13 +122,16 @@
 	}
 
 	.admin-meta-cards__label {
-		font-size: 0.8125rem;
-		font-weight: 620;
+		font-size: 0.875rem;
+		font-weight: 650;
+		line-height: 1.3;
+		letter-spacing: -0.005em;
 	}
 
 	.admin-meta-cards__detail {
-		margin-top: 0.05rem;
+		margin-top: 0.1rem;
 		font-size: 0.6875rem;
+		line-height: 1.35;
 		color: color-mix(in srgb, var(--text) 42%, transparent);
 	}
 
