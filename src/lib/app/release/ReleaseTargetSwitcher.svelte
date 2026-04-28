@@ -119,22 +119,22 @@
 		position: fixed;
 		right: 1rem;
 		bottom: 1rem;
-		z-index: 40;
+		z-index: 100;
 		display: grid;
-		grid-template-columns: auto auto;
-		gap: 0.45rem 0.65rem;
-		padding: 0.55rem;
-		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+		grid-template-columns: minmax(0, 18rem);
+		gap: 0.45rem;
+		padding: 0.55rem 0.65rem;
+		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
 		border-radius: 14px;
-		background: color-mix(in srgb, var(--bg) 92%, white 8%);
-		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.14);
+		background: color-mix(in srgb, var(--bg) 94%, transparent);
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
 		backdrop-filter: blur(14px);
+		-webkit-backdrop-filter: blur(14px);
 	}
 
 	.release-switcher__row {
 		display: grid;
-		grid-column: 1 / -1;
-		grid-template-columns: 3.7rem 1fr;
+		grid-template-columns: 3.7rem minmax(0, 1fr);
 		align-items: center;
 		gap: 0.5rem;
 	}
