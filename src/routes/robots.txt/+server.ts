@@ -57,10 +57,14 @@ export const GET: RequestHandler = ({ platform, url }) => {
 		blocks.push(block.join('\n'))
 	}
 
+	// `LLM-Content` and `LLM-Full-Content` are not standard robots.txt
+	// directives, so we keep them as comments — crawlers that recognize
+	// the convention still find them, and Lighthouse stops flagging them
+	// as unknown directives.
 	const trailer = [
 		`Sitemap: ${origin}/sitemap.xml`,
-		`LLM-Content: ${origin}/llms.txt`,
-		`LLM-Full-Content: ${origin}/llms-full.txt`
+		`# LLM-Content: ${origin}/llms.txt`,
+		`# LLM-Full-Content: ${origin}/llms-full.txt`
 	]
 
 	const robots = [ ...blocks, trailer.join('\n') ].join('\n\n')

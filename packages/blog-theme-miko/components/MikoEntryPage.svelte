@@ -138,6 +138,8 @@
 							class="miko-blog__entry-hero-image"
 							src={coverVariants.fallbackSrc}
 							alt={coverAlt}
+							width={coverVariants.width}
+							height={coverVariants.height}
 							loading="eager"
 							fetchpriority="high"
 							decoding="async"

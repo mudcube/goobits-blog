@@ -44,7 +44,7 @@
 		<div class="layout-header__logo">
 			<a href={logoHref} class="layout-header__logo-link" aria-label="{logoAlt} — Home">
 				{#if logoSrc}
-					<img src={logoSrc} alt={logoAlt} class="layout-header__logo-image" />
+					<img src={logoSrc} alt={logoAlt} width="335" height="120" class="layout-header__logo-image" />
 				{:else}
 					<span class="layout-header__logo-fallback">{logoAlt}</span>
 				{/if}
