@@ -1,5 +1,5 @@
 $admin-sidebar-width: 13.75rem;
-$admin-mobile-breakpoint: 820px;
+$admin-mobile-breakpoint: 768px;
 
 .social-admin {
   a, a:visited { color: inherit; }
@@ -555,6 +555,8 @@ $admin-mobile-breakpoint: 820px;
   .social-admin__sidebar {
     grid-row: 2;
     grid-column: 1;
+    position: static;
+    height: auto;
     flex-direction: row;
     align-items: center;
     gap: 0.25rem;
@@ -587,7 +589,12 @@ $admin-mobile-breakpoint: 820px;
     white-space: nowrap;
   }
 
+  .social-admin__logout {
+    flex-shrink: 0;
+  }
+
   .social-admin__logout button {
+    width: auto;
     white-space: nowrap;
   }
 

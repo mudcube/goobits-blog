@@ -209,6 +209,10 @@
 }
 
 .layout-footer__col-link {
+	display: inline-flex;
+	align-items: center;
+	min-height: 32px;
+	padding: 0.4rem 0;
 	font-size: var(--font-size-xs);
 	color: color-mix(in srgb, var(--muted) 92%, var(--text));
 	text-decoration: none;

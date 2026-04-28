@@ -82,6 +82,9 @@
 		margin: 0 auto;
 		width: 100%;
 		padding: 0.55rem 1rem;
+		box-sizing: border-box;
+		min-width: 0;
+		flex-wrap: wrap;
 	}
 	.calendar-shell-nav__left { display: flex; align-items: center; gap: 0.8rem; min-width: 0; }
 	.calendar-shell-nav__home {
