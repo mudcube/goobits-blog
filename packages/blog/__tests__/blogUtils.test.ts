@@ -47,7 +47,7 @@ vi.mock('../config/index.js', () => ({
 			popularTagsCount: 10,
 			popularCategoriesCount: 10,
 		readTime: {
-			defaultTime: 3
+			defaultTime: 1
 		}
 		},
 		pageContent: {

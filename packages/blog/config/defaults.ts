@@ -238,7 +238,7 @@ export const defaultBlogConfig: BlogConfig = {
 		popularCategoriesCount: 5,
 		readTime: {
 			wordsPerMinute: 225,
-			defaultTime: 3,
+			defaultTime: 1,
 			minTimeForLongArticle: 5,
 			minTimeForVeryLongArticle: 10,
 			longArticleThreshold: 20000,

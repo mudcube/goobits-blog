@@ -27,10 +27,10 @@
 	 */
 	function getReadTime() {
 		try {
-			return post?.metadata?.fm?.readTime || 5
+			return post?.metadata?.fm?.readTime || blogConfig.posts.readTime.defaultTime
 		} catch (error) {
 			logger.error('Error accessing readTime:', error)
-			return 5
+			return blogConfig.posts.readTime.defaultTime
 		}
 	}
 
@@ -261,7 +261,7 @@
 											day: 'numeric'
 										}).format(new Date(post.date))}</span>
 										<span>•</span>
-										<span>{getMessage('minRead', `${post.metadata?.fm?.readTime || 5} min read`, post.metadata?.fm?.readTime || 5)}</span>
+										<span>{getMessage('minRead', `${post.metadata?.fm?.readTime || blogConfig.posts.readTime.defaultTime} min read`, post.metadata?.fm?.readTime || blogConfig.posts.readTime.defaultTime)}</span>
 									</div>
 								</div>
 							</div>

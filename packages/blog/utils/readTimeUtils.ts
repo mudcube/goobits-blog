@@ -34,7 +34,7 @@ export interface ReadTimePost {
 // Default configuration that can be used without dependency on blogConfig
 export const DEFAULT_READ_TIME_CONFIG: ReadTimeConfig = {
 	wordsPerMinute: 225,
-	defaultTime: 3,
+	defaultTime: 1,
 	minTimeForLongArticle: 5,
 	minTimeForVeryLongArticle: 10,
 	longArticleThreshold: 1500, // Word count

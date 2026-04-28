@@ -11,8 +11,8 @@ describe('readTimeUtils', () => {
 
     it('calculates read time based on word count', () => {
       // At 225 WPM: 225 words = 1 min, 450 = 2 min, 675 = 3 min, 900 = 4 min
-      // Minimum is 3 minutes (defaultTime)
-      expect(calculateReadTime('word '.repeat(225))).toBe(3) // 1 min rounds to minimum
+      // Minimum is 1 minute (defaultTime)
+      expect(calculateReadTime('word '.repeat(225))).toBe(1) // exactly 1 min
       expect(calculateReadTime('word '.repeat(675))).toBe(3) // exactly 3 min
       expect(calculateReadTime('word '.repeat(900))).toBe(4) // 4 min
       expect(calculateReadTime('word '.repeat(1125))).toBe(5) // 5 min
@@ -37,8 +37,7 @@ ${'word '.repeat(135)}`
     })
 
     it('respects custom wordsPerMinute option', () => {
-      // 200 words at 100 WPM = 2 minutes, but minimum is 3
-      // 400 words at 100 WPM = 4 minutes (exceeds minimum)
+      // 400 words at 100 WPM = 4 minutes
       expect(calculateReadTime('word '.repeat(400), { wordsPerMinute: 100 })).toBe(4)
     })
 
@@ -85,10 +84,10 @@ ${'word '.repeat(135)}`
     })
 
     it('estimates from excerpt when no content (multiplied by 3)', () => {
-      // Excerpt of 225 words -> calculateReadTime returns 3 (minimum)
-      // 3 * 3 = 9 minutes estimated for full article
+      // Excerpt of 225 words -> calculateReadTime returns 1 minute
+      // 1 * 3 = 3 minutes estimated for full article
       const post = { metadata: { fm: { excerpt: 'word '.repeat(225) } } }
-      expect(getPostReadTime(post)).toBe(9)
+      expect(getPostReadTime(post)).toBe(3)
     })
 
     it('returns default for empty post object', () => {
@@ -105,7 +104,7 @@ ${'word '.repeat(135)}`
     it('exports expected configuration values', () => {
       expect(DEFAULT_READ_TIME_CONFIG).toEqual({
         wordsPerMinute: 225,
-        defaultTime: 3,
+        defaultTime: 1,
         minTimeForLongArticle: 5,
         minTimeForVeryLongArticle: 10,
         longArticleThreshold: 1500,

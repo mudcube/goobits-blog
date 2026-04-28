@@ -1017,7 +1017,8 @@ export async function getAllPosts(options: GetAllPostsOptions = {}): Promise<Pro
 				const needsImageExtraction = !postModule.metadata.thumbnail?.src &&
 					!postModule.metadata.image?.src &&
 					!postModule.metadata.coverImage
-				if (includeContent || needsImageExtraction || !postModule.metadata.excerpt) {
+				const needsReadTimeFromContent = !postModule.metadata.readTime
+				if (includeContent || needsImageExtraction || !postModule.metadata.excerpt || needsReadTimeFromContent) {
 					content = await getMarkdownContent(filePath)
 				}
 
