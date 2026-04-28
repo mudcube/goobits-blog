@@ -39,10 +39,10 @@ export const labsCatalog: LabItem[] = [
 
 const labImageByHref: Record<string, { src: string; webp?: string }> = {
 	'/labs/color-galaxy/': { src: '/media/labs/color-galaxy-card.png', webp: '/media/labs/color-galaxy-card.webp' },
-	'/labs/js1k/BreathingGalaxies.html': { src: '/journal/2010/08/what-can-1kb-of-javascript-do/images/BreathingGalaxies.jpeg', webp: '/journal/2010/08/what-can-1kb-of-javascript-do/images/generated/BreathingGalaxies-28.webp' },
+	'/labs/js1k/BreathingGalaxies.html': { src: '/journal/2010/08/what-can-1kb-of-javascript-do/images/BreathingGalaxies.jpeg', webp: '/journal/2010/08/what-can-1kb-of-javascript-do/images/generated/BreathingGalaxies-320.webp' },
 	'/labs/js1k/Daltonize.html': { src: '/journal/2011/10/color-accessibility-on-digital-displays/images/hero.png', webp: '/journal/2011/10/color-accessibility-on-digital-displays/images/generated/hero-640.webp' },
-	'/labs/js1k/MicroSketchpad.html': { src: '/journal/2010/08/what-can-1kb-of-javascript-do/images/MicroSketchpad.jpeg', webp: '/journal/2010/08/what-can-1kb-of-javascript-do/images/generated/MicroSketchpad-640.webp' },
-	'/labs/js1k/SpectrumDJ.html': { src: '/journal/2010/08/what-can-1kb-of-javascript-do/images/SpectrumDJ.jpeg', webp: '/journal/2010/08/what-can-1kb-of-javascript-do/images/generated/SpectrumDJ-640.webp' },
+	'/labs/js1k/MicroSketchpad.html': { src: '/journal/2010/08/what-can-1kb-of-javascript-do/images/MicroSketchpad.jpeg', webp: '/journal/2010/08/what-can-1kb-of-javascript-do/images/MicroSketchpad.webp' },
+	'/labs/js1k/SpectrumDJ.html': { src: '/journal/2010/08/what-can-1kb-of-javascript-do/images/SpectrumDJ.jpeg' },
 	'/labs/midi-js/': { src: '/journal/2012/02/midi-js/images/hero.png', webp: '/journal/2012/02/midi-js/images/generated/hero-640.webp' },
 	'/labs/sketch-js/': { src: '/media/labs/sketch-js-card.png', webp: '/media/labs/sketch-js-card.webp' },
 	'/labs/sketchpad-1.0/': { src: '/media/labs/sketchpad-v1-card.webp' },
