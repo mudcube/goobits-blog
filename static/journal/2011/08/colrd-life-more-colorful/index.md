@@ -6,7 +6,7 @@ categories:
 tags:
   - "color"
   - "color-tools"
-coverImage: "images/Screen-Shot-2011-08-14-at-9.00.14-PM.png"
+coverImage: "images/hero.png"
 ---
 
 [ColRD](http://colrd.com/) is a new website to help you

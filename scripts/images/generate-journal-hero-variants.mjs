@@ -7,8 +7,8 @@ const ROOT = process.cwd()
 const JOURNAL_DIR = path.join(ROOT, 'static', 'journal')
 const OUTPUT_DIR_NAME = 'generated'
 const OUTPUT_BASENAME = 'hero'
-const WIDTH_CANDIDATES = [640, 960, 1280, 1600]
-const COVER_WIDTH_CANDIDATES = [320, 640]
+const WIDTH_CANDIDATES = [320, 640, 960, 1280, 1600]
+const COVER_WIDTH_CANDIDATES = [320, 640, 960, 1280, 1600]
 const MANIFEST_PATH = path.join(ROOT, 'packages', 'blog-theme-miko', 'utils', 'generated', 'journal-image-manifest.ts')
 
 async function walk(dir) {
@@ -239,7 +239,7 @@ async function run() {
 		manifest[toPublicPath(sourcePath)] = {
 			width,
 			height,
-			sizes: '160px',
+			sizes: '(min-width: 1100px) 1100px, 100vw',
 			webp: {
 				type: 'image/webp',
 				srcset: outputs.map((entry) => `${entry.src} ${entry.width}w`).join(', '),
