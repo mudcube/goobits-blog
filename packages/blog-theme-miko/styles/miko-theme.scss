@@ -571,6 +571,8 @@
 .miko-blog__entry-hero-image-wrap {
 	position: relative;
 	margin-top: var(--space-10);
+	aspect-ratio: 16 / 9;
+	max-height: 32rem;
 	overflow: hidden;
 	border: 1px solid var(--showcase-outline-variant);
 	border-radius: var(--radius-lg);
@@ -583,7 +585,6 @@
 	display: block;
 	width: 100%;
 	height: 100%;
-	max-height: 32rem;
 	object-fit: cover;
 	object-position: top center;
 }
