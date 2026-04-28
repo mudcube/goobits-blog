@@ -9,7 +9,7 @@ tags:
 coverImage: "images/120e5b61-e808-4ffa-bcfd-b06b2d188479-2.jpeg"
 ---
 
-Released June 2016. I’m excited to announce [Sketchpad 4.0](https://sketch.io/sketchpad/)! The focus of this release was making the app more colorful, faster, and easier to use. That meant rewriting a lot of the interior: real gradient editors, smoother text editing via OpenType.js, and VectorFill replacing the old bitmap FloodFill for crisper edges and much faster rendering.
+I’m excited to announce [Sketchpad 4.0](https://sketch.io/sketchpad/)! The focus of this release was making the app more colorful, faster, and easier to use. That meant rewriting a lot of the interior: real gradient editors, smoother text editing via OpenType.js, and VectorFill replacing the old bitmap FloodFill for crisper edges and much faster rendering.
 
 Here’s an overview of what’s new:
 

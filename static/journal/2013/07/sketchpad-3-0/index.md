@@ -9,7 +9,7 @@ tags:
 coverImage: "images/sketch-3-copy-3.png"
 ---
 
-Released July 2013. Sketchpad 3 is available in the Chrome Webstore (for free), combining WebGL effects with vector editing, and lots of HTML5 goodness! You can now drop a photo through webcam filters and paint onto the result in the same session, and save your whole document (vectors + attached assets) as a single .SKETCH package via drag-and-drop.
+Sketchpad 3 is available in the Chrome Webstore (for free), combining WebGL effects with vector editing, and lots of HTML5 goodness! You can now drop a photo through webcam filters and paint onto the result in the same session, and save your whole document (vectors + attached assets) as a single .SKETCH package via drag-and-drop.
 
 Some of the major improvements include:
 
