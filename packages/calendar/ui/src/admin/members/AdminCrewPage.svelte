@@ -444,7 +444,7 @@
 		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Manage access & send invites." />
 
 		<h4>MEMBERS ({users.length})</h4>
-		<div class="social-crew__list">
+		<div class="social-crew__list calendar-ui-card">
 			{#each sortedUsers as user (String(user['id'] || user['email'] || user['name']))}
 				<AdminCrewMemberCard
 					name={displayName(user)}
@@ -540,7 +540,19 @@
 
 	.social-crew__list {
 		display: grid;
-		gap: 0.5rem;
+		gap: 0;
+		overflow: hidden;
+	}
+
+	.social-crew__list :global(.calendar-ui-card) {
+		border: none;
+		border-radius: 0;
+		box-shadow: none;
+		background: transparent;
+	}
+
+	.social-crew__list :global(.calendar-ui-card + .calendar-ui-card) {
+		border-top: 1px solid color-mix(in srgb, var(--admin-card-border) 60%, transparent);
 	}
 
 	.social-crew__access {

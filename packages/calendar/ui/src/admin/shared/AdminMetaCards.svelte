@@ -30,7 +30,9 @@
 	{#if items.length === 0}
 		<div class="admin-meta-cards__empty calendar-ui-card">{emptyText}</div>
 	{:else}
-		{#each items as item (item.id)}
+		<div class="admin-meta-cards__container">
+		{#each items as item, i (item.id)}
+			{#if i > 0}<div class="admin-meta-cards__divider"></div>{/if}
 			<div class="admin-meta-cards__card">
 				<div class="admin-meta-cards__icon" aria-hidden="true">
 					{#if item.icon}
@@ -68,13 +70,25 @@
 				{/if}
 			</div>
 		{/each}
+		</div>
 	{/if}
 </div>
 
 <style>
 	.admin-meta-cards {
 		display: grid;
-		gap: 0.5rem;
+	}
+
+	.admin-meta-cards__container {
+		border: 1px solid var(--admin-card-border);
+		border-radius: 0.875rem;
+		background: var(--admin-card-bg);
+		overflow: hidden;
+	}
+
+	.admin-meta-cards__divider {
+		height: 1px;
+		background: color-mix(in srgb, var(--admin-card-border) 60%, transparent);
 	}
 
 	.admin-meta-cards__empty {
@@ -89,9 +103,6 @@
 		gap: 0.875rem;
 		padding: 0.75rem 0.875rem;
 		min-height: 4rem;
-		border-radius: 0.875rem;
-		border: 1px dashed var(--admin-card-border);
-		background: var(--admin-card-bg);
 	}
 
 	.admin-meta-cards__icon {

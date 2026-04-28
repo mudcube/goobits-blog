@@ -458,7 +458,7 @@
           </button>
         </div>
       {/if}
-      <div class="admin-settings__sync-list">
+      <div class="admin-settings__sync-list admin-settings__grouped-card">
         {#each visibleSyncProviders() as provider}
           <div class="admin-settings__sync-card">
             <div class="admin-settings__sync-main">
@@ -606,7 +606,7 @@
       </div>
 
       <div
-        class="admin-settings__payment-cards"
+        class="admin-settings__payment-cards admin-settings__grouped-card"
         role="group"
         aria-label="Payment platforms"
       >
@@ -739,9 +739,16 @@
     background: var(--admin-status-success-dot);
   }
 
+  .admin-settings__grouped-card {
+    border: 1px solid var(--admin-card-border);
+    border-radius: 0.875rem;
+    background: var(--admin-card-bg);
+    overflow: hidden;
+  }
+
   .admin-settings__sync-list {
     display: grid;
-    gap: 0.5rem;
+    gap: 0;
   }
 
   .admin-settings__sync-top-actions {
@@ -770,9 +777,11 @@
     justify-content: space-between;
     gap: 0.875rem;
     padding: 0.75rem 0.875rem;
-    border: 1px solid var(--admin-card-border);
-    background: var(--admin-card-bg);
-    border-radius: 0.875rem;
+    min-height: 4rem;
+  }
+
+  .admin-settings__sync-card + .admin-settings__sync-card {
+    border-top: 1px solid color-mix(in srgb, var(--admin-card-border) 60%, transparent);
   }
 
   .admin-settings__sync-action {
@@ -899,14 +908,15 @@
 
   .admin-settings__payment-cards {
     display: grid;
-    gap: 0.5rem;
+    gap: 0;
   }
 
   .admin-settings__payment-card {
-    border: 1px solid var(--admin-card-border);
-    background: var(--admin-card-bg);
-    border-radius: 0.875rem;
     overflow: clip;
+  }
+
+  .admin-settings__payment-card + .admin-settings__payment-card {
+    border-top: 1px solid color-mix(in srgb, var(--admin-card-border) 60%, transparent);
   }
 
   .admin-settings__payment-card--active {

@@ -16,7 +16,6 @@
 		start,
 		end,
 		overlapping = [],
-		capacity = 0,
 		onBack,
 		onEdit,
 	}: {
@@ -26,7 +25,6 @@
 		start: number
 		end: number
 		overlapping?: Person[]
-		capacity?: number
 		onBack: () => void
 		onEdit?: () => void
 	} = $props()
