@@ -11,7 +11,7 @@
 	const categories = $derived(post.metadata?.fm?.categories || [])
 	const primaryCategory = $derived(post.metadata?.fm?.category || categories[0] || '')
 	const tags = $derived(post.metadata?.fm?.tags || [])
-	const readTime = $derived(post.metadata?.fm?.readTime || 5)
+	const readTime = $derived(post.metadata?.fm?.readTime || blogConfig.posts.readTime.defaultTime)
 	const title = $derived(post.metadata?.fm?.title || 'Untitled entry')
 	const excerpt = $derived(post.metadata?.fm?.excerpt || '')
 	const thumbAlt = $derived(post.metadata?.fm?.image?.alt || title || 'Journal cover image')

@@ -32,7 +32,7 @@
 	const coverAlt = $derived(post?.metadata?.fm?.image?.alt || post?.metadata?.fm?.title || 'Journal cover image')
 	const authorAvatar = $derived(post ? getAuthorAvatarUrl(post, '') : '')
 	const authorName = $derived(post?.metadata?.fm?.author?.name || blogConfig.appName || blogConfig.name)
-	const readTime = $derived(post?.metadata?.fm?.readTime || 5)
+	const readTime = $derived(post?.metadata?.fm?.readTime || blogConfig.posts.readTime.defaultTime)
 	const primaryCategory = $derived(categories[0] || '')
 	const title = $derived(post?.metadata?.fm?.title || 'Untitled entry')
 	const excerpt = $derived(post?.metadata?.fm?.excerpt || '')
