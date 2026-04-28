@@ -114,7 +114,10 @@
 		</div>
 
 		{#if shouldShowHeroImage}
-			<div class="miko-blog__entry-hero-image-wrap">
+			<div
+				class="miko-blog__entry-hero-image-wrap"
+				class:miko-blog__entry-hero-image-wrap--small={coverVariants && coverVariants.width < 1000}
+			>
 				{#if coverVariants}
 					<picture>
 						{#if coverVariants.avif}

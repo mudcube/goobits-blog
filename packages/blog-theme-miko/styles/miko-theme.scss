@@ -108,29 +108,28 @@
 
 .miko-blog__tbody {
 	display: grid;
-	gap: var(--space-4);
-}
-
-.miko-blog__row {
-	position: relative;
-	padding: var(--space-5) var(--space-6);
+	gap: 0;
 	border: 1px solid var(--showcase-outline-variant);
 	border-radius: var(--radius-lg);
 	background: color-mix(in srgb, var(--showcase-surface-bright) 38%, transparent);
 	box-shadow: 0 25px 50px -30px rgba(0, 0, 0, 0.5);
 	backdrop-filter: blur(18px);
 	-webkit-backdrop-filter: blur(18px);
+	overflow: hidden;
+}
+
+.miko-blog__row {
+	position: relative;
+	padding: var(--space-5) var(--space-6);
 	transition:
-		background 0.4s ease,
-		border-color 0.4s ease,
-		transform 0.4s ease,
-		box-shadow 0.4s ease;
+		background 0.4s ease;
+
+	& + & {
+		border-top: 1px solid color-mix(in srgb, var(--showcase-outline-variant) 70%, transparent);
+	}
 
 	&:hover {
-		background: color-mix(in srgb, var(--showcase-surface-bright) 58%, transparent);
-		border-color: color-mix(in srgb, var(--showcase-primary) 45%, transparent);
-		transform: translateY(-2px);
-		box-shadow: 0 30px 60px -28px rgba(0, 0, 0, 0.6);
+		background: color-mix(in srgb, var(--showcase-surface-bright) 38%, transparent);
 
 		.miko-blog__row-title a {
 			color: var(--showcase-primary);
@@ -594,6 +593,22 @@
 	height: 100%;
 	object-fit: cover;
 	object-position: top center;
+}
+
+/* When the source is too small to fill at hero size, show it letterboxed
+ * over a soft showcase backdrop instead of upscaling and going blurry. */
+.miko-blog__entry-hero-image-wrap--small {
+	background:
+		radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--showcase-primary) 18%, transparent) 0%, transparent 60%),
+		linear-gradient(180deg,
+			color-mix(in srgb, var(--showcase-surface-high) 80%, transparent) 0%,
+			color-mix(in srgb, var(--showcase-surface) 92%, transparent) 100%);
+}
+
+.miko-blog__entry-hero-image-wrap--small .miko-blog__entry-hero-image {
+	object-fit: contain;
+	object-position: center;
+	padding: 1.5rem;
 }
 
 .miko-blog__entry-body-section,
