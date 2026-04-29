@@ -343,7 +343,7 @@
 		border-radius: var(--radius-md);
 		background: rgba(0, 42, 51, 0.6);
 		color: var(--apps-secondary);
-		font-size: 0.625rem;
+		font-size: 0.75rem;
 		font-weight: 700;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;

@@ -88,7 +88,7 @@
 		border-radius: var(--radius-pill);
 		background: var(--showcase-badge-bg, rgba(0, 42, 51, 0.6));
 		color: var(--showcase-badge-text, var(--showcase-secondary-on-container));
-		font-size: 0.625rem;
+		font-size: 0.75rem;
 		font-weight: 700;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;

@@ -133,6 +133,8 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
+		min-width: 44px;
+		min-height: 44px;
 		padding: 0.15rem;
 		color: var(--header-nav-color, var(--color-white));
 		text-decoration: none;
@@ -152,8 +154,8 @@
 
 	@media (max-width: 50em) {
 		:global(.layout-header__utility-link) {
-			width: 2.35rem;
-			height: 2.35rem;
+			width: 44px;
+			height: 44px;
 			padding: 0;
 			border: 1px solid color-mix(in srgb, var(--color-white) 14%, transparent);
 			border-radius: var(--radius-pill);

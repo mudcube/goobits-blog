@@ -106,8 +106,8 @@
 		display: none;
 		align-items: center;
 		justify-content: center;
-		width: 2.35rem;
-		height: 2.35rem;
+		width: 44px;
+		height: 44px;
 		padding: 0;
 		border: 1px solid rgba(255, 255, 255, 0.14);
 		border-radius: var(--radius-pill);

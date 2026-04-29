@@ -96,7 +96,7 @@
 .miko-blog__thead {
 	padding: 0 var(--space-6) var(--space-3);
 	color: color-mix(in srgb, var(--showcase-muted) 70%, transparent);
-	font-size: 0.62rem;
+	font-size: 0.75rem;
 	font-weight: var(--font-weight-semibold);
 	letter-spacing: 0.22em;
 	text-transform: uppercase;
@@ -165,7 +165,7 @@
 .miko-blog__row-date-meta {
 	margin-top: 0.35rem;
 	color: color-mix(in srgb, var(--showcase-muted) 70%, transparent);
-	font-size: 0.6rem;
+	font-size: 0.75rem;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
 }
@@ -468,6 +468,10 @@
 }
 
 .miko-blog__breadcrumbs a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+	padding: 0 0.25rem;
 	color: color-mix(in srgb, var(--showcase-muted) 85%, transparent);
 	text-decoration: none;
 	transition: color 0.25s ease;
@@ -560,7 +564,7 @@
 .miko-blog__entry-byline-role {
 	margin: 0.1rem 0 0;
 	color: var(--showcase-muted);
-	font-size: 0.65rem;
+	font-size: 0.75rem;
 	font-weight: var(--font-weight-semibold);
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
