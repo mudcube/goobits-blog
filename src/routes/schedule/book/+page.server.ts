@@ -19,9 +19,29 @@ const PERSON_COLORS = [
 	'#4ab5d8'
 ]
 
-function isoToDecimalHour(iso: string): number {
-	const d = new Date(iso)
-	return d.getHours() + d.getMinutes() / 60
+const VENUE_TIMEZONE = 'America/Los_Angeles'
+const venueDayFormatter = new Intl.DateTimeFormat('en-CA', {
+	timeZone: VENUE_TIMEZONE,
+	year: 'numeric',
+	month: '2-digit',
+	day: '2-digit'
+})
+const venueHourFormatter = new Intl.DateTimeFormat('en-US', {
+	timeZone: VENUE_TIMEZONE,
+	hour: '2-digit',
+	minute: '2-digit',
+	hour12: false
+})
+
+function venueDayKey(iso: string): string {
+	return venueDayFormatter.format(new Date(iso))
+}
+
+function venueDecimalHour(iso: string): number {
+	const parts = venueHourFormatter.formatToParts(new Date(iso))
+	const h = Number(parts.find((p) => p.type === 'hour')?.value ?? 0)
+	const m = Number(parts.find((p) => p.type === 'minute')?.value ?? 0)
+	return (h === 24 ? 0 : h) + m / 60
 }
 
 function eventToOpenDay(events: CalendarFeedEvent[], activitySlug: string): OpenDay[] {
@@ -29,7 +49,7 @@ function eventToOpenDay(events: CalendarFeedEvent[], activitySlug: string): Open
 
 	for (const ev of events) {
 		if (activitySlug && ev.activitySlug !== activitySlug) continue
-		const dateKey = ev.startsAt.split('T')[0]!
+		const dateKey = venueDayKey(ev.startsAt)
 		const existing = byDate.get(dateKey) ?? []
 		existing.push(ev)
 		byDate.set(dateKey, existing)
@@ -39,8 +59,8 @@ function eventToOpenDay(events: CalendarFeedEvent[], activitySlug: string): Open
 	for (const [dateStr, dayEvents] of byDate) {
 		// Use the first event's window as the day's window
 		const first = dayEvents[0]!
-		const windowStart = isoToDecimalHour(first.startsAt)
-		const windowEnd = isoToDecimalHour(first.endsAt)
+		const windowStart = venueDecimalHour(first.startsAt)
+		const windowEnd = venueDecimalHour(first.endsAt)
 
 		const bookings: Person[] = []
 		for (const ev of dayEvents) {
@@ -48,14 +68,14 @@ function eventToOpenDay(events: CalendarFeedEvent[], activitySlug: string): Open
 				bookings.push({
 					name: p.name ?? 'Guest',
 					color: PERSON_COLORS[bookings.length % PERSON_COLORS.length]!,
-					start: isoToDecimalHour(ev.startsAt),
-					end: isoToDecimalHour(ev.endsAt)
+					start: venueDecimalHour(ev.startsAt),
+					end: venueDecimalHour(ev.endsAt)
 				})
 			}
 		}
 
 		days.push({
-			date: new Date(dateStr + 'T00:00:00'),
+			date: new Date(dateStr + 'T12:00:00Z'),
 			eventId: first.id,
 			bookings,
 			windowStart,

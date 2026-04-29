@@ -555,6 +555,7 @@
 	}
 
 	function onTopbarToggleSettings() {
+		if (!settingsOpen && popOpen) closePop()
 		settingsOpen = !settingsOpen
 	}
 
