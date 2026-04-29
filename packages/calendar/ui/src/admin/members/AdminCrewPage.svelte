@@ -6,7 +6,7 @@
 	import { createAdminMembersController } from '@calendar/ui/admin/members/admin-members.svelte'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import { createInviteShareLink } from '@calendar/ui/admin/dashboard/admin-dashboard'
-	import { Copy, Trash2, Mail } from '@lucide/svelte'
+	import { Copy, Trash2, Ticket, Hourglass, CircleDashed } from '@lucide/svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
@@ -57,6 +57,18 @@
 	let createdInviteId = $state('')
 	let createdInviteCode = $state('')
 	let inviteAnchorRect = $state<AdminInviteAnchorRect | null>(null)
+
+	type InviteStatus = 'pending' | 'expired' | 'exhausted'
+	type InviteFilter = 'all' | InviteStatus
+	let inviteFilter = $state<InviteFilter>('all')
+	let confirmBulkDelete = $state(false)
+
+	function inviteStatus(invite: InviteRow): InviteStatus {
+		const expiresAt = invite.expires_at
+		if (typeof expiresAt === 'number' && expiresAt * 1000 < Date.now()) return 'expired'
+		if (invite.uses_remaining === 0) return 'exhausted'
+		return 'pending'
+	}
 
 	$effect(() => {
 		if (!authed) return
@@ -221,7 +233,15 @@
 		return "Hasn't been in a while"
 	}
 
-	const inviteItems = $derived.by(() => {
+	type InviteAugmented = {
+		id: string
+		code: string
+		label: string
+		detail: string
+		status: InviteStatus
+	}
+
+	const inviteItems = $derived.by<InviteAugmented[]>(() => {
 		return invites.map((invite) => {
 			const id = String(invite['id'] || invite['code'] || crypto.randomUUID())
 			const code = String(invite['code'] || '')
@@ -232,14 +252,71 @@
 			const daysAgo = createdAt ? Math.max(0, Math.floor((Date.now() - createdAt) / (24 * 60 * 60 * 1000))) : 0
 			const expiresInDays = Number(invite['expires_in_days'] || members.inviteExpires || 7)
 			const possessive = inviteName.endsWith('s') ? `${inviteName}' invite` : `${inviteName}'s invite`
+			const status = inviteStatus(invite)
+			const sentLabel = `Sent ${daysAgo === 0 ? 'today' : `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago`}`
+			let detail: string
+			if (status === 'expired') {
+				detail = `Expired · ${sentLabel.toLowerCase()}`
+			} else if (status === 'exhausted') {
+				detail = `Used up · ${sentLabel.toLowerCase()}`
+			} else {
+				detail = `${sentLabel} · expires in ${expiresInDays} day${expiresInDays === 1 ? '' : 's'}`
+			}
 			return {
 				id,
 				code,
-				label: inviteName ? possessive : 'Pending invite',
-				detail: `Sent ${daysAgo === 0 ? 'today' : `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago`} · expires in ${expiresInDays} days`
+				label: inviteName ? possessive : code || 'Pending invite',
+				detail,
+				status
 			}
 		})
 	})
+
+	const inviteCounts = $derived.by(() => {
+		const c = { all: inviteItems.length, pending: 0, expired: 0, exhausted: 0 }
+		for (const it of inviteItems) c[it.status]++
+		return c
+	})
+
+	const visibleInviteItems = $derived.by(() => {
+		const filtered = inviteFilter === 'all'
+			? inviteItems
+			: inviteItems.filter((it) => it.status === inviteFilter)
+		// Sort: pending first, then expired, then exhausted
+		const order: Record<InviteStatus, number> = { pending: 0, expired: 1, exhausted: 2 }
+		return [...filtered].sort((a, b) => order[a.status] - order[b.status])
+	})
+
+	function statusIcon(status: InviteStatus) {
+		if (status === 'expired') return Hourglass
+		if (status === 'exhausted') return CircleDashed
+		return Ticket
+	}
+
+	function statusDotColor(status: InviteStatus) {
+		if (status === 'expired') return '#9ca3af'
+		if (status === 'exhausted') return '#d97706'
+		return '#a78bfa'
+	}
+
+	async function deleteAllExpired() {
+		const expired = inviteItems.filter((it) => it.status === 'expired')
+		if (expired.length === 0) return
+		if (mockMode) {
+			const ids = new Set(expired.map((it) => it.id))
+			mockInvitesState = mockInvitesState.filter((inv) => !ids.has(String(inv.id ?? inv.code ?? '')))
+			confirmBulkDelete = false
+			showToast(`Deleted ${expired.length} expired invite${expired.length === 1 ? '' : 's'}`)
+			return
+		}
+		await Promise.all(expired.map((it) => members.deleteInvite(it.id)))
+		confirmBulkDelete = false
+		if (members.error) {
+			showToast(members.error)
+			return
+		}
+		showToast(`Deleted ${expired.length} expired invite${expired.length === 1 ? '' : 's'}`)
+	}
 
 	function showToast(message: string, undo: null | (() => Promise<void>) = null) {
 		toastMessage = message
@@ -441,7 +518,7 @@
 
 {#if authed}
 	<div class="social-crew admin-content">
-		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Manage access & send invites." />
+		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Everyone with access — and everyone who could have it." />
 
 		<h4>MEMBERS ({users.length})</h4>
 		<div class="social-crew__list calendar-ui-card">
@@ -462,14 +539,39 @@
 			{/each}
 		</div>
 
-		<h4>INVITES ({inviteItems.length})</h4>
+		<h4>INVITE LINKS ({inviteCounts.all})</h4>
+
+		{#if inviteCounts.all > 0}
+			<div class="social-crew__filters">
+				<button type="button" class="social-crew__chip" class:social-crew__chip--active={inviteFilter === 'all'} onclick={() => { inviteFilter = 'all' }}>All ({inviteCounts.all})</button>
+				<button type="button" class="social-crew__chip" class:social-crew__chip--active={inviteFilter === 'pending'} onclick={() => { inviteFilter = 'pending' }}>Pending ({inviteCounts.pending})</button>
+				<button type="button" class="social-crew__chip" class:social-crew__chip--active={inviteFilter === 'expired'} onclick={() => { inviteFilter = 'expired' }}>Expired ({inviteCounts.expired})</button>
+				<button type="button" class="social-crew__chip" class:social-crew__chip--active={inviteFilter === 'exhausted'} onclick={() => { inviteFilter = 'exhausted' }}>Exhausted ({inviteCounts.exhausted})</button>
+				{#if inviteCounts.expired > 0}
+					<button type="button" class="social-crew__bulk" onclick={() => { confirmBulkDelete = true }}>Delete {inviteCounts.expired} expired</button>
+				{/if}
+			</div>
+		{/if}
+
+		{#if confirmBulkDelete}
+			<div class="social-crew__notice">
+				<p>Delete all {inviteCounts.expired} expired invite{inviteCounts.expired === 1 ? '' : 's'}?</p>
+				<div class="social-crew__notice-actions">
+					<button type="button" class="admin-ui-btn" onclick={() => { confirmBulkDelete = false }}>Cancel</button>
+					<button type="button" class="admin-ui-btn admin-ui-btn--danger" onclick={() => void deleteAllExpired()}>Delete all</button>
+				</div>
+			</div>
+		{/if}
+
 		<AdminMetaCards
-			items={inviteItems.map((invite) => ({
+			items={visibleInviteItems.map((invite) => ({
 				id: invite.id,
 				label: invite.label,
 				detail: invite.detail,
-				icon: Mail,
-				actions: [
+				dotIcon: statusIcon(invite.status),
+				dotColor: statusDotColor(invite.status),
+				dimmed: invite.status === 'expired' || invite.status === 'exhausted',
+				actions: invite.status === 'pending' ? [
 					{
 						variant: 'subtle' as const,
 						icon: Copy,
@@ -482,9 +584,16 @@
 						ariaLabel: 'Delete invite',
 						onclick: (): void => void deleteInviteWithToast(invite.id)
 					}
+				] : [
+					{
+						variant: 'danger' as const,
+						icon: Trash2,
+						ariaLabel: 'Delete invite',
+						onclick: (): void => void deleteInviteWithToast(invite.id)
+					}
 				]
 			}))}
-			emptyText="No active invites yet."
+			emptyText={inviteFilter === 'all' ? 'No invites yet.' : `No ${inviteFilter} invites.`}
 		/>
 
 		{#if expandedUserId}
@@ -592,5 +701,74 @@
 		align-items: center;
 		gap: 0.75rem;
 		z-index: 120;
+	}
+
+	.social-crew__filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		margin: 0 0 0.85rem;
+		align-items: center;
+	}
+
+	.social-crew__chip {
+		appearance: none;
+		padding: 0.35rem 0.75rem;
+		border-radius: 999px;
+		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+		background: transparent;
+		color: color-mix(in srgb, var(--text) 65%, transparent);
+		font-size: 0.74rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 140ms, color 140ms, border-color 140ms;
+	}
+
+	.social-crew__chip:hover {
+		background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
+		color: var(--text);
+	}
+
+	.social-crew__chip--active {
+		background: color-mix(in srgb, var(--admin-accent) 14%, transparent);
+		border-color: color-mix(in srgb, var(--admin-accent) 36%, transparent);
+		color: color-mix(in srgb, var(--admin-accent) 86%, var(--text) 14%);
+	}
+
+	.social-crew__bulk {
+		appearance: none;
+		margin-left: auto;
+		padding: 0.35rem 0.75rem;
+		border-radius: 999px;
+		border: 1px solid color-mix(in srgb, #b91c1c 32%, transparent);
+		background: color-mix(in srgb, #b91c1c 8%, transparent);
+		color: color-mix(in srgb, #b91c1c 90%, var(--text) 10%);
+		font-size: 0.72rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.social-crew__bulk:hover {
+		background: color-mix(in srgb, #b91c1c 14%, transparent);
+	}
+
+	.social-crew__notice {
+		margin: 0 0 1rem;
+		padding: 0.65rem 0.85rem;
+		border-radius: 0.875rem;
+		background: color-mix(in srgb, #f87171 4%, transparent);
+		border: 1px solid color-mix(in srgb, #f87171 14%, transparent);
+		font-size: 0.82rem;
+	}
+
+	.social-crew__notice p {
+		margin: 0 0 0.5rem;
+		font-weight: 600;
+	}
+
+	.social-crew__notice-actions {
+		display: flex;
+		gap: 0.4rem;
+		justify-content: flex-end;
 	}
 </style>

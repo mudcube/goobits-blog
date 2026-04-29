@@ -5,7 +5,6 @@
 		LayoutDashboard,
 		LogOut,
 		Settings,
-		Ticket,
 		Users
 	} from '@lucide/svelte'
 	import { getCalendarUiConfig } from '../../../config'
@@ -30,8 +29,7 @@
 	const primaryNav: NavItem[] = [
 		{ href: `${adminBase}/`, label: 'Dashboard', icon: LayoutDashboard, section: 'dashboard' },
 		{ href: `${adminBase}/crew/`, label: 'Crew', icon: Users, section: 'crew' },
-		{ href: `${adminBase}/events/`, label: 'Events', icon: CalendarDays, section: 'events' },
-		{ href: `${adminBase}/invites/`, label: 'Invites', icon: Ticket, section: 'invites' }
+		{ href: `${adminBase}/events/`, label: 'Events', icon: CalendarDays, section: 'events' }
 	]
 
 	const footerNav: NavItem[] = [

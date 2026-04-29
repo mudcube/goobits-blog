@@ -1,6 +1,6 @@
 import { getCalendarUiConfig } from '../../config'
 
-export type AdminNavSection = 'dashboard' | 'crew' | 'events' | 'invites' | 'settings'
+export type AdminNavSection = 'dashboard' | 'crew' | 'events' | 'settings'
 
 export type AdminBreadcrumbItem = {
 	label: string
@@ -13,7 +13,6 @@ export type AdminRouteActionId =
 	| 'new-event'
 	| 'back-to-events'
 	| 'crew-invite'
-	| 'create-invite'
 	| 'view-calendar'
 	| 'event-edit'
 	| 'event-cancel'
@@ -163,15 +162,6 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 		}
 	}
 
-	if (normalized === `${adminBase}/invites`) {
-		return {
-			kind: 'settings',
-			currentSection: 'invites',
-			title: 'Invites',
-			breadcrumbs: [...baseCrumbs, { label: 'Invites' }],
-			actions: ['create-invite']
-		}
-	}
 
 	return {
 		kind: 'settings',
