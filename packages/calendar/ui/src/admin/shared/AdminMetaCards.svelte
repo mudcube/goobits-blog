@@ -115,14 +115,14 @@
 								{#if action.label}
 									<AdminActionButton
 										variant={action.variant || 'subtle'}
-										icon={action.icon}
+										icon={action.icon ?? null}
 										ariaLabel={action.ariaLabel}
 										onclick={action.onclick}
 									>{action.label}</AdminActionButton>
 								{:else}
 									<AdminActionButton
 										variant={action.variant || 'subtle'}
-										icon={action.icon}
+										icon={action.icon ?? null}
 										ariaLabel={action.ariaLabel}
 										onclick={action.onclick}
 									/>

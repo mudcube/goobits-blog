@@ -18,7 +18,7 @@
 		{ name: 'Tyler', color: '#d8944a', start: 13, end: 15 },
 	]
 	const weather = createMockWeatherProvider()
-	const mockOpenDays = data.useMockData ? buildMockOpenDays(GYM, DEMO_PEOPLE) : []
+	const mockOpenDays = $derived(data.useMockData ? buildMockOpenDays(GYM, DEMO_PEOPLE) : [])
 
 	let tourRef: SpotlightTour
 
@@ -39,8 +39,8 @@
 		} else if (phase === 2) goStep(2)
 	}
 
-	const activity = data.useMockData ? GYM : data.activity
-	const openDays = (data.useMockData ? mockOpenDays : data.openDays) as OpenDay[]
+	const activity = $derived(data.useMockData ? GYM : data.activity)
+	const openDays = $derived((data.useMockData ? mockOpenDays : data.openDays) as OpenDay[])
 
 	let stepNum = $state(0)
 	let selectedDay = $state<OpenDay | null>(null)
@@ -60,30 +60,6 @@
 	})
 	const HOURLY = $derived((dayWeather?.hourly ?? []) as import('@calendar/ui').HourlyWeather[])
 	const hasAnyRain = $derived(HOURLY.some(w => w.precipitation > 0))
-
-	let calYear = $state(new Date().getFullYear())
-	let calMonthIdx = $state(new Date().getMonth())
-
-	function prevMonth() { if (calMonthIdx === 0) { calMonthIdx = 11; calYear-- } else { calMonthIdx-- } }
-	function nextMonth() { if (calMonthIdx === 11) { calMonthIdx = 0; calYear++ } else { calMonthIdx++ } }
-
-	const calMonthLabel = $derived(new Date(calYear, calMonthIdx).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }))
-	const calDays = $derived.by(() => {
-		const year = calYear; const month = calMonthIdx
-		const first = new Date(year, month, 1); const last = new Date(year, month + 1, 0)
-		const pad = (first.getDay() + 6) % 7
-		const cells: Array<{ date: Date; inMonth: boolean; isToday: boolean; isOpen: boolean; isPast: boolean; bookingCount: number }> = []
-		for (let i = pad - 1; i >= 0; i--) cells.push({ date: new Date(year, month, -i), inMonth: false, isToday: false, isOpen: false, isPast: true, bookingCount: 0 })
-		const today = new Date(); today.setHours(0, 0, 0, 0)
-		for (let d = 1; d <= last.getDate(); d++) {
-			const dt = new Date(year, month, d); const match = openDays.find(od => od.date.getTime() === dt.getTime())
-			cells.push({ date: dt, inMonth: true, isToday: dt.getTime() === today.getTime(), isOpen: !!match, isPast: dt < today, bookingCount: match?.bookings.length ?? 0 })
-		}
-		const endPad = (7 - cells.length % 7) % 7
-		for (let i = 1; i <= endPad; i++) cells.push({ date: new Date(year, month + 1, i), inMonth: false, isToday: false, isOpen: false, isPast: false, bookingCount: 0 })
-		return cells
-	})
-	const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 	function goStep(n: number) {
 		direction = n >= stepNum ? 'forward' : 'back'
@@ -161,7 +137,7 @@
 		<button type="button" class="book__help" data-tip="Take the tour" aria-label="Take a guided tour" onclick={() => tourRef.showPrompt()}>?</button>
 
 		{#if stepNum === 0}
-			<CalendarStep {activity} {calDays} weekdays={WEEKDAYS} {openDays} {claimed} bind:pendingDay {onSelectDay} {onClaim} monthLabel={calMonthLabel} {prevMonth} {nextMonth} />
+			<CalendarStep {activity} {openDays} {claimed} bind:pendingDay {onSelectDay} {onClaim} />
 
 		{:else if stepNum === 1 && selectedDay}
 			{#if dayWeather}

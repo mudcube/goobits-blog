@@ -2,19 +2,28 @@ import type { D1DatabaseLike } from '../storage/d1.ts'
 
 export function generateConfirmationId(): string {
 	const bytes = crypto.getRandomValues(new Uint8Array(16))
-	return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
+	return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-export async function setConfirmationId(
-	db: D1DatabaseLike,
-	participantId: number
-): Promise<string> {
+export async function setConfirmationId(db: D1DatabaseLike, participantId: number): Promise<string> {
 	for (let attempt = 0; attempt < 3; attempt++) {
 		const confirmationId = generateConfirmationId()
 		try {
-			await db.prepare(
-				`UPDATE calendar_event_participants SET confirmation_id = ? WHERE id = ?`
-			).bind(confirmationId, participantId).run()
+			const result = await db
+				.prepare(
+					`UPDATE calendar_event_participants
+				 SET confirmation_id = ?
+				 WHERE id = ? AND confirmation_id IS NULL`
+				)
+				.bind(confirmationId, participantId)
+				.run()
+			if ((result.meta?.changes ?? 0) > 0) return confirmationId
+
+			const existing = await db
+				.prepare(`SELECT confirmation_id FROM calendar_event_participants WHERE id = ? LIMIT 1`)
+				.bind(participantId)
+				.first<{ confirmation_id: string | null }>()
+			if (existing?.confirmation_id) return existing.confirmation_id
 			return confirmationId
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : ''
@@ -40,15 +49,18 @@ export async function getBookingByConfirmation(
 	event_end: string | null
 	activity_slug: string | null
 } | null> {
-	const row = await db.prepare(
-		`SELECT
+	const row = await db
+		.prepare(
+			`SELECT
 			p.id, p.event_id, p.user_id, p.status, p.guest_count, p.confirmation_id,
 			e.title AS event_title, e.starts_at AS event_start, e.ends_at AS event_end, e.activity_slug
 		 FROM calendar_event_participants p
 		 JOIN calendar_events e ON e.id = p.event_id
 		 WHERE p.confirmation_id = ?
 		 LIMIT 1`
-	).bind(confirmationId).first()
+		)
+		.bind(confirmationId)
+		.first()
 	if (!row) return null
 	return {
 		id: row['id'] as number,
@@ -76,9 +88,12 @@ export async function cancelBookingByConfirmation(
 		return { ok: false, code: 'already_cancelled' }
 	}
 
-	await db.prepare(
-		`UPDATE calendar_event_participants SET status = 'left', guest_count = 0, updated_at = unixepoch() WHERE id = ?`
-	).bind(booking.id).run()
+	await db
+		.prepare(
+			`UPDATE calendar_event_participants SET status = 'left', guest_count = 0, updated_at = unixepoch() WHERE id = ?`
+		)
+		.bind(booking.id)
+		.run()
 
 	return { ok: true, eventId: booking.event_id }
 }

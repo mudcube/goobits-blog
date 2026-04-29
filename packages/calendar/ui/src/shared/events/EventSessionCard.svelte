@@ -15,6 +15,8 @@
 		startsAt: string
 		seatsTaken: number
 		capacity: number
+		userStatus?: 'joined' | 'waitlist' | null
+		userGuestCount?: number | null
 		participants?: Participant[]
 	}
 
@@ -47,6 +49,16 @@
 		const second = parts[1]?.charAt(0) ?? ''
 		return `${first}${second}`.toUpperCase() || raw.slice(0, 2).toUpperCase()
 	}
+
+	function showCurrentUser() {
+		return event.userStatus === 'joined' || event.userStatus === 'waitlist'
+	}
+
+	function participantAvatarCount() {
+		const selfSeats =
+			event.userStatus === 'joined' ? 1 + Math.max(0, event.userGuestCount ?? 0) : 0
+		return Math.min(Math.max(0, (event.seatsTaken || 0) - selfSeats), 5)
+	}
 </script>
 
 <button
@@ -71,8 +83,10 @@
 			{/if}
 		</div>
 		<div class="event-session-card__people">
-			<span class="event-session-card__avatar event-session-card__avatar--you">You</span>
-			{#each Array.from({ length: Math.min(event.seatsTaken || 0, 5) }, (_value, idx) => idx) as i (i)}
+			{#if showCurrentUser()}
+				<span class="event-session-card__avatar event-session-card__avatar--you">You</span>
+			{/if}
+			{#each Array.from({ length: participantAvatarCount() }, (_value, idx) => idx) as i (i)}
 				<span class="event-session-card__avatar">{initials(i)}</span>
 			{/each}
 			<span class="event-session-card__people-text" data-testid="member-event-attendance">

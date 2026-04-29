@@ -27,6 +27,9 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Type, lint, and critical e2e
         run: pnpm ci:gate
 

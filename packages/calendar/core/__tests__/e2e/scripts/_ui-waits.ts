@@ -2,10 +2,11 @@ import type { APIRequestContext, Page } from 'playwright'
 import { BASE_URL, sleep, withRequestRetry } from './_helpers'
 
 export async function waitForMonthLabel(page: Page, timeout = 5_000) {
-	const monthTitle = page.locator('.member-calendar__month-banner-title')
+	await page.locator('[data-calendar-ready="true"]').waitFor({ timeout })
+	const monthTitle = page.locator('.member-calendar__month-banner-title, .cg__nav-label').first()
 	await monthTitle.waitFor({ timeout })
 	await page.waitForFunction(
-		() => (document.querySelector('.member-calendar__month-banner-title')?.textContent || '').trim().length > 0,
+		() => (document.querySelector('.member-calendar__month-banner-title, .cg__nav-label')?.textContent || '').trim().length > 0,
 		undefined,
 		{ timeout }
 	)
@@ -15,7 +16,7 @@ export async function waitForMonthLabel(page: Page, timeout = 5_000) {
 export async function waitForMonthChange(page: Page, previousLabel: string, timeout = 5_000) {
 	await page.waitForFunction(
 		(previous) => {
-			const current = (document.querySelector('.member-calendar__month-banner-title')?.textContent || '').trim()
+			const current = (document.querySelector('.member-calendar__month-banner-title, .cg__nav-label')?.textContent || '').trim()
 			return current.length > 0 && current !== previous
 		},
 		previousLabel,
@@ -25,20 +26,19 @@ export async function waitForMonthChange(page: Page, previousLabel: string, time
 }
 
 export async function waitForAvailableDays(page: Page, timeout = 5_000) {
-	await page.locator('.member-calendar__viewport').waitFor({ timeout })
+	await page.locator('[data-calendar-ready="true"]').waitFor({ timeout })
+	await page.locator('.member-calendar__viewport, .cg__viewport').waitFor({ timeout })
 	await page.waitForFunction(
-		() => document.querySelectorAll('.member-calendar__day--available').length > 0,
+		() => document.querySelectorAll('.member-calendar__day--available, .cg__cell--active').length > 0,
 		undefined,
 		{ timeout }
 	)
 }
 
 export async function waitForSlotButtons(page: Page, timeout = 10_000) {
-	await page.waitForFunction(
-		() => document.querySelectorAll('.calendar-page__slot-button').length > 0,
-		undefined,
-		{ timeout }
-	)
+	await page.waitForFunction(() => document.querySelectorAll('.calendar-page__slot-button').length > 0, undefined, {
+		timeout
+	})
 }
 
 export async function waitForFeedEvent(
@@ -49,15 +49,12 @@ export async function waitForFeedEvent(
 	delayMs = 300
 ) {
 	for (let attempt = 0; attempt < attempts; attempt += 1) {
-		const res = await withRequestRetry(
-			`wait for feed event ${title}`,
-			() => request.get(`${BASE_URL}/api/calendar/events`)
+		const res = await withRequestRetry(`wait for feed event ${title}`, () =>
+			request.get(`${BASE_URL}/api/calendar/events`)
 		)
 		if (res.ok()) {
-			const json = await res.json() as { upcoming?: Array<Record<string, unknown>> }
-			const found = (json.upcoming ?? []).find(
-				(event) => event['title'] === title && (!predicate || predicate(event))
-			)
+			const json = (await res.json()) as { upcoming?: Array<Record<string, unknown>> }
+			const found = (json.upcoming ?? []).find((event) => event['title'] === title && (!predicate || predicate(event)))
 			if (found) return found
 		}
 		await sleep(delayMs)
@@ -73,12 +70,11 @@ export async function waitForFeedEventById(
 	delayMs = 300
 ) {
 	for (let attempt = 0; attempt < attempts; attempt += 1) {
-		const res = await withRequestRetry(
-			`wait for feed event id ${eventId}`,
-			() => request.get(`${BASE_URL}/api/calendar/events`)
+		const res = await withRequestRetry(`wait for feed event id ${eventId}`, () =>
+			request.get(`${BASE_URL}/api/calendar/events`)
 		)
 		if (res.ok()) {
-			const json = await res.json() as { upcoming?: Array<Record<string, unknown>> }
+			const json = (await res.json()) as { upcoming?: Array<Record<string, unknown>> }
 			const found = (json.upcoming ?? []).find(
 				(event) => Number(event['id']) === eventId && (!predicate || predicate(event))
 			)
@@ -97,9 +93,8 @@ export async function requireFeedEvent(
 	const found = await waitForFeedEvent(request, title, predicate)
 	if (found) return found
 
-	const res = await withRequestRetry(
-		`require feed event ${title}`,
-		() => request.get(`${BASE_URL}/api/calendar/events`)
+	const res = await withRequestRetry(`require feed event ${title}`, () =>
+		request.get(`${BASE_URL}/api/calendar/events`)
 	)
 	const status = res.status()
 	const body = await res.text().catch(() => '')
@@ -114,16 +109,20 @@ export async function requireFeedEventById(
 	const found = await waitForFeedEventById(request, eventId, predicate)
 	if (found) return found
 
-	const res = await withRequestRetry(
-		`require feed event id ${eventId}`,
-		() => request.get(`${BASE_URL}/api/calendar/events`)
+	const res = await withRequestRetry(`require feed event id ${eventId}`, () =>
+		request.get(`${BASE_URL}/api/calendar/events`)
 	)
 	const status = res.status()
 	const body = await res.text().catch(() => '')
 	throw new Error(`calendar feed event not found (id=${eventId}); status=${status}; body=${body.slice(0, 1000)}`)
 }
 
-export async function waitForAttendanceCount(page: Page, eventId: number | string, expectedText: string, timeout = 30_000) {
+export async function waitForAttendanceCount(
+	page: Page,
+	eventId: number | string,
+	expectedText: string,
+	timeout = 30_000
+) {
 	await page
 		.locator(`[data-testid="member-event-card"][data-event-id="${eventId}"] [data-testid="member-event-attendance"]`, {
 			hasText: expectedText

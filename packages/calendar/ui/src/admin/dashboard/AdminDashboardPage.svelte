@@ -121,12 +121,6 @@ const adminMockCatalog = getAdminMockCatalog()
 		gap: 0.75rem;
 	}
 
-	.social-home__loading {
-		margin: 0;
-		padding: 0.8rem 0;
-		font-size: 0.9rem;
-		color: color-mix(in srgb, var(--text) 58%, transparent);
-	}
 
 	.social-home__detail-scrim {
 		z-index: 100;

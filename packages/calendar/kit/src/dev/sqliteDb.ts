@@ -24,12 +24,14 @@ function ensureDbDir(dbPath: string) {
 function runMigrations(db: Database.Database) {
 	db.exec(`CREATE TABLE IF NOT EXISTS migrations (name TEXT PRIMARY KEY, applied_at INTEGER NOT NULL)`)
 	const applied = new Set(
-		(db.prepare(`SELECT name FROM migrations`).all() as Array<Record<string, unknown>>)
-			.map((row) => String(row['name']))
+		(db.prepare(`SELECT name FROM migrations`).all() as Array<Record<string, unknown>>).map((row) =>
+			String(row['name'])
+		)
 	)
 
-	const files = fs.readdirSync(MIGRATIONS_DIR)
-		.filter(f => f.endsWith('.sql'))
+	const files = fs
+		.readdirSync(MIGRATIONS_DIR)
+		.filter((f) => f.endsWith('.sql'))
 		.sort()
 
 	const insertApplied = db.prepare(`INSERT INTO migrations (name, applied_at) VALUES (?, strftime('%s','now'))`)
@@ -62,7 +64,12 @@ function wrapStatement(stmt: Database.Statement): D1PreparedStatement {
 			const info = stmt.run(...bound)
 			// D1 exposes `last_row_id` as a number. better-sqlite3 types allow bigint.
 			// In dev we coerce to number for API compatibility.
-			return { meta: { last_row_id: Number(info.lastInsertRowid), changes: info.changes } }
+			return {
+				meta: {
+					last_row_id: Number(info.lastInsertRowid),
+					changes: info.changes
+				}
+			}
 		}
 	}
 	return statement
@@ -73,6 +80,7 @@ export function createSqliteDb(options?: { dbPath?: string }): D1DatabaseLike {
 	ensureDbDir(dbPath)
 	const db = new Database(dbPath)
 	runMigrations(db)
+	db.pragma('foreign_keys = ON')
 
 	return {
 		prepare(sql: string) {

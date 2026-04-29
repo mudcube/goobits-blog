@@ -38,6 +38,10 @@ async function tryBootstrapDevCalendarSession(event: Parameters<Handle>[0]['even
 
 export type CalendarAppHookConfig = CalendarConfigInput['routes']
 
+function isRouteUnder(pathname: string, base: string) {
+	return pathname === base || pathname.startsWith(`${base}/`)
+}
+
 export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 	const routes = { ...getCalendarConfig().routes, ...config }
 	const adminBase = routes.adminBase
@@ -57,9 +61,9 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 		const pathname = event.url.pathname
 
 		if (
-			!pathname.startsWith(adminBase) &&
-			!pathname.startsWith(apiAdminBase) &&
-			!pathname.startsWith(apiCalendarAdminBase)
+			!isRouteUnder(pathname, adminBase) &&
+			!isRouteUnder(pathname, apiAdminBase) &&
+			!isRouteUnder(pathname, apiCalendarAdminBase)
 		) {
 			return resolve(event)
 		}
@@ -74,7 +78,7 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 				throw error
 			}
 			console.error('[admin-auth] unavailable', error)
-			if (pathname.startsWith(adminBase)) {
+			if (isRouteUnder(pathname, adminBase)) {
 				;(event.locals as { user?: unknown }).user = undefined
 				return resolve(event)
 			}
@@ -89,8 +93,11 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 
 		const pathname = event.url.pathname
 		if (
-			pathname.startsWith(apiCalendarAdminBase) ||
-			(!pathname.startsWith(calendarBase) && !pathname.startsWith(apiCalendarBase) && !pathname.startsWith(authBase))
+			isRouteUnder(pathname, adminBase) ||
+			isRouteUnder(pathname, apiCalendarAdminBase) ||
+			(!isRouteUnder(pathname, calendarBase) &&
+				!isRouteUnder(pathname, apiCalendarBase) &&
+				!isRouteUnder(pathname, authBase))
 		) {
 			return resolve(event)
 		}
@@ -108,7 +115,7 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 
 		const pathname = event.url.pathname
 
-		if (!pathname.startsWith(calendarBase)) {
+		if (!isRouteUnder(pathname, calendarBase) || isRouteUnder(pathname, adminBase)) {
 			return resolve(event)
 		}
 
@@ -117,7 +124,7 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 			pathname === `${calendarLoginPath}/` ||
 			pathname === calendarLoginRedirectPath ||
 			pathname === `${calendarLoginRedirectPath}/` ||
-			pathname.startsWith(apiCalendarBase)
+			isRouteUnder(pathname, apiCalendarBase)
 		) {
 			return resolve(event)
 		}

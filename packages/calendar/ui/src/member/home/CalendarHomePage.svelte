@@ -11,8 +11,8 @@
 	import { getActivityEmoji } from '../../shared'
 	import { formatEventDayLabel } from '../../shared'
 	let { data } = $props()
-	let upcoming = $state([])
-	let recent = $state([])
+	let upcoming = $state(Array.isArray(data?.upcoming) ? data.upcoming : [])
+	let recent = $state(Array.isArray(data?.recent) ? data.recent : [])
 	let pendingEventId = $state(null)
 	let feedError = $state('')
 	const calendarConfig = getCalendarUiConfig()
@@ -103,9 +103,10 @@
 		}
 	}
 
-
 	const firstName = $derived(data.user?.name?.split(' ')[0] || '')
-	const homeTitleLines = $derived(firstName ? [`Hey, ${firstName}.`, "What's on the schedule?"] : ['Hey.', "What's on the schedule?"])
+	const homeTitleLines = $derived(
+		firstName ? [`Hey, ${firstName}.`, "What's on the schedule?"] : ['Hey.', "What's on the schedule?"]
+	)
 
 	function withMock(path) {
 		if (!mockMode) return path
@@ -151,7 +152,7 @@
 
 	<section class="calendar-page__section calendar-home__section">
 		<div class="calendar-home__feed-head">
-				<h2 class="calendar-home__feed-title">{data.onlyMine ? 'My Schedule' : 'Upcoming Events'}</h2>
+			<h2 class="calendar-home__feed-title">{data.onlyMine ? 'My Schedule' : 'Upcoming Events'}</h2>
 			<PillButton
 				href={data.onlyMine ? withMock(calendarConfig.routes.calendarBase) : withMock(`${calendarConfig.routes.calendarBase}?mine=1`)}
 				variant={data.onlyMine ? 'secondary' : 'ghost'}

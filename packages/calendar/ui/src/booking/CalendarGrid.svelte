@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ChevronLeft, ChevronRight } from '@lucide/svelte'
+	import { onMount } from 'svelte'
 	import type { CalendarDay } from './types'
 
 	let {
@@ -10,6 +11,10 @@
 		prevMonth,
 		nextMonth,
 		onSelect,
+		variant = 'compact',
+		testId = 'calendar-grid',
+		onWheel,
+		onKeydown
 	}: {
 		days: CalendarDay[]
 		weekdays: string[]
@@ -18,7 +23,16 @@
 		prevMonth?: (() => void) | undefined
 		nextMonth?: (() => void) | undefined
 		onSelect?: (day: CalendarDay, element: HTMLButtonElement) => void
+		variant?: 'compact' | 'member'
+		testId?: string
+		onWheel?: (event: WheelEvent) => void
+		onKeydown?: (event: KeyboardEvent) => void
 	} = $props()
+	let isHydrated = $state(false)
+
+	onMount(() => {
+		isHydrated = true
+	})
 
 	function isSelected(day: CalendarDay) {
 		if (!selectedDate) return false
@@ -31,42 +45,84 @@
 		if (!day.isActive || day.isPast) return
 		onSelect?.(day, event.currentTarget as HTMLButtonElement)
 	}
+
+	function rootClass() {
+		return `cg ${variant === 'member' ? 'cg--member member-calendar' : ''}`.trim()
+	}
+
+	function navClass() {
+		return `cg__nav ${variant === 'member' ? 'member-calendar__month-banner' : ''}`.trim()
+	}
+
+	function navButtonClass() {
+		return `cg__nav-btn ${variant === 'member' ? 'member-calendar__month-button' : ''}`.trim()
+	}
+
+	function navLabelClass() {
+		return `cg__nav-label ${variant === 'member' ? 'member-calendar__month-banner-title' : ''}`.trim()
+	}
+
+	function viewportClass() {
+		return `cg__viewport ${variant === 'member' ? 'member-calendar__viewport' : ''}`.trim()
+	}
+
+	function gridClass() {
+		return `cg__grid ${variant === 'member' ? 'member-calendar__grid' : ''}`.trim()
+	}
+
+	function cellClass(day: CalendarDay) {
+		const classes = ['cg__cell']
+		if (variant === 'member') classes.push('member-calendar__day')
+		if (!day.inMonth) classes.push('cg__cell--other', 'member-calendar__day--adjacent')
+		if (day.isPast) classes.push('cg__cell--past', 'member-calendar__day--past')
+		if (day.isToday) classes.push('cg__cell--today', 'member-calendar__day--today')
+		if (day.isActive && !day.isPast) classes.push('cg__cell--active', 'member-calendar__day--available')
+		if (isSelected(day)) classes.push('cg__cell--selected', 'member-calendar__day--selected')
+		return classes.join(' ')
+	}
 </script>
 
-<div class="cg">
-	<div class="cg__nav">
-		<button type="button" class="cg__nav-btn" onclick={prevMonth} aria-label="Previous month"><ChevronLeft size={14} strokeWidth={2.2} /></button>
-		<span class="cg__nav-label">{monthLabel}</span>
-		<button type="button" class="cg__nav-btn" onclick={nextMonth} aria-label="Next month"><ChevronRight size={14} strokeWidth={2.2} /></button>
+<div class={rootClass()} data-testid={testId} data-calendar-ready={isHydrated ? 'true' : 'false'}>
+	<div class={navClass()} data-current-month-key={monthLabel}>
+		<button type="button" class={navButtonClass()} onclick={prevMonth} aria-label="Previous month"><ChevronLeft size={variant === 'member' ? 18 : 14} strokeWidth={2.2} /></button>
+		<span class={navLabelClass()}>{monthLabel}</span>
+		<button type="button" class={navButtonClass()} onclick={nextMonth} aria-label="Next month"><ChevronRight size={variant === 'member' ? 18 : 14} strokeWidth={2.2} /></button>
 	</div>
 
-	<div class="cg__weekdays">{#each weekdays as w}<span>{w}</span>{/each}</div>
+	<div class={`cg__weekdays ${variant === 'member' ? 'member-calendar__weekday-row' : ''}`.trim()}>{#each weekdays as w}<span>{w}</span>{/each}</div>
 
-	<div class="cg__grid">
-		{#each days as day}
-			<button
-				type="button"
-				class="cg__cell"
-				class:cg__cell--other={!day.inMonth}
-				class:cg__cell--past={day.isPast}
-				class:cg__cell--today={day.isToday}
-				class:cg__cell--active={day.isActive && !day.isPast}
-				class:cg__cell--selected={isSelected(day)}
-				disabled={!day.isActive || day.isPast}
-				aria-label={day.ariaLabel ?? day.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-				onclick={(e) => handleClick(day, e)}
-			>
-				<span class="cg__num">{day.date.getDate()}</span>
-				{#if day.isActive && !day.isPast && (day.dotCount ?? 0) >= 0}
-					<span class="cg__dots">
-						<span class="cg__dot" style={day.dotColor ? `background:${day.dotColor}` : ''}></span>
-						{#if (day.dotCount ?? 0) > 0}
-							<span class="cg__dot cg__dot--secondary"></span>
-						{/if}
-					</span>
-				{/if}
-			</button>
-		{/each}
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_static_element_interactions -->
+	<div
+		class={viewportClass()}
+		aria-label="Calendar month view"
+		tabindex={variant === 'member' ? 0 : undefined}
+		onwheel={onWheel}
+		onkeydown={onKeydown}
+	>
+		<div class={gridClass()}>
+			{#each days as day}
+				<button
+					type="button"
+					class={cellClass(day)}
+					disabled={!day.isActive || day.isPast}
+					aria-label={day.ariaLabel ?? day.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+					onclick={(e) => handleClick(day, e)}
+				>
+					<span class={`cg__num ${variant === 'member' ? 'member-calendar__day-num' : ''}`.trim()}>{day.date.getDate()}</span>
+					{#if day.isActive && !day.isPast && (day.dotCount ?? 0) >= 0}
+						<span
+							class={`cg__dots ${variant === 'member' ? 'member-calendar__event-dots' : ''}`.trim()}
+							style={day.dotColor ? `--member-calendar-dot-override:${day.dotColor};` : ''}
+						>
+							<span class={`cg__dot ${variant === 'member' ? 'member-calendar__event-dot' : ''}`.trim()} style={day.dotColor ? `background:${day.dotColor}` : ''}></span>
+							{#if (day.dotCount ?? 0) > 0}
+								<span class={`cg__dot cg__dot--secondary ${variant === 'member' ? 'member-calendar__event-dot' : ''}`.trim()}></span>
+							{/if}
+						</span>
+					{/if}
+				</button>
+			{/each}
+		</div>
 	</div>
 </div>
 
@@ -93,4 +149,142 @@
 	.cg__dots { position: absolute; bottom: 0.32rem; left: 0.4rem; display: flex; gap: 0.16rem; }
 	.cg__dot { width: 0.26rem; height: 0.26rem; border-radius: 999px; background: var(--cg-accent, var(--book-accent, #a78bfa)); }
 	.cg__dot--secondary { background: var(--cg-dot-secondary, var(--book-dot-green, #4ade80)); }
+
+	.cg--member {
+		--member-calendar-dot: color-mix(in srgb, var(--link) 72%, var(--text) 28%);
+		--cg-accent: var(--member-calendar-dot);
+		--cg-gap: 0.35rem;
+		--cg-radius: 0.78rem;
+		--cg-num-size: 0.95rem;
+		display: grid;
+		gap: 0.65rem;
+		width: 100%;
+	}
+
+	.cg--member .cg__nav {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 0.75rem;
+		margin: 0;
+		padding: 0;
+	}
+
+	.cg--member .cg__nav-label {
+		min-width: 0;
+		font-size: clamp(1rem, 2.4vw, 1.25rem);
+		font-weight: 650;
+		line-height: 1.1;
+	}
+
+	.cg--member .cg__nav-btn {
+		width: 2.35rem;
+		height: 2.35rem;
+		border-radius: 999px;
+		background: transparent;
+		color: var(--text);
+	}
+
+	.cg--member .cg__weekdays {
+		gap: 0.35rem;
+		margin: 0;
+		padding: 0 0.15rem;
+		color: color-mix(in srgb, var(--text) 42%, transparent);
+		font-size: 0.68rem;
+		font-weight: 650;
+		letter-spacing: 0.04em;
+	}
+
+	.cg--member .cg__viewport {
+		touch-action: pan-y;
+		outline: none;
+	}
+
+	.cg--member .cg__viewport:focus-visible {
+		border-radius: 1.2rem;
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--member-calendar-dot) 28%, transparent);
+	}
+
+	.cg--member .cg__grid {
+		gap: 0.35rem;
+	}
+
+	.cg--member .cg__cell {
+		color: color-mix(in srgb, var(--text) 35%, transparent);
+	}
+
+	.cg--member .cg__cell:hover:not(:disabled) {
+		border-color: color-mix(in srgb, var(--member-calendar-dot) 50%, transparent);
+	}
+
+	.cg--member .cg__cell--other {
+		opacity: 0.15;
+	}
+
+	.cg--member .cg__cell--past {
+		cursor: default;
+		opacity: 0.25;
+	}
+
+	.cg--member .cg__cell--today {
+		border-color: color-mix(in srgb, var(--text) 24%, transparent);
+	}
+
+	.cg--member .cg__cell--active {
+		color: var(--text);
+	}
+
+	.cg--member .cg__cell--selected {
+		opacity: 1 !important;
+	}
+
+	.cg--member .cg__num {
+		top: 0.72rem;
+		right: 0.72rem;
+		font-size: 0.95rem;
+		line-height: 1;
+	}
+
+	.cg--member .cg__dots {
+		left: 0.72rem;
+		bottom: 0.66rem;
+		gap: 0.22rem;
+	}
+
+	.cg--member .cg__dot {
+		width: 0.38rem;
+		height: 0.38rem;
+		background: var(--member-calendar-dot-override, var(--member-calendar-dot));
+	}
+
+	@media (max-width: 720px) {
+		.cg--member .cg__nav {
+			padding: 0;
+		}
+
+		.cg--member .cg__nav-btn {
+			width: 2.15rem;
+			height: 2.15rem;
+		}
+
+		.cg--member .cg__weekdays,
+		.cg--member .cg__grid {
+			gap: 0.28rem;
+		}
+
+		.cg--member .cg__cell {
+			--cg-radius: 0.72rem;
+		}
+
+		.cg--member .cg__num {
+			top: 0.56rem;
+			right: 0.56rem;
+			font-size: 0.86rem;
+		}
+
+		.cg--member .cg__dots {
+			left: 0.56rem;
+			bottom: 0.56rem;
+		}
+	}
 </style>

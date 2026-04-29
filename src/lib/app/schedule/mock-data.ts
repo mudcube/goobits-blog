@@ -171,10 +171,16 @@ function mockEvent(id: number, slug: string, label: string, title: string, weekd
 
 export const scheduleMockUpcoming: MockCalendarEvent[] = [
 	// ── Gym: Mon/Wed/Fri, 3 weeks ──
+	mockEvent(9030, 'gym', 'Gym', 'Early Strength',    1,  7, 30, 60, 0, [jen],                2, 6),
 	mockEvent(9001, 'gym', 'Gym', 'Morning Flow',     1, 12, 0,  90, 0, [jen, marco, ava],    5, 8),
+	mockEvent(9031, 'gym', 'Gym', 'After Work Lift',  1, 18, 0,  75, 0, [...participants],     8, 8),
 	mockEvent(9002, 'gym', 'Gym', 'Open Gym',         3, 15, 0, 120, 0, [...participants],     6, 10),
+	mockEvent(9032, 'gym', 'Gym', 'Mobility Reset',   3, 18, 30, 45, 0, [ava],                 1, 5),
+	mockEvent(9033, 'gym', 'Gym', 'Lunch Circuit',    5, 12, 15, 60, 0, [marco],               3, 6),
 	mockEvent(9003, 'gym', 'Gym', 'Leg Day Crew',     5, 17, 0,  90, 0, [jen, marco, ava],     4, 8),
 	mockEvent(9011, 'gym', 'Gym', 'Morning Flow',     1, 12, 0,  90, 1, [jen, ava],            3, 8),
+	mockEvent(9034, 'gym', 'Gym', 'Evening Strength', 1, 18, 15, 75, 1, [marco, tyler],        5, 6),
+	mockEvent(9035, 'gym', 'Gym', 'Quick Circuit',    3,  7, 45, 45, 1, [ava],                 2, 5),
 	mockEvent(9012, 'gym', 'Gym', 'Open Gym',         3, 15, 0, 120, 1, [marco, tyler],        2, 10),
 	mockEvent(9013, 'gym', 'Gym', 'Upper Body',       5, 17, 0,  90, 1, [jen, tyler],          2, 8),
 	mockEvent(9014, 'gym', 'Gym', 'Saturday Stretch', 6, 10, 0,  60, 1, [ava],                 1, 6),

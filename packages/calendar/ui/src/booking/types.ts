@@ -3,12 +3,26 @@ export type PersonRow = Person[]
 
 export type OpenDay = {
 	date: Date
+	mode?: 'range' | 'preset'
 	eventId?: number
+	slots?: BookingSlot[]
 	bookings: Person[]
 	windowStart: number
 	windowEnd: number
 	maxDuration: number
 	capacity: number
+}
+
+export type BookingSlot = {
+	id: number | string
+	label: string
+	start: number
+	end: number
+	seatsLeft?: number
+	capacity?: number
+	waitlistCount?: number
+	userStatus?: string | null
+	eventId?: number
 }
 
 export type Step = 'calendar' | 'claim' | 'day' | 'done'

@@ -52,7 +52,11 @@ export type AdminCreateEventsBatchInput = {
 
 export type AdminEventUpdateInput =
 	| { action: 'capacity'; capacity: number }
-	| { action: 'attendance'; userId: string; attendanceStatus: 'unknown' | 'attended' | 'flaked' }
+	| {
+			action: 'attendance'
+			userId: string
+			attendanceStatus: 'unknown' | 'attended' | 'flaked'
+	  }
 	| { action: 'delete' }
 	| { action: 'event'; title: string; startsAt: string; endsAt: string }
 	| { action: 'memory'; recapText: string | null; heroImageUrl: string | null }
@@ -71,10 +75,28 @@ export type AdminPaymentDefaultsInput = {
 	handle: string | null
 }
 
+function readZonedDateTime(body: Record<string, unknown>, key: string) {
+	const value = readRequiredString(body, key, {
+		trim: true,
+		maxLength: 64,
+		message: 'Invalid event times'
+	})
+	if (!/(?:z|[+-]\d{2}:\d{2})$/i.test(value)) {
+		throw new TransportValidationError('Invalid event times')
+	}
+	return value
+}
+
 export function parseAdminRulesInput(input: unknown): AdminRulesInput {
 	const body = asJsonObject(input)
-	const hoursFrom = readRequiredString(body, 'hoursFrom', { trim: true, maxLength: 5 })
-	const hoursTo = readRequiredString(body, 'hoursTo', { trim: true, maxLength: 5 })
+	const hoursFrom = readRequiredString(body, 'hoursFrom', {
+		trim: true,
+		maxLength: 5
+	})
+	const hoursTo = readRequiredString(body, 'hoursTo', {
+		trim: true,
+		maxLength: 5
+	})
 	const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/
 	if (!timePattern.test(hoursFrom) || !timePattern.test(hoursTo)) {
 		throw new TransportValidationError('Invalid hours format')
@@ -83,16 +105,32 @@ export function parseAdminRulesInput(input: unknown): AdminRulesInput {
 	return {
 		hoursFrom,
 		hoursTo,
-		buffer: readIntInRange(body, 'buffer', { min: 0, max: 180, message: 'Invalid buffer' }),
-		notice: readIntInRange(body, 'notice', { min: 0, max: 720, message: 'Invalid notice' }),
-		capacity: readIntInRange(body, 'capacity', { min: 1, max: 50, message: 'Invalid capacity' })
+		buffer: readIntInRange(body, 'buffer', {
+			min: 0,
+			max: 180,
+			message: 'Invalid buffer'
+		}),
+		notice: readIntInRange(body, 'notice', {
+			min: 0,
+			max: 720,
+			message: 'Invalid notice'
+		}),
+		capacity: readIntInRange(body, 'capacity', {
+			min: 1,
+			max: 50,
+			message: 'Invalid capacity'
+		})
 	}
 }
 
 export function parseAdminProgramMutationInput(input: unknown): AdminProgramMutationInput {
 	const body = asJsonObject(input)
 	const action = readEnum(body, 'action', ['delete', 'toggle', 'upsert'] as const, 'Unknown action')
-	const slug = readRequiredString(body, 'slug', { trim: true, maxLength: 64, message: 'Invalid program slug' })
+	const slug = readRequiredString(body, 'slug', {
+		trim: true,
+		maxLength: 64,
+		message: 'Invalid program slug'
+	})
 	if (!isValidProgramSlug(slug)) throw new TransportValidationError('Invalid program slug')
 
 	if (action === 'delete') {
@@ -113,25 +151,35 @@ export function parseAdminProgramMutationInput(input: unknown): AdminProgramMuta
 		activityName: readRequiredString(body, 'activityName', { maxLength: 80 }),
 		pageTitle: readRequiredString(body, 'pageTitle', { maxLength: 120 }),
 		eyebrow: readRequiredString(body, 'eyebrow', { maxLength: 60 }),
-		heroTitleLine1: readRequiredString(body, 'heroTitleLine1', { maxLength: 80 }),
-		heroTitleLine2: readOptionalString(body, 'heroTitleLine2', { maxLength: 80 }),
+		heroTitleLine1: readRequiredString(body, 'heroTitleLine1', {
+			maxLength: 80
+		}),
+		heroTitleLine2: readOptionalString(body, 'heroTitleLine2', {
+			maxLength: 80
+		}),
 		heroSubtitle: readRequiredString(body, 'heroSubtitle', { maxLength: 180 }),
 		description: readRequiredString(body, 'description', { maxLength: 180 }),
 		icon: readRequiredString(body, 'icon', { maxLength: 16 }),
 		eyebrowClass: readOptionalString(body, 'eyebrowClass', { maxLength: 64 }),
 		glowClass: readOptionalString(body, 'glowClass', { maxLength: 64 }),
 		formGlowClass: readOptionalString(body, 'formGlowClass', { maxLength: 64 }),
-		serviceStatusNote: readOptionalString(body, 'serviceStatusNote', { maxLength: 120 }),
+		serviceStatusNote: readOptionalString(body, 'serviceStatusNote', {
+			maxLength: 120
+		}),
 		enabled: readBoolean(body, 'enabled', true),
-		sortOrder: readIntInRange(body, 'sortOrder', { min: -1000, max: 1000, defaultValue: 0 })
+		sortOrder: readIntInRange(body, 'sortOrder', {
+			min: -1000,
+			max: 1000,
+			defaultValue: 0
+		})
 	}
 	return { action, program }
 }
 
 export function parseAdminCreateEventsBatchInput(input: unknown): AdminCreateEventsBatchInput {
 	const body = asJsonObject(input)
-	const startsAt = readRequiredString(body, 'startsAt', { trim: true, maxLength: 64 })
-	const endsAt = readRequiredString(body, 'endsAt', { trim: true, maxLength: 64 })
+	const startsAt = readZonedDateTime(body, 'startsAt')
+	const endsAt = readZonedDateTime(body, 'endsAt')
 	const startsMs = Date.parse(startsAt)
 	const endsMs = Date.parse(endsAt)
 	if (!Number.isFinite(startsMs) || !Number.isFinite(endsMs) || endsMs <= startsMs) {
@@ -139,17 +187,38 @@ export function parseAdminCreateEventsBatchInput(input: unknown): AdminCreateEve
 	}
 
 	return {
-		activitySlug: readRequiredString(body, 'activitySlug', { trim: true, maxLength: 64 }),
+		activitySlug: readRequiredString(body, 'activitySlug', {
+			trim: true,
+			maxLength: 64
+		}),
 		title: readRequiredString(body, 'title', { maxLength: 80 }),
 		startsAt,
 		endsAt,
-		capacity: readIntInRange(body, 'capacity', { min: 1, max: 50, message: 'Invalid event input' }),
-		repeatWeeks: readIntInRange(body, 'repeatWeeks', { min: 0, max: 52, defaultValue: 0 }),
-		costCents: readIntInRange(body, 'costCents', { min: 0, max: 200000, defaultValue: 0, message: 'Invalid cost' }),
+		capacity: readIntInRange(body, 'capacity', {
+			min: 1,
+			max: 50,
+			message: 'Invalid event input'
+		}),
+		repeatWeeks: readIntInRange(body, 'repeatWeeks', {
+			min: 0,
+			max: 52,
+			defaultValue: 0
+		}),
+		costCents: readIntInRange(body, 'costCents', {
+			min: 0,
+			max: 200000,
+			defaultValue: 0,
+			message: 'Invalid cost'
+		}),
 		currency: (readOptionalString(body, 'currency', { maxLength: 8 }) ?? 'USD').toUpperCase(),
-		paymentProvider: readOptionalString(body, 'paymentProvider', { maxLength: 32 })?.toLowerCase() ?? null,
+		paymentProvider:
+			readOptionalString(body, 'paymentProvider', {
+				maxLength: 32
+			})?.toLowerCase() ?? null,
 		paymentHandle: readOptionalString(body, 'paymentHandle', { maxLength: 80 }),
-		paymentNoteTemplate: readOptionalString(body, 'paymentNoteTemplate', { maxLength: 120 }),
+		paymentNoteTemplate: readOptionalString(body, 'paymentNoteTemplate', {
+			maxLength: 120
+		}),
 		location: readOptionalString(body, 'location', { maxLength: 120 }),
 		note: readOptionalString(body, 'note', { maxLength: 300 })
 	}
@@ -157,23 +226,44 @@ export function parseAdminCreateEventsBatchInput(input: unknown): AdminCreateEve
 
 export function parseAdminEventUpdateInput(input: unknown): AdminEventUpdateInput {
 	const body = asJsonObject(input)
-	const action = readEnum(body, 'action', ['capacity', 'attendance', 'memory', 'delete', 'event'] as const, 'Unknown action')
+	const action = readEnum(
+		body,
+		'action',
+		['capacity', 'attendance', 'memory', 'delete', 'event'] as const,
+		'Unknown action'
+	)
 	if (action === 'capacity') {
-		return { action, capacity: readIntInRange(body, 'capacity', { min: 1, max: 50, message: 'Invalid capacity' }) }
+		return {
+			action,
+			capacity: readIntInRange(body, 'capacity', {
+				min: 1,
+				max: 50,
+				message: 'Invalid capacity'
+			})
+		}
 	}
 	if (action === 'attendance') {
 		return {
 			action,
-			userId: readRequiredString(body, 'userId', { trim: true, maxLength: 128, message: 'Invalid attendance input' }),
-			attendanceStatus: readEnum(body, 'attendanceStatus', ['unknown', 'attended', 'flaked'] as const, 'Invalid attendance input')
+			userId: readRequiredString(body, 'userId', {
+				trim: true,
+				maxLength: 128,
+				message: 'Invalid attendance input'
+			}),
+			attendanceStatus: readEnum(
+				body,
+				'attendanceStatus',
+				['unknown', 'attended', 'flaked'] as const,
+				'Invalid attendance input'
+			)
 		}
 	}
 	if (action === 'delete') {
 		return { action }
 	}
 	if (action === 'event') {
-		const startsAt = readRequiredString(body, 'startsAt', { trim: true, maxLength: 64, message: 'Invalid event input' })
-		const endsAt = readRequiredString(body, 'endsAt', { trim: true, maxLength: 64, message: 'Invalid event input' })
+		const startsAt = readZonedDateTime(body, 'startsAt')
+		const endsAt = readZonedDateTime(body, 'endsAt')
 		const startsMs = Date.parse(startsAt)
 		const endsMs = Date.parse(endsAt)
 		if (!Number.isFinite(startsMs) || !Number.isFinite(endsMs) || endsMs <= startsMs) {
@@ -181,7 +271,10 @@ export function parseAdminEventUpdateInput(input: unknown): AdminEventUpdateInpu
 		}
 		return {
 			action,
-			title: readRequiredString(body, 'title', { maxLength: 80, message: 'Invalid event title' }),
+			title: readRequiredString(body, 'title', {
+				maxLength: 80,
+				message: 'Invalid event title'
+			}),
 			startsAt,
 			endsAt
 		}
@@ -217,7 +310,10 @@ export function parseAdminUserProgramAccessInput(input: unknown): AdminUserProgr
 
 	const access = raw.map((entry) => {
 		const row = asJsonObject(entry)
-		const programSlug = readRequiredString(row, 'programSlug', { trim: true, maxLength: 64 })
+		const programSlug = readRequiredString(row, 'programSlug', {
+			trim: true,
+			maxLength: 64
+		})
 		if (!isValidProgramSlug(programSlug)) {
 			throw new TransportValidationError('Invalid program slug')
 		}

@@ -4,6 +4,7 @@ import {
 	getCalendarPrograms,
 	listUserProgramAccess,
 	parseAdminUserProgramAccessInput,
+	parsePositiveInteger,
 	setUserProgramAccess,
 	TransportValidationError
 } from '@calendar/core'
@@ -11,9 +12,8 @@ import { apiError, apiOk, apiValidationError } from '@calendar/kit'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 
 function normalizeUserId(param: string | undefined) {
-	if (!param) return null
-	const value = Number.parseInt(param, 10)
-	return Number.isFinite(value) && value > 0 ? String(value) : null
+	const value = parsePositiveInteger(param)
+	return value == null ? null : String(value)
 }
 
 export async function GET(event: RequestEvent) {
@@ -24,10 +24,7 @@ export async function GET(event: RequestEvent) {
 		if (!userId) return apiError('Invalid user id', { status: 400 })
 
 		const { db } = await getAdminAuth({ event })
-		const [programs, access] = await Promise.all([
-			getCalendarPrograms(db),
-			listUserProgramAccess(db, userId)
-		])
+		const [programs, access] = await Promise.all([getCalendarPrograms(db), listUserProgramAccess(db, userId)])
 		const accessMap = new Map(access.map((row) => [row.programSlug, row.allowed]))
 		return apiOk({
 			access: programs.map((program) => ({
@@ -39,17 +36,21 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function PUT(event: RequestEvent) {
-	return runApiRequest('admin.users.access.put', async () => {
-		const guard = requireAdminRequest(event, { csrf: true })
-		if (guard) return guard
-		const userId = normalizeUserId(event.params['id'])
-		if (!userId) return apiError('Invalid user id', { status: 400 })
+	return runApiRequest(
+		'admin.users.access.put',
+		async () => {
+			const guard = requireAdminRequest(event, { csrf: true })
+			if (guard) return guard
+			const userId = normalizeUserId(event.params['id'])
+			if (!userId) return apiError('Invalid user id', { status: 400 })
 
-		const input = parseAdminUserProgramAccessInput(await event.request.json().catch(() => null))
-		const { db } = await getAdminAuth({ event })
-		await setUserProgramAccess(db, userId, input.access)
-		return apiOk({})
-	}, {
-		onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
-	})
+			const input = parseAdminUserProgramAccessInput(await event.request.json().catch(() => null))
+			const { db } = await getAdminAuth({ event })
+			await setUserProgramAccess(db, userId, input.access)
+			return apiOk({})
+		},
+		{
+			onError: (error) => (error instanceof TransportValidationError ? apiValidationError(error) : null)
+		}
+	)
 }

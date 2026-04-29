@@ -1,6 +1,14 @@
 <script lang="ts">
-	import VirtualMonthStack from './VirtualMonthStack.svelte'
-	import { isSameDay, isoDay, startOfDay, type CalendarTone } from './month-stack'
+	import CalendarGrid from '../../booking/CalendarGrid.svelte'
+	import {
+		createCalendarSurface,
+		dotColorForTone,
+		isSameDay,
+		isoDay,
+		startOfDay,
+		type CalendarTone
+	} from '../../booking/calendar-surface.svelte'
+	import { createWheelMonthPager } from './wheel-month-pager'
 	import type { CalendarEventsResponse } from '../../api/calendar'
 
 	type FeedEvent = CalendarEventsResponse['upcoming'][number]
@@ -20,6 +28,7 @@
 	}>()
 
 	let selectedDate = $state<Date | null>(null)
+	let lastPageDirection = $state<1 | -1 | 0>(0)
 
 	function isPast(date: Date) {
 		return date < startOfDay(new Date())
@@ -78,8 +87,64 @@
 		return ''
 	}
 
-	const selectedDateIso = $derived.by(() => (selectedDate ? isoDay(selectedDate) : null))
 	const selectedDateEvents = $derived(selectedDate ? getEventsForDate(selectedDate) : [])
+	const calendar = createCalendarSurface({
+		isPast,
+		isToday,
+		isActive: (date) => getEventsForDate(date).length > 0,
+		eventCount: (date) => getEventsForDate(date).length,
+		dotColor: (date) => dotColorForTone(eventTone(getEventsForDate(date)[0])),
+		ariaLabel: (date) => dayAriaLabel(date, getEventsForDate(date).length)
+	})
+
+	function dayAriaLabel(date: Date, count: number) {
+		const parts = [
+			date.toLocaleDateString(undefined, {
+				weekday: 'long',
+				month: 'long',
+				day: 'numeric',
+				year: 'numeric'
+			})
+		]
+		if (isToday(date)) parts.push('today')
+		if (count > 0) parts.push(count === 1 ? '1 event available' : `${count} events available`)
+		return parts.join(', ')
+	}
+
+	function prevMonth() {
+		lastPageDirection = -1
+		calendar.prevMonth()
+	}
+
+	function nextMonth() {
+		lastPageDirection = 1
+		calendar.nextMonth()
+	}
+
+	const wheelPager = createWheelMonthPager({
+		triggerDelta: 48,
+		sameDirectionRearmGapMs: 0,
+		getLastPageDirection: () => lastPageDirection,
+		onPage: (direction) => {
+			if (direction > 0) nextMonth()
+			else prevMonth()
+		}
+	})
+
+	function handleWheel(event: WheelEvent) {
+		wheelPager.handle(event)
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'ArrowLeft') {
+			event.preventDefault()
+			prevMonth()
+		}
+		if (event.key === 'ArrowRight') {
+			event.preventDefault()
+			nextMonth()
+		}
+	}
 </script>
 
 <section class="calendar-page__section calendar-home__section">
@@ -89,14 +154,18 @@
 		</div>
 	{/if}
 
-	<VirtualMonthStack
-		selectedDateIso={selectedDateIso}
-		onSelect={(date) => selectDateFromCalendar(date)}
-		{isPast}
-		{isToday}
-		isActive={(date) => getEventsForDate(date).length > 0}
-		eventCount={(date) => getEventsForDate(date).length}
-		eventTone={(date) => eventTone(getEventsForDate(date)[0])}
+	<CalendarGrid
+		days={calendar.days}
+		weekdays={calendar.weekdays}
+		monthLabel={calendar.monthLabel}
+		selectedDate={selectedDate}
+		{prevMonth}
+		{nextMonth}
+		onSelect={(day) => selectDateFromCalendar(day.date)}
+		variant="member"
+		testId="member-calendar"
+		onWheel={handleWheel}
+		onKeydown={handleKeydown}
 	/>
 
 	{#if selectedDate}

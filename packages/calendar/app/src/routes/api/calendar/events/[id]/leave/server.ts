@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { enqueueCalendarSyncJob, leaveEvent, processCalendarSyncQueue } from '@calendar/core'
+import { enqueueCalendarSyncJob, leaveEvent, parsePositiveInteger, processCalendarSyncQueue } from '@calendar/core'
 import { apiError, apiOk, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
 
@@ -16,8 +16,8 @@ export async function POST(event: RequestEvent) {
 		if (!eventParam) {
 			return apiError('Missing event id', { status: 400 })
 		}
-		const eventId = Number.parseInt(eventParam, 10)
-		if (!Number.isFinite(eventId) || eventId <= 0) {
+		const eventId = parsePositiveInteger(eventParam)
+		if (!eventId) {
 			return apiError('Invalid event id', { status: 400 })
 		}
 

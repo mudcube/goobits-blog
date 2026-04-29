@@ -47,23 +47,25 @@
 			{/if}
 		</section>
 
-		<BookingCalendar initialUpcoming={upcoming} {mockMode} />
+		<BookingCalendar
+			activity={{
+				slug: activity.slug,
+				label: activity.activityName || activity.label,
+				icon: activity.icon,
+				tagline: activity.heroSubtitle || '',
+				windowStart: 9,
+				windowEnd: 18,
+				maxDuration: 2,
+				capacity: 8
+			}}
+			initialUpcoming={upcoming}
+			{mockMode}
+		/>
 	</div>
 </div>
 
 <style lang="scss">
 	.program-editor {
-		--surface: color-mix(in srgb, var(--panel-bg) 88%, var(--text) 12%);
-		--admin-accent: color-mix(in srgb, var(--link) 72%, #7a5af8 28%);
-		--admin-calendar-border-uniform: color-mix(in srgb, var(--text) 14%, transparent);
-		--admin-calendar-arrow-fg: color-mix(in srgb, var(--text) 60%, transparent);
-		--admin-calendar-arrow-hover-fg: color-mix(in srgb, var(--admin-accent) 80%, var(--text) 20%);
-		--admin-calendar-weekday-row-bg: #1f1f23;
-		--admin-calendar-weekday-row-fg: #f7f7fb;
-		--admin-calendar-dot: color-mix(in srgb, var(--admin-accent) 76%, var(--text) 24%);
-		--admin-calendar-selected-bg: color-mix(in srgb, var(--admin-accent) 11%, transparent);
-		--admin-calendar-selected-border: color-mix(in srgb, var(--admin-accent) 62%, transparent);
-
 		width: 100%;
 		max-width: none;
 		border-radius: 0;
@@ -206,17 +208,5 @@
 		color: color-mix(in srgb, var(--text) 55%, transparent);
 		position: relative;
 		z-index: 1;
-	}
-
-	.program-editor :global(.calendar-page__section.calendar-home__section) {
-		margin: 0;
-		padding: 0 var(--calendar-size-24);
-		width: 100%;
-		max-width: var(--calendar-size-900);
-	}
-
-	.program-editor :global(.calendar-home__feed-head) {
-		margin: 0;
-		padding: 0;
 	}
 </style>

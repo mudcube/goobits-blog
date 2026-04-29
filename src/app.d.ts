@@ -1,4 +1,4 @@
-import type { D1DatabaseLike } from '$lib/dev/devDb.ts'
+import type { D1DatabaseLike } from '@calendar/kit'
 import type { Session, User } from '@goobits/auth/types'
 
 declare global {

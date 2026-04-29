@@ -2,7 +2,8 @@
  * One-step production deploy:
  * 1) Push secrets (when --full)
  * 2) Build
- * 3) Deploy Cloudflare Pages artifact
+ * 3) Apply D1 migrations
+ * 4) Deploy Cloudflare Pages artifact
  *
  * Usage:
  *   pnpm deploy:prod
@@ -37,10 +38,11 @@ if (fullDeploy) {
 	run('pnpm', ['deploy:secrets'])
 }
 
+run('pnpm', ['build'])
+
 if (!skipMigrations) {
 	assertD1IsConfigured()
 	run('wrangler', ['d1', 'migrations', 'apply', 'DB', '--remote'])
 }
 
-run('pnpm', ['build'])
 run('wrangler', ['pages', 'deploy', '.svelte-kit/cloudflare', '--project-name', projectName])

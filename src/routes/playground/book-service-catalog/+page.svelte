@@ -43,85 +43,6 @@
 
 	const openDays = $derived<OpenDay[]>(selectedService ? buildMockOpenDays(activity, DEMO_PEOPLE) : [])
 
-	let calYear = $state(new Date().getFullYear())
-	let calMonthIdx = $state(new Date().getMonth())
-
-	function prevMonth() {
-		if (calMonthIdx === 0) {
-			calMonthIdx = 11
-			calYear--
-		} else {
-			calMonthIdx--
-		}
-	}
-	function nextMonth() {
-		if (calMonthIdx === 11) {
-			calMonthIdx = 0
-			calYear++
-		} else {
-			calMonthIdx++
-		}
-	}
-
-	const calMonthLabel = $derived(
-		new Date(calYear, calMonthIdx).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-	)
-
-	const calDays = $derived.by(() => {
-		const year = calYear
-		const month = calMonthIdx
-		const first = new Date(year, month, 1)
-		const last = new Date(year, month + 1, 0)
-		const pad = (first.getDay() + 6) % 7
-		type Cell = {
-			date: Date
-			inMonth: boolean
-			isToday: boolean
-			isOpen: boolean
-			isPast: boolean
-			bookingCount: number
-		}
-		const cells: Cell[] = []
-		for (let i = pad - 1; i >= 0; i--) {
-			cells.push({
-				date: new Date(year, month, -i),
-				inMonth: false,
-				isToday: false,
-				isOpen: false,
-				isPast: true,
-				bookingCount: 0
-			})
-		}
-		const today = new Date()
-		today.setHours(0, 0, 0, 0)
-		for (let d = 1; d <= last.getDate(); d++) {
-			const dt = new Date(year, month, d)
-			const match = openDays.find((od: OpenDay) => od.date.getTime() === dt.getTime())
-			cells.push({
-				date: dt,
-				inMonth: true,
-				isToday: dt.getTime() === today.getTime(),
-				isOpen: !!match,
-				isPast: dt < today,
-				bookingCount: match?.bookings.length ?? 0
-			})
-		}
-		const endPad = (7 - (cells.length % 7)) % 7
-		for (let i = 1; i <= endPad; i++) {
-			cells.push({
-				date: new Date(year, month + 1, i),
-				inMonth: false,
-				isToday: false,
-				isOpen: false,
-				isPast: false,
-				bookingCount: 0
-			})
-		}
-		return cells
-	})
-
-	const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
 	const overlapping = $derived(
 		selectedDay ? selectedDay.bookings.filter((o) => o.start < end && o.end > start) : []
 	)
@@ -253,16 +174,11 @@
 					{:else if stepNum === 1 && selectedService}
 						<CalendarStep
 							{activity}
-							{calDays}
-							weekdays={WEEKDAYS}
 							{openDays}
 							claimed={true}
 							bind:pendingDay
 							onSelectDay={selectDay}
 							onClaim={() => {}}
-							monthLabel={calMonthLabel}
-							{prevMonth}
-							{nextMonth}
 						/>
 					{:else if stepNum === 2 && selectedDay}
 						<TimeStep

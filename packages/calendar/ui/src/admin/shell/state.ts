@@ -14,7 +14,6 @@ export type AdminInviteAnchorRect = {
 export type AdminActionHandlers = {
 	onProgramEditorToggleSettings?: () => void
 	onCrewCreateInvite?: (detail?: { anchorRect?: AdminInviteAnchorRect }) => void
-	onInvitesCreateInvite?: () => void
 	onEventDetailEdit?: () => void
 	onEventDetailCancel?: () => void
 }

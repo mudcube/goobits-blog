@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte'
 	import CalendarGrid from '../../booking/CalendarGrid.svelte'
 	import type { CalendarDay } from '../../booking/types'
+	import { createCalendarSurface, type CalendarWeekStart } from '../../booking/calendar-surface.svelte'
 	import {
 		CALENDAR_WEEK_START_CHANGED_EVENT,
 		getAdminCalendarWeekStart,
@@ -48,56 +49,24 @@
 		return ''
 	}
 
-	const WEEKDAYS_SUN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-	const WEEKDAYS_MON = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
 	let weekStart = $state<AdminCalendarWeekStart>('monday')
 
 	$effect(() => {
 		if (!syncWeekStartPreference) weekStart = initialWeekStart === 'sunday' ? 'sunday' : 'monday'
 	})
 
-	const weekdays = $derived(weekStart === 'sunday' ? WEEKDAYS_SUN : WEEKDAYS_MON)
+	const calendar = createCalendarSurface({
+		weekStart: () => weekStart as CalendarWeekStart,
+		isPast: (date) => isPast(date),
+		isToday: (date) => isToday(date),
+		isActive: (date) => isActive(date),
+		eventCount: (date) => eventCount(date),
+		dotColor: (date) => dotColorForTone(eventTone(date)) || '',
+		title: () => title
+	})
 
-	const monthLabel = $derived(
-		title || currentMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
-	)
-
-	const gridDays = $derived.by((): CalendarDay[] => {
-		const first = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
-		const last = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0)
-		const days: CalendarDay[] = []
-
-		const firstWeekday = first.getDay()
-		const offset = weekStart === 'monday' ? (firstWeekday + 6) % 7 : firstWeekday
-		for (let i = 0; i < offset; i++) {
-			const d = new Date(first)
-			d.setDate(d.getDate() - (offset - i))
-			days.push({ date: d, inMonth: false, isToday: false, isActive: false, isPast: true })
-		}
-
-		for (let day = 1; day <= last.getDate(); day++) {
-			const d = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
-			const tone = eventTone(d)
-			days.push({
-				date: d,
-				inMonth: true,
-				isToday: isToday(d),
-				isActive: isActive(d),
-				isPast: isPast(d),
-				dotCount: eventCount(d),
-				dotColor: dotColorForTone(tone) || '',
-			})
-		}
-
-		let pad = 1
-		while (days.length % 7 !== 0) {
-			const d = new Date(last)
-			d.setDate(d.getDate() + pad++)
-			days.push({ date: d, inMonth: false, isToday: false, isActive: false, isPast: false })
-		}
-
-		return days
+	$effect(() => {
+		calendar.setMonth(currentMonth)
 	})
 
 	const selectedDate = $derived.by(() => {
@@ -123,15 +92,15 @@
 
 <div class="ac" class:ac--compact={compact}>
 	<CalendarGrid
-		days={gridDays}
-		{weekdays}
-		{monthLabel}
+		days={calendar.days}
+		weekdays={calendar.weekdays}
+		monthLabel={calendar.monthLabel}
 		{selectedDate}
 		prevMonth={onPrev}
 		nextMonth={onNext}
 		onSelect={handleSelect}
 	/>
-	{#if gridDays.some(d => d.isActive && !d.isPast)}
+	{#if calendar.days.some(d => d.isActive && !d.isPast)}
 		<div class="ac__legend">
 			<span class="ac__legend-item"><span class="ac__dot-swatch" style="border-color:var(--cg-accent, var(--admin-accent));background:color-mix(in srgb, var(--cg-accent, var(--admin-accent)) 5%, transparent);"></span> Has events</span>
 		</div>

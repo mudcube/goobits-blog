@@ -1,4 +1,4 @@
-import { dominantAxisValue } from './month-stack'
+import { dominantAxisValue } from '../../booking/calendar-surface.svelte'
 
 type Direction = 1 | -1
 type WheelLikeEvent = Pick<WheelEvent, 'deltaX' | 'deltaY' | 'timeStamp' | 'preventDefault'>
@@ -74,9 +74,9 @@ export function createWheelMonthPager({
 	function shouldRestartFromReacceleration(absMovement: number) {
 		if (!Number.isFinite(postTriggerFloorAbsMovement)) return false
 		const increase = absMovement - postTriggerFloorAbsMovement
+		const sustainedLargeMovement = absMovement >= triggerDelta * 2 && absMovement >= postTriggerFloorAbsMovement * 0.9
 		return (
-			absMovement >= postTriggerFloorAbsMovement * 1.35 &&
-			increase >= triggerDelta * 0.5
+			sustainedLargeMovement || (absMovement >= postTriggerFloorAbsMovement * 1.35 && increase >= triggerDelta * 0.5)
 		)
 	}
 
@@ -118,6 +118,7 @@ export function createWheelMonthPager({
 		gestureDelta += primaryMovement
 		if (Math.abs(gestureDelta) < triggerDelta) return
 		wheelGestureConsumed = true
+		postTriggerFloorAbsMovement = absMovement >= triggerDelta * 2 ? absMovement : Number.POSITIVE_INFINITY
 		emitState()
 
 		if (

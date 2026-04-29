@@ -5,7 +5,7 @@ import { getAllPosts, type ProcessedPost } from '@goobits/blog/utils'
 import { getBlogConfig } from '@goobits/blog/config'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import { remarkTableOfContents } from '@goobits/blog/utils/remark-table-of-contents.ts'
-// @ts-ignore — JS rehype plugin, no type declarations
+// @ts-expect-error -- JS rehype plugin, no type declarations
 import { rehypeWebpPicture } from '@goobits/blog/utils/rehype-webp-picture.js'
 import type { JournalMetadata, JournalPost } from '$lib/blog/viewmodel'
 
@@ -77,9 +77,7 @@ function upgradeImagesToWebpPicture(html: string, postDir: string) {
 		const webpSrc = src.substring(0, src.length - ext.length) + '.webp'
 
 		// Check if the WebP file exists on disk
-		const webpDiskPath = src.startsWith('/')
-			? join(process.cwd(), 'static', webpSrc)
-			: join(postDir, webpSrc)
+		const webpDiskPath = src.startsWith('/') ? join(process.cwd(), 'static', webpSrc) : join(postDir, webpSrc)
 
 		try {
 			accessSync(webpDiskPath)
@@ -111,9 +109,7 @@ function isOwnedExternalUrl(href: string) {
 	try {
 		const url = new URL(href)
 		const ownedDomains = getBlogConfig().ownedDomains ?? []
-		return ownedDomains.some(
-			(domain) => url.hostname === domain || url.hostname.endsWith(`.${domain}`)
-		)
+		return ownedDomains.some((domain) => url.hostname === domain || url.hostname.endsWith(`.${domain}`))
 	} catch {
 		return false
 	}
@@ -131,7 +127,7 @@ function mergeRelAttribute(existingRel: string | null, requiredTokens: string[])
 		relTokens.add(token)
 	}
 
-	return [ ...relTokens ].join(' ')
+	return [...relTokens].join(' ')
 }
 
 function normalizeExternalAnchorRel(html: string) {
@@ -141,7 +137,7 @@ function normalizeExternalAnchorRel(html: string) {
 		}
 
 		const relMatch = anchorTag.match(/\brel=(['"])(.*?)\1/i)
-		const mergedRel = mergeRelAttribute(relMatch?.[2] ?? null, [ 'nofollow' ])
+		const mergedRel = mergeRelAttribute(relMatch?.[2] ?? null, ['nofollow'])
 
 		if (relMatch) {
 			return anchorTag.replace(/\brel=(['"])(.*?)\1/i, `rel=${quote}${mergedRel}${quote}`)
@@ -191,9 +187,7 @@ export async function getPost({
 		const postFilePath = getJournalPostFilePath(year, month, slug)
 		const postDir = dirname(postFilePath)
 		const strippedContent = upgradeImagesToWebpPicture(
-			normalizeExternalAnchorRel(
-				stripScriptTags(upgradeInsecureMediaUrls(renderedContent))
-			),
+			normalizeExternalAnchorRel(stripScriptTags(upgradeInsecureMediaUrls(renderedContent))),
 			postDir
 		)
 		const fallbackDate = () => new Date(`${year}-${month}-01`)

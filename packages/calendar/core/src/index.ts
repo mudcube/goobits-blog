@@ -119,7 +119,12 @@ import {
 import { listEventTemplates, type CalendarEventTemplate } from './events/event-templates.ts'
 import { promoteWaitlistedParticipant, type PromoteWaitlistResult } from './events/promote-waitlist.ts'
 import { getAdminEventDetail, type AdminEventDetail } from './events/event-detail.ts'
-import { fetchWeatherForEvent, fetchDayForecast, type WeatherSnapshot, type DayForecast } from './weather/weather-provider.ts'
+import {
+	fetchWeatherForEvent,
+	fetchDayForecast,
+	type WeatherSnapshot,
+	type DayForecast
+} from './weather/weather-provider.ts'
 import { createMockWeatherProvider } from './weather/mock-provider.ts'
 import type { WeatherProvider } from './weather/provider.ts'
 import {
@@ -128,10 +133,7 @@ import {
 	getBookingByConfirmation,
 	cancelBookingByConfirmation
 } from './services/booking-confirmation.ts'
-import {
-	getSlotAvailability,
-	type SlotAvailabilityResult
-} from './services/slot-availability.ts'
+import { getSlotAvailability, type SlotAvailabilityResult } from './services/slot-availability.ts'
 import {
 	parseAdminRulesInput,
 	parseAdminProgramMutationInput,
@@ -150,6 +152,7 @@ import {
 	type AdminUserProgramAccessInput,
 	type AdminPaymentDefaultsInput
 } from './transport/admin.ts'
+import { parsePositiveInteger } from './transport/parse.ts'
 import {
 	parseCalendarJoinEventInput,
 	parseCalendarProfileInput,
@@ -272,6 +275,7 @@ export {
 	parseDiscordWebhookTextInput,
 	TransportValidationError,
 	asTransportErrorMessage,
+	parsePositiveInteger,
 	generateConfirmationId,
 	setConfirmationId,
 	getBookingByConfirmation,

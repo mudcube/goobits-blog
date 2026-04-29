@@ -641,44 +641,6 @@
     gap: 1rem;
   }
 
-  .admin-settings__status {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.34rem;
-    padding: 0.18rem 0.6rem;
-    border-radius: 0.45rem;
-    font-size: 0.69rem;
-    font-weight: 650;
-    line-height: 1;
-    white-space: nowrap;
-    margin-top: 0.1rem;
-  }
-
-  .admin-settings__status-dot {
-    width: 0.35rem;
-    height: 0.35rem;
-    border-radius: 999px;
-    flex-shrink: 0;
-  }
-
-  .admin-settings__status--warn {
-    background: var(--admin-status-warn-bg);
-    color: var(--admin-status-warn-fg);
-  }
-
-  .admin-settings__status--warn .admin-settings__status-dot {
-    background: var(--admin-status-warn-dot);
-  }
-
-  .admin-settings__status--ok {
-    background: var(--admin-status-success-bg);
-    color: var(--admin-status-success-fg);
-  }
-
-  .admin-settings__status--ok .admin-settings__status-dot {
-    background: var(--admin-status-success-dot);
-  }
-
   .admin-settings__sync-top-actions {
     display: flex;
     justify-content: flex-end;
@@ -699,36 +661,6 @@
     color: color-mix(in srgb, var(--admin-accent) 82%, var(--text) 18%);
   }
 
-  .admin-settings__sync-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.875rem;
-    padding: 0.75rem 0.875rem;
-    min-height: 4rem;
-  }
-
-  .admin-settings__sync-action {
-    width: 32px;
-    min-width: 32px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .admin-settings__sync-action:hover:not(:disabled) {
-    transform: none;
-    box-shadow: none;
-  }
-
-  .admin-settings__sync-main {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    min-width: 0;
-  }
-
   .admin-settings__sync-icon {
     width: 1.35rem;
     height: 1.35rem;
@@ -742,17 +674,6 @@
     width: 1rem;
     height: 1rem;
     display: block;
-  }
-
-  .admin-settings__sync-info {
-    display: grid;
-    gap: 0.2rem;
-  }
-
-  .admin-settings__sync-name {
-    font-size: 0.8rem;
-    font-weight: 620;
-    color: var(--text);
   }
 
   .admin-settings__platform-field {

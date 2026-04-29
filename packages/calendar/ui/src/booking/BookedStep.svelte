@@ -76,30 +76,47 @@
 	}
 
 	/* --- Sparkles --- */
-	let sparkleEl: HTMLDivElement | undefined
+	type Sparkle = {
+		id: number
+		color: string
+		angle: number
+		dist: number
+		delay: number
+	}
+
+	let sparkles = $state<Sparkle[]>([])
+	let sparkleReset: ReturnType<typeof setTimeout> | undefined
 	const SPARKLE_COLORS = ['#c4b5fd', '#6ee7b7', '#a78bfa', '#4ade80', '#f9a8d4', '#fbbf24', '#818cf8', '#34d399']
 
 	function spawnSparkles() {
-		if (!sparkleEl) return
-		sparkleEl.innerHTML = ''
-		for (let i = 0; i < 8; i++) {
-			const dot = document.createElement('div')
-			dot.className = 'bs__sparkle-dot'
-			const color = SPARKLE_COLORS[i % SPARKLE_COLORS.length]
+		sparkles = Array.from({ length: 8 }, (_, i) => {
+			const color = SPARKLE_COLORS[i % SPARKLE_COLORS.length] ?? '#c4b5fd'
 			const angle = (i / 8) * 360 + (Math.random() - 0.5) * 25
 			const dist = 26 + Math.random() * 16
 			const delay = i * 0.035
-			dot.style.cssText = `background:${color};--angle:${angle}deg;--dist:${dist}px;animation-delay:${delay}s;`
-			sparkleEl.appendChild(dot)
-		}
-		setTimeout(() => { if (sparkleEl) sparkleEl.innerHTML = '' }, 1200)
+			return { id: i, color, angle, dist, delay }
+		})
+		clearTimeout(sparkleReset)
+		sparkleReset = setTimeout(() => {
+			sparkles = []
+		}, 1200)
 	}
 
-	onMount(() => { spawnSparkles() })
+	onMount(() => {
+		spawnSparkles()
+		return () => clearTimeout(sparkleReset)
+	})
 </script>
 
 <div class="bs">
-	<div class="bs__sparkles" bind:this={sparkleEl}></div>
+	<div class="bs__sparkles">
+		{#each sparkles as sparkle (sparkle.id)}
+			<span
+				class="bs__sparkle-dot"
+				style={`background:${sparkle.color};--angle:${sparkle.angle}deg;--dist:${sparkle.dist}px;animation-delay:${sparkle.delay}s;`}
+			></span>
+		{/each}
+	</div>
 
 	<div class="bs__check-wrap">
 		<div class="bs__check-glow"></div>
@@ -171,7 +188,7 @@
 		z-index: 5;
 	}
 
-	:global(.bs__sparkle-dot) {
+	.bs__sparkle-dot {
 		position: absolute;
 		width: 5px; height: 5px;
 		border-radius: 999px;

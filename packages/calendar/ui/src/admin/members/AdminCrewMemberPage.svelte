@@ -4,7 +4,7 @@
 	import { createAdminMembersController } from '@calendar/ui/admin/members/admin-members.svelte'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
-	import { ChevronRowCard } from '@calendar/ui/shared'
+	import { ChevronRowCard, getActivityEmoji } from '@calendar/ui/shared'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { withAdminRoute } from '@calendar/ui/config'
@@ -22,6 +22,31 @@
 	const users = $derived.by(() => (mockMode ? (adminMockCatalog.crewUsers as CrewMember[]) : (members.users as CrewMember[])))
 	const upcomingEvents = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
 	const recentEvents = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
+
+	let mockAccessRows = $state<Array<{ programSlug: string; allowed: boolean }>>([])
+	let accessSaveError = $state('')
+	const accessRows = $derived(mockMode ? mockAccessRows : members.accessRows)
+	const accessLoading = $derived(!mockMode && members.accessLoading)
+
+	async function toggleAccessWithSave(programSlug: string) {
+		accessSaveError = ''
+		if (mockMode) {
+			mockAccessRows = mockAccessRows.map((row) =>
+				row.programSlug === programSlug ? { ...row, allowed: !row.allowed } : row
+			)
+			return
+		}
+		const before = members.accessRows.map((row) => ({ ...row }))
+		members.toggleAccess(programSlug)
+		await members.saveAccess(false)
+		if (members.error) {
+			for (const row of before) {
+				const current = members.accessRows.find((item) => item.programSlug === row.programSlug)
+				if (current && current.allowed !== row.allowed) members.toggleAccess(row.programSlug)
+			}
+			accessSaveError = "Couldn't save — try again."
+		}
+	}
 
 	function hrefWithMock(path: string) {
 		return withAdminMock(path, mockMode)
@@ -93,9 +118,17 @@
 	)
 
 	$effect(() => {
-		if (!authed || mockMode) return
+		if (!authed) return
+		if (mockMode) {
+			mockAccessRows = adminMockCatalog.programs.map((program) => ({
+				programSlug: program.slug,
+				allowed: true
+			}))
+			return
+		}
 		void members.load()
 		void dashboard.loadEvents()
+		void members.openAccess(userId)
 	})
 </script>
 
@@ -123,6 +156,33 @@
 						<div class="admin-crew-member-page__meta-label">Joined</div>
 						<div class="admin-crew-member-page__meta-value">{joinedDate}</div>
 					</div>
+				</div>
+			</section>
+
+			<section class="admin-crew-member-page__section">
+				<h4>ACCESS</h4>
+				<div class="admin-crew-member-page__access calendar-ui-card">
+					{#if accessLoading}
+						<span class="admin-crew-member-page__access-meta">Loading access…</span>
+					{:else if accessRows.length === 0}
+						<span class="admin-crew-member-page__access-meta">No programs configured.</span>
+					{:else}
+						<div class="admin-crew-member-page__access-chips">
+							{#each accessRows as row (row.programSlug)}
+								<button
+									type="button"
+									class="admin-ui-chip"
+									class:admin-ui-chip--active={row.allowed}
+									onclick={() => void toggleAccessWithSave(row.programSlug)}
+								>
+									{getActivityEmoji('', row.programSlug)} {row.programSlug}
+								</button>
+							{/each}
+						</div>
+					{/if}
+					{#if accessSaveError}
+						<p class="admin-crew-member-page__access-error">{accessSaveError}</p>
+					{/if}
 				</div>
 			</section>
 
@@ -205,6 +265,29 @@
 	.admin-crew-member-page__list {
 		display: grid;
 		gap: 0.5rem;
+	}
+
+	.admin-crew-member-page__access {
+		padding: 0.75rem 0.85rem;
+		display: grid;
+		gap: 0.55rem;
+	}
+
+	.admin-crew-member-page__access-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+
+	.admin-crew-member-page__access-meta {
+		font-size: 0.78rem;
+		color: color-mix(in srgb, var(--text) 52%, transparent);
+	}
+
+	.admin-crew-member-page__access-error {
+		margin: 0;
+		font-size: 0.74rem;
+		color: #f87171;
 	}
 
 	.admin-crew-member-page__event-title {

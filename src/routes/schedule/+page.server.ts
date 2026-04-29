@@ -1,8 +1,9 @@
 import { load as coreLoad } from '@calendar/app/routes/calendar/page.server'
+import { isScheduleDesignMode, withScheduleDesignMode } from '$lib/app/schedule/design-mode'
 import { scheduleMockPrograms, scheduleMockRecent, scheduleMockUpcoming } from '$lib/app/schedule/mock-data'
 
 export async function load(event: Parameters<typeof coreLoad>[0]) {
-	const mockMode = event.url.searchParams.get('mock') === '1'
+	const mockMode = isScheduleDesignMode(event.url)
 	if (!mockMode) return coreLoad(event)
 
 	const baseData = await coreLoad(event)
@@ -12,7 +13,7 @@ export async function load(event: Parameters<typeof coreLoad>[0]) {
 		label: program.activityName || program.label,
 		icon: program.icon,
 		description: program.description,
-		href: `/schedule/${program.slug}/${mockMode ? '?mock=1' : ''}`
+		href: withScheduleDesignMode(`/schedule/${program.slug}/`, mockMode)
 	}))
 
 	return {

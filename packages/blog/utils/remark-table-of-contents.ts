@@ -8,7 +8,7 @@ type MdHeading = {
 type MdNode = MdHeading | { type: string; [key: string]: unknown }
 type MdRoot = { children: MdNode[] }
 
-export function remarkTableOfContents() {
+export function remarkTableOfContents(): (tree: MdRoot) => MdRoot {
 	return (tree: MdRoot) => {
 		const headings: Array<{ depth: number; text: string; id: string }> = []
 		let tocIndex = -1
@@ -19,7 +19,7 @@ export function remarkTableOfContents() {
 			if (node.type === 'heading') {
 				const headingNode = node as MdHeading
 				const first = headingNode.children[0]
-				const headingText = first && first.type === 'text' ? (first as MdText).value : ''
+				const headingText = first?.type === 'text' ? (first as MdText).value : ''
 				const tocMatch = headingText.match(/^TOC(?::(\d+))?$/)
 				if (tocMatch) {
 					tocIndex = index
@@ -27,7 +27,9 @@ export function remarkTableOfContents() {
 					if (tocMatch[1]) {
 						tocDepth = Math.min(6, Math.max(0, parseInt(tocMatch[1], 10)))
 					}
-					if (tocDepth === 0) tocDepth = 6
+					if (tocDepth === 0) {
+						tocDepth = 6
+					}
 					return
 				}
 
@@ -91,7 +93,7 @@ export function remarkTableOfContents() {
 	}
 }
 
-function toId(text: string) {
+function toId(text: string): string {
 	return text
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')

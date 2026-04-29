@@ -3,75 +3,90 @@
 	import type { CalendarDay } from './types'
 	import CalendarGrid from './CalendarGrid.svelte'
 	import InlineClaim from './InlineClaim.svelte'
+	import { createCalendarSurface, isSameDay, startOfDay } from './calendar-surface.svelte'
 
 	let {
 		activity,
-		calDays,
-		weekdays,
 		openDays,
 		claimed = false,
 		pendingDay = $bindable<OpenDay | null>(null),
 		onSelectDay,
 		onClaim,
-		monthLabel = '',
-		prevMonth,
-		nextMonth,
+		variant = 'compact',
+		showHero = true
 	}: {
 		activity: { icon: string; label: string; tagline: string }
-		calDays: Array<{ date: Date; inMonth: boolean; isToday: boolean; isOpen: boolean; isPast: boolean; bookingCount: number }>
-		weekdays: string[]
 		openDays: OpenDay[]
 		claimed?: boolean
 		pendingDay?: OpenDay | null
 		onSelectDay: (day: OpenDay) => void
 		onClaim: (name: string) => void
-		monthLabel?: string
-		prevMonth?: () => void
-		nextMonth?: () => void
+		variant?: 'compact' | 'member'
+		showHero?: boolean
 	} = $props()
 
-	const hasOpenDays = $derived(calDays.some(c => c.isOpen && !c.isPast))
-	const isEntireMonthPast = $derived(calDays.filter(c => c.inMonth).every(c => c.isPast))
+	const today = $derived(startOfDay(new Date()))
+	const hasOpenDays = $derived(openDays.some(day => !isPast(day.date)))
+	const isEntireMonthPast = $derived(openDays.length > 0 && openDays.every(day => isPast(day.date)))
 
-	const gridDays = $derived<CalendarDay[]>(calDays.map(c => ({
-		date: c.date,
-		inMonth: c.inMonth,
-		isToday: c.isToday,
-		isActive: c.isOpen,
-		isPast: c.isPast,
-		dotCount: c.bookingCount,
-		ariaLabel: `${c.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}${c.isOpen && !c.isPast ? ', available' : ''}`,
-	})))
+	function findOpenDay(date: Date) {
+		return openDays.find(od => isSameDay(od.date, date))
+	}
+
+	function isPast(date: Date) {
+		return startOfDay(date) < today
+	}
+
+	function isToday(date: Date) {
+		return isSameDay(date, today)
+	}
+
+	function isActive(date: Date) {
+		return !!findOpenDay(date)
+	}
+
+	function eventCount(date: Date) {
+		return findOpenDay(date)?.bookings.length ?? 0
+	}
+
+	const calendar = createCalendarSurface({
+		isPast,
+		isToday,
+		isActive,
+		eventCount,
+		ariaLabel: (date) =>
+			`${date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}${isActive(date) && !isPast(date) ? ', available' : ''}`
+	})
 
 	function handleSelect(day: CalendarDay) {
-		const match = openDays.find(od => od.date.getTime() === day.date.getTime())
+		const match = findOpenDay(day.date)
 		if (!match) return
 		pendingDay = match
 		if (claimed) onSelectDay(match)
 	}
 </script>
 
-<div class="cs__hero">
-	<span class="cs__icon">{activity.icon}</span>
-	<h2 class="cs__name">{activity.label}</h2>
+{#if showHero}
+	<div class="cs__hero">
+		<span class="cs__icon">{activity.icon}</span>
+		<h2 class="cs__name">{activity.label}</h2>
+	</div>
+{/if}
+
+<div class="cs__grid">
+	<CalendarGrid
+		days={calendar.days}
+		weekdays={calendar.weekdays}
+		monthLabel={calendar.monthLabel}
+		selectedDate={pendingDay?.date ?? null}
+		prevMonth={calendar.prevMonth}
+		nextMonth={calendar.nextMonth}
+		onSelect={handleSelect}
+		{variant}
+	/>
 </div>
 
-<CalendarGrid
-	days={gridDays}
-	{weekdays}
-	{monthLabel}
-	selectedDate={pendingDay?.date ?? null}
-	{prevMonth}
-	{nextMonth}
-	onSelect={handleSelect}
-/>
-
-{#if hasOpenDays}
-	<div class="cs__legend">
-		<span class="cs__legend-item"><span class="cs__dot"></span> Available</span>
-		{#if calDays.some(c => c.bookingCount > 0)}<span class="cs__legend-item"><span class="cs__dot cs__dot--grn"></span> Others going</span>{/if}
-	</div>
-{:else}
+{#if !hasOpenDays}
 	<div class="cs__empty">
 		{#if isEntireMonthPast}
 			<p class="cs__empty-title">This month has passed</p>
@@ -80,6 +95,11 @@
 			<p class="cs__empty-title">No open days this month</p>
 			<p class="cs__empty-sub">Try checking next month, or ask the organizer to open more days.</p>
 		{/if}
+	</div>
+{:else if variant !== 'member'}
+	<div class="cs__legend">
+		<span class="cs__legend-item"><span class="cs__dot"></span> Available</span>
+		{#if openDays.some(day => day.bookings.length > 0)}<span class="cs__legend-item"><span class="cs__dot cs__dot--grn"></span> Others going</span>{/if}
 	</div>
 {/if}
 

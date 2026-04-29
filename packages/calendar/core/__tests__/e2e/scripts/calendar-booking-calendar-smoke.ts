@@ -1,27 +1,16 @@
 import { chromium, type Page } from 'playwright'
 import { BASE_URL } from './_helpers'
-import { waitForAvailableDays, waitForMonthChange, waitForMonthLabel, waitForSlotButtons } from './_ui-waits'
+import { waitForMonthChange } from './_ui-waits'
 
-async function expectWheelBurstToAdvanceExactlyOneMonth(page: Page) {
-	const monthTitle = page.locator('.member-calendar__month-banner-title')
+async function expectNextButtonToAdvanceExactlyOneMonth(page: Page) {
+	const monthTitle = page.locator('.cg__nav-label')
 	const readMonthTitle = async () => ((await monthTitle.textContent()) || '').trim()
-	const runBurst = async () => {
-		await page.locator('.member-calendar__viewport').hover()
-		for (const delta of [120, 72, 40, 22, 12, 6, 3]) {
-			await page.mouse.wheel(0, delta)
-		}
-	}
 	const before = await readMonthTitle()
-
-	await runBurst()
-	let after = await waitForMonthChange(page, before).catch(async () => readMonthTitle())
-	if (before === after) {
-		await runBurst()
-		after = await waitForMonthChange(page, before).catch(async () => readMonthTitle())
-	}
+	await page.getByRole('button', { name: 'Next month' }).click()
+	const after = await waitForMonthChange(page, before)
 
 	if (before === after) {
-		throw new Error(`wheel burst did not advance the visible month: ${before}`)
+		throw new Error(`next month button did not advance the visible month: ${before}`)
 	}
 
 	const steppedTwice = await page.evaluate((beforeLabel) => {
@@ -30,7 +19,7 @@ async function expectWheelBurstToAdvanceExactlyOneMonth(page: Page) {
 			return Number.isNaN(parsed.getTime()) ? null : parsed
 		}
 		const beforeDate = parseMonth(beforeLabel)
-		const currentLabel = (document.querySelector('.member-calendar__month-banner-title')?.textContent || '').trim()
+		const currentLabel = (document.querySelector('.cg__nav-label')?.textContent || '').trim()
 		const afterDate = parseMonth(currentLabel)
 		if (!beforeDate || !afterDate) return false
 		const monthDistance =
@@ -40,20 +29,19 @@ async function expectWheelBurstToAdvanceExactlyOneMonth(page: Page) {
 	}, before)
 
 	if (steppedTwice) {
-		throw new Error(`wheel burst advanced more than one month: ${before} -> ${after}`)
+		throw new Error(`next month button advanced more than one month: ${before} -> ${after}`)
 	}
 }
 
-async function expectSecondWheelGestureToAdvanceOneMoreMonth(page: Page) {
-	const monthTitle = page.locator('.member-calendar__month-banner-title')
+async function expectSecondNextClickToAdvanceOneMoreMonth(page: Page) {
+	const monthTitle = page.locator('.cg__nav-label')
 	const readMonthTitle = async () => ((await monthTitle.textContent()) || '').trim()
 	const before = await readMonthTitle()
 
-	await page.locator('.member-calendar__viewport').hover()
-	await page.mouse.wheel(0, 120)
+	await page.getByRole('button', { name: 'Next month' }).click()
 	const after = await waitForMonthChange(page, before)
 	if (before === after) {
-		throw new Error(`separate wheel gesture did not advance the visible month: ${before}`)
+		throw new Error(`second next month click did not advance the visible month: ${before}`)
 	}
 
 	const steppedTwice = await page.evaluate((beforeLabel) => {
@@ -62,7 +50,7 @@ async function expectSecondWheelGestureToAdvanceOneMoreMonth(page: Page) {
 			return Number.isNaN(parsed.getTime()) ? null : parsed
 		}
 		const beforeDate = parseMonth(beforeLabel)
-		const currentLabel = (document.querySelector('.member-calendar__month-banner-title')?.textContent || '').trim()
+		const currentLabel = (document.querySelector('.cg__nav-label')?.textContent || '').trim()
 		const afterDate = parseMonth(currentLabel)
 		if (!beforeDate || !afterDate) return false
 		const monthDistance =
@@ -72,12 +60,12 @@ async function expectSecondWheelGestureToAdvanceOneMoreMonth(page: Page) {
 	}, before)
 
 	if (steppedTwice) {
-		throw new Error(`separate wheel gesture advanced more than one month: ${before} -> ${after}`)
+		throw new Error(`second next month click advanced more than one month: ${before} -> ${after}`)
 	}
 }
 
-async function expectBackwardWheelPagingToRemainMonthAccurate(page: Page) {
-	const monthTitle = page.locator('.member-calendar__month-banner-title')
+async function expectBackwardButtonPagingToRemainMonthAccurate(page: Page) {
+	const monthTitle = page.locator('.cg__nav-label')
 	const parseMonthLabel = (label: string) => {
 		const parsed = new Date(`${label} 1`)
 		if (Number.isNaN(parsed.getTime())) {
@@ -94,7 +82,7 @@ async function expectBackwardWheelPagingToRemainMonthAccurate(page: Page) {
 	const labels: string[] = [((await monthTitle.textContent()) || '').trim()]
 	for (let i = 0; i < 4; i += 1) {
 		const before = ((await monthTitle.textContent()) || '').trim()
-		await page.mouse.wheel(0, -120)
+		await page.getByRole('button', { name: 'Previous month' }).click()
 		labels.push(await waitForMonthChange(page, before))
 	}
 
@@ -107,50 +95,10 @@ async function expectBackwardWheelPagingToRemainMonthAccurate(page: Page) {
 		const distance = monthDistance(previousLabel, nextLabel)
 		if (distance !== -1) {
 			throw new Error(
-				`backward wheel paging skipped or misaligned months: ${previousLabel} -> ${nextLabel}`
+				`backward button paging skipped or misaligned months: ${previousLabel} -> ${nextLabel}`
 			)
 		}
 	}
-}
-
-async function assertCanSelectFromALaterMonth(page: Page) {
-	const monthTitle = page.locator('.member-calendar__month-banner-title')
-	const enabledAvailableDaySelector = '.member-calendar__day--available:not([disabled])'
-	const startLabel = ((await monthTitle.textContent()) || '').trim()
-	let laterLabel = startLabel
-	let foundAvailableDay = false
-
-	await page.locator('.member-calendar__viewport').hover()
-	for (let attempt = 0; attempt < 12; attempt += 1) {
-		const before = ((await monthTitle.textContent()) || '').trim()
-		await page.mouse.wheel(0, 120)
-		laterLabel = await waitForMonthChange(page, before)
-		if (laterLabel !== startLabel && (await page.locator(enabledAvailableDaySelector).count()) > 0) {
-			foundAvailableDay = true
-			break
-		}
-	}
-
-	if (!foundAvailableDay) {
-		throw new Error('could not reach a later month with available days')
-	}
-
-	await page.locator(enabledAvailableDaySelector).first().click()
-	await page.locator('.calendar-page__slots-section').waitFor({ timeout: 5000 })
-
-	const selectedCount = await page.locator('.member-calendar__day--selected').count()
-	if (selectedCount === 0) {
-		throw new Error(`clicking an available day in ${laterLabel} did not select that day`)
-	}
-}
-
-async function clickVisibleAvailableDay(page: Page) {
-	const enabledAvailableDaySelector = '.member-calendar__day--available:not([disabled])'
-	const totalAvailable = await page.locator(enabledAvailableDaySelector).count()
-	if (totalAvailable === 0) {
-		throw new Error('could not find an available day in the current month view')
-	}
-	await page.locator(enabledAvailableDaySelector).first().click()
 }
 
 export async function runCalendarBookingCalendarSmoke() {
@@ -175,84 +123,54 @@ export async function runCalendarBookingCalendarSmoke() {
 			throw new Error('calendar member session bootstrap did not stick')
 		}
 
-		await page.locator('.member-calendar__viewport').waitFor({ timeout: 10000 })
-		await waitForAvailableDays(page)
-		await waitForMonthLabel(page)
-		await page.locator('.member-calendar__viewport').hover()
-		await expectWheelBurstToAdvanceExactlyOneMonth(page)
-		await expectSecondWheelGestureToAdvanceOneMoreMonth(page)
+		await page.locator('[data-calendar-ready="true"]').waitFor({ timeout: 10000 })
+		await page.locator('.cg__cell--active:not([disabled])').first().waitFor({ timeout: 10000 })
+		await page.locator('.cg__nav-label').waitFor({ timeout: 10000 })
+		await expectNextButtonToAdvanceExactlyOneMonth(page)
+		await expectSecondNextClickToAdvanceOneMoreMonth(page)
 		await page.goto(`${BASE_URL}/schedule/gym/?mock=1&preview=1`, {
 			waitUntil: 'domcontentloaded',
 			timeout: 30000
 		})
-		await page.locator('.member-calendar__viewport').waitFor({ timeout: 10000 })
-		await waitForMonthLabel(page)
-		await page.locator('.member-calendar__viewport').hover()
-		await expectBackwardWheelPagingToRemainMonthAccurate(page)
+		await page.locator('[data-calendar-ready="true"]').waitFor({ timeout: 10000 })
+		await page.locator('.cg__nav-label').waitFor({ timeout: 10000 })
+		await expectBackwardButtonPagingToRemainMonthAccurate(page)
 
 		await page.goto(`${BASE_URL}/schedule/gym/?mock=1&preview=1`, {
 			waitUntil: 'domcontentloaded',
 			timeout: 30000
 		})
-		await page.locator('.member-calendar__viewport').waitFor({ timeout: 10000 })
-		await waitForAvailableDays(page)
+		await page.locator('[data-calendar-ready="true"]').waitFor({ timeout: 10000 })
+		await page.locator('.cg__cell--active:not([disabled])').first().waitFor({ timeout: 10000 })
 
-		const activeDays = page.locator('.member-calendar__day--available')
+		const activeDays = page.locator('.cg__cell--active:not([disabled])')
 		const activeCount = await activeDays.count()
 		if (activeCount === 0) {
 			throw new Error('no active calendar days rendered on mock booking page')
 		}
 
-		await clickVisibleAvailableDay(page)
+		await activeDays.first().click()
 
-		const slotButtons = page.locator('.calendar-page__slot-button')
-		await waitForSlotButtons(page)
+		const slotButtons = page.locator('.ts__slot')
+		await slotButtons.first().waitFor({ timeout: 10000 })
 		const slotCount = await slotButtons.count()
 		if (slotCount === 0) {
-			throw new Error('clicking an active day did not reveal any slot buttons')
+			throw new Error('clicking an active day did not reveal preset slot buttons')
 		}
 
 		const firstSlot = slotButtons.first()
 		const firstSlotTextBefore = (await firstSlot.textContent()) || ''
-		const beforeIndicatesJoinable =
-			firstSlotTextBefore.includes('Join') ||
-			firstSlotTextBefore.includes('Join waitlist') ||
-			firstSlotTextBefore.includes('Leave')
-		if (!beforeIndicatesJoinable) {
-			throw new Error(`slot button did not expose a booking action: ${firstSlotTextBefore}`)
+		if (!firstSlotTextBefore.includes('left') && !firstSlotTextBefore.includes('Waitlist')) {
+			throw new Error(`preset slot did not expose availability: ${firstSlotTextBefore}`)
 		}
 
 		await firstSlot.click()
-		await page.waitForFunction(
-			(before) => {
-				const button = document.querySelector('.calendar-page__slot-button')
-				return (button?.textContent || '') !== before
-			},
-			firstSlotTextBefore,
-			{ timeout: 3_000 }
-		)
-
-		const firstSlotTextAfterJoin = (await firstSlot.textContent()) || ''
-		if (!firstSlotTextAfterJoin.includes('Leave')) {
-			throw new Error(`joining a mock slot did not update the CTA to Leave: ${firstSlotTextAfterJoin}`)
+		if ((await page.locator('.ts__slot--selected').count()) === 0) {
+			throw new Error('clicking a preset slot did not mark it selected')
 		}
 
-		await firstSlot.click()
-		await page.waitForFunction(
-			(before) => {
-				const button = document.querySelector('.calendar-page__slot-button')
-				return (button?.textContent || '') !== before
-			},
-			firstSlotTextAfterJoin,
-			{ timeout: 3_000 }
-		)
-
-		const firstSlotTextAfterLeave = (await firstSlot.textContent()) || ''
-		if (firstSlotTextAfterLeave.includes('Leave')) {
-			throw new Error(`leaving a mock slot did not clear the joined state: ${firstSlotTextAfterLeave}`)
-		}
-
-		await assertCanSelectFromALaterMonth(page)
+		await page.locator('.ts__confirm').click()
+		await page.locator('.bs__card').waitFor({ timeout: 10000 })
 
 		if (errors.length > 0) {
 			throw new Error(`booking page emitted runtime errors:\n- ${errors.join('\n- ')}`)

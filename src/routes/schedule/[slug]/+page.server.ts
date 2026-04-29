@@ -1,11 +1,12 @@
 import { error } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { buildPaymentLink, getCalendarProgramBySlug, listEventsFeed } from '@calendar/core'
+import { isScheduleDesignMode } from '$lib/app/schedule/design-mode'
 import { scheduleMockPrograms, scheduleMockRecent, scheduleMockUpcoming } from '$lib/app/schedule/mock-data'
 import type { RequestEvent } from './$types'
 
 export async function load(event: RequestEvent) {
-	const mockMode = event.url.searchParams.get('mock') === '1'
+	const mockMode = isScheduleDesignMode(event.url)
 	const slug = event.params.slug
 
 	if (mockMode) {

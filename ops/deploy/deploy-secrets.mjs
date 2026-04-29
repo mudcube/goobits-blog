@@ -8,21 +8,24 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 const envFile = readFileSync('config/env/.env.production', 'utf8')
 const keys = envFile
 	.split('\n')
-	.map(l => l.trim())
-	.filter(l => l && !l.startsWith('#') && !l.startsWith('DOTENV_') && l.includes('='))
-	.map(l => l.split('=')[0].trim())
+	.map((l) => l.trim())
+	.filter((l) => l && !l.startsWith('#') && !l.startsWith('DOTENV_') && l.includes('='))
+	.map((l) => l.split('=')[0].trim())
 
 const secrets = {}
 for (const key of keys) {
 	if (process.env[key]) secrets[key] = process.env[key]
 }
 const projectName = process.env.CF_PAGES_PROJECT || 'miko-art'
-const tempSecretsFile = '.wrangler-pages-secrets.json'
+const tempSecretsDir = mkdtempSync(join(tmpdir(), 'wrangler-pages-secrets-'))
+const tempSecretsFile = join(tempSecretsDir, 'secrets.json')
 
 const count = Object.keys(secrets).length
 if (count === 0) {
@@ -31,7 +34,9 @@ if (count === 0) {
 }
 
 console.log(`Pushing ${count} secrets to Cloudflare: ${Object.keys(secrets).join(', ')}`)
-writeFileSync(tempSecretsFile, JSON.stringify(secrets, null, 2))
+writeFileSync(tempSecretsFile, JSON.stringify(secrets, null, 2), {
+	mode: 0o600
+})
 
 try {
 	const result = spawnSync('wrangler', ['pages', 'secret', 'bulk', tempSecretsFile, '--project-name', projectName], {
@@ -41,5 +46,5 @@ try {
 		process.exit(result.status ?? 1)
 	}
 } finally {
-	rmSync(tempSecretsFile, { force: true })
+	rmSync(tempSecretsDir, { force: true, recursive: true })
 }

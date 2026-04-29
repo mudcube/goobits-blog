@@ -21,6 +21,12 @@
 	const eventsSource = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
 	const recentEventsSource = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
 
+	type EventCardExtra = {
+		startsAt: string
+		seatsTaken: number
+		participants?: { name?: string | null; displayName?: string | null }[]
+	}
+
 	function hrefWithMock(path: string) {
 		return withAdminMock(path, mockMode)
 	}
@@ -65,6 +71,10 @@
 		const second = parts[1]?.charAt(0) ?? ''
 		return `${first}${second}`.toUpperCase() || raw.slice(0, 2).toUpperCase()
 	}
+
+	function eventCardExtra(item: { extra?: unknown }) {
+		return item.extra as EventCardExtra
+	}
 </script>
 
 {#if authed}
@@ -106,13 +116,13 @@
 						dimmed: past,
 						onClick: () => goto(hrefWithMock(eventRoute(ev))),
 						ariaLabel: `Open ${ev.title}`,
-						_event: ev,
+						extra: ev,
 					}
 				})}
 				emptyText="No upcoming events yet."
 			>
 				{#snippet right(item)}
-					{@const ev = item._event}
+					{@const ev = eventCardExtra(item)}
 					<div class="social-events__time">{timeLabel(ev.startsAt)}</div>
 					<div class="social-events__people">
 						<span class="social-events__avatar social-events__avatar--you" title="You">You</span>
@@ -183,12 +193,6 @@
 		font-size: 0.68rem;
 		font-weight: 600;
 		color: color-mix(in srgb, var(--text) 45%, transparent);
-	}
-
-	.social-events__meta {
-		margin: 0;
-		font-size: 0.84rem;
-		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
 
 </style>

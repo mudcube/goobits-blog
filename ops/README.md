@@ -24,4 +24,4 @@ pnpm calendar:sync
 Required env:
 
 - `PUBLIC_BASE_URL`
-- `CALENDAR_SYNC_CRON_SECRET` (or `ADMIN_PASSCODE` fallback)
+- `CALENDAR_SYNC_CRON_SECRET`

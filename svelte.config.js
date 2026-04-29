@@ -16,6 +16,8 @@ export default {
 					'/admin/*',
 					'/calendar',
 					'/calendar/*',
+					'/schedule',
+					'/schedule/*',
 					'/blog',
 					'/blog/*',
 					'/contact',
@@ -66,12 +68,12 @@ export default {
 			'@calendar/ui': './packages/calendar/ui/src'
 		}
 	},
-	extensions: [ '.svelte', '.md' ],
+	extensions: ['.svelte', '.md'],
 	preprocess: [
 		mdsvex({
-			extensions: [ '.md' ],
-			remarkPlugins: [ remarkTableOfContents ],
-			rehypePlugins: [ rehypeWebpPicture ],
+			extensions: ['.md'],
+			remarkPlugins: [remarkTableOfContents],
+			rehypePlugins: [rehypeWebpPicture],
 			smartypants: {
 				dashes: 'oldschool'
 			}

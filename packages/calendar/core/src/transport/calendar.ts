@@ -9,7 +9,11 @@ export type CalendarJoinEventInput = {
 export function parseCalendarJoinEventInput(input: unknown): CalendarJoinEventInput {
 	const body = input == null ? {} : asJsonObject(input)
 	return {
-		guestCount: readIntInRange(body, 'guestCount', { min: 0, max: 8, defaultValue: 0 }),
+		guestCount: readIntInRange(body, 'guestCount', {
+			min: 0,
+			max: 8,
+			defaultValue: 0
+		}),
 		note: readOptionalString(body, 'note', { maxLength: 400 })
 	}
 }
@@ -23,9 +27,9 @@ export type CalendarProfileInput = {
 export function parseCalendarProfileInput(input: unknown): CalendarProfileInput {
 	const body = asJsonObject(input)
 	return {
-		emergencyContact: (readOptionalString(body, 'emergencyContact', { maxLength: 120 }) ?? ''),
-		dietaryRestrictions: (readOptionalString(body, 'dietaryRestrictions', { maxLength: 240 }) ?? ''),
-		chatHandle: (readOptionalString(body, 'chatHandle', { maxLength: 80 }) ?? '')
+		emergencyContact: readOptionalString(body, 'emergencyContact', { maxLength: 120 }) ?? '',
+		dietaryRestrictions: readOptionalString(body, 'dietaryRestrictions', { maxLength: 240 }) ?? '',
+		chatHandle: readOptionalString(body, 'chatHandle', { maxLength: 80 }) ?? ''
 	}
 }
 
@@ -37,11 +41,19 @@ export type CalendarInviteCreateInput = {
 
 export function parseCalendarInviteCreateInput(input: unknown): CalendarInviteCreateInput {
 	const body = asJsonObject(input)
-	const uses = readIntInRange(body, 'uses', { min: 1, max: 100, defaultValue: 1 })
+	const uses = readIntInRange(body, 'uses', {
+		min: 1,
+		max: 100,
+		defaultValue: 1
+	})
 	const expiresRaw = body['expiresInDays']
 	let expiresInDays: number | null = null
 	if (expiresRaw != null && String(expiresRaw).trim() !== '') {
-		expiresInDays = readIntInRange(body, 'expiresInDays', { min: 1, max: 365, message: 'Invalid expiresInDays' })
+		expiresInDays = readIntInRange(body, 'expiresInDays', {
+			min: 1,
+			max: 365,
+			message: 'Invalid expiresInDays'
+		})
 	}
 	return {
 		email: readOptionalString(body, 'email', { maxLength: 320 }),
@@ -57,7 +69,9 @@ export type CalendarSessionBootstrapInput = {
 
 export function parseCalendarSessionBootstrapInput(input: unknown): CalendarSessionBootstrapInput {
 	const body = input == null ? {} : asJsonObject(input)
-	const email = (readOptionalString(body, 'email', { maxLength: 320 }) ?? `e2e-calendar-${Date.now()}@example.com`).toLowerCase()
+	const email = (
+		readOptionalString(body, 'email', { maxLength: 320 }) ?? `e2e-calendar-${Date.now()}@example.com`
+	).toLowerCase()
 	const name = readOptionalString(body, 'name', { maxLength: 120 }) ?? 'E2E Calendar User'
 	return { email, name }
 }
@@ -71,7 +85,7 @@ export type CalendarInviteClaimInput = {
 export function parseCalendarInviteClaimInput(input: unknown): CalendarInviteClaimInput {
 	const body = input == null ? {} : asJsonObject(input)
 	return {
-		code: readRequiredString(body, 'code', { maxLength: 24 }),
+		code: readRequiredString(body, 'code', { maxLength: 25 }),
 		name: readRequiredString(body, 'name', { maxLength: 120 }),
 		email: readOptionalString(body, 'email', { maxLength: 320 })?.toLowerCase() ?? null
 	}
@@ -99,7 +113,9 @@ export type CalendarBookingLookupInput = {
 export function parseCalendarBookingLookupInput(input: unknown): CalendarBookingLookupInput {
 	const body = asJsonObject(input)
 	return {
-		confirmationId: readRequiredString(body, 'confirmationId', { maxLength: 64 })
+		confirmationId: readRequiredString(body, 'confirmationId', {
+			maxLength: 64
+		})
 	}
 }
 
