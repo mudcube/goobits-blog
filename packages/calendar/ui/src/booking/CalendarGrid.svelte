@@ -13,7 +13,6 @@
 		onSelect,
 		variant = 'compact',
 		testId = 'calendar-grid',
-		onWheel,
 		onKeydown
 	}: {
 		days: CalendarDay[]
@@ -25,7 +24,6 @@
 		onSelect?: (day: CalendarDay, element: HTMLButtonElement) => void
 		variant?: 'compact' | 'member'
 		testId?: string
-		onWheel?: (event: WheelEvent) => void
 		onKeydown?: (event: KeyboardEvent) => void
 	} = $props()
 	let isHydrated = $state(false)
@@ -96,7 +94,6 @@
 		class={viewportClass()}
 		aria-label="Calendar month view"
 		tabindex={variant === 'member' ? 0 : undefined}
-		onwheel={onWheel}
 		onkeydown={onKeydown}
 	>
 		<div class={gridClass()}>

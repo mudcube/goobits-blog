@@ -9,7 +9,6 @@
 		type CalendarTone
 	} from '../../booking/calendar-surface.svelte'
 	import { venueDayKey } from '../../booking/venue-time'
-	import { createWheelMonthPager } from './wheel-month-pager'
 	import type { CalendarEventsResponse } from '../../api/calendar'
 
 	type FeedEvent = CalendarEventsResponse['upcoming'][number]
@@ -29,7 +28,6 @@
 	}>()
 
 	let selectedDate = $state<Date | null>(null)
-	let lastPageDirection = $state<1 | -1 | 0>(0)
 
 	function isPast(date: Date) {
 		return date < startOfDay(new Date())
@@ -113,27 +111,11 @@
 	}
 
 	function prevMonth() {
-		lastPageDirection = -1
 		calendar.prevMonth()
 	}
 
 	function nextMonth() {
-		lastPageDirection = 1
 		calendar.nextMonth()
-	}
-
-	const wheelPager = createWheelMonthPager({
-		triggerDelta: 48,
-		sameDirectionRearmGapMs: 0,
-		getLastPageDirection: () => lastPageDirection,
-		onPage: (direction) => {
-			if (direction > 0) nextMonth()
-			else prevMonth()
-		}
-	})
-
-	function handleWheel(event: WheelEvent) {
-		wheelPager.handle(event)
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -165,7 +147,6 @@
 		onSelect={(day) => selectDateFromCalendar(day.date)}
 		variant="member"
 		testId="member-calendar"
-		onWheel={handleWheel}
 		onKeydown={handleKeydown}
 	/>
 
