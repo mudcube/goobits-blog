@@ -9,7 +9,8 @@ export type CreateInviteInput = {
 }
 
 const CalendarOAuthStartResponseSchema = z.object({
-	authUrl: z.string()
+	authUrl: z.string(),
+	provider: z.union([z.literal('google'), z.literal('outlook')]).optional()
 })
 
 const CalendarMutationOkSchema = z.object({
@@ -179,6 +180,40 @@ const CalendarJoinResponseSchema = z.object({
 	}).nullable().optional()
 })
 
+const CalendarPaymentConfigResponseSchema = z.object({
+	ok: z.literal(true),
+	payments: z.object({
+		paypal: z.object({
+			clientId: z.union([z.string(), z.null()]),
+			enabled: z.boolean()
+		}),
+		square: z.object({
+			applicationId: z.union([z.string(), z.null()]),
+			locationId: z.union([z.string(), z.null()]),
+			environment: z.union([z.literal('sandbox'), z.literal('production')]),
+			enabled: z.boolean()
+		})
+	})
+})
+
+const CalendarPayPalOrderResponseSchema = z.object({
+	ok: z.literal(true),
+	orderId: z.string()
+})
+
+const CalendarPayPalCaptureResponseSchema = z.object({
+	ok: z.literal(true),
+	orderId: z.string(),
+	status: z.string()
+})
+
+const CalendarCashAppPaymentResponseSchema = z.object({
+	ok: z.literal(true),
+	paymentId: z.string(),
+	status: z.string(),
+	receiptUrl: z.union([z.string(), z.null()])
+})
+
 const CalendarLeaveResponseSchema = z.object({
 	ok: z.literal(true),
 	state: z.object({
@@ -211,14 +246,21 @@ export type CalendarEventsResponse = z.infer<typeof CalendarEventsResponseSchema
 export type CalendarJoinResponse = z.infer<typeof CalendarJoinResponseSchema>
 export type CalendarLeaveResponse = z.infer<typeof CalendarLeaveResponseSchema>
 export type CalendarProfile = z.infer<typeof CalendarProfileSchema>
+export type CalendarPaymentConfigResponse = z.infer<typeof CalendarPaymentConfigResponseSchema>
+export type CalendarPayPalOrderResponse = z.infer<typeof CalendarPayPalOrderResponseSchema>
+export type CalendarPayPalCaptureResponse = z.infer<typeof CalendarPayPalCaptureResponseSchema>
+export type CalendarCashAppPaymentResponse = z.infer<typeof CalendarCashAppPaymentResponseSchema>
 export type CalendarUserAccessResponse = z.infer<typeof CalendarUserAccessResponseSchema>
 export type CalendarPaymentDefaultsResponse = z.infer<typeof CalendarPaymentDefaultsResponseSchema>
 export type CalendarEventTemplatesResponse = z.infer<typeof CalendarEventTemplatesResponseSchema>
 export type CalendarAdminEventDetailResponse = z.infer<typeof CalendarAdminEventDetailResponseSchema>
 export type CalendarPromoteResponse = z.infer<typeof CalendarPromoteResponseSchema>
 
-export async function startCalendarOAuth() {
+export async function startCalendarOAuth(input: { provider?: 'google' | 'outlook' } = {}) {
 	return requestApi<CalendarOAuthStartResponse>(withCalendarApi('/oauth-start'), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ provider: input.provider ?? 'google' }),
 		parse: (payload) => CalendarOAuthStartResponseSchema.parse(payload)
 	})
 }
@@ -344,6 +386,47 @@ export async function leaveCalendarEvent(eventId: number) {
 	return requestApi<CalendarLeaveResponse>(withCalendarApi(`/events/${eventId}/leave`), {
 		method: 'POST',
 		parse: (payload) => CalendarLeaveResponseSchema.parse(payload)
+	})
+}
+
+export async function getCalendarPaymentConfig() {
+	return requestApi<CalendarPaymentConfigResponse>(withCalendarApi('/payments/config'), {
+		parse: (payload) => CalendarPaymentConfigResponseSchema.parse(payload)
+	})
+}
+
+export async function createCalendarPayPalOrder(input: {
+	eventId: number
+	confirmationId?: string | null
+	fundingSource?: 'paypal' | 'venmo'
+}) {
+	return requestApi<CalendarPayPalOrderResponse>(withCalendarApi('/payments/paypal/order'), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(input),
+		parse: (payload) => CalendarPayPalOrderResponseSchema.parse(payload)
+	})
+}
+
+export async function captureCalendarPayPalOrder(orderId: string) {
+	return requestApi<CalendarPayPalCaptureResponse>(withCalendarApi('/payments/paypal/capture'), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ orderId }),
+		parse: (payload) => CalendarPayPalCaptureResponseSchema.parse(payload)
+	})
+}
+
+export async function createCalendarCashAppPayment(input: {
+	eventId: number
+	confirmationId?: string | null
+	sourceId: string
+}) {
+	return requestApi<CalendarCashAppPaymentResponse>(withCalendarApi('/payments/cashapp'), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(input),
+		parse: (payload) => CalendarCashAppPaymentResponseSchema.parse(payload)
 	})
 }
 

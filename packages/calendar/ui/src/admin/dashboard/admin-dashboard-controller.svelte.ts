@@ -1,12 +1,17 @@
 import { DEFAULT_ADMIN_RULES, DEFAULT_ADMIN_STATS } from "../shared/admin";
 import {
   createAdminEventsBatch,
+  connectAppleCalendarCredentials,
+  deletePaymentIntegration,
   deleteDashboardProgram,
+  disconnectAppleCalendarReconnect,
   disconnectCalendarReconnect,
+  disconnectOutlookCalendarReconnect,
   getCalendarReconnectUrl,
   loadAdminEventsData,
   loadAdminPrograms,
   loadAdminPaymentDefaults,
+  loadPaymentIntegrations,
   loadAdminEventTemplates,
   loadAdminEventDetail,
   loadDashboardBookings,
@@ -18,6 +23,8 @@ import {
   saveAdminPaymentDefaults,
   saveDashboardProgram,
   saveDashboardRules,
+  savePayPalIntegration,
+  saveSquareIntegration,
   updateAdminEventCapacityValue,
   updateAdminEventDetailsValue,
   updateAdminEventAttendanceValue,
@@ -30,6 +37,32 @@ type UnauthorizedHandler = (error: unknown) => boolean;
 
 type DashboardControllerOptions = {
   onUnauthorized?: UnauthorizedHandler;
+};
+
+type SyncProviderKey = "google" | "outlook" | "apple";
+
+type SyncProviderStatus = {
+  connected: boolean;
+  expired: boolean;
+  expiresAt: number | null;
+  refreshFailed: boolean;
+  active: boolean;
+};
+
+type PaymentIntegrations = {
+  paypal: {
+    clientId: string | null;
+    environment: "sandbox" | "live";
+    source: "stored" | "env" | null;
+    enabled: boolean;
+  };
+  square: {
+    applicationId: string | null;
+    locationId: string | null;
+    environment: "sandbox" | "production";
+    source: "stored" | "env" | null;
+    enabled: boolean;
+  };
 };
 
 export function createAdminDashboardController(
@@ -49,8 +82,20 @@ export function createAdminDashboardController(
   let disconnecting = $state(false);
   let oauth = $state({
     googleCalendarRedirectUri: null as string | null,
+    outlookRedirectUri: null as string | null,
     googleLoginRedirectUri: "",
     appleLoginRedirectUri: "",
+  });
+  let sync = $state<{
+    activeProvider: SyncProviderKey | null;
+    providers: Record<SyncProviderKey, SyncProviderStatus>;
+  }>({
+    activeProvider: null,
+    providers: {
+      google: { connected: false, expired: false, expiresAt: null, refreshFailed: false, active: false },
+      outlook: { connected: false, expired: false, expiresAt: null, refreshFailed: false, active: false },
+      apple: { connected: false, expired: false, expiresAt: null, refreshFailed: false, active: false },
+    },
   });
   let syncQueue = $state({
     pending: 0,
@@ -66,6 +111,10 @@ export function createAdminDashboardController(
   let paymentDefaults = $state({
     provider: "",
     handle: "",
+  });
+  let paymentIntegrations = $state<PaymentIntegrations>({
+    paypal: { clientId: null, environment: "sandbox", source: null, enabled: false },
+    square: { applicationId: null, locationId: null, environment: "sandbox", source: null, enabled: false },
   });
   let stats = $state(DEFAULT_ADMIN_STATS);
   let loading = $state(true);
@@ -236,6 +285,7 @@ export function createAdminDashboardController(
       connectionExpired = dashboardStatus.connectionExpired;
       connectionRefreshFailed = dashboardStatus.connectionRefreshFailed;
       oauth = dashboardStatus.oauth ?? oauth;
+      sync = dashboardStatus.sync ?? sync;
       syncQueue = dashboardStatus.syncQueue ?? {
         pending: 0,
         processing: 0,
@@ -252,6 +302,7 @@ export function createAdminDashboardController(
             handle: dashboardStatus.paymentDefaults.handle ?? "",
           }
         : paymentDefaults;
+      paymentIntegrations = dashboardStatus.paymentIntegrations ?? paymentIntegrations;
       if (dashboardStatus.rules) {
         hours = {
           from: dashboardStatus.rules.hoursFrom,
@@ -305,6 +356,63 @@ export function createAdminDashboardController(
     }
   }
 
+  async function loadPaymentProviderIntegrations() {
+    try {
+      const result = await loadPaymentIntegrations();
+      if (result.ok) {
+        paymentIntegrations = result.payments;
+      }
+    } catch (err) {
+      if (onUnauthorized?.(err)) return;
+      error = err instanceof Error ? err.message : "Failed to load payment integrations";
+    }
+  }
+
+  async function connectPayPal(input: { clientId: string; clientSecret: string; environment: "sandbox" | "live" }) {
+    error = "";
+    try {
+      const result = await savePayPalIntegration(input);
+      if (!result.ok) {
+        error = result.error;
+        return;
+      }
+      await loadPaymentProviderIntegrations();
+    } catch (err) {
+      if (onUnauthorized?.(err)) return;
+      error = err instanceof Error ? err.message : "Failed to save PayPal checkout";
+    }
+  }
+
+  async function connectSquare(input: { applicationId: string; locationId: string; accessToken: string; environment: "sandbox" | "live" }) {
+    error = "";
+    try {
+      const result = await saveSquareIntegration(input);
+      if (!result.ok) {
+        error = result.error;
+        return;
+      }
+      await loadPaymentProviderIntegrations();
+    } catch (err) {
+      if (onUnauthorized?.(err)) return;
+      error = err instanceof Error ? err.message : "Failed to save Cash App Pay";
+    }
+  }
+
+  async function disconnectPaymentIntegration(provider: "paypal" | "square") {
+    error = "";
+    try {
+      const result = await deletePaymentIntegration(provider);
+      if (!result.ok) {
+        error = result.error;
+        return;
+      }
+      await loadPaymentProviderIntegrations();
+    } catch (err) {
+      if (onUnauthorized?.(err)) return;
+      error = err instanceof Error ? err.message : "Failed to disconnect payment integration";
+    }
+  }
+
   async function loadBookings() {
     loading = true;
     error = "";
@@ -346,9 +454,9 @@ export function createAdminDashboardController(
     }
   }
 
-  async function reconnect() {
+  async function reconnect(provider: "google" | "outlook" = "google") {
     try {
-      const reconnectResult = await getCalendarReconnectUrl();
+      const reconnectResult = await getCalendarReconnectUrl(provider);
       if (reconnectResult.ok) {
         window.location.href = reconnectResult.authUrl;
       } else {
@@ -357,14 +465,19 @@ export function createAdminDashboardController(
     } catch (err) {
       if (onUnauthorized?.(err)) return;
       error =
-        err instanceof Error ? err.message : "Failed to connect to Google";
+        err instanceof Error ? err.message : `Failed to connect to ${provider}`;
     }
   }
 
-  async function disconnect() {
+  async function disconnect(provider: SyncProviderKey = "google") {
     disconnecting = true;
     try {
-      const disconnectResult = await disconnectCalendarReconnect();
+      const disconnectResult =
+        provider === "outlook"
+          ? await disconnectOutlookCalendarReconnect()
+          : provider === "apple"
+            ? await disconnectAppleCalendarReconnect()
+            : await disconnectCalendarReconnect();
       if (disconnectResult.ok) {
         connected = false;
         connectionExpired = false;
@@ -376,9 +489,24 @@ export function createAdminDashboardController(
     } catch (err) {
       if (onUnauthorized?.(err)) return;
       error =
-        err instanceof Error ? err.message : "Failed to disconnect Google";
+        err instanceof Error ? err.message : `Failed to disconnect ${provider}`;
     } finally {
       disconnecting = false;
+    }
+  }
+
+  async function connectApple(input: { username: string; appPassword: string; calendarUrl: string }) {
+    error = "";
+    try {
+      const result = await connectAppleCalendarCredentials(input);
+      if (!result.ok) {
+        error = result.error;
+        return;
+      }
+      await loadStatus();
+    } catch (err) {
+      if (onUnauthorized?.(err)) return;
+      error = err instanceof Error ? err.message : "Failed to connect Apple Calendar";
     }
   }
 
@@ -935,6 +1063,9 @@ export function createAdminDashboardController(
     get oauth() {
       return oauth;
     },
+    get sync() {
+      return sync;
+    },
     get syncQueue() {
       return syncQueue;
     },
@@ -943,6 +1074,9 @@ export function createAdminDashboardController(
     },
     set paymentDefaults(value) {
       paymentDefaults = value;
+    },
+    get paymentIntegrations() {
+      return paymentIntegrations;
     },
     get bookings() {
       return bookings;
@@ -1021,6 +1155,11 @@ export function createAdminDashboardController(
     save,
     reconnect,
     disconnect,
+    connectApple,
+    loadPaymentProviderIntegrations,
+    connectPayPal,
+    connectSquare,
+    disconnectPaymentIntegration,
     toggleProgram,
     selectProgram,
     newProgramDraft,

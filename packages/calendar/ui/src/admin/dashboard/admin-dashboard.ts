@@ -3,6 +3,10 @@ import {
 	buildInviteLink,
 	cleanupAdminE2EData,
 	disconnectCalendarOAuth,
+	disconnectOutlookCalendarOAuth,
+	connectAppleCalendar,
+	disconnectAppleCalendar,
+	fetchAdminPaymentIntegrations,
 	fetchAdminEvents,
 	fetchAdminPrograms,
 	fetchAdminStatus,
@@ -18,6 +22,9 @@ import {
 	processAdminSyncQueue,
 	purgeAdminSyncDeadLetters,
 	persistInvite,
+	persistPayPalIntegration,
+	persistSquareIntegration,
+	removePaymentIntegration,
 	removeAdminProgram,
 	retryAdminSyncDeadLetters,
 	saveAdminProgram,
@@ -46,7 +53,9 @@ export async function loadDashboardStatus() {
 		oauth: data.oauth,
 		syncQueue: data.syncQueue,
 		rules: data.rules,
-		paymentDefaults: data.paymentDefaults
+		paymentDefaults: data.paymentDefaults,
+		paymentIntegrations: data.paymentIntegrations,
+		sync: data.sync
 	}
 }
 
@@ -98,13 +107,51 @@ export async function cleanupDevE2EData() {
 	return cleanupAdminE2EData()
 }
 
-export async function getCalendarReconnectUrl() {
-	const data = await beginCalendarOAuth()
+export async function getCalendarReconnectUrl(provider: 'google' | 'outlook' = 'google') {
+	const data = await beginCalendarOAuth({ provider })
 	return { ok: true, authUrl: data.authUrl, error: '' }
 }
 
 export async function disconnectCalendarReconnect() {
 	return runSuccess(() => disconnectCalendarOAuth())
+}
+
+export async function disconnectOutlookCalendarReconnect() {
+	return runSuccess(() => disconnectOutlookCalendarOAuth())
+}
+
+export async function connectAppleCalendarCredentials(input: { username: string; appPassword: string; calendarUrl: string }) {
+	return runSuccess(() => connectAppleCalendar(input))
+}
+
+export async function disconnectAppleCalendarReconnect() {
+	return runSuccess(() => disconnectAppleCalendar())
+}
+
+export async function loadPaymentIntegrations() {
+	const data = await fetchAdminPaymentIntegrations()
+	return { ok: true, payments: data.payments, error: '' }
+}
+
+export async function savePayPalIntegration(input: {
+	clientId: string
+	clientSecret: string
+	environment: 'sandbox' | 'live'
+}) {
+	return runSuccess(() => persistPayPalIntegration(input))
+}
+
+export async function saveSquareIntegration(input: {
+	applicationId: string
+	locationId: string
+	accessToken: string
+	environment: 'sandbox' | 'live'
+}) {
+	return runSuccess(() => persistSquareIntegration(input))
+}
+
+export async function deletePaymentIntegration(provider: 'paypal' | 'square') {
+	return runSuccess(() => removePaymentIntegration(provider))
 }
 
 export async function loadAdminPrograms() {

@@ -3,6 +3,27 @@
   import PillButton from "../../../primitives/CalendarPillButton.svelte";
   const { dashboard } = $props();
   const isDev = import.meta.env.DEV;
+  const paymentProviderOptions = [
+    { value: "", label: "None" },
+    { value: "venmo", label: "Venmo" },
+    { value: "cashapp", label: "Cash App" },
+    { value: "paypal", label: "PayPal" },
+  ];
+  const paymentDefaultsConfigured = $derived(
+    !!dashboard.paymentDefaults.provider?.trim() &&
+      !!dashboard.paymentDefaults.handle?.trim(),
+  );
+  const paymentDefaultsSaveDisabled = $derived(
+    !!dashboard.paymentDefaults.provider?.trim() !==
+      !!dashboard.paymentDefaults.handle?.trim(),
+  );
+
+  function updatePaymentProvider(value) {
+    dashboard.paymentDefaults = {
+      provider: value,
+      handle: value ? dashboard.paymentDefaults.handle : "",
+    };
+  }
 </script>
 
 <h1 class="admin-page__title">Integrations</h1>
@@ -80,8 +101,11 @@
 <div class="admin-page__section">
   <div class="admin-page__section-head">
     <h3 class="admin-page__section-title">Payment defaults</h3>
-    <span class="admin-page__status-badge admin-page__status-badge--connected"
-      >Active</span
+    <span
+      class="admin-page__status-badge"
+      class:admin-page__status-badge--connected={paymentDefaultsConfigured}
+      class:admin-page__status-badge--muted={!paymentDefaultsConfigured}
+      >{paymentDefaultsConfigured ? "Active" : "Not configured"}</span
     >
   </div>
   <p class="admin-page__section-description">
@@ -93,13 +117,16 @@
         <label class="admin-page__field-label" for="payment-provider"
           >Provider</label
         >
-        <input
+        <select
           id="payment-provider"
           class="ui-form-control"
-          type="text"
-          bind:value={dashboard.paymentDefaults.provider}
-          placeholder="venmo"
-        />
+          value={dashboard.paymentDefaults.provider}
+          onchange={(event) => updatePaymentProvider(event.currentTarget.value)}
+        >
+          {#each paymentProviderOptions as option}
+            <option value={option.value}>{option.label}</option>
+          {/each}
+        </select>
       </div>
       <div class="admin-page__field admin-page__field--email">
         <label class="admin-page__field-label" for="payment-handle"
@@ -110,6 +137,7 @@
           class="ui-form-control"
           type="text"
           bind:value={dashboard.paymentDefaults.handle}
+          disabled={!dashboard.paymentDefaults.provider}
           placeholder="@mudcube"
         />
       </div>
@@ -120,6 +148,7 @@
       className="admin-page__button-secondary"
       variant="secondary"
       onClick={dashboard.savePaymentDefaults}
+      disabled={paymentDefaultsSaveDisabled}
     >
       Save
     </PillButton>

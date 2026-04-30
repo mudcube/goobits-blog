@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
 	parseAdminCreateEventsBatchInput,
+	parseAdminPaymentDefaultsInput,
 	parseAdminProgramMutationInput,
 	TransportValidationError
 } from '../../src/index.ts'
@@ -44,5 +45,28 @@ describe('admin transport validation', () => {
 				capacity: 2
 			})
 		).toThrow(TransportValidationError)
+	})
+
+	it('accepts supported payment defaults', () => {
+		expect(parseAdminPaymentDefaultsInput({ provider: 'PayPal', handle: 'billing@example.com' })).toEqual({
+			provider: 'paypal',
+			handle: 'billing@example.com'
+		})
+		expect(parseAdminPaymentDefaultsInput({ provider: '', handle: '' })).toEqual({
+			provider: null,
+			handle: null
+		})
+	})
+
+	it('rejects unsupported or partial payment defaults', () => {
+		expect(() => parseAdminPaymentDefaultsInput({ provider: 'zelle', handle: 'billing@example.com' })).toThrow(
+			TransportValidationError
+		)
+		expect(() => parseAdminPaymentDefaultsInput({ provider: 'venmo', handle: '' })).toThrow(
+			TransportValidationError
+		)
+		expect(() => parseAdminPaymentDefaultsInput({ provider: '', handle: '@miko' })).toThrow(
+			TransportValidationError
+		)
 	})
 })

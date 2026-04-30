@@ -5,7 +5,14 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { createSqliteDb } from '../../../kit/src/dev/sqliteDb.ts'
 import { getAdminEventDetail } from '../../src/events/event-detail.ts'
 import { promoteWaitlistedParticipant } from '../../src/events/promote-waitlist.ts'
+import {
+	getPaymentCheckoutConfig,
+	getPaymentCheckoutContext,
+	savePayPalPaymentCredentials,
+	saveSquarePaymentCredentials
+} from '../../src/payments/checkout.ts'
 import { enqueueCalendarSyncJob, processCalendarSyncQueue } from '../../src/services/sync-queue.ts'
+import { setActiveCalendarSyncProvider, type CalendarSyncProvider } from '../../src/sync/settings.ts'
 import type { D1DatabaseLike } from '../../src/storage/d1.ts'
 
 const dbDirs: string[] = []
@@ -112,17 +119,195 @@ describe('calendar regression coverage', () => {
 		const db = createTestDb()
 		const eventId = await createEvent(db, { capacity: 5, status: 'canceled' })
 		await db.prepare(
-			`INSERT INTO calendar_event_sync (event_id, google_event_id, google_html_link, last_synced_at, updated_at)
-			 VALUES (?, 'google-old', 'https://example.com/old', unixepoch() - 100, unixepoch() - 100)`
+			`INSERT INTO calendar_event_sync (
+				event_id,
+				google_event_id,
+				google_html_link,
+				outlook_event_id,
+				outlook_html_link,
+				apple_event_id,
+				apple_html_link,
+				last_synced_at,
+				updated_at
+			 )
+			 VALUES (
+				?,
+				'google-old',
+				'https://example.com/google-old',
+				'outlook-old',
+				'https://example.com/outlook-old',
+				'apple-old',
+				'https://example.com/apple-old',
+				unixepoch() - 100,
+				unixepoch() - 100
+			 )`
 		).bind(eventId).run()
 		await enqueueCalendarSyncJob(db, { eventId, trigger: 'cancel-test' })
 
 		const result = await processCalendarSyncQueue(db, { CALENDAR_SYNC_MODE: 'mock' }, 5)
 		const sync = await db.prepare(
-			`SELECT google_event_id, google_html_link, last_error FROM calendar_event_sync WHERE event_id = ?`
-		).bind(eventId).first<{ google_event_id: string | null; google_html_link: string | null; last_error: string | null }>()
+			`SELECT
+				google_event_id,
+				google_html_link,
+				outlook_event_id,
+				outlook_html_link,
+				apple_event_id,
+				apple_html_link,
+				last_error
+			 FROM calendar_event_sync
+			 WHERE event_id = ?`
+		).bind(eventId).first<{
+			google_event_id: string | null
+			google_html_link: string | null
+			outlook_event_id: string | null
+			outlook_html_link: string | null
+			apple_event_id: string | null
+			apple_html_link: string | null
+			last_error: string | null
+		}>()
 
 		expect(result).toEqual({ claimed: 1, processed: 1, failed: 0, deadLettered: 0 })
-		expect(sync).toEqual({ google_event_id: null, google_html_link: null, last_error: null })
+		expect(sync).toEqual({
+			google_event_id: null,
+			google_html_link: null,
+			outlook_event_id: null,
+			outlook_html_link: null,
+			apple_event_id: null,
+			apple_html_link: null,
+			last_error: null
+		})
+	})
+
+	it.each([
+		['google', 'google_event_id'],
+		['outlook', 'outlook_event_id'],
+		['apple', 'apple_event_id']
+	] satisfies Array<[CalendarSyncProvider, 'google_event_id' | 'outlook_event_id' | 'apple_event_id']>)(
+		'writes mock sync metadata to the active %s provider columns',
+		async (provider, providerColumn) => {
+			const db = createTestDb()
+			const eventId = await createEvent(db, { capacity: 5 })
+			await setActiveCalendarSyncProvider(db, provider)
+			await enqueueCalendarSyncJob(db, { eventId, trigger: `${provider}-provider-test` })
+
+			const result = await processCalendarSyncQueue(db, { CALENDAR_SYNC_MODE: 'mock' }, 5)
+			const sync = await db.prepare(
+				`SELECT google_event_id, outlook_event_id, apple_event_id, last_error
+				 FROM calendar_event_sync
+				 WHERE event_id = ?`
+			).bind(eventId).first<{
+				google_event_id: string | null
+				outlook_event_id: string | null
+				apple_event_id: string | null
+				last_error: string | null
+			}>()
+
+			expect(result).toEqual({ claimed: 1, processed: 1, failed: 0, deadLettered: 0 })
+			expect(sync?.[providerColumn]).toBe(`mock_${provider}_${eventId}_1`)
+			expect(sync?.last_error).toBeNull()
+			for (const column of ['google_event_id', 'outlook_event_id', 'apple_event_id'] as const) {
+				if (column !== providerColumn) expect(sync?.[column]).toBeNull()
+			}
+		}
+	)
+
+	it('only builds payment checkout context for the signed-in joined paid booking', async () => {
+		const db = createTestDb()
+		const eventId = await createEvent(db, { capacity: 5 })
+		await db.prepare(
+			`UPDATE calendar_events
+			 SET cost_cents = 1500, currency = 'USD', payment_provider = 'paypal', payment_handle = 'billing@example.com'
+			 WHERE id = ?`
+		).bind(eventId).run()
+		await createParticipant(db, {
+			eventId,
+			userId: 'joined-user',
+			status: 'joined'
+		})
+		await db.prepare(
+			`UPDATE calendar_event_participants
+			 SET confirmation_id = 'confirm-paid'
+			 WHERE event_id = ? AND user_id = 'joined-user'`
+		).bind(eventId).run()
+		await createParticipant(db, {
+			eventId,
+			userId: 'waitlisted-user',
+			status: 'waitlist'
+		})
+
+		const context = await getPaymentCheckoutContext(db, {
+			eventId,
+			userId: 'joined-user',
+			confirmationId: 'confirm-paid'
+		})
+		const wrongUser = await getPaymentCheckoutContext(db, {
+			eventId,
+			userId: 'other-user',
+			confirmationId: 'confirm-paid'
+		})
+		const waitlisted = await getPaymentCheckoutContext(db, {
+			eventId,
+			userId: 'waitlisted-user'
+		})
+
+		expect(context).toMatchObject({
+			eventId,
+			userId: 'joined-user',
+			confirmationId: 'confirm-paid',
+			amountCents: 1500,
+			currency: 'USD',
+			paymentProvider: 'paypal',
+			paymentHandle: 'billing@example.com'
+		})
+		expect(wrongUser).toBeNull()
+		expect(waitlisted).toBeNull()
+	})
+
+	it('loads encrypted payment checkout credentials from settings before env fallback', async () => {
+		const db = createTestDb()
+		const base64Key = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+		await savePayPalPaymentCredentials({
+			db,
+			base64Key,
+			clientId: 'stored-paypal-client',
+			clientSecret: 'stored-paypal-secret',
+			environment: 'live'
+		})
+		await saveSquarePaymentCredentials({
+			db,
+			base64Key,
+			applicationId: 'stored-square-app',
+			locationId: 'stored-square-location',
+			accessToken: 'stored-square-token',
+			environment: 'sandbox'
+		})
+
+		const config = await getPaymentCheckoutConfig({
+			db,
+			base64Key,
+			env: {
+				PAYPAL_CLIENT_ID: 'env-paypal-client',
+				PAYPAL_CLIENT_SECRET: 'env-paypal-secret',
+				PUBLIC_SQUARE_APPLICATION_ID: 'env-square-app',
+				PUBLIC_SQUARE_LOCATION_ID: 'env-square-location',
+				SQUARE_ACCESS_TOKEN: 'env-square-token'
+			}
+		})
+
+		expect(config).toEqual({
+			paypal: {
+				clientId: 'stored-paypal-client',
+				environment: 'live',
+				source: 'stored',
+				enabled: true
+			},
+			square: {
+				applicationId: 'stored-square-app',
+				locationId: 'stored-square-location',
+				environment: 'sandbox',
+				source: 'stored',
+				enabled: true
+			}
+		})
 	})
 })

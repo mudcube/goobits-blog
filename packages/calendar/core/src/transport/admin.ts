@@ -327,8 +327,16 @@ export function parseAdminUserProgramAccessInput(input: unknown): AdminUserProgr
 
 export function parseAdminPaymentDefaultsInput(input: unknown): AdminPaymentDefaultsInput {
 	const body = asJsonObject(input)
+	const provider = readOptionalString(body, 'provider', { maxLength: 32 })?.toLowerCase() ?? null
+	const handle = readOptionalString(body, 'handle', { maxLength: 80 }) ?? null
+	if (provider && provider !== 'venmo' && provider !== 'cashapp' && provider !== 'paypal') {
+		throw new TransportValidationError('Unsupported payment provider')
+	}
+	if ((provider && !handle) || (!provider && handle)) {
+		throw new TransportValidationError('Payment provider and handle must be configured together')
+	}
 	return {
-		provider: readOptionalString(body, 'provider', { maxLength: 32 })?.toLowerCase() ?? null,
-		handle: readOptionalString(body, 'handle', { maxLength: 80 }) ?? null
+		provider,
+		handle
 	}
 }

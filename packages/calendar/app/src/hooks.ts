@@ -42,6 +42,11 @@ function isRouteUnder(pathname: string, base: string) {
 	return pathname === base || pathname.startsWith(`${base}/`)
 }
 
+function isAdminProtectedCalendarApiPath(pathname: string, apiCalendarBase: string) {
+	const base = apiCalendarBase.replace(/\/$/, '')
+	return pathname === `${base}/oauth-start` || pathname === `${base}/webhook/discord`
+}
+
 export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 	const routes = { ...getCalendarConfig().routes, ...config }
 	const adminBase = routes.adminBase
@@ -63,7 +68,8 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 		if (
 			!isRouteUnder(pathname, adminBase) &&
 			!isRouteUnder(pathname, apiAdminBase) &&
-			!isRouteUnder(pathname, apiCalendarAdminBase)
+			!isRouteUnder(pathname, apiCalendarAdminBase) &&
+			!isAdminProtectedCalendarApiPath(pathname, apiCalendarBase)
 		) {
 			return resolve(event)
 		}
@@ -95,6 +101,7 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 		if (
 			isRouteUnder(pathname, adminBase) ||
 			isRouteUnder(pathname, apiCalendarAdminBase) ||
+			isAdminProtectedCalendarApiPath(pathname, apiCalendarBase) ||
 			(!isRouteUnder(pathname, calendarBase) &&
 				!isRouteUnder(pathname, apiCalendarBase) &&
 				!isRouteUnder(pathname, authBase))

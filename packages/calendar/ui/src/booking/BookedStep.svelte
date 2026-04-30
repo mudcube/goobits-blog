@@ -4,6 +4,7 @@
 	import { ft, formatDate } from './time'
 	import { getCalendarConfig } from '@calendar/core'
 	import { onMount } from 'svelte'
+	import PaymentCheckout from '../member/booking/PaymentCheckout.svelte'
 
 	const { brand, ics } = getCalendarConfig()
 	const siteName = brand.siteName
@@ -16,6 +17,8 @@
 		start,
 		end,
 		overlapping = [],
+		event = null,
+		confirmationId = null,
 		onBack,
 		onEdit,
 	}: {
@@ -25,6 +28,16 @@
 		start: number
 		end: number
 		overlapping?: Person[]
+		event?: {
+			id: number
+			title: string
+			costCents: number
+			currency: string
+			paymentProvider: string | null
+			paymentHandle: string | null
+			payUrl?: string | null
+		} | null
+		confirmationId?: string | null
 		onBack: () => void
 		onEdit?: () => void
 	} = $props()
@@ -141,6 +154,8 @@
 	{/if}
 
 	<p class="bs__greeting">See you there <img src="/media/page-icons/holidays-party.png" alt="" class="bs__greeting-icon" loading="eager" decoding="async" /></p>
+
+	<PaymentCheckout {event} {confirmationId} />
 
 	<div class="bs__cal-list">
 		<a class="bs__cal-option" href={googleCalUrl()} target="_blank" rel="noopener">

@@ -3,9 +3,11 @@ import { buildEnv, apiError, logApiError } from "@calendar/kit";
 import {
   consumeOauthState,
   exchangeGoogleCode,
+  exchangeOutlookCode,
   getCalendarConfig,
   requireEnv,
   saveConnection,
+  setActiveCalendarSyncProvider,
 } from "@calendar/core";
 
 function withAdminSettingsRedirect(url: URL) {
@@ -36,13 +38,18 @@ export async function GET(event: RequestEvent) {
       return apiError("Invalid OAuth state", { status: 400, code: "invalid_state" });
     }
 
-    const token = await exchangeGoogleCode({ env, code });
+    const provider = url.searchParams.get("provider") === "outlook" ? "outlook" : "google";
+    const token =
+      provider === "outlook"
+        ? await exchangeOutlookCode({ env, code })
+        : await exchangeGoogleCode({ env, code });
     await saveConnection({
       db: env.DB,
-      provider: "google",
+      provider,
       token,
       base64Key: requireEnv(env, "TOKEN_ENC_KEY"),
     });
+    await setActiveCalendarSyncProvider(env.DB, provider);
 
     return Response.redirect(
       withAdminSettingsRedirect(new URL(event.request.url)),

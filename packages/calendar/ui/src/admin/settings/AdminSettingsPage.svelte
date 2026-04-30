@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { page } from "$app/stores";
-  import { HandCoins, Landmark, Wallet, Plus, X } from "@lucide/svelte";
+  import { CreditCard, HandCoins, Wallet, Plus, X } from "@lucide/svelte";
   import { handleUnauthorizedSessionError } from "@calendar/ui/routing/auth";
   import { createAdminDashboardController } from "@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte";
   import AdminPageHero from "@calendar/ui/admin/shared/AdminPageHero.svelte";
   import AdminGroupedCard from "@calendar/ui/admin/shared/AdminGroupedCard.svelte";
   import AdminMetaCards from "@calendar/ui/admin/shared/AdminMetaCards.svelte";
+  import AdminPaymentMethodCard from "./AdminPaymentMethodCard.svelte";
   import {
     getAdminCalendarWeekStart,
     setAdminCalendarWeekStart,
@@ -32,7 +33,7 @@
   let suspendWeekStartAutosave = $state(true);
   let handledConnectedNotice = $state(false);
 
-  type PaymentMethodKey = "venmo" | "zelle" | "cashapp";
+  type PaymentMethodKey = "venmo" | "paypal" | "cashapp";
   type PaymentMethodState = Record<
     PaymentMethodKey,
     { enabled: boolean; handle: string }
@@ -41,13 +42,23 @@
   function blankPaymentMethods(): PaymentMethodState {
     return {
       venmo: { enabled: false, handle: "" },
-      zelle: { enabled: false, handle: "" },
+      paypal: { enabled: false, handle: "" },
       cashapp: { enabled: false, handle: "" },
     };
   }
 
   let paymentMethods = $state<PaymentMethodState>(blankPaymentMethods());
   let initialPaymentMethods = $state<PaymentMethodState>(blankPaymentMethods());
+  let payPalFormExpanded = $state(false);
+  let payPalClientId = $state("");
+  let payPalClientSecret = $state("");
+  let payPalEnvironment = $state<"sandbox" | "live">("sandbox");
+  let squareFormExpanded = $state(false);
+  let squareApplicationId = $state("");
+  let squareLocationId = $state("");
+  let squareAccessToken = $state("");
+  let squareEnvironment = $state<"sandbox" | "live">("sandbox");
+  let paymentIntegrationBusy = $state(false);
   type SyncProviderKey = "google" | "apple" | "outlook";
   type SyncConnections = Record<SyncProviderKey, boolean>;
   type SyncBusy = Record<SyncProviderKey, boolean>;
@@ -63,18 +74,19 @@
   });
   let syncOptionsExpanded = $state(false);
   let calendarWeekStart = $state<AdminCalendarWeekStart>("monday");
-  const syncProviders: Array<{ value: SyncProviderKey; label: string }> = [
-    { value: "google", label: "Google Calendar" },
-    { value: "apple", label: "Apple Calendar" },
-    { value: "outlook", label: "Outlook" },
+  const syncProviders: Array<{
+    value: SyncProviderKey;
+    label: string;
+    supported: boolean;
+  }> = [
+    { value: "google", label: "Google Calendar", supported: true },
+    { value: "apple", label: "Apple Calendar", supported: true },
+    { value: "outlook", label: "Outlook", supported: true },
   ];
-
-  function singleSyncConnection(next: SyncConnections): SyncConnections {
-    if (next.google) return { google: true, apple: false, outlook: false };
-    if (next.apple) return { google: false, apple: true, outlook: false };
-    if (next.outlook) return { google: false, apple: false, outlook: true };
-    return { google: false, apple: false, outlook: false };
-  }
+  let appleFormExpanded = $state(false);
+  let appleUsername = $state("");
+  let appleAppPassword = $state("");
+  let appleCalendarUrl = $state("");
 
   function setConnectedProvider(provider: SyncProviderKey | null) {
     if (!provider) {
@@ -88,28 +100,22 @@
     };
   }
 
-  function sameSyncConnections(a: SyncConnections, b: SyncConnections) {
-    return (
-      a.google === b.google && a.apple === b.apple && a.outlook === b.outlook
-    );
-  }
-
   const paymentProviders = [
     {
       value: "venmo" as const,
-      label: "Venmo",
+      label: "Venmo handle",
       icon: HandCoins,
       placeholder: "e.g. @yourname",
     },
     {
-      value: "zelle" as const,
-      label: "Zelle",
-      icon: Landmark,
-      placeholder: "Email or phone",
+      value: "paypal" as const,
+      label: "PayPal handle",
+      icon: CreditCard,
+      placeholder: "Email or merchant ID",
     },
     {
       value: "cashapp" as const,
-      label: "Cash App",
+      label: "Cash App handle",
       icon: Wallet,
       placeholder: "e.g. $yourname",
     },
@@ -132,7 +138,7 @@
   ) {
     const next = blankPaymentMethods();
     const key = (provider || "").toLowerCase();
-    if (key === "venmo" || key === "zelle" || key === "cashapp") {
+    if (key === "venmo" || key === "paypal" || key === "cashapp") {
       next[key] = {
         enabled: true,
         handle: (handle || "").trim(),
@@ -149,92 +155,44 @@
         adminMockCatalog.paymentDefaults.handle,
       );
       paymentMethods = next;
-      initialPaymentMethods = {
-        venmo: { ...next.venmo },
-        zelle: { ...next.zelle },
-        cashapp: { ...next.cashapp },
-      };
+      initialPaymentMethods = paymentMethodsClone(next);
       suspendPaymentAutosave = false;
       return;
     }
-    void dashboard.loadStatus();
-    void dashboard.loadPaymentDefaults();
+    void loadSettingsPane();
   });
 
   $effect(() => {
     if (!authed || mockMode) return;
-    const googleConnected = !!(
-      dashboard.connected && !dashboard.connectionExpired
-    );
-    if (googleConnected) {
-      setConnectedProvider("google");
+    const activeProvider = dashboard.sync.activeProvider;
+    const activeStatus = activeProvider ? dashboard.sync.providers[activeProvider] : null;
+    if (activeProvider && activeStatus?.connected && !activeStatus.expired) {
+      setConnectedProvider(activeProvider);
       syncOptionsExpanded = false;
       return;
     }
-    const normalized = singleSyncConnection(syncConnections);
-    if (!sameSyncConnections(syncConnections, normalized)) {
-      syncConnections = normalized;
-    }
+    setConnectedProvider(null);
   });
 
   $effect(() => {
     if (!authed || mockMode || handledConnectedNotice) return;
     if ($page.url.searchParams.get("connected") !== "1") return;
     handledConnectedNotice = true;
-    showToast("Google Calendar connected");
+    void handleConnectedNotice();
     if (typeof window === "undefined") return;
     const next = new URL(window.location.href);
     next.searchParams.delete("connected");
     window.history.replaceState(window.history.state, "", `${next.pathname}${next.search}${next.hash}`);
   });
 
-  $effect(() => {
-    if (!authed || mockMode) return;
-    const next = hydratePaymentMethods(
-      dashboard.paymentDefaults.provider,
-      dashboard.paymentDefaults.handle,
-    );
-    paymentMethods = next;
-    initialPaymentMethods = {
-      venmo: { ...next.venmo },
-      zelle: { ...next.zelle },
-      cashapp: { ...next.cashapp },
-    };
-    suspendPaymentAutosave = false;
-  });
-
   onMount(() => {
     calendarWeekStart = getAdminCalendarWeekStart();
-    try {
-      const raw = localStorage.getItem("admin_sync_connections");
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<SyncConnections>;
-        syncConnections = singleSyncConnection({
-          google: !!parsed.google,
-          apple: !!parsed.apple,
-          outlook: !!parsed.outlook,
-        });
-      }
-    } catch {
-      // ignore invalid local settings payload
-    }
     suspendWeekStartAutosave = false;
     return () => {
       if (toastTimer) clearTimeout(toastTimer);
       if (paymentAutosaveTimer) clearTimeout(paymentAutosaveTimer);
       if (weekStartAutosaveTimer) clearTimeout(weekStartAutosaveTimer);
     };
-  });
-
-  $effect(() => {
-    try {
-      localStorage.setItem(
-        "admin_sync_connections",
-        JSON.stringify(singleSyncConnection(syncConnections)),
-      );
-    } catch {
-      // ignore storage write errors
-    }
   });
 
   function showToast(message: string, isError = false) {
@@ -269,8 +227,8 @@
   }
 
   async function disconnectProvider(provider: SyncProviderKey) {
-    if (provider === "google" && !mockMode) {
-      await dashboard.disconnect();
+    if (!mockMode) {
+      await dashboard.disconnect(provider);
       if (dashboard.error) {
         showToast(dashboard.error, true);
         return false;
@@ -281,15 +239,222 @@
   }
 
   async function connectProvider(provider: SyncProviderKey) {
-    if (provider === "google" && !mockMode) {
-      await dashboard.reconnect();
+    if ((provider === "google" || provider === "outlook") && !mockMode) {
+      await dashboard.reconnect(provider);
       if (dashboard.error) {
         showToast(dashboard.error, true);
-        return false;
       }
+      return false;
     }
-    setConnectedProvider(provider);
-    return true;
+    if (provider === "apple" && !mockMode) {
+      appleFormExpanded = true;
+      return false;
+    }
+    if (mockMode) {
+      setConnectedProvider(provider);
+      return true;
+    }
+    return false;
+  }
+
+  function paymentStateLabel(method: PaymentMethodKey) {
+    const payment = paymentMethods[method];
+    if (!payment.enabled) return "OFF";
+    if (method === "venmo" || method === "paypal") {
+      if (!dashboard.paymentIntegrations.paypal.enabled) return "NEEDS PAYPAL";
+    }
+    if (method === "cashapp" && !dashboard.paymentIntegrations.square.enabled) {
+      return "NEEDS SQUARE";
+    }
+    return payment.handle.trim() ? "DEFAULT" : "NEEDS HANDLE";
+  }
+
+  function paymentStateTone(method: PaymentMethodKey) {
+    const payment = paymentMethods[method];
+    if (!payment.enabled) return "off";
+    if ((method === "venmo" || method === "paypal") && !dashboard.paymentIntegrations.paypal.enabled) return "warn";
+    if (method === "cashapp" && !dashboard.paymentIntegrations.square.enabled) return "warn";
+    return payment.handle.trim() ? "on" : "warn";
+  }
+
+  function integrationSourceLabel(source: "stored" | "env" | null | undefined) {
+    if (source === "stored") return "Settings";
+    if (source === "env") return "Env";
+    return "Not connected";
+  }
+
+  function integrationStatusLabel(enabled: boolean, source: "stored" | "env" | null | undefined) {
+    return enabled ? integrationSourceLabel(source) : "Not connected";
+  }
+
+  function paymentMethodsClone(methods: PaymentMethodState) {
+    return {
+      venmo: { ...methods.venmo },
+      paypal: { ...methods.paypal },
+      cashapp: { ...methods.cashapp },
+    };
+  }
+
+  async function refreshStatus() {
+    await dashboard.loadStatus();
+    const activeProvider = dashboard.sync.activeProvider;
+    const activeStatus = activeProvider ? dashboard.sync.providers[activeProvider] : null;
+    const connected = !!(activeProvider && activeStatus?.connected && !activeStatus.expired);
+    setConnectedProvider(connected ? activeProvider : null);
+    return connected;
+  }
+
+  async function handleConnectedNotice() {
+    const connected = await refreshStatus();
+    const activeProvider = dashboard.sync.activeProvider;
+    const providerLabel = activeProvider
+      ? syncProviders.find((provider) => provider.value === activeProvider)?.label || "Calendar"
+      : "Calendar";
+    showToast(
+      connected
+        ? `${providerLabel} connected`
+        : "Calendar connection was not completed",
+      !connected,
+    );
+  }
+
+  async function connectAppleProvider() {
+    if (!appleUsername.trim() || !appleAppPassword.trim() || !appleCalendarUrl.trim()) {
+      showToast("Apple Calendar credentials are required", true);
+      return;
+    }
+    syncBusy = { google: false, apple: true, outlook: false };
+    try {
+      await dashboard.connectApple({
+        username: appleUsername.trim(),
+        appPassword: appleAppPassword.trim(),
+        calendarUrl: appleCalendarUrl.trim(),
+      });
+      if (dashboard.error) {
+        showToast(dashboard.error, true);
+        return;
+      }
+      appleAppPassword = "";
+      appleFormExpanded = false;
+      await refreshStatus();
+      showToast("Apple Calendar connected");
+    } finally {
+      syncBusy = { google: false, apple: false, outlook: false };
+    }
+  }
+
+  async function loadSettingsPane() {
+    await dashboard.loadStatus();
+    const next = hydratePaymentMethods(
+      dashboard.paymentDefaults.provider,
+      dashboard.paymentDefaults.handle,
+    );
+    paymentMethods = next;
+    initialPaymentMethods = paymentMethodsClone(next);
+    suspendPaymentAutosave = false;
+  }
+
+  function openPayPalCredentials() {
+    payPalClientId = dashboard.paymentIntegrations.paypal.clientId || "";
+    payPalEnvironment = dashboard.paymentIntegrations.paypal.environment || "sandbox";
+    payPalClientSecret = "";
+    payPalFormExpanded = true;
+  }
+
+  function openSquareCredentials() {
+    squareApplicationId = dashboard.paymentIntegrations.square.applicationId || "";
+    squareLocationId = dashboard.paymentIntegrations.square.locationId || "";
+    squareEnvironment = dashboard.paymentIntegrations.square.environment === "production" ? "live" : "sandbox";
+    squareAccessToken = "";
+    squareFormExpanded = true;
+  }
+
+  function payPalSummary() {
+    return dashboard.paymentIntegrations.paypal.clientId || "";
+  }
+
+  function squareSummary() {
+    const { applicationId, locationId } = dashboard.paymentIntegrations.square;
+    if (!applicationId && !locationId) return "";
+    return `${applicationId || ""} / ${locationId || ""}`;
+  }
+
+  async function savePayPalCredentials() {
+    if (!payPalClientId.trim() || !payPalClientSecret.trim()) {
+      showToast("PayPal client ID and secret are required", true);
+      return;
+    }
+    paymentIntegrationBusy = true;
+    try {
+      await dashboard.connectPayPal({
+        clientId: payPalClientId.trim(),
+        clientSecret: payPalClientSecret.trim(),
+        environment: payPalEnvironment,
+      });
+      if (dashboard.error) {
+        showToast(dashboard.error, true);
+        return;
+      }
+      payPalClientSecret = "";
+      payPalFormExpanded = false;
+      await dashboard.loadStatus();
+      showToast("PayPal and Venmo checkout connected");
+    } finally {
+      paymentIntegrationBusy = false;
+    }
+  }
+
+  async function saveSquareCredentials() {
+    if (!squareApplicationId.trim() || !squareLocationId.trim() || !squareAccessToken.trim()) {
+      showToast("Square app ID, location ID, and access token are required", true);
+      return;
+    }
+    paymentIntegrationBusy = true;
+    try {
+      await dashboard.connectSquare({
+        applicationId: squareApplicationId.trim(),
+        locationId: squareLocationId.trim(),
+        accessToken: squareAccessToken.trim(),
+        environment: squareEnvironment,
+      });
+      if (dashboard.error) {
+        showToast(dashboard.error, true);
+        return;
+      }
+      squareAccessToken = "";
+      squareFormExpanded = false;
+      await dashboard.loadStatus();
+      showToast("Cash App Pay connected");
+    } finally {
+      paymentIntegrationBusy = false;
+    }
+  }
+
+  async function disconnectPaymentCredentials(provider: "paypal" | "square") {
+    paymentIntegrationBusy = true;
+    try {
+      await dashboard.disconnectPaymentIntegration(provider);
+      if (dashboard.error) {
+        showToast(dashboard.error, true);
+        return;
+      }
+      await dashboard.loadStatus();
+      showToast("Saved");
+    } finally {
+      paymentIntegrationBusy = false;
+    }
+  }
+
+  function selectablePaymentMethods(method: PaymentMethodKey) {
+    const current = paymentMethods[method];
+    const next = blankPaymentMethods();
+    if (!current.enabled) {
+      next[method] = {
+        enabled: true,
+        handle: current.handle,
+      };
+    }
+    return next;
   }
 
   async function toggleSyncProvider(provider: SyncProviderKey) {
@@ -302,6 +467,7 @@
       if (currentlyConnected) {
         const ok = await disconnectProvider(provider);
         if (ok) {
+          await refreshStatus();
           syncOptionsExpanded = false;
           showToast("Saved");
         }
@@ -326,39 +492,24 @@
   }
 
   async function startSwitchProvider() {
-    const current = primaryConnectedProvider();
-    if (!current) {
-      syncOptionsExpanded = true;
-      return;
-    }
     if (syncBusy.google || syncBusy.apple || syncBusy.outlook) return;
-    syncBusy = { ...syncBusy, [current.value]: true };
-    try {
-      const ok = await disconnectProvider(current.value);
-      if (!ok) return;
-      syncOptionsExpanded = true;
-      showToast("Saved");
-    } finally {
-      syncBusy = { google: false, apple: false, outlook: false };
-    }
+    syncOptionsExpanded = true;
   }
 
   async function persistPayments(expectedSnapshot: string) {
     if (paymentSnapshot(paymentMethods) !== expectedSnapshot) return;
-    if (mockMode) {
-      showToast("Saved");
-      initialPaymentMethods = {
-        venmo: { ...paymentMethods.venmo },
-        zelle: { ...paymentMethods.zelle },
-        cashapp: { ...paymentMethods.cashapp },
-      };
-      return;
-    }
     const enabledProviders = paymentProviders
       .filter((provider) => paymentMethods[provider.value].enabled)
       .map((provider) => provider.value);
     const primary = enabledProviders[0] || "";
     const primaryHandle = primary ? paymentMethods[primary].handle.trim() : "";
+    if (primary && !primaryHandle) return;
+
+    if (mockMode) {
+      showToast("Saved");
+      initialPaymentMethods = paymentMethodsClone(paymentMethods);
+      return;
+    }
     dashboard.paymentDefaults = {
       provider: primary || "",
       handle: primaryHandle,
@@ -368,11 +519,7 @@
       showToast(dashboard.error, true);
       return;
     }
-    initialPaymentMethods = {
-      venmo: { ...paymentMethods.venmo },
-      zelle: { ...paymentMethods.zelle },
-      cashapp: { ...paymentMethods.cashapp },
-    };
+    initialPaymentMethods = paymentMethodsClone(paymentMethods);
     showToast("Saved");
   }
 
@@ -402,14 +549,7 @@
   });
 
   function togglePaymentMethod(method: PaymentMethodKey) {
-    const current = paymentMethods[method];
-    paymentMethods = {
-      ...paymentMethods,
-      [method]: {
-        ...current,
-        enabled: !current.enabled,
-      },
-    };
+    paymentMethods = selectablePaymentMethods(method);
   }
 
   function updatePaymentHandle(method: PaymentMethodKey, value: string) {
@@ -456,28 +596,36 @@
             class="admin-settings__switch-link"
             onclick={() => void startSwitchProvider()}
           >
-            Switch provider
+            Show other providers
           </button>
         </div>
       {/if}
       <AdminMetaCards
         items={visibleSyncProviders().map((provider) => {
           const connected = providerConnected(provider.value)
-          const busy = !!syncBusy[provider.value] || (provider.value === 'google' && dashboard.disconnecting)
+          const providerStatus = dashboard.sync.providers[provider.value]
+          const needsReconnect = !!providerStatus?.connected && !!providerStatus?.expired
+          const busy = !!syncBusy[provider.value] || (connected && dashboard.disconnecting)
           const actionLabel = busy
             ? (connected ? `Disconnecting ${provider.label}` : `Connecting ${provider.label}`)
-            : (connected ? `Disconnect ${provider.label}` : `Connect ${provider.label}`)
+            : (connected ? `Disconnect ${provider.label}` : `${needsReconnect ? 'Reconnect' : 'Connect'} ${provider.label}`)
+          const statusBadge = provider.supported
+            ? {
+                text: connected ? 'Connected' : (needsReconnect ? 'Needs reconnect' : 'Not connected'),
+                tone: connected ? 'success' as const : 'warn' as const,
+              }
+            : { text: 'Unavailable', tone: 'neutral' as const }
           return {
             id: provider.value,
             label: provider.label,
-            statusBadge: { text: connected ? 'Connected' : 'Not connected', tone: connected ? 'success' as const : 'warn' as const },
+            statusBadge,
             extra: { providerValue: provider.value, busy },
-            actions: [{
+            actions: provider.supported ? [{
               variant: connected ? 'danger' as const : 'subtle' as const,
               icon: busy ? null : (connected ? X : Plus),
               ariaLabel: actionLabel,
               onclick: () => void toggleSyncProvider(provider.value),
-            }],
+            }] : [],
           }
         })}
       >
@@ -502,6 +650,28 @@
           </span>
         {/snippet}
       </AdminMetaCards>
+      {#if appleFormExpanded}
+        <div class="admin-settings__apple-form">
+          <label>
+            <span>Apple ID email</span>
+            <input class="ui-form-control" type="email" autocomplete="username" bind:value={appleUsername} />
+          </label>
+          <label>
+            <span>App-specific password</span>
+            <input class="ui-form-control" type="password" autocomplete="new-password" bind:value={appleAppPassword} />
+          </label>
+          <label>
+            <span>CalDAV calendar URL</span>
+            <input class="ui-form-control" type="url" placeholder="https://caldav.icloud.com/..." bind:value={appleCalendarUrl} />
+          </label>
+          <div class="admin-settings__apple-actions">
+            <button type="button" class="admin-settings__switch-link" onclick={() => (appleFormExpanded = false)}>Cancel</button>
+            <button type="button" class="admin-settings__apple-submit" disabled={syncBusy.apple} onclick={() => void connectAppleProvider()}>
+              {syncBusy.apple ? "Connecting..." : "Connect Apple Calendar"}
+            </button>
+          </div>
+        </div>
+      {/if}
       {#if primaryConnectedProvider() && syncOptionsExpanded}
         <div class="admin-settings__sync-top-actions">
           <button
@@ -558,58 +728,131 @@
         </div>
       </div>
 
+      <h5 class="admin-settings__group-title">PAYMENT METHODS</h5>
       <AdminGroupedCard>
         {#each paymentProviders as provider}
-          <div
-            class="admin-settings__payment-card"
-            class:admin-settings__payment-card--active={paymentMethods[
-              provider.value
-            ].enabled}
+          <AdminPaymentMethodCard
+            id={provider.value}
+            label={provider.label}
+            icon={provider.icon}
+            enabled={paymentMethods[provider.value].enabled}
+            stateLabel={paymentStateLabel(provider.value)}
+            stateTone={paymentStateTone(provider.value)}
+            handle={paymentMethods[provider.value].handle}
+            placeholder={provider.placeholder}
+            toggle={() => togglePaymentMethod(provider.value)}
+            updateHandle={(value) => updatePaymentHandle(provider.value, value)}
           >
-            <button
-              type="button"
-              class="admin-settings__payment-toggle"
-              onclick={() => togglePaymentMethod(provider.value)}
-              aria-pressed={paymentMethods[provider.value].enabled}
-            >
-              <span class="admin-settings__platform-icon" aria-hidden="true">
-                <provider.icon size={16} strokeWidth={2} />
-              </span>
-              <span class="admin-settings__platform-label"
-                >{provider.label}</span
-              >
-              <span
-                class="admin-settings__payment-state"
-                class:admin-settings__payment-state--on={paymentMethods[
-                  provider.value
-                ].enabled}
-                class:admin-settings__payment-state--off={!paymentMethods[
-                  provider.value
-                ].enabled}
-              >
-                {paymentMethods[provider.value].enabled ? "ON" : "OFF"}
-              </span>
-            </button>
-            {#if paymentMethods[provider.value].enabled}
-              <div class="admin-settings__payment-input-wrap">
-                <label for={`admin-settings-payment-${provider.value}`}
-                  >Handle</label
+            {#if provider.value === "cashapp"}
+              <div class="payment-method-card__setup-title">
+                <span>Cash App Pay setup</span>
+                <span
+                  class="payment-method-card__setup-badge"
+                  class:payment-method-card__setup-badge--on={dashboard.paymentIntegrations.square.enabled}
                 >
-                <input
-                  id={`admin-settings-payment-${provider.value}`}
-                  class="ui-form-control"
-                  type="text"
-                  value={paymentMethods[provider.value].handle}
-                  placeholder={provider.placeholder}
-                  oninput={(event) =>
-                    updatePaymentHandle(
-                      provider.value,
-                      (event.currentTarget as HTMLInputElement).value,
-                    )}
-                />
+                  {integrationStatusLabel(dashboard.paymentIntegrations.square.enabled, dashboard.paymentIntegrations.square.source)}
+                </span>
               </div>
+              {#if dashboard.paymentIntegrations.square.enabled && !squareFormExpanded}
+                <label for="payment-integration-cash-app-pay-checkout">
+                  <span>Application / location</span>
+                  <input
+                    id="payment-integration-cash-app-pay-checkout"
+                    class="ui-form-control"
+                    type="text"
+                    value={squareSummary()}
+                    readonly
+                  />
+                </label>
+                <div class="payment-method-card__actions">
+                  <button type="button" class="payment-method-card__link" disabled={paymentIntegrationBusy} onclick={() => void disconnectPaymentCredentials("square")}>Disconnect</button>
+                  <button type="button" class="payment-method-card__submit" disabled={paymentIntegrationBusy} onclick={openSquareCredentials}>Edit setup</button>
+                </div>
+              {:else if squareFormExpanded}
+                <label>
+                  <span>Environment</span>
+                  <select class="ui-form-control" bind:value={squareEnvironment}>
+                    <option value="sandbox">Sandbox</option>
+                    <option value="live">Live</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Application ID</span>
+                  <input class="ui-form-control" type="text" autocomplete="off" bind:value={squareApplicationId} />
+                </label>
+                <label>
+                  <span>Location ID</span>
+                  <input class="ui-form-control" type="text" autocomplete="off" bind:value={squareLocationId} />
+                </label>
+                <label>
+                  <span>Access token</span>
+                  <input class="ui-form-control" type="password" autocomplete="new-password" bind:value={squareAccessToken} />
+                </label>
+                <div class="payment-method-card__actions">
+                  <button type="button" class="payment-method-card__link" onclick={() => (squareFormExpanded = false)}>Cancel</button>
+                  <button type="button" class="payment-method-card__submit" disabled={paymentIntegrationBusy} onclick={() => void saveSquareCredentials()}>
+                    {paymentIntegrationBusy ? "Saving..." : "Save Cash App Pay setup"}
+                  </button>
+                </div>
+              {:else}
+                <div class="payment-method-card__actions">
+                  <button type="button" class="payment-method-card__submit" disabled={paymentIntegrationBusy} onclick={openSquareCredentials}>Set up Cash App Pay</button>
+                </div>
+              {/if}
+            {:else}
+              <div class="payment-method-card__setup-title">
+                <span>{provider.value === "venmo" ? "Venmo checkout setup" : "PayPal checkout setup"}</span>
+                <span
+                  class="payment-method-card__setup-badge"
+                  class:payment-method-card__setup-badge--on={dashboard.paymentIntegrations.paypal.enabled}
+                >
+                  {integrationStatusLabel(dashboard.paymentIntegrations.paypal.enabled, dashboard.paymentIntegrations.paypal.source)}
+                </span>
+              </div>
+              {#if dashboard.paymentIntegrations.paypal.enabled && !payPalFormExpanded}
+                <label for="payment-integration-paypal-venmo-checkout">
+                  <span>Client ID</span>
+                  <input
+                    id="payment-integration-paypal-venmo-checkout"
+                    class="ui-form-control"
+                    type="text"
+                    value={payPalSummary()}
+                    readonly
+                  />
+                </label>
+                <div class="payment-method-card__actions">
+                  <button type="button" class="payment-method-card__link" disabled={paymentIntegrationBusy} onclick={() => void disconnectPaymentCredentials("paypal")}>Disconnect</button>
+                  <button type="button" class="payment-method-card__submit" disabled={paymentIntegrationBusy} onclick={openPayPalCredentials}>Edit setup</button>
+                </div>
+              {:else if payPalFormExpanded}
+                <label>
+                  <span>Environment</span>
+                  <select class="ui-form-control" bind:value={payPalEnvironment}>
+                    <option value="sandbox">Sandbox</option>
+                    <option value="live">Live</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Client ID</span>
+                  <input class="ui-form-control" type="text" autocomplete="off" bind:value={payPalClientId} />
+                </label>
+                <label>
+                  <span>Client secret</span>
+                  <input class="ui-form-control" type="password" autocomplete="new-password" bind:value={payPalClientSecret} />
+                </label>
+                <div class="payment-method-card__actions">
+                  <button type="button" class="payment-method-card__link" onclick={() => (payPalFormExpanded = false)}>Cancel</button>
+                  <button type="button" class="payment-method-card__submit" disabled={paymentIntegrationBusy} onclick={() => void savePayPalCredentials()}>
+                    {paymentIntegrationBusy ? "Saving..." : "Save PayPal setup"}
+                  </button>
+                </div>
+              {:else}
+                <div class="payment-method-card__actions">
+                  <button type="button" class="payment-method-card__submit" disabled={paymentIntegrationBusy} onclick={openPayPalCredentials}>Set up checkout</button>
+                </div>
+              {/if}
             {/if}
-          </div>
+          </AdminPaymentMethodCard>
         {/each}
       </AdminGroupedCard>
     </section>
@@ -646,6 +889,14 @@
     justify-content: flex-end;
   }
 
+  .admin-settings__group-title {
+    margin: 0 0 -0.35rem;
+    font-size: 0.68rem;
+    font-weight: 720;
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--text) 48%, transparent);
+  }
+
   .admin-settings__switch-link {
     border: none;
     background: none;
@@ -674,6 +925,47 @@
     width: 1rem;
     height: 1rem;
     display: block;
+  }
+
+  .admin-settings__apple-form {
+    display: grid;
+    gap: 0.65rem;
+    padding: 0.85rem;
+    border: 1px solid var(--admin-card-border);
+    border-radius: 0.875rem;
+    background: var(--admin-card-bg);
+  }
+
+  .admin-settings__apple-form label {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 620;
+    color: color-mix(in srgb, var(--text) 60%, transparent);
+  }
+
+  .admin-settings__apple-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .admin-settings__apple-submit {
+    border: 1px solid color-mix(in srgb, var(--admin-accent) 28%, transparent);
+    border-radius: 0.625rem;
+    background: color-mix(in srgb, var(--admin-accent) 14%, var(--bg) 86%);
+    color: var(--text);
+    padding: 0.55rem 0.8rem;
+    font: inherit;
+    font-size: 0.76rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .admin-settings__apple-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 
   .admin-settings__platform-field {
@@ -731,80 +1023,10 @@
     color: var(--text);
   }
 
-  .admin-settings__platform-icon {
-    width: 1.35rem;
-    height: 1.35rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .admin-settings__platform-icon :global(svg) {
-    width: 1rem;
-    height: 1rem;
-    display: block;
-  }
-
   .admin-settings__platform-label {
     font-size: 0.76rem;
     font-weight: 620;
     letter-spacing: -0.005em;
-  }
-
-  .admin-settings__payment-card {
-    overflow: clip;
-  }
-
-  .admin-settings__payment-card--active {
-    border-color: color-mix(in srgb, var(--admin-accent) 34%, transparent);
-    background: color-mix(in srgb, var(--admin-accent) 10%, var(--bg) 90%);
-  }
-
-  .admin-settings__payment-toggle {
-    width: 100%;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 0.875rem;
-    padding: 0.75rem 0.875rem;
-    border: none;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    text-align: left;
-    font: inherit;
-  }
-
-  .admin-settings__payment-state {
-    font-size: 0.66rem;
-    font-weight: 650;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 0.16rem 0.44rem;
-    border-radius: 0.42rem;
-    line-height: 1;
-  }
-
-  .admin-settings__payment-state--on {
-    background: var(--admin-status-success-bg);
-    color: var(--admin-status-success-fg);
-  }
-
-  .admin-settings__payment-state--off {
-    background: var(--admin-status-warn-bg);
-    color: var(--admin-status-warn-fg);
-  }
-
-  .admin-settings__payment-input-wrap {
-    display: grid;
-    gap: 0.3rem;
-    padding: 0 0.7rem 0.7rem;
-  }
-
-  .admin-settings__payment-input-wrap label {
-    font-size: 0.72rem;
-    font-weight: 620;
-    color: color-mix(in srgb, var(--text) 60%, transparent);
   }
 
   .admin-settings__toast {

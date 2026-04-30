@@ -37,9 +37,14 @@
 	let start = $state(12)
 	let end = $state(14)
 	let bookingError = $state('')
+	let confirmationId = $state<string | null>(null)
 
 	const openDays = $derived.by(() => eventsToPresetDays(upcoming))
 	const selectedSlot = $derived.by(() => selectedDay?.slots?.find(slot => slot.id === selectedSlotId) ?? null)
+	const selectedEvent = $derived.by(() => {
+		const eventId = Number(selectedSlot?.eventId ?? selectedSlotId ?? selectedDay?.eventId ?? 0)
+		return upcoming.find((event: FeedEvent) => event.id === eventId) ?? null
+	})
 	const overlapping = $derived(selectedDay ? selectedDay.bookings.filter(person => person.start < end && person.end > start) : [])
 
 	function decimalHour(iso: string) {
@@ -144,10 +149,12 @@
 		try {
 			if (mockMode) {
 				applyMockJoin(eventId)
+				confirmationId = `mock-${eventId}`
 				goStep(2)
 				return
 			}
 			const result = await joinCalendarEvent(eventId, { guestCount: 0 })
+			confirmationId = result.confirmationId ?? null
 			localUpcoming = applyEventMutationState(upcoming, eventId, result.state)
 			goStep(2)
 		} catch {
@@ -205,6 +212,8 @@
 				{start}
 				{end}
 				{overlapping}
+				event={selectedEvent}
+				{confirmationId}
 				onBack={() => goStep(0)}
 				onEdit={() => goStep(1)}
 			/>

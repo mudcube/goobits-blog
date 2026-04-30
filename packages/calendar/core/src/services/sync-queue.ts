@@ -1,7 +1,10 @@
 import type { D1DatabaseLike } from '../storage/d1.ts'
 import { ensureValidGoogleToken, googleCreateEvent, googleDeleteEvent } from '../providers/google/index.ts'
+import { appleCreateEvent, appleDeleteEvent, type AppleCalDavConnection } from '../providers/apple/caldav.ts'
+import { ensureValidOutlookToken, outlookCreateEvent, outlookDeleteEvent } from '../providers/outlook/index.ts'
 import { getConnection, saveConnection } from '../storage/d1.ts'
 import { getEnv } from '../config/env.ts'
+import { getActiveCalendarSyncProvider, type CalendarSyncProvider } from '../sync/settings.ts'
 
 type SyncJobRow = {
 	id: number
@@ -58,6 +61,12 @@ function getPrimaryCalendarIdFromEnv(env: Record<string, unknown>) {
 			.map((id) => id.trim())
 			.filter(Boolean)[0] || ''
 	)
+}
+
+function calendarProviderEventColumns(provider: CalendarSyncProvider) {
+	if (provider === 'outlook') return { id: 'outlook_event_id', link: 'outlook_html_link' }
+	if (provider === 'apple') return { id: 'apple_event_id', link: 'apple_html_link' }
+	return { id: 'google_event_id', link: 'google_html_link' }
 }
 
 function nextBackoffSeconds(attemptCount: number) {
@@ -249,6 +258,10 @@ async function clearCalendarEventSync(db: D1DatabaseLike, eventId: number) {
 			`UPDATE calendar_event_sync
 		 SET google_event_id = NULL,
 		     google_html_link = NULL,
+		     outlook_event_id = NULL,
+		     outlook_html_link = NULL,
+		     apple_event_id = NULL,
+		     apple_html_link = NULL,
 		     last_synced_at = unixepoch(),
 		     last_error = NULL,
 		     updated_at = unixepoch()
@@ -275,32 +288,35 @@ async function upsertCalendarEventSync(
 	db: D1DatabaseLike,
 	input: {
 		eventId: number
-		googleEventId: string
-		googleHtmlLink: string | null
+		provider: CalendarSyncProvider
+		providerEventId: string
+		providerHtmlLink: string | null
 		lastError?: string | null
 	}
 ) {
+	const columns = calendarProviderEventColumns(input.provider)
 	await db
 		.prepare(
-			`INSERT INTO calendar_event_sync (event_id, google_event_id, google_html_link, last_synced_at, last_error, updated_at)
+			`INSERT INTO calendar_event_sync (event_id, ${columns.id}, ${columns.link}, last_synced_at, last_error, updated_at)
 		 VALUES (?, ?, ?, unixepoch(), ?, unixepoch())
 		 ON CONFLICT(event_id) DO UPDATE SET
-		   google_event_id = excluded.google_event_id,
-		   google_html_link = excluded.google_html_link,
+		   ${columns.id} = excluded.${columns.id},
+		   ${columns.link} = excluded.${columns.link},
 		   last_synced_at = excluded.last_synced_at,
 		   last_error = excluded.last_error,
 		   updated_at = unixepoch()`
 		)
-		.bind(input.eventId, input.googleEventId, input.googleHtmlLink, input.lastError ?? null)
+		.bind(input.eventId, input.providerEventId, input.providerHtmlLink, input.lastError ?? null)
 		.run()
 }
 
-async function getPreviousGoogleEventId(db: D1DatabaseLike, eventId: number) {
+async function getPreviousProviderEventId(db: D1DatabaseLike, provider: CalendarSyncProvider, eventId: number) {
+	const columns = calendarProviderEventColumns(provider)
 	const row = await db
-		.prepare(`SELECT google_event_id FROM calendar_event_sync WHERE event_id = ? LIMIT 1`)
+		.prepare(`SELECT ${columns.id} AS provider_event_id FROM calendar_event_sync WHERE event_id = ? LIMIT 1`)
 		.bind(eventId)
-		.first<{ google_event_id: string | null }>()
-	return row?.google_event_id ?? null
+		.first<{ provider_event_id: string | null }>()
+	return row?.provider_event_id ?? null
 }
 
 function syncWorkerId(job: SyncJobRow) {
@@ -337,6 +353,121 @@ async function releaseEventSyncLock(db: D1DatabaseLike, eventId: number, workerI
 		.run()
 }
 
+async function syncProviderEvent({
+	db,
+	env,
+	base64Key,
+	provider,
+	oldProviderEventId,
+	eventId,
+	status,
+	event
+}: {
+	db: D1DatabaseLike
+	env: Record<string, unknown>
+	base64Key: string
+	provider: CalendarSyncProvider
+	oldProviderEventId: string | null
+	eventId: number
+	status: string
+	event: {
+		title: string
+		description: string
+		startsAt: string
+		endsAt: string
+		location: string | null
+	}
+}) {
+	const connection = await getConnection({ db, provider, base64Key })
+	if (!connection) throw new Error(`${provider} calendar connection not found`)
+
+	if (provider === 'google') {
+		const calendarId = getPrimaryCalendarIdFromEnv(env)
+		if (!calendarId) throw new Error('Missing GOOGLE_PRIMARY_CALENDAR_ID/GOOGLE_CALENDAR_IDS')
+		const token = await ensureValidGoogleToken({ env, token: connection })
+		if (token.expiresAt !== connection.expiresAt || token.accessToken !== connection.accessToken) {
+			await saveConnection({ db, provider, token, base64Key })
+		}
+		if (status === 'canceled' || status === 'cancelled') {
+			if (oldProviderEventId) {
+				await googleDeleteEvent({ accessToken: token.accessToken, calendarId, eventId: oldProviderEventId })
+			}
+			return null
+		}
+		const created = await googleCreateEvent({
+			accessToken: token.accessToken,
+			calendarId,
+			event: {
+				summary: event.title,
+				description: event.description,
+				start: { dateTime: event.startsAt, timeZone: 'UTC' },
+				end: { dateTime: event.endsAt, timeZone: 'UTC' },
+				...(event.location ? { location: event.location } : {})
+			}
+		})
+		if (oldProviderEventId) {
+			await googleDeleteEvent({ accessToken: token.accessToken, calendarId, eventId: oldProviderEventId })
+		}
+		return created
+	}
+
+	if (provider === 'outlook') {
+		const token = await ensureValidOutlookToken({ env, token: connection })
+		if (token.expiresAt !== connection.expiresAt || token.accessToken !== connection.accessToken) {
+			await saveConnection({ db, provider, token, base64Key })
+		}
+		if (status === 'canceled' || status === 'cancelled') {
+			if (oldProviderEventId) {
+				await outlookDeleteEvent({ accessToken: token.accessToken, eventId: oldProviderEventId })
+			}
+			return null
+		}
+		const created = await outlookCreateEvent({
+			accessToken: token.accessToken,
+			env,
+			event: {
+				subject: event.title,
+				body: { contentType: 'text', content: event.description },
+				start: { dateTime: event.startsAt, timeZone: 'UTC' },
+				end: { dateTime: event.endsAt, timeZone: 'UTC' },
+				...(event.location ? { location: { displayName: event.location } } : {})
+			}
+		})
+		if (oldProviderEventId) {
+			await outlookDeleteEvent({ accessToken: token.accessToken, eventId: oldProviderEventId })
+		}
+		return created
+	}
+
+	const connectionPayload: AppleCalDavConnection = {
+		username: connection.accessToken,
+		appPassword: connection.refreshToken,
+		calendarUrl: connection.scope || ''
+	}
+	if (!connectionPayload.calendarUrl) throw new Error('Apple CalDAV calendar URL is missing')
+	if (status === 'canceled' || status === 'cancelled') {
+		if (oldProviderEventId) {
+			await appleDeleteEvent({ connection: connectionPayload, eventId: oldProviderEventId })
+		}
+		return null
+	}
+	const created = await appleCreateEvent({
+		connection: connectionPayload,
+		event: {
+			uid: `miko-calendar-${eventId}`,
+			summary: event.title,
+			description: event.description,
+			startsAt: event.startsAt,
+			endsAt: event.endsAt,
+			location: event.location
+		}
+	})
+	if (oldProviderEventId) {
+		await appleDeleteEvent({ connection: connectionPayload, eventId: oldProviderEventId })
+	}
+	return created
+}
+
 async function processSingleJob(db: D1DatabaseLike, env: Record<string, unknown>, job: SyncJobRow) {
 	const event = await fetchEventForSync(db, job.event_id)
 	if (!event) {
@@ -354,7 +485,7 @@ async function processSingleJob(db: D1DatabaseLike, env: Record<string, unknown>
 	}
 
 	try {
-		const oldGoogleEventId = await getPreviousGoogleEventId(db, job.event_id)
+		let provider = (await getActiveCalendarSyncProvider(db)) ?? 'google'
 
 		if ((event.status === 'canceled' || event.status === 'cancelled') && isMockSyncMode(env)) {
 			await clearCalendarEventSync(db, job.event_id)
@@ -366,8 +497,9 @@ async function processSingleJob(db: D1DatabaseLike, env: Record<string, unknown>
 		if (isMockSyncMode(env)) {
 			await upsertCalendarEventSync(db, {
 				eventId: job.event_id,
-				googleEventId: `mock_${job.event_id}_${job.id}`,
-				googleHtmlLink: null,
+				provider,
+				providerEventId: `mock_${provider}_${job.event_id}_${job.id}`,
+				providerHtmlLink: null,
 				lastError: null
 			})
 			await markJobDone(db, job.id)
@@ -376,34 +508,13 @@ async function processSingleJob(db: D1DatabaseLike, env: Record<string, unknown>
 
 		const base64Key = String(getEnv(env, 'TOKEN_ENC_KEY', '') || '')
 		if (!base64Key) throw new Error('Missing TOKEN_ENC_KEY')
-
-		const calendarId = getPrimaryCalendarIdFromEnv(env)
-		if (!calendarId) throw new Error('Missing GOOGLE_PRIMARY_CALENDAR_ID/GOOGLE_CALENDAR_IDS')
-
-		const connection = await getConnection({
-			db,
-			provider: 'google',
-			base64Key
-		})
-		if (!connection) throw new Error('Google calendar connection not found')
-
-		const token = await ensureValidGoogleToken({ env, token: connection })
-		if (token.expiresAt !== connection.expiresAt || token.accessToken !== connection.accessToken) {
-			await saveConnection({ db, provider: 'google', token, base64Key })
+		const activeProvider = await getActiveCalendarSyncProvider(db)
+		if (!activeProvider) {
+			const legacyGoogleConnection = await getConnection({ db, provider: 'google', base64Key })
+			if (!legacyGoogleConnection) throw new Error('Calendar sync provider not connected')
+			provider = 'google'
 		}
-
-		if (event.status === 'canceled' || event.status === 'cancelled') {
-			if (oldGoogleEventId) {
-				await googleDeleteEvent({
-					accessToken: token.accessToken,
-					calendarId,
-					eventId: oldGoogleEventId
-				})
-			}
-			await clearCalendarEventSync(db, job.event_id)
-			await markJobDone(db, job.id)
-			return
-		}
+		const oldProviderEventId = await getPreviousProviderEventId(db, provider, job.event_id)
 
 		const summary = await fetchSeatSummary(db, job.event_id)
 		const seatsTaken = summary?.seats_taken ?? 0
@@ -414,31 +525,35 @@ async function processSingleJob(db: D1DatabaseLike, env: Record<string, unknown>
 			waitlist > 0 ? `Waitlist: ${waitlist}` : '',
 			event.note ? `Note: ${event.note}` : ''
 		].filter(Boolean)
+		const syncEvent = {
+			title: `${event.title} (${seatsTaken}/${event.capacity})`,
+			description: descriptionLines.join('\n'),
+			startsAt: event.starts_at,
+			endsAt: event.ends_at,
+			location: event.location
+		}
 
-		const created = await googleCreateEvent({
-			accessToken: token.accessToken,
-			calendarId,
-			event: {
-				summary: `${event.title} (${seatsTaken}/${event.capacity})`,
-				description: descriptionLines.join('\n'),
-				start: { dateTime: event.starts_at, timeZone: 'UTC' },
-				end: { dateTime: event.ends_at, timeZone: 'UTC' },
-				...(event.location ? { location: event.location } : {})
-			}
+		const created = await syncProviderEvent({
+			db,
+			env,
+			base64Key,
+			provider,
+			oldProviderEventId,
+			eventId: job.event_id,
+			status: event.status,
+			event: syncEvent
 		})
-
-		if (oldGoogleEventId) {
-			await googleDeleteEvent({
-				accessToken: token.accessToken,
-				calendarId,
-				eventId: oldGoogleEventId
-			})
+		if (!created) {
+			await clearCalendarEventSync(db, job.event_id)
+			await markJobDone(db, job.id)
+			return
 		}
 
 		await upsertCalendarEventSync(db, {
 			eventId: job.event_id,
-			googleEventId: created.id,
-			googleHtmlLink: created.htmlLink ?? null,
+			provider,
+			providerEventId: created.id,
+			providerHtmlLink: created.htmlLink ?? null,
 			lastError: null
 		})
 		await markJobDone(db, job.id)

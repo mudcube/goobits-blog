@@ -1,7 +1,12 @@
 import {
 	createAdminEvents,
+	connectAdminAppleIntegration,
 	disconnectAdminGoogleIntegration,
+	disconnectAdminOutlookIntegration,
+	disconnectAdminAppleIntegration,
+	deleteAdminPaymentIntegration,
 	deleteAdminProgram,
+	getAdminPaymentIntegrations,
 	getAdminEvents,
 	getAdminPrograms,
 	getAdminStatus,
@@ -10,6 +15,8 @@ import {
 	setAdminProgram,
 	toggleAdminProgram,
 	mutateAdminSyncQueue,
+	saveAdminPayPalIntegration,
+	saveAdminSquareIntegration,
 	updateAdminEventMemory,
 	updateAdminEventDetails,
 	updateAdminEventAttendance,
@@ -134,6 +141,13 @@ export async function persistAdminRules(state: AdminRulesState) {
 
 export const beginCalendarOAuth = startCalendarOAuth
 export const disconnectCalendarOAuth = disconnectAdminGoogleIntegration
+export const disconnectOutlookCalendarOAuth = disconnectAdminOutlookIntegration
+export const connectAppleCalendar = connectAdminAppleIntegration
+export const disconnectAppleCalendar = disconnectAdminAppleIntegration
+export const fetchAdminPaymentIntegrations = getAdminPaymentIntegrations
+export const persistPayPalIntegration = saveAdminPayPalIntegration
+export const persistSquareIntegration = saveAdminSquareIntegration
+export const removePaymentIntegration = deleteAdminPaymentIntegration
 export const fetchAdminPrograms = getAdminPrograms
 
 export async function persistAdminProgram(input: { slug: string; enabled: boolean }) {

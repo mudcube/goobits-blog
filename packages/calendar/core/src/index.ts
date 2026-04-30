@@ -8,6 +8,21 @@ import {
 	DEFAULT_SCOPES
 } from './providers/google/index.ts'
 import {
+	getOutlookAuthUrl,
+	exchangeOutlookCode,
+	ensureValidOutlookToken,
+	outlookCreateEvent,
+	outlookDeleteEvent,
+	OUTLOOK_SCOPES
+} from './providers/outlook/index.ts'
+import {
+	appleCreateEvent,
+	appleDeleteEvent,
+	buildAppleEventIcs,
+	type AppleCalDavConnection,
+	type AppleCalendarEventInput
+} from './providers/apple/caldav.ts'
+import {
 	getConnection,
 	saveConnection,
 	deleteConnection,
@@ -116,6 +131,18 @@ import {
 	setAdminPaymentDefaults,
 	type AdminPaymentDefaults
 } from './payments/admin-payment-defaults.ts'
+import {
+	capturePayPalCheckoutOrder,
+	createPayPalCheckoutOrder,
+	createSquareCashAppPayment,
+	deletePaymentCredentials,
+	getPaymentCheckoutConfig,
+	getPaymentCheckoutContext,
+	savePayPalPaymentCredentials,
+	saveSquarePaymentCredentials,
+	type CheckoutProvider,
+	type PaymentCheckoutContext
+} from './payments/checkout.ts'
 import { listEventTemplates, type CalendarEventTemplate } from './events/event-templates.ts'
 import { promoteWaitlistedParticipant, type PromoteWaitlistResult } from './events/promote-waitlist.ts'
 import { getAdminEventDetail, type AdminEventDetail } from './events/event-detail.ts'
@@ -171,6 +198,12 @@ import {
 	type CalendarBookingLookupInput
 } from './transport/calendar.ts'
 import { TransportValidationError, asTransportErrorMessage } from './transport/errors.ts'
+import {
+	getActiveCalendarSyncProvider,
+	isCalendarSyncProvider,
+	setActiveCalendarSyncProvider,
+	type CalendarSyncProvider
+} from './sync/settings.ts'
 
 export {
 	getGoogleAuthUrl,
@@ -180,6 +213,15 @@ export {
 	googleCreateEvent,
 	googleDeleteEvent,
 	DEFAULT_SCOPES,
+	getOutlookAuthUrl,
+	exchangeOutlookCode,
+	ensureValidOutlookToken,
+	outlookCreateEvent,
+	outlookDeleteEvent,
+	OUTLOOK_SCOPES,
+	appleCreateEvent,
+	appleDeleteEvent,
+	buildAppleEventIcs,
 	getConnection,
 	saveConnection,
 	deleteConnection,
@@ -251,6 +293,14 @@ export {
 	hasUserProgramAccess,
 	getAdminPaymentDefaults,
 	setAdminPaymentDefaults,
+	capturePayPalCheckoutOrder,
+	createPayPalCheckoutOrder,
+	createSquareCashAppPayment,
+	deletePaymentCredentials,
+	getPaymentCheckoutConfig,
+	getPaymentCheckoutContext,
+	savePayPalPaymentCredentials,
+	saveSquarePaymentCredentials,
 	listEventTemplates,
 	promoteWaitlistedParticipant,
 	getAdminEventDetail,
@@ -280,7 +330,10 @@ export {
 	setConfirmationId,
 	getBookingByConfirmation,
 	cancelBookingByConfirmation,
-	getSlotAvailability
+	getSlotAvailability,
+	getActiveCalendarSyncProvider,
+	isCalendarSyncProvider,
+	setActiveCalendarSyncProvider
 }
 
 export type {
@@ -290,6 +343,11 @@ export type {
 	CalendarActivityDefinition,
 	CalendarProgramSlug,
 	PaymentProvider,
+	CheckoutProvider,
+	PaymentCheckoutContext,
+	CalendarSyncProvider,
+	AppleCalDavConnection,
+	AppleCalendarEventInput,
 	CalendarHomeFeedEvent,
 	CalendarMemberHomeData,
 	CalendarShellUser,

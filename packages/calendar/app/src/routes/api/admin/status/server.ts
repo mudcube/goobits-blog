@@ -2,11 +2,14 @@ import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import {
 	ensureValidGoogleToken,
+	ensureValidOutlookToken,
 	getConnection,
+	getActiveCalendarSyncProvider,
 	saveConnection,
 	requireEnv,
 	getCalendarSyncQueueHealth,
-	getAdminPaymentDefaults
+	getAdminPaymentDefaults,
+	getPaymentCheckoutConfig
 } from '@calendar/core'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk } from '@calendar/kit'
@@ -18,33 +21,61 @@ export async function GET(event: RequestEvent) {
 		const env = await buildEnv(event.platform)
 		const db = env.DB
 
-		let connected = false
-		let expired = false
-		let refreshFailed = false
-		let expiresAt: number | null = null
-
 		const base64Key = requireEnv(env, 'TOKEN_ENC_KEY')
-		const connection = await getConnection({ db, provider: 'google', base64Key })
-		if (connection) {
-			connected = true
-			expiresAt = connection.expiresAt ?? null
-			expired = !expiresAt || Date.now() > expiresAt
+		const storedActiveProvider = await getActiveCalendarSyncProvider(db)
 
-			// Access tokens are short-lived; attempt refresh before flagging broken state.
-			if (expired) {
-				try {
-					const next = await ensureValidGoogleToken({ env, token: connection })
-					if (next.expiresAt !== connection.expiresAt || next.accessToken !== connection.accessToken) {
-						await saveConnection({ db, provider: 'google', token: next, base64Key })
+		async function providerStatus(provider: 'google' | 'outlook' | 'apple') {
+			let providerConnected = false
+			let providerExpired = false
+			let providerRefreshFailed = false
+			let providerExpiresAt: number | null = null
+			const connection = await getConnection({ db, provider, base64Key })
+			if (connection) {
+				providerConnected = true
+				providerExpiresAt = connection.expiresAt ?? null
+				providerExpired = provider === 'apple' ? false : !providerExpiresAt || Date.now() > providerExpiresAt
+				if (providerExpired) {
+					try {
+						const next =
+							provider === 'google'
+								? await ensureValidGoogleToken({ env, token: connection })
+								: await ensureValidOutlookToken({ env, token: connection })
+						if (next.expiresAt !== connection.expiresAt || next.accessToken !== connection.accessToken) {
+							await saveConnection({ db, provider, token: next, base64Key })
+						}
+						providerExpiresAt = next.expiresAt ?? null
+						providerExpired = !providerExpiresAt || Date.now() > providerExpiresAt
+					} catch (error) {
+						providerRefreshFailed = true
+						console.warn(`${provider} token refresh check failed in admin status:`, error)
 					}
-					expiresAt = next.expiresAt ?? null
-					expired = !expiresAt || Date.now() > expiresAt
-				} catch (error) {
-					refreshFailed = true
-					console.warn('Google token refresh check failed in admin status:', error)
 				}
 			}
+			return {
+				connected: providerConnected,
+				expired: providerExpired,
+				expiresAt: providerExpiresAt,
+				refreshFailed: providerRefreshFailed,
+				active: false
+			}
 		}
+		const providerStatuses = {
+			google: await providerStatus('google'),
+			outlook: await providerStatus('outlook'),
+			apple: await providerStatus('apple')
+		}
+		const activeProvider =
+			storedActiveProvider ??
+			(providerStatuses.google.connected
+				? 'google'
+				: providerStatuses.outlook.connected
+					? 'outlook'
+					: providerStatuses.apple.connected
+						? 'apple'
+						: null)
+		providerStatuses.google.active = activeProvider === 'google'
+		providerStatuses.outlook.active = activeProvider === 'outlook'
+		providerStatuses.apple.active = activeProvider === 'apple'
 
 		// Get current rules from settings table, fallback to env
 		const settingsRes = await db.prepare(
@@ -67,9 +98,10 @@ export async function GET(event: RequestEvent) {
 			notice: parseInt(settings['notice'] || envValue('BOOKING_MIN_NOTICE_HOURS', '24'), 10),
 			capacity: parseInt(settings['capacity'] || envValue('BOOKING_CAPACITY', '4'), 10)
 		}
-		const [syncQueue, paymentDefaults] = await Promise.all([
+		const [syncQueue, paymentDefaults, paymentIntegrations] = await Promise.all([
 			getCalendarSyncQueueHealth(db),
-			getAdminPaymentDefaults(db)
+			getAdminPaymentDefaults(db),
+			getPaymentCheckoutConfig({ db, env, base64Key })
 		])
 
 		const baseUrl =
@@ -80,14 +112,20 @@ export async function GET(event: RequestEvent) {
 
 		return apiOk({
 			google: {
-				connected,
-				expired,
-				expiresAt,
-				refreshFailed
+				connected: providerStatuses.google.connected,
+				expired: providerStatuses.google.expired,
+				expiresAt: providerStatuses.google.expiresAt,
+				refreshFailed: providerStatuses.google.refreshFailed
+			},
+			sync: {
+				activeProvider,
+				providers: providerStatuses
 			},
 			oauth: {
 				googleCalendarRedirectUri:
 					typeof env['GOOGLE_REDIRECT_URI'] === 'string' ? normalize(env['GOOGLE_REDIRECT_URI']) : null,
+				outlookRedirectUri:
+					typeof env['OUTLOOK_REDIRECT_URI'] === 'string' ? normalize(env['OUTLOOK_REDIRECT_URI']) : null,
 				googleLoginRedirectUri:
 					typeof env['GOOGLE_AUTH_REDIRECT_URI'] === 'string'
 						? normalize(env['GOOGLE_AUTH_REDIRECT_URI'])
@@ -99,7 +137,8 @@ export async function GET(event: RequestEvent) {
 			},
 			syncQueue,
 			rules,
-			paymentDefaults
+			paymentDefaults,
+			paymentIntegrations
 		})
 	})
 }
