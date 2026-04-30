@@ -146,7 +146,7 @@
 		{/if}
 		<div class="program-editor__actions program-editor__actions--split">
 			<AdminActionButton variant="danger" onclick={onRemove}>Remove</AdminActionButton>
-			<AdminActionButton variant="primary" onclick={onDone}>Done</AdminActionButton>
+			<AdminActionButton variant="primary" onclick={onDone}>Save</AdminActionButton>
 		</div>
 	{/if}
 </div>

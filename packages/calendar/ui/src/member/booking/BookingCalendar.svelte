@@ -10,8 +10,9 @@
 		type BookingSlot,
 		type OpenDay,
 		type Person,
-		isoDay,
-		startOfDay
+		venueDayDate,
+		venueDayKey,
+		venueDecimalHour
 	} from '../../booking'
 	import { ft, formatDate } from '../../booking/time'
 
@@ -38,6 +39,7 @@
 	let end = $state(14)
 	let bookingError = $state('')
 	let confirmationId = $state<string | null>(null)
+	let bookingStatus = $state<'booked' | 'waitlist'>('booked')
 
 	const openDays = $derived.by(() => eventsToPresetDays(upcoming))
 	const selectedSlot = $derived.by(() => selectedDay?.slots?.find(slot => slot.id === selectedSlotId) ?? null)
@@ -48,8 +50,7 @@
 	const overlapping = $derived(selectedDay ? selectedDay.bookings.filter(person => person.start < end && person.end > start) : [])
 
 	function decimalHour(iso: string) {
-		const date = new Date(iso)
-		return date.getHours() + date.getMinutes() / 60
+		return venueDecimalHour(iso)
 	}
 
 	function formatTimeRange(startIso: string, endIso: string) {
@@ -68,18 +69,19 @@
 	function eventsToPresetDays(events: FeedEvent[]): OpenDay[] {
 		const groups = new Map<string, FeedEvent[]>()
 		for (const event of events) {
-			const key = isoDay(new Date(event.startsAt))
+			const key = venueDayKey(event.startsAt)
 			const group = groups.get(key) ?? []
 			group.push(event)
 			groups.set(key, group)
 		}
 
-		return [...groups.values()]
+		return [...groups.entries()]
 			.map((eventsForDay) => {
-				eventsForDay.sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
-				const first = eventsForDay[0]!
-				const date = startOfDay(new Date(first.startsAt))
-				const slots: BookingSlot[] = eventsForDay.map((event) => ({
+				const [dayKey, dayEvents] = eventsForDay
+				dayEvents.sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
+				const first = dayEvents[0]!
+				const date = venueDayDate(dayKey)
+				const slots: BookingSlot[] = dayEvents.map((event) => ({
 					id: event.id,
 					eventId: event.id,
 					label: formatTimeRange(event.startsAt, event.endsAt),
@@ -90,7 +92,7 @@
 					waitlistCount: event.waitlistCount,
 					userStatus: event.userStatus
 				}))
-				const bookings = eventsForDay.flatMap(participantToPerson)
+				const bookings = dayEvents.flatMap(participantToPerson)
 				return {
 					date,
 					mode: 'preset' as const,
@@ -100,7 +102,7 @@
 					windowStart: Math.min(...slots.map(slot => slot.start)),
 					windowEnd: Math.max(...slots.map(slot => slot.end)),
 					maxDuration: Math.max(...slots.map(slot => slot.end - slot.start)),
-					capacity: Math.max(...eventsForDay.map(event => event.capacity))
+					capacity: Math.max(...dayEvents.map(event => event.capacity))
 				}
 			})
 			.sort((a, b) => a.date.getTime() - b.date.getTime())
@@ -115,6 +117,7 @@
 		selectedDay = day
 		const firstSlot = day.slots?.[0] ?? null
 		selectedSlotId = firstSlot?.id ?? null
+		bookingStatus = 'booked'
 		start = firstSlot?.start ?? day.windowStart
 		end = firstSlot?.end ?? Math.min(day.windowStart + 1, day.windowEnd)
 		goStep(1)
@@ -146,14 +149,21 @@
 		if (!Number.isFinite(eventId) || eventId <= 0) return
 
 		bookingError = ''
+		if (selectedSlot?.userStatus === 'joined' || selectedSlot?.userStatus === 'waitlist') {
+			bookingStatus = selectedSlot.userStatus === 'waitlist' ? 'waitlist' : 'booked'
+			goStep(2)
+			return
+		}
 		try {
 			if (mockMode) {
+				bookingStatus = (selectedSlot?.seatsLeft ?? 0) > 0 ? 'booked' : 'waitlist'
 				applyMockJoin(eventId)
 				confirmationId = `mock-${eventId}`
 				goStep(2)
 				return
 			}
 			const result = await joinCalendarEvent(eventId, { guestCount: 0 })
+			bookingStatus = result.status === 'waitlist' ? 'waitlist' : 'booked'
 			confirmationId = result.confirmationId ?? null
 			localUpcoming = applyEventMutationState(upcoming, eventId, result.state)
 			goStep(2)
@@ -214,6 +224,7 @@
 				{overlapping}
 				event={selectedEvent}
 				{confirmationId}
+				status={bookingStatus}
 				onBack={() => goStep(0)}
 				onEdit={() => goStep(1)}
 			/>

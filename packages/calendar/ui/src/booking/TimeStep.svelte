@@ -52,6 +52,16 @@
 		start = slot.start
 		end = slot.end
 	}
+
+	const selectedSlot = $derived(
+		day.slots?.find((slot) => slot.id === selectedSlotId) ?? day.slots?.[0] ?? null
+	)
+	const confirmLabel = $derived.by(() => {
+		if (day.mode !== 'preset' || !selectedSlot) return 'Confirm'
+		if (selectedSlot.userStatus === 'joined') return 'Already joined'
+		if (selectedSlot.userStatus === 'waitlist') return 'On waitlist'
+		return (selectedSlot.seatsLeft ?? 0) > 0 ? 'Join' : 'Join waitlist'
+	})
 </script>
 
 <p class="ts__instruction">Pick your time</p>
@@ -67,7 +77,11 @@
 			>
 				<span class="ts__slot-main">{slot.label}</span>
 				<span class="ts__slot-meta">
-					{#if (slot.seatsLeft ?? 0) > 0}
+					{#if slot.userStatus === 'joined'}
+						Joined
+					{:else if slot.userStatus === 'waitlist'}
+						On waitlist
+					{:else if (slot.seatsLeft ?? 0) > 0}
 						{slot.seatsLeft} left
 					{:else}
 						Waitlist
@@ -83,10 +97,10 @@
 	<SkyTrack {sunrise} {sunset} {hourly} {hasRain} animate={animating} maxDuration={day.maxDuration ?? 24} bind:start bind:end />
 {/if}
 
-<CrewCard bookings={day.bookings} {overlapping} onJoin={handleJoin} dayLabel={formatDate(day.date)} capacity={8} />
+<CrewCard bookings={day.bookings} {overlapping} onJoin={handleJoin} dayLabel={formatDate(day.date)} capacity={day.capacity} />
 
 <button type="button" class="ts__confirm" data-tip="Lock in your time" onclick={onConfirm}>
-	<span>Confirm</span>
+	<span>{confirmLabel}</span>
 	<ChevronRight size={15} strokeWidth={2.2} />
 </button>
 

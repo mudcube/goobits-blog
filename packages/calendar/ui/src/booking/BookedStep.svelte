@@ -19,6 +19,7 @@
 		overlapping = [],
 		event = null,
 		confirmationId = null,
+		status = 'booked',
 		onBack,
 		onEdit,
 	}: {
@@ -38,6 +39,7 @@
 			payUrl?: string | null
 		} | null
 		confirmationId?: string | null
+		status?: 'booked' | 'waitlist'
 		onBack: () => void
 		onEdit?: () => void
 	} = $props()
@@ -135,7 +137,7 @@
 		<div class="bs__check-glow"></div>
 		<div class="bs__check">✓</div>
 	</div>
-	<h2 class="bs__title">Booked.</h2>
+	<h2 class="bs__title">{status === 'waitlist' ? 'Waitlisted.' : 'Booked.'}</h2>
 
 	<div class="bs__card">
 		<p class="bs__activity">{activityIcon} {activityLabel}</p>
@@ -153,7 +155,12 @@
 		</div>
 	{/if}
 
-	<p class="bs__greeting">See you there <img src="/media/page-icons/holidays-party.png" alt="" class="bs__greeting-icon" loading="eager" decoding="async" /></p>
+	<p class="bs__greeting">
+		{status === 'waitlist' ? "We'll let you know if a spot opens" : 'See you there'}
+		{#if status === 'booked'}
+			<img src="/media/page-icons/holidays-party.png" alt="" class="bs__greeting-icon" loading="eager" decoding="async" />
+		{/if}
+	</p>
 
 	<PaymentCheckout {event} {confirmationId} />
 

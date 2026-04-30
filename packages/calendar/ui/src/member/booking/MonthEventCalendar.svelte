@@ -8,6 +8,7 @@
 		startOfDay,
 		type CalendarTone
 	} from '../../booking/calendar-surface.svelte'
+	import { venueDayKey } from '../../booking/venue-time'
 	import { createWheelMonthPager } from './wheel-month-pager'
 	import type { CalendarEventsResponse } from '../../api/calendar'
 
@@ -41,7 +42,7 @@
 	const eventsByDate = $derived.by(() => {
 		const grouped = new Map<string, FeedEvent[]>()
 		for (const event of events) {
-			const key = isoDay(new Date(event.startsAt))
+			const key = venueDayKey(event.startsAt)
 			const dayEvents = grouped.get(key) || []
 			dayEvents.push(event)
 			grouped.set(key, dayEvents)

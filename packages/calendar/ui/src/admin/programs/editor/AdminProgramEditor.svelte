@@ -449,6 +449,9 @@
 			closePop()
 			return
 		}
+		const selectedEvent = eventsSource.find((ev: { id: number }) => ev.id === selectedEventId) as
+			| { title: string; startsAt: string; endsAt: string }
+			| undefined
 		if (popCap !== originalPopCap) {
 			await dashboard.updateEventCapacity(selectedEventId, popCap)
 			if (dashboard.error) {
@@ -456,9 +459,27 @@
 				return
 			}
 		}
-		if (popTime !== originalPopTime) {
-			flash('Time edit is preview-only in this panel', false)
+		if (popTime !== originalPopTime && selectedDayDate && selectedEvent) {
+			const [hours, minutes] = popTime.split(':').map((part) => Number.parseInt(part, 10))
+			const safeHours = Number.isFinite(hours) ? (hours as number) : 10
+			const safeMinutes = Number.isFinite(minutes) ? (minutes as number) : 30
+			const originalStartMs = new Date(selectedEvent.startsAt).getTime()
+			const originalEndMs = new Date(selectedEvent.endsAt).getTime()
+			const durationMs = Math.max(15 * 60 * 1000, originalEndMs - originalStartMs)
+			const nextStart = new Date(selectedDayDate)
+			nextStart.setHours(safeHours, safeMinutes, 0, 0)
+			const nextEnd = new Date(nextStart.getTime() + durationMs)
+			await dashboard.updateEventDetails(selectedEventId, {
+				title: selectedEvent.title,
+				startsAt: nextStart.toISOString(),
+				endsAt: nextEnd.toISOString()
+			})
+			if (dashboard.error) {
+				flash(dashboard.error, true)
+				return
+			}
 		}
+		if (popCap !== originalPopCap || popTime !== originalPopTime) flash('Event updated')
 		closePop()
 	}
 

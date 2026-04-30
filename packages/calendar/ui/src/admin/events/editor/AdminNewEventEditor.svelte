@@ -86,7 +86,24 @@
 	}
 
 	async function submitCreate() {
-		if (!selectedActivitySlug || !createTitle || !createStartsAt || !createEndsAt) return
+		if (!selectedActivitySlug) {
+			flash('Pick a program before creating the event', true)
+			return
+		}
+		if (!createTitle.trim()) {
+			flash('Add an event title before creating the event', true)
+			return
+		}
+		if (!createStartsAt || !createEndsAt) {
+			flash('Add start and end times before creating the event', true)
+			drawerOpen = true
+			return
+		}
+		if (new Date(createEndsAt).getTime() <= new Date(createStartsAt).getTime()) {
+			flash('End time must be after start time', true)
+			drawerOpen = true
+			return
+		}
 		if (mockMode) {
 			flash('Mock mode: event created in preview')
 			void goto(hrefWithMock(withAdminRoute(`events/program/${selectedActivitySlug}/`)))
