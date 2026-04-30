@@ -39,96 +39,30 @@
 	></button>
 	<aside class="program-editor__settings">
 		<div class="program-editor__settings-body">
-			<div class="program-editor__toggle-row">
-				<span>Accepting bookings</span>
-				<button
-					type="button"
-					aria-label={draft.enabled ? 'Disable bookings' : 'Enable bookings'}
-					class="program-editor__switch"
-					class:program-editor__switch--on={draft.enabled}
-					onclick={() => onPatch({ enabled: !draft.enabled }, 'enabled')}
+			<section class="program-editor__settings-section">
+				<h3>Publishing</h3>
+				<div class="program-editor__toggle-row">
+					<span>Accepting bookings</span>
+					<button
+						type="button"
+						aria-label={draft.enabled ? 'Disable bookings' : 'Enable bookings'}
+						class="program-editor__switch"
+						class:program-editor__switch--on={draft.enabled}
+						onclick={() => onPatch({ enabled: !draft.enabled }, 'enabled')}
+					>
+						<span></span>
+					</button>
+				</div>
+				<label
+					><span>URL path</span><input
+						class="ui-form-control"
+						type="text"
+						value={draft.slug}
+						oninput={(event) => onFieldInput('slug', event.currentTarget.value)}
+						onblur={() => onFieldCommit('slug')}
+					/></label
 				>
-					<span></span>
-				</button>
-			</div>
-			<label
-				><span>URL path</span><input
-					class="ui-form-control"
-					type="text"
-					value={draft.slug}
-					oninput={(event) => onFieldInput('slug', event.currentTarget.value)}
-					onblur={() => onFieldCommit('slug')}
-				/></label
-			>
-			<label
-				><span>Sort order</span><input
-					class="ui-form-control ui-form-control--number"
-					type="number"
-					value={draft.sortOrder}
-					oninput={(event) =>
-						onFieldInput(
-							'sortOrder',
-							Number.isFinite(event.currentTarget.valueAsNumber)
-								? event.currentTarget.valueAsNumber
-								: 0
-						)}
-					onblur={() => onFieldCommit('sortOrder')}
-				/></label
-			>
-			<label
-				><span>Status note</span><input
-					class="ui-form-control"
-					type="text"
-					value={draft.serviceStatusNote}
-					oninput={(event) => onFieldInput('serviceStatusNote', event.currentTarget.value)}
-					onblur={() => onFieldCommit('serviceStatusNote')}
-				/></label
-			>
-			<label
-				><span>Page title</span><input
-					class="ui-form-control"
-					type="text"
-					value={draft.pageTitle}
-					oninput={(event) => onFieldInput('pageTitle', event.currentTarget.value)}
-					onblur={() => onFieldCommit('pageTitle')}
-				/></label
-			>
-			<label
-				><span>Activity name</span><input
-					class="ui-form-control"
-					type="text"
-					value={draft.activityName}
-					oninput={(event) => onFieldInput('activityName', event.currentTarget.value)}
-					onblur={() => onFieldCommit('activityName')}
-				/></label
-			>
-			<label
-				><span>Eyebrow class</span><input
-					class="ui-form-control"
-					type="text"
-					value={draft.eyebrowClass}
-					oninput={(event) => onFieldInput('eyebrowClass', event.currentTarget.value)}
-					onblur={() => onFieldCommit('eyebrowClass')}
-				/></label
-			>
-			<label
-				><span>Glow class</span><input
-					class="ui-form-control"
-					type="text"
-					value={draft.glowClass}
-					oninput={(event) => onFieldInput('glowClass', event.currentTarget.value)}
-					onblur={() => onFieldCommit('glowClass')}
-				/></label
-			>
-			<label
-				><span>Form glow class</span><input
-					class="ui-form-control"
-					type="text"
-					value={draft.formGlowClass}
-					oninput={(event) => onFieldInput('formGlowClass', event.currentTarget.value)}
-					onblur={() => onFieldCommit('formGlowClass')}
-				/></label
-			>
+			</section>
 			<div class="program-editor__settings-actions">
 				<AdminActionButton
 					variant="danger"
@@ -181,9 +115,23 @@
 	.program-editor__settings-body {
 		padding: 0.95rem 0.9rem;
 		display: grid;
-		gap: 0.55rem;
+		gap: 0.9rem;
 		overflow: auto;
 		font-family: var(--font-ui-sans, var(--font-sans));
+	}
+
+	.program-editor__settings-section {
+		display: grid;
+		gap: 0.55rem;
+	}
+
+	.program-editor__settings-section h3 {
+		margin: 0;
+		font-size: 0.68rem;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--text-3);
 	}
 
 	.program-editor__settings-body label {

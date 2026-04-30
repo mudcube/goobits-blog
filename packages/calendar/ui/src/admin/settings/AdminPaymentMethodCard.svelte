@@ -119,11 +119,6 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: border-color 120ms ease;
-  }
-
-  .payment-method-card--active .payment-method-card__radio {
-    border-color: color-mix(in srgb, var(--admin-accent) 70%, transparent);
   }
 
   .payment-method-card__radio-dot {

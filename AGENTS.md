@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Communication
+
+- Be brief in all responses. Lead with the answer, then only the essential details.
+
 ## Commands
 
 ```bash

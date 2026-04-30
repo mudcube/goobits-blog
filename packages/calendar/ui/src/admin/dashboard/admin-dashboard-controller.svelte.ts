@@ -65,6 +65,76 @@ type PaymentIntegrations = {
   };
 };
 
+type PaymentProviderKey = "venmo" | "paypal" | "cashapp";
+
+type PaymentDefaults = {
+  provider: string;
+  handle: string;
+  primaryProvider: PaymentProviderKey | "";
+  handles: Record<PaymentProviderKey, string>;
+};
+
+const PAYMENT_PROVIDER_KEYS: PaymentProviderKey[] = [
+  "venmo",
+  "paypal",
+  "cashapp",
+];
+
+function blankPaymentDefaults(): PaymentDefaults {
+  return {
+    provider: "",
+    handle: "",
+    primaryProvider: "",
+    handles: {
+      venmo: "",
+      paypal: "",
+      cashapp: "",
+    },
+  };
+}
+
+function normalizePaymentDefaults(
+  input:
+    | {
+        provider?: string | null | undefined;
+        handle?: string | null | undefined;
+        primaryProvider?: string | null | undefined;
+        handles?:
+          | Partial<Record<PaymentProviderKey, string | null>>
+          | undefined;
+      }
+    | null
+    | undefined,
+): PaymentDefaults {
+  const provider = (input?.primaryProvider ?? input?.provider ?? "") || "";
+  const normalizedProvider = PAYMENT_PROVIDER_KEYS.includes(
+    provider as PaymentProviderKey,
+  )
+    ? (provider as PaymentProviderKey)
+    : "";
+  const handles = blankPaymentDefaults().handles;
+  for (const key of PAYMENT_PROVIDER_KEYS) {
+    handles[key] = input?.handles?.[key] ?? "";
+  }
+  if (normalizedProvider && !handles[normalizedProvider] && input?.handle) {
+    handles[normalizedProvider] = input.handle;
+  }
+  return {
+    provider: normalizedProvider,
+    handle: normalizedProvider ? handles[normalizedProvider] : "",
+    primaryProvider: normalizedProvider,
+    handles,
+  };
+}
+
+function paymentHandleFor(
+  defaults: PaymentDefaults,
+  provider: string | null | undefined,
+) {
+  const key = provider as PaymentProviderKey;
+  return PAYMENT_PROVIDER_KEYS.includes(key) ? defaults.handles[key] : "";
+}
+
 export function createAdminDashboardController(
   options: DashboardControllerOptions = {},
 ) {
@@ -92,9 +162,27 @@ export function createAdminDashboardController(
   }>({
     activeProvider: null,
     providers: {
-      google: { connected: false, expired: false, expiresAt: null, refreshFailed: false, active: false },
-      outlook: { connected: false, expired: false, expiresAt: null, refreshFailed: false, active: false },
-      apple: { connected: false, expired: false, expiresAt: null, refreshFailed: false, active: false },
+      google: {
+        connected: false,
+        expired: false,
+        expiresAt: null,
+        refreshFailed: false,
+        active: false,
+      },
+      outlook: {
+        connected: false,
+        expired: false,
+        expiresAt: null,
+        refreshFailed: false,
+        active: false,
+      },
+      apple: {
+        connected: false,
+        expired: false,
+        expiresAt: null,
+        refreshFailed: false,
+        active: false,
+      },
     },
   });
   let syncQueue = $state({
@@ -108,13 +196,21 @@ export function createAdminDashboardController(
     hasDeadLetterAlert: false,
   });
   let bookings = $state<unknown[]>([]);
-  let paymentDefaults = $state({
-    provider: "",
-    handle: "",
-  });
+  let paymentDefaults = $state<PaymentDefaults>(blankPaymentDefaults());
   let paymentIntegrations = $state<PaymentIntegrations>({
-    paypal: { clientId: null, environment: "sandbox", source: null, enabled: false },
-    square: { applicationId: null, locationId: null, environment: "sandbox", source: null, enabled: false },
+    paypal: {
+      clientId: null,
+      environment: "sandbox",
+      source: null,
+      enabled: false,
+    },
+    square: {
+      applicationId: null,
+      locationId: null,
+      environment: "sandbox",
+      source: null,
+      enabled: false,
+    },
   });
   let stats = $state(DEFAULT_ADMIN_STATS);
   let loading = $state(true);
@@ -297,12 +393,10 @@ export function createAdminDashboardController(
         hasDeadLetterAlert: false,
       };
       paymentDefaults = dashboardStatus.paymentDefaults
-        ? {
-            provider: dashboardStatus.paymentDefaults.provider ?? "",
-            handle: dashboardStatus.paymentDefaults.handle ?? "",
-          }
+        ? normalizePaymentDefaults(dashboardStatus.paymentDefaults)
         : paymentDefaults;
-      paymentIntegrations = dashboardStatus.paymentIntegrations ?? paymentIntegrations;
+      paymentIntegrations =
+        dashboardStatus.paymentIntegrations ?? paymentIntegrations;
       if (dashboardStatus.rules) {
         hours = {
           from: dashboardStatus.rules.hoursFrom,
@@ -321,18 +415,20 @@ export function createAdminDashboardController(
   async function loadPaymentDefaults() {
     try {
       const result = await loadAdminPaymentDefaults();
-      paymentDefaults = {
-        provider: result.payment.provider ?? "",
-        handle: result.payment.handle ?? "",
-      };
+      paymentDefaults = normalizePaymentDefaults(result.payment);
       if (!eventDraft.paymentProvider && paymentDefaults.provider) {
         eventDraft = {
           ...eventDraft,
           paymentProvider: paymentDefaults.provider,
         };
       }
-      if (!eventDraft.paymentHandle && paymentDefaults.handle) {
-        eventDraft = { ...eventDraft, paymentHandle: paymentDefaults.handle };
+      if (!eventDraft.paymentHandle) {
+        const defaultHandle = paymentHandleFor(
+          paymentDefaults,
+          eventDraft.paymentProvider || paymentDefaults.provider,
+        );
+        if (defaultHandle)
+          eventDraft = { ...eventDraft, paymentHandle: defaultHandle };
       }
     } catch (err) {
       if (onUnauthorized?.(err)) return;
@@ -342,9 +438,28 @@ export function createAdminDashboardController(
   async function savePaymentDefaults() {
     error = "";
     try {
+      const primaryProvider =
+        paymentDefaults.primaryProvider.trim() ||
+        paymentDefaults.provider.trim();
+      const handles = {
+        venmo: paymentDefaults.handles.venmo.trim() || null,
+        paypal: paymentDefaults.handles.paypal.trim() || null,
+        cashapp: paymentDefaults.handles.cashapp.trim() || null,
+      };
+      if (
+        (primaryProvider === "venmo" ||
+          primaryProvider === "paypal" ||
+          primaryProvider === "cashapp") &&
+        !handles[primaryProvider] &&
+        paymentDefaults.handle.trim()
+      ) {
+        handles[primaryProvider] = paymentDefaults.handle.trim();
+      }
       const result = await saveAdminPaymentDefaults({
-        provider: paymentDefaults.provider.trim() || null,
+        provider: primaryProvider || null,
         handle: paymentDefaults.handle.trim() || null,
+        primaryProvider: primaryProvider || null,
+        handles,
       });
       if (!result.ok) {
         error = result.error;
@@ -364,11 +479,18 @@ export function createAdminDashboardController(
       }
     } catch (err) {
       if (onUnauthorized?.(err)) return;
-      error = err instanceof Error ? err.message : "Failed to load payment integrations";
+      error =
+        err instanceof Error
+          ? err.message
+          : "Failed to load payment integrations";
     }
   }
 
-  async function connectPayPal(input: { clientId: string; clientSecret: string; environment: "sandbox" | "live" }) {
+  async function connectPayPal(input: {
+    clientId: string;
+    clientSecret: string;
+    environment: "sandbox" | "live";
+  }) {
     error = "";
     try {
       const result = await savePayPalIntegration(input);
@@ -379,11 +501,17 @@ export function createAdminDashboardController(
       await loadPaymentProviderIntegrations();
     } catch (err) {
       if (onUnauthorized?.(err)) return;
-      error = err instanceof Error ? err.message : "Failed to save PayPal checkout";
+      error =
+        err instanceof Error ? err.message : "Failed to save PayPal checkout";
     }
   }
 
-  async function connectSquare(input: { applicationId: string; locationId: string; accessToken: string; environment: "sandbox" | "live" }) {
+  async function connectSquare(input: {
+    applicationId: string;
+    locationId: string;
+    accessToken: string;
+    environment: "sandbox" | "live";
+  }) {
     error = "";
     try {
       const result = await saveSquareIntegration(input);
@@ -394,7 +522,8 @@ export function createAdminDashboardController(
       await loadPaymentProviderIntegrations();
     } catch (err) {
       if (onUnauthorized?.(err)) return;
-      error = err instanceof Error ? err.message : "Failed to save Cash App Pay";
+      error =
+        err instanceof Error ? err.message : "Failed to save Cash App Pay";
     }
   }
 
@@ -409,7 +538,10 @@ export function createAdminDashboardController(
       await loadPaymentProviderIntegrations();
     } catch (err) {
       if (onUnauthorized?.(err)) return;
-      error = err instanceof Error ? err.message : "Failed to disconnect payment integration";
+      error =
+        err instanceof Error
+          ? err.message
+          : "Failed to disconnect payment integration";
     }
   }
 
@@ -495,7 +627,11 @@ export function createAdminDashboardController(
     }
   }
 
-  async function connectApple(input: { username: string; appPassword: string; calendarUrl: string }) {
+  async function connectApple(input: {
+    username: string;
+    appPassword: string;
+    calendarUrl: string;
+  }) {
     error = "";
     try {
       const result = await connectAppleCalendarCredentials(input);
@@ -506,7 +642,8 @@ export function createAdminDashboardController(
       await loadStatus();
     } catch (err) {
       if (onUnauthorized?.(err)) return;
-      error = err instanceof Error ? err.message : "Failed to connect Apple Calendar";
+      error =
+        err instanceof Error ? err.message : "Failed to connect Apple Calendar";
     }
   }
 
@@ -585,16 +722,24 @@ export function createAdminDashboardController(
   }
 
   function newProgramDraft() {
+    const existingSlugs = new Set(programs.map((program) => program.slug));
+    let slug = "new-program";
+    let suffix = 2;
+    while (existingSlugs.has(slug)) {
+      slug = `new-program-${suffix}`;
+      suffix += 1;
+    }
     selectedProgramSlug = null;
     programDraft = {
-      slug: "",
-      label: "",
-      activityName: "",
-      pageTitle: "",
-      eyebrow: "",
-      heroTitleLine1: "",
+      slug,
+      label: "New Program",
+      activityName: "New Program",
+      pageTitle: "New Program",
+      eyebrow: "New Program",
+      heroTitleLine1: "Make it yours.",
       heroTitleLine2: "",
-      heroSubtitle: "",
+      heroSubtitle:
+        "Set up the page, save it as a draft, then click days to schedule sessions.",
       description: "",
       icon: "✨",
       eyebrowClass: "",
@@ -638,6 +783,66 @@ export function createAdminDashboardController(
     } catch (err) {
       if (onUnauthorized?.(err)) return;
       error = err instanceof Error ? err.message : "Failed to save program";
+    } finally {
+      programSaving = false;
+    }
+  }
+
+  async function moveProgram(slug: string, direction: "up" | "down") {
+    const current = [...programs].sort((a, b) => a.sortOrder - b.sortOrder);
+    const index = current.findIndex((program) => program.slug === slug);
+    const nextIndex = direction === "up" ? index - 1 : index + 1;
+    if (index < 0 || nextIndex < 0 || nextIndex >= current.length) return;
+
+    const reordered = [...current];
+    const [item] = reordered.splice(index, 1);
+    if (!item) return;
+    reordered.splice(nextIndex, 0, item);
+
+    const previousPrograms = programs;
+    const nextSortOrders = new Map(
+      reordered.map((program, orderIndex) => [program.slug, (orderIndex + 1) * 10]),
+    );
+    programs = programs.map((program) => ({
+      ...program,
+      sortOrder: nextSortOrders.get(program.slug) ?? program.sortOrder,
+    }));
+
+    programSaving = true;
+    error = "";
+    try {
+      for (const program of reordered) {
+        const sortOrder = nextSortOrders.get(program.slug) ?? program.sortOrder;
+        if (sortOrder === program.sortOrder) continue;
+        const result = await saveDashboardProgram({
+          slug: program.slug,
+          label: program.label,
+          activityName: program.activityName,
+          pageTitle: program.pageTitle,
+          eyebrow: program.eyebrow,
+          heroTitleLine1: program.heroTitleLines[0] ?? "",
+          heroTitleLine2: program.heroTitleLines[1] ?? "",
+          heroSubtitle: program.heroSubtitle,
+          description: program.description,
+          icon: program.icon,
+          eyebrowClass: program.eyebrowClass ?? "",
+          glowClass: program.glowClass ?? "",
+          formGlowClass: program.formGlowClass ?? "",
+          serviceStatusNote: program.serviceStatusNote ?? "",
+          enabled: program.enabled,
+          sortOrder,
+        });
+        if (!result.ok) {
+          error = result.error;
+          programs = previousPrograms;
+          return;
+        }
+      }
+      await loadPrograms();
+    } catch (err) {
+      programs = previousPrograms;
+      if (onUnauthorized?.(err)) return;
+      error = err instanceof Error ? err.message : "Failed to reorder programs";
     } finally {
       programSaving = false;
     }
@@ -737,7 +942,13 @@ export function createAdminDashboardController(
       currency: template.currency || "USD",
       paymentProvider:
         template.paymentProvider ?? paymentDefaults.provider ?? "venmo",
-      paymentHandle: template.paymentHandle ?? paymentDefaults.handle ?? "",
+      paymentHandle:
+        template.paymentHandle ??
+        paymentHandleFor(
+          paymentDefaults,
+          template.paymentProvider ?? paymentDefaults.provider,
+        ) ??
+        "",
       paymentNoteTemplate: template.paymentNoteTemplate ?? "",
       location: template.location ?? "",
       note: template.note ?? "",
@@ -1164,6 +1375,7 @@ export function createAdminDashboardController(
     selectProgram,
     newProgramDraft,
     saveProgram,
+    moveProgram,
     deleteProgram,
     createEvents,
     applyTemplate,

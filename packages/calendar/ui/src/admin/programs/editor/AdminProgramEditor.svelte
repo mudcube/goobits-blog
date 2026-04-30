@@ -67,6 +67,7 @@
 
 	let activeDays = $state<Record<string, ActiveDay>>({})
 	const adminMockCatalog = getAdminMockCatalog()
+	const createMode = $derived(slug === 'new')
 	const eventsSource = $derived(mockMode ? adminMockCatalog.dashboardEvents : dashboard.events)
 	const programsSource = $derived(mockMode ? adminMockCatalog.programs : dashboard.programs)
 	const editorHistory = createHistory<ProgramEditorSnapshot>({
@@ -91,7 +92,33 @@
 	})
 
 	$effect(() => {
-		if (!authed || initialized || programsSource.length === 0) return
+		if (!authed || initialized) return
+		if (createMode) {
+			if (!mockMode) dashboard.newProgramDraft()
+			else {
+				dashboard.programDraft = {
+					...dashboard.programDraft,
+					slug: 'new-program',
+					label: 'New Program',
+					activityName: 'New Program',
+					pageTitle: 'New Program',
+					eyebrow: 'New Program',
+					heroTitleLine1: 'Make it yours.',
+					heroTitleLine2: '',
+					heroSubtitle: 'Set up the page, save it as a draft, then click days to schedule sessions.',
+					description: '',
+					icon: '✨',
+					enabled: false,
+					sortOrder: programsSource.length + 10,
+					serviceStatusNote: 'Draft'
+				}
+			}
+			settingsOpen = true
+			initialized = true
+			resetEditorHistory()
+			return
+		}
+		if (programsSource.length === 0) return
 		const found = programsSource.find((program: { slug: string }) => program.slug === slug)
 		if (!found) {
 			void goto(eventsHref)
@@ -493,6 +520,7 @@
 			flash('Mock mode: program save skipped')
 			return
 		}
+		const savedSlug = dashboard.programDraft.slug.trim()
 		await dashboard.saveProgram()
 		if (dashboard.error) {
 			flash(dashboard.error, true)
@@ -500,6 +528,9 @@
 		}
 		lastSavedSignature = programSignature()
 		flash('Program saved')
+		if (createMode && savedSlug) {
+			void goto(`${eventsHref.replace(/\/events\/?$/, `/events/program/${savedSlug}/`)}`)
+		}
 	}
 
 	async function deleteProgram() {
@@ -604,7 +635,7 @@
 	})
 
 	$effect(() => {
-		if (!authed || !initialized || mockMode) return
+		if (!authed || !initialized || mockMode || createMode) return
 		const signature = programSignature()
 		if (!autosaveReady) {
 			lastSavedSignature = signature
@@ -710,6 +741,21 @@
 						</div>
 					</section>
 
+					<div class="program-editor__schedule-head">
+						<h4 class="program-editor__schedule-title">Sessions</h4>
+						<button
+							type="button"
+							class="program-editor__new-session"
+							onclick={(event) => {
+								const target = new Date()
+								target.setHours(0, 0, 0, 0)
+								if (isPast(target)) target.setDate(target.getDate() + 1)
+								openDay(target, event.currentTarget)
+							}}
+						>
+							+ New session
+						</button>
+					</div>
 					<AdminCalendar
 						{currentMonth}
 						selectedDateIso={selectedDayDate ? isoDay(selectedDayDate) : null}
@@ -722,6 +768,7 @@
 						eventCount={(date) => activeDays[isoDay(date)]?.count || 0}
 						eventTone={() => slug}
 						compact={true}
+						interactive="all-future"
 					/>
 				</div>
 
@@ -1031,6 +1078,44 @@
 		white-space: pre-wrap;
 	}
 
+
+	.program-editor__schedule-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		width: 100%;
+		margin: 1.4rem 0 0.4rem;
+		padding: 0 0.1rem;
+	}
+
+	.program-editor__schedule-title {
+		margin: 0;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--text-2);
+	}
+
+	.program-editor__new-session {
+		appearance: none;
+		border: 1px solid color-mix(in srgb, var(--blue) 38%, transparent);
+		background: color-mix(in srgb, var(--blue) 14%, var(--bg) 86%);
+		color: color-mix(in srgb, var(--blue) 78%, var(--text) 22%);
+		border-radius: 999px;
+		padding: 0.36rem 0.85rem;
+		font: inherit;
+		font-size: 0.78rem;
+		font-weight: 650;
+		cursor: pointer;
+		transition: background 140ms, box-shadow 140ms;
+	}
+
+	.program-editor__new-session:hover {
+		background: color-mix(in srgb, var(--blue) 22%, var(--bg) 78%);
+		box-shadow: 0 2px 10px color-mix(in srgb, var(--blue) 22%, transparent);
+	}
 
 	.program-editor__hint {
 		margin-top: 1rem;

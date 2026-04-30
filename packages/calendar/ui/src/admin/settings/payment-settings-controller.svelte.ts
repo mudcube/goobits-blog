@@ -1,15 +1,27 @@
 import type { AdminPaymentIntegrationsResponse } from "../../api/admin";
 
 export type PaymentMethodKey = "venmo" | "paypal" | "cashapp";
-export type PaymentMethodState = Record<
-  PaymentMethodKey,
-  { enabled: boolean; handle: string }
->;
+export const PAYMENT_METHOD_KEYS: PaymentMethodKey[] = [
+  "venmo",
+  "paypal",
+  "cashapp",
+];
 
 type PaymentIntegrations = AdminPaymentIntegrationsResponse["payments"];
+type PaymentHandles = Record<PaymentMethodKey, string>;
+type PaymentHandlesInput = Partial<
+  Record<PaymentMethodKey, string | null | undefined>
+>;
+
+type PaymentDefaultsShape = {
+  provider: string;
+  handle: string;
+  primaryProvider?: string;
+  handles?: PaymentHandlesInput;
+};
 
 type PaymentSettingsDashboard = {
-  paymentDefaults: { provider: string; handle: string };
+  paymentDefaults: PaymentDefaultsShape;
   paymentIntegrations: PaymentIntegrations;
   error: string;
   loadStatus: () => Promise<void>;
@@ -25,49 +37,56 @@ type PaymentSettingsDashboard = {
     accessToken: string;
     environment: "sandbox" | "live";
   }) => Promise<void>;
-  disconnectPaymentIntegration: (provider: "paypal" | "square") => Promise<void>;
+  disconnectPaymentIntegration: (
+    provider: "paypal" | "square",
+  ) => Promise<void>;
 };
 
 type PaymentSettingsOptions = {
   dashboard: () => PaymentSettingsDashboard;
   mockMode: () => boolean;
-  mockDefaults: () => { provider: string | null; handle: string | null };
+  mockDefaults: () => {
+    provider: string | null;
+    handle: string | null;
+    primaryProvider?: string | null;
+    handles?: PaymentHandlesInput;
+  };
   showToast: (message: string, isError?: boolean) => void;
 };
 
-export function blankPaymentMethods(): PaymentMethodState {
-  return {
-    venmo: { enabled: false, handle: "" },
-    paypal: { enabled: false, handle: "" },
-    cashapp: { enabled: false, handle: "" },
-  };
+function blankHandles(): PaymentHandles {
+  return { venmo: "", paypal: "", cashapp: "" };
 }
 
-function paymentMethodsClone(methods: PaymentMethodState) {
-  return {
-    venmo: { ...methods.venmo },
-    paypal: { ...methods.paypal },
-    cashapp: { ...methods.cashapp },
-  };
+function normalizeMethod(
+  value: string | null | undefined,
+): PaymentMethodKey | "" {
+  if (value === "venmo" || value === "paypal" || value === "cashapp")
+    return value;
+  return "";
 }
 
-function paymentSnapshot(methods: PaymentMethodState) {
-  return JSON.stringify(methods);
-}
-
-export function hydratePaymentMethods(
-  provider: string | null | undefined,
-  handle: string | null | undefined,
-) {
-  const next = blankPaymentMethods();
-  const key = (provider || "").toLowerCase();
-  if (key === "venmo" || key === "paypal" || key === "cashapp") {
-    next[key] = {
-      enabled: true,
-      handle: (handle || "").trim(),
-    };
+function readHandles(
+  input: PaymentHandlesInput | undefined,
+  fallbackProvider: string,
+  fallbackHandle: string,
+): PaymentHandles {
+  const result = blankHandles();
+  if (input) {
+    for (const key of PAYMENT_METHOD_KEYS) {
+      const value = input[key];
+      if (typeof value === "string") result[key] = value;
+    }
   }
-  return next;
+  const provider = normalizeMethod(fallbackProvider);
+  if (provider && !result[provider] && fallbackHandle) {
+    result[provider] = fallbackHandle;
+  }
+  return result;
+}
+
+function snapshot(handles: PaymentHandles, primary: PaymentMethodKey | "") {
+  return JSON.stringify({ handles, primary });
 }
 
 export function paymentRailForMethod(method: PaymentMethodKey) {
@@ -78,10 +97,14 @@ export function paymentMethodUsesPayPalCheckout(method: PaymentMethodKey) {
   return paymentRailForMethod(method) === "paypal_checkout";
 }
 
-export function createPaymentSettingsController(options: PaymentSettingsOptions) {
+export function createPaymentSettingsController(
+  options: PaymentSettingsOptions,
+) {
   const { showToast } = options;
-  let paymentMethods = $state<PaymentMethodState>(blankPaymentMethods());
-  let initialPaymentMethods = $state<PaymentMethodState>(blankPaymentMethods());
+  let handles = $state<PaymentHandles>(blankHandles());
+  let primary = $state<PaymentMethodKey | "">("");
+  let editing = $state<PaymentMethodKey | null>(null);
+  let initialSnapshot = $state(snapshot(blankHandles(), ""));
   let autosaveTimer: ReturnType<typeof setTimeout> | null = null;
   let suspendAutosave = $state(true);
   let payPalFormExpanded = $state(false);
@@ -99,38 +122,89 @@ export function createPaymentSettingsController(options: PaymentSettingsOptions)
     if (autosaveTimer) clearTimeout(autosaveTimer);
   }
 
-  function setPaymentMethods(next: PaymentMethodState) {
-    paymentMethods = next;
+  function isConfigured(method: PaymentMethodKey) {
+    return handles[method].trim().length > 0;
+  }
+
+  function configuredMethods(): PaymentMethodKey[] {
+    return PAYMENT_METHOD_KEYS.filter((method) => isConfigured(method));
+  }
+
+  function pickFallbackPrimary(): PaymentMethodKey | "" {
+    return configuredMethods()[0] ?? "";
+  }
+
+  function ensurePrimary() {
+    if (primary && isConfigured(primary)) return;
+    primary = pickFallbackPrimary();
   }
 
   async function load() {
     const dashboard = options.dashboard();
     if (options.mockMode()) {
-      const mockDefaults = options.mockDefaults();
-      const next = hydratePaymentMethods(mockDefaults.provider, mockDefaults.handle);
-      paymentMethods = next;
-      initialPaymentMethods = paymentMethodsClone(next);
+      const mock = options.mockDefaults();
+      const nextHandles = readHandles(
+        mock.handles,
+        (mock.primaryProvider ?? mock.provider ?? "") || "",
+        (mock.handle ?? "") || "",
+      );
+      handles = nextHandles;
+      const explicit = normalizeMethod(mock.primaryProvider ?? mock.provider);
+      primary =
+        explicit && nextHandles[explicit].trim()
+          ? explicit
+          : pickFallbackPrimary();
+      editing = primary || null;
+      initialSnapshot = snapshot(handles, primary);
       suspendAutosave = false;
       return;
     }
     await dashboard.loadStatus();
-    const next = hydratePaymentMethods(
-      dashboard.paymentDefaults.provider,
-      dashboard.paymentDefaults.handle,
+    const defaults = dashboard.paymentDefaults;
+    const nextHandles = readHandles(
+      defaults.handles,
+      defaults.primaryProvider ?? defaults.provider ?? "",
+      defaults.handle ?? "",
     );
-    paymentMethods = next;
-    initialPaymentMethods = paymentMethodsClone(next);
+    handles = nextHandles;
+    const explicit = normalizeMethod(
+      defaults.primaryProvider ?? defaults.provider,
+    );
+    primary =
+      explicit && nextHandles[explicit].trim()
+        ? explicit
+        : pickFallbackPrimary();
+    editing = primary || null;
+    initialSnapshot = snapshot(handles, primary);
     suspendAutosave = false;
   }
 
-  function paymentBadge(method: PaymentMethodKey): {
-    label: string | null;
-    tone: "on" | "warn" | null;
-  } {
-    const payment = paymentMethods[method];
-    if (!payment.enabled) return { label: null, tone: null };
-    if (!payment.handle.trim()) return { label: "Add handle", tone: "warn" };
-    return { label: "Default", tone: "on" };
+  function startEditing(method: PaymentMethodKey) {
+    editing = method;
+  }
+
+  function updateHandle(method: PaymentMethodKey, value: string) {
+    handles = { ...handles, [method]: value };
+    if (!isConfigured(method) && primary === method) {
+      ensurePrimary();
+    }
+    if (!primary && isConfigured(method)) {
+      primary = method;
+    }
+  }
+
+  function removeHandle(method: PaymentMethodKey) {
+    handles = { ...handles, [method]: "" };
+    if (primary === method) ensurePrimary();
+    if (editing === method) editing = primary || null;
+  }
+
+  function makePrimary(method: PaymentMethodKey) {
+    if (!isConfigured(method)) {
+      showToast("Add a handle before marking as primary", true);
+      return;
+    }
+    primary = method;
   }
 
   function integrationSourceLabel(source: "stored" | "env" | null | undefined) {
@@ -142,15 +216,18 @@ export function createPaymentSettingsController(options: PaymentSettingsOptions)
   function openPayPalSetup() {
     const dashboard = options.dashboard();
     payPalClientId = dashboard.paymentIntegrations.paypal.clientId || "";
-    payPalEnvironment = dashboard.paymentIntegrations.paypal.environment || "sandbox";
+    payPalEnvironment =
+      dashboard.paymentIntegrations.paypal.environment || "sandbox";
     payPalClientSecret = "";
     payPalFormExpanded = true;
   }
 
   function openCashAppPaySetup() {
     const dashboard = options.dashboard();
-    cashAppPayApplicationId = dashboard.paymentIntegrations.square.applicationId || "";
-    cashAppPayLocationId = dashboard.paymentIntegrations.square.locationId || "";
+    cashAppPayApplicationId =
+      dashboard.paymentIntegrations.square.applicationId || "";
+    cashAppPayLocationId =
+      dashboard.paymentIntegrations.square.locationId || "";
     cashAppPayEnvironment =
       dashboard.paymentIntegrations.square.environment === "production"
         ? "live"
@@ -192,7 +269,10 @@ export function createPaymentSettingsController(options: PaymentSettingsOptions)
       !cashAppPayLocationId.trim() ||
       !cashAppPayAccessToken.trim()
     ) {
-      showToast("Cash App Pay app ID, location ID, and access token are required", true);
+      showToast(
+        "Cash App Pay app ID, location ID, and access token are required",
+        true,
+      );
       return;
     }
     paymentIntegrationBusy = true;
@@ -234,74 +314,62 @@ export function createPaymentSettingsController(options: PaymentSettingsOptions)
     }
   }
 
-  function selectablePaymentMethods(method: PaymentMethodKey) {
-    const current = paymentMethods[method];
-    const next = blankPaymentMethods();
-    if (!current.enabled) {
-      next[method] = {
-        enabled: true,
-        handle: current.handle,
-      };
-    }
-    return next;
-  }
-
-  function togglePaymentMethod(method: PaymentMethodKey) {
-    paymentMethods = selectablePaymentMethods(method);
-  }
-
-  function updatePaymentHandle(method: PaymentMethodKey, value: string) {
-    paymentMethods = {
-      ...paymentMethods,
-      [method]: {
-        ...paymentMethods[method],
-        handle: value,
-      },
-    };
-  }
-
-  async function persistPayments(expectedSnapshot: string) {
-    if (paymentSnapshot(paymentMethods) !== expectedSnapshot) return;
-    const enabledProviders = (["venmo", "paypal", "cashapp"] as const)
-      .filter((provider) => paymentMethods[provider].enabled);
-    const primary = enabledProviders[0] || "";
-    const primaryHandle = primary ? paymentMethods[primary].handle.trim() : "";
-    if (primary && !primaryHandle) return;
-
+  async function persistPayments(expected: string) {
+    if (snapshot(handles, primary) !== expected) return;
     if (options.mockMode()) {
       showToast("Saved");
-      initialPaymentMethods = paymentMethodsClone(paymentMethods);
+      initialSnapshot = expected;
       return;
     }
     const dashboard = options.dashboard();
+    const trimmed: PaymentHandles = {
+      venmo: handles.venmo.trim(),
+      paypal: handles.paypal.trim(),
+      cashapp: handles.cashapp.trim(),
+    };
+    const effectivePrimary = primary && trimmed[primary] ? primary : "";
     dashboard.paymentDefaults = {
-      provider: primary || "",
-      handle: primaryHandle,
+      ...dashboard.paymentDefaults,
+      provider: effectivePrimary,
+      handle: effectivePrimary ? trimmed[effectivePrimary] : "",
+      primaryProvider: effectivePrimary,
+      handles: { ...trimmed },
     };
     await dashboard.savePaymentDefaults();
     if (dashboard.error) {
       showToast(dashboard.error, true);
       return;
     }
-    initialPaymentMethods = paymentMethodsClone(paymentMethods);
+    initialSnapshot = expected;
     showToast("Saved");
   }
 
   $effect(() => {
     if (suspendAutosave) return;
-    if (paymentSnapshot(paymentMethods) === paymentSnapshot(initialPaymentMethods)) return;
+    const current = snapshot(handles, primary);
+    if (current === initialSnapshot) return;
     if (autosaveTimer) clearTimeout(autosaveTimer);
-    const expectedSnapshot = paymentSnapshot(paymentMethods);
     autosaveTimer = setTimeout(() => {
-      void persistPayments(expectedSnapshot);
-    }, 450);
+      void persistPayments(current);
+    }, 500);
   });
 
   return {
-    get paymentMethods() {
-      return paymentMethods;
+    get handles() {
+      return handles;
     },
-    setPaymentMethods,
+    get primary() {
+      return primary;
+    },
+    get editing() {
+      return editing;
+    },
+    isConfigured,
+    configuredMethods,
+    startEditing,
+    updateHandle,
+    removeHandle,
+    makePrimary,
     get payPalFormExpanded() {
       return payPalFormExpanded;
     },
@@ -361,14 +429,11 @@ export function createPaymentSettingsController(options: PaymentSettingsOptions)
     },
     load,
     dispose,
-    paymentBadge,
     integrationSourceLabel,
     openPayPalSetup,
     openCashAppPaySetup,
     savePayPalSetup,
     saveCashAppPaySetup,
     disconnectCheckout,
-    togglePaymentMethod,
-    updatePaymentHandle,
   };
 }

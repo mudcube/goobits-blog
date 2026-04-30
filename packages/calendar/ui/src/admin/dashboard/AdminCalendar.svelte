@@ -23,7 +23,8 @@
 		isActive,
 		eventCount = () => 0,
 		eventTone = () => '',
-		compact = false
+		compact = false,
+		interactive = 'active-only'
 	} = $props<{
 		currentMonth: Date
 		selectedDateIso?: string | null
@@ -39,6 +40,7 @@
 		eventCount?: (date: Date) => number
 		eventTone?: (date: Date) => string
 		compact?: boolean
+		interactive?: 'active-only' | 'all-future'
 	}>()
 
 	function dotColorForTone(tone: string) {
@@ -99,6 +101,7 @@
 		prevMonth={onPrev}
 		nextMonth={onNext}
 		onSelect={handleSelect}
+		{interactive}
 	/>
 	{#if calendar.days.some(d => d.isActive && !d.isPast)}
 		<div class="ac__legend">

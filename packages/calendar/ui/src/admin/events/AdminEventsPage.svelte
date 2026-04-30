@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
+	import { ArrowDown, ArrowUp, Plus } from '@lucide/svelte'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
@@ -17,9 +18,19 @@
 	const authed = $derived(!!data.user)
 	const mockMode = $derived(isAdminMockMode($page.url))
 	const adminMockCatalog = getAdminMockCatalog()
-	const programsSource = $derived((mockMode ? adminMockCatalog.programs : dashboard.programs))
+	let mockProgramOrder = $state<string[]>([])
+	const rawProgramsSource = $derived(mockMode ? adminMockCatalog.programs : dashboard.programs)
+	const programsSource = $derived(
+		rawProgramsSource.toSorted((a, b) => {
+			if (mockMode && mockProgramOrder.length > 0) {
+				return mockProgramOrder.indexOf(a.slug) - mockProgramOrder.indexOf(b.slug)
+			}
+			return a.sortOrder - b.sortOrder
+		})
+	)
 	const eventsSource = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
 	const recentEventsSource = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
+	let movingProgramSlug = $state<string | null>(null)
 
 	type EventCardExtra = {
 		startsAt: string
@@ -35,6 +46,13 @@
 		if (!authed || mockMode) return
 		dashboard.loadPrograms()
 		dashboard.loadEvents()
+	})
+
+	$effect(() => {
+		if (!mockMode || mockProgramOrder.length > 0) return
+		mockProgramOrder = adminMockCatalog.programs
+			.toSorted((a, b) => a.sortOrder - b.sortOrder)
+			.map((program) => program.slug)
 	})
 
 	function dayLabel(iso: string) {
@@ -75,6 +93,27 @@
 	function eventCardExtra(item: { extra?: unknown }) {
 		return item.extra as EventCardExtra
 	}
+
+	async function moveProgram(slug: string, direction: 'up' | 'down') {
+		if (movingProgramSlug) return
+		if (mockMode) {
+			const current = mockProgramOrder.length > 0 ? [...mockProgramOrder] : programsSource.map((program) => program.slug)
+			const index = current.indexOf(slug)
+			const nextIndex = direction === 'up' ? index - 1 : index + 1
+			if (index < 0 || nextIndex < 0 || nextIndex >= current.length) return
+			const [item] = current.splice(index, 1)
+			if (!item) return
+			current.splice(nextIndex, 0, item)
+			mockProgramOrder = current
+			return
+		}
+		movingProgramSlug = slug
+		try {
+			await dashboard.moveProgram(slug, direction)
+		} finally {
+			movingProgramSlug = null
+		}
+	}
 </script>
 
 {#if authed}
@@ -85,19 +124,67 @@
 			subtitle="Manage program pages & upcoming sessions."
 		/>
 
-		<h4>ACTIVITY PAGES ({programsSource.length})</h4>
-		<AdminMetaCards
-			items={programsSource.map((program) => ({
-				id: String(program.slug),
-				label: program.label,
-				detail: program.enabled ? 'Live' : 'Draft',
-				dotColor: getActivityColor(program.label, program.slug),
-				dotIcon: getActivityIcon(program.label, program.slug),
-				onClick: () => goto(hrefWithMock(withAdminRoute(`events/program/${program.slug}/`))),
-				ariaLabel: `Open ${program.label}`,
-			}))}
-			emptyText="No activity pages yet."
-		/>
+		<div class="social-events__section-head">
+			<h4>PROGRAMS ({programsSource.length})</h4>
+			<button
+				type="button"
+				class="social-events__new-program"
+				onclick={() => goto(hrefWithMock(withAdminRoute('events/program/new/')))}
+			>
+				<Plus size={14} strokeWidth={2.2} aria-hidden="true" />
+				<span>New program</span>
+			</button>
+		</div>
+		{#if programsSource.length === 0}
+			<div class="social-events__empty calendar-ui-card">No activity pages yet.</div>
+		{:else}
+			<div class="social-events__programs">
+				{#each programsSource as program, i (program.slug)}
+					{@const ActivityIcon = getActivityIcon(program.label, program.slug)}
+					{#if i > 0}<div class="social-events__program-divider"></div>{/if}
+					<div class="social-events__program">
+						<button
+							type="button"
+							class="social-events__program-main"
+							onclick={() => goto(hrefWithMock(withAdminRoute(`events/program/${program.slug}/`)))}
+							aria-label={`Open ${program.label}`}
+						>
+							<div
+								class="social-events__program-icon"
+								style={`--activity-color:${getActivityColor(program.label, program.slug)};`}
+								aria-hidden="true"
+							>
+								<ActivityIcon size={14} strokeWidth={2.2} />
+							</div>
+							<div class="social-events__program-copy">
+								<div class="social-events__program-label">{program.label}</div>
+								<div class="social-events__program-detail">{program.enabled ? 'Live' : 'Draft'}</div>
+							</div>
+						</button>
+						<div class="social-events__program-sort" aria-label={`Sort ${program.label}`}>
+							<button
+								type="button"
+								class="social-events__sort-button"
+								aria-label={`Move ${program.label} up`}
+								disabled={i === 0 || movingProgramSlug !== null}
+								onclick={() => void moveProgram(program.slug, 'up')}
+							>
+								<ArrowUp size={14} strokeWidth={2.2} aria-hidden="true" />
+							</button>
+							<button
+								type="button"
+								class="social-events__sort-button"
+								aria-label={`Move ${program.label} down`}
+								disabled={i === programsSource.length - 1 || movingProgramSlug !== null}
+								onclick={() => void moveProgram(program.slug, 'down')}
+							>
+								<ArrowDown size={14} strokeWidth={2.2} aria-hidden="true" />
+							</button>
+						</div>
+					</div>
+				{/each}
+			</div>
+		{/if}
 
 		<h4>UPCOMING</h4>
 		{#if !mockMode && dashboard.eventsLoading}
@@ -157,6 +244,140 @@
 		gap: 1rem;
 	}
 
+	.social-events__section-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.social-events__section-head h4 {
+		margin: 0;
+	}
+
+	.social-events__new-program {
+		min-height: 2rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		border: 1px solid var(--admin-card-border);
+		border-radius: 0.55rem;
+		background: var(--admin-card-bg);
+		color: var(--text);
+		padding: 0 0.65rem;
+		font: inherit;
+		font-size: 0.74rem;
+		font-weight: 650;
+		cursor: pointer;
+	}
+
+	.social-events__new-program:hover {
+		border-color: color-mix(in srgb, var(--admin-accent) 42%, var(--admin-card-border));
+	}
+
+	.social-events__programs {
+		border: 1px solid var(--admin-card-border);
+		border-radius: 0.875rem;
+		background: var(--admin-card-bg);
+		overflow: hidden;
+	}
+
+	.social-events__program-divider {
+		height: 1px;
+		background: color-mix(in srgb, var(--admin-card-border) 60%, transparent);
+	}
+
+	.social-events__program {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: stretch;
+		min-height: 4rem;
+	}
+
+	.social-events__program-main {
+		display: flex;
+		align-items: center;
+		gap: 0.875rem;
+		min-width: 0;
+		border: none;
+		background: transparent;
+		color: inherit;
+		text-align: left;
+		font: inherit;
+		padding: 0.75rem 0.875rem;
+		cursor: pointer;
+	}
+
+	.social-events__program-main:hover {
+		background: color-mix(in srgb, var(--admin-accent) 6%, transparent);
+	}
+
+	.social-events__program-icon {
+		--activity-color: var(--admin-accent);
+		width: 2rem;
+		height: 2rem;
+		border-radius: 999px;
+		display: grid;
+		place-items: center;
+		flex-shrink: 0;
+		background: color-mix(in srgb, var(--activity-color) 14%, transparent);
+		color: color-mix(in srgb, var(--activity-color) 88%, var(--text) 12%);
+		border: 1px solid color-mix(in srgb, var(--activity-color) 28%, transparent);
+	}
+
+	.social-events__program-copy {
+		min-width: 0;
+	}
+
+	.social-events__program-label {
+		font-size: 0.875rem;
+		font-weight: 650;
+		line-height: 1.3;
+	}
+
+	.social-events__program-detail {
+		margin-top: 0.1rem;
+		font-size: 0.6875rem;
+		line-height: 1.35;
+		color: color-mix(in srgb, var(--text) 42%, transparent);
+	}
+
+	.social-events__program-sort {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0 0.75rem 0 0.25rem;
+	}
+
+	.social-events__sort-button {
+		width: 1.9rem;
+		height: 1.9rem;
+		display: grid;
+		place-items: center;
+		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+		border-radius: 0.5rem;
+		background: color-mix(in srgb, var(--bg) 82%, var(--text) 18%);
+		color: color-mix(in srgb, var(--text) 68%, transparent);
+		cursor: pointer;
+		padding: 0;
+	}
+
+	.social-events__sort-button:hover:not(:disabled) {
+		color: var(--text);
+		border-color: color-mix(in srgb, var(--admin-accent) 42%, var(--admin-card-border));
+	}
+
+	.social-events__sort-button:disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
+	}
+
+	.social-events__empty {
+		padding: 0.8rem 0.95rem;
+		font-size: 0.8rem;
+		color: color-mix(in srgb, var(--text) 52%, transparent);
+	}
+
 	.social-events__time {
 		font-size: 0.78rem;
 		font-weight: 600;
@@ -193,6 +414,17 @@
 		font-size: 0.68rem;
 		font-weight: 600;
 		color: color-mix(in srgb, var(--text) 45%, transparent);
+	}
+
+	@media (max-width: 720px) {
+		.social-events__program {
+			grid-template-columns: 1fr;
+		}
+
+		.social-events__program-sort {
+			justify-content: flex-end;
+			padding: 0 0.75rem 0.7rem;
+		}
 	}
 
 </style>

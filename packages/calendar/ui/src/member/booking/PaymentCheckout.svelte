@@ -84,6 +84,10 @@
 	let cashApp: SquareCashAppPay | null = null
 
 	const isPaid = $derived(!!event && event.costCents > 0)
+	const eventPaymentProvider = $derived((event?.paymentProvider || '').toLowerCase())
+	const showPayPalCheckout = $derived(eventPaymentProvider === 'paypal')
+	const showVenmoCheckout = $derived(eventPaymentProvider === 'venmo')
+	const showCashAppCheckout = $derived(eventPaymentProvider === 'cashapp')
 	const amountLabel = $derived(
 		event
 			? new Intl.NumberFormat(undefined, {
@@ -117,7 +121,7 @@
 	}
 
 	async function initPayPal(nextConfig: CalendarPaymentConfigResponse['payments']) {
-		if (!event || !nextConfig.paypal.enabled || !nextConfig.paypal.clientId) return
+		if (!event || (!showPayPalCheckout && !showVenmoCheckout) || !nextConfig.paypal.enabled || !nextConfig.paypal.clientId) return
 		const currency = encodeURIComponent(event.currency || 'USD')
 		const clientId = encodeURIComponent(nextConfig.paypal.clientId)
 		await loadScript(`https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}&enable-funding=venmo`)
@@ -130,6 +134,8 @@
 			{ selector: '#calendar-venmo-button', fundingSource: paypal.FUNDING.VENMO }
 		]
 		for (const target of targets) {
+			if (target.fundingSource === paypal.FUNDING.PAYPAL && !showPayPalCheckout) continue
+			if (target.fundingSource === paypal.FUNDING.VENMO && !showVenmoCheckout) continue
 			const buttons = paypal.Buttons({
 				fundingSource: target.fundingSource,
 				style: {
@@ -168,7 +174,7 @@
 	}
 
 	async function initCashApp(nextConfig: CalendarPaymentConfigResponse['payments']) {
-		if (!event || !nextConfig.square.enabled || !nextConfig.square.applicationId || !nextConfig.square.locationId) return
+		if (!event || !showCashAppCheckout || !nextConfig.square.enabled || !nextConfig.square.applicationId || !nextConfig.square.locationId) return
 		const sdkUrl =
 			nextConfig.square.environment === 'production'
 				? 'https://web.squarecdn.com/v1/square.js'
@@ -243,11 +249,11 @@
 			<span>{event.currency || 'USD'}</span>
 		</div>
 
-		<div class="payment-checkout__buttons">
-			<div id="calendar-paypal-button" class:payment-checkout__hidden={!config?.paypal.enabled}></div>
-			<div id="calendar-venmo-button" class:payment-checkout__hidden={!config?.paypal.enabled}></div>
-			<div id="calendar-cashapp-button" class:payment-checkout__hidden={!config?.square.enabled}></div>
-		</div>
+			<div class="payment-checkout__buttons">
+				<div id="calendar-paypal-button" class:payment-checkout__hidden={!config?.paypal.enabled || !showPayPalCheckout}></div>
+				<div id="calendar-venmo-button" class:payment-checkout__hidden={!config?.paypal.enabled || !showVenmoCheckout}></div>
+				<div id="calendar-cashapp-button" class:payment-checkout__hidden={!config?.square.enabled || !showCashAppCheckout}></div>
+			</div>
 
 		{#if !paypalReady && !cashAppReady && event.payUrl}
 			<a class="payment-checkout__fallback" href={event.payUrl} target="_blank" rel="noopener">Open payment link</a>

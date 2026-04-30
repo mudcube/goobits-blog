@@ -13,7 +13,8 @@
 		onSelect,
 		variant = 'compact',
 		testId = 'calendar-grid',
-		onKeydown
+		onKeydown,
+		interactive = 'active-only'
 	}: {
 		days: CalendarDay[]
 		weekdays: string[]
@@ -25,6 +26,7 @@
 		variant?: 'compact' | 'member'
 		testId?: string
 		onKeydown?: (event: KeyboardEvent) => void
+		interactive?: 'active-only' | 'all-future'
 	} = $props()
 	let isHydrated = $state(false)
 
@@ -40,7 +42,8 @@
 	}
 
 	function handleClick(day: CalendarDay, event: MouseEvent) {
-		if (!day.isActive || day.isPast) return
+		if (day.isPast) return
+		if (interactive === 'active-only' && !day.isActive) return
 		onSelect?.(day, event.currentTarget as HTMLButtonElement)
 	}
 
@@ -74,7 +77,8 @@
 		if (!day.inMonth) classes.push('cg__cell--other', 'member-calendar__day--adjacent')
 		if (day.isPast) classes.push('cg__cell--past', 'member-calendar__day--past')
 		if (day.isToday) classes.push('cg__cell--today', 'member-calendar__day--today')
-		if (day.isActive && !day.isPast) classes.push('cg__cell--active', 'member-calendar__day--available')
+		const treatAsClickable = !day.isPast && (day.isActive || interactive === 'all-future')
+		if (treatAsClickable) classes.push('cg__cell--active', 'member-calendar__day--available')
 		if (isSelected(day)) classes.push('cg__cell--selected', 'member-calendar__day--selected')
 		return classes.join(' ')
 	}
@@ -101,7 +105,7 @@
 				<button
 					type="button"
 					class={cellClass(day)}
-					disabled={!day.isActive || day.isPast}
+					disabled={day.isPast || (interactive === 'active-only' && !day.isActive)}
 					aria-label={day.ariaLabel ?? day.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
 					onclick={(e) => handleClick(day, e)}
 				>

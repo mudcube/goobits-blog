@@ -10,7 +10,7 @@ export type AdminBreadcrumbItem = {
 export type AdminRouteActionId =
 	| 'view-program'
 	| 'program-settings'
-	| 'new-event'
+	| 'new-program'
 	| 'back-to-events'
 	| 'crew-invite'
 	| 'view-calendar'
@@ -110,7 +110,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 			currentSection: 'events',
 			title: 'Events',
 			breadcrumbs: [...baseCrumbs, { label: 'Events' }],
-			actions: ['new-event']
+			actions: ['new-program']
 		}
 	}
 
@@ -131,6 +131,19 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 	const eventProgramMatch = normalized.match(new RegExp(`^${adminBasePattern}/events/program/([^/]+)$`))
 	if (eventProgramMatch) {
 		const programSlug = eventProgramMatch[1]!
+		if (programSlug === 'new') {
+			return {
+				kind: 'event-program',
+				currentSection: 'events',
+				title: 'Events',
+				breadcrumbs: [
+					...baseCrumbs,
+					{ label: 'Events', href: hrefWithMock(`${adminBase}/events/`) },
+					{ label: 'New Program' }
+				],
+				actions: ['back-to-events']
+			}
+		}
 		return {
 			kind: 'event-program',
 			currentSection: 'events',

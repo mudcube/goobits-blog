@@ -350,6 +350,24 @@ export const mockPrograms: AdminProgramsResponse['programs'] = [
 		eyebrowClass: 'eyebrow-movie',
 		glowClass: 'glow-movie',
 		formGlowClass: 'form-glow-movie'
+	},
+	{
+		slug: 'pottery',
+		href: '/schedule/pottery',
+		label: 'Pottery Studio',
+		icon: '🏺',
+		eyebrow: 'Pottery Studio',
+		heroTitleLines: ['Make a mess.', 'Make a mug.'],
+		heroSubtitle: 'Drop-in pottery sessions on the wheel.',
+		description: 'Drop-in pottery sessions on the wheel.',
+		enabled: false,
+		sortOrder: 5,
+		pageTitle: 'Pottery Studio',
+		activityName: 'Pottery',
+		serviceStatusNote: 'Coming soon',
+		eyebrowClass: 'eyebrow-pottery',
+		glowClass: 'glow-pottery',
+		formGlowClass: 'form-glow-pottery'
 	}
 ]
 

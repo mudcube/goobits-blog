@@ -18,11 +18,11 @@ export { default as AdminCrewMemberCard } from "./members/AdminCrewMemberCard.sv
 export { default as AdminCrewMemberPage } from "./members/AdminCrewMemberPage.svelte";
 export { default as AdminMembersPanel } from "./members/AdminMembersPanel.svelte";
 export { default as AdminProgramPage } from "./programs/AdminProgramPage.svelte";
+export { default as AdminNewProgramPage } from "./programs/AdminNewProgramPage.svelte";
 export { default as AdminProgramEditor } from "./programs/editor/AdminProgramEditor.svelte";
 export { default as AdminSettingsPage } from "./settings/AdminSettingsPage.svelte";
 export { default as AdminActionButton } from "./shared/AdminActionButton.svelte";
 export { ChevronRowCard } from "../shared";
 export { default as AdminMetaCards } from "./shared/AdminMetaCards.svelte";
 export { default as AdminPageHero } from "./shared/AdminPageHero.svelte";
-export { default as AdminWysiwygWorkspace } from "./events/editor/AdminWysiwygWorkspace.svelte";
 export * from "./shared/admin";
