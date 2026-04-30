@@ -50,7 +50,7 @@
     display: grid;
     place-items: center;
     gap: 0.45rem;
-    padding: 1.05rem 0.9rem 0.9rem;
+    padding: 1.85rem 0.9rem 0.9rem;
     border: 1.5px solid var(--admin-card-border);
     border-radius: 1rem;
     background: var(--admin-card-bg);

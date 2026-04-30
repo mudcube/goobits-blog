@@ -554,7 +554,8 @@
 		if (
 			popOpen &&
 			!target.closest('.program-editor__popover') &&
-			!target.closest('.admin-calendar__day')
+			!target.closest('.cg__cell') &&
+			!target.closest('.program-editor__new-session')
 		) {
 			closePop()
 		}

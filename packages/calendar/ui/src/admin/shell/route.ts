@@ -23,7 +23,6 @@ export type AdminRouteInfo = {
 		| 'crew-index'
 		| 'crew-detail'
 		| 'events-index'
-		| 'event-new'
 		| 'event-program'
 		| 'event-detail'
 		| 'settings'
@@ -111,20 +110,6 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 			title: 'Events',
 			breadcrumbs: [...baseCrumbs, { label: 'Events' }],
 			actions: ['new-program']
-		}
-	}
-
-	if (normalized === `${adminBase}/events/new`) {
-		return {
-			kind: 'event-new',
-			currentSection: 'events',
-			title: 'Events',
-			breadcrumbs: [
-				...baseCrumbs,
-				{ label: 'Events', href: hrefWithMock(`${adminBase}/events/`) },
-				{ label: 'New Event' }
-			],
-			actions: ['back-to-events']
 		}
 	}
 
