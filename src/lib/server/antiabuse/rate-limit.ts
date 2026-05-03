@@ -11,6 +11,7 @@ type Bucket = {
 }
 
 const buckets = new Map<string, Bucket>()
+const MAX_BUCKETS = 5000
 
 function nowMs() {
 	return Date.now()
@@ -28,6 +29,8 @@ function touchBucket(key: string, windowMs: number): Bucket {
 }
 
 export function checkRateLimit(key: string, limit: number, windowMs: number): RateLimitCheckResult {
+	compactRateLimitBuckets()
+	if (!buckets.has(key) && buckets.size >= MAX_BUCKETS) evictOldestBucket()
 	const bucket = touchBucket(key, windowMs)
 	bucket.count += 1
 	const allowed = bucket.count <= limit
@@ -53,4 +56,16 @@ export function compactRateLimitBuckets(maxSize = 5000) {
 		}
 		if (buckets.size <= maxSize) break
 	}
+}
+
+function evictOldestBucket() {
+	let oldestKey = ''
+	let oldestReset = Number.POSITIVE_INFINITY
+	for (const [key, bucket] of buckets.entries()) {
+		if (bucket.resetAt < oldestReset) {
+			oldestReset = bucket.resetAt
+			oldestKey = key
+		}
+	}
+	if (oldestKey) buckets.delete(oldestKey)
 }

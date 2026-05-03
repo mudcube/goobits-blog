@@ -176,24 +176,15 @@
 	}
 
 	@media (max-width: 50em) {
-		:global(.layout-header__nav) {
-			display: none;
-		}
-
 		.layout-header__utilities {
 			display: inline-flex;
+			justify-content: flex-end;
 			margin-left: auto;
 			gap: 0.45rem;
 		}
 
 		.layout-header__menu-button {
 			display: inline-flex;
-		}
-	}
-
-	@media (max-width: 43.75em) {
-		.layout-header__utilities {
-			margin-left: 1.5rem;
 		}
 	}
 </style>

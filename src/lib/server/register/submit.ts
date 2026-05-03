@@ -21,10 +21,11 @@ export async function submitRegisterData(
 		asn: getAsn(event.request),
 		deviceId: data.device_id,
 		honeypot: data.website,
-		startedAtMs: Number.parseInt(data.started_at || '0', 10),
-		turnstileToken: data['cf-turnstile-response'],
-		env
-	})
+			startedAtMs: Number.parseInt(data.started_at || '0', 10),
+			turnstileToken: data['cf-turnstile-response'],
+			env,
+			db
+		})
 
 	if (!antiAbuse.ok) {
 		return {

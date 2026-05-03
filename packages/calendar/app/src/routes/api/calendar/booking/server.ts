@@ -19,11 +19,18 @@ export async function GET(event: RequestEvent) {
 		}
 
 		const booking = await getBookingByConfirmation(env.DB, confirmationId)
-		if (!booking) {
-			return apiError('Booking not found', { status: 404, code: 'not_found' })
-		}
+			if (!booking) {
+				return apiError('Booking not found', { status: 404, code: 'not_found' })
+			}
+			const user = (event.locals as { user?: { id: string | number } }).user
+			if (!user?.id) {
+				return apiError('Not authenticated', { status: 401, code: 'unauthorized' })
+			}
+			if (booking.user_id !== String(user.id)) {
+				return apiError('Booking not found', { status: 404, code: 'not_found' })
+			}
 
-		return apiOk({
+			return apiOk({
 			id: booking.id,
 			confirmationId: booking.confirmation_id,
 			status: booking.status,

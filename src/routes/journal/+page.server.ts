@@ -1,6 +1,21 @@
-import { createBlogIndexHandler } from '@goobits/blog/core'
+import { dev } from '$app/environment'
+import { loadBlogIndex } from '@goobits/blog/core'
+import type { ServerLoad } from '@sveltejs/kit'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
+import { getActiveReleaseStage } from '$lib/app/release'
+import { isLocalPreviewHost } from '$lib/app/is-local-preview-host'
 
 ensureJournalBlogConfig()
 
-export const { load, prerender } = createBlogIndexHandler()
+export const prerender = false
+
+export const load: ServerLoad = async ({ cookies, url, locals }) => {
+	const enablePreview = dev && isLocalPreviewHost(url.hostname)
+	const stage = getActiveReleaseStage({ cookies, enablePreview })
+	const lang = (locals as { paraglideLocale?: string })?.paraglideLocale || 'en'
+
+	return await loadBlogIndex(lang, null, {
+		initialLoad: true,
+		includeDrafts: stage === 'preview'
+	})
+}

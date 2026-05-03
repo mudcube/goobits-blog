@@ -49,8 +49,8 @@
     position: relative;
     display: grid;
     place-items: center;
-    gap: 0.45rem;
-    padding: 1.85rem 0.9rem 0.9rem;
+    gap: 0.85rem;
+    padding: 1.25rem 0.9rem;
     border: 1.5px solid var(--admin-card-border);
     border-radius: 1rem;
     background: var(--admin-card-bg);
@@ -128,14 +128,14 @@
 
   .payment-tile__primary {
     position: absolute;
-    top: 0.5rem;
+    top: -0.55rem;
     left: 50%;
     transform: translateX(-50%);
-    padding: 0.16rem 0.5rem;
-    border-radius: 0.35rem;
+    padding: 0.18rem 0.55rem;
+    border-radius: 0.4rem;
     background: var(--tile-color);
     color: #fff;
-    font-size: 0.56rem;
+    font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;

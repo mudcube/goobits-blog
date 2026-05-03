@@ -26,7 +26,8 @@
 
 	const isCalendarRoute = $derived(
 		$page.url.pathname.startsWith(calendarConfig.routes.calendarBase) ||
-			$page.url.pathname.startsWith(calendarConfig.routes.adminBase)
+			$page.url.pathname.startsWith(calendarConfig.routes.adminBase) ||
+			$page.url.pathname.startsWith('/playground/admin-settings')
 	)
 	const showSitemapVisibilityToggle = $derived(
 		$page.url.pathname.startsWith('/sitemap') && Boolean($page.data.canViewInternalRoutes)

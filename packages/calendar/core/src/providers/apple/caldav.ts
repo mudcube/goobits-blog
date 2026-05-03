@@ -15,7 +15,16 @@ export type AppleCalendarEventInput = {
 
 function normalizeCalendarUrl(calendarUrl: string) {
 	const trimmed = calendarUrl.trim()
-	return trimmed.endsWith('/') ? trimmed : `${trimmed}/`
+	const parsed = new URL(trimmed)
+	if (parsed.protocol !== 'https:') {
+		throw new Error('Apple CalDAV calendar URL must use HTTPS')
+	}
+	const host = parsed.hostname.toLowerCase()
+	if (host !== 'caldav.icloud.com' && !host.endsWith('.caldav.icloud.com')) {
+		throw new Error('Apple CalDAV calendar URL host is not allowed')
+	}
+	const normalized = parsed.toString()
+	return normalized.endsWith('/') ? normalized : `${normalized}/`
 }
 
 function escapeText(value: string) {

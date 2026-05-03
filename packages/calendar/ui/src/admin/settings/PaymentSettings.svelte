@@ -379,7 +379,7 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.7rem;
-    margin-top: 0.55rem;
+    margin-top: 1.2rem;
   }
 
   .payment-settings__empty {

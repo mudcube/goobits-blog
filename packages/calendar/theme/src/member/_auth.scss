@@ -100,7 +100,7 @@
 
 .calendar-login__divider span {
 	font-size: 0.75rem;
-	color: color-mix(in srgb, var(--calendar-shell-text) 34%, transparent);
+	color: color-mix(in srgb, var(--calendar-shell-text) 62%, transparent);
 	letter-spacing: 0.02em;
 }
 
@@ -281,7 +281,7 @@
 }
 
 .calendar-page__invite-hint {
-	color: color-mix(in srgb, var(--calendar-shell-text) 36%, transparent);
+	color: color-mix(in srgb, var(--calendar-shell-text) 62%, transparent);
 	font-size: var(--calendar-size-13);
 	margin-top: var(--calendar-size-20);
 }

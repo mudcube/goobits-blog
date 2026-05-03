@@ -3,6 +3,11 @@ import { getCalendarUserId, requireCalendarUserId, runCalendarRequest, unauthori
 import { buildEnv, type RuntimeEnv } from './runtime/build-env'
 import { getAdminAuth, ensureAdminAccount } from './auth/admin'
 import {
+	createCalendarAuthAdapters,
+	createCalendarSessionAdapter,
+	createCalendarUserAdapter
+} from './auth/calendar-adapters'
+import {
 	clearCalendarLoginContext,
 	getCalendarAuth,
 	getCalendarLoginContext,
@@ -26,6 +31,9 @@ export {
 	buildEnv,
 	getAdminAuth,
 	ensureAdminAccount,
+	createCalendarAuthAdapters,
+	createCalendarSessionAdapter,
+	createCalendarUserAdapter,
 	getCalendarAuth,
 	getCalendarLoginContext,
 	getCalendarRedirect,

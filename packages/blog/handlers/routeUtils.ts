@@ -4,6 +4,7 @@
  * Helper functions for loading blog content in different contexts
  */
 
+import { error } from '@sveltejs/kit'
 import {
 	getAllPosts,
 	slugify,
@@ -40,6 +41,16 @@ export type { ProcessedPost, PostMetadata, GetAllPostsOptions }
 export interface LoadBlogIndexOptions {
 	/** If true, only return first batch for SSR */
 	initialLoad?: boolean
+	/** If true, posts with `draft: true` frontmatter are included */
+	includeDrafts?: boolean
+}
+
+/**
+ * Options for loadCategory / loadTag / loadPost
+ */
+export interface LoadPostsOptions {
+	/** If true, posts with `draft: true` frontmatter are included */
+	includeDrafts?: boolean
 }
 
 /**
@@ -149,10 +160,19 @@ function getRouteRelativePostPath(path: string, config: BlogConfig | null = null
 /**
  * Creates an error with an HTTP status code
  */
-function createHttpError(message: string, status: number): HttpError {
-	const error = new Error(message) as HttpError
-	error.status = status
-	return error
+export function createHttpError(message: string, status: number): HttpError {
+	try {
+		error(status, message)
+	} catch (caught) {
+		if (caught !== null && typeof caught === 'object') {
+			Object.defineProperty(caught, 'message', {
+				value: message,
+				enumerable: true,
+				configurable: true
+			})
+		}
+		throw caught
+	}
 }
 
 /**
@@ -185,11 +205,12 @@ export async function loadBlogIndex(
 	options: LoadBlogIndexOptions = {}
 ): Promise<BlogIndexData> {
 	const finalConfig = config || getBlogConfig()
-	const { initialLoad = false } = options
+	const { initialLoad = false, includeDrafts = false } = options
 
 	const allPosts: ProcessedPost[] = await getAllPosts({
 		lang,
-		includeContent: false
+		includeContent: false,
+		includeDrafts
 	})
 
 	// If this is the initial SSR load, only return the first batch
@@ -224,14 +245,16 @@ export async function loadBlogIndex(
 export async function loadCategory(
 	categorySlugParam: string,
 	lang: string,
-	_config: BlogConfig | null = null
+	_config: BlogConfig | null = null,
+	options: LoadPostsOptions = {}
 ): Promise<CategoryData> {
 	if (!categorySlugParam) {
 		throw createHttpError('Category not specified', 404)
 	}
 
 	const slug = categorySlugParam.replace(/\/$/, '')
-	const allPosts: ProcessedPost[] = await getAllPosts({ lang })
+	const { includeDrafts = false } = options
+	const allPosts: ProcessedPost[] = await getAllPosts({ lang, includeDrafts })
 	const categoryDescriptions: Record<string, CategoryInfo> = await loadConfiguredCategoryDescriptions<CategoryInfo>(lang)
 	const slugLowerCase = slug.toLowerCase()
 	const categoryInfo: CategoryInfo = categoryDescriptions[slugLowerCase] || {}
@@ -271,14 +294,16 @@ export async function loadCategory(
 export async function loadTag(
 	tagSlugParam: string,
 	lang: string,
-	_config: BlogConfig | null = null
+	_config: BlogConfig | null = null,
+	options: LoadPostsOptions = {}
 ): Promise<TagData> {
 	if (!tagSlugParam) {
 		throw createHttpError('Tag not specified', 404)
 	}
 
 	const slug = tagSlugParam.replace(/\/$/, '')
-	const allPosts: ProcessedPost[] = await getAllPosts({ lang })
+	const { includeDrafts = false } = options
+	const allPosts: ProcessedPost[] = await getAllPosts({ lang, includeDrafts })
 	const slugLowerCase = slug.toLowerCase()
 	const posts = filterPostsByTag(allPosts, slugLowerCase, slugify)
 	const originalTag = getOriginalTaxonomyName(
@@ -317,12 +342,15 @@ export async function loadPost(
 	month: string,
 	postSlug: string,
 	lang: string,
-	_config: BlogConfig | null = null
+	_config: BlogConfig | null = null,
+	options: LoadPostsOptions = {}
 ): Promise<PostPageData> {
 	try {
+		const { includeDrafts = false } = options
 		const allPosts: ProcessedPost[] = await getAllPosts({
 			lang,
-			includeContent: true
+			includeContent: true,
+			includeDrafts
 		})
 
 		const foundPost = allPosts.find((p: ProcessedPost) => {

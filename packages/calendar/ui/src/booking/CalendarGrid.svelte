@@ -144,7 +144,7 @@
 	.cg__cell--other { opacity: 0.15; }
 	.cg__cell--past { opacity: 0.25; }
 	.cg__cell--today { border-color: color-mix(in srgb, var(--text) 18%, transparent); }
-	.cg__cell--selected { border-color: var(--cg-accent, var(--book-accent, #a78bfa)); background: color-mix(in srgb, var(--cg-accent, var(--book-accent, #a78bfa)) 12%, var(--panel-bg, var(--bg)) 88%); opacity: 1 !important; }
+	.cg__cell--selected { border-color: var(--cg-accent, var(--book-accent, #a78bfa)); background: color-mix(in srgb, var(--cg-accent, var(--book-accent, #a78bfa)) 32%, var(--panel-bg, var(--bg)) 68%); box-shadow: inset 0 0 0 2px var(--cg-accent, var(--book-accent, #a78bfa)), 0 4px 14px color-mix(in srgb, var(--cg-accent, var(--book-accent, #a78bfa)) 30%, transparent); color: var(--text); opacity: 1 !important; }
 
 	.cg__num { position: absolute; top: 0.35rem; right: 0.4rem; font-size: var(--cg-num-size, 0.78rem); font-weight: 600; }
 	.cg__dots { position: absolute; bottom: 0.32rem; left: 0.4rem; display: flex; gap: 0.16rem; }

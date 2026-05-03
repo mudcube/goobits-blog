@@ -28,7 +28,7 @@ async function checkAdminLoginLimit(db: RateLimitDb, key: string) {
 			windowSeconds: 60
 		})
 	} catch {
-		return { allowed: true }
+		return { allowed: false }
 	}
 }
 
@@ -94,7 +94,7 @@ export const actions: Actions = {
 					throw redirect(status, location)
 				}
 			}
-			console.error('[admin] login handler threw', err)
+			console.error('[admin] login handler threw', err instanceof Error ? err.message : String(err))
 			throw err
 		}
 	},

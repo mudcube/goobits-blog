@@ -1,3 +1,19 @@
+/*
+ * Breakpoint convention (em-based; rems honor user font-size scaling).
+ *
+ *   --bp-xs:  30em   (480px)  small phone — collapse secondary nav, single-col
+ *   --bp-sm:  40em   (640px)  large phone — typical mobile→tablet transition
+ *   --bp-md:  48em   (768px)  tablet portrait — most common breakpoint
+ *   --bp-lg:  64em   (1024px) desktop — multi-column layouts
+ *
+ * Prefer these tiers in new code. Custom values (e.g. 50em for the topbar
+ * desktop-nav transition, where 48em causes nav text overflow) are allowed
+ * but should sit in the same file as the rule they pair with, with a
+ * one-line comment explaining the deviation. CSS @media doesn't expand
+ * custom properties, so this convention is enforced by review, not the
+ * compiler.
+ */
+
 .layout-header {
 	background: var(--header-gradient), url('/media/decor/hexabump.png');
 	border-bottom: 1px solid color-mix(in srgb, var(--border) 52%, transparent);
@@ -160,6 +176,9 @@
 }
 
 .layout-footer__brand-link {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
 	font-weight: var(--font-weight-semibold);
 	text-decoration: none;
 	font-size: 0.95rem;
@@ -238,6 +257,12 @@
 	.layout-footer__columns {
 		gap: 2.25rem;
 		justify-content: flex-start;
+	}
+}
+
+@media (max-width: 50em) {
+	.layout-header__nav {
+		display: none;
 	}
 }
 

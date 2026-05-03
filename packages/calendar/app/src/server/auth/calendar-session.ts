@@ -1,25 +1,15 @@
-import { D1SessionAdapter } from '@goobits/auth/adapters'
 import type { Cookies } from '@sveltejs/kit'
-import type { D1DatabaseLike } from '@calendar/kit'
+import { createCalendarSessionAdapter, type D1DatabaseLike } from '@calendar/kit'
 
 type CalendarUserRow = { id: string | number }
 
-export function createCalendarSessionAdapter(db: D1DatabaseLike, secureCookies: boolean) {
-	return new D1SessionAdapter(db, {
-		sessionsTable: 'calendar_sessions',
-		usersTable: 'calendar_users',
-		cookieName: 'calendar_session',
-		secureCookies,
-		sessionLifetime: 7 * 24 * 60 * 60 * 1000,
-		userColumns: {
-			id: 'id',
-			email: 'email',
-			name: 'name',
-			avatar: 'avatar_url',
-			password: 'password',
-			emailVerified: 'email_verified'
-		}
-	})
+async function seedCalendarUserProgramAccess(db: D1DatabaseLike, userId: string | number) {
+	await db.prepare(
+		`INSERT OR IGNORE INTO calendar_user_program_access (user_id, program_slug, allowed, updated_at)
+		 SELECT ?, slug, 1, unixepoch()
+		 FROM calendar_programs
+		 WHERE enabled = 1`
+	).bind(userId).run()
 }
 
 export async function ensureCalendarUserByEmail({
@@ -42,16 +32,19 @@ export async function ensureCalendarUserByEmail({
 	if (existing?.id) {
 		if (rejectIfExists) return { ok: false as const, reason: 'exists' as const }
 
-		await db.prepare(
-			`UPDATE calendar_users SET last_login_at = unixepoch() WHERE id = ?`
-		).bind(existing.id).run()
-		return { ok: true as const, userId: existing.id, created: false as const }
-	}
+			await db.prepare(
+				`UPDATE calendar_users SET last_login_at = unixepoch() WHERE id = ?`
+			).bind(existing.id).run()
+			await seedCalendarUserProgramAccess(db, existing.id)
+			return { ok: true as const, userId: existing.id, created: false as const }
+		}
 
 	const inserted = await db.prepare(
 		`INSERT INTO calendar_users (email, name, email_verified, created_at, last_login_at)
 		 VALUES (?, ?, ?, unixepoch(), unixepoch())`
 	).bind(email, name, emailVerified ? 1 : 0).run()
+
+	await seedCalendarUserProgramAccess(db, inserted.meta.last_row_id)
 
 	return { ok: true as const, userId: inserted.meta.last_row_id, created: true as const }
 }

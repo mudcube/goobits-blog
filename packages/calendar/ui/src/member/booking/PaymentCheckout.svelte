@@ -43,11 +43,15 @@
 	type SquareCashAppPay = {
 		attach: (selector: string) => Promise<void>
 		destroy?: () => void
-		addEventListener: (
-			name: 'ontokenization',
-			listener: (event: { detail: { tokenResult?: { status?: string; token?: string }; error?: unknown } }) => void
-		) => void
-	}
+			addEventListener: (
+				name: 'ontokenization',
+				listener: (event: { detail: { tokenResult?: { status?: string; token?: string }; error?: unknown } }) => void
+			) => void
+			removeEventListener?: (
+				name: 'ontokenization',
+				listener: (event: { detail: { tokenResult?: { status?: string; token?: string }; error?: unknown } }) => void
+			) => void
+		}
 
 	type SquarePayments = {
 		paymentRequest: (input: Record<string, unknown>) => unknown
@@ -80,8 +84,9 @@
 	let paypalReady = $state(false)
 	let cashAppReady = $state(false)
 	let cashAppReceiptUrl = $state<string | null>(null)
-	let paypalButtons: PayPalButtonsInstance[] = []
-	let cashApp: SquareCashAppPay | null = null
+		let paypalButtons: PayPalButtonsInstance[] = []
+		let cashApp: SquareCashAppPay | null = null
+		let cashAppTokenizationListener: Parameters<SquareCashAppPay['addEventListener']>[1] | null = null
 
 	const isPaid = $derived(!!event && event.costCents > 0)
 	const eventPaymentProvider = $derived((event?.paymentProvider || '').toLowerCase())
@@ -195,10 +200,10 @@
 			redirectURL: window.location.href,
 			referenceId: confirmationId || `event-${event.id}`
 		})
-		cashApp.addEventListener('ontokenization', (tokenEvent) => {
-			const token = tokenEvent.detail.tokenResult?.token
-			if (tokenEvent.detail.error || !token || tokenEvent.detail.tokenResult?.status !== 'OK') {
-				error = 'Cash App authorization failed.'
+			cashAppTokenizationListener = (tokenEvent) => {
+				const token = tokenEvent.detail.tokenResult?.token
+				if (tokenEvent.detail.error || !token || tokenEvent.detail.tokenResult?.status !== 'OK') {
+					error = 'Cash App authorization failed.'
 				return
 			}
 			void createCalendarCashAppPayment({
@@ -210,10 +215,11 @@
 				cashAppReceiptUrl = result.receiptUrl
 				error = ''
 			}).catch((err: unknown) => {
-				console.error('Cash App payment failed', err)
-				error = 'Cash App payment failed. Try again or use the direct payment link.'
-			})
-		})
+					console.error('Cash App payment failed', err)
+					error = 'Cash App payment failed. Try again or use the direct payment link.'
+				})
+			}
+			cashApp.addEventListener('ontokenization', cashAppTokenizationListener)
 		await cashApp.attach('#calendar-cashapp-button')
 		cashAppReady = true
 	}
@@ -232,10 +238,14 @@
 				error = 'Online checkout is unavailable.'
 			})
 		return () => {
-			active = false
-			for (const button of paypalButtons) button.close?.()
-			cashApp?.destroy?.()
-		}
+				active = false
+				for (const button of paypalButtons) button.close?.()
+				if (cashApp && cashAppTokenizationListener) {
+					cashApp.removeEventListener?.('ontokenization', cashAppTokenizationListener)
+					cashAppTokenizationListener = null
+				}
+				cashApp?.destroy?.()
+			}
 	})
 </script>
 

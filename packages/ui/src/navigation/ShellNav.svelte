@@ -164,7 +164,7 @@
 		gap: var(--space-3);
 	}
 
-	@media (max-width: 700px) {
+	@media (max-width: 43.75em) {
 		.shell-nav__inner {
 			padding: var(--space-3) var(--space-4);
 			gap: var(--space-3);

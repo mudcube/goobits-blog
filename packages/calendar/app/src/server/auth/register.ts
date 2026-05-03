@@ -1,6 +1,6 @@
 import { CredentialsProvider } from '@goobits/auth/providers'
-import { D1UserAdapter } from '@goobits/auth/adapters'
-import type { D1DatabaseLike } from '@calendar/kit'
+import { createCalendarUserAdapter, type D1DatabaseLike } from '@calendar/kit'
+import { setUserProgramAccess } from '@calendar/core'
 import { issueEmailVerification } from '../email/verification'
 
 export type RegisterUserInput = {
@@ -41,26 +41,6 @@ function createCredentialsProvider() {
 	})
 }
 
-function createUserAdapter(db: D1DatabaseLike) {
-	return new D1UserAdapter(db, {
-		usersTable: 'calendar_users',
-		oauthAccountsTable: 'calendar_oauth_accounts',
-		columns: {
-			id: 'id',
-			email: 'email',
-			name: 'name',
-			avatar: 'avatar_url',
-			emailVerified: 'email_verified',
-			password: 'password'
-		},
-		oauthColumns: {
-			userId: 'user_id',
-			provider: 'provider',
-			providerAccountId: 'provider_account_id'
-		}
-	})
-}
-
 async function rollbackRegistration(db: D1DatabaseLike, userId: string) {
 	await db.prepare('DELETE FROM calendar_email_verifications WHERE user_id = ?').bind(userId).run()
 	await db.prepare('DELETE FROM calendar_users WHERE id = ?').bind(userId).run()
@@ -82,7 +62,7 @@ export async function registerUser(db: D1DatabaseLike, input: RegisterUserInput)
 		return { ok: false, error: passwordError }
 	}
 
-	const userAdapter = createUserAdapter(db)
+	const userAdapter = createCalendarUserAdapter(db)
 	const existingUser = await userAdapter.getUserByEmail(email)
 	if (existingUser) {
 		return { ok: false, error: 'We could not complete that request. Please try again later.' }
@@ -100,6 +80,18 @@ export async function registerUser(db: D1DatabaseLike, input: RegisterUserInput)
 	if (!userId) {
 		return { ok: false, error: 'We could not complete that request. Please try again later.' }
 	}
+
+	const enabledPrograms = await db.prepare(
+		`SELECT slug FROM calendar_programs WHERE enabled = 1`
+	).all<{ slug: string }>()
+	await setUserProgramAccess(
+		db,
+		userId,
+		(enabledPrograms.results ?? []).map((program) => ({
+			programSlug: program.slug,
+			allowed: true
+		}))
+	)
 
 	const verification = await issueEmailVerification({
 		db,

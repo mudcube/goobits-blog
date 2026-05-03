@@ -175,6 +175,19 @@
 		grid-template-columns: repeat(3, minmax(0, var(--project-card-width)));
 	}
 
+	@media (max-width: 64em) {
+		:global(.ui-page-shell.showcase-page--collection .showcase-grid__items) {
+			grid-template-columns: repeat(2, minmax(0, var(--project-card-width)));
+			justify-content: center;
+		}
+	}
+
+	@media (max-width: 40em) {
+		:global(.ui-page-shell.showcase-page--collection .showcase-grid__items) {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
 	:global(.ui-page-shell.showcase-page--collection .showcase-card__art img) {
 		opacity: 0.98;
 		filter: saturate(0.92) contrast(1.02);

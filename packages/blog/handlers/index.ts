@@ -6,6 +6,7 @@
  */
 
 import { getAllPosts, generateRssFeed } from '../utils/index.js'
+import { error } from '@sveltejs/kit'
 import { getBlogConfig } from '../config/index.js'
 import {
 	loadBlogIndex,
@@ -125,9 +126,18 @@ export interface RSSFeedHandlerOptions {
  * Custom error with HTTP status code
  */
 function createHttpError(message: string, status: number): HttpError {
-	const error = new Error(message) as HttpError
-	error.status = status
-	return error
+	try {
+		error(status, message)
+	} catch (caught) {
+		if (caught !== null && typeof caught === 'object') {
+			Object.defineProperty(caught, 'message', {
+				value: message,
+				enumerable: true,
+				configurable: true
+			})
+		}
+		throw caught
+	}
 }
 
 /**

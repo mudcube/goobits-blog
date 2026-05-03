@@ -2,11 +2,16 @@
 	import { Hero } from '@miko/ui'
 	import { ChevronRowCard } from '@calendar/ui/shared'
 
+	type ParkingItem = { href: string; title: string; vibe: string; date?: string }
+
 	let { data } = $props<{
-		data: { items: { href: string; title: string; vibe: string; date?: string }[] }
+		data: { items: ParkingItem[] }
 	}>()
 
-	const parkingItems = $derived(data.items)
+	const featuredHrefs = new Set(['/playground/admin-settings'])
+	const parkingItems = $derived(
+		data.items.filter((item: ParkingItem) => !featuredHrefs.has(item.href.replace(/\/$/, '')))
+	)
 </script>
 
 <svelte:head>
@@ -29,7 +34,15 @@
 			<h2 class="pg__section-title">Current ideas</h2>
 		</header>
 
-		<p class="pg__cta">Close the tab. Go for a walk. Everything's done.</p>
+		<div class="pg__row-list">
+			<ChevronRowCard href="/playground/admin-settings/" ariaLabel="Open Admin Settings redesign">
+				{#snippet start()}<span class="pg__dot" aria-hidden="true">·</span>{/snippet}
+				<div class="pg__row">
+					<span class="pg__row-name">Admin Settings</span>
+					<span class="pg__row-vibe">Redesigned settings — sync, week start, payments, inline saves.</span>
+				</div>
+			</ChevronRowCard>
+		</div>
 	</section>
 
 	<section class="pg__future">
@@ -68,13 +81,6 @@
 
 	:global(.pg__hero.ui-hero) {
 		margin-bottom: 0;
-	}
-
-	.pg__cta {
-		margin: 0.4rem 0 0;
-		font-size: 0.85rem;
-		font-style: italic;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
 	}
 
 	.pg__current,

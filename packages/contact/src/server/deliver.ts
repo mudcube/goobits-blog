@@ -5,6 +5,8 @@ export type ContactDeliveryConfig = {
 	webhook: string
 	source: string
 	event?: string
+	secret?: string
+	timeoutMs?: number
 }
 
 export type ContactDeliveryResult =
@@ -30,10 +32,16 @@ export async function deliverContactMessage(
 		return { ok: true, status: 202 }
 	}
 
+	const controller = new AbortController()
+	const timeout = setTimeout(() => controller.abort(), config.timeoutMs ?? 5000)
 	try {
 		const response = await fetch(config.webhook, {
 			method: 'POST',
-			headers: { 'content-type': 'application/json' },
+			headers: {
+				'content-type': 'application/json',
+				...(config.secret ? { 'x-contact-webhook-secret': config.secret } : {})
+			},
+			signal: controller.signal,
 			body: JSON.stringify({
 				event: config.event || 'contact-form',
 				source: config.source,
@@ -51,6 +59,8 @@ export async function deliverContactMessage(
 			source: config.source
 		})
 		return { ok: false, status: 502, error: 'Contact delivery failed.' }
+	} finally {
+		clearTimeout(timeout)
 	}
 
 	return { ok: true, status: 200 }

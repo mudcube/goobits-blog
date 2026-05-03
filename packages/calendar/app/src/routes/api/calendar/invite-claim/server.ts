@@ -1,5 +1,6 @@
 import {
 	consumeInvite,
+	checkRateLimit,
 	parseCalendarInviteClaimInput,
 	TransportValidationError,
 	validateInvite
@@ -40,6 +41,24 @@ async function rollbackInviteConsumption({
 	).bind(inviteId).run()
 }
 
+async function enforceInviteClaimRateLimit(event: RequestEvent, db: Awaited<ReturnType<typeof buildEnv>>['DB'], code: string, email: string | null) {
+	const ip =
+		event.getClientAddress?.() ||
+		event.request.headers.get('cf-connecting-ip') ||
+		event.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+		'unknown'
+	const checks = [
+		{ key: `rate:invite_claim:ip:${ip}`, limit: 20, windowSeconds: 60 },
+		{ key: `rate:invite_claim:code:${code.toLowerCase()}`, limit: 8, windowSeconds: 60 },
+		...(email ? [{ key: `rate:invite_claim:email:${email.toLowerCase()}`, limit: 10, windowSeconds: 60 }] : [])
+	]
+	for (const check of checks) {
+		const result = await checkRateLimit({ db, ...check })
+		if (!result.allowed) return apiError('Too many attempts. Try again later.', { status: 429, code: 'rate_limited' })
+	}
+	return null
+}
+
 export async function POST(event: RequestEvent) {
 	let createdUserId: string | null = null
 	let consumedInviteId: number | null = null
@@ -48,13 +67,15 @@ export async function POST(event: RequestEvent) {
 		const csrf = enforceSameOrigin(event)
 		if (csrf) return csrf
 
-		const env = await buildEnv(event.platform)
-		const secureCookies = env['NODE_ENV'] !== 'development'
-		const { code, name, email } = parseCalendarInviteClaimInput(
-			await event.request.json().catch(() => null)
-		)
+			const env = await buildEnv(event.platform)
+			const secureCookies = env['NODE_ENV'] !== 'development'
+			const { code, name, email } = parseCalendarInviteClaimInput(
+				await event.request.json().catch(() => null)
+			)
+			const rateLimited = await enforceInviteClaimRateLimit(event, env.DB, code, email)
+			if (rateLimited) return rateLimited
 
-		const result = await validateInvite({ db: env.DB, code, email })
+			const result = await validateInvite({ db: env.DB, code, email })
 		if (!result.valid || !result.invite || typeof result.invite.id !== 'number') {
 			const reason = result.reason ?? 'invalid'
 			const status = reason === 'not_found' ? 404 : 403

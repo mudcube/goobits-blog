@@ -17,6 +17,11 @@ export function forbidden() {
 }
 
 function isSameOrigin(event: RequestEvent) {
+	const fetchSite = event.request.headers.get('sec-fetch-site')
+	if (fetchSite && fetchSite !== 'same-origin' && fetchSite !== 'same-site' && fetchSite !== 'none') {
+		return false
+	}
+
 	const origin = event.request.headers.get('origin')
 	if (origin) return origin === event.url.origin
 

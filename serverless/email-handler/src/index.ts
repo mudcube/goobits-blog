@@ -74,6 +74,12 @@ function getSesClient() {
 	return cachedSesClient
 }
 
+function isAuthorized(request: Request) {
+	const expected = getEnv('CONTACT_WEBHOOK_SECRET') || ''
+	if (!expected) return true
+	return request.headers.get('x-contact-webhook-secret') === expected
+}
+
 async function readJson(request: Request) {
 	const contentLength = request.headers.get('content-length')
 	if (contentLength) {
@@ -101,6 +107,12 @@ async function readJson(request: Request) {
 async function handleRequest(request: Request) {
 	const origin = request.headers.get('Origin')
 	const corsHeaders = buildCorsHeaders(origin)
+	if (!isAuthorized(request)) {
+		return new Response('Unauthorized', {
+			status: 401,
+			headers: corsHeaders
+		})
+	}
 	if (origin && !isAllowedOrigin(origin)) {
 		return new Response('Forbidden', {
 			status: 403,

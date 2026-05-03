@@ -398,7 +398,7 @@
   .calendar-login__invite-input {
     flex: 1;
     min-width: 0;
-    padding: 0.65rem 1.15rem;
+    padding: 0.65rem 1.5rem 0.65rem 1.15rem;
     border: none;
     background: transparent;
     color: var(--calendar-shell-text, var(--text));

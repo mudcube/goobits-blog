@@ -82,6 +82,7 @@ export interface PostMetadata {
 	readTime?: number | undefined
 	updated?: string | undefined
 	i18n?: I18nData | undefined
+	draft?: boolean | undefined
 }
 
 // Processed post interface
@@ -124,6 +125,7 @@ export interface GetAllPostsOptions {
 	lang?: string
 	includeContent?: boolean
 	includeLocalizedVersions?: boolean
+	includeDrafts?: boolean
 }
 
 // Post module from import
@@ -962,11 +964,12 @@ export async function getAllPosts(options: GetAllPostsOptions = {}): Promise<Pro
 	const {
 		lang = 'en',
 		includeContent = false,
-		includeLocalizedVersions = false
+		includeLocalizedVersions = false,
+		includeDrafts = false
 	} = options
 
 	// Create cache key based on options
-	const cacheKey = JSON.stringify({ lang, includeContent, includeLocalizedVersions })
+	const cacheKey = JSON.stringify({ lang, includeContent, includeLocalizedVersions, includeDrafts })
 
 	// Check if we have cached data that's still fresh
 	const cached = postsCache.get(cacheKey)
@@ -1123,8 +1126,15 @@ export async function getAllPosts(options: GetAllPostsOptions = {}): Promise<Pro
 	// Flatten any nested arrays from localized versions and filter out nulls
 	const flattenedPosts = processedPosts.flat().filter((post): post is ProcessedPost => post !== null)
 
+	// Drop draft posts unless the caller explicitly opts in. Lets RSS,
+	// llms.txt, and the prerendered live build stay clean while authoring
+	// surfaces (preview-stage page loaders) can request the full set.
+	const visiblePosts = includeDrafts
+		? flattenedPosts
+		: flattenedPosts.filter((post) => post.metadata?.fm?.draft !== true)
+
 	// Sort the posts by date in descending order (newest first)
-	const sortedPosts = flattenedPosts.sort((a, b) =>
+	const sortedPosts = visiblePosts.sort((a, b) =>
 		new Date(b.date).getTime() - new Date(a.date).getTime()
 	)
 

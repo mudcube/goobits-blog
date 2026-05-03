@@ -102,7 +102,7 @@ export async function hasUserProgramAccess(db: D1DatabaseLike, userId: string, p
 		.bind(normalizedUserId)
 		.first<{ has_rules: number }>()
 
-	if (!anyRules) return true
+	if (!anyRules) return false
 
 	const row = await db
 		.prepare(

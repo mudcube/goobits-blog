@@ -1,5 +1,5 @@
 import { GoobitsAuth } from '@goobits/auth'
-import { D1SessionAdapter, D1UserAdapter } from '@goobits/auth/adapters'
+import { createCookieLoginContext, normalizeSafeRedirectPath } from '@goobits/auth/login-context'
 import { GoogleProvider, AppleProvider } from '@goobits/auth/providers'
 import type { OAuthProfile, OAuthTokens, RequestEventLike, User } from '@goobits/auth/types'
 import { dev } from '$app/environment'
@@ -8,10 +8,20 @@ import { redirect } from '@sveltejs/kit'
 import type { Cookies } from '@sveltejs/kit'
 import { getDevDb } from '../dev/devDb'
 import type { D1DatabaseLike } from '../dev/types'
+import { createCalendarAuthAdapters } from './calendar-adapters'
 
 const INVITE_COOKIE = 'calendar_invite'
 const REDIRECT_COOKIE = 'calendar_redirect'
 const INVITE_TTL_SECONDS = 600
+const calendarLoginContext = createCookieLoginContext({
+	cookies: {
+		invite: INVITE_COOKIE,
+		redirectTo: REDIRECT_COOKIE
+	},
+	options: {
+		maxAge: INVITE_TTL_SECONDS
+	}
+})
 
 type PlatformEnv = {
 	DB?: D1DatabaseLike
@@ -59,33 +69,20 @@ function emailMatchesDomain(email: string, domain: string) {
 
 export function normalizeCalendarRedirect(redirectTo: unknown) {
 	const config = getCalendarConfig()
-	if (!redirectTo || typeof redirectTo !== 'string') return null
-	const trimmed = redirectTo.trim()
-	if (!trimmed.startsWith('/')) return null
-	if (trimmed.startsWith('//')) return null
-	if (trimmed.includes('\\')) return null
-	if (/[\r\n]/.test(trimmed)) return null
-	const parsed = new URL(trimmed, 'https://calendar.local')
-	const pathname = parsed.pathname
 	const allowedPrefixes = [config.routes.calendarBase, config.routes.adminBase]
-	const isAllowed = allowedPrefixes.some((prefix) => (
-		pathname === prefix || pathname.startsWith(`${prefix}/`)
-	))
-	if (!isAllowed) return null
-	return `${pathname}${parsed.search}${parsed.hash}`
+	return normalizeSafeRedirectPath(redirectTo, { allowedPrefixes })
 }
 
-
 export function getCalendarLoginContext(cookies: Pick<Cookies, 'get'>) {
+	const context = calendarLoginContext.get(cookies)
 	return {
-		invite: cookies.get(INVITE_COOKIE) || null,
-		redirectTo: normalizeCalendarRedirect(cookies.get(REDIRECT_COOKIE))
+		invite: context.invite,
+		redirectTo: normalizeCalendarRedirect(context.redirectTo)
 	}
 }
 
 export function clearCalendarLoginContext(cookies: Pick<Cookies, 'delete'>) {
-	cookies.delete(INVITE_COOKIE, { path: '/' })
-	cookies.delete(REDIRECT_COOKIE, { path: '/' })
+	calendarLoginContext.clear(cookies)
 }
 
 export async function getCalendarAuth({ event }: { event: { platform?: PlatformLike; url: URL } }) {
@@ -102,39 +99,7 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 	const secureCookies = env['NODE_ENV'] !== 'development'
 	const config = getCalendarConfig()
 
-	const sessionAdapter = new D1SessionAdapter(db, {
-		sessionsTable: 'calendar_sessions',
-		usersTable: 'calendar_users',
-		cookieName: 'calendar_session',
-		secureCookies,
-		sessionLifetime: 7 * 24 * 60 * 60 * 1000,
-		userColumns: {
-			id: 'id',
-			email: 'email',
-			name: 'name',
-			avatar: 'avatar_url',
-			password: 'password',
-			emailVerified: 'email_verified'
-		}
-	})
-
-	const userAdapter = new D1UserAdapter(db, {
-		usersTable: 'calendar_users',
-		oauthAccountsTable: 'calendar_oauth_accounts',
-		columns: {
-			id: 'id',
-			email: 'email',
-			name: 'name',
-			avatar: 'avatar_url',
-			emailVerified: 'email_verified',
-			password: 'password'
-		},
-		oauthColumns: {
-			userId: 'user_id',
-			provider: 'provider',
-			providerAccountId: 'provider_account_id'
-		}
-	})
+	const { sessionAdapter, userAdapter, rateLimitStore } = createCalendarAuthAdapters(db, secureCookies)
 
 	const providers: {
 		google?: { provider: InstanceType<typeof GoogleProvider>; scopes: string[] }
@@ -178,8 +143,14 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 			afterLogin: config.routes.calendarLoginRedirectPath,
 			afterLogout: config.routes.calendarLoginPath
 		},
-		profile: 'secure',
-		sessions: {},
+			profile: 'secure',
+			security: {
+				rateLimit: {
+					store: rateLimitStore,
+					trustProxyHeader: true
+				}
+			},
+			sessions: {},
 		hooks: {
 			onLoginMode: 'manual',
 			onLogin: async (evt: RequestEventLike, profile: OAuthProfile, _tokens: OAuthTokens | null, user?: User | null) => {
@@ -204,14 +175,14 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 							}
 
 							const consumed = await consumeInvite({
-									db,
-									inviteId: result.invite.id,
-									userId: user.id,
-									usesRemaining: result.invite.uses_remaining
-								})
-								if (!consumed.ok) {
-									throw redirect(302, `${config.routes.calendarLoginPath}?error=invite_${consumed.reason}`)
-								}
+								db,
+								inviteId: result.invite.id,
+								userId: user.id,
+								usesRemaining: result.invite.uses_remaining
+							})
+							if (!consumed.ok) {
+								throw redirect(302, `${config.routes.calendarLoginPath}?error=invite_${consumed.reason}`)
+							}
 						}
 					}
 
@@ -228,13 +199,7 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 				clearCalendarLoginContext(evt.cookies)
 
 				if (redirectTo) {
-					evt.cookies.set(REDIRECT_COOKIE, redirectTo, {
-						httpOnly: true,
-						secure: secureCookies,
-						sameSite: 'lax',
-						path: '/',
-						maxAge: INVITE_TTL_SECONDS
-					})
+					calendarLoginContext.set(evt.cookies, { redirectTo }, { secure: secureCookies })
 				}
 
 				return { userId: user.id }
@@ -260,32 +225,11 @@ export function setCalendarLoginContext(
 	cookies: Pick<Cookies, 'set'>,
 	{ invite, redirectTo, secure }: { invite?: string; redirectTo?: string; secure: boolean }
 ) {
-	if (invite) {
-		cookies.set(INVITE_COOKIE, invite, {
-			httpOnly: true,
-			secure,
-			sameSite: 'lax',
-			path: '/',
-			maxAge: INVITE_TTL_SECONDS
-		})
-	}
 	const safeRedirect = normalizeCalendarRedirect(redirectTo)
-	if (safeRedirect) {
-		cookies.set(REDIRECT_COOKIE, safeRedirect, {
-			httpOnly: true,
-			secure,
-			sameSite: 'lax',
-			path: '/',
-			maxAge: INVITE_TTL_SECONDS
-		})
-	}
+	calendarLoginContext.set(cookies, { invite, redirectTo: safeRedirect }, { secure })
 }
 
 export function getCalendarRedirect(cookies: Pick<Cookies, 'get' | 'delete'>) {
-	const redirectTo = cookies.get(REDIRECT_COOKIE)
-	if (redirectTo) {
-		cookies.delete(REDIRECT_COOKIE, { path: '/' })
-		return normalizeCalendarRedirect(redirectTo)
-	}
-	return null
+	const context = calendarLoginContext.take(cookies, ['redirectTo'])
+	return normalizeCalendarRedirect(context.redirectTo)
 }

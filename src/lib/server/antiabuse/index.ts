@@ -1,4 +1,4 @@
-import { checkRateLimit, compactRateLimitBuckets, keyForRateLimit } from './rate-limit'
+import { checkRateLimit as checkMemoryRateLimit, compactRateLimitBuckets, keyForRateLimit } from './rate-limit'
 import { isDisposableEmailDomain, type DisposableMode } from './disposable-email'
 import { verifyTurnstileToken } from './turnstile'
 
@@ -12,6 +12,7 @@ export type RegisterAntiAbuseInput = {
 	turnstileToken: string
 	nowMs?: number
 	env: Record<string, string | undefined>
+	db?: RateLimitDb
 }
 
 export type RegisterAntiAbuseResult = {
@@ -31,6 +32,16 @@ export type ContactAntiAbuseInput = {
 	turnstileToken: string
 	nowMs?: number
 	env: Record<string, string | undefined>
+	db?: RateLimitDb
+}
+
+type RateLimitDb = {
+	prepare: (query: string) => {
+		bind: (...values: unknown[]) => {
+			run: () => Promise<unknown>
+			first: <T = unknown>() => Promise<T | null>
+		}
+	}
 }
 
 function toInt(value: string | undefined, fallback: number) {
@@ -84,6 +95,28 @@ function missingTurnstileSecretResult(env: Record<string, string | undefined>): 
 	}
 }
 
+async function checkAbuseRateLimit(db: RateLimitDb | undefined, key: string, limit: number, windowMs: number) {
+	if (!db) return checkMemoryRateLimit(key, limit, windowMs)
+	const now = Math.floor(Date.now() / 1000)
+	const resetAt = now + Math.max(1, Math.ceil(windowMs / 1000))
+	await db.prepare(
+		`INSERT INTO rate_limits (key, count, reset_at) VALUES (?, 1, ?)
+		 ON CONFLICT(key) DO UPDATE SET
+		   count = CASE WHEN reset_at <= ? THEN 1 ELSE count + 1 END,
+		   reset_at = CASE WHEN reset_at <= ? THEN excluded.reset_at ELSE reset_at END`
+	).bind(key, resetAt, now, now).run()
+	const row = await db.prepare(
+		`SELECT count, reset_at FROM rate_limits WHERE key = ? LIMIT 1`
+	).bind(key).first<{ count: number; reset_at: number }>()
+	const count = Number(row?.count ?? 1)
+	return {
+		allowed: count <= limit,
+		remaining: Math.max(0, limit - count),
+		resetAt: Number(row?.reset_at ?? resetAt) * 1000,
+		count
+	}
+}
+
 export async function runRegisterAntiAbuse(input: RegisterAntiAbuseInput): Promise<RegisterAntiAbuseResult> {
 	const now = input.nowMs ?? Date.now()
 	const antiAbuseEnabled = enabled(input.env['ANTIABUSE_ENABLED'], true)
@@ -107,11 +140,12 @@ export async function runRegisterAntiAbuse(input: RegisterAntiAbuseInput): Promi
 	const ratePerAsn = toInt(input.env['REGISTRATION_RATE_LIMIT_PER_ASN'], 30)
 	const rateWindowMs = toInt(input.env['REGISTRATION_RATE_LIMIT_WINDOW_MS'], 60 * 60 * 1000)
 
-	const ipCheck = checkRateLimit(keyForRateLimit('signup:ip', input.ip || 'unknown'), ratePerIp, rateWindowMs)
+	const ipCheck = await checkAbuseRateLimit(input.db, keyForRateLimit('signup:ip', input.ip || 'unknown'), ratePerIp, rateWindowMs)
 	if (!ipCheck.allowed) return genericFailure()
 	if (ipCheck.count > Math.ceil(ratePerIp * 0.7)) riskScore += 1
 
-	const emailCheck = checkRateLimit(
+	const emailCheck = await checkAbuseRateLimit(
+		input.db,
 		keyForRateLimit('signup:email', input.email || 'unknown@example.com'),
 		ratePerEmail,
 		rateWindowMs
@@ -120,8 +154,9 @@ export async function runRegisterAntiAbuse(input: RegisterAntiAbuseInput): Promi
 	if (emailCheck.count > Math.ceil(ratePerEmail * 0.6)) riskScore += 1
 
 	if (input.deviceId) {
-		const deviceCheck = checkRateLimit(
-			keyForRateLimit('signup:device', input.deviceId),
+			const deviceCheck = await checkAbuseRateLimit(
+				input.db,
+				keyForRateLimit('signup:device', input.deviceId),
 			ratePerDevice,
 			rateWindowMs
 		)
@@ -130,7 +165,7 @@ export async function runRegisterAntiAbuse(input: RegisterAntiAbuseInput): Promi
 	}
 
 	if (input.asn) {
-		const asnCheck = checkRateLimit(keyForRateLimit('signup:asn', input.asn), ratePerAsn, rateWindowMs)
+		const asnCheck = await checkAbuseRateLimit(input.db, keyForRateLimit('signup:asn', input.asn), ratePerAsn, rateWindowMs)
 		if (!asnCheck.allowed) return genericFailure()
 		if (asnCheck.count > Math.ceil(ratePerAsn * 0.75)) riskScore += 1
 	}
@@ -196,11 +231,12 @@ export async function runContactAntiAbuse(input: ContactAntiAbuseInput): Promise
 	const ratePerAsn = toInt(input.env['CONTACT_RATE_LIMIT_PER_ASN'], 20)
 	const rateWindowMs = toInt(input.env['CONTACT_RATE_LIMIT_WINDOW_MS'], 60 * 60 * 1000)
 
-	const ipCheck = checkRateLimit(keyForRateLimit('contact:ip', input.ip || 'unknown'), ratePerIp, rateWindowMs)
+	const ipCheck = await checkAbuseRateLimit(input.db, keyForRateLimit('contact:ip', input.ip || 'unknown'), ratePerIp, rateWindowMs)
 	if (!ipCheck.allowed) return genericFailure()
 	if (ipCheck.count > Math.ceil(ratePerIp * 0.5)) riskScore += 1
 
-	const emailCheck = checkRateLimit(
+	const emailCheck = await checkAbuseRateLimit(
+		input.db,
 		keyForRateLimit('contact:email', input.email || 'unknown@example.com'),
 		ratePerEmail,
 		rateWindowMs
@@ -209,8 +245,9 @@ export async function runContactAntiAbuse(input: ContactAntiAbuseInput): Promise
 	if (emailCheck.count > Math.ceil(ratePerEmail * 0.5)) riskScore += 1
 
 	if (input.deviceId) {
-		const deviceCheck = checkRateLimit(
-			keyForRateLimit('contact:device', input.deviceId),
+			const deviceCheck = await checkAbuseRateLimit(
+				input.db,
+				keyForRateLimit('contact:device', input.deviceId),
 			ratePerDevice,
 			rateWindowMs
 		)
@@ -219,7 +256,7 @@ export async function runContactAntiAbuse(input: ContactAntiAbuseInput): Promise
 	}
 
 	if (input.asn) {
-		const asnCheck = checkRateLimit(keyForRateLimit('contact:asn', input.asn), ratePerAsn, rateWindowMs)
+		const asnCheck = await checkAbuseRateLimit(input.db, keyForRateLimit('contact:asn', input.asn), ratePerAsn, rateWindowMs)
 		if (!asnCheck.allowed) return genericFailure()
 		if (asnCheck.count > Math.ceil(ratePerAsn * 0.6)) riskScore += 1
 	}

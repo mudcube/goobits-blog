@@ -81,7 +81,7 @@
 		max-width: var(--max-width-readable);
 		margin: 0 auto;
 		width: 100%;
-		padding: 0.55rem 1rem;
+		padding: 0.25rem 1rem;
 		box-sizing: border-box;
 		min-width: 0;
 		flex-wrap: wrap;
@@ -90,6 +90,9 @@
 	.calendar-shell-nav__home {
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
+		min-width: 44px;
+		min-height: 44px;
 		text-decoration: none;
 	}
 	.calendar-shell-nav__home-logo {
@@ -98,8 +101,11 @@
 		width: auto;
 	}
 	.calendar-shell-nav__brand { color: var(--calendar-shell-text); text-decoration: none; font-weight: 700; }
-	.calendar-shell-nav__links { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+	.calendar-shell-nav__links { display: flex; gap: 0.25rem; flex-wrap: wrap; }
 	.calendar-shell-nav__link {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
 		text-decoration: none;
 		color: color-mix(in srgb, var(--calendar-shell-text) 75%, transparent);
 		padding: 0.3rem 0.6rem;
@@ -118,4 +124,13 @@
 		background: color-mix(in srgb, var(--calendar-shell-text) 14%, transparent);
 	}
 	.calendar-shell-nav__right { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+
+	@media (max-width: 25em) {
+		.calendar-shell-nav__inner {
+			gap: 0.25rem;
+			padding-inline: 0.5rem;
+		}
+		.calendar-shell-nav__left { gap: 0.25rem; }
+		.calendar-shell-nav__link { padding: 0.3rem 0.5rem; }
+	}
 </style>

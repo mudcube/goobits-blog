@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '@calendar/theme/admin.scss'
 	import NoIndexHead from '$lib/app/seo/NoIndexHead.svelte'
 
 	const { children } = $props()

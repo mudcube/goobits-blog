@@ -35,7 +35,7 @@
 		min-width: 0;
 	}
 
-	@media (max-width: 760px) {
+	@media (max-width: 47.5em) {
 		.ui-page-shell {
 			padding-top: var(--page-shell-space-top-mobile);
 		}

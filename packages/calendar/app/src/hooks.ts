@@ -13,6 +13,7 @@ async function tryBootstrapDevCalendarSession(event: Parameters<Handle>[0]['even
 	const requestUrl = new URL(event.request.url)
 	const previewFlag = requestUrl.searchParams.get('preview')
 	if (previewFlag !== '1') return false
+	if (requestUrl.hostname !== 'localhost' && requestUrl.hostname !== '127.0.0.1') return false
 
 	const env = await buildEnv(event.platform)
 	if (env['NODE_ENV'] !== 'development') return false

@@ -132,12 +132,27 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 	const nonce = crypto.randomUUID()
 	event.locals.cspNonce = nonce
 
-	let response = await resolve(event, {
-		transformPageChunk: ({ html }) => {
-			// Add nonce attribute to all <script> tags in the rendered HTML
-			return html.replace(/<script(?=[\s>])/g, `<script nonce="${nonce}"`)
+	let response: Response
+	try {
+		response = await resolve(event, {
+			transformPageChunk: ({ html }) => {
+				// Add nonce attribute to all <script> tags in the rendered HTML
+				return html.replace(/<script(?=[\s>])/g, `<script nonce="${nonce}"`)
+			}
+		})
+	} catch (caught) {
+		if (caught && typeof caught === 'object' && 'status' in caught && 'location' in caught) {
+			const status = Number((caught as { status?: unknown }).status)
+			const location = (caught as { location?: unknown }).location
+			if (Number.isFinite(status) && typeof location === 'string') {
+				response = new Response(null, { status, headers: { location } })
+			} else {
+				throw caught
+			}
+		} else {
+			throw caught
 		}
-	})
+	}
 
 	const url = event.url
 	const isHttps = url?.protocol === 'https:'
@@ -158,12 +173,12 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 		"base-uri 'self'",
 		"form-action 'self'",
 		"frame-ancestors 'none'",
-		"img-src 'self' data: https:",
-		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
-		`script-src 'self' https://challenges.cloudflare.com 'nonce-${nonce}'${dev ? " 'unsafe-eval'" : ''}`,
-		"frame-src 'self' https://challenges.cloudflare.com",
-		"connect-src 'self' https://challenges.cloudflare.com https:",
-		"font-src 'self' data: https:"
+			"img-src 'self' data: https://miko.art https://www.miko.art https://cdn.jsdelivr.net https://challenges.cloudflare.com",
+			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+			`script-src 'self' https://challenges.cloudflare.com https://www.paypal.com https://www.paypalobjects.com https://web.squarecdn.com https://sandbox.web.squarecdn.com 'nonce-${nonce}'${dev ? " 'unsafe-eval'" : ''}`,
+			"frame-src 'self' https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com",
+			"connect-src 'self' https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com https://api-m.paypal.com https://api-m.sandbox.paypal.com https://connect.squareup.com https://connect.squareupsandbox.com https://web.squarecdn.com https://sandbox.web.squarecdn.com",
+			"font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com"
 	].join('; ')
 
 	const applySecurityHeaders = (target: Response) => {
@@ -196,11 +211,11 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 }
 
 export const handle = sequence(
+	securityHeadersHandle,
 	themeHandle,
 	handleRedirects,
 	releaseVisibilityHandle,
 	handleAdminAuth,
 	handleCalendarAuth,
-	requireCalendarUser,
-	securityHeadersHandle
+	requireCalendarUser
 )

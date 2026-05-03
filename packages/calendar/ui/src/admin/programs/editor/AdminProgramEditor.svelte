@@ -4,7 +4,7 @@
 	import { onMount } from 'svelte'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import AdminCalendar from '../../dashboard/AdminCalendar.svelte'
-	import ProgramDayPopover from './ProgramDayPopover.svelte'
+	import ProgramDaySheet from './ProgramDaySheet.svelte'
 	import ProgramSettingsDrawer from './ProgramSettingsDrawer.svelte'
 	import { getAdminMockCatalog } from '../../mock/catalog'
 	import { createHistory } from '../../history/create-history'
@@ -52,10 +52,6 @@
 	let currentMonth = $state(new Date())
 	let selectedDayDate = $state<Date | null>(null)
 	let popOpen = $state(false)
-	let popTop = $state(0)
-	let popLeft = $state(0)
-	let popBottom = $state(0)
-	let popAbove = $state(false)
 	let selectedEventId = $state<number | null>(null)
 	let originalPopTime = $state('')
 	let originalPopCap = $state(0)
@@ -330,7 +326,7 @@
 		closePop()
 	}
 
-	function openDay(dayDate: Date, dayEl: HTMLButtonElement) {
+	function openDay(dayDate: Date, _dayEl?: HTMLButtonElement) {
 		if (isPast(dayDate)) return
 		emojiPickerOpen = false
 		selectedDayDate = dayDate
@@ -350,19 +346,6 @@
 			)
 		})
 		selectedEventId = eventForDay?.id ?? null
-
-		const rect = dayEl.getBoundingClientRect()
-		const popWidth = 260
-		let left = rect.left + rect.width / 2
-		if (left - popWidth / 2 < 24) left = 24 + popWidth / 2
-		if (left + popWidth / 2 > window.innerWidth - 24) {
-			left = window.innerWidth - 24 - popWidth / 2
-		}
-		const goAbove = window.innerHeight - rect.bottom < 300
-		popAbove = goAbove
-		popTop = goAbove ? rect.top - 10 : rect.bottom + 10
-		popBottom = goAbove ? window.innerHeight - rect.top + 10 : 0
-		popLeft = left
 		popOpen = true
 	}
 
@@ -550,14 +533,6 @@
 		const target = event.target as HTMLElement
 		if (!target.closest('.program-editor__emoji-wrap')) {
 			emojiPickerOpen = false
-		}
-		if (
-			popOpen &&
-			!target.closest('.program-editor__popover') &&
-			!target.closest('.cg__cell') &&
-			!target.closest('.program-editor__new-session')
-		) {
-			closePop()
 		}
 	}
 
@@ -747,11 +722,11 @@
 						<button
 							type="button"
 							class="program-editor__new-session"
-							onclick={(event) => {
+							onclick={() => {
 								const target = new Date()
 								target.setHours(0, 0, 0, 0)
 								if (isPast(target)) target.setDate(target.getDate() + 1)
-								openDay(target, event.currentTarget)
+								openDay(target)
 							}}
 						>
 							+ New session
@@ -773,25 +748,20 @@
 					/>
 				</div>
 
-				{#if popOpen}
-					<ProgramDayPopover
-						selectedDayDate={selectedDayDate}
-						activeDay={selectedDayDate ? (activeDays[isoDay(selectedDayDate)] ?? null) : null}
-						{popLeft}
-						{popTop}
-						{popBottom}
-						{popAbove}
-						bind:newMode
-						bind:untilMode
-						bind:untilDate
-						bind:popTime
-						bind:popCap
-						onClose={closePop}
-						onAdd={() => void persistDaySchedule()}
-						onRemove={() => void removeDay()}
-						onDone={() => void persistExistingDayEdits()}
-					/>
-				{/if}
+				<ProgramDaySheet
+					open={popOpen}
+					selectedDayDate={selectedDayDate}
+					activeDay={selectedDayDate ? (activeDays[isoDay(selectedDayDate)] ?? null) : null}
+					bind:newMode
+					bind:untilMode
+					bind:untilDate
+					bind:popTime
+					bind:popCap
+					onClose={closePop}
+					onAdd={() => void persistDaySchedule()}
+					onRemove={() => void removeDay()}
+					onDone={() => void persistExistingDayEdits()}
+				/>
 
 				<p class="program-editor__hint">
 					<Lightbulb class="program-editor__hint-icon" size={14} strokeWidth={1.9} aria-hidden="true" />
