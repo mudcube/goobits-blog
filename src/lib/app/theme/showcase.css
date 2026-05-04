@@ -6,6 +6,12 @@
 	color: var(--text);
 }
 
+@media (max-width: 47.5em) {
+	.ui-page-shell.ui-page-shell.showcase-page {
+		padding-top: var(--page-shell-space-top-mobile);
+	}
+}
+
 .ui-page-shell.ui-page-shell.showcase-page > * {
 	grid-column: 1;
 }

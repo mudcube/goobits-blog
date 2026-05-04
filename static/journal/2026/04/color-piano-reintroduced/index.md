@@ -1,6 +1,7 @@
 ---
 title: "Color Piano, Reintroduced"
 date: "2026-04-16"
+draft: true
 categories:
   - "apps"
 tags:

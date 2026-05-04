@@ -446,17 +446,18 @@
 			{/if}
 
 			<header class="settings__head">
+				<span class="settings__head-eyebrow">Preferences</span>
 				<h1>Settings</h1>
+				<p class="settings__head-sub">Configure sync &amp; payment defaults for your space.</p>
 			</header>
 
-			<section id="calendar" class="settings__section">
+			<section id="calendar-sync" class="settings__section">
 				<header class="settings__section-head">
-					<h2>Calendar</h2>
+					<h4>CALENDAR SYNC</h4>
 					<span class="save-indicator" data-state={calendarSave}>{saveLabel(calendarSave)}</span>
 				</header>
 
 				<div class="settings__row settings__row--stack">
-					<div class="settings__row-label">Sync</div>
 					{#if sync.active}
 						<div class="sync-line">
 							<span class="sync-line__icon" aria-hidden="true">{@render providerIcon(sync.active)}</span>
@@ -484,6 +485,12 @@
 						</button>
 					{/if}
 				</div>
+			</section>
+
+			<section id="calendar-view" class="settings__section">
+				<header class="settings__section-head">
+					<h4>CALENDAR VIEW</h4>
+				</header>
 
 				<div class="settings__row">
 					<div class="settings__row-label">Week starts on</div>
@@ -513,9 +520,9 @@
 			<section id="payments" class="settings__section">
 				<header class="settings__section-head">
 					<div>
-						<h2>Payments</h2>
+						<h4>PAYMENT</h4>
 						<p class="settings__section-sub">
-							How buyers pay you. One method is your primary.
+							How buyers pay you. Add as many methods as you want — pick one as primary.
 						</p>
 					</div>
 					<div class="settings__section-meta">
@@ -561,7 +568,7 @@
 									{/if}
 								</span>
 								<span class="payment-row__chev" aria-hidden="true">
-									{#if row.expanded}<ChevronDown size={16} />{:else}<ChevronRight size={16} />{/if}
+									{#if row.expanded}<ChevronDown size={14} />{:else}<ChevronRight size={14} />{/if}
 								</span>
 							</button>
 
@@ -1178,20 +1185,43 @@
 		background: color-mix(in srgb, var(--admin-accent) 32%, transparent);
 	}
 
-	/* settings page */
+	/* settings page — left-aligned, original-style typography */
 	.settings {
 		display: grid;
-		gap: 1.4rem;
+		gap: 0.9rem;
 		width: 100%;
 		max-width: var(--admin-content-max);
-		margin: 0 auto;
 	}
 
+	.settings__head {
+		display: block;
+		margin: 0 0 0.9rem;
+	}
+	.settings__head-eyebrow {
+		display: block;
+		margin: 0 0 0.25rem;
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: 0.71rem;
+		font-weight: 650;
+		letter-spacing: 0.07em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--text) 48%, transparent);
+	}
 	.settings__head h1 {
 		margin: 0;
-		font-size: 1.4rem;
-		font-weight: 680;
-		letter-spacing: -0.01em;
+		font-family: var(--font-display);
+		font-size: clamp(1.7rem, 2.8vw, 2.35rem);
+		font-weight: 500;
+		letter-spacing: -0.03em;
+		line-height: 1.08;
+		color: var(--text);
+	}
+	.settings__head-sub {
+		margin: 0.42rem 0 0;
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: 0.9rem;
+		line-height: 1.5;
+		color: color-mix(in srgb, var(--text) 64%, transparent);
 	}
 
 	.settings__section {
@@ -1204,18 +1234,19 @@
 		align-items: flex-start;
 		justify-content: space-between;
 		gap: 1rem;
-		padding-bottom: 0.4rem;
-		border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
 	}
-	.settings__section-head h2 {
+	.settings__section-head h4 {
 		margin: 0;
-		font-size: 0.92rem;
-		font-weight: 660;
-		letter-spacing: -0.005em;
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+		font-weight: 700;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--text) 55%, transparent);
 	}
 	.settings__section-sub {
-		margin: 0.2rem 0 0;
+		margin: 0.15rem 0 0;
 		font-size: 0.74rem;
+		font-weight: 520;
 		color: color-mix(in srgb, var(--text) 56%, transparent);
 	}
 	.settings__section-meta {
@@ -1278,8 +1309,9 @@
 		background: color-mix(in srgb, var(--text) 6%, transparent);
 	}
 	.sync-line__name {
-		font-size: 0.86rem;
-		font-weight: 620;
+		font-size: 0.92rem;
+		font-weight: 680;
+		letter-spacing: -0.005em;
 	}
 	.sync-line__status {
 		display: inline-flex;
@@ -1310,7 +1342,7 @@
 		font-size: 0.8rem;
 		font-weight: 620;
 		border: 1px dashed color-mix(in srgb, var(--text) 22%, transparent);
-		border-radius: 0.55rem;
+		border-radius: 0.625rem;
 		background: transparent;
 		color: var(--text);
 		cursor: pointer;
@@ -1425,16 +1457,16 @@
 	}
 
 	.pill {
-		font-size: 0.64rem;
+		font-size: 0.7rem;
 		font-weight: 700;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.06em;
 		text-transform: uppercase;
-		padding: 0.2rem 0.45rem;
-		border-radius: 0.4rem;
+		padding: 0.32rem 0.7rem;
+		border-radius: 0.5rem;
 		line-height: 1;
 		display: inline-flex;
 		align-items: center;
-		gap: 0.25rem;
+		gap: 0.3rem;
 	}
 	.pill--primary {
 		background: var(--method-color);
@@ -1464,14 +1496,17 @@
 	}
 	.field__label {
 		font-size: 0.74rem;
-		font-weight: 620;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		font-weight: 660;
+		color: color-mix(in srgb, var(--text) 64%, transparent);
 		display: flex;
 		justify-content: space-between;
 		gap: 0.5rem;
 	}
 	.field__control {
 		position: relative;
+	}
+	.field__input {
+		font-size: 0.92rem;
 	}
 	.field__check {
 		position: absolute;
@@ -1482,9 +1517,10 @@
 		display: inline-flex;
 	}
 	.field__hint {
-		margin: 0;
-		font-size: 0.72rem;
-		color: color-mix(in srgb, var(--text) 52%, transparent);
+		margin: 0.15rem 0 0;
+		font-size: 0.74rem;
+		font-weight: 520;
+		color: color-mix(in srgb, var(--text) 56%, transparent);
 	}
 
 	.checkout {
@@ -1498,13 +1534,15 @@
 		gap: 0.85rem;
 	}
 	.checkout__title {
-		font-size: 0.82rem;
-		font-weight: 640;
+		font-size: 0.84rem;
+		font-weight: 660;
+		letter-spacing: -0.005em;
 	}
 	.checkout__blurb {
-		margin: 0.15rem 0 0;
-		font-size: 0.72rem;
-		color: color-mix(in srgb, var(--text) 56%, transparent);
+		margin: 0.2rem 0 0;
+		font-size: 0.74rem;
+		font-weight: 520;
+		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
 	.checkout__alert {
 		display: inline-flex;
@@ -1519,8 +1557,8 @@
 
 	.toggle {
 		flex-shrink: 0;
-		width: 2.4rem;
-		height: 1.4rem;
+		width: 2.1rem;
+		height: 1.2rem;
 		padding: 0;
 		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
 		border-radius: 999px;
@@ -1533,11 +1571,11 @@
 		position: absolute;
 		top: 0.13rem;
 		left: 0.13rem;
-		width: 1.04rem;
-		height: 1.04rem;
+		width: 0.86rem;
+		height: 0.86rem;
 		border-radius: 999px;
 		background: var(--bg);
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
 		transition: transform 150ms ease;
 	}
 	.toggle--on {
@@ -1545,7 +1583,7 @@
 		border-color: var(--method-color);
 	}
 	.toggle--on .toggle__knob {
-		transform: translateX(1rem);
+		transform: translateX(0.88rem);
 	}
 
 	.disclosure {
