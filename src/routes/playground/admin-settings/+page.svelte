@@ -617,12 +617,19 @@
 											</div>
 											<button
 												type="button"
-												class="admin-btn"
-												class:admin-btn--accent={row.checkoutEnabled}
-												aria-pressed={row.checkoutEnabled}
+												class="switch"
+												class:switch--on={row.checkoutEnabled}
+												role="switch"
+												aria-checked={row.checkoutEnabled}
+												aria-label={`${row.checkoutEnabled ? 'Disable' : 'Enable'} ${method.label} checkout`}
 												onclick={() => toggleCheckout(method.key)}
 											>
-												{row.checkoutEnabled ? 'On' : 'Off'}
+												<span class="switch__track" aria-hidden="true">
+													<span class="switch__knob"></span>
+												</span>
+												<span class="switch__label">
+													{row.checkoutEnabled ? 'On' : 'Off'}
+												</span>
 											</button>
 										</div>
 
@@ -1239,13 +1246,15 @@
 	}
 	.profile-menu__name {
 		font-size: 0.82rem;
-		font-weight: 660;
+		font-weight: 560;
 		color: var(--text);
 	}
 	.profile-menu__email {
 		font-size: 0.72rem;
-		color: color-mix(in srgb, var(--text) 56%, transparent);
-		margin-top: 0.1rem;
+		font-weight: 400;
+		font-style: italic;
+		color: color-mix(in srgb, var(--text) 54%, transparent);
+		margin-top: 0.15rem;
 	}
 	.profile-menu__divider {
 		height: 1px;
@@ -1262,8 +1271,8 @@
 		background: transparent;
 		font: inherit;
 		font-size: 0.78rem;
-		font-weight: 580;
-		color: color-mix(in srgb, var(--text) 75%, transparent);
+		font-weight: 500;
+		color: color-mix(in srgb, var(--text) 72%, transparent);
 		cursor: pointer;
 		text-align: left;
 	}
@@ -1283,11 +1292,11 @@
 
 	.settings__save {
 		position: absolute;
-		top: 0.35rem;
+		top: 0.4rem;
 		right: 0;
-		font-size: 0.72rem;
-		font-weight: 620;
-		letter-spacing: 0.02em;
+		font-size: 0.74rem;
+		font-weight: 440;
+		font-style: italic;
 		color: color-mix(in srgb, var(--text) 56%, transparent);
 		opacity: 1;
 		transition: opacity 200ms ease;
@@ -1309,7 +1318,7 @@
 		margin: 0 0 0.25rem;
 		font-family: var(--font-ui-sans, var(--font-sans));
 		font-size: 0.71rem;
-		font-weight: 650;
+		font-weight: 600;
 		letter-spacing: 0.07em;
 		text-transform: uppercase;
 		color: color-mix(in srgb, var(--text) 48%, transparent);
@@ -1324,11 +1333,13 @@
 		color: var(--text);
 	}
 	.settings__head-sub {
-		margin: 0.42rem 0 0;
+		margin: 0.5rem 0 0;
 		font-family: var(--font-ui-sans, var(--font-sans));
 		font-size: 0.9rem;
-		line-height: 1.5;
-		color: color-mix(in srgb, var(--text) 64%, transparent);
+		font-weight: 400;
+		font-style: italic;
+		line-height: 1.55;
+		color: color-mix(in srgb, var(--text) 56%, transparent);
 	}
 
 	.settings__section {
@@ -1345,10 +1356,10 @@
 	.settings__section-head h4 {
 		margin: 0;
 		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		font-weight: 700;
+		letter-spacing: 0.09em;
+		font-weight: 600;
 		text-transform: uppercase;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
+		color: color-mix(in srgb, var(--text) 50%, transparent);
 	}
 	.sync-card {
 		display: grid;
@@ -1379,7 +1390,7 @@
 	}
 	.sync-card__name {
 		font-size: 0.92rem;
-		font-weight: 680;
+		font-weight: 580;
 		letter-spacing: -0.005em;
 	}
 	.sync-card__status {
@@ -1387,8 +1398,9 @@
 		align-items: center;
 		gap: 0.4rem;
 		font-size: 0.76rem;
-		font-weight: 520;
-		color: color-mix(in srgb, var(--text) 58%, transparent);
+		font-weight: 420;
+		font-style: italic;
+		color: color-mix(in srgb, var(--text) 56%, transparent);
 	}
 	.sync-card__dot {
 		width: 0.45rem;
@@ -1411,7 +1423,7 @@
 		padding: 0 0.85rem;
 		font: inherit;
 		font-size: 0.78rem;
-		font-weight: 620;
+		font-weight: 560;
 		letter-spacing: -0.003em;
 		border-radius: 0.625rem;
 		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
@@ -1498,8 +1510,8 @@
 		background: var(--admin-card-bg);
 		color: color-mix(in srgb, var(--text) 70%, transparent);
 		cursor: pointer;
-		font-size: 0.76rem;
-		font-weight: 620;
+		font-size: 0.8rem;
+		font-weight: 520;
 		letter-spacing: -0.005em;
 		transition:
 			border-color 120ms ease,
@@ -1570,10 +1582,11 @@
 	}
 	.payment-row__name {
 		font-size: 0.86rem;
-		font-weight: 620;
+		font-weight: 560;
 	}
 	.payment-row__handle {
 		font-size: 0.78rem;
+		font-weight: 400;
 		color: color-mix(in srgb, var(--text) 60%, transparent);
 		font-variant-numeric: tabular-nums;
 		overflow: hidden;
@@ -1582,6 +1595,7 @@
 	}
 	.payment-row__placeholder {
 		font-style: italic;
+		font-weight: 400;
 		opacity: 0.7;
 	}
 	.payment-row__meta {
@@ -1594,8 +1608,7 @@
 		align-items: center;
 		gap: 0.3rem;
 		font-size: 0.72rem;
-		font-weight: 620;
-		letter-spacing: 0.02em;
+		font-weight: 540;
 		color: color-mix(in srgb, var(--text) 58%, transparent);
 		padding: 0.28rem 0.6rem;
 		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
@@ -1608,11 +1621,11 @@
 	}
 
 	.pill {
-		font-size: 0.7rem;
-		font-weight: 700;
-		letter-spacing: 0.06em;
+		font-size: 0.66rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		padding: 0.32rem 0.7rem;
+		padding: 0.3rem 0.6rem;
 		border-radius: 0.5rem;
 		line-height: 1;
 		display: inline-flex;
@@ -1649,8 +1662,8 @@
 	}
 	.field__label {
 		font-size: 0.74rem;
-		font-weight: 660;
-		color: color-mix(in srgb, var(--text) 64%, transparent);
+		font-weight: 540;
+		color: color-mix(in srgb, var(--text) 60%, transparent);
 		display: flex;
 		justify-content: space-between;
 		gap: 0.5rem;
@@ -1670,10 +1683,12 @@
 		display: inline-flex;
 	}
 	.field__hint {
-		margin: 0.15rem 0 0;
+		margin: 0.2rem 0 0;
 		font-size: 0.74rem;
-		font-weight: 520;
-		color: color-mix(in srgb, var(--text) 56%, transparent);
+		font-weight: 420;
+		font-style: italic;
+		line-height: 1.5;
+		color: color-mix(in srgb, var(--text) 54%, transparent);
 	}
 
 	.checkout {
@@ -1688,14 +1703,16 @@
 	}
 	.checkout__title {
 		font-size: 0.84rem;
-		font-weight: 660;
+		font-weight: 560;
 		letter-spacing: -0.005em;
 	}
 	.checkout__blurb {
-		margin: 0.2rem 0 0;
+		margin: 0.25rem 0 0;
 		font-size: 0.74rem;
-		font-weight: 520;
-		color: color-mix(in srgb, var(--text) 58%, transparent);
+		font-weight: 420;
+		font-style: italic;
+		line-height: 1.5;
+		color: color-mix(in srgb, var(--text) 54%, transparent);
 	}
 	.checkout__alert {
 		display: flex;
@@ -1703,7 +1720,7 @@
 		justify-content: space-between;
 		gap: 0.6rem;
 		font-size: 0.76rem;
-		font-weight: 540;
+		font-weight: 460;
 		padding: 0.5rem 0.55rem 0.5rem 0.8rem;
 		border-radius: 0.625rem;
 		background: var(--admin-status-warn-bg);
@@ -1716,14 +1733,73 @@
 		gap: 0.4rem;
 	}
 
+	.switch {
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		border: none;
+		background: transparent;
+		padding: 0.15rem 0.1rem;
+		cursor: pointer;
+		font: inherit;
+	}
+	.switch__track {
+		position: relative;
+		display: inline-block;
+		width: 2.25rem;
+		height: 1.3rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--text) 12%, transparent);
+		border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+		transition:
+			background 160ms ease,
+			border-color 160ms ease;
+	}
+	.switch__knob {
+		position: absolute;
+		top: 0.13rem;
+		left: 0.15rem;
+		width: 0.95rem;
+		height: 0.95rem;
+		border-radius: 999px;
+		background: var(--bg);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+		transition: transform 160ms ease;
+	}
+	.switch__label {
+		font-size: 0.74rem;
+		font-weight: 500;
+		font-style: italic;
+		color: color-mix(in srgb, var(--text) 56%, transparent);
+		min-width: 1.5rem;
+		text-align: left;
+	}
+	.switch--on .switch__track {
+		background: var(--admin-accent);
+		border-color: var(--admin-accent);
+	}
+	.switch--on .switch__knob {
+		transform: translateX(0.94rem);
+	}
+	.switch--on .switch__label {
+		color: var(--admin-accent);
+		font-style: normal;
+		font-weight: 580;
+	}
+	.switch:focus-visible .switch__track {
+		outline: 2px solid var(--admin-focus-ring, var(--admin-accent));
+		outline-offset: 2px;
+	}
+
 	.disclosure {
 		justify-self: start;
 		border: none;
 		background: none;
 		font: inherit;
 		font-size: 0.74rem;
-		font-weight: 580;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		font-weight: 500;
+		color: color-mix(in srgb, var(--text) 58%, transparent);
 		display: inline-flex;
 		align-items: center;
 		gap: 0.3rem;
@@ -1763,7 +1839,7 @@
 		color: var(--admin-status-warn-fg);
 		border: 1px solid color-mix(in srgb, var(--admin-status-warn-fg) 22%, transparent);
 		font-size: 0.78rem;
-		font-weight: 540;
+		font-weight: 460;
 	}
 	.attention__text {
 		flex: 1;
@@ -1797,8 +1873,9 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
-		font-size: 0.76rem;
-		font-weight: 560;
+		font-size: 0.78rem;
+		font-weight: 460;
+		font-style: italic;
 	}
 	.hint--ok {
 		color: var(--admin-status-success-dot, #16a34a);
@@ -1878,8 +1955,8 @@
 	}
 	.sheet__head h3 {
 		margin: 0;
-		font-size: 0.92rem;
-		font-weight: 680;
+		font-size: 0.95rem;
+		font-weight: 580;
 		letter-spacing: -0.005em;
 		color: var(--text);
 	}
@@ -1891,9 +1968,10 @@
 	}
 	.sheet__current {
 		margin: 0;
-		font-size: 0.76rem;
-		font-weight: 520;
-		color: color-mix(in srgb, var(--text) 58%, transparent);
+		font-size: 0.78rem;
+		font-weight: 420;
+		font-style: italic;
+		color: color-mix(in srgb, var(--text) 56%, transparent);
 	}
 	.sheet__list {
 		display: grid;
@@ -1938,16 +2016,18 @@
 	}
 	.sheet__opt-label {
 		font-size: 0.86rem;
-		font-weight: 620;
+		font-weight: 540;
 	}
 	.sheet__check {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		font-size: 0.76rem;
-		font-weight: 520;
-		color: color-mix(in srgb, var(--text) 64%, transparent);
+		font-size: 0.78rem;
+		font-weight: 420;
+		font-style: italic;
+		color: color-mix(in srgb, var(--text) 60%, transparent);
 		padding: 0.3rem 0;
+		line-height: 1.45;
 	}
 	.sheet__check input {
 		width: 0.95rem;
