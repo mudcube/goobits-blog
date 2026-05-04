@@ -76,9 +76,11 @@
     position: relative;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    padding: 0.75rem 0.875rem;
-    border-radius: 0.875rem;
+    min-height: 2.4rem;
+    padding: 0 0.875rem;
+    border-radius: 0.625rem;
     border: 1px solid var(--admin-card-border);
     background: var(--admin-card-bg);
     color: color-mix(in srgb, var(--text) 70%, transparent);
@@ -90,8 +92,8 @@
   }
 
   .calendar-view-settings__option:hover {
-    background: var(--admin-card-bg-hover, var(--admin-card-bg));
-    border-color: color-mix(in srgb, var(--admin-accent) 24%, transparent);
+    background: color-mix(in srgb, var(--admin-accent) 7%, var(--bg) 93%);
+    border-color: color-mix(in srgb, var(--admin-accent) 28%, transparent);
   }
 
   .calendar-view-settings__option input {
@@ -107,8 +109,8 @@
   }
 
   .calendar-view-settings__label {
-    font-size: 0.76rem;
-    font-weight: 620;
+    font-size: 0.82rem;
+    font-weight: 520;
     letter-spacing: -0.005em;
   }
 
