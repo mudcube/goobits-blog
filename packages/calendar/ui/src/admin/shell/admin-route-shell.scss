@@ -414,41 +414,6 @@ $admin-mobile-breakpoint: 768px;
   color: var(--admin-active-fg);
 }
 
-.social-admin__logout {
-  margin: 0;
-}
-
-.social-admin__logout button {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  width: 100%;
-  padding: 0.5rem 0.625rem;
-  border-radius: 0.5rem;
-  border: none;
-  background: transparent;
-  color: color-mix(in srgb, var(--admin-muted) 80%, var(--text));
-  font-size: 0.8125rem;
-  font-weight: 400;
-  font-family: inherit;
-  line-height: 1.25;
-  cursor: pointer;
-  text-align: left;
-  transition:
-    color 0.15s,
-    background 0.15s;
-}
-
-.social-admin__logout button:hover {
-  color: var(--text);
-  background: color-mix(in srgb, var(--text) 3.5%, transparent);
-}
-
-.social-admin__logout button:focus-visible {
-  outline: 2px solid var(--text);
-  outline-offset: -2px;
-}
-
 .social-admin__breadcrumbs {
   grid-column: 2;
   grid-row: 1;
@@ -502,13 +467,46 @@ $admin-mobile-breakpoint: 768px;
   gap: 0.5rem;
   flex-shrink: 0;
   min-height: 32px;
-  min-width: 8.5rem;
   justify-content: flex-end;
 }
 
 .social-admin__breadcrumbs-actions--empty {
   pointer-events: none;
   visibility: hidden;
+}
+
+.social-admin__breadcrumbs-actions-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  min-height: 32px;
+  justify-content: flex-end;
+}
+
+.social-admin__topbar-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: transparent;
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+  text-decoration: none;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+
+.social-admin__topbar-icon:hover {
+  background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
+  color: var(--text);
+}
+
+.social-admin__topbar-icon--active {
+  background: var(--admin-active-bg);
+  color: var(--admin-active-fg);
 }
 
 .social-admin__main {
@@ -586,15 +584,6 @@ $admin-mobile-breakpoint: 768px;
   }
 
   .social-admin__nav-item {
-    white-space: nowrap;
-  }
-
-  .social-admin__logout {
-    flex-shrink: 0;
-  }
-
-  .social-admin__logout button {
-    width: auto;
     white-space: nowrap;
   }
 
