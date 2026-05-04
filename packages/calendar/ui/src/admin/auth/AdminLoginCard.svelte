@@ -1,6 +1,11 @@
 <script>
   import Button from "../../primitives/CalendarButton.svelte";
-  const { form, loginUrl = '/schedule/login?redirect=%2Fschedule%2Fadmin%2F', currentUser = null } = $props();
+  const {
+    form,
+    loginUrl = '/schedule/login?redirect=%2Fschedule%2Fadmin%2F',
+    currentUser = null,
+    canBootstrapAdmin = false
+  } = $props();
 </script>
 
 <div class="admin-page__login">
@@ -18,7 +23,7 @@
         variant="primary"
         size="lg"
       >Continue with Google</Button>
-    {:else}
+    {:else if canBootstrapAdmin}
       <p class="admin-login__hint">
         Signed in as {currentUser.email}. Enter the admin passcode once to grant this account access.
       </p>
@@ -46,6 +51,16 @@
           <p class="admin-login__error" role="status">{form.error}</p>
         {/if}
       </form>
+    {:else}
+      <p class="admin-login__hint">
+        Signed in as {currentUser.email}. This account does not have admin access.
+      </p>
+      <Button
+        href={loginUrl}
+        className="admin-login__unlock"
+        variant="secondary"
+        size="lg"
+      >Use another Google account</Button>
     {/if}
 
     <p class="admin-login__hint">The admin area shares the calendar login session; permissions stay separate.</p>

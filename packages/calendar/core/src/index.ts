@@ -33,6 +33,8 @@ import {
 } from './storage/d1.ts'
 import { toErrorResponse } from './utils/errors.ts'
 import {
+	canBootstrapCalendarAdmin,
+	getCalendarAdminCount,
 	getCalendarUserByEmail,
 	grantCalendarAdmin,
 	grantCalendarAdminByEmail,
@@ -228,6 +230,8 @@ export {
 	checkRateLimit,
 	listCalendarUsers,
 	toErrorResponse,
+	canBootstrapCalendarAdmin,
+	getCalendarAdminCount,
 	getCalendarUserByEmail,
 	grantCalendarAdmin,
 	grantCalendarAdminByEmail,

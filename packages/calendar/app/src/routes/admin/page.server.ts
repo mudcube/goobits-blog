@@ -1,8 +1,13 @@
 import { buildEnv, createCalendarSessionAdapter } from '@calendar/kit'
 import { createLogoutHandler } from '@goobits/auth/handlers'
 import { hashAdminApiKey, timingSafeEqual } from '@goobits/auth/security'
-import { checkRateLimit, getCalendarConfig, grantCalendarAdmin } from '@calendar/core'
-import { logAdminEvent } from '@calendar/app/admin-api-helpers'
+import {
+	canBootstrapCalendarAdmin,
+	checkRateLimit,
+	getCalendarConfig,
+	grantCalendarAdmin
+} from '@calendar/core'
+import { enforceSameOrigin, logAdminEvent } from '@calendar/app/admin-api-helpers'
 import { fail, redirect } from '@sveltejs/kit'
 import type { Actions, RequestEvent } from '@sveltejs/kit'
 
@@ -35,14 +40,32 @@ async function passcodeMatches(input: string, expected: string) {
 	return timingSafeEqual(inputHash, expectedHash)
 }
 
+function adminBootstrapEmail(env: Record<string, unknown>) {
+	const configured = env['ADMIN_BOOTSTRAP_EMAIL']
+	if (typeof configured === 'string' && configured.trim()) {
+		return configured.trim()
+	}
+	return getCalendarConfig().brand.adminEmail
+}
+
 export const load = async (event: RequestEvent) => {
 	const locals = event.locals as { user?: Record<string, unknown>; calendarAdmin?: boolean }
 	const config = getCalendarConfig()
+	const env = await buildEnv(event.platform)
+	const currentEmail = typeof locals.user?.['email'] === 'string' ? locals.user['email'] : null
+	const canBootstrapAdmin = locals.user
+		? await canBootstrapCalendarAdmin({
+			db: env.DB,
+			userEmail: currentEmail,
+			bootstrapEmail: adminBootstrapEmail(env)
+		})
+		: false
 	const adminPath = `${config.routes.adminBase}/`
 	return {
 		user: locals.calendarAdmin ? (locals.user ?? null) : null,
 		currentUser: locals.user ?? null,
 		isAdmin: locals.calendarAdmin === true,
+		canBootstrapAdmin,
 		loginUrl: `${config.routes.calendarLoginPath}?redirect=${encodeURIComponent(adminPath)}`,
 		initialTab: 'dashboard'
 	}
@@ -51,12 +74,32 @@ export const load = async (event: RequestEvent) => {
 export const actions: Actions = {
 	grantAdmin: async (event) => {
 		const locals = event.locals as { user?: { id?: string | number; email?: string } | null }
+		const sameOrigin = enforceSameOrigin(event)
+		if (sameOrigin) {
+			return fail(403, {
+				error: 'Forbidden.',
+				success: false
+			})
+		}
 		if (!locals.user?.id) {
 			const config = getCalendarConfig()
 			throw redirect(302, `${config.routes.calendarLoginPath}?redirect=${encodeURIComponent(`${config.routes.adminBase}/`)}`)
 		}
 
 		const env = await buildEnv(event.platform)
+		const canBootstrap = await canBootstrapCalendarAdmin({
+			db: env.DB,
+			userEmail: locals.user.email,
+			bootstrapEmail: adminBootstrapEmail(env)
+		})
+		if (!canBootstrap) {
+			logAdminEvent(event, 'admin_grant_denied', { userId: locals.user.id, email: locals.user.email })
+			return fail(403, {
+				error: 'This account cannot bootstrap admin access.',
+				success: false
+			})
+		}
+
 		const rateLimitKey = event.getClientAddress?.() ?? 'unknown'
 		const preflightLimit = await checkAdminLoginLimit(env.DB, rateLimitKey)
 		if (!preflightLimit.allowed) {

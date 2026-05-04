@@ -15,6 +15,7 @@ import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 			user: unknown | null
 			currentUser?: { email?: string | null } | null
 			isAdmin?: boolean
+			canBootstrapAdmin?: boolean
 			loginUrl?: string
 		}
 		form: unknown
@@ -61,7 +62,12 @@ const adminMockCatalog = getAdminMockCatalog()
 </script>
 
 {#if !authed}
-	<AdminLoginCard {form} loginUrl={data.loginUrl} currentUser={data.currentUser} />
+	<AdminLoginCard
+		{form}
+		loginUrl={data.loginUrl}
+		currentUser={data.currentUser}
+		canBootstrapAdmin={data.canBootstrapAdmin === true}
+	/>
 {:else}
 	<div class="social-home admin-content">
 		<div class="social-home__main" data-testid="admin-dashboard-main">

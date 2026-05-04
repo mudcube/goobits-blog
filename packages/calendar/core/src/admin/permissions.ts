@@ -23,6 +23,28 @@ export async function isCalendarAdmin({
 	return !!row
 }
 
+export async function getCalendarAdminCount({ db }: { db: D1DatabaseLike }) {
+	const row = await db
+		.prepare('SELECT COUNT(*) AS count FROM calendar_admins')
+		.first<{ count: number }>()
+	return Number(row?.count ?? 0)
+}
+
+export async function canBootstrapCalendarAdmin({
+	db,
+	userEmail,
+	bootstrapEmail
+}: {
+	db: D1DatabaseLike
+	userEmail: string | null | undefined
+	bootstrapEmail: string | null | undefined
+}) {
+	const adminCount = await getCalendarAdminCount({ db })
+	if (adminCount === 0) return true
+	if (!userEmail || !bootstrapEmail) return false
+	return userEmail.trim().toLowerCase() === bootstrapEmail.trim().toLowerCase()
+}
+
 export async function grantCalendarAdmin({
 	db,
 	userId,

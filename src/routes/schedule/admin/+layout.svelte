@@ -10,6 +10,10 @@
 
 <NoIndexHead />
 
-<AdminRouteShell user={data.user}>
+{#if data.user}
+	<AdminRouteShell user={data.user}>
+		{@render children()}
+	</AdminRouteShell>
+{:else}
 	{@render children()}
-</AdminRouteShell>
+{/if}

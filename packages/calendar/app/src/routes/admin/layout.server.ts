@@ -12,9 +12,9 @@ function adminRootWithContext(url: URL) {
 	return `${next.pathname}${next.search}`
 }
 
-export function load(event: { locals: { user?: unknown }; url: URL }) {
+export function load(event: { locals: { user?: unknown; calendarAdmin?: boolean }; url: URL }) {
 	const config = getCalendarConfig()
-	const user = event.locals.user ?? null
+	const user = event.locals.calendarAdmin ? (event.locals.user ?? null) : null
 	const isAdminRoot =
 		event.url.pathname === config.routes.adminBase ||
 		event.url.pathname === `${config.routes.adminBase}/`
