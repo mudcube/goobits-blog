@@ -8,6 +8,7 @@
 	import { ArrowUp, Check, X as XIcon } from '@lucide/svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminToast from '@calendar/ui/admin/shared/AdminToast.svelte'
+	import EditableField from '@calendar/ui/admin/shared/EditableField.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
@@ -184,6 +185,28 @@
 		showToast('Promoted from waitlist')
 	}
 
+	async function handleCapacityCommit(next: string) {
+		const value = Number(next)
+		if (!Number.isFinite(value) || value < joinedCount) return
+		if (mockMode) {
+			showToast('Mock mode: capacity preview only')
+			return
+		}
+		await dashboard.updateEventCapacity(eventId, value)
+		if (dashboard.error) {
+			showToast(dashboard.error, true)
+			return
+		}
+		showToast('Capacity updated')
+	}
+
+	function validateCapacity(next: string): string | null {
+		const value = Number(next)
+		if (!Number.isFinite(value)) return 'Number'
+		if (value < joinedCount) return `≥ ${joinedCount}`
+		return null
+	}
+
 	async function handleAttendance(userId: string, status: 'unknown' | 'attended' | 'flaked') {
 		if (mockMode) {
 			showToast('Mock mode: attendance preview only')
@@ -281,7 +304,17 @@
 					title={detail.event.title}
 					subtitle={formatEventRange(detail.event.startsAt, detail.event.endsAt)}
 				/>
-				<div class="admin-event-detail__capacity"><strong>{joinedCount}</strong> of {detail.event.capacity} spots filled</div>
+				<div class="admin-event-detail__capacity">
+					<strong>{joinedCount}</strong> of
+					<EditableField
+						value={String(detail.event.capacity)}
+						onCommit={handleCapacityCommit}
+						validate={validateCapacity}
+						ariaLabel="Capacity"
+						className="admin-event-detail__capacity-edit"
+					/>
+					spots filled
+				</div>
 			</div>
 
 			<section class="admin-event-detail__section">
@@ -420,6 +453,12 @@
 	.admin-event-detail__capacity strong {
 		color: var(--text);
 		font-weight: 650;
+	}
+
+	.admin-event-detail__capacity :global(.admin-event-detail__capacity-edit) {
+		font-weight: 650;
+		color: var(--text);
+		min-width: 1.5rem;
 	}
 
 	.admin-event-detail__section {
