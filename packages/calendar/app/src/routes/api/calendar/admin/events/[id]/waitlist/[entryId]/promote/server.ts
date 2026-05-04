@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import { getAdminAuth } from '@calendar/kit'
+import { buildEnv } from '@calendar/kit'
 import {
 	enqueueCalendarSyncJob,
 	parsePositiveInteger,
@@ -17,7 +17,8 @@ export async function POST(event: RequestEvent) {
 		const entryId = parsePositiveInteger(event.params['entryId'])
 		if (!eventId || !entryId) return apiError('Invalid ids', { status: 400 })
 
-		const { db, env } = await getAdminAuth({ event })
+		const env = await buildEnv(event.platform)
+		const db = env.DB
 		const result = await promoteWaitlistedParticipant(db, { eventId, entryId })
 		if (result.status === 'not_found') return apiError('Entry not found', { status: 404 })
 		if (result.status === 'promoted') {

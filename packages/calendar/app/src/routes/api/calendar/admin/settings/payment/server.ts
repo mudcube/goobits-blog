@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import { getAdminAuth } from '@calendar/kit'
+import { buildEnv } from '@calendar/kit'
 import {
 	getAdminPaymentDefaults,
 	parseAdminPaymentDefaultsInput,
@@ -13,7 +13,7 @@ export async function GET(event: RequestEvent) {
 	return runApiRequest('admin.settings.payment.get', async () => {
 		const guard = requireAdminRequest(event)
 		if (guard) return guard
-		const { db } = await getAdminAuth({ event })
+		const { DB: db } = await buildEnv(event.platform)
 		const payment = await getAdminPaymentDefaults(db)
 		return apiOk({ payment })
 	})
@@ -24,7 +24,7 @@ export async function PUT(event: RequestEvent) {
 		const guard = requireAdminRequest(event, { csrf: true })
 		if (guard) return guard
 		const input = parseAdminPaymentDefaultsInput(await event.request.json().catch(() => null))
-		const { db } = await getAdminAuth({ event })
+		const { DB: db } = await buildEnv(event.platform)
 		await setAdminPaymentDefaults(db, input)
 		return apiOk({})
 	}, {

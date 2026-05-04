@@ -1,8 +1,8 @@
 import { redirect } from '@sveltejs/kit'
 import type { Handle } from '@sveltejs/kit'
 import { building, dev } from '$app/environment'
-import { getAdminAuth, getCalendarAuth } from '@calendar/kit'
-import { getCalendarConfig, type CalendarConfigInput } from '@calendar/core'
+import { getCalendarAuth } from '@calendar/kit'
+import { getCalendarConfig, isCalendarAdmin, type CalendarConfigInput } from '@calendar/core'
 import { buildEnv } from '@calendar/kit'
 import { ensureCalendarProgramCatalog } from './server/runtime/calendar-program-catalog'
 import { ensureCalendarUserByEmail, setCalendarSessionCookie } from './server/auth/calendar-session'
@@ -48,6 +48,16 @@ function isAdminProtectedCalendarApiPath(pathname: string, apiCalendarBase: stri
 	return pathname === `${base}/oauth-start` || pathname === `${base}/webhook/discord`
 }
 
+function isAdminRootPath(pathname: string, adminBase: string) {
+	return pathname === adminBase || pathname === `${adminBase}/`
+}
+
+function adminLoginRedirect(pathname: string, search: string, calendarLoginPath: string) {
+	const redirectTarget = `${pathname}${search}`
+	const redirectTo = encodeURIComponent(redirectTarget)
+	return `${calendarLoginPath}?redirect=${redirectTo}`
+}
+
 export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 	const routes = { ...getCalendarConfig().routes, ...config }
 	const adminBase = routes.adminBase
@@ -78,8 +88,40 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 		try {
 			const env = await buildEnv(event.platform)
 			await ensureCalendarProgramCatalog(env.DB)
-			const { auth } = await getAdminAuth({ event })
-			return auth.handle()({ event, resolve })
+			const { auth } = await getCalendarAuth({ event })
+			return auth.handle()({
+				event,
+				resolve: async (authedEvent) => {
+					const locals = authedEvent.locals as {
+						user?: { id?: string | number } | null
+						session?: unknown
+						calendarAdmin?: boolean
+					}
+					const userId = locals.user?.id
+					const isAdmin = await isCalendarAdmin({ db: env.DB, userId })
+					locals.calendarAdmin = isAdmin
+
+					if (isAdmin) {
+						return resolve(authedEvent)
+					}
+
+					if (isRouteUnder(pathname, apiAdminBase) || isRouteUnder(pathname, apiCalendarAdminBase) || isAdminProtectedCalendarApiPath(pathname, apiCalendarBase)) {
+						return new Response(locals.user ? 'Forbidden' : 'Unauthorized', {
+							status: locals.user ? 403 : 401
+						})
+					}
+
+					if (isAdminRootPath(pathname, adminBase)) {
+						return resolve(authedEvent)
+					}
+
+					if (!locals.user) {
+						throw redirect(302, adminLoginRedirect(pathname, authedEvent.url.search, calendarLoginPath))
+					}
+
+					throw redirect(302, adminBase)
+				}
+			})
 		} catch (error) {
 			if (error && typeof error === 'object' && 'status' in error) {
 				throw error

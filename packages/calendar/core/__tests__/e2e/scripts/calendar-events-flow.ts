@@ -227,8 +227,8 @@ export async function runCalendarEventsFlow() {
 		await page.goto(`${ADMIN_URL}?preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 
 		const cookies = await context.cookies(ADMIN_URL)
-		const hasSessionCookie = cookies.some((cookie) => cookie.name === 'admin_session')
-		if (!hasSessionCookie) throw new Error('admin session cookie missing after login')
+		const hasSessionCookie = cookies.some((cookie) => cookie.name === 'calendar_session')
+		if (!hasSessionCookie) throw new Error('calendar session cookie missing after admin login')
 
 		// Clean prior E2E spam using the real admin session (dev-only endpoint).
 		await withRequestRetry(

@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
-import { getAdminAuth } from '@calendar/kit'
+import { buildEnv } from '@calendar/kit'
 import {
 	createInvite,
 	deleteInvite,
@@ -15,7 +15,7 @@ export async function GET(event: RequestEvent) {
 	return runApiRequest('admin.invites.list', async () => {
 		const guard = requireAdminRequest(event)
 		if (guard) return guard
-		const { db } = await getAdminAuth({ event })
+		const { DB: db } = await buildEnv(event.platform)
 		const invites = await listInvites({ db })
 		return apiOk({ invites })
 	})
@@ -25,7 +25,7 @@ export async function POST(event: RequestEvent) {
 	return runApiRequest('admin.invites.create', async () => {
 		const guard = requireAdminRequest(event, { csrf: true })
 		if (guard) return guard
-		const { db } = await getAdminAuth({ event })
+		const { DB: db } = await buildEnv(event.platform)
 		const input = parseCalendarInviteCreateInput(await event.request.json().catch(() => null))
 		const uses = input.uses
 		const expiresInDays = input.expiresInDays
@@ -56,7 +56,7 @@ export async function DELETE(event: RequestEvent) {
 			return apiError('Missing invite id', { status: 400 })
 		}
 
-		const { db } = await getAdminAuth({ event })
+		const { DB: db } = await buildEnv(event.platform)
 		const numericId = Number(rawId)
 		if (Number.isFinite(numericId) && numericId > 0) {
 			await deleteInvite({ db, inviteId: numericId })

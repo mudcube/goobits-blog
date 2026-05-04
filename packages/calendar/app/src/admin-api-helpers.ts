@@ -4,8 +4,8 @@ import { apiError, logApiError, noStoreHeaders as sharedNoStoreHeaders } from '@
 export const noStoreHeaders = sharedNoStoreHeaders
 
 export function requireAdminSession({ event }: { event: RequestEvent }) {
-	const locals = event.locals as { user?: unknown; session?: unknown }
-	return { ok: !!(locals.session && locals.user) }
+	const locals = event.locals as { user?: unknown; session?: unknown; calendarAdmin?: boolean }
+	return { ok: !!(locals.session && locals.user && locals.calendarAdmin) }
 }
 
 export function unauthorized() {

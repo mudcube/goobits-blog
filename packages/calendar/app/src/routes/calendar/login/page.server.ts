@@ -1,6 +1,7 @@
 import { dev } from '$app/environment'
 import { getCalendarConfig, validateInvite } from '@calendar/core'
 import { buildEnv, getCalendarLoginContext, normalizeCalendarRedirect } from '@calendar/kit'
+import { redirect } from '@sveltejs/kit'
 import type { RequestEvent } from '@sveltejs/kit'
 
 type CalendarAuthEnv = {
@@ -27,15 +28,20 @@ function resolveCalendarProviders(env: Record<string, string | undefined>) {
 	}
 }
 
-export const load = async ({ cookies, platform, url }: RequestEvent) => {
+export const load = async ({ cookies, locals, platform, url }: RequestEvent) => {
 	const env = mergeAuthEnv(platform?.env as Record<string, string | undefined> | undefined)
 	const providers = resolveCalendarProviders(env)
 	const loginContext = getCalendarLoginContext(cookies)
+	const config = getCalendarConfig()
 	const inviteCode = (url.searchParams.get('invite') || loginContext.invite || '').trim()
 	const redirectTo =
 		normalizeCalendarRedirect(url.searchParams.get('redirect')) ||
 		loginContext.redirectTo ||
-		getCalendarConfig().routes.calendarBase
+		config.routes.calendarBase
+
+	if ((locals as { user?: unknown }).user) {
+		throw redirect(302, redirectTo === config.routes.calendarLoginPath ? config.routes.calendarBase : redirectTo)
+	}
 	let inviteStatus: 'valid' | 'expired' | 'exhausted' | 'not_found' | 'email_mismatch' | 'missing_code' | null = null
 	let inviteEmailRestricted = false
 

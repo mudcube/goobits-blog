@@ -33,13 +33,11 @@ import {
 } from './storage/d1.ts'
 import { toErrorResponse } from './utils/errors.ts'
 import {
-	getAdminEmail,
-	ADMIN_COOKIE_NAME,
-	createAdminAdapters,
-	ensureAdminUser,
-	parseCookieHeader,
-	validateAdminSessionFromHeader
-} from './admin/auth.ts'
+	getCalendarUserByEmail,
+	grantCalendarAdmin,
+	grantCalendarAdminByEmail,
+	isCalendarAdmin
+} from './admin/permissions.ts'
 import {
 	configureCalendarConfig,
 	getCalendarConfig,
@@ -230,12 +228,10 @@ export {
 	checkRateLimit,
 	listCalendarUsers,
 	toErrorResponse,
-	getAdminEmail,
-	ADMIN_COOKIE_NAME,
-	createAdminAdapters,
-	ensureAdminUser,
-	parseCookieHeader,
-	validateAdminSessionFromHeader,
+	getCalendarUserByEmail,
+	grantCalendarAdmin,
+	grantCalendarAdminByEmail,
+	isCalendarAdmin,
 	configureCalendarConfig,
 	getCalendarConfig,
 	resetCalendarConfig,

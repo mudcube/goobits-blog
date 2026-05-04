@@ -1,7 +1,8 @@
 import { json, type RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { createAdminAdapters, ensureAdminUser } from '@calendar/core'
+import { getCalendarConfig, grantCalendarAdmin } from '@calendar/core'
 import { apiError } from '@calendar/kit'
+import { ensureCalendarUserByEmail, setCalendarSessionCookie } from '../../../../server/auth/calendar-session'
 
 export async function POST(event: RequestEvent) {
 	try {
@@ -15,22 +16,30 @@ export async function POST(event: RequestEvent) {
 		const token = authHeader.startsWith('Bearer ') ? authHeader.slice('Bearer '.length).trim() : ''
 		if (!token || token !== expected) return apiError('Unauthorized', { status: 401 })
 
-		const secureCookies = env['NODE_ENV'] !== 'development'
-		const { userAdapter, sessionAdapter } = createAdminAdapters({
+		const adminEmail = getCalendarConfig().brand.adminEmail
+		const user = await ensureCalendarUserByEmail({
 			db: env.DB,
+			email: adminEmail,
+			name: 'Admin',
+			emailVerified: true
+		})
+		if (!user.ok) return apiError('Unauthorized', { status: 401 })
+
+		await grantCalendarAdmin({
+			db: env.DB,
+			userId: String(user.userId),
+			grantedBy: String(user.userId)
+		})
+
+		const secureCookies = env['NODE_ENV'] !== 'development'
+		await setCalendarSessionCookie({
+			db: env.DB,
+			cookies: event.cookies,
 			secureCookies,
-			sessionLifetimeMs: 60 * 24 * 60 * 60 * 1000
+			userId: String(user.userId)
 		})
 
-		const user = await ensureAdminUser({
-			userAdapter,
-			passcode: String(env['ADMIN_PASSCODE'] || '')
-		})
-
-		const session = await sessionAdapter.createSession(String(user.id))
-		sessionAdapter.setSessionCookie(event.cookies, session)
-
-		return json({ ok: true, userId: String(user.id), email: user.email })
+		return json({ ok: true, userId: String(user.userId), email: adminEmail })
 	} catch (error) {
 		console.error('E2E admin session bootstrap failed:', error)
 		return apiError('Internal server error')

@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
-import { getAdminAuth } from '@calendar/kit'
+import { buildEnv } from '@calendar/kit'
 import { listCalendarUsers } from '@calendar/core'
 import { apiOk } from '@calendar/kit'
 
@@ -8,7 +8,7 @@ export async function GET(event: RequestEvent) {
 	return runApiRequest('admin.users.list', async () => {
 		const guard = requireAdminRequest(event)
 		if (guard) return guard
-		const { db } = await getAdminAuth({ event })
+		const { DB: db } = await buildEnv(event.platform)
 		const users = await listCalendarUsers({ db })
 		type UserRow = { id: number; email: string; name: string; avatar_url: string | null; email_verified: number; last_login_at: number | null; provider: string | null }
 		const sanitized = (users as UserRow[]).map(user => ({

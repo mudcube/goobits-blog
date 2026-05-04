@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import { getAdminAuth } from '@calendar/kit'
+import { buildEnv } from '@calendar/kit'
 import {
 	getCalendarPrograms,
 	listUserProgramAccess,
@@ -23,7 +23,7 @@ export async function GET(event: RequestEvent) {
 		const userId = normalizeUserId(event.params['id'])
 		if (!userId) return apiError('Invalid user id', { status: 400 })
 
-		const { db } = await getAdminAuth({ event })
+		const { DB: db } = await buildEnv(event.platform)
 		const [programs, access] = await Promise.all([getCalendarPrograms(db), listUserProgramAccess(db, userId)])
 		const accessMap = new Map(access.map((row) => [row.programSlug, row.allowed]))
 		return apiOk({
@@ -45,7 +45,7 @@ export async function PUT(event: RequestEvent) {
 			if (!userId) return apiError('Invalid user id', { status: 400 })
 
 			const input = parseAdminUserProgramAccessInput(await event.request.json().catch(() => null))
-			const { db } = await getAdminAuth({ event })
+			const { DB: db } = await buildEnv(event.platform)
 			await setUserProgramAccess(db, userId, input.access)
 			return apiOk({})
 		},

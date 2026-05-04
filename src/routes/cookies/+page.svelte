@@ -65,11 +65,7 @@
 			</tr>
 			<tr>
 				<td class="legal__cookie-cell legal__cookie-cell--name"><code class="legal__inline-code">calendar_session</code></td>
-				<td class="legal__cookie-cell">Calendar authentication session</td>
-			</tr>
-			<tr>
-				<td class="legal__cookie-cell legal__cookie-cell--name"><code class="legal__inline-code">admin_session</code></td>
-				<td class="legal__cookie-cell">Admin authentication session</td>
+				<td class="legal__cookie-cell">Calendar and admin authentication session</td>
 			</tr>
 			<tr>
 				<td class="legal__cookie-cell legal__cookie-cell--name"><code class="legal__inline-code">calendar_invite</code></td>

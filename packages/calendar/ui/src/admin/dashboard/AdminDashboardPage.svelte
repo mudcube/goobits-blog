@@ -10,9 +10,17 @@ import AdminDashboardContent from '@calendar/ui/admin/dashboard/AdminDashboardCo
 import AdminLoadingText from '@calendar/ui/admin/shared/AdminLoadingText.svelte'
 import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 
-	const { data, form } = $props<{ data: { user: unknown | null }; form: unknown }>()
+	const { data, form } = $props<{
+		data: {
+			user: unknown | null
+			currentUser?: { email?: string | null } | null
+			isAdmin?: boolean
+			loginUrl?: string
+		}
+		form: unknown
+	}>()
 const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
-const authed = $derived(!!data.user)
+const authed = $derived(data.isAdmin === true && !!data.user)
 const isMobile = $derived(typeof window !== 'undefined' && window.matchMedia('(max-width: 820px)').matches)
 const mockMode = $derived($page.url.searchParams.get('mock') === '1')
 const adminMockCatalog = getAdminMockCatalog()
@@ -53,7 +61,7 @@ const adminMockCatalog = getAdminMockCatalog()
 </script>
 
 {#if !authed}
-	<AdminLoginCard {form} />
+	<AdminLoginCard {form} loginUrl={data.loginUrl} currentUser={data.currentUser} />
 {:else}
 	<div class="social-home admin-content">
 		<div class="social-home__main" data-testid="admin-dashboard-main">

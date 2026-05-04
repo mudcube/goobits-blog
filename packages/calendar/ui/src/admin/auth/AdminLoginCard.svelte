@@ -1,48 +1,53 @@
 <script>
   import Button from "../../primitives/CalendarButton.svelte";
-  import { getCalendarUiConfig } from "../../config";
-  const { form } = $props();
-  const calendarConfig = getCalendarUiConfig();
+  const { form, loginUrl = '/schedule/login?redirect=%2Fschedule%2Fadmin%2F', currentUser = null } = $props();
 </script>
 
 <div class="admin-page__login">
   <div class="admin-login" aria-label="Admin login">
     <div class="admin-login__label">Admin</div>
-    <h1 class="admin-login__title">Control room 🔐</h1>
+    <h1 class="admin-login__title">Admin sign-in</h1>
     <p class="admin-login__subtitle">
-      Bookings, invites, and calendar management.
+      Sign in with your Google account. Admin access is granted to approved calendar users.
     </p>
 
-    <form class="admin-login__form" method="POST" action="?/login">
-      <input
-        type="hidden"
-        name="email"
-        value={calendarConfig.brand.adminEmail}
-      />
-      <div class="ui-inline-field admin-login__row">
-        <input
-          class="ui-form-control admin-login__passcode"
-          type="password"
-          name="password"
-          placeholder="Passcode"
-          autocomplete="current-password"
-          required
-        />
-        <Button
-          className="ui-inline-field__action admin-login__unlock"
-          variant="primary"
-          size="lg"
-          type="submit">Unlock</Button
-        >
-      </div>
-      {#if form?.success}
-        <p class="admin-login__hint">Signing you in...</p>
-      {/if}
-      {#if form?.error}
-        <p class="admin-login__error" role="status">{form.error}</p>
-      {/if}
-    </form>
+    {#if !currentUser}
+      <Button
+        href={loginUrl}
+        className="admin-login__unlock"
+        variant="primary"
+        size="lg"
+      >Continue with Google</Button>
+    {:else}
+      <p class="admin-login__hint">
+        Signed in as {currentUser.email}. Enter the admin passcode once to grant this account access.
+      </p>
+      <form class="admin-login__form" method="POST" action="?/grantAdmin">
+        <div class="ui-inline-field admin-login__row">
+          <input
+            class="ui-form-control admin-login__passcode"
+            type="password"
+            name="password"
+            placeholder="Admin passcode"
+            autocomplete="current-password"
+            required
+          />
+          <Button
+            className="ui-inline-field__action admin-login__unlock"
+            variant="primary"
+            size="lg"
+            type="submit">Grant access</Button
+          >
+        </div>
+        {#if form?.success}
+          <p class="admin-login__hint">Granting access...</p>
+        {/if}
+        {#if form?.error}
+          <p class="admin-login__error" role="status">{form.error}</p>
+        {/if}
+      </form>
+    {/if}
 
-    <p class="admin-login__hint">Authorized access only.</p>
+    <p class="admin-login__hint">The admin area shares the calendar login session; permissions stay separate.</p>
   </div>
 </div>

@@ -1,12 +1,16 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte'
+	import { onDestroy, onMount, tick } from 'svelte'
+	import { fade, fly, slide } from 'svelte/transition'
+	import { cubicOut, quintOut } from 'svelte/easing'
 	import {
 		ArrowRight,
 		CalendarDays,
 		Check,
 		ChevronDown,
 		ChevronRight,
+		HelpCircle,
 		LayoutDashboard,
+		Loader2,
 		LogOut,
 		Plug,
 		Plus,
@@ -137,6 +141,19 @@
 	let appleTestState = $state<'idle' | 'testing' | 'ok' | 'fail'>('idle')
 	let connectingProvider = $state<SyncProvider | null>(null)
 	let profileMenuOpen = $state(false)
+	let removeConfirmFor = $state<PaymentMethod | null>(null)
+	let lastSavedAt = $state<number | null>(null)
+	let nowTick = $state(Date.now())
+	let switchSheetEl = $state<HTMLDivElement | null>(null)
+	let appleSheetEl = $state<HTMLDivElement | null>(null)
+
+	type UndoSnapshot =
+		| { kind: 'remove-handle'; method: PaymentMethod; row: PaymentRow; primary: PaymentMethod | null }
+		| { kind: 'disconnect-sync'; sync: SyncStatus }
+
+	let undoToast = $state<{ label: string; snapshot: UndoSnapshot } | null>(null)
+	let undoTimer: ReturnType<typeof setTimeout> | null = null
+	let removeConfirmTimer: ReturnType<typeof setTimeout> | null = null
 
 	const calendarTimers = {
 		saving: null as ReturnType<typeof setTimeout> | null,
@@ -147,9 +164,28 @@
 		saved: null as ReturnType<typeof setTimeout> | null
 	}
 
+	let nowInterval: ReturnType<typeof setInterval> | null = null
+
+	onMount(() => {
+		const onClickAway = (e: MouseEvent) => {
+			if (!profileMenuOpen) return
+			const target = e.target as HTMLElement | null
+			if (target && target.closest('.profile-menu')) return
+			profileMenuOpen = false
+		}
+		window.addEventListener('mousedown', onClickAway)
+		nowInterval = setInterval(() => (nowTick = Date.now()), 30000)
+		return () => {
+			window.removeEventListener('mousedown', onClickAway)
+			if (nowInterval) clearInterval(nowInterval)
+		}
+	})
+
 	onDestroy(() => {
 		clearAll(calendarTimers)
 		clearAll(paymentsTimers)
+		if (undoTimer) clearTimeout(undoTimer)
+		if (removeConfirmTimer) clearTimeout(removeConfirmTimer)
 	})
 
 	function clearAll(t: {
@@ -168,6 +204,7 @@
 		t.saving = setTimeout(() => {
 			if (section === 'calendar') calendarSave = 'saved'
 			else paymentsSave = 'saved'
+			lastSavedAt = Date.now()
 			t.saved = setTimeout(() => {
 				if (section === 'calendar') calendarSave = 'idle'
 				else paymentsSave = 'idle'
@@ -225,6 +262,54 @@
 		}
 	}
 
+	function validateHandle(method: PaymentMethod, raw: string): string | null {
+		const v = raw.trim()
+		if (!v) return null
+		if (method === 'venmo') {
+			if (!/^@?[a-zA-Z0-9_-]{1,30}$/.test(v))
+				return 'Letters, numbers, dashes or underscores only.'
+		} else if (method === 'paypal') {
+			const isEmail = /^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(v)
+			const isMerchant = /^[A-Z0-9]{6,20}$/.test(v)
+			if (!isEmail && !isMerchant) return 'Use an email or PayPal merchant ID.'
+		} else if (method === 'cashapp') {
+			if (!/^\$?[a-zA-Z][a-zA-Z0-9_-]{0,30}$/.test(v))
+				return 'Cashtag — starts with a letter, no spaces.'
+		}
+		return null
+	}
+
+	const configuredCount = $derived(
+		paymentMethods.filter((m) => payments[m.key].handle.trim().length > 0).length
+	)
+
+	$effect(() => {
+		if (showSwitchSheet && switchSheetEl) {
+			void tick().then(() => {
+				const el = switchSheetEl?.querySelector<HTMLElement>('button, [tabindex="0"], input')
+				el?.focus()
+			})
+		}
+	})
+	$effect(() => {
+		if (showAppleSheet && appleSheetEl) {
+			void tick().then(() => {
+				const el = appleSheetEl?.querySelector<HTMLElement>('input, button')
+				el?.focus()
+			})
+		}
+	})
+
+	function relativeSavedLabel(stamp: number, now: number) {
+		const seconds = Math.max(0, Math.floor((now - stamp) / 1000))
+		if (seconds < 5) return 'All saved · just now'
+		if (seconds < 60) return `All saved · ${seconds}s ago`
+		const minutes = Math.floor(seconds / 60)
+		if (minutes < 60) return `All saved · ${minutes}m ago`
+		const hours = Math.floor(minutes / 60)
+		return `All saved · ${hours}h ago`
+	}
+
 	function toggleRow(method: PaymentMethod) {
 		payments[method].expanded = !payments[method].expanded
 	}
@@ -245,21 +330,83 @@
 		flagSaving('payments')
 	}
 
-	function removeHandle(method: PaymentMethod) {
+	function requestRemove(method: PaymentMethod) {
+		if (removeConfirmTimer) clearTimeout(removeConfirmTimer)
+		removeConfirmFor = method
+		removeConfirmTimer = setTimeout(() => {
+			if (removeConfirmFor === method) removeConfirmFor = null
+		}, 4000)
+	}
+
+	function cancelRemove() {
+		if (removeConfirmTimer) clearTimeout(removeConfirmTimer)
+		removeConfirmFor = null
+	}
+
+	function confirmRemove(method: PaymentMethod) {
+		if (removeConfirmTimer) clearTimeout(removeConfirmTimer)
+		removeConfirmFor = null
+		const meta = paymentMethods.find((m) => m.key === method)
+		const snapshot: UndoSnapshot = {
+			kind: 'remove-handle',
+			method,
+			row: { ...payments[method] },
+			primary
+		}
 		payments[method].handle = ''
 		payments[method].checkoutEnabled = false
 		payments[method].advancedOpen = false
+		payments[method].expanded = false
 		if (primary === method) {
 			const fallback = paymentMethods.find((m) => m.key !== method && payments[m.key].handle.trim())
 			primary = fallback ? fallback.key : null
 		}
 		flagSaving('payments')
+		showUndoToast(`Removed ${meta?.label ?? method}`, snapshot)
+	}
+
+	function showUndoToast(label: string, snapshot: UndoSnapshot) {
+		if (undoTimer) clearTimeout(undoTimer)
+		undoToast = { label, snapshot }
+		undoTimer = setTimeout(() => {
+			undoToast = null
+		}, 5000)
+	}
+
+	function dismissUndo() {
+		if (undoTimer) clearTimeout(undoTimer)
+		undoToast = null
+	}
+
+	function applyUndo() {
+		if (!undoToast) return
+		const { snapshot } = undoToast
+		if (snapshot.kind === 'remove-handle') {
+			payments[snapshot.method] = snapshot.row
+			primary = snapshot.primary
+			flagSaving('payments')
+		} else if (snapshot.kind === 'disconnect-sync') {
+			sync = snapshot.sync
+			flagSaving('calendar')
+		}
+		dismissUndo()
+	}
+
+	function checkoutCredsConfigured(method: PaymentMethod) {
+		if (method === 'cashapp') {
+			return Boolean(squareCreds.applicationId && squareCreds.locationId && squareCreds.accessToken)
+		}
+		return Boolean(payPalCreds.clientId && payPalCreds.clientSecret)
 	}
 
 	function toggleCheckout(method: PaymentMethod) {
 		const row = payments[method]
-		row.checkoutEnabled = !row.checkoutEnabled
-		if (!row.checkoutEnabled) {
+		const turningOn = !row.checkoutEnabled
+		row.checkoutEnabled = turningOn
+		if (turningOn && !checkoutCredsConfigured(method)) {
+			row.advancedOpen = true
+		}
+		if (!turningOn) {
 			row.advancedOpen = false
 			row.expiringSoon = false
 		}
@@ -312,9 +459,14 @@
 
 	function disconnectSync() {
 		if (!sync.active) return
-		if (!confirm(`Disconnect ${providerLabel(sync.active)}?`)) return
+		const label = providerLabel(sync.active)
+		const snapshot: UndoSnapshot = {
+			kind: 'disconnect-sync',
+			sync: { ...sync }
+		}
 		sync = { active: null, syncedAtLabel: null }
 		flagSaving('calendar')
+		showUndoToast(`Disconnected ${label}`, snapshot)
 	}
 
 	function providerLabel(p: SyncProvider) {
@@ -358,6 +510,15 @@
 				: 'idle'
 	)
 
+	const savedDisplay = $derived.by(() => {
+		if (globalSave === 'saving') return { state: 'saving' as const, label: 'Saving…' }
+		if (globalSave === 'saved') return { state: 'saved' as const, label: 'Saved ✓' }
+		if (lastSavedAt) {
+			return { state: 'idle-saved' as const, label: relativeSavedLabel(lastSavedAt, nowTick) }
+		}
+		return { state: 'idle' as const, label: '' }
+	})
+
 	const attentionItems = $derived.by(() => {
 		const items: Array<{ key: 'paypal'; text: string; cta: string; onClick: () => void }> = []
 		if (payments.paypal.expiringSoon)
@@ -374,11 +535,6 @@
 		return items
 	})
 
-	function saveLabel(state: SaveState) {
-		if (state === 'saving') return 'Saving…'
-		if (state === 'saved') return 'Saved ✓'
-		return ''
-	}
 </script>
 
 <svelte:head>
@@ -416,7 +572,7 @@
 					aria-current="page"
 					aria-label="Settings"
 				>
-					<SettingsIcon size={22} strokeWidth={2} />
+					<SettingsIcon size={20} strokeWidth={2} />
 				</button>
 				<div class="profile-menu">
 					<button
@@ -430,7 +586,11 @@
 						M
 					</button>
 					{#if profileMenuOpen}
-						<div class="profile-menu__panel" role="menu">
+						<div
+							class="profile-menu__panel"
+							role="menu"
+							transition:fly={{ y: -4, duration: 140, easing: cubicOut }}
+						>
 							<div class="profile-menu__header">
 								<div class="profile-menu__name">Miko</div>
 								<div class="profile-menu__email">hello@miko.art</div>
@@ -476,9 +636,29 @@
 				<p class="settings__head-sub">Calendar sync, week start, and payouts.</p>
 			</header>
 
-			<span class="settings__save" data-state={globalSave} aria-live="polite">
-				{saveLabel(globalSave)}
+			<span class="settings__save" data-state={savedDisplay.state} aria-live="polite">
+				{savedDisplay.label}
 			</span>
+
+			{#if undoToast}
+				<div
+					class="undo-toast"
+					role="status"
+					aria-live="polite"
+					transition:fly={{ y: -8, duration: 180, easing: cubicOut }}
+				>
+					<span class="undo-toast__label">{undoToast.label}</span>
+					<button type="button" class="undo-toast__undo" onclick={applyUndo}>Undo</button>
+					<button
+						type="button"
+						class="undo-toast__dismiss"
+						aria-label="Dismiss"
+						onclick={dismissUndo}
+					>
+						<XIcon size={12} />
+					</button>
+				</div>
+			{/if}
 
 			<section id="calendar-sync" class="settings__section">
 				<header class="settings__section-head">
@@ -490,7 +670,10 @@
 						<span class="sync-card__icon" aria-hidden="true">{@render providerIcon(sync.active)}</span>
 						<div class="sync-card__body">
 							<div class="sync-card__name">{providerLabel(sync.active)}</div>
-							<div class="sync-card__status">
+							<div
+								class="sync-card__status"
+								title={`Last successful sync ${sync.syncedAtLabel}. Next attempt in 8m.`}
+							>
 								<span class="sync-card__dot" aria-hidden="true"></span>
 								Connected · synced {sync.syncedAtLabel}
 							</div>
@@ -506,7 +689,9 @@
 					</div>
 				{:else if connectingProvider}
 					<div class="sync-card sync-card--busy">
-						<span class="sync-card__icon" aria-hidden="true">{@render providerIcon(connectingProvider)}</span>
+						<span class="sync-card__icon sync-card__icon--spinning" aria-hidden="true">
+							<Loader2 size={16} strokeWidth={2} />
+						</span>
 						<div class="sync-card__body">
 							<div class="sync-card__name">{providerLabel(connectingProvider)}</div>
 							<div class="sync-card__status">Connecting…</div>
@@ -548,6 +733,15 @@
 					<h4>PAYMENT</h4>
 				</header>
 
+				{#if configuredCount === 0}
+					<p
+						class="settings__empty-hint"
+						transition:slide={{ duration: 180, easing: cubicOut }}
+					>
+						Add at least one method to accept bookings.
+					</p>
+				{/if}
+
 				<ul class="payment-list">
 					{#each paymentMethods as method}
 						{@const row = payments[method.key]}
@@ -575,7 +769,9 @@
 								</span>
 								<span class="payment-row__meta">
 									{#if isPrimary && configured}
-										<span class="pill pill--primary">Primary</span>
+										<span class="pill pill--primary" title="Default for new bookings.">
+											Primary
+										</span>
 									{/if}
 									{#if row.expiringSoon}
 										<span class="pill pill--warn"><AlertTriangle size={11} /> Token</span>
@@ -590,23 +786,41 @@
 							</button>
 
 							{#if row.expanded}
-								<div class="payment-row__body">
+								{@const handleErr = validateHandle(method.key, row.handle)}
+								<div
+									class="payment-row__body"
+									transition:slide={{ duration: 220, easing: cubicOut }}
+								>
 									<label class="field">
 										<span class="field__label">Your handle</span>
-										<div class="field__control">
+										<div class="field__control" class:field__control--invalid={!!handleErr}>
 											<input
 												type="text"
 												class="ui-form-control field__input"
 												value={row.handle}
 												placeholder={method.placeholder}
+												aria-invalid={handleErr ? 'true' : undefined}
 												oninput={(e) =>
 													setHandle(method.key, (e.currentTarget as HTMLInputElement).value)}
 											/>
-											{#if configured && paymentsSave === 'saved'}
+											{#if handleErr}
+												<span class="field__warn" aria-hidden="true">
+													<AlertTriangle size={14} />
+												</span>
+											{:else if configured && paymentsSave === 'saved'}
 												<span class="field__check" aria-hidden="true"><Check size={14} /></span>
 											{/if}
 										</div>
-										<p class="field__hint">{method.blurb(row.handle)}</p>
+										{#if handleErr}
+											<p
+												class="field__error"
+												transition:slide={{ duration: 160, easing: cubicOut }}
+											>
+												{handleErr}
+											</p>
+										{:else}
+											<p class="field__hint">{method.blurb(row.handle)}</p>
+										{/if}
 									</label>
 
 									<div class="checkout">
@@ -666,10 +880,13 @@
 										{/if}
 
 										{#if row.advancedOpen}
-											<div class="creds">
+											<div class="creds" transition:slide={{ duration: 200, easing: cubicOut }}>
 												{#if method.key === 'cashapp'}
 													<label class="field">
-														<span class="field__label">Application ID</span>
+														<span class="field__label">
+															Application ID
+															{@render helpHint('Square Dashboard → Apps → your app → Credentials')}
+														</span>
 														<input
 															type="text"
 															class="ui-form-control"
@@ -677,7 +894,10 @@
 														/>
 													</label>
 													<label class="field">
-														<span class="field__label">Location ID</span>
+														<span class="field__label">
+															Location ID
+															{@render helpHint('Square Dashboard → Account → Locations')}
+														</span>
 														<input
 															type="text"
 															class="ui-form-control"
@@ -685,7 +905,10 @@
 														/>
 													</label>
 													<label class="field">
-														<span class="field__label">Access token</span>
+														<span class="field__label">
+															Access token
+															{@render helpHint('Personal access token. Treat it like a password.')}
+														</span>
 														<input
 															type="password"
 															class="ui-form-control"
@@ -701,7 +924,10 @@
 													</label>
 												{:else}
 													<label class="field">
-														<span class="field__label">Client ID</span>
+														<span class="field__label">
+															Client ID
+															{@render helpHint('PayPal Developer → My Apps & Credentials')}
+														</span>
 														<input
 															type="text"
 															class="ui-form-control"
@@ -709,7 +935,10 @@
 														/>
 													</label>
 													<label class="field">
-														<span class="field__label">Client secret</span>
+														<span class="field__label">
+															Client secret
+															{@render helpHint('Same screen as Client ID. Treat like a password.')}
+														</span>
 														<input
 															type="password"
 															class="ui-form-control"
@@ -741,23 +970,51 @@
 									</div>
 
 									<div class="payment-row__footer">
-										{#if configured && !isPrimary}
-											<button
-												type="button"
-												class="admin-btn admin-btn--accent"
-												onclick={() => makePrimary(method.key)}
-											>
-												<Star size={13} strokeWidth={2} /> Make primary
-											</button>
-										{/if}
-										{#if configured}
-											<button
-												type="button"
-												class="admin-btn admin-btn--danger"
-												onclick={() => removeHandle(method.key)}
-											>
-												<Trash2 size={13} strokeWidth={2} /> Remove {method.label}
-											</button>
+										{#if removeConfirmFor === method.key}
+											<div class="confirm-row">
+												<span class="confirm-row__text">
+													Remove {method.label}?
+												</span>
+												<div class="confirm-row__actions">
+													<button
+														type="button"
+														class="admin-btn admin-btn--muted"
+														onclick={cancelRemove}
+													>
+														Cancel
+													</button>
+													<button
+														type="button"
+														class="admin-btn admin-btn--danger admin-btn--solid-danger"
+														onclick={() => confirmRemove(method.key)}
+													>
+														<Trash2 size={13} strokeWidth={2} /> Yes, remove
+													</button>
+												</div>
+											</div>
+										{:else}
+											<div class="payment-row__footer-primary">
+												{#if configured && !isPrimary}
+													<button
+														type="button"
+														class="admin-btn admin-btn--accent"
+														onclick={() => makePrimary(method.key)}
+													>
+														<Star size={13} strokeWidth={2} /> Make primary
+													</button>
+												{/if}
+											</div>
+											{#if configured}
+												<button
+													type="button"
+													class="admin-btn admin-btn--icon admin-btn--danger"
+													aria-label={`Remove ${method.label}`}
+													title={`Remove ${method.label}`}
+													onclick={() => requestRemove(method.key)}
+												>
+													<Trash2 size={14} strokeWidth={2} />
+												</button>
+											{/if}
 										{/if}
 									</div>
 								</div>
@@ -789,15 +1046,21 @@
 			role="presentation"
 			onclick={closeSwitchSheet}
 			onkeydown={(e) => e.key === 'Escape' && closeSwitchSheet()}
+			transition:fade={{ duration: 160 }}
 		>
 			<div
+				bind:this={switchSheetEl}
 				class="sheet"
 				role="dialog"
 				aria-modal="true"
 				aria-label="Switch provider"
 				tabindex="-1"
+				transition:fly={{ y: 12, duration: 200, easing: quintOut }}
 				onclick={(e) => e.stopPropagation()}
-				onkeydown={(e) => e.stopPropagation()}
+				onkeydown={(e) => {
+					e.stopPropagation()
+					if (e.key === 'Escape') closeSwitchSheet()
+				}}
 			>
 				<header class="sheet__head">
 					<h3>{sync.active ? 'Switch calendar provider' : 'Connect a calendar'}</h3>
@@ -856,15 +1119,21 @@
 			role="presentation"
 			onclick={() => (showAppleSheet = false)}
 			onkeydown={(e) => e.key === 'Escape' && (showAppleSheet = false)}
+			transition:fade={{ duration: 160 }}
 		>
 			<div
+				bind:this={appleSheetEl}
 				class="sheet"
 				role="dialog"
 				aria-modal="true"
 				aria-label="Connect Apple Calendar"
 				tabindex="-1"
+				transition:fly={{ y: 12, duration: 200, easing: quintOut }}
 				onclick={(e) => e.stopPropagation()}
-				onkeydown={(e) => e.stopPropagation()}
+				onkeydown={(e) => {
+					e.stopPropagation()
+					if (e.key === 'Escape') showAppleSheet = false
+				}}
 			>
 				<header class="sheet__head">
 					<h3>Connect Apple Calendar</h3>
@@ -880,7 +1149,10 @@
 						/>
 					</label>
 					<label class="field">
-						<span class="field__label">App-specific password</span>
+						<span class="field__label">
+							App-specific password
+							{@render helpHint('Create one at appleid.apple.com → Sign-In & Security → App-Specific Passwords')}
+						</span>
 						<input
 							class="ui-form-control"
 							type="password"
@@ -889,7 +1161,10 @@
 						/>
 					</label>
 					<label class="field">
-						<span class="field__label">CalDAV URL</span>
+						<span class="field__label">
+							CalDAV URL
+							{@render helpHint('From iCloud → Calendars → right-click your calendar → Public Calendar URL')}
+						</span>
 						<input
 							class="ui-form-control"
 							type="url"
@@ -928,6 +1203,18 @@
 		</div>
 	{/if}
 </div>
+
+{#snippet helpHint(text: string)}
+	<button
+		type="button"
+		class="field__help-btn"
+		title={text}
+		aria-label={`Help: ${text}`}
+		onclick={(e) => e.preventDefault()}
+	>
+		<HelpCircle size={12} strokeWidth={2} />
+	</button>
+{/snippet}
 
 {#snippet providerIcon(p: SyncProvider)}
 	{#if p === 'google'}
@@ -1191,11 +1478,14 @@
 		align-items: center;
 		justify-content: center;
 		border: 1px solid transparent;
-		border-radius: 0.625rem;
+		border-radius: 999px;
 		background: transparent;
 		color: color-mix(in srgb, var(--text) 60%, transparent);
 		cursor: pointer;
 		transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+	}
+	.topbar-icon :global(svg) {
+		display: block;
 	}
 	.topbar-icon:hover {
 		background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
@@ -1305,8 +1595,69 @@
 	.settings__save[data-state='idle'] {
 		opacity: 0;
 	}
+	.settings__save[data-state='idle-saved'] {
+		opacity: 0.7;
+	}
 	.settings__save[data-state='saved'] {
 		color: color-mix(in srgb, var(--admin-status-success-dot, #22c55e) 80%, var(--text) 20%);
+	}
+
+	.settings__empty-hint {
+		margin: 0 0 0.2rem;
+		font-size: 0.82rem;
+		font-weight: 420;
+		font-style: italic;
+		color: color-mix(in srgb, var(--text) 58%, transparent);
+		line-height: 1.5;
+	}
+
+	.undo-toast {
+		position: fixed;
+		top: calc(3rem + 0.6rem);
+		right: clamp(1rem, 2.2vw, 2rem);
+		z-index: 90;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.55rem 0.5rem 0.85rem;
+		border-radius: 0.7rem;
+		background: color-mix(in srgb, var(--text) 92%, var(--bg) 8%);
+		color: var(--bg);
+		font-size: 0.78rem;
+		font-weight: 480;
+		box-shadow: 0 12px 30px -10px color-mix(in srgb, black 38%, transparent);
+	}
+	.undo-toast__label {
+		font-style: italic;
+		opacity: 0.86;
+	}
+	.undo-toast__undo {
+		border: none;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		font-size: 0.78rem;
+		font-weight: 600;
+		cursor: pointer;
+		padding: 0.2rem 0.55rem;
+		border-radius: 0.4rem;
+	}
+	.undo-toast__undo:hover {
+		background: color-mix(in srgb, var(--bg) 14%, transparent);
+	}
+	.undo-toast__dismiss {
+		border: none;
+		background: transparent;
+		color: inherit;
+		opacity: 0.55;
+		display: inline-flex;
+		padding: 0.25rem;
+		cursor: pointer;
+		border-radius: 0.35rem;
+	}
+	.undo-toast__dismiss:hover {
+		opacity: 1;
+		background: color-mix(in srgb, var(--bg) 14%, transparent);
 	}
 
 	.settings__head {
@@ -1325,11 +1676,11 @@
 	}
 	.settings__head h1 {
 		margin: 0;
-		font-family: var(--font-display);
-		font-size: clamp(1.7rem, 2.8vw, 2.35rem);
-		font-weight: 500;
-		letter-spacing: -0.03em;
-		line-height: 1.08;
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: clamp(1.55rem, 2.4vw, 2rem);
+		font-weight: 600;
+		letter-spacing: -0.022em;
+		line-height: 1.12;
 		color: var(--text);
 	}
 	.settings__head-sub {
@@ -1383,6 +1734,27 @@
 		justify-content: center;
 		background: color-mix(in srgb, var(--text) 6%, transparent);
 	}
+	.sync-card__icon--spinning {
+		color: var(--admin-accent);
+	}
+	.sync-card__icon--spinning :global(svg) {
+		animation: spin 0.9s linear infinite;
+	}
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.sync-card__icon--spinning :global(svg) {
+			animation: none;
+		}
+		.switch__knob,
+		.switch__track {
+			transition: none;
+		}
+	}
 	.sync-card__body {
 		display: grid;
 		gap: 0.15rem;
@@ -1396,17 +1768,19 @@
 	.sync-card__status {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.4rem;
+		gap: 0.42rem;
 		font-size: 0.76rem;
 		font-weight: 420;
 		font-style: italic;
 		color: color-mix(in srgb, var(--text) 56%, transparent);
+		line-height: 1.4;
 	}
 	.sync-card__dot {
-		width: 0.45rem;
-		height: 0.45rem;
+		width: 0.5rem;
+		height: 0.5rem;
 		border-radius: 999px;
 		background: var(--admin-status-success-dot, #22c55e);
+		flex-shrink: 0;
 	}
 	.sync-card__actions {
 		display: inline-flex;
@@ -1493,6 +1867,26 @@
 		border-color: color-mix(in srgb, var(--admin-accent) 50%, transparent);
 		background: color-mix(in srgb, var(--admin-accent) 6%, transparent);
 	}
+	.admin-btn--icon {
+		min-height: 2rem;
+		width: 2rem;
+		padding: 0;
+	}
+	.admin-btn--icon:hover:not(:disabled) {
+		background: color-mix(in srgb, #ef4444 10%, transparent);
+		border-color: color-mix(in srgb, #ef4444 36%, transparent);
+		color: #ef4444;
+	}
+	.admin-btn--solid-danger {
+		background: #ef4444;
+		border-color: #ef4444;
+		color: #fff;
+	}
+	.admin-btn--solid-danger:hover:not(:disabled) {
+		background: #dc2626;
+		border-color: #dc2626;
+		color: #fff;
+	}
 
 	.week-pick {
 		display: grid;
@@ -1503,14 +1897,16 @@
 		position: relative;
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		gap: 0.5rem;
-		padding: 0.75rem 0.875rem;
-		border-radius: 0.875rem;
+		min-height: 2.4rem;
+		padding: 0 0.875rem;
+		border-radius: 0.625rem;
 		border: 1px solid var(--admin-card-border);
 		background: var(--admin-card-bg);
 		color: color-mix(in srgb, var(--text) 70%, transparent);
 		cursor: pointer;
-		font-size: 0.8rem;
+		font-size: 0.82rem;
 		font-weight: 520;
 		letter-spacing: -0.005em;
 		transition:
@@ -1579,6 +1975,7 @@
 		height: 0.5rem;
 		border-radius: 999px;
 		background: var(--method-color);
+		flex-shrink: 0;
 	}
 	.payment-row__name {
 		font-size: 0.86rem;
@@ -1606,14 +2003,14 @@
 	.payment-row__add {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.3rem;
-		font-size: 0.72rem;
-		font-weight: 540;
-		color: color-mix(in srgb, var(--text) 58%, transparent);
-		padding: 0.28rem 0.6rem;
-		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+		gap: 0.32rem;
+		font-size: 0.74rem;
+		font-weight: 580;
+		color: color-mix(in srgb, var(--admin-accent) 80%, var(--text) 20%);
+		padding: 0.32rem 0.7rem;
+		border: 1px solid color-mix(in srgb, var(--admin-accent) 30%, transparent);
 		border-radius: 0.5rem;
-		background: color-mix(in srgb, var(--text) 4%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
 	}
 	.payment-row__chev {
 		color: color-mix(in srgb, var(--text) 50%, transparent);
@@ -1651,14 +2048,38 @@
 	.payment-row__footer {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
 		gap: 0.8rem;
 		padding-top: 0.4rem;
 		border-top: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
+		min-height: 2.5rem;
+	}
+	.payment-row__footer-primary {
+		display: inline-flex;
+		gap: 0.5rem;
+	}
+
+	.confirm-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.8rem;
+		width: 100%;
+	}
+	.confirm-row__text {
+		font-size: 0.82rem;
+		font-weight: 500;
+		color: var(--text);
+	}
+	.confirm-row__actions {
+		display: inline-flex;
+		gap: 0.45rem;
 	}
 
 	.field {
 		display: grid;
 		gap: 0.35rem;
+		max-width: 26em;
 	}
 	.field__label {
 		font-size: 0.74rem;
@@ -1671,8 +2092,14 @@
 	.field__control {
 		position: relative;
 	}
-	.field__input {
-		font-size: 0.92rem;
+	.pg-settings :global(.ui-form-control) {
+		min-height: 2rem;
+		padding: 0 0.7rem;
+		font-size: 0.84rem;
+		border-radius: 0.625rem;
+	}
+	.pg-settings :global(select.ui-form-control) {
+		padding-right: 1.6rem;
 	}
 	.field__check {
 		position: absolute;
@@ -1681,6 +2108,41 @@
 		transform: translateY(-50%);
 		color: var(--admin-status-success-dot, #22c55e);
 		display: inline-flex;
+	}
+	.field__warn {
+		position: absolute;
+		right: 0.6rem;
+		top: 50%;
+		transform: translateY(-50%);
+		color: #c27800;
+		display: inline-flex;
+	}
+	.field__control--invalid .field__input {
+		border-color: color-mix(in srgb, #ef4444 50%, transparent);
+		background: color-mix(in srgb, #ef4444 5%, transparent);
+	}
+	.field__error {
+		margin: 0.25rem 0 0;
+		font-size: 0.74rem;
+		font-weight: 460;
+		color: #c27800;
+	}
+	.field__help-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.1rem;
+		height: 1.1rem;
+		padding: 0;
+		margin-left: 0.35rem;
+		border: none;
+		background: transparent;
+		color: color-mix(in srgb, var(--text) 42%, transparent);
+		cursor: help;
+		vertical-align: -3px;
+	}
+	.field__help-btn:hover {
+		color: var(--admin-accent);
 	}
 	.field__hint {
 		margin: 0.2rem 0 0;
@@ -1743,6 +2205,7 @@
 		padding: 0.15rem 0.1rem;
 		cursor: pointer;
 		font: inherit;
+		min-height: 1.6rem;
 	}
 	.switch__track {
 		position: relative;
@@ -1812,10 +2275,18 @@
 
 	.creds {
 		display: grid;
-		gap: 0.55rem;
-		padding: 0.85rem;
+		gap: 0.6rem;
+		padding: 0.95rem;
 		border-radius: 0.625rem;
-		background: color-mix(in srgb, var(--text) 4%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 9%, var(--bg) 91%);
+		border: 1px solid color-mix(in srgb, var(--admin-accent) 18%, transparent);
+	}
+	.creds .field {
+		max-width: 100%;
+	}
+	.creds :global(.ui-form-control) {
+		background: var(--bg);
+		border-color: color-mix(in srgb, var(--text) 16%, transparent);
 	}
 	.creds__actions {
 		display: flex;
@@ -1832,7 +2303,7 @@
 	.attention__item {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.55rem;
 		padding: 0.55rem 0.75rem;
 		border-radius: 0.625rem;
 		background: var(--admin-status-warn-bg);
@@ -1840,6 +2311,10 @@
 		border: 1px solid color-mix(in srgb, var(--admin-status-warn-fg) 22%, transparent);
 		font-size: 0.78rem;
 		font-weight: 460;
+		line-height: 1.4;
+	}
+	.attention__item :global(svg) {
+		flex-shrink: 0;
 	}
 	.attention__text {
 		flex: 1;
@@ -1982,7 +2457,8 @@
 		grid-template-columns: auto 1fr auto;
 		align-items: center;
 		gap: 0.7rem;
-		padding: 0.7rem 0.85rem;
+		min-height: 2.6rem;
+		padding: 0.45rem 0.85rem;
 		border-radius: 0.625rem;
 		border: 1px solid var(--admin-card-border);
 		background: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
@@ -2019,19 +2495,22 @@
 		font-weight: 540;
 	}
 	.sheet__check {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
+		display: flex;
+		align-items: flex-start;
+		gap: 0.55rem;
 		font-size: 0.78rem;
 		font-weight: 420;
 		font-style: italic;
 		color: color-mix(in srgb, var(--text) 60%, transparent);
 		padding: 0.3rem 0;
-		line-height: 1.45;
+		line-height: 1.5;
+		cursor: pointer;
 	}
 	.sheet__check input {
+		flex-shrink: 0;
 		width: 0.95rem;
 		height: 0.95rem;
+		margin: 0.18rem 0 0;
 		accent-color: var(--admin-accent);
 	}
 	.sheet__foot {
