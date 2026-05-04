@@ -9,6 +9,7 @@
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminToast from '@calendar/ui/admin/shared/AdminToast.svelte'
 	import EditableField from '@calendar/ui/admin/shared/EditableField.svelte'
+	import AdminInlineConfirm from '@calendar/ui/admin/shared/AdminInlineConfirm.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
@@ -33,6 +34,7 @@
 	let toast = $state('')
 	let toastError = $state(false)
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
+	let cancelConfirmOpen = $state(false)
 	const mockEvent = $derived.by(() => {
 		if (!mockMode || !Number.isFinite(eventId) || eventId <= 0) return null
 		return [...adminMockCatalog.dashboardEvents, ...adminMockCatalog.dashboardRecentEvents]
@@ -162,55 +164,45 @@
 		return 'Booking confirmed'
 	}
 
-	function showToast(message: string, isError = false) {
-		toast = message
-		toastError = isError
-		if (toastTimer) clearTimeout(toastTimer)
-		toastTimer = setTimeout(() => {
-			toast = ''
-			toastError = false
-		}, 2400)
-	}
-
 	async function handlePromote(entryId: number) {
 		if (mockMode) {
-			showToast('Mock mode: promote preview only')
+			flash('Mock mode: promote preview only')
 			return
 		}
 		await dashboard.promoteWaitlist(eventId, entryId)
 		if (dashboard.error) {
-			showToast(dashboard.error, true)
+			flash(dashboard.error, true)
 			return
 		}
-		showToast('Promoted from waitlist')
+		flash('Promoted from waitlist')
 	}
 
 	async function handleRecapCommit(next: string) {
 		if (mockMode) {
-			showToast('Mock mode: description preview only')
+			flash('Mock mode: description preview only')
 			return
 		}
 		await dashboard.updateEventMemory(eventId, next, detail?.event.heroImageUrl ?? '')
 		if (dashboard.error) {
-			showToast(dashboard.error, true)
+			flash(dashboard.error, true)
 			return
 		}
-		showToast('Description saved')
+		flash('Description saved')
 	}
 
 	async function handleCapacityCommit(next: string) {
 		const value = Number(next)
 		if (!Number.isFinite(value) || value < joinedCount) return
 		if (mockMode) {
-			showToast('Mock mode: capacity preview only')
+			flash('Mock mode: capacity preview only')
 			return
 		}
 		await dashboard.updateEventCapacity(eventId, value)
 		if (dashboard.error) {
-			showToast(dashboard.error, true)
+			flash(dashboard.error, true)
 			return
 		}
-		showToast('Capacity updated')
+		flash('Capacity updated')
 	}
 
 	function validateCapacity(next: string): string | null {
@@ -222,17 +214,15 @@
 
 	async function handleAttendance(userId: string, status: 'unknown' | 'attended' | 'flaked') {
 		if (mockMode) {
-			showToast('Mock mode: attendance preview only')
+			flash('Mock mode: attendance preview only')
 			return
 		}
 		await dashboard.updateEventAttendance(eventId, userId, status)
 		if (dashboard.error) {
-			showToast(dashboard.error, true)
+			flash(dashboard.error, true)
 			return
 		}
-		showToast(
-			status === 'attended' ? 'Marked attended' : status === 'flaked' ? 'Marked no-show' : 'Cleared'
-		)
+		flash(status === 'attended' ? 'Marked attended' : status === 'flaked' ? 'Marked no-show' : 'Cleared')
 	}
 
 	function openEditor() {
@@ -240,9 +230,9 @@
 		void goto(hrefWithMock(withAdminRoute(`events/program/${detail.event.activitySlug || 'events'}/`)))
 	}
 
-	async function cancelEvent() {
+	async function performCancelEvent() {
+		cancelConfirmOpen = false
 		if (!detail) return
-		if (!confirm('Cancel this event? This action cannot be undone.')) return
 		if (mockMode) {
 			flash('Mock mode: cancel skipped')
 			return
@@ -253,6 +243,11 @@
 			return
 		}
 		void goto(hrefWithMock(withAdminRoute('events/')))
+	}
+
+	function cancelEvent() {
+		if (!detail) return
+		cancelConfirmOpen = true
 	}
 
 	function handleEditRequest() {
@@ -307,6 +302,16 @@
 	<div class="admin-event-detail admin-content">
 		{#if toast}
 			<AdminToast message={toast} variant={toastError ? 'error' : 'status'} />
+		{/if}
+		{#if cancelConfirmOpen}
+			<div class="admin-event-detail__cancel-confirm">
+				<AdminInlineConfirm
+					question="Cancel this event? This action cannot be undone."
+					confirmLabel="Yes, cancel"
+					onCancel={() => (cancelConfirmOpen = false)}
+					onConfirm={() => void performCancelEvent()}
+				/>
+			</div>
 		{/if}
 		{#if loading}
 			<p class="admin-event-detail__loading">Loading event detail...</p>
@@ -475,6 +480,14 @@
 		font-weight: 650;
 		color: var(--text);
 		min-width: 1.5rem;
+	}
+
+	.admin-event-detail__cancel-confirm {
+		padding: 0.85rem 1rem;
+		border-radius: 0.7rem;
+		background: color-mix(in srgb, #ef4444 8%, var(--bg) 92%);
+		border: 1px solid color-mix(in srgb, #ef4444 30%, transparent);
+		margin-bottom: 0.5rem;
 	}
 
 	.admin-event-detail__section {
