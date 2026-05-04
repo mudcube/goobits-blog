@@ -29,8 +29,31 @@
   let weekStartAutosaveTimer: ReturnType<typeof setTimeout> | null = null;
   let suspendWeekStartAutosave = $state(true);
   let handledConnectedNotice = $state(false);
+  let lastSavedAt = $state<number | null>(null);
+  let nowTick = $state(Date.now());
+  let nowInterval: ReturnType<typeof setInterval> | null = null;
 
   let calendarWeekStart = $state<AdminCalendarWeekStart>("monday");
+
+  const savedDisplay = $derived.by(() => {
+    if (toastMessage) {
+      return { label: toastIsError ? toastMessage : `✓ ${toastMessage}`, error: toastIsError };
+    }
+    if (lastSavedAt) {
+      return { label: relativeSavedLabel(lastSavedAt, nowTick), error: false };
+    }
+    return null;
+  });
+
+  function relativeSavedLabel(stamp: number, now: number) {
+    const seconds = Math.max(0, Math.floor((now - stamp) / 1000));
+    if (seconds < 5) return "All saved · just now";
+    if (seconds < 60) return `All saved · ${seconds}s ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `All saved · ${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    return `All saved · ${hours}h ago`;
+  }
 
   $effect(() => {
     if (!authed || mockMode) return;
@@ -51,15 +74,18 @@
   onMount(() => {
     calendarWeekStart = getAdminCalendarWeekStart();
     suspendWeekStartAutosave = false;
+    nowInterval = setInterval(() => (nowTick = Date.now()), 30000);
     return () => {
       if (toastTimer) clearTimeout(toastTimer);
       if (weekStartAutosaveTimer) clearTimeout(weekStartAutosaveTimer);
+      if (nowInterval) clearInterval(nowInterval);
     };
   });
 
   function showToast(message: string, isError = false) {
     toastMessage = message;
     toastIsError = isError;
+    if (!isError) lastSavedAt = Date.now();
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
       toastMessage = "";
@@ -99,14 +125,15 @@
 
 {#if authed}
   <div class="admin-settings admin-content">
-    {#if toastMessage}
+    {#if savedDisplay}
       <div
         class="admin-settings__save"
-        class:admin-settings__save--error={toastIsError}
+        class:admin-settings__save--error={savedDisplay.error}
+        class:admin-settings__save--idle={!toastMessage}
         role="status"
         aria-live="polite"
       >
-        {#if !toastIsError}✓ {/if}{toastMessage}
+        {savedDisplay.label}
       </div>
     {/if}
 
@@ -183,12 +210,18 @@
     color: color-mix(in srgb, var(--text) 56%, transparent);
     z-index: 5;
     pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+
+  .admin-settings__save--idle {
+    opacity: 0.7;
   }
 
   .admin-settings__save--error {
     font-style: normal;
     font-weight: 540;
     color: #ef4444;
+    opacity: 1;
   }
 
   @media (max-width: 720px) {
