@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import AdminCalendar from '../../dashboard/AdminCalendar.svelte'
+	import AdminInlineConfirm from '../../shared/AdminInlineConfirm.svelte'
 	import ProgramDaySheet from './ProgramDaySheet.svelte'
 	import ProgramSettingsDrawer from './ProgramSettingsDrawer.svelte'
 	import { getAdminMockCatalog } from '../../mock/catalog'
@@ -39,6 +40,7 @@
 
 	let preview = $state(false)
 	let settingsOpen = $state(false)
+	let deleteConfirmOpen = $state(false)
 	let initialized = $state(false)
 	let toast = $state('')
 	let toastError = $state(false)
@@ -516,7 +518,13 @@
 		}
 	}
 
+	function requestDeleteProgram() {
+		deleteConfirmOpen = true
+		settingsOpen = false
+	}
+
 	async function deleteProgram() {
+		deleteConfirmOpen = false
 		if (mockMode) {
 			flash('Mock mode: delete skipped')
 			return
@@ -640,6 +648,16 @@
 	{/if}
 
 	<div class="program-editor admin-content">
+		{#if deleteConfirmOpen}
+			<div class="program-editor__delete-confirm">
+				<AdminInlineConfirm
+					question="Delete program {dashboard.programDraft?.label || dashboard.selectedProgramSlug || ''}? This cannot be undone."
+					confirmLabel="Yes, delete"
+					onCancel={() => (deleteConfirmOpen = false)}
+					onConfirm={() => void deleteProgram()}
+				/>
+			</div>
+		{/if}
 		<div class="program-editor__canvas-wrap">
 			<div class="program-editor__canvas">
 				<div class="program-editor__panel calendar-ui-card">
@@ -778,7 +796,7 @@
 				onPatch={updateProgramDraft}
 				onFieldInput={handleSettingInput}
 				onFieldCommit={(field) => pushEditorHistory(String(field))}
-				onDelete={() => void deleteProgram()}
+				onDelete={requestDeleteProgram}
 				onSave={() => void saveProgram()}
 			/>
 		</div>
@@ -788,6 +806,14 @@
 <style>
 	:global(.social-admin) {
 		overflow-x: clip;
+	}
+
+	.program-editor__delete-confirm {
+		padding: 0.85rem 1rem;
+		border-radius: 0.7rem;
+		background: color-mix(in srgb, #ef4444 8%, var(--bg) 92%);
+		border: 1px solid color-mix(in srgb, #ef4444 30%, transparent);
+		margin-bottom: 0.6rem;
 	}
 
 	.program-editor {

@@ -834,7 +834,6 @@ export function createAdminDashboardController(
   async function deleteProgram() {
     const slug = selectedProgramSlug;
     if (!slug) return;
-    if (!confirm(`Delete program "${slug}"?`)) return;
     programDeleting = true;
     error = "";
     try {
@@ -1206,12 +1205,6 @@ export function createAdminDashboardController(
   }
 
   async function purgeDeadLetters() {
-    if (
-      !confirm(
-        "Purge dead-letter sync jobs? This discards failed jobs permanently.",
-      )
-    )
-      return;
     syncQueueBusy = true;
     error = "";
     try {

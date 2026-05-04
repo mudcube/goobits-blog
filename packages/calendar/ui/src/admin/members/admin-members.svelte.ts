@@ -99,7 +99,6 @@ export function createAdminMembersController(
 	}
 
 	async function cleanupE2E() {
-		if (!confirm('Delete E2E test users and events?')) return
 		cleaning = true
 		error = ''
 		notice = ''

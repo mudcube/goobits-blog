@@ -7,12 +7,9 @@ import CalendarProfilePage from './member/profile/CalendarProfilePage.svelte'
 import AdminLoginCard from './admin/auth/AdminLoginCard.svelte'
 import AdminRouteShell from './admin/shell/AdminRouteShell.svelte'
 import AdminCalendarPanel from './admin/availability/AdminCalendarPanel.svelte'
-import AdminDashboardPanel from './admin/dashboard/AdminDashboardPanel.svelte'
 import AdminWeekGrid from './admin/dashboard/AdminWeekGrid.svelte'
-import AdminNeedsAttention from './admin/dashboard/AdminNeedsAttention.svelte'
 import AdminMemoriesRail from './admin/dashboard/AdminMemoriesRail.svelte'
 import AdminEventDetailSheet from './admin/events/AdminEventDetailSheet.svelte'
-import AdminMembersPanel from './admin/members/AdminMembersPanel.svelte'
 import PillButton from './primitives/CalendarPillButton.svelte'
 import Button from './primitives/CalendarButton.svelte'
 import Hero from './primitives/CalendarHero.svelte'
@@ -26,12 +23,9 @@ export {
 	AdminLoginCard,
 	AdminRouteShell,
 	AdminCalendarPanel,
-	AdminDashboardPanel,
 	AdminWeekGrid,
-	AdminNeedsAttention,
 	AdminMemoriesRail,
 	AdminEventDetailSheet,
-	AdminMembersPanel,
 	PillButton,
 	Button,
 	Hero,
