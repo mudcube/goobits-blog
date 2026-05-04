@@ -101,12 +101,12 @@
   <div class="admin-settings admin-content">
     {#if toastMessage}
       <div
-        class="admin-settings__toast admin-ui-toast"
-        class:admin-ui-toast--error={toastIsError}
+        class="admin-settings__save"
+        class:admin-settings__save--error={toastIsError}
         role="status"
+        aria-live="polite"
       >
-        {#if !toastIsError}✓
-        {/if}{toastMessage}
+        {#if !toastIsError}✓ {/if}{toastMessage}
       </div>
     {/if}
 
@@ -162,10 +162,26 @@
     color: color-mix(in srgb, var(--text) 56%, transparent);
   }
 
-  .admin-settings__toast {
-    bottom: 1rem;
-    z-index: 120;
-    font-size: 0.78rem;
+  .admin-settings {
+    position: relative;
+  }
+
+  .admin-settings__save {
+    position: absolute;
+    top: 0.4rem;
+    right: 0;
+    font-size: 0.74rem;
+    font-weight: 440;
+    font-style: italic;
+    color: color-mix(in srgb, var(--text) 56%, transparent);
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .admin-settings__save--error {
+    font-style: normal;
+    font-weight: 540;
+    color: #ef4444;
   }
 
   @media (max-width: 720px) {
