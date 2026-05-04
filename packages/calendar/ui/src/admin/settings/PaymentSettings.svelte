@@ -1,9 +1,13 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte'
+	import { fly } from 'svelte/transition'
+	import { cubicOut } from 'svelte/easing'
+	import { X as XIcon } from '@lucide/svelte'
 	import {
 		createPaymentSettingsController,
 		paymentMethodUsesPayPalCheckout,
-		type PaymentMethodKey
+		type PaymentMethodKey,
+		type RemoveSnapshot
 	} from './payment-settings-controller.svelte'
 	import PaymentMethodRow from './PaymentMethodRow.svelte'
 	import type { AdminPaymentIntegrationsResponse } from '../../api/admin'
@@ -104,6 +108,8 @@
 
 	let removeConfirmFor = $state<PaymentMethodKey | null>(null)
 	let removeConfirmTimer: ReturnType<typeof setTimeout> | null = null
+	let undoToast = $state<{ label: string; snapshot: RemoveSnapshot } | null>(null)
+	let undoTimer: ReturnType<typeof setTimeout> | null = null
 
 	$effect(() => {
 		if (!authed) return
@@ -113,6 +119,7 @@
 	onDestroy(() => {
 		payment.dispose()
 		if (removeConfirmTimer) clearTimeout(removeConfirmTimer)
+		if (undoTimer) clearTimeout(undoTimer)
 	})
 
 	const configuredCount = $derived(
@@ -146,9 +153,50 @@
 	function handleConfirmRemove(method: PaymentMethodKey) {
 		if (removeConfirmTimer) clearTimeout(removeConfirmTimer)
 		removeConfirmFor = null
-		payment.removeHandle(method)
+		const snapshot = payment.removeHandleWithSnapshot(method)
+		const meta = paymentProviders.find((p) => p.value === method)
+		showUndoToast(`Removed ${meta?.label ?? method}`, snapshot)
+	}
+
+	function showUndoToast(label: string, snapshot: RemoveSnapshot) {
+		if (undoTimer) clearTimeout(undoTimer)
+		undoToast = { label, snapshot }
+		undoTimer = setTimeout(() => {
+			undoToast = null
+		}, 5000)
+	}
+
+	function dismissUndo() {
+		if (undoTimer) clearTimeout(undoTimer)
+		undoToast = null
+	}
+
+	function applyUndo() {
+		if (!undoToast) return
+		payment.restoreHandle(undoToast.snapshot)
+		dismissUndo()
 	}
 </script>
+
+{#if undoToast}
+	<div
+		class="payment-settings__undo-toast"
+		role="status"
+		aria-live="polite"
+		transition:fly={{ y: -8, duration: 180, easing: cubicOut }}
+	>
+		<span class="payment-settings__undo-label">{undoToast.label}</span>
+		<button type="button" class="payment-settings__undo-action" onclick={applyUndo}>Undo</button>
+		<button
+			type="button"
+			class="payment-settings__undo-dismiss"
+			aria-label="Dismiss"
+			onclick={dismissUndo}
+		>
+			<XIcon size={12} />
+		</button>
+	</div>
+{/if}
 
 <section class="payment-settings admin-settings__section">
 	<div class="admin-settings__section-head">
@@ -207,5 +255,54 @@
 		font-style: normal;
 		font-size: 0.85rem;
 		opacity: 0.85;
+	}
+
+	.payment-settings__undo-toast {
+		position: fixed;
+		top: calc(3rem + 0.6rem);
+		right: clamp(1rem, 2.2vw, 2rem);
+		z-index: 90;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.55rem 0.5rem 0.85rem;
+		border-radius: 0.7rem;
+		background: color-mix(in srgb, var(--text) 92%, var(--bg) 8%);
+		color: var(--bg);
+		font-size: 0.78rem;
+		font-weight: 480;
+		box-shadow: 0 12px 30px -10px color-mix(in srgb, black 38%, transparent);
+	}
+	.payment-settings__undo-label {
+		font-style: italic;
+		opacity: 0.86;
+	}
+	.payment-settings__undo-action {
+		border: none;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		font-size: 0.78rem;
+		font-weight: 600;
+		cursor: pointer;
+		padding: 0.2rem 0.55rem;
+		border-radius: 0.4rem;
+	}
+	.payment-settings__undo-action:hover {
+		background: color-mix(in srgb, var(--bg) 14%, transparent);
+	}
+	.payment-settings__undo-dismiss {
+		border: none;
+		background: transparent;
+		color: inherit;
+		opacity: 0.55;
+		display: inline-flex;
+		padding: 0.25rem;
+		cursor: pointer;
+		border-radius: 0.35rem;
+	}
+	.payment-settings__undo-dismiss:hover {
+		opacity: 1;
+		background: color-mix(in srgb, var(--bg) 14%, transparent);
 	}
 </style>

@@ -67,6 +67,7 @@
 	let pendingDisconnectAfter = $state<SyncProvider | null>(null)
 	let appleBusy = $state(false)
 	let appleError = $state('')
+	let connectingProvider = $state<SyncProvider | null>(null)
 
 	async function handleDisconnect() {
 		const provider = dashboard.sync.activeProvider
@@ -113,6 +114,7 @@
 	}) {
 		appleBusy = true
 		appleError = ''
+		connectingProvider = 'apple'
 		try {
 			if (mockMode) {
 				showAppleSheet = false
@@ -133,6 +135,7 @@
 			showToast('Apple Calendar connected')
 		} finally {
 			appleBusy = false
+			connectingProvider = null
 		}
 	}
 
@@ -152,7 +155,7 @@
 
 	<SyncCard
 		active={activeProvider}
-		connecting={null}
+		connecting={connectingProvider}
 		statusLabel={null}
 		expiringSoon={needsReconnect}
 		onConnectStart={() => (showSwitchSheet = true)}

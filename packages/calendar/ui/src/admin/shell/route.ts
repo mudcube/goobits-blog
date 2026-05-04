@@ -160,12 +160,21 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 		}
 	}
 
-
-	return {
-		kind: 'settings',
+	if (normalized === `${adminBase}/settings`) {
+		return {
+			kind: 'settings',
 			currentSection: 'settings',
 			title: 'Settings',
 			breadcrumbs: [...baseCrumbs, { label: 'Settings' }],
 			actions: []
+		}
+	}
+
+	return {
+		kind: 'dashboard',
+		currentSection: 'dashboard',
+		title: 'Dashboard',
+		breadcrumbs: baseCrumbs,
+		actions: []
 	}
 }

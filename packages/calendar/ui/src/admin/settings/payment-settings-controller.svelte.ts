@@ -42,6 +42,12 @@ type PaymentSettingsDashboard = {
   ) => Promise<void>;
 };
 
+export type RemoveSnapshot = {
+  method: PaymentMethodKey;
+  handle: string;
+  primary: PaymentMethodKey | "";
+};
+
 type PaymentSettingsOptions = {
   dashboard: () => PaymentSettingsDashboard;
   mockMode: () => boolean;
@@ -106,6 +112,9 @@ export function createPaymentSettingsController(
   let initialSnapshot = $state(snapshot(blankHandles(), ""));
   let autosaveTimer: ReturnType<typeof setTimeout> | null = null;
   let suspendAutosave = $state(true);
+  let lastTouchedMethod = $state<PaymentMethodKey | "">("");
+  let lastSavedMethod = $state<PaymentMethodKey | "">("");
+  let savedFlashTimer: ReturnType<typeof setTimeout> | null = null;
   let payPalClientId = $state("");
   let payPalClientSecret = $state("");
   let payPalEnvironment = $state<"sandbox" | "live">("sandbox");
@@ -117,6 +126,7 @@ export function createPaymentSettingsController(
 
   function dispose() {
     if (autosaveTimer) clearTimeout(autosaveTimer);
+    if (savedFlashTimer) clearTimeout(savedFlashTimer);
   }
 
   function isConfigured(method: PaymentMethodKey) {
@@ -176,6 +186,7 @@ export function createPaymentSettingsController(
 
   function updateHandle(method: PaymentMethodKey, value: string) {
     handles = { ...handles, [method]: value };
+    lastTouchedMethod = method;
     if (!isConfigured(method) && primary === method) {
       ensurePrimary();
     }
@@ -186,7 +197,24 @@ export function createPaymentSettingsController(
 
   function removeHandle(method: PaymentMethodKey) {
     handles = { ...handles, [method]: "" };
+    lastTouchedMethod = method;
     if (primary === method) ensurePrimary();
+  }
+
+  function removeHandleWithSnapshot(method: PaymentMethodKey): RemoveSnapshot {
+    const snap: RemoveSnapshot = {
+      method,
+      handle: handles[method],
+      primary,
+    };
+    removeHandle(method);
+    return snap;
+  }
+
+  function restoreHandle(snap: RemoveSnapshot) {
+    handles = { ...handles, [snap.method]: snap.handle };
+    primary = snap.primary;
+    lastTouchedMethod = snap.method;
   }
 
   function makePrimary(method: PaymentMethodKey) {
@@ -195,6 +223,7 @@ export function createPaymentSettingsController(
       return;
     }
     primary = method;
+    lastTouchedMethod = method;
   }
 
   function integrationSourceLabel(source: "stored" | "env" | null | undefined) {
@@ -300,11 +329,22 @@ export function createPaymentSettingsController(
     }
   }
 
+  function flashSaved(method: PaymentMethodKey | "") {
+    if (savedFlashTimer) clearTimeout(savedFlashTimer);
+    lastSavedMethod = method;
+    if (!method) return;
+    savedFlashTimer = setTimeout(() => {
+      lastSavedMethod = "";
+    }, 2000);
+  }
+
   async function persistPayments(expected: string) {
     if (snapshot(handles, primary) !== expected) return;
+    const touched = lastTouchedMethod;
     if (options.mockMode()) {
       showToast("Saved");
       initialSnapshot = expected;
+      flashSaved(touched);
       return;
     }
     const dashboard = options.dashboard();
@@ -327,6 +367,7 @@ export function createPaymentSettingsController(
       return;
     }
     initialSnapshot = expected;
+    flashSaved(touched);
     showToast("Saved");
   }
 
@@ -347,9 +388,14 @@ export function createPaymentSettingsController(
     get primary() {
       return primary;
     },
+    get lastSavedMethod() {
+      return lastSavedMethod;
+    },
     isConfigured,
     updateHandle,
     removeHandle,
+    removeHandleWithSnapshot,
+    restoreHandle,
     makePrimary,
     get payPalClientId() {
       return payPalClientId;

@@ -30,6 +30,7 @@
 	type PaymentController = {
 		handles: Record<PaymentMethodKey, string>
 		primary: PaymentMethodKey | ''
+		lastSavedMethod: PaymentMethodKey | ''
 		isConfigured: (method: PaymentMethodKey) => boolean
 		updateHandle: (method: PaymentMethodKey, value: string) => void
 		makePrimary: (method: PaymentMethodKey) => void
@@ -80,6 +81,7 @@
 	const handle = $derived(payment.handles[meta.value] ?? '')
 	const configured = $derived(payment.isConfigured(meta.value))
 	const isPrimary = $derived(payment.primary === meta.value)
+	const justSaved = $derived(payment.lastSavedMethod === meta.value && configured)
 	const usesPayPalRail = $derived(paymentMethodUsesPayPalCheckout(meta.value))
 	const railName = $derived<'paypal_checkout' | 'cash_app_pay'>(
 		usesPayPalRail ? 'paypal_checkout' : 'cash_app_pay'
@@ -203,6 +205,10 @@
 					{#if handleErr}
 						<span class="payment-method-row__field-warn" aria-hidden="true">
 							<AlertTriangle size={14} />
+						</span>
+					{:else if justSaved}
+						<span class="payment-method-row__field-check" aria-hidden="true">
+							<Check size={14} />
 						</span>
 					{/if}
 				</div>
@@ -636,6 +642,14 @@
 		top: 50%;
 		transform: translateY(-50%);
 		color: #c27800;
+		display: inline-flex;
+	}
+	.payment-method-row__field-check {
+		position: absolute;
+		right: 0.6rem;
+		top: 50%;
+		transform: translateY(-50%);
+		color: var(--admin-status-success-dot, #22c55e);
 		display: inline-flex;
 	}
 	.payment-method-row__field-error {
