@@ -9,7 +9,6 @@ export { default as AdminEventDetailSheet } from "./events/AdminEventDetailSheet
 export { default as AdminEventDetailPage } from "./events/AdminEventDetailPage.svelte";
 export { default as AdminEventsPage } from "./events/AdminEventsPage.svelte";
 export { EventSessionCard } from "../shared";
-export { default as AdminIntegrationsPanel } from "./integrations/google/AdminIntegrationsPanel.svelte";
 export { default as AdminCrewInviteModal } from "./members/AdminCrewInviteModal.svelte";
 export { default as AdminCrewPage } from "./members/AdminCrewPage.svelte";
 export { default as AdminCrewMemberCard } from "./members/AdminCrewMemberCard.svelte";

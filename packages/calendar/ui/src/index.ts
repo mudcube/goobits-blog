@@ -13,7 +13,6 @@ import AdminNeedsAttention from './admin/dashboard/AdminNeedsAttention.svelte'
 import AdminMemoriesRail from './admin/dashboard/AdminMemoriesRail.svelte'
 import AdminEventDetailSheet from './admin/events/AdminEventDetailSheet.svelte'
 import AdminMembersPanel from './admin/members/AdminMembersPanel.svelte'
-import AdminIntegrationsPanel from './admin/integrations/google/AdminIntegrationsPanel.svelte'
 import PillButton from './primitives/CalendarPillButton.svelte'
 import Button from './primitives/CalendarButton.svelte'
 import Hero from './primitives/CalendarHero.svelte'
@@ -33,7 +32,6 @@ export {
 	AdminMemoriesRail,
 	AdminEventDetailSheet,
 	AdminMembersPanel,
-	AdminIntegrationsPanel,
 	PillButton,
 	Button,
 	Hero,
