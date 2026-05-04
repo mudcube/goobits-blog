@@ -39,6 +39,9 @@
     if (toastMessage) {
       return { label: toastIsError ? toastMessage : `✓ ${toastMessage}`, error: toastIsError };
     }
+    if (dashboard.error) {
+      return { label: dashboard.error, error: true };
+    }
     if (lastSavedAt) {
       return { label: relativeSavedLabel(lastSavedAt, nowTick), error: false };
     }

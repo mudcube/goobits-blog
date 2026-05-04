@@ -5,6 +5,7 @@
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import { Users } from '@lucide/svelte'
 	import { ArrowUpRight } from '@lucide/svelte'
+	import { ArrowUp, Check, X as XIcon } from '@lucide/svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
@@ -159,6 +160,44 @@
 		return 'Booking confirmed'
 	}
 
+	function showToast(message: string, isError = false) {
+		toast = message
+		toastError = isError
+		if (toastTimer) clearTimeout(toastTimer)
+		toastTimer = setTimeout(() => {
+			toast = ''
+			toastError = false
+		}, 2400)
+	}
+
+	async function handlePromote(entryId: number) {
+		if (mockMode) {
+			showToast('Mock mode: promote preview only')
+			return
+		}
+		await dashboard.promoteWaitlist(eventId, entryId)
+		if (dashboard.error) {
+			showToast(dashboard.error, true)
+			return
+		}
+		showToast('Promoted from waitlist')
+	}
+
+	async function handleAttendance(userId: string, status: 'unknown' | 'attended' | 'flaked') {
+		if (mockMode) {
+			showToast('Mock mode: attendance preview only')
+			return
+		}
+		await dashboard.updateEventAttendance(eventId, userId, status)
+		if (dashboard.error) {
+			showToast(dashboard.error, true)
+			return
+		}
+		showToast(
+			status === 'attended' ? 'Marked attended' : status === 'flaked' ? 'Marked no-show' : 'Cleared'
+		)
+	}
+
 	function openEditor() {
 		if (!detail) return
 		void goto(hrefWithMock(withAdminRoute(`events/program/${detail.event.activitySlug || 'events'}/`)))
@@ -230,7 +269,12 @@
 {#if authed}
 	<div class="admin-event-detail admin-content">
 		{#if toast}
-			<div class="admin-ui-toast admin-event-detail__toast" class:admin-ui-toast--error={toastError} role="status">
+			<div
+				class="admin-event-detail__toast"
+				class:admin-event-detail__toast--error={toastError}
+				role="status"
+				aria-live="polite"
+			>
 				{#if !toastError}✓ {/if}{toast}
 			</div>
 		{/if}
@@ -290,6 +334,44 @@
 									detail={attendeeDetail(attendee)}
 									href={crewMemberHref(attendee.userId)}
 								/>
+								{#if attendee.status === 'waitlist' || attendee.waitlistPosition}
+									<div class="admin-event-detail__attendee-actions">
+										<button
+											type="button"
+											class="admin-ui-btn admin-ui-btn--accent"
+											onclick={() => void handlePromote(attendee.entryId)}
+										>
+											<ArrowUp size={13} strokeWidth={2} /> Promote
+										</button>
+									</div>
+								{:else if eventEnded && attendee.status === 'joined'}
+									<div class="admin-event-detail__attendee-actions">
+										<button
+											type="button"
+											class="admin-ui-btn"
+											class:admin-ui-btn--accent={attendee.attendanceStatus === 'attended'}
+											onclick={() =>
+												void handleAttendance(
+													attendee.userId,
+													attendee.attendanceStatus === 'attended' ? 'unknown' : 'attended'
+												)}
+										>
+											<Check size={13} strokeWidth={2} /> Attended
+										</button>
+										<button
+											type="button"
+											class="admin-ui-btn"
+											class:admin-ui-btn--warn={attendee.attendanceStatus === 'flaked'}
+											onclick={() =>
+												void handleAttendance(
+													attendee.userId,
+													attendee.attendanceStatus === 'flaked' ? 'unknown' : 'flaked'
+												)}
+										>
+											<XIcon size={13} strokeWidth={2} /> No-show
+										</button>
+									</div>
+								{/if}
 							</li>
 						{/each}
 					</ul>
@@ -425,6 +507,35 @@
 
 	.admin-event-detail__attendee-item {
 		list-style: none;
+		display: grid;
+		gap: 0.4rem;
+	}
+
+	.admin-event-detail__attendee-actions {
+		display: inline-flex;
+		gap: 0.4rem;
+		padding-left: 3rem;
+	}
+
+	.admin-event-detail__toast {
+		position: fixed;
+		top: calc(3rem + 0.6rem);
+		right: clamp(1rem, 2.2vw, 2rem);
+		z-index: 90;
+		padding: 0.5rem 0.85rem;
+		border-radius: 0.7rem;
+		background: color-mix(in srgb, var(--text) 92%, var(--bg) 8%);
+		color: var(--bg);
+		font-size: 0.78rem;
+		font-style: italic;
+		font-weight: 480;
+		box-shadow: 0 12px 30px -10px color-mix(in srgb, black 38%, transparent);
+	}
+	.admin-event-detail__toast--error {
+		background: #ef4444;
+		color: #fff;
+		font-style: normal;
+		font-weight: 540;
 	}
 
 	.admin-event-detail__editor-link {
