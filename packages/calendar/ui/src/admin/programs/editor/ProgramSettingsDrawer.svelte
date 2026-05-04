@@ -1,5 +1,6 @@
 <script lang="ts">
 	import AdminActionButton from '../../shared/AdminActionButton.svelte'
+	import AdminSheet from '../../shared/AdminSheet.svelte'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 
 	type DashboardController = ReturnType<typeof createAdminDashboardController>
@@ -31,14 +32,13 @@
 </script>
 
 {#if open}
-	<button
-		type="button"
-		class="program-editor__settings-overlay"
-		aria-label="Close settings"
-		onclick={onClose}
-	></button>
-	<aside class="program-editor__settings">
-		<div class="program-editor__settings-body">
+	<AdminSheet
+		variant="drawer"
+		ariaLabel="Program settings"
+		topOffset="calc(2.5rem + 1px)"
+		{onClose}
+	>
+		{#snippet body()}
 			<section class="program-editor__settings-section">
 				<h3>Publishing</h3>
 				<div class="program-editor__toggle-row">
@@ -63,63 +63,28 @@
 					/></label
 				>
 			</section>
-			<div class="program-editor__settings-actions">
-				<AdminActionButton
-					variant="danger"
-					onclick={onDelete}
-					disabled={programDeleting}
-				>
-					{programDeleting ? 'Deleting…' : 'Delete'}
-				</AdminActionButton>
-				<AdminActionButton
-					variant="primary"
-					onclick={onSave}
-					disabled={programSaving}
-				>
-					{programSaving ? 'Saving…' : 'Save'}
-				</AdminActionButton>
-			</div>
-		</div>
-	</aside>
+		{/snippet}
+
+		{#snippet foot()}
+			<AdminActionButton
+				variant="danger"
+				onclick={onDelete}
+				disabled={programDeleting}
+			>
+				{programDeleting ? 'Deleting…' : 'Delete'}
+			</AdminActionButton>
+			<AdminActionButton
+				variant="primary"
+				onclick={onSave}
+				disabled={programSaving}
+			>
+				{programSaving ? 'Saving…' : 'Save'}
+			</AdminActionButton>
+		{/snippet}
+	</AdminSheet>
 {/if}
 
 <style>
-	.program-editor__settings-overlay {
-		position: fixed;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		top: calc(2.5rem + 1px);
-		border: none;
-		background: color-mix(in srgb, var(--text) 68%, transparent);
-		z-index: 9993 !important;
-	}
-
-	.program-editor__settings {
-		position: fixed;
-		top: calc(2.5rem + 1px);
-		right: 0;
-		bottom: 0;
-		width: min(20rem, 90vw);
-		height: calc(100vh - 2.5rem - 1px);
-		border-left: 1px solid var(--border);
-		background-color: var(--surface);
-		background-image: none;
-		z-index: 9994 !important;
-		display: flex;
-		flex-direction: column;
-		color: var(--text);
-		font-family: var(--font-ui-sans, var(--font-sans));
-	}
-
-	.program-editor__settings-body {
-		padding: 0.95rem 0.9rem;
-		display: grid;
-		gap: 0.9rem;
-		overflow: auto;
-		font-family: var(--font-ui-sans, var(--font-sans));
-	}
-
 	.program-editor__settings-section {
 		display: grid;
 		gap: 0.55rem;
@@ -134,12 +99,12 @@
 		color: var(--text-3);
 	}
 
-	.program-editor__settings-body label {
+	.program-editor__settings-section label {
 		display: grid;
 		gap: 0.2rem;
 	}
 
-	.program-editor__settings-body label span {
+	.program-editor__settings-section label > span {
 		font-size: 0.66rem;
 		font-weight: 700;
 		color: var(--text-3);
@@ -183,24 +148,5 @@
 
 	.program-editor__switch--on span {
 		left: 23px;
-	}
-
-	.program-editor__settings-actions {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-top: 0.5rem;
-	}
-
-	@media (max-width: 1080px) {
-		.program-editor__settings-overlay {
-			top: calc(2.5rem + 1px);
-		}
-
-		.program-editor__settings {
-			width: min(20rem, 90vw);
-			top: calc(2.5rem + 1px);
-			height: calc(100vh - 2.5rem - 1px);
-		}
 	}
 </style>
