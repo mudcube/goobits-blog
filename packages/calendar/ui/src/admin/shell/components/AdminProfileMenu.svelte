@@ -87,7 +87,7 @@
 	{/if}
 </div>
 
-<style lang="scss">
+<style>
 	.admin-profile-menu {
 		position: relative;
 		display: inline-flex;
@@ -105,10 +105,9 @@
 		color: var(--text);
 		border: none;
 		cursor: pointer;
-
-		&:hover {
-			background: color-mix(in srgb, var(--admin-accent) 32%, transparent);
-		}
+	}
+	.admin-profile-menu__avatar:hover {
+		background: color-mix(in srgb, var(--admin-accent) 32%, transparent);
 	}
 	.admin-profile-menu__panel {
 		position: absolute;
@@ -159,10 +158,9 @@
 		color: color-mix(in srgb, var(--text) 72%, transparent);
 		cursor: pointer;
 		text-align: left;
-
-		&:hover {
-			background: color-mix(in srgb, var(--text) 5%, transparent);
-			color: var(--text);
-		}
+	}
+	.admin-profile-menu__item:hover {
+		background: color-mix(in srgb, var(--text) 5%, transparent);
+		color: var(--text);
 	}
 </style>

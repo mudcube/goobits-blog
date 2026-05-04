@@ -30,52 +30,11 @@
   let suspendWeekStartAutosave = $state(true);
   let handledConnectedNotice = $state(false);
 
-  type SyncProviderKey = "google" | "apple" | "outlook";
-  type SyncConnections = Record<SyncProviderKey, boolean>;
-  type SyncBusy = Record<SyncProviderKey, boolean>;
-
-  let syncConnections = $state<SyncConnections>({
-    google: false,
-    apple: false,
-    outlook: false,
-  });
-  let syncBusy = $state<SyncBusy>({
-    google: false,
-    apple: false,
-    outlook: false,
-  });
-  let syncOptionsExpanded = $state(false);
   let calendarWeekStart = $state<AdminCalendarWeekStart>("monday");
-  let appleFormExpanded = $state(false);
-  let appleUsername = $state("");
-  let appleAppPassword = $state("");
-  let appleCalendarUrl = $state("");
-
-  const syncProviders: Array<{
-    value: SyncProviderKey;
-    label: string;
-    supported: boolean;
-  }> = [
-    { value: "google", label: "Google Calendar", supported: true },
-    { value: "apple", label: "Apple Calendar", supported: true },
-    { value: "outlook", label: "Outlook", supported: true },
-  ];
 
   $effect(() => {
     if (!authed || mockMode) return;
     void dashboard.loadStatus();
-  });
-
-  $effect(() => {
-    if (!authed || mockMode) return;
-    const activeProvider = dashboard.sync.activeProvider;
-    const activeStatus = activeProvider ? dashboard.sync.providers[activeProvider] : null;
-    if (activeProvider && activeStatus?.connected && !activeStatus.expired) {
-      setConnectedProvider(activeProvider);
-      syncOptionsExpanded = false;
-      return;
-    }
-    setConnectedProvider(null);
   });
 
   $effect(() => {
@@ -108,153 +67,21 @@
     }, 2200);
   }
 
-  function setConnectedProvider(provider: SyncProviderKey | null) {
-    if (!provider) {
-      syncConnections = { google: false, apple: false, outlook: false };
-      return;
-    }
-    syncConnections = {
-      google: provider === "google",
-      apple: provider === "apple",
-      outlook: provider === "outlook",
-    };
-  }
-
-  function providerConnected(provider: SyncProviderKey) {
-    return syncConnections[provider];
-  }
-
-  function connectedProviders() {
-    return syncProviders.filter((provider) =>
-      providerConnected(provider.value),
-    );
-  }
-
-  function primaryConnectedProvider() {
-    const connected = connectedProviders();
-    return connected[0] || null;
-  }
-
-  function visibleSyncProviders() {
-    const primary = primaryConnectedProvider();
-    if (!primary || syncOptionsExpanded) return syncProviders;
-    return [primary];
-  }
-
-  async function refreshStatus() {
+  async function handleConnectedNotice() {
     await dashboard.loadStatus();
     const activeProvider = dashboard.sync.activeProvider;
     const activeStatus = activeProvider ? dashboard.sync.providers[activeProvider] : null;
     const connected = !!(activeProvider && activeStatus?.connected && !activeStatus.expired);
-    setConnectedProvider(connected ? activeProvider : null);
-    return connected;
-  }
-
-  async function handleConnectedNotice() {
-    const connected = await refreshStatus();
-    const activeProvider = dashboard.sync.activeProvider;
-    const providerLabel = activeProvider
-      ? syncProviders.find((provider) => provider.value === activeProvider)?.label || "Calendar"
-      : "Calendar";
+    const providerLabels: Record<string, string> = {
+      google: "Google Calendar",
+      apple: "Apple Calendar",
+      outlook: "Outlook",
+    };
+    const providerLabel = activeProvider ? providerLabels[activeProvider] || "Calendar" : "Calendar";
     showToast(
-      connected
-        ? `${providerLabel} connected`
-        : "Calendar connection was not completed",
+      connected ? `${providerLabel} connected` : "Calendar connection was not completed",
       !connected,
     );
-  }
-
-  async function disconnectProvider(provider: SyncProviderKey) {
-    if (!mockMode) {
-      await dashboard.disconnect(provider);
-      if (dashboard.error) {
-        showToast(dashboard.error, true);
-        return false;
-      }
-    }
-    setConnectedProvider(null);
-    return true;
-  }
-
-  async function connectProvider(provider: SyncProviderKey) {
-    if ((provider === "google" || provider === "outlook") && !mockMode) {
-      await dashboard.reconnect(provider);
-      if (dashboard.error) showToast(dashboard.error, true);
-      return false;
-    }
-    if (provider === "apple" && !mockMode) {
-      appleFormExpanded = true;
-      return false;
-    }
-    if (mockMode) {
-      setConnectedProvider(provider);
-      return true;
-    }
-    return false;
-  }
-
-  async function connectAppleProvider() {
-    if (!appleUsername.trim() || !appleAppPassword.trim() || !appleCalendarUrl.trim()) {
-      showToast("Apple Calendar credentials are required", true);
-      return;
-    }
-    syncBusy = { google: false, apple: true, outlook: false };
-    try {
-      await dashboard.connectApple({
-        username: appleUsername.trim(),
-        appPassword: appleAppPassword.trim(),
-        calendarUrl: appleCalendarUrl.trim(),
-      });
-      if (dashboard.error) {
-        showToast(dashboard.error, true);
-        return;
-      }
-      appleAppPassword = "";
-      appleFormExpanded = false;
-      await refreshStatus();
-      showToast("Apple Calendar connected");
-    } finally {
-      syncBusy = { google: false, apple: false, outlook: false };
-    }
-  }
-
-  async function toggleSyncProvider(provider: SyncProviderKey) {
-    if (syncBusy.google || syncBusy.apple || syncBusy.outlook) return;
-    const busyState: SyncBusy = { google: false, apple: false, outlook: false };
-    busyState[provider] = true;
-    syncBusy = busyState;
-    try {
-      const currentlyConnected = providerConnected(provider);
-      if (currentlyConnected) {
-        const ok = await disconnectProvider(provider);
-        if (ok) {
-          await refreshStatus();
-          syncOptionsExpanded = false;
-          showToast("Saved");
-        }
-        return;
-      }
-
-      const current = primaryConnectedProvider();
-      if (current && current.value !== provider) {
-        busyState[current.value] = true;
-        syncBusy = { ...busyState };
-        const disconnected = await disconnectProvider(current.value);
-        if (!disconnected) return;
-      }
-
-      const connected = await connectProvider(provider);
-      if (!connected) return;
-      syncOptionsExpanded = false;
-      showToast("Saved");
-    } finally {
-      syncBusy = { google: false, apple: false, outlook: false };
-    }
-  }
-
-  function startSwitchProvider() {
-    if (syncBusy.google || syncBusy.apple || syncBusy.outlook) return;
-    syncOptionsExpanded = true;
   }
 
   $effect(() => {
@@ -289,22 +116,7 @@
       subtitle="Configure sync & payment defaults for your space."
     />
 
-    <CalendarSyncSettings
-      dashboardSync={dashboard.sync}
-      disconnecting={dashboard.disconnecting}
-      {syncBusy}
-      bind:syncOptionsExpanded
-      bind:appleFormExpanded
-      bind:appleUsername
-      bind:appleAppPassword
-      bind:appleCalendarUrl
-      {visibleSyncProviders}
-      {primaryConnectedProvider}
-      {providerConnected}
-      toggleSyncProvider={(provider) => void toggleSyncProvider(provider)}
-      {startSwitchProvider}
-      connectAppleProvider={() => void connectAppleProvider()}
-    />
+    <CalendarSyncSettings {dashboard} {showToast} />
 
     <CalendarViewSettings bind:calendarWeekStart />
 
