@@ -7,6 +7,7 @@
 	import { ArrowUpRight } from '@lucide/svelte'
 	import { ArrowUp, Check, X as XIcon } from '@lucide/svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
+	import AdminToast from '@calendar/ui/admin/shared/AdminToast.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
@@ -269,14 +270,7 @@
 {#if authed}
 	<div class="admin-event-detail admin-content">
 		{#if toast}
-			<div
-				class="admin-event-detail__toast"
-				class:admin-event-detail__toast--error={toastError}
-				role="status"
-				aria-live="polite"
-			>
-				{#if !toastError}✓ {/if}{toast}
-			</div>
+			<AdminToast message={toast} variant={toastError ? 'error' : 'status'} />
 		{/if}
 		{#if loading}
 			<p class="admin-event-detail__loading">Loading event detail...</p>
@@ -517,26 +511,6 @@
 		padding-left: 3rem;
 	}
 
-	.admin-event-detail__toast {
-		position: fixed;
-		top: calc(3rem + 0.6rem);
-		right: clamp(1rem, 2.2vw, 2rem);
-		z-index: 90;
-		padding: 0.5rem 0.85rem;
-		border-radius: 0.7rem;
-		background: color-mix(in srgb, var(--text) 92%, var(--bg) 8%);
-		color: var(--bg);
-		font-size: 0.78rem;
-		font-style: italic;
-		font-weight: 480;
-		box-shadow: 0 12px 30px -10px color-mix(in srgb, black 38%, transparent);
-	}
-	.admin-event-detail__toast--error {
-		background: #ef4444;
-		color: #fff;
-		font-style: normal;
-		font-weight: 540;
-	}
 
 	.admin-event-detail__editor-link {
 		display: inline-flex;
@@ -552,11 +526,6 @@
 
 	.admin-event-detail__editor-link:hover {
 		color: var(--text);
-	}
-
-	.admin-event-detail__toast {
-		bottom: 1rem;
-		z-index: 130;
 	}
 
 	@media (max-width: 760px) {

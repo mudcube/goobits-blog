@@ -8,6 +8,7 @@
 	import { createInviteShareLink } from '@calendar/ui/admin/dashboard/admin-dashboard'
 	import { Copy, Trash2, Ticket, Hourglass, CircleDashed } from '@lucide/svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
+	import AdminToast from '@calendar/ui/admin/shared/AdminToast.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import AdminCrewInviteModal from '@calendar/ui/admin/members/AdminCrewInviteModal.svelte'
@@ -589,12 +590,16 @@
 	/>
 
 	{#if toastVisible}
-		<div class="social-crew__toast admin-ui-toast" role="status">
-			<span>{toastMessage}</span>
-			{#if undoAction}
-				<button type="button" class="admin-ui-btn" onclick={handleUndoClick}>Undo</button>
-			{/if}
-		</div>
+		{#if undoAction}
+			<AdminToast
+				message={toastMessage}
+				variant="undo"
+				actionLabel="Undo"
+				onAction={handleUndoClick}
+			/>
+		{:else}
+			<AdminToast message={toastMessage} variant="status" />
+		{/if}
 	{/if}
 {/if}
 
@@ -616,14 +621,6 @@
 
 	.social-crew__list :global(.calendar-ui-card + .calendar-ui-card) {
 		border-top: 1px solid color-mix(in srgb, var(--admin-card-border) 60%, transparent);
-	}
-
-	.social-crew__toast {
-		bottom: 5.5rem;
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		z-index: 120;
 	}
 
 	.social-crew__filters {
