@@ -185,6 +185,19 @@
 		showToast('Promoted from waitlist')
 	}
 
+	async function handleRecapCommit(next: string) {
+		if (mockMode) {
+			showToast('Mock mode: description preview only')
+			return
+		}
+		await dashboard.updateEventMemory(eventId, next, detail?.event.heroImageUrl ?? '')
+		if (dashboard.error) {
+			showToast(dashboard.error, true)
+			return
+		}
+		showToast('Description saved')
+	}
+
 	async function handleCapacityCommit(next: string) {
 		const value = Number(next)
 		if (!Number.isFinite(value) || value < joinedCount) return
@@ -337,11 +350,14 @@
 
 			<section class="admin-event-detail__section">
 				<div class="admin-event-detail__section-label">Description</div>
-				{#if detail.event.recapText && detail.event.recapText.trim()}
-					<p class="admin-event-detail__description">{detail.event.recapText}</p>
-				{:else}
-					<p class="admin-event-detail__description-empty">No description added yet</p>
-				{/if}
+				<EditableField
+					value={detail.event.recapText ?? ''}
+					onCommit={handleRecapCommit}
+					ariaLabel="Description"
+					placeholder="Add a description for this event…"
+					multiline={true}
+					className="admin-event-detail__description"
+				/>
 			</section>
 
 			<section class="admin-event-detail__section">
@@ -510,18 +526,11 @@
 		color: var(--text);
 	}
 
-	.admin-event-detail__description {
-		margin: 0;
+	.admin-event-detail__section :global(.admin-event-detail__description) {
 		font-size: 0.8125rem;
 		line-height: 1.55;
 		color: color-mix(in srgb, var(--text) 58%, transparent);
-	}
-
-	.admin-event-detail__description-empty {
-		margin: 0;
-		font-size: 0.8125rem;
-		font-style: italic;
-		color: color-mix(in srgb, var(--text) 40%, transparent);
+		min-height: 1.5em;
 	}
 
 	.admin-event-detail__attendee-header {

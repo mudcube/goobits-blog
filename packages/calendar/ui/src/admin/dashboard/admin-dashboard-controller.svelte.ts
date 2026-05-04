@@ -365,6 +365,7 @@ export function createAdminDashboardController(
       status: "joined" | "waitlist";
       waitlistPosition: number | null;
       attendanceStatus: "unknown" | "attended" | "flaked";
+      joinedAt: string;
     }>;
     weather: { summary: string; temperatureF: number } | null;
   } | null>(null);
@@ -1141,6 +1142,16 @@ export function createAdminDashboardController(
       recentEvents = recentEvents.map((event) =>
         event.id === eventId ? { ...event, recapText, heroImageUrl } : event,
       );
+      if (selectedEventDetail?.event.id === eventId) {
+        selectedEventDetail = {
+          ...selectedEventDetail,
+          event: {
+            ...selectedEventDetail.event,
+            recapText,
+            heroImageUrl: heroImageUrl || null,
+          },
+        };
+      }
     } catch (err) {
       if (onUnauthorized?.(err)) return;
       error =

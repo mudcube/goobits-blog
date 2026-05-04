@@ -127,6 +127,7 @@ const CalendarAdminEventDetailResponseSchema = z.object({
         z.literal("attended"),
         z.literal("flaked"),
       ]),
+      joinedAt: z.string(),
     }),
   ),
   weather: z.union([
