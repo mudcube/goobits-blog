@@ -16,6 +16,7 @@
 		paymentMethodUsesPayPalCheckout,
 		type PaymentMethodKey
 	} from './payment-settings-controller.svelte'
+	import AdminInlineConfirm from '../shared/AdminInlineConfirm.svelte'
 
 	type PaymentMethodMeta = {
 		value: PaymentMethodKey
@@ -413,25 +414,11 @@
 
 			<div class="payment-method-row__footer">
 				{#if removeConfirm}
-					<div class="payment-method-row__confirm">
-						<span class="payment-method-row__confirm-text">Remove {meta.label}?</span>
-						<div class="payment-method-row__confirm-actions">
-							<button
-								type="button"
-								class="admin-ui-btn admin-ui-btn--muted"
-								onclick={onCancelRemove}
-							>
-								Cancel
-							</button>
-							<button
-								type="button"
-								class="admin-ui-btn admin-ui-btn--solid-danger"
-								onclick={() => onConfirmRemove(meta.value)}
-							>
-								<Trash2 size={13} strokeWidth={2} /> Yes, remove
-							</button>
-						</div>
-					</div>
+					<AdminInlineConfirm
+						question={`Remove ${meta.label}?`}
+						onCancel={onCancelRemove}
+						onConfirm={() => onConfirmRemove(meta.value)}
+					/>
 				{:else}
 					<div class="payment-method-row__footer-primary">
 						{#if configured && !isPrimary}
@@ -580,23 +567,6 @@
 	.payment-method-row__footer-primary {
 		display: inline-flex;
 		gap: 0.5rem;
-	}
-
-	.payment-method-row__confirm {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.8rem;
-		width: 100%;
-	}
-	.payment-method-row__confirm-text {
-		font-size: 0.82rem;
-		font-weight: 500;
-		color: var(--text);
-	}
-	.payment-method-row__confirm-actions {
-		display: inline-flex;
-		gap: 0.45rem;
 	}
 
 	.payment-method-row__field {
