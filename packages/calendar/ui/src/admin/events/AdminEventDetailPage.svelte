@@ -9,6 +9,7 @@
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminToast from '@calendar/ui/admin/shared/AdminToast.svelte'
 	import EditableField from '@calendar/ui/admin/shared/EditableField.svelte'
+	import AdminDateTimePicker from '@calendar/ui/admin/shared/AdminDateTimePicker.svelte'
 	import AdminInlineConfirm from '@calendar/ui/admin/shared/AdminInlineConfirm.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
@@ -177,6 +178,48 @@
 		flash('Promoted from waitlist')
 	}
 
+	async function handleTitleCommit(next: string) {
+		if (!detail) return
+		const trimmed = next.trim()
+		if (!trimmed || trimmed === detail.event.title) return
+		if (mockMode) {
+			flash('Mock mode: title preview only')
+			return
+		}
+		await dashboard.updateEventDetails(eventId, {
+			title: trimmed,
+			startsAt: detail.event.startsAt,
+			endsAt: detail.event.endsAt
+		})
+		if (dashboard.error) {
+			flash(dashboard.error, true)
+			return
+		}
+		flash('Title saved')
+	}
+
+	function validateTitle(next: string): string | null {
+		return next.trim() ? null : 'Required'
+	}
+
+	async function handleDateTimeCommit(next: { startsAt: string; endsAt: string }) {
+		if (!detail) return
+		if (mockMode) {
+			flash('Mock mode: date preview only')
+			return
+		}
+		await dashboard.updateEventDetails(eventId, {
+			title: detail.event.title,
+			startsAt: next.startsAt,
+			endsAt: next.endsAt
+		})
+		if (dashboard.error) {
+			flash(dashboard.error, true)
+			return
+		}
+		flash('Time updated')
+	}
+
 	async function handleRecapCommit(next: string) {
 		if (mockMode) {
 			flash('Mock mode: description preview only')
@@ -317,11 +360,26 @@
 			<p class="admin-event-detail__loading">Loading event detail...</p>
 		{:else if detail}
 			<div class="admin-event-detail__header">
-				<AdminPageHero
-					eyebrow={activityLabel || 'Event'}
-					title={detail.event.title}
-					subtitle={formatEventRange(detail.event.startsAt, detail.event.endsAt)}
-				/>
+				<AdminPageHero eyebrow={activityLabel || 'Event'}>
+					{#snippet titleSnippet()}
+						<EditableField
+							value={detail.event.title}
+							onCommit={handleTitleCommit}
+							validate={validateTitle}
+							ariaLabel="Event title"
+							className="admin-event-detail__title-edit"
+						/>
+					{/snippet}
+					{#snippet subtitleSnippet()}
+						<AdminDateTimePicker
+							startsAt={detail.event.startsAt}
+							endsAt={detail.event.endsAt}
+							onCommit={handleDateTimeCommit}
+							ariaLabel="Event date and time"
+							formatDisplay={formatEventRange}
+						/>
+					{/snippet}
+				</AdminPageHero>
 				<div class="admin-event-detail__capacity">
 					<strong>{joinedCount}</strong> of
 					<EditableField
@@ -480,6 +538,12 @@
 		font-weight: 650;
 		color: var(--text);
 		min-width: 1.5rem;
+	}
+
+	.admin-event-detail :global(.admin-event-detail__title-edit) {
+		font: inherit;
+		color: inherit;
+		display: inline;
 	}
 
 	.admin-event-detail__cancel-confirm {

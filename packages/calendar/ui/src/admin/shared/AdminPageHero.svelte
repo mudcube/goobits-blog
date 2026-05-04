@@ -5,11 +5,15 @@
 		eyebrow = '',
 		title = '',
 		subtitle = '',
+		titleSnippet,
+		subtitleSnippet,
 		actions
 	}: {
 		eyebrow?: string
 		title?: string
 		subtitle?: string
+		titleSnippet?: Snippet
+		subtitleSnippet?: Snippet
 		actions?: Snippet
 	} = $props()
 </script>
@@ -19,8 +23,12 @@
 		{#if eyebrow}
 			<p class="admin-page-hero__eyebrow">{eyebrow}</p>
 		{/if}
-		<h1 class="admin-page-hero__title" data-testid="admin-page-hero-title">{title}</h1>
-		{#if subtitle}
+		<h1 class="admin-page-hero__title" data-testid="admin-page-hero-title">
+			{#if titleSnippet}{@render titleSnippet()}{:else}{title}{/if}
+		</h1>
+		{#if subtitleSnippet}
+			<p class="admin-page-hero__subtitle">{@render subtitleSnippet()}</p>
+		{:else if subtitle}
 			<p class="admin-page-hero__subtitle">{subtitle}</p>
 		{/if}
 	</div>
