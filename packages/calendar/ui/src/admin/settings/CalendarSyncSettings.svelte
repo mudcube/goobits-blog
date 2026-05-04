@@ -28,8 +28,9 @@
 		}) => Promise<void>
 	}
 
-	const { dashboard, showToast } = $props<{
+	const { dashboard, mockMode = false, showToast } = $props<{
 		dashboard: DashboardController
+		mockMode?: boolean
 		showToast: (message: string, isError?: boolean) => void
 	}>()
 
@@ -70,6 +71,10 @@
 	async function handleDisconnect() {
 		const provider = dashboard.sync.activeProvider
 		if (!provider) return
+		if (mockMode) {
+			showToast('Calendar disconnected')
+			return
+		}
 		await dashboard.disconnect(provider)
 		if (dashboard.error) {
 			showToast(dashboard.error, true)
@@ -88,8 +93,17 @@
 			showAppleSheet = true
 			return
 		}
+		if (mockMode) {
+			showToast(`${providerLabels(target)} connected`)
+			return
+		}
 		await dashboard.reconnect(target)
 		if (dashboard.error) showToast(dashboard.error, true)
+	}
+
+	function providerLabels(p: SyncProvider) {
+		const map = { google: 'Google Calendar', apple: 'Apple Calendar', outlook: 'Outlook' } as const
+		return map[p]
 	}
 
 	async function handleAppleConnect(creds: {
@@ -100,6 +114,12 @@
 		appleBusy = true
 		appleError = ''
 		try {
+			if (mockMode) {
+				showAppleSheet = false
+				pendingDisconnectAfter = null
+				showToast('Apple Calendar connected')
+				return
+			}
 			await dashboard.connectApple(creds)
 			if (dashboard.error) {
 				appleError = dashboard.error

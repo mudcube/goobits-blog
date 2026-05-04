@@ -46,7 +46,7 @@
 		margin: 0 0 0.25rem;
 		font-family: var(--font-ui-sans, var(--font-sans));
 		font-size: 0.71rem;
-		font-weight: 650;
+		font-weight: 600;
 		letter-spacing: 0.07em;
 		text-transform: uppercase;
 		color: color-mix(in srgb, var(--text) 48%, transparent);

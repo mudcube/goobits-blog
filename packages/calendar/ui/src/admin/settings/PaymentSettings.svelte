@@ -168,6 +168,7 @@
 			<PaymentMethodRow
 				{meta}
 				{payment}
+				{mockMode}
 				checkout={checkoutFor(meta.value)}
 				removeConfirm={removeConfirmFor === meta.value}
 				onRequestRemove={handleRequestRemove}

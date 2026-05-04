@@ -58,6 +58,7 @@
 		meta,
 		payment,
 		checkout,
+		mockMode = false,
 		removeConfirm,
 		onRequestRemove,
 		onCancelRemove,
@@ -66,6 +67,7 @@
 		meta: PaymentMethodMeta
 		payment: PaymentController
 		checkout: CheckoutInfo
+		mockMode?: boolean
 		removeConfirm: boolean
 		onRequestRemove: (method: PaymentMethodKey) => void
 		onCancelRemove: () => void
@@ -107,9 +109,11 @@
 
 	function toggleCheckout() {
 		if (checkout.enabled) {
-			void payment.disconnectCheckout(railName)
+			if (!mockMode) void payment.disconnectCheckout(railName)
 			advancedOpen = false
-		} else {
+			return
+		}
+		if (!checkout.enabled && !mockMode) {
 			advancedOpen = true
 			if (usesPayPalRail) payment.openPayPalSetup()
 			else payment.openCashAppPaySetup()
@@ -118,11 +122,16 @@
 
 	function openAdvanced() {
 		advancedOpen = true
+		if (mockMode) return
 		if (usesPayPalRail) payment.openPayPalSetup()
 		else payment.openCashAppPaySetup()
 	}
 
 	async function handleSaveAdvanced() {
+		if (mockMode) {
+			advancedOpen = false
+			return
+		}
 		if (usesPayPalRail) await payment.savePayPalSetup()
 		else await payment.saveCashAppPaySetup()
 		advancedOpen = false

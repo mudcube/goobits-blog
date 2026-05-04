@@ -143,7 +143,7 @@
       subtitle="Calendar sync, week start, and payouts."
     />
 
-    <CalendarSyncSettings {dashboard} {showToast} />
+    <CalendarSyncSettings {dashboard} {mockMode} {showToast} />
 
     <CalendarViewSettings bind:calendarWeekStart />
 

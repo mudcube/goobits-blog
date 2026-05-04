@@ -103,15 +103,12 @@ export function createPaymentSettingsController(
   const { showToast } = options;
   let handles = $state<PaymentHandles>(blankHandles());
   let primary = $state<PaymentMethodKey | "">("");
-  let editing = $state<PaymentMethodKey | null>(null);
   let initialSnapshot = $state(snapshot(blankHandles(), ""));
   let autosaveTimer: ReturnType<typeof setTimeout> | null = null;
   let suspendAutosave = $state(true);
-  let payPalFormExpanded = $state(false);
   let payPalClientId = $state("");
   let payPalClientSecret = $state("");
   let payPalEnvironment = $state<"sandbox" | "live">("sandbox");
-  let cashAppPayFormExpanded = $state(false);
   let cashAppPayApplicationId = $state("");
   let cashAppPayLocationId = $state("");
   let cashAppPayAccessToken = $state("");
@@ -154,7 +151,6 @@ export function createPaymentSettingsController(
         explicit && nextHandles[explicit].trim()
           ? explicit
           : pickFallbackPrimary();
-      editing = primary || null;
       initialSnapshot = snapshot(handles, primary);
       suspendAutosave = false;
       return;
@@ -174,13 +170,8 @@ export function createPaymentSettingsController(
       explicit && nextHandles[explicit].trim()
         ? explicit
         : pickFallbackPrimary();
-    editing = primary || null;
     initialSnapshot = snapshot(handles, primary);
     suspendAutosave = false;
-  }
-
-  function startEditing(method: PaymentMethodKey) {
-    editing = method;
   }
 
   function updateHandle(method: PaymentMethodKey, value: string) {
@@ -196,7 +187,6 @@ export function createPaymentSettingsController(
   function removeHandle(method: PaymentMethodKey) {
     handles = { ...handles, [method]: "" };
     if (primary === method) ensurePrimary();
-    if (editing === method) editing = primary || null;
   }
 
   function makePrimary(method: PaymentMethodKey) {
@@ -219,7 +209,6 @@ export function createPaymentSettingsController(
     payPalEnvironment =
       dashboard.paymentIntegrations.paypal.environment || "sandbox";
     payPalClientSecret = "";
-    payPalFormExpanded = true;
   }
 
   function openCashAppPaySetup() {
@@ -233,7 +222,6 @@ export function createPaymentSettingsController(
         ? "live"
         : "sandbox";
     cashAppPayAccessToken = "";
-    cashAppPayFormExpanded = true;
   }
 
   async function savePayPalSetup() {
@@ -254,7 +242,6 @@ export function createPaymentSettingsController(
         return;
       }
       payPalClientSecret = "";
-      payPalFormExpanded = false;
       await dashboard.loadStatus();
       showToast("PayPal and Venmo checkout connected");
     } finally {
@@ -288,7 +275,6 @@ export function createPaymentSettingsController(
         return;
       }
       cashAppPayAccessToken = "";
-      cashAppPayFormExpanded = false;
       await dashboard.loadStatus();
       showToast("Cash App Pay connected");
     } finally {
@@ -361,21 +347,10 @@ export function createPaymentSettingsController(
     get primary() {
       return primary;
     },
-    get editing() {
-      return editing;
-    },
     isConfigured,
-    configuredMethods,
-    startEditing,
     updateHandle,
     removeHandle,
     makePrimary,
-    get payPalFormExpanded() {
-      return payPalFormExpanded;
-    },
-    set payPalFormExpanded(value: boolean) {
-      payPalFormExpanded = value;
-    },
     get payPalClientId() {
       return payPalClientId;
     },
@@ -393,12 +368,6 @@ export function createPaymentSettingsController(
     },
     set payPalEnvironment(value: "sandbox" | "live") {
       payPalEnvironment = value;
-    },
-    get cashAppPayFormExpanded() {
-      return cashAppPayFormExpanded;
-    },
-    set cashAppPayFormExpanded(value: boolean) {
-      cashAppPayFormExpanded = value;
     },
     get cashAppPayApplicationId() {
       return cashAppPayApplicationId;
