@@ -987,8 +987,17 @@ export function createAdminDashboardController(
   }
 
   async function promoteWaitlist(eventId: number, entryId: number) {
+    error = "";
     try {
-      await promoteWaitlistEntry(eventId, entryId);
+      const result = await promoteWaitlistEntry(eventId, entryId);
+      if (result.status === "full") {
+        error = "Event is full; couldn't promote.";
+        return;
+      }
+      if (result.status === "already_joined") {
+        error = "Already joined this event.";
+        return;
+      }
       await Promise.all([loadEvents(), openEventDetail(eventId)]);
     } catch (err) {
       if (onUnauthorized?.(err)) return;

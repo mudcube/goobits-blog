@@ -69,6 +69,21 @@
 	let appleError = $state('')
 	let connectingProvider = $state<SyncProvider | null>(null)
 
+	async function handleReconnect() {
+		const provider = dashboard.sync.activeProvider
+		if (!provider) return
+		if (mockMode) {
+			showToast(`${providerLabels(provider)} reconnected`)
+			return
+		}
+		if (provider === 'apple') {
+			showAppleSheet = true
+			return
+		}
+		await dashboard.reconnect(provider)
+		if (dashboard.error) showToast(dashboard.error, true)
+	}
+
 	async function handleDisconnect() {
 		const provider = dashboard.sync.activeProvider
 		if (!provider) return
@@ -160,6 +175,7 @@
 		expiringSoon={needsReconnect}
 		onConnectStart={() => (showSwitchSheet = true)}
 		onSwitch={() => (showSwitchSheet = true)}
+		onReconnect={() => void handleReconnect()}
 		onDisconnect={() => void handleDisconnect()}
 	/>
 </section>

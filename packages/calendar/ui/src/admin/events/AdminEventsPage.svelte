@@ -35,6 +35,7 @@
 	type EventCardExtra = {
 		startsAt: string
 		seatsTaken: number
+		capacity: number
 		participants?: { name?: string | null; displayName?: string | null }[]
 	}
 
@@ -217,7 +218,7 @@
 							<span class="social-events__avatar" title={participant.displayName || participant.name || ''}>{initialsFor(participant, i)}</span>
 						{/each}
 						<span class="social-events__count">
-							{ev.seatsTaken}{isPast(ev.startsAt) ? '' : ''}
+							{ev.seatsTaken}{isPast(ev.startsAt) ? ' went' : ` of ${ev.capacity}`}
 						</span>
 					</div>
 				{/snippet}

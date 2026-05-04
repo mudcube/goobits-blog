@@ -71,24 +71,31 @@ export function createAdminMembersController(
 		}
 	}
 
-	async function deleteInvite(id: string) {
-		if (!confirm('Delete this invite?')) return
+	async function deleteInvite(id: string, options: { skipConfirm?: boolean; reload?: boolean } = {}) {
+		if (!options.skipConfirm && !confirm('Delete this invite?')) return false
 		try {
 			const inviteDeletion = await deleteMemberInvite(id)
-			if (inviteDeletion.ok) {
-				await load()
-			} else {
+			if (!inviteDeletion.ok) {
 				error = inviteDeletion.error
+				return false
 			}
+			if (options.reload !== false) await load()
+			return true
 		} catch (err) {
-			if (onUnauthorized?.(err)) return
+			if (onUnauthorized?.(err)) return false
 			error = err instanceof Error ? err.message : 'Failed to delete invite'
+			return false
 		}
 	}
 
-	function copyInvite(code: string) {
+	async function copyInvite(code: string): Promise<boolean> {
 		const url = createInviteShareLink(window.location.origin, code)
-		navigator.clipboard.writeText(url)
+		try {
+			await navigator.clipboard.writeText(url)
+			return true
+		} catch {
+			return false
+		}
 	}
 
 	async function cleanupE2E() {

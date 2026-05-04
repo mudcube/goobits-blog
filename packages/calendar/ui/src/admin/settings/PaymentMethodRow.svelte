@@ -115,11 +115,10 @@
 			advancedOpen = false
 			return
 		}
-		if (!checkout.enabled && !mockMode) {
-			advancedOpen = true
-			if (usesPayPalRail) payment.openPayPalSetup()
-			else payment.openCashAppPaySetup()
-		}
+		advancedOpen = true
+		if (mockMode) return
+		if (usesPayPalRail) payment.openPayPalSetup()
+		else payment.openCashAppPaySetup()
 	}
 
 	function openAdvanced() {

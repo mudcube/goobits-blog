@@ -42,10 +42,6 @@
 	const eventsSource = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
 	const recentEventsSource = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
 
-	let expandedUserId = $state<string | null>(null)
-	let mockAccessRows = $state<Array<{ programSlug: string; allowed: boolean }>>([])
-	const accessRows = $derived((mockMode ? mockAccessRows : members.accessRows))
-	const accessLoading = $derived((mockMode ? false : members.accessLoading))
 	let toastMessage = $state('')
 	let toastVisible = $state(false)
 	let undoAction = $state<null | (() => Promise<void>)>(null)
@@ -309,10 +305,14 @@
 			showToast(`Deleted ${expired.length} expired invite${expired.length === 1 ? '' : 's'}`)
 			return
 		}
-		await Promise.all(expired.map((it) => members.deleteInvite(it.id)))
+		const results = await Promise.all(
+			expired.map((it) => members.deleteInvite(it.id, { skipConfirm: true, reload: false }))
+		)
+		await members.load()
 		confirmBulkDelete = false
-		if (members.error) {
-			showToast(members.error)
+		const failed = results.filter((ok) => !ok).length
+		if (failed) {
+			showToast(`Deleted ${expired.length - failed}; ${failed} failed`)
 			return
 		}
 		showToast(`Deleted ${expired.length} expired invite${expired.length === 1 ? '' : 's'}`)
@@ -327,34 +327,6 @@
 			toastVisible = false
 			undoAction = null
 		}, 5000)
-	}
-
-	async function toggleAccessWithSave(programSlug: string) {
-		if (mockMode) {
-			mockAccessRows = mockAccessRows.map((row) =>
-				row.programSlug === programSlug ? { ...row, allowed: !row.allowed } : row
-			)
-			showToast('Mock mode: access updated (preview only)')
-			return
-		}
-		const before = members.accessRows.map((row) => ({ ...row }))
-		members.toggleAccess(programSlug)
-		await members.saveAccess(false)
-		if (members.error) {
-			for (const row of before) {
-				const current = members.accessRows.find((item) => item.programSlug === row.programSlug)
-				if (current && current.allowed !== row.allowed) members.toggleAccess(row.programSlug)
-			}
-			showToast("Couldn't save — try again")
-			return
-		}
-		showToast('Updated access', async () => {
-			for (const row of before) {
-				const current = members.accessRows.find((item) => item.programSlug === row.programSlug)
-				if (current && current.allowed !== row.allowed) members.toggleAccess(row.programSlug)
-			}
-			await members.saveAccess(false)
-		})
 	}
 
 	function handleUndoClick() {
@@ -440,7 +412,11 @@
 			return
 		}
 		try {
-			await Promise.resolve(members.copyInvite(code))
+			const ok = await members.copyInvite(code)
+			if (!ok) {
+				showToast("Couldn't copy link — check clipboard permissions")
+				return
+			}
 			if (members.error) {
 				showToast(members.error)
 				return
@@ -596,28 +572,6 @@
 			emptyText={inviteFilter === 'all' ? 'No invites yet.' : `No ${inviteFilter} invites.`}
 		/>
 
-		{#if expandedUserId}
-			<h4>MEMBER ACCESS</h4>
-			<div class="social-crew__access calendar-ui-card">
-				<div class="social-crew__access-label">Program access</div>
-				<div class="social-crew__tags">
-					{#if accessLoading}
-						<span class="social-crew__meta">Loading access...</span>
-					{:else}
-						{#each accessRows as row}
-							<button
-								type="button"
-								class="social-crew__tag admin-ui-chip"
-								class:admin-ui-chip--active={row.allowed}
-								onclick={() => void toggleAccessWithSave(row.programSlug)}
-							>
-								{getActivityEmoji(row.programSlug)} {row.programSlug}
-							</button>
-						{/each}
-					{/if}
-				</div>
-			</div>
-		{/if}
 	</div>
 
 	<AdminCrewInviteModal
@@ -662,37 +616,6 @@
 
 	.social-crew__list :global(.calendar-ui-card + .calendar-ui-card) {
 		border-top: 1px solid color-mix(in srgb, var(--admin-card-border) 60%, transparent);
-	}
-
-	.social-crew__access {
-		padding: 0.75rem;
-		border-radius: 0.875rem;
-		background: color-mix(in srgb, var(--bg) 92%, var(--text) 8%);
-	}
-
-	.social-crew__access-label {
-		font-size: 0.75rem;
-		font-weight: 620;
-		color: color-mix(in srgb, var(--text) 64%, transparent);
-		margin-bottom: 0.5rem;
-	}
-
-	.social-crew__tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	.social-crew__tag {
-		min-width: 44px;
-		padding: 0 0.625rem;
-		font-size: 0.75rem;
-		font-weight: 600;
-	}
-
-	.social-crew__meta {
-		font-size: 0.75rem;
-		color: color-mix(in srgb, var(--text) 62%, transparent);
 	}
 
 	.social-crew__toast {

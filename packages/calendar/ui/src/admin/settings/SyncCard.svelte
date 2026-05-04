@@ -16,6 +16,7 @@
 		expiringSoon = false,
 		onConnectStart,
 		onSwitch,
+		onReconnect,
 		onDisconnect
 	}: {
 		active: SyncProvider | null
@@ -24,6 +25,7 @@
 		expiringSoon?: boolean
 		onConnectStart: () => void
 		onSwitch: () => void
+		onReconnect?: () => void
 		onDisconnect: () => void
 	} = $props()
 </script>
@@ -49,9 +51,15 @@
 			</div>
 		</div>
 		<div class="sync-card__actions">
-			<button type="button" class="admin-ui-btn" onclick={onSwitch}>
-				<RefreshCw size={13} strokeWidth={2} /> Switch
-			</button>
+			{#if expiringSoon && onReconnect}
+				<button type="button" class="admin-ui-btn admin-ui-btn--warn" onclick={onReconnect}>
+					<RefreshCw size={13} strokeWidth={2} /> Reconnect
+				</button>
+			{:else}
+				<button type="button" class="admin-ui-btn" onclick={onSwitch}>
+					<RefreshCw size={13} strokeWidth={2} /> Switch
+				</button>
+			{/if}
 			<button type="button" class="admin-ui-btn admin-ui-btn--danger" onclick={onDisconnect}>
 				<Unplug size={13} strokeWidth={2} /> Disconnect
 			</button>
