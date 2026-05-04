@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+	<title id="title">Sketchpad 8.0 placeholder artwork</title>
+	<desc id="desc">A simple placeholder cover image with layered drawing panels and color swatches.</desc>
+	<rect width="1600" height="1000" fill="#f6f3ec"/>
+	<rect x="96" y="88" width="1408" height="824" rx="34" fill="#20242b"/>
+	<rect x="150" y="146" width="1098" height="708" rx="22" fill="#fffaf0"/>
+	<rect x="1290" y="146" width="160" height="708" rx="22" fill="#2f3540"/>
+	<path d="M278 626c126-222 257-308 394-258 89 33 132 130 231 126 69-3 130-54 184-151" fill="none" stroke="#1d75bd" stroke-width="36" stroke-linecap="round"/>
+	<path d="M294 693c159-93 302-116 430-70 91 33 187 37 288 12" fill="none" stroke="#f36f45" stroke-width="26" stroke-linecap="round"/>
+	<path d="M336 288h196v196H336z" fill="#f7d84a"/>
+	<circle cx="731" cy="364" r="98" fill="#6ec6a6"/>
+	<path d="M954 274l154 252H800z" fill="#d66bb2"/>
+	<g fill="#fffaf0">
+		<rect x="1320" y="192" width="100" height="18" rx="9"/>
+		<rect x="1320" y="246" width="100" height="18" rx="9"/>
+		<rect x="1320" y="300" width="100" height="18" rx="9"/>
+	</g>
+	<g>
+		<circle cx="1348" cy="724" r="28" fill="#f36f45"/>
+		<circle cx="1420" cy="724" r="28" fill="#f7d84a"/>
+		<circle cx="1348" cy="796" r="28" fill="#6ec6a6"/>
+		<circle cx="1420" cy="796" r="28" fill="#1d75bd"/>
+	</g>
+	<text x="196" y="800" fill="#20242b" font-family="Inter, Arial, sans-serif" font-size="84" font-weight="700">Sketchpad 8.0</text>
+</svg>

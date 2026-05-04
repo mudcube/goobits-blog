@@ -15,13 +15,17 @@
 	const title = $derived(post.metadata?.fm?.title || 'Untitled entry')
 	const excerpt = $derived(post.metadata?.fm?.excerpt || '')
 	const thumbAlt = $derived(post.metadata?.fm?.image?.alt || title || 'Journal cover image')
+	const isDraft = $derived(post.metadata?.fm?.draft === true)
 </script>
 
-<div class="miko-blog__row" role="row">
-	<div class="miko-blog__cell miko-blog__cell--date" role="cell">
-		<div class="miko-blog__row-date-day">{formatDate(post.date)}</div>
-		<div class="miko-blog__row-date-meta">{readTime} min read</div>
-	</div>
+<div class="miko-blog__row" class:miko-blog__row--draft={isDraft} role="row">
+		<div class="miko-blog__cell miko-blog__cell--date" role="cell">
+			<div class="miko-blog__row-date-day">{formatDate(post.date)}</div>
+			<div class="miko-blog__row-date-meta">{readTime} min read</div>
+			{#if isDraft}
+				<div class="miko-blog__draft-badge">Draft</div>
+			{/if}
+		</div>
 
 	<div class="miko-blog__cell miko-blog__cell--detail" role="cell">
 		{#if coverImage}
@@ -61,10 +65,10 @@
 				{/if}
 			</div>
 		{/if}
-		<div class="miko-blog__row-copy">
-			<h3 class="miko-blog__row-title">
-				<a class="miko-blog__row-link" href={postUrl}>{title}</a>
-			</h3>
+			<div class="miko-blog__row-copy">
+				<h3 class="miko-blog__row-title">
+					<a class="miko-blog__row-link" href={postUrl}>{title}</a>
+				</h3>
 			{#if excerpt}
 				<p class="miko-blog__row-excerpt">{excerpt}</p>
 			{/if}

@@ -118,11 +118,11 @@
 	overflow: hidden;
 }
 
-.miko-blog__row {
-	position: relative;
-	padding: var(--space-5) var(--space-6);
-	transition:
-		background 0.4s ease;
+	.miko-blog__row {
+		position: relative;
+		padding: var(--space-5) var(--space-6);
+		transition:
+			background 0.4s ease;
 
 	& + & {
 		border-top: 1px solid color-mix(in srgb, var(--showcase-outline-variant) 70%, transparent);
@@ -145,6 +145,30 @@
 			transform: translate(3px, -3px);
 		}
 	}
+
+	.miko-blog__row--draft {
+		background:
+			linear-gradient(90deg,
+				color-mix(in srgb, var(--showcase-secondary) 12%, transparent) 0%,
+				transparent 42%),
+			color-mix(in srgb, var(--showcase-surface-bright) 30%, transparent);
+
+		&::before {
+			content: '';
+			position: absolute;
+			inset: 0 auto 0 0;
+			width: 3px;
+			background: var(--showcase-secondary);
+		}
+
+		&:hover {
+			background:
+				linear-gradient(90deg,
+					color-mix(in srgb, var(--showcase-secondary) 16%, transparent) 0%,
+					transparent 46%),
+				color-mix(in srgb, var(--showcase-surface-bright) 46%, transparent);
+		}
+	}
 }
 
 /* --- Cell: Date --- */
@@ -162,13 +186,30 @@
 	text-transform: uppercase;
 }
 
-.miko-blog__row-date-meta {
-	margin-top: 0.35rem;
-	color: color-mix(in srgb, var(--showcase-muted) 70%, transparent);
-	font-size: 0.75rem;
-	letter-spacing: 0.18em;
-	text-transform: uppercase;
-}
+	.miko-blog__row-date-meta {
+		margin-top: 0.35rem;
+		color: color-mix(in srgb, var(--showcase-muted) 70%, transparent);
+		font-size: 0.75rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+	}
+
+	.miko-blog__draft-badge {
+		display: inline-flex;
+		align-items: center;
+		width: fit-content;
+		margin-top: 0.55rem;
+		padding: 0.28rem 0.55rem;
+		border: 1px solid color-mix(in srgb, var(--showcase-secondary) 58%, transparent);
+		border-radius: var(--radius-sm);
+		background: color-mix(in srgb, var(--showcase-secondary) 14%, transparent);
+		color: var(--showcase-secondary);
+		font-size: 0.62rem;
+		font-weight: var(--font-weight-semibold);
+		letter-spacing: 0.14em;
+		line-height: 1;
+		text-transform: uppercase;
+	}
 
 /* --- Cell: Entry detail (thumb + copy) --- */
 .miko-blog__cell--detail {
@@ -523,14 +564,19 @@
 	text-wrap: balance;
 }
 
-.miko-blog__entry-lede {
-	max-width: var(--hero-subtitle-max-width);
-	margin: 0;
-	color: var(--showcase-muted);
-	font-size: var(--font-size-lg);
-	line-height: 1.7;
-	text-wrap: pretty;
-}
+	.miko-blog__entry-lede {
+		max-width: var(--hero-subtitle-max-width);
+		margin: 0;
+		color: var(--showcase-muted);
+		font-size: var(--font-size-lg);
+		line-height: 1.7;
+		text-wrap: pretty;
+	}
+
+	.miko-blog__draft-badge--entry {
+		margin-top: 0;
+		vertical-align: middle;
+	}
 
 /* ---------- Byline ---------- */
 .miko-blog__entry-byline {

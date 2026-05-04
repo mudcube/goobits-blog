@@ -1,14 +1,20 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte'
 	import {
+		ArrowRight,
 		CalendarDays,
 		Check,
 		ChevronDown,
 		ChevronRight,
 		LayoutDashboard,
 		LogOut,
+		Plug,
 		Plus,
+		RefreshCw,
 		Settings as SettingsIcon,
+		Star,
+		Trash2,
+		Unplug,
 		Users,
 		AlertTriangle,
 		X as XIcon
@@ -109,7 +115,7 @@
 	let sync = $state<SyncStatus>({ active: 'google', syncedAtLabel: '2m ago' })
 	let payments = $state<Record<PaymentMethod, PaymentRow>>({
 		venmo: { ...blankPayment(), handle: '@miko', checkoutEnabled: true },
-		paypal: { ...blankPayment(), handle: 'hello@miko.art', expanded: true, checkoutEnabled: true },
+		paypal: { ...blankPayment(), handle: 'hello@miko.art', checkoutEnabled: true },
 		cashapp: blankPayment()
 	})
 	let primary = $state<PaymentMethod | null>('venmo')
@@ -130,6 +136,7 @@
 	let appleUrl = $state('')
 	let appleTestState = $state<'idle' | 'testing' | 'ok' | 'fail'>('idle')
 	let connectingProvider = $state<SyncProvider | null>(null)
+	let profileMenuOpen = $state(false)
 
 	const calendarTimers = {
 		saving: null as ReturnType<typeof setTimeout> | null,
@@ -193,7 +200,7 @@
 			sync = { active: 'google', syncedAtLabel: '2m ago' }
 			payments = {
 				venmo: { ...blankPayment(), handle: '@miko', checkoutEnabled: true },
-				paypal: { ...blankPayment(), handle: 'hello@miko.art', expanded: true, checkoutEnabled: true },
+				paypal: { ...blankPayment(), handle: 'hello@miko.art', checkoutEnabled: true },
 				cashapp: blankPayment()
 			}
 			primary = 'venmo'
@@ -207,7 +214,6 @@
 				paypal: {
 					...blankPayment(),
 					handle: 'hello@miko.art',
-					expanded: true,
 					checkoutEnabled: true,
 					expiringSoon: true
 				},
@@ -217,10 +223,6 @@
 			payPalCreds = { clientId: 'AaQ...••••', clientSecret: '', environment: 'sandbox' }
 			squareCreds = blankSquareCreds()
 		}
-	}
-
-	function configuredCount() {
-		return paymentMethods.filter((m) => payments[m.key].handle.trim().length > 0).length
 	}
 
 	function toggleRow(method: PaymentMethod) {
@@ -256,14 +258,12 @@
 
 	function toggleCheckout(method: PaymentMethod) {
 		const row = payments[method]
-		if (row.checkoutEnabled) {
-			row.checkoutEnabled = false
+		row.checkoutEnabled = !row.checkoutEnabled
+		if (!row.checkoutEnabled) {
 			row.advancedOpen = false
 			row.expiringSoon = false
-			flagSaving('payments')
-		} else {
-			row.advancedOpen = true
 		}
+		flagSaving('payments')
 	}
 
 	function saveCheckoutAdvanced(method: PaymentMethod) {
@@ -350,6 +350,14 @@
 		if (key === 'paypal') payments.paypal.expiringSoon = false
 	}
 
+	const globalSave = $derived<SaveState>(
+		calendarSave === 'saving' || paymentsSave === 'saving'
+			? 'saving'
+			: calendarSave === 'saved' || paymentsSave === 'saved'
+				? 'saved'
+				: 'idle'
+	)
+
 	const attentionItems = $derived.by(() => {
 		const items: Array<{ key: 'paypal'; text: string; cta: string; onClick: () => void }> = []
 		if (payments.paypal.expiringSoon)
@@ -394,12 +402,6 @@
 		</nav>
 
 		<div class="social-admin__sidebar-spacer"></div>
-
-		<form class="social-admin__logout">
-			<button type="button">
-				<LogOut size={16} strokeWidth={1.8} /> <span>Log out</span>
-			</button>
-		</form>
 	</aside>
 
 	<nav class="social-admin__breadcrumbs" aria-label="Breadcrumbs">
@@ -414,9 +416,32 @@
 					aria-current="page"
 					aria-label="Settings"
 				>
-					<SettingsIcon size={16} strokeWidth={1.8} />
+					<SettingsIcon size={22} strokeWidth={2} />
 				</button>
-				<button type="button" class="topbar-avatar" aria-label="Account">M</button>
+				<div class="profile-menu">
+					<button
+						type="button"
+						class="topbar-avatar"
+						aria-label="Account"
+						aria-expanded={profileMenuOpen}
+						aria-haspopup="menu"
+						onclick={() => (profileMenuOpen = !profileMenuOpen)}
+					>
+						M
+					</button>
+					{#if profileMenuOpen}
+						<div class="profile-menu__panel" role="menu">
+							<div class="profile-menu__header">
+								<div class="profile-menu__name">Miko</div>
+								<div class="profile-menu__email">hello@miko.art</div>
+							</div>
+							<div class="profile-menu__divider" aria-hidden="true"></div>
+							<button type="button" class="profile-menu__item" role="menuitem">
+								<LogOut size={14} strokeWidth={1.8} /> Log out
+							</button>
+						</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 	</nav>
@@ -448,87 +473,79 @@
 			<header class="settings__head">
 				<span class="settings__head-eyebrow">Preferences</span>
 				<h1>Settings</h1>
-				<p class="settings__head-sub">Configure sync &amp; payment defaults for your space.</p>
+				<p class="settings__head-sub">Calendar sync, week start, and payouts.</p>
 			</header>
+
+			<span class="settings__save" data-state={globalSave} aria-live="polite">
+				{saveLabel(globalSave)}
+			</span>
 
 			<section id="calendar-sync" class="settings__section">
 				<header class="settings__section-head">
 					<h4>CALENDAR SYNC</h4>
-					<span class="save-indicator" data-state={calendarSave}>{saveLabel(calendarSave)}</span>
 				</header>
 
-				<div class="settings__row settings__row--stack">
-					{#if sync.active}
-						<div class="sync-line">
-							<span class="sync-line__icon" aria-hidden="true">{@render providerIcon(sync.active)}</span>
-							<span class="sync-line__name">{providerLabel(sync.active)}</span>
-							<span class="sync-line__status">
-								<span class="sync-line__dot" aria-hidden="true"></span>
+				{#if sync.active}
+					<div class="sync-card">
+						<span class="sync-card__icon" aria-hidden="true">{@render providerIcon(sync.active)}</span>
+						<div class="sync-card__body">
+							<div class="sync-card__name">{providerLabel(sync.active)}</div>
+							<div class="sync-card__status">
+								<span class="sync-card__dot" aria-hidden="true"></span>
 								Connected · synced {sync.syncedAtLabel}
-							</span>
-							<span class="sync-line__actions">
-								<button type="button" class="link" onclick={openSwitchSheet}>Switch</button>
-								<button type="button" class="link link--muted" onclick={disconnectSync}>
-									Disconnect
-								</button>
-							</span>
+							</div>
 						</div>
-					{:else if connectingProvider}
-						<div class="sync-line sync-line--busy">
-							<span class="sync-line__icon" aria-hidden="true">{@render providerIcon(connectingProvider)}</span>
-							<span class="sync-line__name">{providerLabel(connectingProvider)}</span>
-							<span class="sync-line__status">Connecting…</span>
+						<div class="sync-card__actions">
+							<button type="button" class="admin-btn" onclick={openSwitchSheet}>
+								<RefreshCw size={13} strokeWidth={2} /> Switch
+							</button>
+							<button type="button" class="admin-btn admin-btn--danger" onclick={disconnectSync}>
+								<Unplug size={13} strokeWidth={2} /> Disconnect
+							</button>
 						</div>
-					{:else}
-						<button type="button" class="connect-cta" onclick={openSwitchSheet}>
-							<Plus size={14} /> Connect a calendar
-						</button>
-					{/if}
-				</div>
+					</div>
+				{:else if connectingProvider}
+					<div class="sync-card sync-card--busy">
+						<span class="sync-card__icon" aria-hidden="true">{@render providerIcon(connectingProvider)}</span>
+						<div class="sync-card__body">
+							<div class="sync-card__name">{providerLabel(connectingProvider)}</div>
+							<div class="sync-card__status">Connecting…</div>
+						</div>
+					</div>
+				{:else}
+					<button type="button" class="admin-btn admin-btn--dashed" onclick={openSwitchSheet}>
+						<Plus size={14} /> Connect a calendar
+					</button>
+				{/if}
 			</section>
 
 			<section id="calendar-view" class="settings__section">
 				<header class="settings__section-head">
-					<h4>CALENDAR VIEW</h4>
+					<h4>WEEK START</h4>
 				</header>
 
-				<div class="settings__row">
-					<div class="settings__row-label">Week starts on</div>
-					<div class="seg" role="radiogroup" aria-label="Week starts on">
-						<button
-							type="button"
-							class="seg__opt"
-							class:seg__opt--active={weekStart === 'monday'}
-							aria-pressed={weekStart === 'monday'}
-							onclick={() => setWeekStart('monday')}
+				<div class="week-pick" role="radiogroup" aria-label="Week starts on">
+					{#each [{ value: 'monday', label: 'Monday' }, { value: 'sunday', label: 'Sunday' }] as opt}
+						<label
+							class="week-pick__opt"
+							class:week-pick__opt--active={weekStart === opt.value}
 						>
-							Mon
-						</button>
-						<button
-							type="button"
-							class="seg__opt"
-							class:seg__opt--active={weekStart === 'sunday'}
-							aria-pressed={weekStart === 'sunday'}
-							onclick={() => setWeekStart('sunday')}
-						>
-							Sun
-						</button>
-					</div>
+							<input
+								type="radio"
+								name="week-start"
+								value={opt.value}
+								checked={weekStart === opt.value}
+								onchange={() => setWeekStart(opt.value as 'monday' | 'sunday')}
+							/>
+							<span>{opt.label}</span>
+						</label>
+					{/each}
 				</div>
 			</section>
 
 			<section id="payments" class="settings__section">
 				<header class="settings__section-head">
-					<div>
-						<h4>PAYMENT</h4>
-						<p class="settings__section-sub">
-							How buyers pay you. Add as many methods as you want — pick one as primary.
-						</p>
-					</div>
-					<div class="settings__section-meta">
-						<span class="settings__count">{configuredCount()} of 3</span>
-						<span class="save-indicator" data-state={paymentsSave}>{saveLabel(paymentsSave)}</span>
-					</div>
+					<h4>PAYMENT</h4>
 				</header>
 
 				<ul class="payment-list">
@@ -600,22 +617,27 @@
 											</div>
 											<button
 												type="button"
-												class="toggle"
-												class:toggle--on={row.checkoutEnabled}
+												class="admin-btn"
+												class:admin-btn--accent={row.checkoutEnabled}
 												aria-pressed={row.checkoutEnabled}
-												aria-label={`${row.checkoutEnabled ? 'Disable' : 'Enable'} ${method.label} checkout`}
 												onclick={() => toggleCheckout(method.key)}
 											>
-												<span class="toggle__knob"></span>
+												{row.checkoutEnabled ? 'On' : 'Off'}
 											</button>
 										</div>
 
 										{#if row.expiringSoon}
 											<div class="checkout__alert">
-												<AlertTriangle size={13} />
-												PayPal token expires Mon ·
-												<button type="button" class="link" onclick={() => (row.advancedOpen = true)}>
-													Reconnect
+												<span class="checkout__alert-text">
+													<AlertTriangle size={13} />
+													PayPal token expires Mon
+												</span>
+												<button
+													type="button"
+													class="admin-btn admin-btn--warn"
+													onclick={() => (row.advancedOpen = true)}
+												>
+													<RefreshCw size={13} strokeWidth={2} /> Reconnect
 												</button>
 											</div>
 										{/if}
@@ -696,13 +718,15 @@
 													</label>
 												{/if}
 												<div class="creds__actions">
-													<button type="button" class="link">Test connection</button>
+													<button type="button" class="admin-btn">
+														<Plug size={13} strokeWidth={2} /> Test connection
+													</button>
 													<button
 														type="button"
-														class="admin-ui-btn admin-ui-btn--primary"
+														class="admin-btn admin-btn--solid"
 														onclick={() => saveCheckoutAdvanced(method.key)}
 													>
-														Save
+														<Check size={14} strokeWidth={2.2} /> Save
 													</button>
 												</div>
 											</div>
@@ -711,17 +735,21 @@
 
 									<div class="payment-row__footer">
 										{#if configured && !isPrimary}
-											<button type="button" class="link" onclick={() => makePrimary(method.key)}>
-												Make primary
+											<button
+												type="button"
+												class="admin-btn admin-btn--accent"
+												onclick={() => makePrimary(method.key)}
+											>
+												<Star size={13} strokeWidth={2} /> Make primary
 											</button>
 										{/if}
 										{#if configured}
 											<button
 												type="button"
-												class="link link--muted"
+												class="admin-btn admin-btn--danger"
 												onclick={() => removeHandle(method.key)}
 											>
-												Remove {method.label}
+												<Trash2 size={13} strokeWidth={2} /> Remove {method.label}
 											</button>
 										{/if}
 									</div>
@@ -775,38 +803,40 @@
 					{/if}
 					<div class="sheet__list" role="radiogroup">
 						{#each providerOptions.filter((p) => p.value !== sync.active) as opt}
-							<label
+							<button
+								type="button"
 								class="sheet__opt"
 								class:sheet__opt--active={switchTarget === opt.value}
+								role="radio"
+								aria-checked={switchTarget === opt.value}
+								onclick={() => (switchTarget = opt.value)}
 							>
-								<input
-									type="radio"
-									name="switch-target"
-									value={opt.value}
-									checked={switchTarget === opt.value}
-									onchange={() => (switchTarget = opt.value)}
-								/>
 								<span class="sheet__opt-icon" aria-hidden="true">{@render providerIcon(opt.value)}</span>
 								<span class="sheet__opt-label">{opt.label}</span>
-							</label>
+								{#if switchTarget === opt.value}
+									<Check size={16} aria-hidden="true" />
+								{/if}
+							</button>
 						{/each}
 					</div>
 					{#if sync.active}
 						<label class="sheet__check">
 							<input type="checkbox" bind:checked={switchDisconnectOld} />
-							Disconnect {providerLabel(sync.active)} after the new one connects
+							<span>Disconnect {providerLabel(sync.active)} after the new one connects.</span>
 						</label>
 					{/if}
 				</div>
 				<footer class="sheet__foot">
-					<button type="button" class="link" onclick={closeSwitchSheet}>Cancel</button>
+					<button type="button" class="admin-btn admin-btn--muted" onclick={closeSwitchSheet}>
+						Cancel
+					</button>
 					<button
 						type="button"
-						class="admin-ui-btn admin-ui-btn--primary"
+						class="admin-btn admin-btn--solid"
 						disabled={!switchTarget}
 						onclick={continueSwitch}
 					>
-						Continue
+						Continue <ArrowRight size={14} strokeWidth={2.2} />
 					</button>
 				</footer>
 			</div>
@@ -867,21 +897,24 @@
 					{/if}
 				</div>
 				<footer class="sheet__foot">
-					<button type="button" class="link" onclick={() => (showAppleSheet = false)}>Cancel</button>
 					<button
 						type="button"
-						class="link"
-						disabled={appleTestState === 'testing'}
-						onclick={testAppleConnection}
+						class="admin-btn admin-btn--muted"
+						onclick={() => (showAppleSheet = false)}
 					>
-						{appleTestState === 'testing' ? 'Testing…' : 'Test connection'}
+						Cancel
 					</button>
 					<button
 						type="button"
-						class="admin-ui-btn admin-ui-btn--primary"
-						onclick={connectApple}
+						class="admin-btn"
+						disabled={appleTestState === 'testing'}
+						onclick={testAppleConnection}
 					>
-						Connect
+						<Plug size={13} strokeWidth={2} />
+						{appleTestState === 'testing' ? 'Testing…' : 'Test connection'}
+					</button>
+					<button type="button" class="admin-btn admin-btn--solid" onclick={connectApple}>
+						<Plug size={14} strokeWidth={2.2} /> Connect
 					</button>
 				</footer>
 			</div>
@@ -1145,13 +1178,13 @@
 
 	/* topbar icons */
 	.topbar-icon {
-		width: 1.85rem;
-		height: 1.85rem;
+		width: 2.4rem;
+		height: 2.4rem;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		border: 1px solid transparent;
-		border-radius: 0.5rem;
+		border-radius: 0.625rem;
 		background: transparent;
 		color: color-mix(in srgb, var(--text) 60%, transparent);
 		cursor: pointer;
@@ -1168,13 +1201,13 @@
 	}
 
 	.topbar-avatar {
-		width: 1.85rem;
-		height: 1.85rem;
+		width: 2.4rem;
+		height: 2.4rem;
 		border-radius: 999px;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 0.74rem;
+		font-size: 0.82rem;
 		font-weight: 700;
 		background: color-mix(in srgb, var(--admin-accent) 22%, transparent);
 		color: var(--text);
@@ -1185,12 +1218,86 @@
 		background: color-mix(in srgb, var(--admin-accent) 32%, transparent);
 	}
 
+	.profile-menu {
+		position: relative;
+		display: inline-flex;
+	}
+	.profile-menu__panel {
+		position: absolute;
+		top: calc(100% + 0.4rem);
+		right: 0;
+		min-width: 12rem;
+		background: var(--admin-card-bg);
+		border: 1px solid var(--admin-card-border);
+		border-radius: 0.875rem;
+		box-shadow: 0 14px 40px -10px color-mix(in srgb, black 28%, transparent);
+		padding: 0.4rem 0;
+		z-index: 30;
+	}
+	.profile-menu__header {
+		padding: 0.45rem 0.85rem 0.55rem;
+	}
+	.profile-menu__name {
+		font-size: 0.82rem;
+		font-weight: 660;
+		color: var(--text);
+	}
+	.profile-menu__email {
+		font-size: 0.72rem;
+		color: color-mix(in srgb, var(--text) 56%, transparent);
+		margin-top: 0.1rem;
+	}
+	.profile-menu__divider {
+		height: 1px;
+		background: color-mix(in srgb, var(--text) 10%, transparent);
+		margin: 0.3rem 0;
+	}
+	.profile-menu__item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		width: 100%;
+		padding: 0.5rem 0.85rem;
+		border: none;
+		background: transparent;
+		font: inherit;
+		font-size: 0.78rem;
+		font-weight: 580;
+		color: color-mix(in srgb, var(--text) 75%, transparent);
+		cursor: pointer;
+		text-align: left;
+	}
+	.profile-menu__item:hover {
+		background: color-mix(in srgb, var(--text) 5%, transparent);
+		color: var(--text);
+	}
+
 	/* settings page — left-aligned, original-style typography */
 	.settings {
 		display: grid;
-		gap: 0.9rem;
+		gap: 1.6rem;
 		width: 100%;
 		max-width: var(--admin-content-max);
+		position: relative;
+	}
+
+	.settings__save {
+		position: absolute;
+		top: 0.35rem;
+		right: 0;
+		font-size: 0.72rem;
+		font-weight: 620;
+		letter-spacing: 0.02em;
+		color: color-mix(in srgb, var(--text) 56%, transparent);
+		opacity: 1;
+		transition: opacity 200ms ease;
+		pointer-events: none;
+	}
+	.settings__save[data-state='idle'] {
+		opacity: 0;
+	}
+	.settings__save[data-state='saved'] {
+		color: color-mix(in srgb, var(--admin-status-success-dot, #22c55e) 80%, var(--text) 20%);
 	}
 
 	.settings__head {
@@ -1243,137 +1350,175 @@
 		text-transform: uppercase;
 		color: color-mix(in srgb, var(--text) 55%, transparent);
 	}
-	.settings__section-sub {
-		margin: 0.15rem 0 0;
-		font-size: 0.74rem;
-		font-weight: 520;
-		color: color-mix(in srgb, var(--text) 56%, transparent);
+	.sync-card {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		gap: 0.85rem;
+		padding: 0.85rem 1rem;
+		border: 1px solid var(--admin-card-border);
+		border-radius: 0.875rem;
+		background: var(--admin-card-bg);
 	}
-	.settings__section-meta {
+	.sync-card--busy {
+		opacity: 0.75;
+	}
+	.sync-card__icon {
 		display: inline-flex;
-		align-items: center;
-		gap: 0.7rem;
-		flex-shrink: 0;
-	}
-	.settings__count {
-		font-size: 0.72rem;
-		font-weight: 540;
-		color: color-mix(in srgb, var(--text) 50%, transparent);
-	}
-
-	.save-indicator {
-		font-size: 0.72rem;
-		font-weight: 620;
-		color: color-mix(in srgb, var(--text) 56%, transparent);
-		min-width: 4rem;
-		text-align: right;
-	}
-	.save-indicator[data-state='idle'] {
-		visibility: hidden;
-	}
-
-	.settings__row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		padding: 0.4rem 0;
-	}
-	.settings__row--stack {
-		flex-direction: column;
-		align-items: stretch;
-		gap: 0.55rem;
-	}
-	.settings__row-label {
-		font-size: 0.78rem;
-		font-weight: 600;
-		color: color-mix(in srgb, var(--text) 70%, transparent);
-	}
-
-	.sync-line {
-		display: flex;
-		align-items: center;
-		gap: 0.7rem;
-		flex-wrap: wrap;
-	}
-	.sync-line--busy {
-		opacity: 0.7;
-	}
-	.sync-line__icon {
-		display: inline-flex;
-		width: 1.6rem;
-		height: 1.6rem;
-		border-radius: 0.4rem;
+		width: 1.85rem;
+		height: 1.85rem;
+		border-radius: 0.5rem;
 		align-items: center;
 		justify-content: center;
 		background: color-mix(in srgb, var(--text) 6%, transparent);
 	}
-	.sync-line__name {
+	.sync-card__body {
+		display: grid;
+		gap: 0.15rem;
+		min-width: 0;
+	}
+	.sync-card__name {
 		font-size: 0.92rem;
 		font-weight: 680;
 		letter-spacing: -0.005em;
 	}
-	.sync-line__status {
+	.sync-card__status {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
 		font-size: 0.76rem;
-		color: color-mix(in srgb, var(--text) 56%, transparent);
+		font-weight: 520;
+		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
-	.sync-line__dot {
+	.sync-card__dot {
 		width: 0.45rem;
 		height: 0.45rem;
 		border-radius: 999px;
 		background: var(--admin-status-success-dot, #22c55e);
 	}
-	.sync-line__actions {
-		margin-left: auto;
+	.sync-card__actions {
 		display: inline-flex;
-		gap: 0.85rem;
+		gap: 0.45rem;
 	}
 
-	.connect-cta {
-		justify-self: start;
+	/* unified button system */
+	.admin-btn {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.4rem;
-		padding: 0.5rem 0.85rem;
+		justify-content: center;
+		gap: 0.35rem;
+		min-height: 2rem;
+		padding: 0 0.85rem;
 		font: inherit;
-		font-size: 0.8rem;
+		font-size: 0.78rem;
 		font-weight: 620;
-		border: 1px dashed color-mix(in srgb, var(--text) 22%, transparent);
+		letter-spacing: -0.003em;
 		border-radius: 0.625rem;
-		background: transparent;
-		color: var(--text);
+		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+		background: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
+		color: color-mix(in srgb, var(--text) 80%, transparent);
 		cursor: pointer;
+		transition:
+			border-color 120ms ease,
+			background 120ms ease,
+			color 120ms ease;
+		white-space: nowrap;
 	}
-	.connect-cta:hover {
+	.admin-btn:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--text) 6%, transparent);
+		color: var(--text);
+		border-color: color-mix(in srgb, var(--text) 22%, transparent);
+	}
+	.admin-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	.admin-btn--accent {
+		background: color-mix(in srgb, var(--admin-accent) 14%, var(--bg) 86%);
+		border-color: color-mix(in srgb, var(--admin-accent) 34%, transparent);
+		color: var(--text);
+	}
+	.admin-btn--accent:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--admin-accent) 18%, var(--bg) 82%);
+		border-color: color-mix(in srgb, var(--admin-accent) 44%, transparent);
+	}
+	.admin-btn--solid {
+		background: var(--admin-accent);
+		border-color: var(--admin-accent);
+		color: #fff;
+	}
+	.admin-btn--solid:hover:not(:disabled) {
+		filter: brightness(1.08);
+	}
+	.admin-btn--muted {
+		background: transparent;
+		border-color: transparent;
+		color: color-mix(in srgb, var(--text) 60%, transparent);
+	}
+	.admin-btn--muted:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--text) 5%, transparent);
+		color: var(--text);
+		border-color: transparent;
+	}
+	.admin-btn--danger:hover:not(:disabled) {
+		background: color-mix(in srgb, #ef4444 10%, transparent);
+		border-color: color-mix(in srgb, #ef4444 36%, transparent);
+		color: #ef4444;
+	}
+	.admin-btn--warn {
+		background: color-mix(in srgb, var(--admin-status-warn-fg) 14%, transparent);
+		border-color: color-mix(in srgb, var(--admin-status-warn-fg) 32%, transparent);
+		color: var(--admin-status-warn-fg);
+	}
+	.admin-btn--dashed {
+		background: transparent;
+		border-style: dashed;
+		border-color: color-mix(in srgb, var(--text) 22%, transparent);
+		color: var(--text);
+		justify-self: start;
+	}
+	.admin-btn--dashed:hover:not(:disabled) {
 		border-color: color-mix(in srgb, var(--admin-accent) 50%, transparent);
 		background: color-mix(in srgb, var(--admin-accent) 6%, transparent);
 	}
 
-	.seg {
+	.week-pick {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.5rem;
+	}
+	.week-pick__opt {
+		position: relative;
 		display: inline-flex;
-		padding: 0.18rem;
-		border-radius: 0.5rem;
-		background: color-mix(in srgb, var(--text) 6%, transparent);
-		border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-	}
-	.seg__opt {
-		border: none;
-		background: transparent;
-		font: inherit;
-		font-size: 0.78rem;
-		font-weight: 600;
-		padding: 0.32rem 0.85rem;
-		border-radius: 0.36rem;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 0.875rem;
+		border-radius: 0.875rem;
+		border: 1px solid var(--admin-card-border);
+		background: var(--admin-card-bg);
+		color: color-mix(in srgb, var(--text) 70%, transparent);
 		cursor: pointer;
+		font-size: 0.76rem;
+		font-weight: 620;
+		letter-spacing: -0.005em;
+		transition:
+			border-color 120ms ease,
+			background 120ms ease,
+			color 120ms ease;
 	}
-	.seg__opt--active {
-		background: var(--bg);
+	.week-pick__opt:hover {
+		background: var(--admin-card-bg-hover, var(--admin-card-bg));
+		border-color: color-mix(in srgb, var(--admin-accent) 24%, transparent);
+	}
+	.week-pick__opt input {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
+	}
+	.week-pick__opt--active {
+		border-color: color-mix(in srgb, var(--admin-accent) 34%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 14%, var(--bg) 86%);
 		color: var(--text);
-		box-shadow: 0 1px 2px color-mix(in srgb, var(--text) 14%, transparent);
 	}
 
 	/* payments — flat list, dividers only, no double borders */
@@ -1394,9 +1539,10 @@
 		content: '';
 		position: absolute;
 		left: 0;
-		top: 0;
-		bottom: 0;
+		top: 0.4rem;
+		bottom: 0.4rem;
 		width: 2px;
+		border-radius: 1px;
 		background: var(--method-color);
 	}
 
@@ -1405,7 +1551,7 @@
 		grid-template-columns: auto auto 1fr auto auto;
 		align-items: center;
 		gap: 0.7rem;
-		padding: 0.85rem 0.25rem;
+		padding: 0.85rem 0.25rem 0.85rem 0.85rem;
 		width: 100%;
 		background: transparent;
 		border: none;
@@ -1446,10 +1592,15 @@
 	.payment-row__add {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.25rem;
-		font-size: 0.74rem;
+		gap: 0.3rem;
+		font-size: 0.72rem;
 		font-weight: 620;
-		color: var(--method-color);
+		letter-spacing: 0.02em;
+		color: color-mix(in srgb, var(--text) 58%, transparent);
+		padding: 0.28rem 0.6rem;
+		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+		border-radius: 0.5rem;
+		background: color-mix(in srgb, var(--text) 4%, transparent);
 	}
 	.payment-row__chev {
 		color: color-mix(in srgb, var(--text) 50%, transparent);
@@ -1469,16 +1620,18 @@
 		gap: 0.3rem;
 	}
 	.pill--primary {
-		background: var(--method-color);
-		color: #fff;
+		background: color-mix(in srgb, var(--method-color) 14%, transparent);
+		color: color-mix(in srgb, var(--method-color) 80%, var(--text) 20%);
+		border: 1px solid color-mix(in srgb, var(--method-color) 32%, transparent);
 	}
 	.pill--warn {
 		background: var(--admin-status-warn-bg);
 		color: var(--admin-status-warn-fg);
+		border: 1px solid color-mix(in srgb, var(--admin-status-warn-fg) 32%, transparent);
 	}
 
 	.payment-row__body {
-		padding: 0.2rem 0.25rem 1rem;
+		padding: 0.2rem 0.25rem 1rem 0.85rem;
 		display: grid;
 		gap: 0.95rem;
 	}
@@ -1545,45 +1698,22 @@
 		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
 	.checkout__alert {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.6rem;
+		font-size: 0.76rem;
+		font-weight: 540;
+		padding: 0.5rem 0.55rem 0.5rem 0.8rem;
+		border-radius: 0.625rem;
+		background: var(--admin-status-warn-bg);
+		color: var(--admin-status-warn-fg);
+		border: 1px solid color-mix(in srgb, var(--admin-status-warn-fg) 22%, transparent);
+	}
+	.checkout__alert-text {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
-		font-size: 0.74rem;
-		padding: 0.5rem 0.7rem;
-		border-radius: 0.45rem;
-		background: var(--admin-status-warn-bg);
-		color: var(--admin-status-warn-fg);
-	}
-
-	.toggle {
-		flex-shrink: 0;
-		width: 2.1rem;
-		height: 1.2rem;
-		padding: 0;
-		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--text) 8%, transparent);
-		cursor: pointer;
-		transition: background 150ms ease;
-		position: relative;
-	}
-	.toggle__knob {
-		position: absolute;
-		top: 0.13rem;
-		left: 0.13rem;
-		width: 0.86rem;
-		height: 0.86rem;
-		border-radius: 999px;
-		background: var(--bg);
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
-		transition: transform 150ms ease;
-	}
-	.toggle--on {
-		background: var(--method-color);
-		border-color: var(--method-color);
-	}
-	.toggle--on .toggle__knob {
-		transform: translateX(0.88rem);
 	}
 
 	.disclosure {
@@ -1608,7 +1738,7 @@
 		display: grid;
 		gap: 0.55rem;
 		padding: 0.85rem;
-		border-radius: 0.5rem;
+		border-radius: 0.625rem;
 		background: color-mix(in srgb, var(--text) 4%, transparent);
 	}
 	.creds__actions {
@@ -1617,31 +1747,6 @@
 		align-items: center;
 		gap: 0.7rem;
 		margin-top: 0.2rem;
-	}
-
-	.link {
-		border: none;
-		background: none;
-		font: inherit;
-		font-size: 0.76rem;
-		font-weight: 580;
-		color: var(--admin-accent);
-		cursor: pointer;
-		padding: 0;
-	}
-	.link:hover {
-		text-decoration: underline;
-	}
-	.link--muted {
-		color: color-mix(in srgb, var(--text) 55%, transparent);
-	}
-	.link--muted:hover {
-		color: var(--text);
-		text-decoration: underline;
-	}
-	.link:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
 	}
 
 	.attention {
@@ -1653,11 +1758,12 @@
 		align-items: center;
 		gap: 0.5rem;
 		padding: 0.55rem 0.75rem;
-		border-radius: 0.55rem;
+		border-radius: 0.625rem;
 		background: var(--admin-status-warn-bg);
 		color: var(--admin-status-warn-fg);
+		border: 1px solid color-mix(in srgb, var(--admin-status-warn-fg) 22%, transparent);
 		font-size: 0.78rem;
-		font-weight: 580;
+		font-weight: 540;
 	}
 	.attention__text {
 		flex: 1;
@@ -1745,11 +1851,12 @@
 		color: var(--text);
 	}
 
-	/* sheets */
+	/* sheets — match admin-card aesthetic */
 	.sheet-backdrop {
 		position: fixed;
 		inset: 0;
-		background: color-mix(in srgb, #000 55%, transparent);
+		background: color-mix(in srgb, var(--text) 30%, transparent);
+		backdrop-filter: blur(2px);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1757,90 +1864,95 @@
 		z-index: 100;
 	}
 	.sheet {
-		width: min(28rem, 100%);
-		background: var(--bg);
+		width: min(26rem, 100%);
+		background: var(--admin-card-bg);
 		border: 1px solid var(--admin-card-border);
-		border-radius: 0.95rem;
-		box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.4);
+		border-radius: 14px;
+		box-shadow: 0 24px 60px -18px color-mix(in srgb, black 36%, transparent);
 		display: grid;
 		max-height: 90vh;
+		overflow: hidden;
 	}
 	.sheet__head {
-		padding: 1rem 1.15rem 0.6rem;
+		padding: 1.05rem 1.15rem 0.55rem;
 	}
 	.sheet__head h3 {
 		margin: 0;
-		font-size: 1rem;
+		font-size: 0.92rem;
 		font-weight: 680;
+		letter-spacing: -0.005em;
+		color: var(--text);
 	}
 	.sheet__body {
-		padding: 0.4rem 1.15rem 0.85rem;
+		padding: 0.4rem 1.15rem 0.95rem;
 		display: grid;
 		gap: 0.7rem;
 		overflow-y: auto;
 	}
 	.sheet__current {
 		margin: 0;
-		font-size: 0.78rem;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		font-size: 0.76rem;
+		font-weight: 520;
+		color: color-mix(in srgb, var(--text) 58%, transparent);
 	}
 	.sheet__list {
 		display: grid;
 		gap: 0.4rem;
 	}
 	.sheet__opt {
-		display: inline-flex;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
 		align-items: center;
-		gap: 0.6rem;
-		padding: 0.65rem 0.8rem;
-		border-radius: 0.55rem;
+		gap: 0.7rem;
+		padding: 0.7rem 0.85rem;
+		border-radius: 0.625rem;
 		border: 1px solid var(--admin-card-border);
+		background: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
+		font: inherit;
+		text-align: left;
 		cursor: pointer;
-		background: var(--bg);
+		color: var(--text);
+		transition:
+			border-color 120ms ease,
+			background 120ms ease;
 	}
-	.sheet__opt input {
-		appearance: none;
-		width: 0.9rem;
-		height: 0.9rem;
-		border-radius: 999px;
-		border: 1px solid color-mix(in srgb, var(--text) 30%, transparent);
-		display: inline-grid;
-		place-content: center;
-	}
-	.sheet__opt input:checked {
-		border-color: var(--admin-accent);
-	}
-	.sheet__opt input:checked::after {
-		content: '';
-		width: 0.45rem;
-		height: 0.45rem;
-		border-radius: 999px;
-		background: var(--admin-accent);
+	.sheet__opt:hover {
+		border-color: color-mix(in srgb, var(--admin-accent) 32%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 6%, var(--bg) 94%);
 	}
 	.sheet__opt--active {
-		border-color: color-mix(in srgb, var(--admin-accent) 50%, transparent);
-		background: color-mix(in srgb, var(--admin-accent) 8%, var(--bg) 92%);
+		border-color: color-mix(in srgb, var(--admin-accent) 48%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 12%, var(--bg) 88%);
+	}
+	.sheet__opt--active :global(svg:last-child) {
+		color: var(--admin-accent);
 	}
 	.sheet__opt-icon {
 		display: inline-flex;
-		width: 1.5rem;
-		height: 1.5rem;
+		width: 1.6rem;
+		height: 1.6rem;
 		border-radius: 0.4rem;
 		background: color-mix(in srgb, var(--text) 6%, transparent);
 		align-items: center;
 		justify-content: center;
 	}
 	.sheet__opt-label {
-		font-size: 0.84rem;
-		font-weight: 600;
+		font-size: 0.86rem;
+		font-weight: 620;
 	}
 	.sheet__check {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.4rem;
-		font-size: 0.78rem;
-		color: color-mix(in srgb, var(--text) 70%, transparent);
+		gap: 0.5rem;
+		font-size: 0.76rem;
+		font-weight: 520;
+		color: color-mix(in srgb, var(--text) 64%, transparent);
 		padding: 0.3rem 0;
+	}
+	.sheet__check input {
+		width: 0.95rem;
+		height: 0.95rem;
+		accent-color: var(--admin-accent);
 	}
 	.sheet__foot {
 		display: flex;
@@ -1848,7 +1960,8 @@
 		align-items: center;
 		gap: 0.85rem;
 		padding: 0.85rem 1.15rem 1rem;
-		border-top: 1px solid var(--admin-card-border);
+		border-top: 1px solid color-mix(in srgb, var(--admin-card-border) 80%, transparent);
+		background: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
 	}
 
 	@media (max-width: 48em) {

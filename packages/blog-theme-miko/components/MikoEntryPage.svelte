@@ -38,6 +38,7 @@
 	const excerpt = $derived(post?.metadata?.fm?.excerpt || '')
 	const formattedDate = $derived(post ? formatDate(post.date) : '')
 	const shouldShowHeroImage = $derived(Boolean(post && coverImage && explicitCoverImage))
+	const isDraft = $derived(post?.metadata?.fm?.draft === true)
 
 	const relatedPosts = $derived.by(() => {
 		if (!post) { return [] }
@@ -81,11 +82,15 @@
 				</ol>
 			</nav>
 
-			<p class="miko-blog__entry-eyebrow">
-				<span>{formattedDate}</span>
-				<span class="miko-blog__entry-eyebrow-dot" aria-hidden="true">·</span>
-				<span>{readTime} min read</span>
-			</p>
+				<p class="miko-blog__entry-eyebrow">
+					{#if isDraft}
+						<span class="miko-blog__draft-badge miko-blog__draft-badge--entry">Draft</span>
+						<span class="miko-blog__entry-eyebrow-dot" aria-hidden="true">·</span>
+					{/if}
+					<span>{formattedDate}</span>
+					<span class="miko-blog__entry-eyebrow-dot" aria-hidden="true">·</span>
+					<span>{readTime} min read</span>
+				</p>
 
 			<h1 class="miko-blog__entry-title">{title}</h1>
 
