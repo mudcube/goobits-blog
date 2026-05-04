@@ -5,6 +5,7 @@
 		name?: string | null
 		displayName?: string | null
 		userId?: string | null
+		joinedAt?: string | null
 	}
 
 	type DashboardEvent = {
@@ -61,11 +62,10 @@
 	const feedItems = $derived.by<FeedItem[]>(() => {
 		const items: FeedItem[] = []
 		for (const event of recentEvents) {
-			const participantName =
-				event.participants?.[0]?.displayName ||
-				event.participants?.[0]?.name ||
-				''
-			const participantUserId = event.participants?.[0]?.userId || null
+			const first = event.participants?.[0]
+			const participantName = first?.displayName || first?.name || ''
+			const participantUserId = first?.userId || null
+			const joinedAt = first?.joinedAt ?? null
 			if (participantName) {
 				items.push({
 					id: `${event.id}-joined`,
@@ -73,7 +73,7 @@
 					initials: initials(participantName),
 					verb: 'joined',
 					target: event.title,
-					when: relativeWhen(event.startsAt),
+					when: relativeWhen(joinedAt ?? event.startsAt),
 					userId: participantUserId,
 					href: participantUserId ? withAdminRoute(`crew/${participantUserId}/`) : null
 				})

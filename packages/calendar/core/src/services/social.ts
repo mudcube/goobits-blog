@@ -32,6 +32,7 @@ type ParticipantRow = {
 	name: string | null
 	avatar_url: string | null
 	email: string | null
+	created_at: number | null
 }
 
 export type CalendarEventParticipant = {
@@ -71,6 +72,7 @@ export type CalendarFeedEvent = {
 		userId: string
 		name: string | null
 		avatarUrl: string | null
+		joinedAt: string | null
 	}>
 }
 
@@ -148,7 +150,7 @@ async function listEventsByRange(
 	const participantsResult = await db
 		.prepare(
 			`SELECT p.event_id, CAST(p.user_id AS TEXT) AS user_id, p.guest_count, p.status, p.attendance_status, p.note,
-		        u.name, u.avatar_url, u.email
+		        u.name, u.avatar_url, u.email, p.created_at
 		 FROM calendar_event_participants p
 		 LEFT JOIN calendar_users u ON CAST(u.id AS TEXT) = CAST(p.user_id AS TEXT)
 		 WHERE p.event_id IN (${placeholders})
@@ -199,7 +201,8 @@ async function listEventsByRange(
 				participants: joined.slice(0, 6).map((participant) => ({
 					userId: participant.user_id,
 					name: participant.name,
-					avatarUrl: participant.avatar_url
+					avatarUrl: participant.avatar_url,
+					joinedAt: participant.created_at != null ? new Date(participant.created_at * 1000).toISOString() : null
 				}))
 			}
 		]

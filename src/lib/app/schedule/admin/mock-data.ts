@@ -30,11 +30,15 @@ function isoFromWeekdayAt(weekday: number, hour: number, minute = 0, weeksAhead 
 	return d.toISOString()
 }
 
+function relativeJoinedAt(hoursAgo: number) {
+	return new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString()
+}
+
 const mockParticipants: MockParticipant[] = [
-	{ userId: 'u-jen', name: 'Jen Kline', avatarUrl: null },
-	{ userId: 'u-marco', name: 'Marco Ruiz', avatarUrl: null },
-	{ userId: 'u-ava', name: 'Ava Lee', avatarUrl: null },
-	{ userId: 'u-tyler', name: 'Tyler Scott', avatarUrl: null }
+	{ userId: 'u-jen', name: 'Jen Kline', avatarUrl: null, joinedAt: relativeJoinedAt(2) },
+	{ userId: 'u-marco', name: 'Marco Ruiz', avatarUrl: null, joinedAt: relativeJoinedAt(8) },
+	{ userId: 'u-ava', name: 'Ava Lee', avatarUrl: null, joinedAt: relativeJoinedAt(26) },
+	{ userId: 'u-tyler', name: 'Tyler Scott', avatarUrl: null, joinedAt: relativeJoinedAt(50) }
 ]
 const jen = mockParticipants[0]!
 const marco = mockParticipants[1]!
@@ -270,7 +274,8 @@ function toMemberFeedEvent(
 		participants: event.participants.map((participant) => ({
 			userId: participant.userId || '',
 			name: participant.name || null,
-			avatarUrl: participant.avatarUrl || null
+			avatarUrl: participant.avatarUrl || null,
+			joinedAt: participant.joinedAt ?? null
 		}))
 	}
 }

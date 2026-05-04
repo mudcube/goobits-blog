@@ -282,6 +282,7 @@ export function createAdminDashboardController(
         userId: string;
         name: string | null;
         avatarUrl: string | null;
+        joinedAt: string | null;
       }>;
     }>
   >([]);
@@ -308,6 +309,7 @@ export function createAdminDashboardController(
         userId: string;
         name: string | null;
         avatarUrl: string | null;
+        joinedAt: string | null;
       }>;
     }>
   >([]);

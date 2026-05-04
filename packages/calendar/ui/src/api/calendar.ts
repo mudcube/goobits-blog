@@ -176,6 +176,7 @@ const CalendarFeedEventSchema = z.object({
       userId: z.string(),
       name: z.union([z.string(), z.null()]),
       avatarUrl: z.union([z.string(), z.null()]),
+      joinedAt: z.union([z.string(), z.null()]),
     }),
   ),
 });
