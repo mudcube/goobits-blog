@@ -727,6 +727,7 @@
 	.topbar-icon--active {
 		background: var(--admin-active-bg);
 		color: var(--admin-active-fg);
+		box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--admin-accent) 34%, transparent);
 	}
 
 	/* settings page */

@@ -113,7 +113,7 @@
     <AdminPageHero
       eyebrow="Preferences"
       title="Settings"
-      subtitle="Configure sync & payment defaults for your space."
+      subtitle="Calendar sync, week start, and payouts."
     />
 
     <CalendarSyncSettings {dashboard} {showToast} />

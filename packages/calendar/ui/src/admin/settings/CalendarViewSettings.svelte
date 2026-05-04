@@ -17,7 +17,7 @@
 <section class="calendar-view-settings admin-settings__section">
   <div class="admin-settings__section-head">
     <div>
-      <h4>CALENDAR VIEW</h4>
+      <h4>WEEK START</h4>
     </div>
   </div>
 
