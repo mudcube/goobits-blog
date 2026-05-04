@@ -134,7 +134,7 @@
   .admin-settings {
     font-family: var(--font-ui-sans, var(--font-sans));
     display: grid;
-    gap: 0.9rem;
+    gap: 1.6rem;
     width: 100%;
   }
 
@@ -144,15 +144,22 @@
     padding: 0;
   }
 
-  .admin-settings :global(.admin-settings__section + .admin-settings__section) {
-    margin-top: 1rem;
-  }
-
   .admin-settings :global(.admin-settings__section-head) {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+  }
+
+  .admin-settings :global(.admin-settings__section-head h4) {
+    margin: 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    font-weight: 680;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--text) 70%, transparent);
   }
 
   .admin-settings :global(.admin-settings__section-sub) {

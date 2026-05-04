@@ -63,10 +63,12 @@
 	}
 
 	.admin-page-hero__subtitle {
-		margin: 0.42rem 0 0;
+		margin: 0.5rem 0 0;
 		font-family: var(--font-ui-sans, var(--font-sans));
 		font-size: 0.9rem;
-		line-height: 1.5;
+		font-weight: 400;
+		font-style: italic;
+		line-height: 1.55;
 		color: color-mix(in srgb, var(--text) 64%, transparent);
 	}
 
