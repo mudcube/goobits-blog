@@ -2,6 +2,7 @@
 	import { slide } from 'svelte/transition'
 	import { cubicOut } from 'svelte/easing'
 	import {
+		AlertTriangle,
 		Check,
 		ChevronDown,
 		ChevronRight,
@@ -81,6 +82,24 @@
 	const railName = $derived<'paypal_checkout' | 'cash_app_pay'>(
 		usesPayPalRail ? 'paypal_checkout' : 'cash_app_pay'
 	)
+	const handleErr = $derived(validateHandle(meta.value, handle))
+
+	function validateHandle(method: PaymentMethodKey, raw: string): string | null {
+		const v = raw.trim()
+		if (!v) return null
+		if (method === 'venmo') {
+			if (!/^@?[a-zA-Z0-9_-]{1,30}$/.test(v))
+				return 'Letters, numbers, dashes or underscores only.'
+		} else if (method === 'paypal') {
+			const isEmail = /^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(v)
+			const isMerchant = /^[A-Z0-9]{6,20}$/.test(v)
+			if (!isEmail && !isMerchant) return 'Use an email or PayPal merchant ID.'
+		} else if (method === 'cashapp') {
+			if (!/^\$?[a-zA-Z][a-zA-Z0-9_-]{0,30}$/.test(v))
+				return 'Cashtag — starts with a letter, no spaces.'
+		}
+		return null
+	}
 
 	function toggleRow() {
 		expanded = !expanded
@@ -159,17 +178,35 @@
 		>
 			<label class="payment-method-row__field">
 				<span class="payment-method-row__field-label">{meta.handleLabel}</span>
-				<div class="payment-method-row__field-control">
+				<div
+					class="payment-method-row__field-control"
+					class:payment-method-row__field-control--invalid={!!handleErr}
+				>
 					<input
 						type="text"
 						class="ui-form-control payment-method-row__input"
 						value={handle}
 						placeholder={meta.placeholder}
+						aria-invalid={handleErr ? 'true' : undefined}
 						oninput={(e) =>
 							payment.updateHandle(meta.value, (e.currentTarget as HTMLInputElement).value)}
 					/>
+					{#if handleErr}
+						<span class="payment-method-row__field-warn" aria-hidden="true">
+							<AlertTriangle size={14} />
+						</span>
+					{/if}
 				</div>
-				<p class="payment-method-row__field-hint">{meta.helper(handle)}</p>
+				{#if handleErr}
+					<p
+						class="payment-method-row__field-error"
+						transition:slide={{ duration: 160, easing: cubicOut }}
+					>
+						{handleErr}
+					</p>
+				{:else}
+					<p class="payment-method-row__field-hint">{meta.helper(handle)}</p>
+				{/if}
 			</label>
 
 			<div class="payment-method-row__checkout">
@@ -579,6 +616,24 @@
 	}
 	.payment-method-row__field-control {
 		position: relative;
+	}
+	.payment-method-row__field-control--invalid :global(.ui-form-control) {
+		border-color: color-mix(in srgb, #ef4444 50%, transparent);
+		background: color-mix(in srgb, #ef4444 5%, transparent);
+	}
+	.payment-method-row__field-warn {
+		position: absolute;
+		right: 0.6rem;
+		top: 50%;
+		transform: translateY(-50%);
+		color: #c27800;
+		display: inline-flex;
+	}
+	.payment-method-row__field-error {
+		margin: 0.25rem 0 0;
+		font-size: 0.74rem;
+		font-weight: 460;
+		color: #c27800;
 	}
 	.payment-method-row__input {
 		font-size: 0.92rem;
