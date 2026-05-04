@@ -78,6 +78,7 @@ import {
 	getEnabledCalendarProgramByActivityName,
 	upsertCalendarProgram,
 	deleteCalendarProgram,
+	reorderCalendarPrograms,
 	type CalendarProgramState,
 	type CalendarProgramInput
 } from './services/programs.ts'
@@ -260,6 +261,7 @@ export {
 	getEnabledCalendarProgramByActivityName,
 	upsertCalendarProgram,
 	deleteCalendarProgram,
+	reorderCalendarPrograms,
 	listUpcomingEvents,
 	listRecentEvents,
 	listEventsFeed,

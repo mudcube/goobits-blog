@@ -184,3 +184,23 @@ export async function deleteCalendarProgram(db: D1DatabaseLike, slug: string) {
 		`DELETE FROM calendar_programs WHERE slug = ?`
 	).bind(slug).run()
 }
+
+export async function reorderCalendarPrograms(
+	db: D1DatabaseLike,
+	orders: ReadonlyArray<{ slug: string; sortOrder: number }>
+) {
+	if (orders.length === 0) return
+	for (const entry of orders) {
+		if (!isValidProgramSlug(entry.slug)) throw new Error('Invalid program slug')
+	}
+	for (const entry of orders) {
+		await db
+			.prepare(
+				`UPDATE calendar_programs
+				 SET sort_order = ?, updated_at = unixepoch()
+				 WHERE slug = ?`
+			)
+			.bind(entry.sortOrder, entry.slug)
+			.run()
+	}
+}

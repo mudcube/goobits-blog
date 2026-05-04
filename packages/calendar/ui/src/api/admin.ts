@@ -370,6 +370,17 @@ export async function deleteAdminProgram(slug: string) {
   });
 }
 
+export async function reorderAdminPrograms(
+  orders: ReadonlyArray<{ slug: string; sortOrder: number }>,
+) {
+  return requestApi<AdminMutationOk>(withAdminApi("/programs"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "reorder", orders }),
+    parse: (payload) => AdminMutationOkSchema.parse(payload),
+  });
+}
+
 export async function getAdminEvents() {
   return requestApi<AdminEventsResponse>(withAdminApi("/events"), {
     parse: (payload) => AdminEventsResponseSchema.parse(payload),

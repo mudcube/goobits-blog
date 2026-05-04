@@ -21,6 +21,7 @@ import {
   purgeDashboardSyncDeadLetters,
   retryDashboardSyncDeadLetters,
   saveAdminPaymentDefaults,
+  reorderDashboardPrograms,
   saveDashboardProgram,
   saveDashboardRules,
   savePayPalIntegration,
@@ -801,9 +802,11 @@ export function createAdminDashboardController(
     reordered.splice(nextIndex, 0, item);
 
     const previousPrograms = programs;
-    const nextSortOrders = new Map(
-      reordered.map((program, orderIndex) => [program.slug, (orderIndex + 1) * 10]),
-    );
+    const orders = reordered.map((program, orderIndex) => ({
+      slug: program.slug,
+      sortOrder: (orderIndex + 1) * 10,
+    }));
+    const nextSortOrders = new Map(orders.map((o) => [o.slug, o.sortOrder]));
     programs = programs.map((program) => ({
       ...program,
       sortOrder: nextSortOrders.get(program.slug) ?? program.sortOrder,
@@ -812,32 +815,11 @@ export function createAdminDashboardController(
     programSaving = true;
     error = "";
     try {
-      for (const program of reordered) {
-        const sortOrder = nextSortOrders.get(program.slug) ?? program.sortOrder;
-        if (sortOrder === program.sortOrder) continue;
-        const result = await saveDashboardProgram({
-          slug: program.slug,
-          label: program.label,
-          activityName: program.activityName,
-          pageTitle: program.pageTitle,
-          eyebrow: program.eyebrow,
-          heroTitleLine1: program.heroTitleLines[0] ?? "",
-          heroTitleLine2: program.heroTitleLines[1] ?? "",
-          heroSubtitle: program.heroSubtitle,
-          description: program.description,
-          icon: program.icon,
-          eyebrowClass: program.eyebrowClass ?? "",
-          glowClass: program.glowClass ?? "",
-          formGlowClass: program.formGlowClass ?? "",
-          serviceStatusNote: program.serviceStatusNote ?? "",
-          enabled: program.enabled,
-          sortOrder,
-        });
-        if (!result.ok) {
-          error = result.error;
-          programs = previousPrograms;
-          return;
-        }
+      const result = await reorderDashboardPrograms(orders);
+      if (!result.ok) {
+        error = result.error;
+        programs = previousPrograms;
+        return;
       }
       await loadPrograms();
     } catch (err) {

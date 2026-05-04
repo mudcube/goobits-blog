@@ -39,7 +39,8 @@ export type AdminProgramUpsertInput = {
 export type AdminProgramMutationInput =
   | { action: "delete"; slug: string }
   | { action: "toggle"; slug: string; enabled: boolean }
-  | { action: "upsert"; program: AdminProgramUpsertInput };
+  | { action: "upsert"; program: AdminProgramUpsertInput }
+  | { action: "reorder"; orders: Array<{ slug: string; sortOrder: number }> };
 
 export type AdminCreateEventsBatchInput = {
   activitySlug: string;
@@ -143,9 +144,36 @@ export function parseAdminProgramMutationInput(
   const action = readEnum(
     body,
     "action",
-    ["delete", "toggle", "upsert"] as const,
+    ["delete", "toggle", "upsert", "reorder"] as const,
     "Unknown action",
   );
+
+  if (action === "reorder") {
+    const rawOrders = body["orders"];
+    if (!Array.isArray(rawOrders)) {
+      throw new TransportValidationError("Missing orders array");
+    }
+    if (rawOrders.length === 0 || rawOrders.length > 200) {
+      throw new TransportValidationError("Invalid orders length");
+    }
+    const orders = rawOrders.map((entry) => {
+      const o = asJsonObject(entry);
+      const slug = readRequiredString(o, "slug", {
+        trim: true,
+        maxLength: 64,
+        message: "Invalid program slug",
+      });
+      if (!isValidProgramSlug(slug))
+        throw new TransportValidationError("Invalid program slug");
+      const sortOrder = readIntInRange(o, "sortOrder", {
+        min: -1000,
+        max: 1000,
+      });
+      return { slug, sortOrder };
+    });
+    return { action, orders };
+  }
+
   const slug = readRequiredString(body, "slug", {
     trim: true,
     maxLength: 64,

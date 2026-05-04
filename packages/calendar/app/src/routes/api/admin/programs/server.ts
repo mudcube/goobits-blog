@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { deleteCalendarProgram, getCalendarPrograms, parseAdminProgramMutationInput, TransportValidationError, upsertCalendarProgram } from '@calendar/core'
+import { deleteCalendarProgram, getCalendarPrograms, parseAdminProgramMutationInput, reorderCalendarPrograms, TransportValidationError, upsertCalendarProgram } from '@calendar/core'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiError, apiOk, apiValidationError } from '@calendar/kit'
 
@@ -28,6 +28,12 @@ export async function POST(event: RequestEvent) {
 			const slug = input.slug
 			await deleteCalendarProgram(env.DB, slug)
 			logAdminEvent(event, 'program_delete', { slug })
+			return apiOk({})
+		}
+
+		if (input.action === 'reorder') {
+			await reorderCalendarPrograms(env.DB, input.orders)
+			logAdminEvent(event, 'program_reorder', { count: input.orders.length })
 			return apiOk({})
 		}
 

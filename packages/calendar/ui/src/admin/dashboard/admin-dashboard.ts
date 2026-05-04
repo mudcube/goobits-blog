@@ -26,6 +26,7 @@ import {
   persistSquareIntegration,
   removePaymentIntegration,
   removeAdminProgram,
+  reorderAdminPrograms,
   retryAdminSyncDeadLetters,
   saveAdminProgram,
   removeInvite,
@@ -205,6 +206,12 @@ export async function saveDashboardProgram(input: {
 
 export async function deleteDashboardProgram(slug: string) {
   return runSuccess(() => removeAdminProgram(slug));
+}
+
+export async function reorderDashboardPrograms(
+  orders: ReadonlyArray<{ slug: string; sortOrder: number }>,
+) {
+  return runSuccess(() => reorderAdminPrograms(orders));
 }
 
 export async function loadAdminEventsData() {

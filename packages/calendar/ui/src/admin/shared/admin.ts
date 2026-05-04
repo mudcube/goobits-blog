@@ -6,6 +6,7 @@ import {
 	disconnectAdminAppleIntegration,
 	deleteAdminPaymentIntegration,
 	deleteAdminProgram,
+	reorderAdminPrograms,
 	getAdminPaymentIntegrations,
 	getAdminEvents,
 	getAdminPrograms,
@@ -176,6 +177,7 @@ export async function saveAdminProgram(input: {
 }
 
 export const removeAdminProgram = deleteAdminProgram
+export { reorderAdminPrograms }
 export const fetchAdminEvents = getAdminEvents
 
 export async function persistAdminEvents(input: {
