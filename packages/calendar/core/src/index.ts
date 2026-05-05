@@ -96,6 +96,8 @@ import {
 	cancelEvent,
 	setAttendanceStatus,
 	updateEventMemory,
+	updateEventHeroImage,
+	getEventHeroImage,
 	getCalendarProfile,
 	saveCalendarProfile,
 	type CalendarEventParticipant,
@@ -174,6 +176,16 @@ import {
 	type AdminViewSettings,
 	type WeekStart
 } from './services/admin-view-settings.ts'
+import {
+	putEventHero,
+	deleteEventHero,
+	extractHeroKeyFromUrl,
+	HeroUploadError,
+	ALLOWED_HERO_MIME_TYPES,
+	MAX_HERO_BYTES,
+	type AllowedHeroMimeType,
+	type PutHeroResult
+} from './media/hero-upload.ts'
 import {
 	parseAdminRulesInput,
 	parseAdminProgramMutationInput,
@@ -287,6 +299,8 @@ export {
 	cancelEvent,
 	setAttendanceStatus,
 	updateEventMemory,
+	updateEventHeroImage,
+	getEventHeroImage,
 	getCalendarProfile,
 	saveCalendarProfile,
 	enqueueCalendarSyncJob,
@@ -353,7 +367,13 @@ export {
 	setAdminPreference,
 	getAdminViewSettings,
 	setAdminViewSettings,
-	getDefaultAdminViewSettings
+	getDefaultAdminViewSettings,
+	putEventHero,
+	deleteEventHero,
+	extractHeroKeyFromUrl,
+	HeroUploadError,
+	ALLOWED_HERO_MIME_TYPES,
+	MAX_HERO_BYTES
 }
 
 export type {
@@ -405,5 +425,7 @@ export type {
 	DayForecast,
 	WeatherProvider,
 	AdminViewSettings,
-	WeekStart
+	WeekStart,
+	AllowedHeroMimeType,
+	PutHeroResult
 }

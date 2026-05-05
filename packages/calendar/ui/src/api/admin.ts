@@ -607,3 +607,35 @@ export async function setAdminViewSettings(patch: Partial<AdminViewSettings>) {
     parse: (payload) => AdminPreferencesResponseSchema.parse(payload),
   });
 }
+
+const AdminEventHeroResponseSchema = z.object({
+  ok: z.literal(true),
+  url: z.string(),
+});
+
+export type AdminEventHeroResponse = z.infer<
+  typeof AdminEventHeroResponseSchema
+>;
+
+export async function uploadEventHero(eventId: number, file: File) {
+  const form = new FormData();
+  form.append("file", file);
+  return requestApi<AdminEventHeroResponse>(
+    withAdminApi(`/events/${encodeURIComponent(String(eventId))}/hero`),
+    {
+      method: "POST",
+      body: form,
+      parse: (payload) => AdminEventHeroResponseSchema.parse(payload),
+    },
+  );
+}
+
+export async function clearEventHero(eventId: number) {
+  return requestApi<AdminMutationOk>(
+    withAdminApi(`/events/${encodeURIComponent(String(eventId))}/hero`),
+    {
+      method: "DELETE",
+      parse: (payload) => AdminMutationOkSchema.parse(payload),
+    },
+  );
+}

@@ -11,6 +11,7 @@
 	import EditableField from '@calendar/ui/admin/shared/EditableField.svelte'
 	import AdminDateTimePicker from '@calendar/ui/admin/shared/AdminDateTimePicker.svelte'
 	import AdminInlineConfirm from '@calendar/ui/admin/shared/AdminInlineConfirm.svelte'
+	import AdminEventHeroUpload from './AdminEventHeroUpload.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
@@ -220,6 +221,34 @@
 		flash('Time updated')
 	}
 
+	async function handleHeroUpload(file: File) {
+		if (mockMode) {
+			flash('Mock mode: hero upload preview only')
+			return null
+		}
+		const url = await dashboard.uploadEventHero(eventId, file)
+		if (!url) {
+			flash(dashboard.error || 'Failed to upload image', true)
+			return null
+		}
+		flash('Hero image saved')
+		return url
+	}
+
+	async function handleHeroClear() {
+		if (mockMode) {
+			flash('Mock mode: hero clear preview only')
+			return false
+		}
+		const cleared = await dashboard.clearEventHero(eventId)
+		if (!cleared) {
+			flash(dashboard.error || 'Failed to remove image', true)
+			return false
+		}
+		flash('Hero image removed')
+		return true
+	}
+
 	async function handleRecapCommit(next: string) {
 		if (mockMode) {
 			flash('Mock mode: description preview only')
@@ -409,6 +438,17 @@
 						<div class="admin-event-detail__detail-value">{formatDuration(detail.event.startsAt, detail.event.endsAt)}</div>
 					</div>
 				</div>
+			</section>
+
+			<section class="admin-event-detail__section">
+				<div class="admin-event-detail__section-label">Hero image</div>
+				<AdminEventHeroUpload
+					heroImageUrl={detail.event.heroImageUrl ?? null}
+					{mockMode}
+					onUpload={handleHeroUpload}
+					onClear={handleHeroClear}
+					onError={(message) => flash(message, true)}
+				/>
 			</section>
 
 			<section class="admin-event-detail__section">

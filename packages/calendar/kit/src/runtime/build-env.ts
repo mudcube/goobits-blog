@@ -1,14 +1,23 @@
 import { dev } from '$app/environment'
 import { getDevDb } from '../dev/devDb'
-import type { D1DatabaseLike } from '../dev/types'
+import type { D1DatabaseLike, R2BucketLike } from '../dev/types'
+
+type RuntimeEnvValue = string | D1DatabaseLike | R2BucketLike | undefined
 
 export type RuntimeEnv = {
 	DB: D1DatabaseLike
-	[key: string]: string | D1DatabaseLike | undefined
+	MEDIA?: R2BucketLike
+	MEDIA_PUBLIC_BASE?: string
+	[key: string]: RuntimeEnvValue
 }
 
 type PlatformLike = {
-	env?: { DB?: D1DatabaseLike; [key: string]: string | D1DatabaseLike | undefined }
+	env?: {
+		DB?: D1DatabaseLike
+		MEDIA?: R2BucketLike
+		MEDIA_PUBLIC_BASE?: string
+		[key: string]: RuntimeEnvValue
+	}
 } | null | undefined
 
 /**

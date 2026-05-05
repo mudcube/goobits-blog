@@ -15,7 +15,7 @@ import {
 	setCalendarLoginContext
 } from './auth/calendar'
 import { getDevDb } from './dev/devDb'
-import type { D1DatabaseLike, D1PreparedStatement } from './dev/types'
+import type { D1DatabaseLike, D1PreparedStatement, R2BucketLike, R2PutOptions } from './dev/types'
 
 export {
 	apiError,
@@ -40,4 +40,4 @@ export {
 	getDevDb
 }
 
-export type { RuntimeEnv, D1DatabaseLike, D1PreparedStatement }
+export type { RuntimeEnv, D1DatabaseLike, D1PreparedStatement, R2BucketLike, R2PutOptions }

@@ -576,6 +576,32 @@ export async function updateEventMemory(
 	return (result.meta?.changes ?? 0) > 0
 }
 
+export async function updateEventHeroImage(
+	db: D1DatabaseLike,
+	input: { eventId: number; heroImageUrl: string | null }
+) {
+	const result = await db
+		.prepare(
+			`UPDATE calendar_events
+		 SET hero_image_url = ?, updated_at = unixepoch()
+		 WHERE id = ?`
+		)
+		.bind(input.heroImageUrl, input.eventId)
+		.run()
+	return (result.meta?.changes ?? 0) > 0
+}
+
+export async function getEventHeroImage(
+	db: D1DatabaseLike,
+	eventId: number
+): Promise<string | null> {
+	const row = await db
+		.prepare(`SELECT hero_image_url FROM calendar_events WHERE id = ? LIMIT 1`)
+		.bind(eventId)
+		.first<{ hero_image_url: string | null }>()
+	return row?.hero_image_url ?? null
+}
+
 export async function cancelEvent(db: D1DatabaseLike, input: { eventId: number }) {
 	const result = await db
 		.prepare(

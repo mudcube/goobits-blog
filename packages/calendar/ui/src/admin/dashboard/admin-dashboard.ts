@@ -15,6 +15,8 @@ import {
   persistAdminEventDetails,
   persistAdminEventAttendance,
   persistAdminEventMemory,
+  persistAdminEventHero,
+  clearAdminEventHero,
   removeAdminEvent,
   persistAdminEvents,
   persistAdminProgram,
@@ -270,6 +272,21 @@ export async function updateAdminEventMemoryValue(
   input: { recapText?: string; heroImageUrl?: string },
 ) {
   return runSuccess(() => persistAdminEventMemory(eventId, input));
+}
+
+export async function uploadAdminEventHeroValue(eventId: number, file: File) {
+  try {
+    const result = await persistAdminEventHero(eventId, file);
+    return { ok: true as const, error: "", url: result.url };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to upload image";
+    return { ok: false as const, error: message, url: "" as string };
+  }
+}
+
+export async function clearAdminEventHeroValue(eventId: number) {
+  return runSuccess(() => clearAdminEventHero(eventId));
 }
 
 export async function deleteAdminEventValue(eventId: number) {

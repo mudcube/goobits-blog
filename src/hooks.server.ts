@@ -173,7 +173,7 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 		"base-uri 'self'",
 		"form-action 'self'",
 		"frame-ancestors 'none'",
-			"img-src 'self' data: https://miko.art https://www.miko.art https://cdn.jsdelivr.net https://challenges.cloudflare.com",
+			"img-src 'self' data: blob: https://miko.art https://www.miko.art https://media.miko.art https://cdn.jsdelivr.net https://challenges.cloudflare.com",
 			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
 			`script-src 'self' https://challenges.cloudflare.com https://www.paypal.com https://www.paypalobjects.com https://web.squarecdn.com https://sandbox.web.squarecdn.com 'nonce-${nonce}'${dev ? " 'unsafe-eval'" : ''}`,
 			"frame-src 'self' https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com",

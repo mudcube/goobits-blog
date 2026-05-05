@@ -9,3 +9,17 @@ export type D1DatabaseLike = {
 	prepare(query: string): D1PreparedStatement
 }
 
+export type R2PutOptions = {
+	httpMetadata?: { contentType?: string; cacheControl?: string }
+	customMetadata?: Record<string, string>
+}
+
+export type R2BucketLike = {
+	put(
+		key: string,
+		value: ArrayBuffer | ArrayBufferView | ReadableStream | string,
+		options?: R2PutOptions
+	): Promise<unknown>
+	delete(key: string): Promise<void>
+}
+

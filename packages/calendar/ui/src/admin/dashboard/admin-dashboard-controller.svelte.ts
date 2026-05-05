@@ -30,6 +30,8 @@ import {
   updateAdminEventDetailsValue,
   updateAdminEventAttendanceValue,
   updateAdminEventMemoryValue,
+  uploadAdminEventHeroValue,
+  clearAdminEventHeroValue,
   deleteAdminEventValue,
   updateAdminProgram,
 } from "./admin-dashboard";
@@ -1144,6 +1146,61 @@ export function createAdminDashboardController(
     }
   }
 
+  function applyHeroImage(eventId: number, heroImageUrl: string | null) {
+    events = events.map((event) =>
+      event.id === eventId ? { ...event, heroImageUrl } : event,
+    );
+    recentEvents = recentEvents.map((event) =>
+      event.id === eventId ? { ...event, heroImageUrl } : event,
+    );
+    if (selectedEventDetail?.event.id === eventId) {
+      selectedEventDetail = {
+        ...selectedEventDetail,
+        event: { ...selectedEventDetail.event, heroImageUrl },
+      };
+    }
+  }
+
+  async function uploadEventHero(eventId: number, file: File) {
+    eventUpdatingId = eventId;
+    error = "";
+    try {
+      const result = await uploadAdminEventHeroValue(eventId, file);
+      if (!result.ok) {
+        error = result.error;
+        return null;
+      }
+      applyHeroImage(eventId, result.url);
+      return result.url;
+    } catch (err) {
+      if (onUnauthorized?.(err)) return null;
+      error = err instanceof Error ? err.message : "Failed to upload image";
+      return null;
+    } finally {
+      eventUpdatingId = null;
+    }
+  }
+
+  async function clearEventHero(eventId: number) {
+    eventUpdatingId = eventId;
+    error = "";
+    try {
+      const result = await clearAdminEventHeroValue(eventId);
+      if (!result.ok) {
+        error = result.error;
+        return false;
+      }
+      applyHeroImage(eventId, null);
+      return true;
+    } catch (err) {
+      if (onUnauthorized?.(err)) return false;
+      error = err instanceof Error ? err.message : "Failed to remove image";
+      return false;
+    } finally {
+      eventUpdatingId = null;
+    }
+  }
+
   async function deleteEvent(eventId: number) {
     eventUpdatingId = eventId;
     error = "";
@@ -1383,6 +1440,8 @@ export function createAdminDashboardController(
     updateEventDetails,
     updateEventAttendance,
     updateEventMemory,
+    uploadEventHero,
+    clearEventHero,
     deleteEvent,
     savePaymentDefaults,
     processSyncQueue,
