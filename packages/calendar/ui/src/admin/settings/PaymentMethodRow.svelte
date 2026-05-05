@@ -266,11 +266,11 @@
 						disabled={payment.paymentIntegrationBusy}
 						onclick={toggleCheckout}
 					>
-						<span class="payment-method-row__switch-track" aria-hidden="true">
-							<span class="payment-method-row__switch-knob"></span>
-						</span>
 						<span class="payment-method-row__switch-label">
 							{pendingOn && !checkout.enabled ? 'Setup…' : switchOn ? 'On' : 'Off'}
+						</span>
+						<span class="payment-method-row__switch-track" aria-hidden="true">
+							<span class="payment-method-row__switch-knob"></span>
 						</span>
 					</button>
 				</div>
@@ -736,8 +736,8 @@
 		font-weight: 500;
 		font-style: italic;
 		color: color-mix(in srgb, var(--text) 56%, transparent);
-		min-width: 1.5rem;
-		text-align: left;
+		min-width: 2.4rem;
+		text-align: right;
 	}
 	.payment-method-row__switch--on .payment-method-row__switch-track {
 		background: var(--admin-accent);

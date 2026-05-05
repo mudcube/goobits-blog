@@ -373,7 +373,7 @@
 			return
 		}
 		const beforeIds = new Set(invites.map((invite) => String(invite['id'] || invite['code'] || '')))
-		members.inviteEmail = `${inviteName}@invite.local`
+		members.inviteEmail = ''
 		await members.createInvite()
 		if (members.error) {
 			showToast(members.error)
@@ -398,15 +398,25 @@
 		return createInviteShareLink(window.location.origin, createdInviteCode)
 	}
 
-	function textCreatedInvite() {
+	async function textCreatedInvite() {
 		const url = createdInviteUrl()
 		if (!url) {
 			showToast("Couldn't create invite link")
 			return
 		}
+		if (navigator.share) {
+			try {
+				await navigator.share({
+					text: `Join me here: ${url}`,
+					url
+				})
+				return
+			} catch (error) {
+				if (error instanceof DOMException && error.name === 'AbortError') return
+			}
+		}
 		showToast('Opening Messages…')
-		const smsUrl = `sms:?&body=${encodeURIComponent(url)}`
-		window.open(smsUrl, '_self')
+		window.location.href = `sms:?body=${encodeURIComponent(url)}`
 	}
 
 	async function copyInviteWithToast(code: string) {
