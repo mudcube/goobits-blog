@@ -1,12 +1,11 @@
 import type { AdminBootstrap } from "@calendar/core";
+import { createProgramsController } from "../programs/programs-controller.svelte";
 import { createSyncController } from "../settings/sync-controller.svelte";
 import { DEFAULT_ADMIN_RULES, DEFAULT_ADMIN_STATS } from "../shared/admin";
 import {
   createAdminEventsBatch,
   deletePaymentIntegration,
-  deleteDashboardProgram,
   loadAdminEventsData,
-  loadAdminPrograms,
   loadAdminPaymentDefaults,
   loadPaymentIntegrations,
   loadAdminEventTemplates,
@@ -15,8 +14,6 @@ import {
   loadDashboardStatus,
   promoteWaitlistEntry,
   saveAdminPaymentDefaults,
-  reorderDashboardPrograms,
-  saveDashboardProgram,
   saveDashboardRules,
   savePayPalIntegration,
   saveSquareIntegration,
@@ -28,7 +25,6 @@ import {
   uploadAdminEventHeroValue,
   clearAdminEventHeroValue,
   deleteAdminEventValue,
-  updateAdminProgram,
 } from "./admin-dashboard";
 
 type UnauthorizedHandler = (error: unknown) => boolean;
@@ -135,6 +131,7 @@ export function createAdminDashboardController(
   let saved = $state(false);
   let saving = $state(false);
   const syncController = createSyncController({ onUnauthorized });
+  const programsController = createProgramsController({ onUnauthorized });
   let bookings = $state<unknown[]>([]);
   let paymentDefaults = $state<PaymentDefaults>(blankPaymentDefaults());
   let paymentIntegrations = $state<PaymentIntegrations>({
@@ -155,50 +152,6 @@ export function createAdminDashboardController(
   let stats = $state(DEFAULT_ADMIN_STATS);
   let loading = $state(true);
   let error = $state("");
-  let programs = $state<
-    Array<{
-      slug: string;
-      href: string;
-      label: string;
-      activityName: string;
-      pageTitle: string;
-      eyebrow: string;
-      heroTitleLines: string[];
-      heroSubtitle: string;
-      description: string;
-      icon: string;
-      eyebrowClass?: string | undefined;
-      glowClass?: string | undefined;
-      formGlowClass?: string | undefined;
-      serviceStatusNote?: string | undefined;
-      enabled: boolean;
-      sortOrder: number;
-    }>
-  >([]);
-  let programsLoading = $state(false);
-  let programsLoaded = $state(false);
-  let programUpdatingSlug = $state<string | null>(null);
-  let programSaving = $state(false);
-  let programDeleting = $state(false);
-  let selectedProgramSlug = $state<string | null>(null);
-  let programDraft = $state({
-    slug: "",
-    label: "",
-    activityName: "",
-    pageTitle: "",
-    eyebrow: "",
-    heroTitleLine1: "",
-    heroTitleLine2: "",
-    heroSubtitle: "",
-    description: "",
-    icon: "",
-    eyebrowClass: "",
-    glowClass: "",
-    formGlowClass: "",
-    serviceStatusNote: "",
-    enabled: true,
-    sortOrder: 0,
-  });
   let events = $state<
     Array<{
       id: number;
@@ -318,26 +271,26 @@ export function createAdminDashboardController(
     return Number.isFinite(date.getTime()) ? date.toISOString() : value;
   }
 
+  function alignEventDraftWithPrograms() {
+    const programs = programsController.programs;
+    const firstEnabled = programs.find((program) => program.enabled);
+    if (
+      firstEnabled &&
+      (!eventDraft.activitySlug ||
+        !programs.some(
+          (program) =>
+            program.slug === eventDraft.activitySlug && program.enabled,
+        ))
+    ) {
+      eventDraft = { ...eventDraft, activitySlug: firstEnabled.slug };
+    }
+  }
+
   function bootstrap(input: Partial<AdminBootstrap> | null | undefined) {
     if (!input) return;
     if (input.programs) {
-      programs = input.programs as typeof programs;
-      programsLoaded = true;
-      const firstProgram = programs[0];
-      if (!selectedProgramSlug && firstProgram) {
-        selectProgram(firstProgram.slug);
-      }
-      const firstEnabled = programs.find((program) => program.enabled);
-      if (
-        firstEnabled &&
-        (!eventDraft.activitySlug ||
-          !programs.some(
-            (program) =>
-              program.slug === eventDraft.activitySlug && program.enabled,
-          ))
-      ) {
-        eventDraft = { ...eventDraft, activitySlug: firstEnabled.slug };
-      }
+      programsController.applyPrograms(input.programs as never);
+      alignEventDraftWithPrograms();
     }
     if (input.upcoming) {
       events = input.upcoming as typeof events;
@@ -557,220 +510,8 @@ export function createAdminDashboardController(
   // below for backwards compat.
 
   async function loadPrograms() {
-    programsLoading = true;
-    error = "";
-    try {
-      const result = await loadAdminPrograms();
-      programs = result.programs;
-      error = result.error;
-      const firstProgram = programs[0];
-      if (!selectedProgramSlug && firstProgram) {
-        selectProgram(firstProgram.slug);
-      }
-      const firstEnabled = programs.find((program) => program.enabled);
-      if (
-        firstEnabled &&
-        (!eventDraft.activitySlug ||
-          !programs.some(
-            (program) =>
-              program.slug === eventDraft.activitySlug && program.enabled,
-          ))
-      ) {
-        eventDraft = { ...eventDraft, activitySlug: firstEnabled.slug };
-      }
-    } catch (err) {
-      if (onUnauthorized?.(err)) return;
-      error = err instanceof Error ? err.message : "Failed to load programs";
-    } finally {
-      programsLoading = false;
-      programsLoaded = true;
-    }
-  }
-
-  async function toggleProgram(slug: string, nextEnabled: boolean) {
-    programUpdatingSlug = slug;
-    error = "";
-    try {
-      const result = await updateAdminProgram({ slug, enabled: nextEnabled });
-      if (!result.ok) {
-        error = result.error;
-        return;
-      }
-      programs = programs.map((program) =>
-        program.slug === slug ? { ...program, enabled: nextEnabled } : program,
-      );
-    } catch (err) {
-      if (onUnauthorized?.(err)) return;
-      error = err instanceof Error ? err.message : "Failed to update program";
-    } finally {
-      programUpdatingSlug = null;
-    }
-  }
-
-  function selectProgram(slug: string) {
-    const program = programs.find((item) => item.slug === slug);
-    if (!program) return;
-    selectedProgramSlug = slug;
-    programDraft = {
-      slug: program.slug,
-      label: program.label,
-      activityName: program.activityName,
-      pageTitle: program.pageTitle,
-      eyebrow: program.eyebrow,
-      heroTitleLine1: program.heroTitleLines[0] ?? "",
-      heroTitleLine2: program.heroTitleLines[1] ?? "",
-      heroSubtitle: program.heroSubtitle,
-      description: program.description,
-      icon: program.icon,
-      eyebrowClass: program.eyebrowClass ?? "",
-      glowClass: program.glowClass ?? "",
-      formGlowClass: program.formGlowClass ?? "",
-      serviceStatusNote: program.serviceStatusNote ?? "",
-      enabled: program.enabled,
-      sortOrder: program.sortOrder,
-    };
-  }
-
-  function newProgramDraft() {
-    const existingSlugs = new Set(programs.map((program) => program.slug));
-    let slug = "new-program";
-    let suffix = 2;
-    while (existingSlugs.has(slug)) {
-      slug = `new-program-${suffix}`;
-      suffix += 1;
-    }
-    selectedProgramSlug = null;
-    programDraft = {
-      slug,
-      label: "New Program",
-      activityName: "New Program",
-      pageTitle: "New Program",
-      eyebrow: "New Program",
-      heroTitleLine1: "Make it yours.",
-      heroTitleLine2: "",
-      heroSubtitle:
-        "Set up the page, save it as a draft, then click days to schedule events.",
-      description: "",
-      icon: "✨",
-      eyebrowClass: "",
-      glowClass: "",
-      formGlowClass: "",
-      serviceStatusNote: "",
-      enabled: true,
-      sortOrder:
-        (programs.length ? programs[programs.length - 1]!.sortOrder : 0) + 10,
-    };
-  }
-
-  async function saveProgram() {
-    programSaving = true;
-    error = "";
-    try {
-      const result = await saveDashboardProgram({
-        slug: programDraft.slug.trim(),
-        label: programDraft.label.trim(),
-        activityName: programDraft.activityName.trim(),
-        pageTitle: programDraft.pageTitle.trim(),
-        eyebrow: programDraft.eyebrow.trim(),
-        heroTitleLine1: programDraft.heroTitleLine1.trim(),
-        heroTitleLine2: programDraft.heroTitleLine2.trim(),
-        heroSubtitle: programDraft.heroSubtitle.trim(),
-        description: programDraft.description.trim(),
-        icon: programDraft.icon.trim(),
-        eyebrowClass: programDraft.eyebrowClass.trim(),
-        glowClass: programDraft.glowClass.trim(),
-        formGlowClass: programDraft.formGlowClass.trim(),
-        serviceStatusNote: programDraft.serviceStatusNote.trim(),
-        enabled: programDraft.enabled,
-        sortOrder: programDraft.sortOrder,
-      });
-      if (!result.ok) {
-        error = result.error;
-        return;
-      }
-      await loadPrograms();
-      selectProgram(programDraft.slug.trim());
-    } catch (err) {
-      if (onUnauthorized?.(err)) return;
-      error = err instanceof Error ? err.message : "Failed to save program";
-    } finally {
-      programSaving = false;
-    }
-  }
-
-  async function persistProgramOrder(orderedSlugs: string[]) {
-    const previousPrograms = programs;
-    const orders = orderedSlugs.map((slug, orderIndex) => ({
-      slug,
-      sortOrder: (orderIndex + 1) * 10,
-    }));
-    const nextSortOrders = new Map(orders.map((o) => [o.slug, o.sortOrder]));
-    programs = programs.map((program) => ({
-      ...program,
-      sortOrder: nextSortOrders.get(program.slug) ?? program.sortOrder,
-    }));
-
-    programSaving = true;
-    error = "";
-    try {
-      const result = await reorderDashboardPrograms(orders);
-      if (!result.ok) {
-        error = result.error;
-        programs = previousPrograms;
-        return;
-      }
-      await loadPrograms();
-    } catch (err) {
-      programs = previousPrograms;
-      if (onUnauthorized?.(err)) return;
-      error = err instanceof Error ? err.message : "Failed to reorder programs";
-    } finally {
-      programSaving = false;
-    }
-  }
-
-  async function moveProgram(slug: string, direction: "up" | "down") {
-    const current = [...programs].sort((a, b) => a.sortOrder - b.sortOrder);
-    const index = current.findIndex((program) => program.slug === slug);
-    const nextIndex = direction === "up" ? index - 1 : index + 1;
-    if (index < 0 || nextIndex < 0 || nextIndex >= current.length) return;
-
-    const reordered = [...current];
-    const [item] = reordered.splice(index, 1);
-    if (!item) return;
-    reordered.splice(nextIndex, 0, item);
-
-    await persistProgramOrder(reordered.map((p) => p.slug));
-  }
-
-  async function reorderPrograms(orderedSlugs: string[]) {
-    const known = new Set(programs.map((p) => p.slug));
-    const filtered = orderedSlugs.filter((slug) => known.has(slug));
-    if (filtered.length === 0) return;
-    await persistProgramOrder(filtered);
-  }
-
-  async function deleteProgram() {
-    const slug = selectedProgramSlug;
-    if (!slug) return;
-    programDeleting = true;
-    error = "";
-    try {
-      const result = await deleteDashboardProgram(slug);
-      if (!result.ok) {
-        error = result.error;
-        return;
-      }
-      await loadPrograms();
-      const firstProgram = programs[0];
-      if (firstProgram) selectProgram(firstProgram.slug);
-      else newProgramDraft();
-    } catch (err) {
-      if (onUnauthorized?.(err)) return;
-      error = err instanceof Error ? err.message : "Failed to delete program";
-    } finally {
-      programDeleting = false;
-    }
+    await programsController.load();
+    alignEventDraftWithPrograms();
   }
 
   async function loadEvents() {
@@ -1241,40 +982,40 @@ export function createAdminDashboardController(
       return loading;
     },
     get error() {
-      return error || syncController.error;
+      return error || syncController.error || programsController.error;
     },
     get programs() {
-      return programs;
+      return programsController.programs;
     },
     get programsLoading() {
-      return programsLoading;
+      return programsController.programsLoading;
     },
     get programsLoaded() {
-      return programsLoaded;
+      return programsController.programsLoaded;
     },
     get programUpdatingSlug() {
-      return programUpdatingSlug;
+      return programsController.programUpdatingSlug;
     },
     get selectedProgramSlug() {
-      return selectedProgramSlug;
+      return programsController.selectedProgramSlug;
     },
     get programDraft() {
-      return programDraft;
+      return programsController.programDraft;
     },
     set programDraft(value) {
-      programDraft = value;
+      programsController.programDraft = value;
     },
     get programSaving() {
-      return programSaving;
+      return programsController.programSaving;
     },
     get programDeleting() {
-      return programDeleting;
+      return programsController.programDeleting;
     },
     get events() {
       return events;
     },
     get enabledPrograms() {
-      return programs.filter((program) => program.enabled);
+      return programsController.enabledPrograms;
     },
     get eventsLoading() {
       return eventsLoading;
@@ -1320,13 +1061,13 @@ export function createAdminDashboardController(
     connectPayPal,
     connectSquare,
     disconnectPaymentIntegration,
-    toggleProgram,
-    selectProgram,
-    newProgramDraft,
-    saveProgram,
-    moveProgram,
-    reorderPrograms,
-    deleteProgram,
+    toggleProgram: programsController.toggleProgram,
+    selectProgram: programsController.selectProgram,
+    newProgramDraft: programsController.newProgramDraft,
+    saveProgram: programsController.saveProgram,
+    moveProgram: programsController.moveProgram,
+    reorderPrograms: programsController.reorderPrograms,
+    deleteProgram: programsController.deleteProgram,
     createEvents,
     applyTemplate,
     openEventDetail,
