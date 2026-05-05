@@ -17,6 +17,7 @@
 		type PaymentMethodKey
 	} from './payment-settings-controller.svelte'
 	import AdminInlineConfirm from '../shared/AdminInlineConfirm.svelte'
+import Tooltip from '../../shared/Tooltip.svelte'
 
 	type PaymentMethodMeta = {
 		value: PaymentMethodKey
@@ -413,15 +414,16 @@
 						{/if}
 					</div>
 					{#if configured}
-						<button
-							type="button"
-							class="admin-ui-btn admin-ui-btn--icon"
-							aria-label={`Remove ${meta.label}`}
-							title={`Remove ${meta.label}`}
-							onclick={() => onRequestRemove(meta.value)}
-						>
-							<Trash2 size={14} strokeWidth={2} />
-						</button>
+						<Tooltip text={`Remove ${meta.label}`} placement="left">
+							<button
+								type="button"
+								class="admin-ui-btn admin-ui-btn--icon"
+								aria-label={`Remove ${meta.label}`}
+								onclick={() => onRequestRemove(meta.value)}
+							>
+								<Trash2 size={14} strokeWidth={2} />
+							</button>
+						</Tooltip>
 					{/if}
 				{/if}
 			</div>

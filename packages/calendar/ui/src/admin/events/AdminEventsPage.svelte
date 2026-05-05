@@ -10,6 +10,7 @@
 	import { formatEventDayLabel } from '@calendar/ui/shared'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import AdminLoadingText from '@calendar/ui/admin/shared/AdminLoadingText.svelte'
+	import Tooltip from '@calendar/ui/shared/Tooltip.svelte'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { withAdminRoute } from '@calendar/ui/config'
@@ -24,7 +25,7 @@
 	const adminMockCatalog = getAdminMockCatalog()
 	let mockProgramOrder = $state<string[]>([])
 	const rawProgramsSource = $derived(mockMode ? adminMockCatalog.programs : dashboard.programs)
-	const programsSource = $derived(
+	const baseProgramsSource = $derived(
 		rawProgramsSource.toSorted((a, b) => {
 			if (mockMode && mockProgramOrder.length > 0) {
 				return mockProgramOrder.indexOf(a.slug) - mockProgramOrder.indexOf(b.slug)
@@ -32,10 +33,17 @@
 			return a.sortOrder - b.sortOrder
 		})
 	)
+	const programsSource = $derived.by(() => {
+		if (!previewOrder) return baseProgramsSource
+		const lookup = new Map(baseProgramsSource.map((program) => [program.slug, program]))
+		return previewOrder
+			.map((slug) => lookup.get(slug))
+			.filter((program): program is (typeof baseProgramsSource)[number] => !!program)
+	})
 	const eventsSource = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
 	const recentEventsSource = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
 	let draggingSlug = $state<string | null>(null)
-	let dragOverSlug = $state<string | null>(null)
+	let previewOrder = $state<string[] | null>(null)
 
 	type EventCardExtra = {
 		startsAt: string
@@ -101,58 +109,62 @@
 		return item.extra as EventCardExtra
 	}
 
-	function currentOrder() {
-		return programsSource.map((program) => program.slug)
+	function baseOrder() {
+		return baseProgramsSource.map((program) => program.slug)
 	}
 
-	async function commitOrder(slug: string, targetSlug: string) {
-		if (slug === targetSlug) return
-		const order = currentOrder()
-		const fromIndex = order.indexOf(slug)
-		const toIndex = order.indexOf(targetSlug)
-		if (fromIndex < 0 || toIndex < 0) return
+	function reorderArray(order: string[], from: number, to: number): string[] {
+		if (from < 0 || to < 0 || from === to) return order
 		const next = [...order]
-		const [item] = next.splice(fromIndex, 1)
-		if (!item) return
-		next.splice(toIndex, 0, item)
+		const [item] = next.splice(from, 1)
+		if (!item) return order
+		next.splice(to, 0, item)
+		return next
+	}
+
+	async function persistOrder(order: string[]) {
 		if (mockMode) {
-			mockProgramOrder = next
+			mockProgramOrder = order
 			return
 		}
-		await dashboard.reorderPrograms(next)
+		await dashboard.reorderPrograms(order)
 	}
 
 	function onDragStart(event: DragEvent, slug: string) {
 		draggingSlug = slug
+		previewOrder = baseOrder()
 		if (event.dataTransfer) {
 			event.dataTransfer.effectAllowed = 'move'
 			event.dataTransfer.setData('text/plain', slug)
 		}
 	}
 
-	function onDragOver(event: DragEvent, slug: string) {
-		if (!draggingSlug || draggingSlug === slug) return
+	function onDragOver(event: DragEvent, targetSlug: string) {
+		if (!draggingSlug || !previewOrder) return
 		event.preventDefault()
 		if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
-		dragOverSlug = slug
+		if (draggingSlug === targetSlug) return
+		const fromIndex = previewOrder.indexOf(draggingSlug)
+		const toIndex = previewOrder.indexOf(targetSlug)
+		if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return
+		previewOrder = reorderArray(previewOrder, fromIndex, toIndex)
 	}
 
-	function onDragLeave(slug: string) {
-		if (dragOverSlug === slug) dragOverSlug = null
-	}
-
-	function onDrop(event: DragEvent, slug: string) {
+	function onDrop(event: DragEvent) {
 		event.preventDefault()
+		const finalOrder = previewOrder
 		const sourceSlug = draggingSlug
 		draggingSlug = null
-		dragOverSlug = null
-		if (!sourceSlug) return
-		void commitOrder(sourceSlug, slug)
+		previewOrder = null
+		if (!sourceSlug || !finalOrder) return
+		const original = baseOrder()
+		if (finalOrder.join('|') === original.join('|')) return
+		void persistOrder(finalOrder)
 	}
 
 	function onDragEnd() {
 		draggingSlug = null
-		dragOverSlug = null
+		previewOrder = null
 	}
 </script>
 
@@ -177,13 +189,11 @@
 					<div
 						class="social-events__program"
 						class:social-events__program--dragging={draggingSlug === program.slug}
-						class:social-events__program--drop-target={dragOverSlug === program.slug && draggingSlug !== program.slug}
 						draggable="true"
 						role="listitem"
 						ondragstart={(event) => onDragStart(event, program.slug)}
 						ondragover={(event) => onDragOver(event, program.slug)}
-						ondragleave={() => onDragLeave(program.slug)}
-						ondrop={(event) => onDrop(event, program.slug)}
+						ondrop={onDrop}
 						ondragend={onDragEnd}
 					>
 						<button
@@ -204,9 +214,11 @@
 								<div class="social-events__program-detail">{program.enabled ? 'Live' : 'Draft'}</div>
 							</div>
 						</button>
-						<span class="social-events__program-grip" aria-hidden="true" title="Drag to reorder">
-							<GripVertical size={16} strokeWidth={1.8} />
-						</span>
+						<Tooltip text="Drag to reorder" placement="left">
+							<span class="social-events__program-grip" aria-hidden="true">
+								<GripVertical size={16} strokeWidth={1.8} />
+							</span>
+						</Tooltip>
 					</div>
 				{/each}
 			</div>
@@ -297,17 +309,7 @@
 
 	.social-events__program--dragging {
 		opacity: 0.4;
-	}
-
-	.social-events__program--drop-target::before {
-		content: '';
-		position: absolute;
-		left: 0;
-		right: 0;
-		top: -1px;
-		height: 2px;
-		background: var(--admin-accent);
-		z-index: 1;
+		background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
 	}
 
 	.social-events__program:hover {

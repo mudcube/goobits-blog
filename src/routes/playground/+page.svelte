@@ -8,13 +8,19 @@
 		data: { items: ParkingItem[] }
 	}>()
 
-	const parkingItems = $derived(data.items)
+	const currentHrefs = new Set([
+		'/playground/schedule-recurring-grid',
+		'/playground/schedule-group-heatmap'
+	])
+	const isCurrentItem = (item: ParkingItem) => currentHrefs.has(item.href)
+	const currentItems = $derived(data.items.filter(isCurrentItem))
+	const parkingItems = $derived(data.items.filter((item: ParkingItem) => !isCurrentItem(item)))
 	const heroCopy = $derived(
-		parkingItems.length === 0
+		data.items.length === 0
 			? { title: "You're done.", subtitle: 'Good job. Nothing here needs fixing today.' }
 			: {
 					title: 'Pick what to play with.',
-					subtitle: `${parkingItems.length} sketch${parkingItems.length === 1 ? '' : 'es'} parked below.`
+					subtitle: `${currentItems.length} current, ${parkingItems.length} future.`
 				}
 	)
 </script>
@@ -32,6 +38,26 @@
 		compact
 		className="pg__hero"
 	/>
+
+	<section class="pg__current">
+		<header class="pg__section-head">
+			<span class="pg__eyebrow">Now</span>
+			<h2 class="pg__section-title">Current work</h2>
+			<p class="pg__section-sub">Sketches actively informing the scheduling product.</p>
+		</header>
+
+		<div class="pg__row-list">
+			{#each currentItems as item (item.href)}
+				<ChevronRowCard href={item.href} ariaLabel={`Open ${item.title}`}>
+					{#snippet start()}<span class="pg__dot pg__dot--current" aria-hidden="true">·</span>{/snippet}
+					<div class="pg__row">
+						<span class="pg__row-name">{item.title}</span>
+						<span class="pg__row-vibe">{item.vibe}</span>
+					</div>
+				</ChevronRowCard>
+			{/each}
+		</div>
+	</section>
 
 	<section class="pg__future">
 		<header class="pg__section-head">
@@ -69,6 +95,11 @@
 
 	:global(.pg__hero.ui-hero) {
 		margin-bottom: 0;
+	}
+
+	.pg__current {
+		display: grid;
+		gap: 0.85rem;
 	}
 
 	.pg__future {
@@ -116,6 +147,9 @@
 		font-size: 1rem;
 		color: color-mix(in srgb, var(--text) 32%, transparent);
 		line-height: 1;
+	}
+	.pg__dot--current {
+		color: var(--brand-primary);
 	}
 	.pg__row {
 		display: flex;

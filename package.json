@@ -59,6 +59,7 @@
     "audit:static-orphans": "node scripts/audit/report-orphan-static-assets.mjs",
     "perf:lighthouse": "pnpm dlx @lhci/cli autorun --config=./lighthouserc.cjs",
     "perf:lighthouse:collect": "pnpm dlx @lhci/cli collect --config=./lighthouserc.cjs",
+    "perf:lighthouse:pages": "node scripts/audit/lighthouse-pages.mjs",
     "images:journal:generate": "node scripts/images/generate-journal-hero-variants.mjs",
     "seed:calendar": "node scripts/seed/calendar-social.mjs",
     "calendar:sync": "node ops/cron/calendar-sync.mjs",

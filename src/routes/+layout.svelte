@@ -137,10 +137,17 @@
 		min-height: 44px;
 		padding: 0.15rem;
 		color: var(--header-nav-color, var(--color-white));
+		line-height: 1;
 		text-decoration: none;
+		vertical-align: middle;
 		transition:
 			color 0.22s ease,
 			transform 0.22s ease;
+	}
+
+	:global(.layout-header__utility-link svg) {
+		display: block;
+		flex-shrink: 0;
 	}
 
 	:global(.layout-header__utility-link:hover) {

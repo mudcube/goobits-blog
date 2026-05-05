@@ -2,6 +2,7 @@
 	import { onMount, type Snippet } from 'svelte'
 	import { fly } from 'svelte/transition'
 	import { cubicOut } from 'svelte/easing'
+	import Tooltip from './Tooltip.svelte'
 
 	type ProfileUser = {
 		name?: string | null
@@ -61,27 +62,29 @@
 </script>
 
 <div bind:this={rootEl} class={`profile-menu ${className}`.trim()}>
-	<button
-		type="button"
-		class="profile-menu__avatar"
-		aria-label={ariaLabel}
-		aria-expanded={open}
-		aria-haspopup="menu"
-		onclick={() => (open = !open)}
-	>
-		{#if user?.avatarUrl && !avatarBroken}
-			<img
-				src={user.avatarUrl}
-				alt=""
-				referrerpolicy="no-referrer"
-				loading="lazy"
-				decoding="async"
-				onerror={() => (avatarBroken = true)}
-			/>
-		{:else}
-			<span class="profile-menu__initials">{initials}</span>
-		{/if}
-	</button>
+	<Tooltip text={open ? '' : displayName} placement="bottom">
+		<button
+			type="button"
+			class="profile-menu__avatar"
+			aria-label={ariaLabel}
+			aria-expanded={open}
+			aria-haspopup="menu"
+			onclick={() => (open = !open)}
+		>
+			{#if user?.avatarUrl && !avatarBroken}
+				<img
+					src={user.avatarUrl}
+					alt=""
+					referrerpolicy="no-referrer"
+					loading="lazy"
+					decoding="async"
+					onerror={() => (avatarBroken = true)}
+				/>
+			{:else}
+				<span class="profile-menu__initials">{initials}</span>
+			{/if}
+		</button>
+	</Tooltip>
 	{#if open}
 		<div
 			class="profile-menu__panel"
