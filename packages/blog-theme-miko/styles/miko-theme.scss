@@ -700,9 +700,14 @@
 
 .miko-blog__entry-body {
 	width: 100%;
-	max-width: 48rem;
-	margin: 0;
+	max-width: 80rem;
+	margin: 0 auto;
 	color: var(--showcase-text);
+	/* Container query scope so the prose grid adapts to its actual
+	 * container width, not the viewport — works whether the entry
+	 * lives at the article root or embedded in a sidebar later. */
+	container-type: inline-size;
+	container-name: journal-entry;
 }
 
 .miko-blog__prose {
@@ -724,20 +729,48 @@
 	line-height: 1.75;
 }
 
-/* Body images: never upscale beyond intrinsic width. BlogProse defaults
- * to width: 100% on standalone images, which stretches small diagrams /
- * screenshots beyond their natural resolution and produces blur on
- * narrow screens. We respect the intrinsic width and only constrain
- * by the column width. Smaller images stay at their natural size and
- * center. (Plain SCSS — no :global() wrapper; that's a Svelte-only
- * directive and would silently invalidate the rule.) */
+/* ---------- Journal article grid ---------- *
+ * Three named tracks — `full`, `wide`, `text`:
+ *   full: viewport edge to edge (heroes only)
+ *   wide: 6rem of breathing room beyond the text column on each side
+ *   text: capped at 65ch for reading comfort
+ *
+ * Default content sits at `text`. Standalone images opt into `wide`
+ * so a 900px photo can present larger on wide screens without forcing
+ * paragraphs to also stretch. The min() on the text column means the
+ * column collapses gracefully on narrow viewports without the wide /
+ * full tracks starving it.
+ */
+.miko-blog__prose .blog-prose {
+	display: grid;
+	grid-template-columns:
+		[full-start] minmax(1rem, 1fr)
+		[wide-start]  minmax(0, 6rem)
+		[text-start]  min(100% - 2rem, 65ch) [text-end]
+		              minmax(0, 6rem) [wide-end]
+		minmax(1rem, 1fr) [full-end];
+}
+
+.miko-blog__prose .blog-prose > * {
+	grid-column: text;
+	min-width: 0;
+}
+
+/* Standalone images break out to `wide` — a 600px photo gets ~700px
+ * to present on a roomy viewport, but stays at intrinsic width on
+ * smaller screens (max-width: 100%, width: auto below). */
 .miko-blog__prose .blog-prose > p:has(> img:only-child),
-.miko-blog__prose .blog-prose > p:has(> a:only-child > img:only-child) {
+.miko-blog__prose .blog-prose > p:has(> a:only-child > img:only-child),
+.miko-blog__prose .blog-prose > figure {
+	grid-column: wide;
 	text-align: center;
 }
 
+/* Image rules: never upscale past intrinsic width. The grid track
+ * provides the upper bound; width: auto picks intrinsic up to that. */
 .miko-blog__prose .blog-prose > p:has(> img:only-child) img,
-.miko-blog__prose .blog-prose > p:has(> a:only-child > img:only-child) img {
+.miko-blog__prose .blog-prose > p:has(> a:only-child > img:only-child) img,
+.miko-blog__prose .blog-prose > figure img {
 	display: inline-block;
 	width: auto;
 	max-width: 100%;
@@ -746,10 +779,42 @@
 	object-fit: contain;
 }
 
-/* Inline images that share a paragraph with text or other content: same rule. */
-.miko-blog__prose .blog-prose img {
+/* Inline images that share a paragraph with text. */
+.miko-blog__prose .blog-prose p img {
 	max-width: 100%;
 	height: auto;
+}
+
+/* Typography polish: balanced headings, pretty paragraph wrapping. */
+.miko-blog__prose .blog-prose > h1,
+.miko-blog__prose .blog-prose > h2,
+.miko-blog__prose .blog-prose > h3,
+.miko-blog__prose .blog-prose > h4 {
+	text-wrap: balance;
+}
+
+.miko-blog__prose .blog-prose > p {
+	text-wrap: pretty;
+}
+
+/* Drop cap on the first paragraph after any leading hr/header (purely
+ * decorative — drops automatically if the first child isn't a <p>). */
+.miko-blog__prose .blog-prose > p:first-of-type::first-letter {
+	font-family: var(--font-display, var(--font-serif));
+	font-size: 3.4em;
+	font-weight: 400;
+	line-height: 0.95;
+	float: left;
+	margin: 0.05em 0.18em 0 0;
+	color: color-mix(in srgb, var(--showcase-text) 88%, transparent);
+}
+
+/* Pull the drop cap back at narrow widths so it doesn't dominate
+ * the column. */
+@container journal-entry (max-width: 32rem) {
+	.miko-blog__prose .blog-prose > p:first-of-type::first-letter {
+		font-size: 2.8em;
+	}
 }
 
 /* ---------- Entry footer band (tags + related + back link) ---------- */
