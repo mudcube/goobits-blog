@@ -383,6 +383,49 @@ export function createAdminDashboardController(
     return Number.isFinite(date.getTime()) ? date.toISOString() : value;
   }
 
+  function bootstrap(input: {
+    programs?: typeof programs;
+    upcoming?: typeof events;
+    recent?: typeof recentEvents;
+    paymentDefaults?: Parameters<typeof normalizePaymentDefaults>[0];
+    paymentIntegrations?: typeof paymentIntegrations;
+  } | null | undefined) {
+    if (!input) return;
+    if (input.programs) {
+      programs = input.programs;
+      programsLoaded = true;
+      const firstProgram = programs[0];
+      if (!selectedProgramSlug && firstProgram) {
+        selectProgram(firstProgram.slug);
+      }
+      const firstEnabled = programs.find((program) => program.enabled);
+      if (
+        firstEnabled &&
+        (!eventDraft.activitySlug ||
+          !programs.some(
+            (program) =>
+              program.slug === eventDraft.activitySlug && program.enabled,
+          ))
+      ) {
+        eventDraft = { ...eventDraft, activitySlug: firstEnabled.slug };
+      }
+    }
+    if (input.upcoming) {
+      events = input.upcoming;
+      eventsLoaded = true;
+    }
+    if (input.recent) {
+      recentEvents = input.recent;
+      eventsLoaded = true;
+    }
+    if (input.paymentDefaults) {
+      paymentDefaults = normalizePaymentDefaults(input.paymentDefaults);
+    }
+    if (input.paymentIntegrations) {
+      paymentIntegrations = input.paymentIntegrations;
+    }
+  }
+
   async function loadStatus() {
     try {
       const dashboardStatus = await loadDashboardStatus();
@@ -1463,6 +1506,7 @@ export function createAdminDashboardController(
     get selectedEventDetail() {
       return selectedEventDetail;
     },
+    bootstrap,
     loadStatus,
     loadBookings,
     loadPaymentDefaults,

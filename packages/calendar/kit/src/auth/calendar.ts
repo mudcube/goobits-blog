@@ -3,7 +3,7 @@ import { createCookieLoginContext, normalizeSafeRedirectPath } from '@goobits/au
 import { GoogleProvider, AppleProvider } from '@goobits/auth/providers'
 import type { OAuthProfile, OAuthTokens, RequestEventLike, User } from '@goobits/auth/types'
 import { dev } from '$app/environment'
-import { consumeInvite, getCalendarConfig, hasUserRedeemedAnyInvite, validateInvite } from '@calendar/core'
+import { consumeInvite, getCalendarConfig, hasUserRedeemedAnyInvite, replaceUserProgramAccess, validateInvite } from '@calendar/core'
 import { redirect } from '@sveltejs/kit'
 import type { Cookies } from '@sveltejs/kit'
 import { getDevDb } from '../dev/devDb'
@@ -182,6 +182,9 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 							})
 							if (!consumed.ok) {
 								throw redirect(302, `${config.routes.calendarLoginPath}?error=invite_${consumed.reason}`)
+							}
+							if (result.invite.target_activity_slug) {
+								await replaceUserProgramAccess(db, String(user.id), [result.invite.target_activity_slug])
 							}
 						}
 					}

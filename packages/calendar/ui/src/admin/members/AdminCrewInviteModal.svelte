@@ -2,14 +2,25 @@
   import { Send, Copy } from "@lucide/svelte";
   import { onMount } from "svelte";
 
+  type ActivityOption = {
+    slug: string;
+    label: string;
+    activityName?: string;
+    icon?: string;
+    enabled?: boolean;
+  };
+
   const {
     open = false,
     step = 1,
     inviteName = "",
     inviteUrl = "",
+    activitySlug = "gym",
+    activities = [],
     anchorRect = null,
     onClose,
     onNameChange,
+    onActivityChange,
     onCreate,
     onCopy,
     onText,
@@ -19,6 +30,8 @@
     step?: 1 | 2;
     inviteName?: string;
     inviteUrl?: string;
+    activitySlug?: string;
+    activities?: ActivityOption[];
     anchorRect?: {
       left: number;
       top: number;
@@ -29,6 +42,7 @@
     } | null;
     onClose: () => void;
     onNameChange: (value: string) => void;
+    onActivityChange: (value: string) => void;
     onCreate: () => void;
     onCopy: () => void;
     onText: () => void;
@@ -80,6 +94,7 @@
   const popoverStyle = $derived(
     `width:${placement.width}px;left:${placement.left}px;top:${placement.top}px;--invite-arrow-left:${placement.arrowLeft}px;`,
   );
+  const enabledActivities = $derived(activities.filter((activity: ActivityOption) => activity.enabled !== false));
 </script>
 
 <svelte:window
@@ -109,7 +124,7 @@
         <div class="admin-crew-modal__body">
           <div class="admin-crew-modal__title">Create invite link</div>
           <div class="admin-crew-modal__field">
-            <label for="crew-invite-name">Who's this for?</label>
+            <label for="crew-invite-name">Label</label>
             <input
               id="crew-invite-name"
               class="ui-form-control"
@@ -119,6 +134,22 @@
               oninput={(event) =>
                 onNameChange((event.currentTarget as HTMLInputElement).value)}
             />
+          </div>
+          <div class="admin-crew-modal__field">
+            <label for="crew-invite-activity">Calendar access</label>
+            <select
+              id="crew-invite-activity"
+              class="ui-form-control"
+              value={activitySlug}
+              onchange={(event) =>
+                onActivityChange((event.currentTarget as HTMLSelectElement).value)}
+            >
+              {#each enabledActivities as activity}
+                <option value={activity.slug}>
+                  {activity.icon ? `${activity.icon} ` : ""}{activity.activityName || activity.label}
+                </option>
+              {/each}
+            </select>
           </div>
           <div class="admin-crew-modal__actions">
             <button type="button" class="admin-ui-btn" onclick={onClose}
@@ -156,7 +187,7 @@
             </button>
           </div>
           <p class="admin-crew-modal__hint">
-            Share this by text or copy it below. Uses and expiry follow your current invite settings.
+            Share this by text or copy it below. This link only grants access to the selected calendar.
           </p>
           <div class="admin-crew-modal__actions">
             <button

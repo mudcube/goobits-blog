@@ -147,6 +147,24 @@ export function createPaymentSettingsController(
     primary = pickFallbackPrimary();
   }
 
+  function bootstrap(input: PaymentDefaultsShape | null | undefined) {
+    if (!input) return;
+    const nextHandles = readHandles(
+      input.handles,
+      input.primaryProvider ?? input.provider ?? "",
+      input.handle ?? "",
+    );
+    handles = nextHandles;
+    const explicit = normalizeMethod(input.primaryProvider ?? input.provider);
+    primary =
+      explicit && nextHandles[explicit].trim()
+        ? explicit
+        : pickFallbackPrimary();
+    initialSnapshot = snapshot(handles, primary);
+    suspendAutosave = false;
+    loaded = true;
+  }
+
   async function load() {
     const dashboard = options.dashboard();
     if (options.mockMode()) {
@@ -448,6 +466,7 @@ export function createPaymentSettingsController(
     get paymentIntegrationBusy() {
       return paymentIntegrationBusy;
     },
+    bootstrap,
     load,
     dispose,
     integrationSourceLabel,

@@ -127,6 +127,7 @@ import {
 import {
 	listUserProgramAccess,
 	setUserProgramAccess,
+	replaceUserProgramAccess,
 	hasUserProgramAccess,
 	type CalendarUserProgramAccess
 } from './access/user-program-access.ts'
@@ -320,6 +321,7 @@ export {
 	hasUserRedeemedAnyInvite,
 	listUserProgramAccess,
 	setUserProgramAccess,
+	replaceUserProgramAccess,
 	hasUserProgramAccess,
 	getAdminPaymentDefaults,
 	setAdminPaymentDefaults,

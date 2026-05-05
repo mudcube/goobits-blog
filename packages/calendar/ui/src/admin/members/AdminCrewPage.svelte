@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
-	import { onMount } from 'svelte'
+	import { onMount, untrack } from 'svelte'
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminMembersController } from '@calendar/ui/admin/members/admin-members.svelte'
@@ -21,9 +21,24 @@
 	import type { CalendarAdminUser } from '@calendar/ui/api/calendar'
 	import { adminActionHandlers, type AdminInviteAnchorRect } from '../shell/state'
 
-	const { data } = $props<{ data: { user: unknown | null } }>()
+	type CrewBootstrap = {
+		programs?: unknown[]
+		upcoming?: unknown[]
+		recent?: unknown[]
+		paymentDefaults?: unknown
+		paymentIntegrations?: unknown
+		invites?: unknown[]
+		users?: unknown[]
+	}
+	const { data } = $props<{ data: { user: unknown | null; bootstrap?: CrewBootstrap | null } }>()
 	const members = createAdminMembersController({ onUnauthorized: handleUnauthorizedSessionError })
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
+	untrack(() => {
+		if (data.bootstrap) {
+			dashboard.bootstrap(data.bootstrap as never)
+			members.bootstrap(data.bootstrap as never)
+		}
+	})
 	const authed = $derived(!!data.user)
 	const mockMode = $derived(isAdminMockMode($page.url))
 	const adminMockCatalog = getAdminMockCatalog()
@@ -32,6 +47,9 @@
 		id: string | number
 		code: string
 		email: string | null
+		label?: string | null
+		target_activity_slug?: string | null
+		redirect_path?: string | null
 		created_at: number
 		uses_remaining?: number | null
 		expires_at?: number | null
@@ -53,6 +71,7 @@
 	let inviteModalOpen = $state(false)
 	let inviteModalStep = $state<1 | 2>(1)
 	let inviteNameDraft = $state('')
+	let inviteActivitySlug = $state('gym')
 	let createdInviteId = $state('')
 	let createdInviteCode = $state('')
 	let inviteAnchorRect = $state<AdminInviteAnchorRect | null>(null)
@@ -73,6 +92,7 @@
 	$effect(() => {
 		if (!authed) return
 		if (mockMode) return
+		if (data.bootstrap) return
 		members.load()
 		dashboard.loadEvents()
 		dashboard.loadPrograms()
@@ -246,7 +266,10 @@
 			const id = String(invite['id'] || invite['code'] || crypto.randomUUID())
 			const code = String(invite['code'] || '')
 			const email = normalizeName(invite['email'])
-			const inviteName = email ? safeInviteNameFromEmail(email) : ''
+			const inviteName = normalizeName(invite['label']) || (email ? safeInviteNameFromEmail(email) : '')
+			const targetSlug = normalizeName(invite['target_activity_slug'])
+			const targetProgram = dashboard.programs.find((program) => program.slug === targetSlug)
+			const targetLabel = targetProgram?.activityName || targetProgram?.label || targetSlug
 			const createdAtRaw = Number(invite['created_at'] || invite['createdAt'] || 0)
 			const createdAt = createdAtRaw > 10_000_000_000 ? createdAtRaw : createdAtRaw * 1000
 			const daysAgo = createdAt ? Math.max(0, Math.floor((Date.now() - createdAt) / (24 * 60 * 60 * 1000))) : 0
@@ -262,6 +285,7 @@
 			} else {
 				detail = `${sentLabel} · expires in ${expiresInDays} day${expiresInDays === 1 ? '' : 's'}`
 			}
+			if (targetLabel) detail = `${targetLabel} only · ${detail}`
 			return {
 				id,
 				code,
@@ -342,6 +366,9 @@
 
 	async function openInviteModal() {
 		inviteNameDraft = ''
+		inviteActivitySlug = dashboard.programs.find((program) => program.slug === 'gym' && program.enabled !== false)?.slug
+			|| dashboard.programs.find((program) => program.enabled !== false)?.slug
+			|| 'gym'
 		createdInviteId = ''
 		createdInviteCode = ''
 		inviteModalOpen = true
@@ -362,7 +389,10 @@
 				{
 					id,
 					code,
-					email: `${inviteName}@example.com`,
+					email: null,
+					label: inviteName,
+					target_activity_slug: inviteActivitySlug,
+					redirect_path: `/schedule/${inviteActivitySlug}/`,
 					created_at: Math.floor(Date.now() / 1000),
 					expires_in_days: 7
 				},
@@ -375,6 +405,8 @@
 		}
 		const beforeIds = new Set(invites.map((invite) => String(invite['id'] || invite['code'] || '')))
 		members.inviteEmail = ''
+		members.inviteLabel = inviteNameDraft.trim()
+		members.inviteActivitySlug = inviteActivitySlug
 		await members.createInvite()
 		if (members.error) {
 			showToast(members.error)
@@ -626,9 +658,12 @@
 		step={inviteModalStep}
 		inviteName={inviteNameDraft}
 		inviteUrl={createdInviteUrl()}
+		activitySlug={inviteActivitySlug}
+		activities={dashboard.programs}
 		anchorRect={inviteAnchorRect}
 		onClose={() => (inviteModalOpen = false)}
 		onNameChange={(value: string) => (inviteNameDraft = value)}
+		onActivityChange={(value: string) => (inviteActivitySlug = value)}
 		onCreate={() => void createInviteFromModal()}
 		onCopy={() => void copyInviteWithToast(createdInviteCode)}
 		onText={textCreatedInvite}

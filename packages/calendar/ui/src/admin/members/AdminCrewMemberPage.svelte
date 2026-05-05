@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte'
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminMembersController } from '@calendar/ui/admin/members/admin-members.svelte'
@@ -10,10 +11,16 @@
 	import { withAdminRoute } from '@calendar/ui/config'
 	import type { CalendarAdminUser } from '@calendar/ui/api/calendar'
 
-	const { data } = $props<{ data: { user: unknown | null; userId: string } }>()
+	const { data } = $props<{ data: { user: unknown | null; userId: string; bootstrap?: unknown } }>()
 
 	const members = createAdminMembersController({ onUnauthorized: handleUnauthorizedSessionError })
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
+	untrack(() => {
+		if (data.bootstrap) {
+			dashboard.bootstrap(data.bootstrap as never)
+			members.bootstrap(data.bootstrap as never)
+		}
+	})
 	const authed = $derived(!!data.user)
 	const userId = $derived(data.userId)
 	const mockMode = $derived(isAdminMockMode($page.url))
@@ -126,8 +133,10 @@
 			}))
 			return
 		}
-		void members.load()
-		void dashboard.loadEvents()
+		if (!data.bootstrap) {
+			void members.load()
+			void dashboard.loadEvents()
+		}
 		void members.openAccess(userId)
 	})
 </script>

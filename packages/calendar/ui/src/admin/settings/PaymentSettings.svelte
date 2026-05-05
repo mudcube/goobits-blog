@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte'
+	import { onDestroy, untrack } from 'svelte'
 	import {
 		createPaymentSettingsController,
 		paymentMethodUsesPayPalCheckout,
@@ -36,7 +36,7 @@
 		disconnectPaymentIntegration: (provider: 'paypal' | 'square') => Promise<void>
 	}
 
-	const { dashboard, authed, mockMode, mockDefaults, showToast } = $props<{
+	const { dashboard, authed, mockMode, mockDefaults, bootstrapped = false, showToast } = $props<{
 		dashboard: PaymentSettingsDashboard
 		authed: boolean
 		mockMode: boolean
@@ -46,6 +46,7 @@
 			primaryProvider?: string | null | undefined
 			handles?: Partial<Record<PaymentMethodKey, string | null | undefined>> | undefined
 		}
+		bootstrapped?: boolean
 		showToast: (message: string, isError?: boolean) => void
 	}>()
 
@@ -54,6 +55,12 @@
 		mockMode: () => mockMode,
 		mockDefaults: () => mockDefaults,
 		showToast: (message, isError) => showToast(message, isError)
+	})
+
+	// Bootstrap from dashboard.paymentDefaults if the admin layout server-loaded
+	// it — skips the redundant client fetch and the empty-state flash.
+	untrack(() => {
+		if (!mockMode && bootstrapped) payment.bootstrap(dashboard.paymentDefaults)
 	})
 
 	type PaymentProviderMeta = {
@@ -112,6 +119,7 @@
 
 	$effect(() => {
 		if (!authed) return
+		if (!mockMode && bootstrapped) return
 		void payment.load()
 	})
 

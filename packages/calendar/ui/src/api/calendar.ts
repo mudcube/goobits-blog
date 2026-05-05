@@ -6,6 +6,8 @@ export type CreateInviteInput = {
   email: string | null;
   uses: number;
   expiresInDays: number;
+  label?: string | null;
+  activitySlug?: string | null;
 };
 
 const CalendarOAuthStartResponseSchema = z.object({
@@ -21,6 +23,9 @@ const CalendarAdminInviteSchema = z.object({
   id: z.union([z.number(), z.string()]),
   code: z.string(),
   email: z.union([z.string(), z.null()]),
+  label: z.union([z.string(), z.null()]).optional(),
+  target_activity_slug: z.union([z.string(), z.null()]).optional(),
+  redirect_path: z.union([z.string(), z.null()]).optional(),
   uses_remaining: z.union([z.number(), z.null()]),
   expires_at: z.union([z.number(), z.null()]),
   created_at: z.number(),

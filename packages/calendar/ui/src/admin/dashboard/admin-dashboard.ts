@@ -106,6 +106,8 @@ export async function createMemberInvite(input: {
   email: string | null;
   uses: number;
   expiresInDays: number;
+  label?: string | null;
+  activitySlug?: string | null;
 }) {
   return runSuccess(() => persistInvite(input));
 }

@@ -1,6 +1,7 @@
 import {
 	consumeInvite,
 	checkRateLimit,
+	replaceUserProgramAccess,
 	parseCalendarInviteClaimInput,
 	TransportValidationError,
 	validateInvite
@@ -105,6 +106,9 @@ export async function POST(event: RequestEvent) {
 			})
 		}
 		if (user.created) createdUserId = String(user.userId)
+		if (result.invite.target_activity_slug) {
+			await replaceUserProgramAccess(env.DB, String(user.userId), [result.invite.target_activity_slug])
+		}
 		const consumed = await consumeInvite({
 			db: env.DB,
 			inviteId: result.invite.id,

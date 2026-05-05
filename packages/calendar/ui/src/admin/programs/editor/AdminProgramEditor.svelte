@@ -85,8 +85,8 @@
 
 	$effect(() => {
 		if (!authed || mockMode) return
-		void dashboard.loadPrograms()
-		void dashboard.loadEvents()
+		if (!dashboard.programsLoaded) void dashboard.loadPrograms()
+		if (!dashboard.eventsLoaded) void dashboard.loadEvents()
 	})
 
 	$effect(() => {

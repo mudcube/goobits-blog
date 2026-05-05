@@ -2,6 +2,7 @@ import type { CalendarActivityConfig } from '../social/activities.ts'
 import { buildPaymentLink } from './pay.ts'
 import { getEnabledCalendarPrograms } from './programs.ts'
 import { getCalendarProfile, listEventsFeed, listUpcomingEvents, type CalendarFeedEvent, type CalendarProfile } from './social.ts'
+import { listUserProgramAccess } from '../access/user-program-access.ts'
 import type { D1DatabaseLike } from '../storage/d1.ts'
 
 export type CalendarHomeFeedEvent = CalendarFeedEvent & {
@@ -38,7 +39,15 @@ export async function loadCalendarMemberShellData(
 		if (resolvedAvatar) normalized.avatarUrl = resolvedAvatar
 		user = normalized
 	}
-	const activities = await getEnabledCalendarPrograms(db)
+	let activities = await getEnabledCalendarPrograms(db)
+	const userId = rawUser?.['id']
+	if (userId != null) {
+		const access = await listUserProgramAccess(db, String(userId), { seedIfMissing: false })
+		if (access.length > 0) {
+			const allowed = new Set(access.filter((row) => row.allowed).map((row) => row.programSlug))
+			activities = activities.filter((activity) => allowed.has(activity.slug))
+		}
+	}
 	return { user, activities }
 }
 
@@ -46,7 +55,14 @@ export async function loadCalendarMemberHomeData(
 	db: D1DatabaseLike,
 	input: { userId: string; onlyMine: boolean }
 ): Promise<CalendarMemberHomeData> {
-	const activities = await getEnabledCalendarPrograms(db)
+	let activities = await getEnabledCalendarPrograms(db)
+	if (input.userId) {
+		const access = await listUserProgramAccess(db, input.userId, { seedIfMissing: false })
+		if (access.length > 0) {
+			const allowed = new Set(access.filter((row) => row.allowed).map((row) => row.programSlug))
+			activities = activities.filter((activity) => allowed.has(activity.slug))
+		}
+	}
 	const feed = input.userId ? await listEventsFeed(db, input.userId, input.onlyMine) : { upcoming: [], recent: [] }
 	const upcoming = feed.upcoming.map((entry) => ({
 		...entry,

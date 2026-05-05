@@ -23,10 +23,20 @@
     data: {
       user: unknown | null;
       viewSettings: { weekStart: AdminCalendarWeekStart };
+      bootstrap?: {
+        programs: unknown[];
+        upcoming: unknown[];
+        recent: unknown[];
+        paymentDefaults: unknown;
+        paymentIntegrations: unknown;
+      } | null;
     };
   }>();
   const dashboard = createAdminDashboardController({
     onUnauthorized: handleUnauthorizedSessionError,
+  });
+  untrack(() => {
+    if (data.bootstrap) dashboard.bootstrap(data.bootstrap as never);
   });
   const authed = $derived(!!data.user);
   const mockMode = $derived(isAdminMockMode($page.url));
@@ -154,6 +164,7 @@
       {authed}
       {mockMode}
       mockDefaults={adminMockCatalog.paymentDefaults}
+      bootstrapped={!!data.bootstrap}
       {showToast}
     />
   </div>

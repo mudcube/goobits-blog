@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
 	import { GripVertical } from '@lucide/svelte'
@@ -13,8 +14,11 @@
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { withAdminRoute } from '@calendar/ui/config'
 
-	const { data } = $props<{ data: { user: unknown | null } }>()
+	const { data } = $props<{ data: { user: unknown | null; bootstrap?: unknown } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
+	untrack(() => {
+		if (data.bootstrap) dashboard.bootstrap(data.bootstrap as never)
+	})
 	const authed = $derived(!!data.user)
 	const mockMode = $derived(isAdminMockMode($page.url))
 	const adminMockCatalog = getAdminMockCatalog()
@@ -46,6 +50,7 @@
 
 	$effect(() => {
 		if (!authed || mockMode) return
+		if (data.bootstrap) return
 		dashboard.loadPrograms()
 		dashboard.loadEvents()
 	})

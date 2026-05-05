@@ -82,6 +82,32 @@ export async function setUserProgramAccess(
 	}
 }
 
+export async function replaceUserProgramAccess(
+	db: D1DatabaseLike,
+	userId: string,
+	allowedProgramSlugs: string[]
+) {
+	const normalizedUserId = parsePositiveInteger(userId)
+	if (!normalizedUserId) {
+		throw new Error('Invalid user id')
+	}
+
+	await db
+		.prepare(`DELETE FROM calendar_user_program_access WHERE user_id = ?`)
+		.bind(normalizedUserId)
+		.run()
+
+	for (const slug of allowedProgramSlugs) {
+		await db
+			.prepare(
+				`INSERT INTO calendar_user_program_access (user_id, program_slug, allowed, updated_at)
+				 VALUES (?, ?, 1, unixepoch())`
+			)
+			.bind(normalizedUserId, slug)
+			.run()
+	}
+}
+
 export async function hasUserProgramAccess(db: D1DatabaseLike, userId: string, programSlug: string): Promise<boolean> {
 	const normalizedUserId = parsePositiveInteger(userId)
 	if (!normalizedUserId) return false

@@ -20,6 +20,8 @@ export function createAdminMembersController(
 	let loaded = $state(false)
 	let error = $state('')
 	let inviteEmail = $state('')
+	let inviteLabel = $state('')
+	let inviteActivitySlug = $state<string | null>('gym')
 	let inviteUses = $state(DEFAULT_INVITE_DRAFT.uses)
 	let inviteExpires = $state(DEFAULT_INVITE_DRAFT.expiresInDays)
 	let creating = $state(false)
@@ -48,17 +50,28 @@ export function createAdminMembersController(
 		}
 	}
 
+	function bootstrap(input: { invites?: CalendarAdminInvite[]; users?: CalendarAdminUser[] } | null | undefined) {
+		if (!input) return
+		if (input.invites) invites = input.invites
+		if (input.users) users = input.users
+		loaded = true
+	}
+
 	async function createInvite() {
 		creating = true
 		error = ''
 		try {
 			const inviteResult = await createMemberInvite({
 				email: inviteEmail || null,
+				label: inviteLabel || null,
+				activitySlug: inviteActivitySlug || null,
 				uses: inviteUses,
 				expiresInDays: inviteExpires
 			})
 			if (inviteResult.ok) {
 				inviteEmail = ''
+				inviteLabel = ''
+				inviteActivitySlug = 'gym'
 				inviteUses = DEFAULT_INVITE_DRAFT.uses
 				inviteExpires = DEFAULT_INVITE_DRAFT.expiresInDays
 				await load()
@@ -172,6 +185,10 @@ export function createAdminMembersController(
 		get notice() { return notice },
 		get inviteEmail() { return inviteEmail },
 		set inviteEmail(value) { inviteEmail = value },
+		get inviteLabel() { return inviteLabel },
+		set inviteLabel(value) { inviteLabel = value },
+		get inviteActivitySlug() { return inviteActivitySlug },
+		set inviteActivitySlug(value) { inviteActivitySlug = value },
 		get inviteUses() { return inviteUses },
 		set inviteUses(value) { inviteUses = value },
 		get inviteExpires() { return inviteExpires },
@@ -182,6 +199,7 @@ export function createAdminMembersController(
 		get accessRows() { return accessRows },
 		get accessLoading() { return accessLoading },
 		get accessSaving() { return accessSaving },
+		bootstrap,
 		load,
 		createInvite,
 		deleteInvite,

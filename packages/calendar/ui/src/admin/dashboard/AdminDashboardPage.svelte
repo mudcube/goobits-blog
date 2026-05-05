@@ -9,6 +9,7 @@ import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 import AdminDashboardContent from '@calendar/ui/admin/dashboard/AdminDashboardContent.svelte'
 import AdminLoadingText from '@calendar/ui/admin/shared/AdminLoadingText.svelte'
 import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
+import { untrack } from 'svelte'
 
 	const { data, form } = $props<{
 		data: {
@@ -17,10 +18,14 @@ import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 			isAdmin?: boolean
 			canBootstrapAdmin?: boolean
 			loginUrl?: string
+			bootstrap?: unknown
 		}
 		form: unknown
 	}>()
 const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
+untrack(() => {
+	if (data.bootstrap) dashboard.bootstrap(data.bootstrap as never)
+})
 const authed = $derived(data.isAdmin === true && !!data.user)
 const isMobile = $derived(typeof window !== 'undefined' && window.matchMedia('(max-width: 820px)').matches)
 const mockMode = $derived($page.url.searchParams.get('mock') === '1')
@@ -30,11 +35,15 @@ const adminMockCatalog = getAdminMockCatalog()
 
 	$effect(() => {
 		if (!authed || mockMode) return
+		// loadStatus is heavy (OAuth refresh checks); still client-fetched
 		dashboard.loadStatus()
 		dashboard.loadBookings()
-		dashboard.loadPaymentDefaults()
-		dashboard.loadPrograms()
-		dashboard.loadEvents()
+		// programs + events + paymentDefaults bootstrapped via data.bootstrap
+		if (!data.bootstrap) {
+			dashboard.loadPaymentDefaults()
+			dashboard.loadPrograms()
+			dashboard.loadEvents()
+		}
 	})
 
 	function openEventDetail(eventId: number) {

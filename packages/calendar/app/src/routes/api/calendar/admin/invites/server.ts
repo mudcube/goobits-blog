@@ -37,7 +37,10 @@ export async function POST(event: RequestEvent) {
 			db,
 			email: input.email,
 			usesRemaining: uses,
-			expiresAt
+			expiresAt,
+			label: input.label,
+			targetActivitySlug: input.activitySlug,
+			redirectPath: input.activitySlug ? `/schedule/${input.activitySlug}/` : null
 		})
 
 		logAdminEvent(event, 'invite_create', { inviteId: invite?.id, email: invite?.email ?? null })

@@ -1,4 +1,16 @@
-import { getAdminViewSettings, getCalendarConfig, getDefaultAdminViewSettings, type AdminViewSettings } from '@calendar/core'
+import {
+	getAdminPaymentDefaults,
+	getAdminViewSettings,
+	getCalendarConfig,
+	getCalendarPrograms,
+	getDefaultAdminViewSettings,
+	getPaymentCheckoutConfig,
+	listEventsFeed,
+	listInvites,
+	listCalendarUsers,
+	requireEnv,
+	type AdminViewSettings
+} from '@calendar/core'
 import { buildEnv } from '@calendar/kit'
 import { redirect } from '@sveltejs/kit'
 import type { RequestEvent } from '@sveltejs/kit'
@@ -25,6 +37,16 @@ function readAdminUserId(user: unknown): number | null {
 	return null
 }
 
+type BootstrapUser = {
+	id: number | string
+	email: string
+	name: string | null
+	avatar_url: string | null
+	email_verified: number | boolean
+	last_login_at: number | null
+	provider: string | null
+}
+
 export async function load(event: RequestEvent) {
 	const config = getCalendarConfig()
 	const locals = event.locals as { user?: unknown; calendarAdmin?: boolean }
@@ -37,15 +59,63 @@ export async function load(event: RequestEvent) {
 	}
 
 	let viewSettings: AdminViewSettings = getDefaultAdminViewSettings()
+	let bootstrap: {
+		programs: Awaited<ReturnType<typeof getCalendarPrograms>>
+		upcoming: Awaited<ReturnType<typeof listEventsFeed>>['upcoming']
+		recent: Awaited<ReturnType<typeof listEventsFeed>>['recent']
+		paymentDefaults: Awaited<ReturnType<typeof getAdminPaymentDefaults>>
+		paymentIntegrations: Awaited<ReturnType<typeof getPaymentCheckoutConfig>>
+		invites: Awaited<ReturnType<typeof listInvites>>
+		users: BootstrapUser[]
+	} | null = null
+
 	const userId = readAdminUserId(user)
 	if (userId != null) {
 		try {
 			const env = await buildEnv(event.platform)
-			viewSettings = await getAdminViewSettings(env.DB, userId)
+			const db = env.DB
+			const base64Key = requireEnv(env, 'TOKEN_ENC_KEY')
+
+			const [
+				viewResult,
+				programs,
+				feed,
+				paymentDefaults,
+				paymentIntegrations,
+				invites,
+				usersRaw
+			] = await Promise.all([
+				getAdminViewSettings(db, userId),
+				getCalendarPrograms(db),
+				listEventsFeed(db, '__admin__', false),
+				getAdminPaymentDefaults(db),
+				getPaymentCheckoutConfig({ db, env, base64Key }),
+				listInvites({ db }),
+				listCalendarUsers({ db })
+			])
+
+			viewSettings = viewResult
+			bootstrap = {
+				programs,
+				upcoming: feed.upcoming,
+				recent: feed.recent,
+				paymentDefaults,
+				paymentIntegrations,
+				invites,
+				users: (usersRaw as Array<Record<string, unknown>>).map((u) => ({
+					id: u['id'] as number | string,
+					email: String(u['email'] ?? ''),
+					name: (u['name'] as string | null) ?? null,
+					avatar_url: (u['avatar_url'] as string | null) ?? null,
+					email_verified: (u['email_verified'] as number | boolean) ?? 0,
+					last_login_at: (u['last_login_at'] as number | null) ?? null,
+					provider: (u['provider'] as string | null) ?? null
+				}))
+			}
 		} catch (error) {
-			console.warn('[admin-layout] failed to load view settings:', error)
+			console.warn('[admin-layout] failed to bootstrap admin data:', error)
 		}
 	}
 
-	return { user, viewSettings }
+	return { user, viewSettings, bootstrap }
 }

@@ -34,21 +34,27 @@ export async function createInvite({
 	db,
 	email = null,
 	usesRemaining = 1,
-	expiresAt = null
+	expiresAt = null,
+	label = null,
+	targetActivitySlug = null,
+	redirectPath = null
 }: {
 	db: D1DatabaseLike
 	email?: string | null
 	usesRemaining?: number
 	expiresAt?: number | null
+	label?: string | null
+	targetActivitySlug?: string | null
+	redirectPath?: string | null
 }) {
 	const code = generateInviteCode()
 
 	const result = await db.prepare(
-		`INSERT INTO calendar_invites (code, email, uses_remaining, expires_at, created_at)
-		 VALUES (?, ?, ?, ?, strftime('%s','now'))`
-	).bind(code, email, usesRemaining, expiresAt).run()
+		`INSERT INTO calendar_invites (code, email, uses_remaining, expires_at, created_at, label, target_activity_slug, redirect_path)
+		 VALUES (?, ?, ?, ?, strftime('%s','now'), ?, ?, ?)`
+	).bind(code, email, usesRemaining, expiresAt, label, targetActivitySlug, redirectPath).run()
 
-	return { id: result.meta.last_row_id, code, email }
+	return { id: result.meta.last_row_id, code, email, label, target_activity_slug: targetActivitySlug, redirect_path: redirectPath }
 }
 
 export async function validateInvite({
@@ -63,13 +69,17 @@ export async function validateInvite({
 	if (!code) return { valid: false, reason: 'missing_code' }
 
 	const invite = await db.prepare(
-		`SELECT id, code, email, uses_remaining, expires_at FROM calendar_invites WHERE code = ? LIMIT 1`
+		`SELECT id, code, email, uses_remaining, expires_at, label, target_activity_slug, redirect_path
+		 FROM calendar_invites WHERE code = ? LIMIT 1`
 	).bind(code).first() as {
 		id: number
 		code: string
 		email: string | null
 		uses_remaining: number | null
 		expires_at: number | null
+		label: string | null
+		target_activity_slug: string | null
+		redirect_path: string | null
 	} | null
 
 	if (!invite) return { valid: false, reason: 'not_found' }

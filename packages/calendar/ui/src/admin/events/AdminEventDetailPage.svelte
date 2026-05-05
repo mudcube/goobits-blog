@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
@@ -19,9 +20,12 @@
 	import { withAdminRoute } from '@calendar/ui/config'
 	import { adminActionHandlers, adminEventDetailBreadcrumb } from '../shell/state'
 
-	const { data } = $props<{ data: { user: unknown | null; eventId: string } }>()
+	const { data } = $props<{ data: { user: unknown | null; eventId: string; bootstrap?: unknown } }>()
 
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
+	untrack(() => {
+		if (data.bootstrap) dashboard.bootstrap(data.bootstrap as never)
+	})
 	const authed = $derived(!!data.user)
 	const eventId = $derived(Number(data.eventId))
 	const mockMode = $derived(isAdminMockMode($page.url))

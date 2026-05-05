@@ -1,3 +1,4 @@
+import { isValidProgramSlug } from '../social/programs.ts'
 import { asJsonObject, readIntInRange, readOptionalString, readRequiredString } from './parse.ts'
 import { TransportValidationError } from './errors.ts'
 
@@ -37,6 +38,8 @@ export type CalendarInviteCreateInput = {
 	email: string | null
 	uses: number
 	expiresInDays: number | null
+	label: string | null
+	activitySlug: string | null
 }
 
 export function parseCalendarInviteCreateInput(input: unknown): CalendarInviteCreateInput {
@@ -55,10 +58,16 @@ export function parseCalendarInviteCreateInput(input: unknown): CalendarInviteCr
 			message: 'Invalid expiresInDays'
 		})
 	}
+	const activitySlug = readOptionalString(body, 'activitySlug', { maxLength: 64 })
+	if (activitySlug && !isValidProgramSlug(activitySlug)) {
+		throw new TransportValidationError('Invalid activitySlug')
+	}
 	return {
 		email: readOptionalString(body, 'email', { maxLength: 320 }),
 		uses,
-		expiresInDays
+		expiresInDays,
+		label: readOptionalString(body, 'label', { maxLength: 80 }),
+		activitySlug
 	}
 }
 
