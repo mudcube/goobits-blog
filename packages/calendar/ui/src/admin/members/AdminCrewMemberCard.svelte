@@ -6,6 +6,7 @@
 		detail,
 		badge = '',
 		initials,
+		avatarUrl = null,
 		isYou = false,
 		href = null,
 		onclick
@@ -14,17 +15,30 @@
 		detail: string
 		badge?: string
 		initials: string
+		avatarUrl?: string | null
 		isYou?: boolean
 		href?: string | null
 		onclick?: () => void
 	}>()
+
+	let avatarBroken = $state(false)
+	const showImage = $derived(!isYou && !!avatarUrl && !avatarBroken)
 </script>
 
 <ChevronRowCard {href} {onclick} ariaLabel={`Open ${name}`}>
 	{#snippet start()}
-		<span class="admin-crew-member__avatar" class:admin-crew-member__avatar--you={isYou}>
+		<span class="admin-crew-member__avatar" class:admin-crew-member__avatar--you={isYou} class:admin-crew-member__avatar--image={showImage}>
 			{#if isYou}
 				You
+			{:else if showImage}
+				<img
+					src={avatarUrl}
+					alt=""
+					referrerpolicy="no-referrer"
+					loading="lazy"
+					decoding="async"
+					onerror={() => (avatarBroken = true)}
+				/>
 			{:else}
 				{initials}
 			{/if}
@@ -41,8 +55,8 @@
 
 <style>
 	.admin-crew-member__avatar {
-		width: 2.25rem;
-		height: 2.25rem;
+		width: 2rem;
+		height: 2rem;
 		border-radius: 999px;
 		display: inline-flex;
 		align-items: center;
@@ -51,8 +65,20 @@
 		font-weight: 700;
 		letter-spacing: 0.02em;
 		flex-shrink: 0;
+		overflow: hidden;
 		background: color-mix(in srgb, var(--admin-accent) 12%, transparent);
 		color: color-mix(in srgb, var(--admin-accent) 86%, var(--text) 14%);
+	}
+
+	.admin-crew-member__avatar--image {
+		background: transparent;
+		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+	}
+
+	.admin-crew-member__avatar img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 
 	.admin-crew-member__avatar--you {
@@ -86,5 +112,4 @@
 		color: color-mix(in srgb, var(--text) 42%, transparent);
 		margin-top: 0.1rem;
 	}
-
 </style>

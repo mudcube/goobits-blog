@@ -310,6 +310,10 @@
 		z-index: 1;
 	}
 
+	.social-events__program:hover {
+		background: color-mix(in srgb, var(--admin-accent) 6%, transparent);
+	}
+
 	.social-events__program-main {
 		display: flex;
 		align-items: center;
@@ -322,10 +326,6 @@
 		font: inherit;
 		padding: 0.75rem 0.875rem;
 		cursor: pointer;
-	}
-
-	.social-events__program-main:hover {
-		background: color-mix(in srgb, var(--admin-accent) 6%, transparent);
 	}
 
 	.social-events__program-icon {

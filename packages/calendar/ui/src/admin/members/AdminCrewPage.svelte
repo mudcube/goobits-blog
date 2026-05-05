@@ -266,7 +266,8 @@
 			const id = String(invite['id'] || invite['code'] || crypto.randomUUID())
 			const code = String(invite['code'] || '')
 			const email = normalizeName(invite['email'])
-			const inviteName = normalizeName(invite['label']) || (email ? safeInviteNameFromEmail(email) : '')
+			const inviteName =
+				normalizeName(invite['label']) || (email ? safeInviteNameFromEmail(email) : '') || email
 			const targetSlug = normalizeName(invite['target_activity_slug'])
 			const targetProgram = dashboard.programs.find((program) => program.slug === targetSlug)
 			const targetLabel = targetProgram?.activityName || targetProgram?.label || targetSlug
@@ -274,23 +275,22 @@
 			const createdAt = createdAtRaw > 10_000_000_000 ? createdAtRaw : createdAtRaw * 1000
 			const daysAgo = createdAt ? Math.max(0, Math.floor((Date.now() - createdAt) / (24 * 60 * 60 * 1000))) : 0
 			const expiresInDays = Number(invite['expires_in_days'] || members.inviteExpires || 7)
-			const possessive = inviteName.endsWith('s') ? `${inviteName}' invite` : `${inviteName}'s invite`
 			const status = inviteStatus(invite)
 			const sentLabel = `Sent ${daysAgo === 0 ? 'today' : `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago`}`
-			let detail: string
+			const detailParts: string[] = []
+			if (targetLabel) detailParts.push(`${targetLabel} only`)
 			if (status === 'expired') {
-				detail = `Expired · ${sentLabel.toLowerCase()}`
+				detailParts.push(`Expired · ${sentLabel.toLowerCase()}`)
 			} else if (status === 'exhausted') {
-				detail = `Used up · ${sentLabel.toLowerCase()}`
+				detailParts.push(`Used up · ${sentLabel.toLowerCase()}`)
 			} else {
-				detail = `${sentLabel} · expires in ${expiresInDays} day${expiresInDays === 1 ? '' : 's'}`
+				detailParts.push(`${sentLabel} · expires in ${expiresInDays} day${expiresInDays === 1 ? '' : 's'}`)
 			}
-			if (targetLabel) detail = `${targetLabel} only · ${detail}`
 			return {
 				id,
 				code,
-				label: inviteName ? possessive : code || 'Pending invite',
-				detail,
+				label: inviteName || 'Unnamed invite',
+				detail: detailParts.join(' · '),
 				status
 			}
 		})
@@ -566,6 +566,7 @@
 						detail={memberDetail(user)}
 						badge={deriveBadge(user)}
 						initials={initials(displayName(user))}
+						avatarUrl={normalizeName(user['avatar_url']) || null}
 						isYou={isYou(user)}
 						href={hrefWithMock(withAdminRoute(`crew/${String(user['id'] || '').trim()}/`))}
 						onclick={() => {

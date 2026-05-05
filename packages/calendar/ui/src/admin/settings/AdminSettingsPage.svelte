@@ -174,7 +174,7 @@
   .admin-settings {
     font-family: var(--font-ui-sans, var(--font-sans));
     display: grid;
-    gap: 1.6rem;
+    gap: 1rem;
     width: 100%;
   }
 

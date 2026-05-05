@@ -17,10 +17,14 @@
     inviteUrl = "",
     activitySlug = "gym",
     activities = [],
+    inviteType = "person",
+    maxUses = 10,
     anchorRect = null,
     onClose,
     onNameChange,
     onActivityChange,
+    onInviteTypeChange,
+    onMaxUsesChange,
     onCreate,
     onCopy,
     onText,
@@ -32,6 +36,8 @@
     inviteUrl?: string;
     activitySlug?: string;
     activities?: ActivityOption[];
+    inviteType?: "person" | "group";
+    maxUses?: number;
     anchorRect?: {
       left: number;
       top: number;
@@ -43,6 +49,8 @@
     onClose: () => void;
     onNameChange: (value: string) => void;
     onActivityChange: (value: string) => void;
+    onInviteTypeChange: (value: "person" | "group") => void;
+    onMaxUsesChange: (value: number) => void;
     onCreate: () => void;
     onCopy: () => void;
     onText: () => void;
@@ -95,6 +103,9 @@
     `width:${placement.width}px;left:${placement.left}px;top:${placement.top}px;--invite-arrow-left:${placement.arrowLeft}px;`,
   );
   const enabledActivities = $derived(activities.filter((activity: ActivityOption) => activity.enabled !== false));
+  const isGroupInvite = $derived(inviteType === "group");
+  const selectedActivity = $derived(enabledActivities.find((activity) => activity.slug === activitySlug));
+  const accessLabel = $derived(selectedActivity?.activityName || selectedActivity?.label || "Selected calendar");
 </script>
 
 <svelte:window
@@ -124,18 +135,6 @@
         <div class="admin-crew-modal__body">
           <div class="admin-crew-modal__title">Create invite link</div>
           <div class="admin-crew-modal__field">
-            <label for="crew-invite-name">Label</label>
-            <input
-              id="crew-invite-name"
-              class="ui-form-control"
-              type="text"
-              placeholder="e.g. Sarah"
-              value={inviteName}
-              oninput={(event) =>
-                onNameChange((event.currentTarget as HTMLInputElement).value)}
-            />
-          </div>
-          <div class="admin-crew-modal__field">
             <label for="crew-invite-activity">Calendar access</label>
             <select
               id="crew-invite-activity"
@@ -151,6 +150,66 @@
               {/each}
             </select>
           </div>
+          <div class="admin-crew-modal__field">
+            <span class="admin-crew-modal__field-label">Invite type</span>
+            <div class="admin-crew-modal__segmented" role="radiogroup" aria-label="Invite type">
+              <button
+                type="button"
+                class:admin-crew-modal__segment--active={!isGroupInvite}
+                class="admin-crew-modal__segment"
+                role="radio"
+                aria-checked={!isGroupInvite}
+                onclick={() => onInviteTypeChange("person")}
+              >
+                One person
+              </button>
+              <button
+                type="button"
+                class:admin-crew-modal__segment--active={isGroupInvite}
+                class="admin-crew-modal__segment"
+                role="radio"
+                aria-checked={isGroupInvite}
+                onclick={() => onInviteTypeChange("group")}
+              >
+                Group link
+              </button>
+            </div>
+          </div>
+          <div class="admin-crew-modal__field">
+            <label for="crew-invite-name">{isGroupInvite ? "Group name" : "Name"}</label>
+            <input
+              id="crew-invite-name"
+              class="ui-form-control"
+              type="text"
+              placeholder={isGroupInvite ? "e.g. Gym group chat" : "e.g. Sarah"}
+              value={inviteName}
+              oninput={(event) =>
+                onNameChange((event.currentTarget as HTMLInputElement).value)}
+            />
+          </div>
+          {#if isGroupInvite}
+            <div class="admin-crew-modal__field">
+              <label for="crew-invite-max-uses">Max uses</label>
+              <input
+                id="crew-invite-max-uses"
+                class="ui-form-control"
+                type="number"
+                min="2"
+                max="100"
+                inputmode="numeric"
+                value={String(maxUses)}
+                oninput={(event) => {
+                  const next = Number((event.currentTarget as HTMLInputElement).value)
+                  onMaxUsesChange(Number.isFinite(next) ? next : 10)
+                }}
+              />
+            </div>
+          {/if}
+          <p class="admin-crew-modal__hint admin-crew-modal__hint--inline">
+            {isGroupInvite
+              ? `This ${accessLabel} link can be used ${maxUses} times.`
+              : `This ${accessLabel} invite can be used once.`}
+          </p>
           <div class="admin-crew-modal__actions">
             <button type="button" class="admin-ui-btn" onclick={onClose}
               >Cancel</button
@@ -166,7 +225,7 @@
         <div class="admin-crew-modal__body">
           <div class="admin-crew-modal__icon">🎉</div>
           <div class="admin-crew-modal__title admin-crew-modal__title--center">
-            Invite link ready for {inviteName || "friend"}
+            Invite ready for {inviteName || (isGroupInvite ? "group" : "friend")}
           </div>
           <div class="admin-crew-modal__url-box">
             <span class="admin-crew-modal__url-text">{inviteUrl}</span>
@@ -187,7 +246,7 @@
             </button>
           </div>
           <p class="admin-crew-modal__hint">
-            Share this by text or copy it below. This link only grants access to the selected calendar.
+            {accessLabel} only · {isGroupInvite ? `${maxUses} uses` : "one use"}
           </p>
           <div class="admin-crew-modal__actions">
             <button
