@@ -7,6 +7,7 @@
 		type RemoveSnapshot
 	} from './payment-settings-controller.svelte'
 	import PaymentMethodRow from './PaymentMethodRow.svelte'
+	import AdminLoadingText from '../shared/AdminLoadingText.svelte'
 	import AdminToast from '../shared/AdminToast.svelte'
 	import type { AdminPaymentIntegrationsResponse } from '../../api/admin'
 
@@ -193,26 +194,30 @@
 		</div>
 	</div>
 
-	{#if payment.loaded && configuredCount === 0}
-		<p class="payment-settings__empty-hint">
-			Add at least one method to accept bookings.
-		</p>
-	{/if}
+	{#if !payment.loaded}
+		<AdminLoadingText text="Loading payment methods…" />
+	{:else}
+		{#if configuredCount === 0}
+			<p class="payment-settings__empty-hint">
+				Add at least one method to accept bookings.
+			</p>
+		{/if}
 
-	<ul class="payment-settings__list">
-		{#each paymentProviders as meta}
-			<PaymentMethodRow
-				{meta}
-				{payment}
-				{mockMode}
-				checkout={checkoutFor(meta.value)}
-				removeConfirm={removeConfirmFor === meta.value}
-				onRequestRemove={handleRequestRemove}
-				onCancelRemove={handleCancelRemove}
-				onConfirmRemove={handleConfirmRemove}
-			/>
-		{/each}
-	</ul>
+		<ul class="payment-settings__list">
+			{#each paymentProviders as meta}
+				<PaymentMethodRow
+					{meta}
+					{payment}
+					{mockMode}
+					checkout={checkoutFor(meta.value)}
+					removeConfirm={removeConfirmFor === meta.value}
+					onRequestRemove={handleRequestRemove}
+					onCancelRemove={handleCancelRemove}
+					onConfirmRemove={handleConfirmRemove}
+				/>
+			{/each}
+		</ul>
+	{/if}
 </section>
 
 <style>
