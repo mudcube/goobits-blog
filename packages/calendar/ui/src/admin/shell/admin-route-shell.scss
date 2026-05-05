@@ -47,6 +47,18 @@ $admin-mobile-breakpoint: 768px;
   --admin-danger-border: color-mix(in srgb, var(--admin-danger) 30%, transparent);
   --admin-danger-border-strong: color-mix(in srgb, var(--admin-danger) 50%, transparent);
   --calendar-shell-nav-height: 3.25rem;
+  --admin-header-inner-left: max(0px, calc((100vw - var(--max-width-readable, 980px)) / 2));
+  --admin-header-logo-space: calc(67px + 0.8rem);
+  --admin-header-inner-pad-x: 1rem;
+  --admin-breadcrumb-offset: max(
+    0px,
+    calc(
+      #{$admin-sidebar-width} + var(--admin-content-pad-x) -
+        var(--admin-header-inner-left) -
+        var(--admin-header-inner-pad-x) -
+        var(--admin-header-logo-space)
+    )
+  );
   --admin-text-soft: color-mix(in srgb, var(--text) 60%, transparent);
   --admin-text-muted: color-mix(in srgb, var(--text) 50%, transparent);
   --admin-text-faint: color-mix(in srgb, var(--text) 40%, transparent);
@@ -98,6 +110,18 @@ $admin-mobile-breakpoint: 768px;
   background: var(--bg);
   color: var(--text);
   overflow-x: clip;
+}
+
+.social-admin .calendar-shell-nav {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  position: relative;
+  z-index: 15;
+  --calendar-shell-text: var(--text);
+}
+
+.social-admin .calendar-shell-nav__left {
+  flex: 1 1 auto;
 }
 
 .social-admin :is(button, a, input, select, textarea):focus-visible {
@@ -518,32 +542,6 @@ $admin-mobile-breakpoint: 768px;
   color: var(--admin-active-fg);
 }
 
-.social-admin__breadcrumbs {
-  grid-column: 1 / -1;
-  grid-row: 1;
-  position: relative;
-  z-index: 15;
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
-  height: var(--calendar-shell-nav-height);
-  border-bottom: 1px solid color-mix(in srgb, var(--admin-border) 60%, transparent);
-  font-size: 0.76rem;
-  box-sizing: border-box;
-}
-
-.social-admin__breadcrumbs-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  width: 100%;
-  max-width: var(--max-width-readable, 980px);
-  min-height: var(--calendar-shell-nav-height);
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-
 .social-admin__breadcrumbs-body {
   display: flex;
   align-items: center;
@@ -551,6 +549,8 @@ $admin-mobile-breakpoint: 768px;
   gap: 0.35rem;
   min-width: 0;
   overflow: hidden;
+  font-size: 0.76rem;
+  margin-left: var(--admin-breadcrumb-offset);
 }
 
 .social-admin__breadcrumbs-body > a {
@@ -558,11 +558,11 @@ $admin-mobile-breakpoint: 768px;
   text-decoration: none;
 }
 
-.social-admin__breadcrumbs span {
+.social-admin__breadcrumbs-body span {
   color: var(--admin-muted);
 }
 
-.social-admin__breadcrumbs .social-admin__crumb-sep {
+.social-admin__breadcrumbs-body .social-admin__crumb-sep {
   color: var(--admin-muted);
   opacity: 0.65;
 }
@@ -619,16 +619,7 @@ $admin-mobile-breakpoint: 768px;
   .social-admin {
     grid-template-columns: 1fr;
     grid-template-rows: var(--calendar-shell-nav-height) auto 1fr;
-  }
-
-  .social-admin__breadcrumbs {
-    grid-column: 1;
-    grid-row: 1;
-    padding: 0 1rem;
-  }
-
-  .social-admin__breadcrumbs-body {
-    min-width: 0;
+    --admin-breadcrumb-offset: 0px;
   }
 
   .social-admin__sidebar {

@@ -4,6 +4,7 @@
 	import { page } from '$app/stores'
 	import { getCalendarUiConfig } from '../../config'
 	import { isAdminMockMode, withAdminMock } from '../mock/mock-mode'
+	import ShellNav from '../../primitives/CalendarShellNav.svelte'
 	import AdminProfileMenu from './components/AdminProfileMenu.svelte'
 	import AdminRouteBreadcrumbs from './components/AdminRouteBreadcrumbs.svelte'
 	import AdminRouteActions from './components/AdminRouteActions.svelte'
@@ -38,9 +39,16 @@
 </svelte:head>
 
 <div class="social-admin">
-	<nav class="social-admin__breadcrumbs" aria-label="Breadcrumbs">
-		<div class="social-admin__breadcrumbs-inner">
+	<ShellNav
+		homeHref="/"
+		showLogo={true}
+		logoSrc="/media/brand/logo.svg"
+		logoAlt={calendarConfig.brand.siteName}
+	>
+		{#snippet left()}
 			<AdminRouteBreadcrumbs items={routeInfo.breadcrumbs} />
+		{/snippet}
+		{#snippet right()}
 			<div class="social-admin__breadcrumbs-actions-group">
 				<AdminRouteActions
 					actions={routeInfo.actions}
@@ -51,8 +59,8 @@
 					<AdminProfileMenu {user} />
 				{/if}
 			</div>
-		</div>
-	</nav>
+		{/snippet}
+	</ShellNav>
 
 	<AdminRouteSidebar
 		currentPath={$page.url.pathname}

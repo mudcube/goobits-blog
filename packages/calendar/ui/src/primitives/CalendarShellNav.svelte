@@ -10,6 +10,7 @@
 		links = [],
 		linksAlign = 'left',
 		currentPath = '',
+		left,
 		right
 	}: {
 		homeHref?: string
@@ -21,6 +22,7 @@
 		links?: Array<{ href?: string; label?: string }>
 		linksAlign?: 'left' | 'right'
 		currentPath?: string
+		left?: Snippet
 		right?: Snippet
 	} = $props()
 </script>
@@ -45,6 +47,7 @@
 					{/each}
 				</div>
 			{/if}
+			{@render left?.()}
 		</div>
 		<div class="calendar-shell-nav__right">
 			{#if links.length && linksAlign === 'right'}
@@ -68,11 +71,13 @@
 		top: 0;
 		z-index: 10;
 		backdrop-filter: blur(14px) saturate(120%);
-		background:
+		background: var(
+			--shell-nav-bg,
 			radial-gradient(circle at 78% 0.5rem, rgba(172, 138, 255, 0.12) 0%, rgba(172, 138, 255, 0) 20rem),
 			radial-gradient(circle at 16% -1rem, rgba(76, 215, 246, 0.07) 0%, rgba(76, 215, 246, 0) 16rem),
-			linear-gradient(180deg, rgba(6, 14, 32, 0.92) 0%, rgba(6, 14, 32, 0.82) 100%);
-		border-bottom: 1px solid color-mix(in srgb, var(--calendar-shell-text) 10%, transparent);
+			linear-gradient(180deg, rgba(6, 14, 32, 0.92) 0%, rgba(6, 14, 32, 0.82) 100%)
+		);
+		border-bottom: 1px solid var(--shell-nav-border, color-mix(in srgb, var(--calendar-shell-text) 10%, transparent));
 	}
 	.calendar-shell-nav__inner {
 		display: flex;
@@ -125,7 +130,7 @@
 		align-items: center;
 		min-height: 44px;
 		text-decoration: none;
-		color: color-mix(in srgb, var(--calendar-shell-text) 75%, transparent);
+		color: var(--shell-nav-link, color-mix(in srgb, var(--calendar-shell-text) 75%, transparent));
 		padding: 0.3rem 0.6rem;
 		border-radius: 999px;
 		font-family: var(--font-ui-sans, var(--font-sans));
@@ -134,12 +139,12 @@
 		transition: background 150ms ease, color 150ms ease;
 	}
 	.calendar-shell-nav__link:hover {
-		color: var(--calendar-shell-text);
-		background: color-mix(in srgb, var(--calendar-shell-text) 8%, transparent);
+		color: var(--shell-nav-link-hover, var(--calendar-shell-text));
+		background: var(--shell-nav-link-hover-bg, color-mix(in srgb, var(--calendar-shell-text) 8%, transparent));
 	}
 	.calendar-shell-nav__link--active {
-		color: var(--calendar-shell-text);
-		background: color-mix(in srgb, var(--calendar-shell-text) 14%, transparent);
+		color: var(--shell-nav-link-active, var(--calendar-shell-text));
+		background: var(--shell-nav-link-active-bg, color-mix(in srgb, var(--calendar-shell-text) 14%, transparent));
 	}
 	.calendar-shell-nav__right {
 		display: flex;
