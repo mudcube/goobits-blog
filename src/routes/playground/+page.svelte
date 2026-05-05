@@ -8,9 +8,14 @@
 		data: { items: ParkingItem[] }
 	}>()
 
-	const featuredHrefs = new Set(['/playground/admin-settings'])
-	const parkingItems = $derived(
-		data.items.filter((item: ParkingItem) => !featuredHrefs.has(item.href.replace(/\/$/, '')))
+	const parkingItems = $derived(data.items)
+	const heroCopy = $derived(
+		parkingItems.length === 0
+			? { title: "You're done.", subtitle: 'Good job. Nothing here needs fixing today.' }
+			: {
+					title: 'Pick what to play with.',
+					subtitle: `${parkingItems.length} sketch${parkingItems.length === 1 ? '' : 'es'} parked below.`
+				}
 	)
 </script>
 
@@ -20,30 +25,13 @@
 
 <div class="pg">
 	<Hero
-		title="You're done."
-		subtitle="Good job. Nothing here needs fixing today."
+		title={heroCopy.title}
+		subtitle={heroCopy.subtitle}
 		icon="/media/page-icons/labs-flask.png"
 		iconAlt="Flask"
 		compact
 		className="pg__hero"
 	/>
-
-	<section class="pg__current">
-		<header class="pg__section-head">
-			<span class="pg__eyebrow">In progress</span>
-			<h2 class="pg__section-title">Current ideas</h2>
-		</header>
-
-		<div class="pg__row-list">
-			<ChevronRowCard href="/playground/admin-settings/" ariaLabel="Open Admin Settings redesign">
-				{#snippet start()}<span class="pg__dot" aria-hidden="true">·</span>{/snippet}
-				<div class="pg__row">
-					<span class="pg__row-name">Admin Settings</span>
-					<span class="pg__row-vibe">Redesigned settings — sync, week start, payments, inline saves.</span>
-				</div>
-			</ChevronRowCard>
-		</div>
-	</section>
 
 	<section class="pg__future">
 		<header class="pg__section-head">
@@ -83,12 +71,9 @@
 		margin-bottom: 0;
 	}
 
-	.pg__current,
 	.pg__future {
 		display: grid;
 		gap: 0.85rem;
-	}
-	.pg__future {
 		opacity: 0.72;
 		filter: saturate(0.7);
 		transition: opacity 220ms ease, filter 220ms ease;
