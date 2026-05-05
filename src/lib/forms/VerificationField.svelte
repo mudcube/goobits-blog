@@ -9,7 +9,7 @@
 </script>
 
 <div class={`verification-field ui-form-field ${className}`.trim()}>
-	<div class="verification-field__widget" aria-label="Verification">
+	<div class="verification-field__widget">
 		<div class="cf-turnstile" data-sitekey={siteKey}></div>
 	</div>
 </div>

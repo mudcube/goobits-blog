@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -12,7 +12,11 @@ const getArg = (name, fallback) => {
 }
 const hasFlag = (name) => args.includes(name)
 
-const baseUrl = getArg('--base', process.env.LIGHTHOUSE_BASE_URL || 'http://localhost:3610').replace(/\/$/, '')
+const baseArg = getArg('--base', process.env.LIGHTHOUSE_BASE_URL || '')
+const servePreview = hasFlag('--serve-preview')
+const buildFirst = hasFlag('--build')
+const previewPort = Number(getArg('--port', '3000'))
+const baseUrl = (baseArg || (servePreview ? `http://localhost:${previewPort}` : 'http://localhost:3610')).replace(/\/$/, '')
 const threshold = Number(getArg('--threshold', '100'))
 const maxPages = Number(getArg('--max-pages', '0'))
 const outPath = getArg('--out', '.lighthouse/latest-results.json')
@@ -20,12 +24,44 @@ const urlsArg = getArg('--urls', '')
 const lighthousePackage = getArg('--lighthouse-package', process.env.LIGHTHOUSE_PACKAGE || 'lighthouse@12.8.2')
 const skipSitemap = hasFlag('--no-sitemap')
 let chromePath = process.env.CHROME_PATH || getArg('--chrome-path', '')
+let previewProcess = null
+
+async function waitForServer(url) {
+	const deadline = Date.now() + 30_000
+	while (Date.now() < deadline) {
+		try {
+			const response = await fetch(url)
+			if (response.ok) return
+		} catch {
+			// Keep waiting.
+		}
+		await new Promise((resolve) => setTimeout(resolve, 500))
+	}
+	throw new Error(`Server did not become ready: ${url}`)
+}
+
+function cleanup() {
+	if (previewProcess && !previewProcess.killed) {
+		previewProcess.kill()
+	}
+}
+
+process.on('exit', cleanup)
+process.on('SIGINT', () => {
+	cleanup()
+	process.exit(130)
+})
+process.on('SIGTERM', () => {
+	cleanup()
+	process.exit(143)
+})
 
 const pageExtensions = /\.(html?|svelte)$/i
 const nonPageExtensions = /\.(xml|txt|json|png|jpe?g|webp|avif|gif|svg|ico|css|js|mjs|map|woff2?|ttf|pdf)$/i
 
 function normalizeUrl(input) {
-	const url = new URL(input, `${baseUrl}/`)
+	const parsed = new URL(input, `${baseUrl}/`)
+	const url = new URL(`${parsed.pathname}${parsed.search}`, `${baseUrl}/`)
 	url.hash = ''
 	return url.toString()
 }
@@ -136,6 +172,19 @@ function runLighthouse(url, mode) {
 	return summarizeLhr(lhr)
 }
 
+if (buildFirst) {
+	const build = spawnSync('pnpm', ['build'], { cwd: process.cwd(), stdio: 'inherit' })
+	if (build.status !== 0) process.exit(build.status || 1)
+}
+
+if (servePreview) {
+	previewProcess = spawn('pnpm', ['preview', '--host', '0.0.0.0', '--port', String(previewPort)], {
+		cwd: process.cwd(),
+		stdio: 'ignore'
+	})
+	await waitForServer(baseUrl)
+}
+
 const explicitUrls = urlsArg
 	.split(',')
 	.map((url) => url.trim())
@@ -174,14 +223,33 @@ for (const [index, url] of urls.entries()) {
 	console.log(`\n[${index + 1}/${urls.length}] ${url}`)
 	const entry = { url, mobile: null, desktop: null }
 	for (const mode of ['mobile', 'desktop']) {
-		const summary = runLighthouse(url, mode)
+		let summary
+		try {
+			summary = runLighthouse(url, mode)
+		} catch (error) {
+			failures += 1
+			summary = {
+				error: error instanceof Error ? error.message : String(error),
+				scores: {
+					performance: null,
+					accessibility: null,
+					bestPractices: null,
+					seo: null
+				},
+				metrics: {},
+				failures: []
+			}
+			entry[mode] = summary
+			console.log(`  ${mode}: ERROR`)
+			continue
+		}
 		entry[mode] = summary
 		const scores = summary.scores
 		const scoreLine = Object.entries(scores)
 			.map(([key, value]) => `${key}=${value ?? 'n/a'}`)
 			.join(' ')
 		console.log(`  ${mode}: ${scoreLine}`)
-		for (const [category, score] of Object.entries(scores)) {
+		for (const score of Object.values(scores)) {
 			if (score !== null && score < threshold) failures += 1
 		}
 	}
@@ -192,7 +260,9 @@ for (const [index, url] of urls.entries()) {
 console.log(`\nWrote ${outPath}`)
 if (failures) {
 	console.error(`${failures} category score(s) below ${threshold}.`)
-	process.exit(1)
+	process.exitCode = 1
+	cleanup()
+} else {
+	console.log(`All audited category scores are >= ${threshold}.`)
+	cleanup()
 }
-
-console.log(`All audited category scores are >= ${threshold}.`)

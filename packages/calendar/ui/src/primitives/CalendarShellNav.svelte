@@ -63,6 +63,7 @@
 
 <style>
 	.calendar-shell-nav {
+		--calendar-shell-nav-height: 3.25rem;
 		position: sticky;
 		top: 0;
 		z-index: 10;
@@ -81,12 +82,19 @@
 		max-width: var(--max-width-readable);
 		margin: 0 auto;
 		width: 100%;
-		padding: 0.25rem 1rem;
+		min-height: var(--calendar-shell-nav-height);
+		padding: 0 1rem;
 		box-sizing: border-box;
 		min-width: 0;
-		flex-wrap: wrap;
+		flex-wrap: nowrap;
 	}
-	.calendar-shell-nav__left { display: flex; align-items: center; gap: 0.8rem; min-width: 0; }
+	.calendar-shell-nav__left {
+		display: flex;
+		align-items: center;
+		gap: 0.8rem;
+		min-width: 0;
+		flex-shrink: 0;
+	}
 	.calendar-shell-nav__home {
 		display: inline-flex;
 		align-items: center;
@@ -101,7 +109,17 @@
 		width: auto;
 	}
 	.calendar-shell-nav__brand { color: var(--calendar-shell-text); text-decoration: none; font-weight: 700; }
-	.calendar-shell-nav__links { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+	.calendar-shell-nav__links {
+		display: flex;
+		gap: 0.25rem;
+		flex-wrap: nowrap;
+		min-width: 0;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+	.calendar-shell-nav__links::-webkit-scrollbar {
+		display: none;
+	}
 	.calendar-shell-nav__link {
 		display: inline-flex;
 		align-items: center;
@@ -123,7 +141,14 @@
 		color: var(--calendar-shell-text);
 		background: color-mix(in srgb, var(--calendar-shell-text) 14%, transparent);
 	}
-	.calendar-shell-nav__right { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+	.calendar-shell-nav__right {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.6rem;
+		min-width: 0;
+		flex: 1 1 auto;
+	}
 
 	@media (max-width: 25em) {
 		.calendar-shell-nav__inner {

@@ -41,7 +41,7 @@
 
 			<div class="layout-footer__columns" aria-label="Footer links">
 				<div class="layout-footer__col">
-					<h3>Explore</h3>
+					<p class="layout-footer__col-heading">Explore</p>
 					<ul>
 						{#each primaryItems as item}
 							<li><a class="layout-footer__col-link" href={item.href}>{item.label}</a></li>
@@ -54,7 +54,7 @@
 
 				{#if elsewhereItems.length}
 					<div class="layout-footer__col">
-						<h3>Elsewhere</h3>
+						<p class="layout-footer__col-heading">Elsewhere</p>
 						<ul>
 							{#each elsewhereItems as item}
 								<li>
@@ -73,7 +73,7 @@
 				{/if}
 
 				<div class="layout-footer__col">
-					<h3>Legal</h3>
+					<p class="layout-footer__col-heading">Legal</p>
 					<ul>
 						{#each legalItems as item}
 							<li><a class="layout-footer__col-link" href={item.href}>{item.label}</a></li>

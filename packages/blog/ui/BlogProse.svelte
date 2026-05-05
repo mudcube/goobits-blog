@@ -24,7 +24,6 @@
 	 * CSS custom properties (override from the host theme):
 	 *   --blog-gallery-min-tile   minimum tile width  (default 220px)
 	 *   --blog-gallery-gap        gap between tiles   (default 0.75rem)
-	 *   --blog-gallery-aspect     aspect ratio        (default 1)
 	 *   --blog-gallery-radius     tile border radius  (default 8px)
 	 *   --blog-gallery-border     tile border color   (default #3a3f4a)
 	 *   --blog-gallery-surface    tile background     (default #1c202a)
@@ -34,7 +33,6 @@
 	.blog-prose {
 		--blog-gallery-min-tile: 220px;
 		--blog-gallery-gap: 0.75rem;
-		--blog-gallery-aspect: 1;
 		--blog-gallery-radius: 8px;
 		--blog-gallery-border: #3a3f4a;
 		--blog-gallery-surface: #1c202a;
@@ -71,7 +69,6 @@
 		grid-column: auto;
 		margin: 0;
 		padding: 0;
-		aspect-ratio: var(--blog-gallery-aspect);
 		overflow: hidden;
 		border: 1px solid var(--blog-gallery-border);
 		border-radius: var(--blog-gallery-radius);
@@ -84,18 +81,17 @@
 	}
 
 	.blog-prose > :global(p[data-blog-gallery-tile] a),
-	.blog-prose > :global(p[data-blog-gallery-tile] img),
-	.blog-prose > :global(p:has(> a:only-child > img:only-child) a),
-	.blog-prose > :global(p:has(> a:only-child > img:only-child) img),
-	.blog-prose > :global(p:has(> img:only-child) img) {
+	.blog-prose > :global(p:has(> a:only-child > img:only-child) a) {
 		display: block;
 		width: 100%;
-		height: 100%;
 	}
 
 	.blog-prose > :global(p[data-blog-gallery-tile] img),
 	.blog-prose > :global(p:has(> a:only-child > img:only-child) img),
 	.blog-prose > :global(p:has(> img:only-child) img) {
+		display: block;
+		width: 100%;
+		height: auto;
 		object-fit: cover;
 		transition: transform 0.5s ease;
 	}

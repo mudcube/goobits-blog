@@ -1,6 +1,6 @@
 {
   "name": "miko-art",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "private": true,
   "workspaces": [
     "packages/*",
@@ -60,6 +60,7 @@
     "perf:lighthouse": "pnpm dlx @lhci/cli autorun --config=./lighthouserc.cjs",
     "perf:lighthouse:collect": "pnpm dlx @lhci/cli collect --config=./lighthouserc.cjs",
     "perf:lighthouse:pages": "node scripts/audit/lighthouse-pages.mjs",
+    "perf:lighthouse:pages:prod": "node scripts/audit/lighthouse-pages.mjs --build --serve-preview --threshold=100 --out=.lighthouse/latest-results.json",
     "images:journal:generate": "node scripts/images/generate-journal-hero-variants.mjs",
     "seed:calendar": "node scripts/seed/calendar-social.mjs",
     "calendar:sync": "node ops/cron/calendar-sync.mjs",

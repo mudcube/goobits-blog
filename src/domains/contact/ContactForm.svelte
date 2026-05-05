@@ -156,4 +156,9 @@
 		height: 1px;
 		overflow: hidden;
 	}
+
+	:global(.contact-page__submit.ui-button--primary) {
+		--button-bg: #166b44;
+		--button-text: #ffffff;
+	}
 </style>

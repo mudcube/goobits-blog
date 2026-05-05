@@ -212,7 +212,7 @@
 	justify-content: flex-end;
 }
 
-.layout-footer__col h3 {
+.layout-footer__col-heading {
 	font-size: 0.75rem;
 	font-weight: var(--font-weight-medium);
 	letter-spacing: 0.06em;

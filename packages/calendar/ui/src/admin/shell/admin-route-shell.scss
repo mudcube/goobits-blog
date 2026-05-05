@@ -46,6 +46,7 @@ $admin-mobile-breakpoint: 768px;
   --admin-danger-bg: color-mix(in srgb, var(--admin-danger) 14%, var(--bg) 86%);
   --admin-danger-border: color-mix(in srgb, var(--admin-danger) 30%, transparent);
   --admin-danger-border-strong: color-mix(in srgb, var(--admin-danger) 50%, transparent);
+  --calendar-shell-nav-height: 3.25rem;
   --admin-text-soft: color-mix(in srgb, var(--text) 60%, transparent);
   --admin-text-muted: color-mix(in srgb, var(--text) 50%, transparent);
   --admin-text-faint: color-mix(in srgb, var(--text) 40%, transparent);
@@ -92,7 +93,7 @@ $admin-mobile-breakpoint: 768px;
   min-width: 0;
   display: grid;
   grid-template-columns: $admin-sidebar-width 1fr;
-  grid-template-rows: 3rem auto;
+  grid-template-rows: var(--calendar-shell-nav-height) auto;
   flex: 1;
   background: var(--bg);
   color: var(--text);
@@ -424,11 +425,11 @@ $admin-mobile-breakpoint: 768px;
 }
 
 .social-admin__sidebar {
-  grid-row: 1 / span 2;
+  grid-row: 2;
   grid-column: 1;
   position: sticky;
-  top: 0;
-  height: 100vh;
+  top: var(--calendar-shell-nav-height);
+  height: calc(100vh - var(--calendar-shell-nav-height));
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -518,14 +519,14 @@ $admin-mobile-breakpoint: 768px;
 }
 
 .social-admin__breadcrumbs {
-  grid-column: 2;
+  grid-column: 1 / -1;
   grid-row: 1;
   position: relative;
   z-index: 15;
   display: flex;
   align-items: center;
-  padding: 0 var(--admin-content-pad-x);
-  height: 3rem;
+  padding: 0 1rem;
+  height: var(--calendar-shell-nav-height);
   border-bottom: 1px solid color-mix(in srgb, var(--admin-border) 60%, transparent);
   font-size: 0.76rem;
   box-sizing: border-box;
@@ -538,7 +539,9 @@ $admin-mobile-breakpoint: 768px;
   gap: 0.75rem;
   width: 100%;
   max-width: var(--max-width-readable, 980px);
-  min-height: 1.5rem;
+  min-height: var(--calendar-shell-nav-height);
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .social-admin__breadcrumbs-body {
@@ -615,13 +618,13 @@ $admin-mobile-breakpoint: 768px;
 @media (max-width: $admin-mobile-breakpoint) {
   .social-admin {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: var(--calendar-shell-nav-height) auto 1fr;
   }
 
   .social-admin__breadcrumbs {
     grid-column: 1;
     grid-row: 1;
-    padding: 0.5rem 1rem;
+    padding: 0 1rem;
   }
 
   .social-admin__breadcrumbs-body {
