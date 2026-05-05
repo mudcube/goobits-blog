@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { page } from "$app/stores";
   import { handleUnauthorizedSessionError } from "@calendar/ui/routing/auth";
   import { createAdminDashboardController } from "@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte";
   import AdminPageHero from "@calendar/ui/admin/shared/AdminPageHero.svelte";
+  import AdminSavedIndicator from "@calendar/ui/admin/shared/AdminSavedIndicator.svelte";
+  import AdminToast from "@calendar/ui/admin/shared/AdminToast.svelte";
   import {
-    getAdminCalendarWeekStart,
+    hydrateAdminCalendarWeekStart,
     setAdminCalendarWeekStart,
     type AdminCalendarWeekStart,
   } from "@calendar/ui/admin/shared/calendar-preferences";
@@ -15,7 +17,14 @@
   import CalendarViewSettings from "./CalendarViewSettings.svelte";
   import PaymentSettings from "./PaymentSettings.svelte";
 
-  const { data } = $props<{ data: { user: unknown | null } }>();
+  type SaveState = "idle" | "saving" | "saved" | "error";
+
+  const { data } = $props<{
+    data: {
+      user: unknown | null;
+      viewSettings: { weekStart: AdminCalendarWeekStart };
+    };
+  }>();
   const dashboard = createAdminDashboardController({
     onUnauthorized: handleUnauthorizedSessionError,
   });
@@ -30,33 +39,12 @@
   let suspendWeekStartAutosave = $state(true);
   let handledConnectedNotice = $state(false);
   let lastSavedAt = $state<number | null>(null);
-  let nowTick = $state(Date.now());
-  let nowInterval: ReturnType<typeof setInterval> | null = null;
+  let saveState = $state<SaveState>("idle");
+  let saveError = $state("");
 
-  let calendarWeekStart = $state<AdminCalendarWeekStart>("monday");
-
-  const savedDisplay = $derived.by(() => {
-    if (toastMessage) {
-      return { label: toastIsError ? toastMessage : `✓ ${toastMessage}`, error: toastIsError };
-    }
-    if (dashboard.error) {
-      return { label: dashboard.error, error: true };
-    }
-    if (lastSavedAt) {
-      return { label: relativeSavedLabel(lastSavedAt, nowTick), error: false };
-    }
-    return null;
-  });
-
-  function relativeSavedLabel(stamp: number, now: number) {
-    const seconds = Math.max(0, Math.floor((now - stamp) / 1000));
-    if (seconds < 5) return "All saved · just now";
-    if (seconds < 60) return `All saved · ${seconds}s ago`;
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `All saved · ${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    return `All saved · ${hours}h ago`;
-  }
+  let calendarWeekStart = $state<AdminCalendarWeekStart>(
+    untrack(() => data.viewSettings?.weekStart ?? "monday")
+  );
 
   $effect(() => {
     if (!authed || mockMode) return;
@@ -75,20 +63,17 @@
   });
 
   onMount(() => {
-    calendarWeekStart = getAdminCalendarWeekStart();
+    hydrateAdminCalendarWeekStart(calendarWeekStart);
     suspendWeekStartAutosave = false;
-    nowInterval = setInterval(() => (nowTick = Date.now()), 30000);
     return () => {
       if (toastTimer) clearTimeout(toastTimer);
       if (weekStartAutosaveTimer) clearTimeout(weekStartAutosaveTimer);
-      if (nowInterval) clearInterval(nowInterval);
     };
   });
 
   function showToast(message: string, isError = false) {
     toastMessage = message;
     toastIsError = isError;
-    if (!isError) lastSavedAt = Date.now();
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
       toastMessage = "";
@@ -113,31 +98,45 @@
     );
   }
 
+  async function persistWeekStart(value: AdminCalendarWeekStart) {
+    if (mockMode) {
+      showToast("Mock mode: preference preview only");
+      return;
+    }
+    saveState = "saving";
+    saveError = "";
+    try {
+      await setAdminCalendarWeekStart(value);
+      saveState = "saved";
+      lastSavedAt = Date.now();
+      setTimeout(() => {
+        if (saveState === "saved") saveState = "idle";
+      }, 1400);
+    } catch (error) {
+      saveError = error instanceof Error ? error.message : "Failed to save";
+      saveState = "error";
+      calendarWeekStart =
+        value === "monday" ? "sunday" : "monday";
+    }
+  }
+
   $effect(() => {
     if (!authed || suspendWeekStartAutosave) return;
-    if (calendarWeekStart === getAdminCalendarWeekStart()) return;
+    if (calendarWeekStart === data.viewSettings?.weekStart && saveState === "idle") return;
     if (weekStartAutosaveTimer) clearTimeout(weekStartAutosaveTimer);
     const expected = calendarWeekStart;
     weekStartAutosaveTimer = setTimeout(() => {
       if (calendarWeekStart !== expected) return;
-      setAdminCalendarWeekStart(expected);
-      showToast("Saved");
+      void persistWeekStart(expected);
     }, 300);
   });
 </script>
 
 {#if authed}
   <div class="admin-settings admin-content">
-    {#if savedDisplay}
-      <div
-        class="admin-settings__save"
-        class:admin-settings__save--error={savedDisplay.error}
-        class:admin-settings__save--idle={!toastMessage}
-        role="status"
-        aria-live="polite"
-      >
-        {savedDisplay.label}
-      </div>
+    <AdminSavedIndicator phase={saveState} errorMessage={saveError} {lastSavedAt} />
+    {#if toastMessage}
+      <AdminToast message={toastMessage} variant={toastIsError ? 'error' : 'status'} />
     {/if}
 
     <AdminPageHero
@@ -201,30 +200,6 @@
 
   .admin-settings {
     position: relative;
-  }
-
-  .admin-settings__save {
-    position: absolute;
-    top: 0.4rem;
-    right: 0;
-    font-size: 0.74rem;
-    font-weight: 440;
-    font-style: italic;
-    color: color-mix(in srgb, var(--text) 56%, transparent);
-    z-index: 5;
-    pointer-events: none;
-    transition: opacity 200ms ease;
-  }
-
-  .admin-settings__save--idle {
-    opacity: 0.7;
-  }
-
-  .admin-settings__save--error {
-    font-style: normal;
-    font-weight: 540;
-    color: #ef4444;
-    opacity: 1;
   }
 
   @media (max-width: 720px) {

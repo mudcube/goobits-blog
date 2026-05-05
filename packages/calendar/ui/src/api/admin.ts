@@ -578,3 +578,32 @@ export async function deleteAdminPaymentIntegration(
     },
   );
 }
+
+const AdminViewSettingsSchema = z.object({
+  weekStart: z.union([z.literal("sunday"), z.literal("monday")]),
+});
+
+const AdminPreferencesResponseSchema = z.object({
+  ok: z.literal(true),
+  view: AdminViewSettingsSchema,
+});
+
+export type AdminViewSettings = z.infer<typeof AdminViewSettingsSchema>;
+export type AdminPreferencesResponse = z.infer<
+  typeof AdminPreferencesResponseSchema
+>;
+
+export async function getAdminViewSettings() {
+  return requestApi<AdminPreferencesResponse>(withAdminApi("/preferences"), {
+    parse: (payload) => AdminPreferencesResponseSchema.parse(payload),
+  });
+}
+
+export async function setAdminViewSettings(patch: Partial<AdminViewSettings>) {
+  return requestApi<AdminPreferencesResponse>(withAdminApi("/preferences"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+    parse: (payload) => AdminPreferencesResponseSchema.parse(payload),
+  });
+}

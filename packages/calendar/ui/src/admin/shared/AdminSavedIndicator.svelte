@@ -4,11 +4,11 @@
 	type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 	const {
-		state = 'idle',
+		phase = 'idle',
 		errorMessage = '',
 		lastSavedAt = null
 	} = $props<{
-		state?: SaveState
+		phase?: SaveState
 		errorMessage?: string
 		lastSavedAt?: number | null
 	}>()
@@ -34,9 +34,9 @@
 	}
 
 	const display = $derived.by(() => {
-		if (state === 'error') return { label: errorMessage || 'Save failed', kind: 'error' }
-		if (state === 'saving') return { label: 'Saving…', kind: 'saving' }
-		if (state === 'saved') return { label: 'Saved ✓', kind: 'saved' }
+		if (phase === 'error') return { label: errorMessage || 'Save failed', kind: 'error' }
+		if (phase === 'saving') return { label: 'Saving…', kind: 'saving' }
+		if (phase === 'saved') return { label: 'Saved ✓', kind: 'saved' }
 		if (lastSavedAt) return { label: relativeLabel(lastSavedAt, nowTick), kind: 'idle-saved' }
 		return null
 	})

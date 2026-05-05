@@ -163,6 +163,18 @@ import {
 } from './services/booking-confirmation.ts'
 import { getSlotAvailability, type SlotAvailabilityResult } from './services/slot-availability.ts'
 import {
+	getAdminPreference,
+	getAdminPreferences,
+	setAdminPreference
+} from './services/admin-preferences.ts'
+import {
+	getAdminViewSettings,
+	setAdminViewSettings,
+	getDefaultAdminViewSettings,
+	type AdminViewSettings,
+	type WeekStart
+} from './services/admin-view-settings.ts'
+import {
 	parseAdminRulesInput,
 	parseAdminProgramMutationInput,
 	parseAdminCreateEventsBatchInput,
@@ -335,7 +347,13 @@ export {
 	getSlotAvailability,
 	getActiveCalendarSyncProvider,
 	isCalendarSyncProvider,
-	setActiveCalendarSyncProvider
+	setActiveCalendarSyncProvider,
+	getAdminPreference,
+	getAdminPreferences,
+	setAdminPreference,
+	getAdminViewSettings,
+	setAdminViewSettings,
+	getDefaultAdminViewSettings
 }
 
 export type {
@@ -385,5 +403,7 @@ export type {
 	AdminEventDetail,
 	WeatherSnapshot,
 	DayForecast,
-	WeatherProvider
+	WeatherProvider,
+	AdminViewSettings,
+	WeekStart
 }
