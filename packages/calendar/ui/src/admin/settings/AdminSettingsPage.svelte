@@ -36,7 +36,7 @@
     onUnauthorized: handleUnauthorizedSessionError,
   });
   untrack(() => {
-    if (data.bootstrap) dashboard.bootstrap(data.bootstrap as never);
+    if (data.bootstrap) dashboard.bootstrap(data.bootstrap);
   });
   const authed = $derived(!!data.user);
   const mockMode = $derived(isAdminMockMode($page.url));

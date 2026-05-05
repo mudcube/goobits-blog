@@ -35,8 +35,8 @@
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	untrack(() => {
 		if (data.bootstrap) {
-			dashboard.bootstrap(data.bootstrap as never)
-			members.bootstrap(data.bootstrap as never)
+			dashboard.bootstrap(data.bootstrap)
+			members.bootstrap(data.bootstrap)
 		}
 	})
 	const authed = $derived(!!data.user)

@@ -107,8 +107,8 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 		return {
 			kind: 'events-index',
 			currentSection: 'events',
-			title: 'Events',
-			breadcrumbs: [...baseCrumbs, { label: 'Events' }],
+			title: 'Programs & Events',
+			breadcrumbs: [...baseCrumbs, { label: 'Programs & Events' }],
 			actions: ['new-program']
 		}
 	}
@@ -120,10 +120,10 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 			return {
 				kind: 'event-program',
 				currentSection: 'events',
-				title: 'Events',
+				title: 'New Program',
 				breadcrumbs: [
 					...baseCrumbs,
-					{ label: 'Events', href: hrefWithMock(`${adminBase}/events/`) },
+					{ label: 'Programs & Events', href: hrefWithMock(`${adminBase}/events/`) },
 					{ label: 'New Program' }
 				],
 				actions: ['back-to-events']
@@ -132,10 +132,10 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 		return {
 			kind: 'event-program',
 			currentSection: 'events',
-			title: 'Events',
+			title: 'Program',
 			breadcrumbs: [
 				...baseCrumbs,
-				{ label: 'Events', href: hrefWithMock(`${adminBase}/events/`) },
+				{ label: 'Programs & Events', href: hrefWithMock(`${adminBase}/events/`) },
 				{ label: prettySegment(programSlug) }
 			],
 			actions: ['view-program', 'program-settings'],
@@ -149,10 +149,10 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 		return {
 			kind: 'event-detail',
 			currentSection: 'events',
-			title: 'Events',
+			title: 'Event',
 			breadcrumbs: [
 				...baseCrumbs,
-				{ label: 'Events', href: hrefWithMock(`${adminBase}/events/`) },
+				{ label: 'Programs & Events', href: hrefWithMock(`${adminBase}/events/`) },
 				{ label: options.detailLabel?.trim() || 'Event Detail' }
 			],
 			actions: ['event-edit', 'event-cancel'],

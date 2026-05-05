@@ -1,3 +1,4 @@
+import type { AdminBootstrap } from "@calendar/core";
 import { DEFAULT_ADMIN_RULES, DEFAULT_ADMIN_STATS } from "../shared/admin";
 import {
   createAdminEventsBatch,
@@ -383,16 +384,10 @@ export function createAdminDashboardController(
     return Number.isFinite(date.getTime()) ? date.toISOString() : value;
   }
 
-  function bootstrap(input: {
-    programs?: typeof programs;
-    upcoming?: typeof events;
-    recent?: typeof recentEvents;
-    paymentDefaults?: Parameters<typeof normalizePaymentDefaults>[0];
-    paymentIntegrations?: typeof paymentIntegrations;
-  } | null | undefined) {
+  function bootstrap(input: Partial<AdminBootstrap> | null | undefined) {
     if (!input) return;
     if (input.programs) {
-      programs = input.programs;
+      programs = input.programs as typeof programs;
       programsLoaded = true;
       const firstProgram = programs[0];
       if (!selectedProgramSlug && firstProgram) {
@@ -411,11 +406,11 @@ export function createAdminDashboardController(
       }
     }
     if (input.upcoming) {
-      events = input.upcoming;
+      events = input.upcoming as typeof events;
       eventsLoaded = true;
     }
     if (input.recent) {
-      recentEvents = input.recent;
+      recentEvents = input.recent as typeof recentEvents;
       eventsLoaded = true;
     }
     if (input.paymentDefaults) {
@@ -792,7 +787,7 @@ export function createAdminDashboardController(
       heroTitleLine1: "Make it yours.",
       heroTitleLine2: "",
       heroSubtitle:
-        "Set up the page, save it as a draft, then click days to schedule sessions.",
+        "Set up the page, save it as a draft, then click days to schedule events.",
       description: "",
       icon: "✨",
       eyebrowClass: "",

@@ -103,7 +103,7 @@
 					eyebrow: 'New Program',
 					heroTitleLine1: 'Make it yours.',
 					heroTitleLine2: '',
-					heroSubtitle: 'Set up the page, save it as a draft, then click days to schedule sessions.',
+					heroSubtitle: 'Set up the page, save it as a draft, then click days to schedule events.',
 					description: '',
 					icon: '✨',
 					enabled: false,
@@ -396,7 +396,7 @@
 		start.setHours(safeHours, safeMinutes, 0, 0)
 		const end = new Date(start.getTime() + 2 * 60 * 60 * 1000)
 		const activity = dashboard.programDraft.slug || slug
-		const title = dashboard.programDraft.label ? `${dashboard.programDraft.label} Session` : 'Session'
+		const title = dashboard.programDraft.label ? `${dashboard.programDraft.label} Event` : 'Event'
 
 		dashboard.eventDraft = {
 			...dashboard.eventDraft,
@@ -736,10 +736,10 @@
 					</section>
 
 					<div class="program-editor__schedule-head">
-						<h4 class="program-editor__schedule-title">Sessions</h4>
+						<h4 class="program-editor__schedule-title">Events</h4>
 						<button
 							type="button"
-							class="program-editor__new-session"
+							class="program-editor__new-event"
 							onclick={() => {
 								const target = new Date()
 								target.setHours(0, 0, 0, 0)
@@ -747,7 +747,7 @@
 								openDay(target)
 							}}
 						>
-							+ New session
+							+ New event
 						</button>
 					</div>
 					<AdminCalendar
@@ -1095,7 +1095,7 @@
 		color: var(--text-2);
 	}
 
-	.program-editor__new-session {
+	.program-editor__new-event {
 		appearance: none;
 		border: 1px solid color-mix(in srgb, var(--blue) 38%, transparent);
 		background: color-mix(in srgb, var(--blue) 14%, var(--bg) 86%);
@@ -1109,7 +1109,7 @@
 		transition: background 140ms, box-shadow 140ms;
 	}
 
-	.program-editor__new-session:hover {
+	.program-editor__new-event:hover {
 		background: color-mix(in srgb, var(--blue) 22%, var(--bg) 78%);
 		box-shadow: 0 2px 10px color-mix(in srgb, var(--blue) 22%, transparent);
 	}

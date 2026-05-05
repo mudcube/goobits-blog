@@ -64,7 +64,7 @@
 
 	{#if actions.includes('new-program')}
 		<AdminActionButton variant="primary" icon={CalendarPlus} href={hrefWithMock(`${adminBase}/events/program/new/`)}>
-			New Program
+			Add Program
 		</AdminActionButton>
 	{/if}
 

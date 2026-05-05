@@ -41,6 +41,13 @@ import {
 	isCalendarAdmin
 } from './admin/permissions.ts'
 import {
+	isAdminBootstrap,
+	type AdminBootstrap,
+	type AdminBootstrapUser,
+	type AdminBootstrapInvite,
+	type AdminBootstrapPaymentIntegrations
+} from './admin/bootstrap-types.ts'
+import {
 	configureCalendarConfig,
 	getCalendarConfig,
 	resetCalendarConfig,
@@ -263,6 +270,7 @@ export {
 	grantCalendarAdmin,
 	grantCalendarAdminByEmail,
 	isCalendarAdmin,
+	isAdminBootstrap,
 	configureCalendarConfig,
 	getCalendarConfig,
 	resetCalendarConfig,
@@ -431,5 +439,9 @@ export type {
 	AdminViewSettings,
 	WeekStart,
 	AllowedHeroMimeType,
-	PutHeroResult
+	PutHeroResult,
+	AdminBootstrap,
+	AdminBootstrapUser,
+	AdminBootstrapInvite,
+	AdminBootstrapPaymentIntegrations
 }

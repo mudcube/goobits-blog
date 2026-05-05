@@ -1,3 +1,4 @@
+import type { AdminBootstrap } from '@calendar/core'
 import { DEFAULT_INVITE_DRAFT } from '../shared/admin'
 import {
 	createInviteShareLink,
@@ -50,10 +51,10 @@ export function createAdminMembersController(
 		}
 	}
 
-	function bootstrap(input: { invites?: CalendarAdminInvite[]; users?: CalendarAdminUser[] } | null | undefined) {
+	function bootstrap(input: Partial<AdminBootstrap> | null | undefined) {
 		if (!input) return
-		if (input.invites) invites = input.invites
-		if (input.users) users = input.users
+		if (input.invites) invites = input.invites as unknown as CalendarAdminInvite[]
+		if (input.users) users = input.users as unknown as CalendarAdminUser[]
 		loaded = true
 	}
 

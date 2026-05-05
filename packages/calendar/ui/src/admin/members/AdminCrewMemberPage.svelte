@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { AdminBootstrap } from '@calendar/core'
 	import { untrack } from 'svelte'
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
@@ -11,14 +12,14 @@
 	import { withAdminRoute } from '@calendar/ui/config'
 	import type { CalendarAdminUser } from '@calendar/ui/api/calendar'
 
-	const { data } = $props<{ data: { user: unknown | null; userId: string; bootstrap?: unknown } }>()
+	const { data } = $props<{ data: { user: unknown | null; userId: string; bootstrap?: AdminBootstrap | null } }>()
 
 	const members = createAdminMembersController({ onUnauthorized: handleUnauthorizedSessionError })
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	untrack(() => {
 		if (data.bootstrap) {
-			dashboard.bootstrap(data.bootstrap as never)
-			members.bootstrap(data.bootstrap as never)
+			dashboard.bootstrap(data.bootstrap)
+			members.bootstrap(data.bootstrap)
 		}
 	})
 	const authed = $derived(!!data.user)
@@ -211,7 +212,7 @@
 					{#if !mockMode && !dashboard.eventsLoaded}
 						<div class="admin-crew-member-page__empty calendar-ui-card">Loading…</div>
 					{:else if memberUpcoming.length === 0}
-						<div class="admin-crew-member-page__empty calendar-ui-card">No upcoming sessions.</div>
+						<div class="admin-crew-member-page__empty calendar-ui-card">No upcoming events.</div>
 					{:else}
 						{#each memberUpcoming as event (event.id)}
 							<ChevronRowCard href={hrefWithMock(withAdminRoute(`events/detail/${event.id}/`))}>
@@ -229,7 +230,7 @@
 					{#if !mockMode && !dashboard.eventsLoaded}
 						<div class="admin-crew-member-page__empty calendar-ui-card">Loading…</div>
 					{:else if memberRecent.length === 0}
-						<div class="admin-crew-member-page__empty calendar-ui-card">No recent sessions.</div>
+						<div class="admin-crew-member-page__empty calendar-ui-card">No recent events.</div>
 					{:else}
 						{#each memberRecent as event (event.id)}
 							<ChevronRowCard href={hrefWithMock(withAdminRoute(`events/detail/${event.id}/`))}>

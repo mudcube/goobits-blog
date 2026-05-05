@@ -231,7 +231,7 @@
 		</AdminGroupedCard>
 
 		<p class="admin-new-program__hint">
-			You can refine the hero, schedule sessions, and tweak settings after creating.
+			You can refine the hero, schedule events, and tweak settings after creating.
 		</p>
 	</div>
 {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { EventSessionCard } from '@calendar/ui/shared'
+	import { EventCard } from '@calendar/ui/shared'
 
 	type Participant = {
 		name?: string | null
@@ -69,7 +69,7 @@
 
 	<div class="admin-dashboard-today__stack">
 		{#if todayEvents.length === 0}
-			<div class="admin-dashboard-today__empty calendar-ui-card">No sessions scheduled for today.</div>
+			<div class="admin-dashboard-today__empty calendar-ui-card">No events scheduled for today.</div>
 		{:else}
 			{#each todayEvents as event, index}
 				{#if nowDividerIndex === index}
@@ -79,7 +79,7 @@
 						<span class="admin-dashboard-today__now-time">{timeLabel(new Date().toISOString())}</span>
 					</div>
 				{/if}
-				<EventSessionCard {event} {onOpenEvent} />
+				<EventCard {event} {onOpenEvent} />
 				{#if index === todayEvents.length - 1 && nowDividerIndex === todayEvents.length}
 					<div class="admin-dashboard-today__now">
 						<div class="admin-dashboard-today__now-dot"></div>

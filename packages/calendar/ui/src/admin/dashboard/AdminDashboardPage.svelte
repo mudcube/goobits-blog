@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { AdminBootstrap } from '@calendar/core'
 import { goto } from '$app/navigation'
 import { page } from '$app/stores'
 import { withAdminRoute } from '@calendar/ui/config'
@@ -18,13 +19,13 @@ import { untrack } from 'svelte'
 			isAdmin?: boolean
 			canBootstrapAdmin?: boolean
 			loginUrl?: string
-			bootstrap?: unknown
+			bootstrap?: AdminBootstrap | null
 		}
 		form: unknown
 	}>()
 const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 untrack(() => {
-	if (data.bootstrap) dashboard.bootstrap(data.bootstrap as never)
+	if (data.bootstrap) dashboard.bootstrap(data.bootstrap)
 })
 const authed = $derived(data.isAdmin === true && !!data.user)
 const isMobile = $derived(typeof window !== 'undefined' && window.matchMedia('(max-width: 820px)').matches)

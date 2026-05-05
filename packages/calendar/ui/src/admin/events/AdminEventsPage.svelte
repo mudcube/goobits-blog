@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { AdminBootstrap } from '@calendar/core'
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
@@ -15,10 +16,10 @@
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { withAdminRoute } from '@calendar/ui/config'
 
-	const { data } = $props<{ data: { user: unknown | null; bootstrap?: unknown } }>()
+	const { data } = $props<{ data: { user: unknown | null; bootstrap?: AdminBootstrap | null } }>()
 	const dashboard = createAdminDashboardController({ onUnauthorized: handleUnauthorizedSessionError })
 	untrack(() => {
-		if (data.bootstrap) dashboard.bootstrap(data.bootstrap as never)
+		if (data.bootstrap) dashboard.bootstrap(data.bootstrap)
 	})
 	const authed = $derived(!!data.user)
 	const mockMode = $derived(isAdminMockMode($page.url))
@@ -172,15 +173,15 @@
 	<div class="social-events admin-content">
 		<AdminPageHero
 			eyebrow="Programs"
-			title="Events"
-			subtitle="Manage program pages & upcoming sessions."
+			title="Programs & Events"
+			subtitle="Manage program pages and scheduled events."
 		/>
 
 		<h4>PROGRAMS{#if mockMode || dashboard.programsLoaded} ({programsSource.length}){/if}</h4>
 		{#if !mockMode && !dashboard.programsLoaded}
 			<AdminLoadingText text="Loading programs…" />
 		{:else if programsSource.length === 0}
-			<div class="social-events__empty calendar-ui-card">No activity pages yet.</div>
+			<div class="social-events__empty calendar-ui-card">No programs yet.</div>
 		{:else}
 			<div class="social-events__programs">
 				{#each programsSource as program, i (program.slug)}

@@ -51,10 +51,10 @@
 	<button
 		type="button"
 		class="program-day-sheet__overlay"
-		aria-label="Close session editor"
+		aria-label="Close event editor"
 		onclick={onClose}
 	></button>
-	<aside class="program-day-sheet" aria-label="Session editor">
+	<aside class="program-day-sheet" aria-label="Event editor">
 		<header class="program-day-sheet__head">
 			<div class="program-day-sheet__title">{dayLabel}</div>
 			<button type="button" class="program-day-sheet__close" aria-label="Close" onclick={onClose}>✕</button>
@@ -114,7 +114,7 @@
 			{/if}
 
 			<section class="program-day-sheet__section">
-				<h3>Session</h3>
+				<h3>Event</h3>
 				<div class="program-day-sheet__fields">
 					<label>
 						<span>Time</span>
@@ -141,7 +141,7 @@
 				<AdminActionButton variant="primary" onclick={onDone}>Save</AdminActionButton>
 			{:else}
 				<AdminActionButton variant="subtle" onclick={onClose}>Cancel</AdminActionButton>
-				<AdminActionButton variant="primary" onclick={onAdd}>Add session</AdminActionButton>
+				<AdminActionButton variant="primary" onclick={onAdd}>Add event</AdminActionButton>
 			{/if}
 		</footer>
 	</aside>

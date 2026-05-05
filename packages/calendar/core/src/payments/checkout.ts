@@ -255,7 +255,7 @@ export async function getPaymentCheckoutConfig({
     square: {
       applicationId: square?.applicationId || null,
       locationId: square?.locationId || null,
-      environment: square?.environment === "live" ? "production" : "sandbox",
+      environment: (square?.environment === "live" ? "production" : "sandbox") as "production" | "sandbox",
       source: square?.source || null,
       enabled: !!square,
     },

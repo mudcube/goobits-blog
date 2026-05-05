@@ -9,6 +9,8 @@ import {
 	listInvites,
 	listCalendarUsers,
 	requireEnv,
+	type AdminBootstrap,
+	type AdminBootstrapUser,
 	type AdminViewSettings
 } from '@calendar/core'
 import { buildEnv } from '@calendar/kit'
@@ -37,16 +39,6 @@ function readAdminUserId(user: unknown): number | null {
 	return null
 }
 
-type BootstrapUser = {
-	id: number | string
-	email: string
-	name: string | null
-	avatar_url: string | null
-	email_verified: number | boolean
-	last_login_at: number | null
-	provider: string | null
-}
-
 function normalizeAdminUser(raw: unknown) {
 	if (!raw || typeof raw !== 'object') return null
 	const source = raw as Record<string, unknown>
@@ -69,15 +61,7 @@ export async function load(event: RequestEvent) {
 	}
 
 	let viewSettings: AdminViewSettings = getDefaultAdminViewSettings()
-	let bootstrap: {
-		programs: Awaited<ReturnType<typeof getCalendarPrograms>>
-		upcoming: Awaited<ReturnType<typeof listEventsFeed>>['upcoming']
-		recent: Awaited<ReturnType<typeof listEventsFeed>>['recent']
-		paymentDefaults: Awaited<ReturnType<typeof getAdminPaymentDefaults>>
-		paymentIntegrations: Awaited<ReturnType<typeof getPaymentCheckoutConfig>>
-		invites: Awaited<ReturnType<typeof listInvites>>
-		users: BootstrapUser[]
-	} | null = null
+	let bootstrap: AdminBootstrap | null = null
 
 	const userId = readAdminUserId(user)
 	if (userId != null) {
@@ -111,8 +95,8 @@ export async function load(event: RequestEvent) {
 				recent: feed.recent,
 				paymentDefaults,
 				paymentIntegrations,
-				invites,
-				users: (usersRaw as Array<Record<string, unknown>>).map((u) => ({
+				invites: invites as AdminBootstrap['invites'],
+				users: (usersRaw as Array<Record<string, unknown>>).map<AdminBootstrapUser>((u) => ({
 					id: u['id'] as number | string,
 					email: String(u['email'] ?? ''),
 					name: (u['name'] as string | null) ?? null,

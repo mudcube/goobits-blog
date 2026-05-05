@@ -12,7 +12,7 @@
     <h3 class="admin-page__section-title">Booking rules</h3>
   </div>
   <p class="admin-page__section-description">
-    Define when friends can book, and how much runway you need between sessions.
+    Define when friends can book, and how much runway you need between events.
   </p>
   <div class="admin-page__fields-grid">
     <div class="admin-page__fields-row">
