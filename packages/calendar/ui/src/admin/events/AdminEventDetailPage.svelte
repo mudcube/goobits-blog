@@ -254,7 +254,7 @@
 			flash('Mock mode: description preview only')
 			return
 		}
-		await dashboard.updateEventMemory(eventId, next, detail?.event.heroImageUrl ?? '')
+		await dashboard.updateEventRecap(eventId, next)
 		if (dashboard.error) {
 			flash(dashboard.error, true)
 			return

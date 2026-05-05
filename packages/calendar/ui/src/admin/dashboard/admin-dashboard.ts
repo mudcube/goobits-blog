@@ -15,6 +15,7 @@ import {
   persistAdminEventDetails,
   persistAdminEventAttendance,
   persistAdminEventMemory,
+  persistAdminEventRecap,
   persistAdminEventHero,
   clearAdminEventHero,
   removeAdminEvent,
@@ -272,6 +273,13 @@ export async function updateAdminEventMemoryValue(
   input: { recapText?: string; heroImageUrl?: string },
 ) {
   return runSuccess(() => persistAdminEventMemory(eventId, input));
+}
+
+export async function updateAdminEventRecapValue(
+  eventId: number,
+  recapText: string,
+) {
+  return runSuccess(() => persistAdminEventRecap(eventId, recapText));
 }
 
 export async function uploadAdminEventHeroValue(eventId: number, file: File) {

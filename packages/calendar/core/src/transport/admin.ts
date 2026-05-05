@@ -67,7 +67,8 @@ export type AdminEventUpdateInput =
     }
   | { action: "delete" }
   | { action: "event"; title: string; startsAt: string; endsAt: string }
-  | { action: "memory"; recapText: string | null; heroImageUrl: string | null };
+  | { action: "memory"; recapText: string | null; heroImageUrl: string | null }
+  | { action: "recap"; recapText: string | null };
 
 export type AdminSyncQueueActionInput = {
   action: "process" | "retry_dead_letters" | "purge_dead_letters";
@@ -288,7 +289,7 @@ export function parseAdminEventUpdateInput(
   const action = readEnum(
     body,
     "action",
-    ["capacity", "attendance", "memory", "delete", "event"] as const,
+    ["capacity", "attendance", "memory", "delete", "event", "recap"] as const,
     "Unknown action",
   );
   if (action === "capacity") {
@@ -340,6 +341,12 @@ export function parseAdminEventUpdateInput(
       }),
       startsAt,
       endsAt,
+    };
+  }
+  if (action === "recap") {
+    return {
+      action,
+      recapText: readOptionalString(body, "recapText", { maxLength: 400 }),
     };
   }
   return {

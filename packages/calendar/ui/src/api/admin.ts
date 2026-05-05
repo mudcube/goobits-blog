@@ -426,6 +426,21 @@ export async function updateAdminEventMemory(
   });
 }
 
+export async function updateAdminEventRecap(
+  eventId: number,
+  recapText: string,
+) {
+  return requestApi<AdminMutationOk>(withAdminApi(`/events/${eventId}`), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "recap",
+      recapText,
+    }),
+    parse: (payload) => AdminMutationOkSchema.parse(payload),
+  });
+}
+
 export async function updateAdminEventDetails(
   eventId: number,
   input: { title: string; startsAt: string; endsAt: string },

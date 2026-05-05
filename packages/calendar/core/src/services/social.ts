@@ -591,6 +591,21 @@ export async function updateEventHeroImage(
 	return (result.meta?.changes ?? 0) > 0
 }
 
+export async function updateEventRecapText(
+	db: D1DatabaseLike,
+	input: { eventId: number; recapText: string | null }
+) {
+	const result = await db
+		.prepare(
+			`UPDATE calendar_events
+		 SET recap_text = ?, updated_at = unixepoch()
+		 WHERE id = ?`
+		)
+		.bind(input.recapText, input.eventId)
+		.run()
+	return (result.meta?.changes ?? 0) > 0
+}
+
 export async function getEventHeroImage(
 	db: D1DatabaseLike,
 	eventId: number

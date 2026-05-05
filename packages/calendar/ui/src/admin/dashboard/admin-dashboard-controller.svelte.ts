@@ -30,6 +30,7 @@ import {
   updateAdminEventDetailsValue,
   updateAdminEventAttendanceValue,
   updateAdminEventMemoryValue,
+  updateAdminEventRecapValue,
   uploadAdminEventHeroValue,
   clearAdminEventHeroValue,
   deleteAdminEventValue,
@@ -1146,6 +1147,35 @@ export function createAdminDashboardController(
     }
   }
 
+  async function updateEventRecap(eventId: number, recapText: string) {
+    eventUpdatingId = eventId;
+    error = "";
+    try {
+      const result = await updateAdminEventRecapValue(eventId, recapText);
+      if (!result.ok) {
+        error = result.error;
+        return;
+      }
+      events = events.map((event) =>
+        event.id === eventId ? { ...event, recapText } : event,
+      );
+      recentEvents = recentEvents.map((event) =>
+        event.id === eventId ? { ...event, recapText } : event,
+      );
+      if (selectedEventDetail?.event.id === eventId) {
+        selectedEventDetail = {
+          ...selectedEventDetail,
+          event: { ...selectedEventDetail.event, recapText },
+        };
+      }
+    } catch (err) {
+      if (onUnauthorized?.(err)) return;
+      error = err instanceof Error ? err.message : "Failed to save description";
+    } finally {
+      eventUpdatingId = null;
+    }
+  }
+
   function applyHeroImage(eventId: number, heroImageUrl: string | null) {
     events = events.map((event) =>
       event.id === eventId ? { ...event, heroImageUrl } : event,
@@ -1440,6 +1470,7 @@ export function createAdminDashboardController(
     updateEventDetails,
     updateEventAttendance,
     updateEventMemory,
+    updateEventRecap,
     uploadEventHero,
     clearEventHero,
     deleteEvent,

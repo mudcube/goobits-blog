@@ -10,7 +10,8 @@ import {
 	TransportValidationError,
 	updateEventCapacity,
 	updateEventDetails,
-	updateEventMemory
+	updateEventMemory,
+	updateEventRecapText
 } from '@calendar/core'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
@@ -98,6 +99,16 @@ export async function POST(event: RequestEvent) {
 				})
 				if (!changed) return apiError('Event not found', { status: 404 })
 				logAdminEvent(event, 'event_memory_update', { eventId })
+				return apiOk({})
+			}
+
+			if (input.action === 'recap') {
+				const changed = await updateEventRecapText(env.DB, {
+					eventId,
+					recapText: input.recapText
+				})
+				if (!changed) return apiError('Event not found', { status: 404 })
+				logAdminEvent(event, 'event_recap_update', { eventId })
 				return apiOk({})
 			}
 

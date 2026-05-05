@@ -19,6 +19,7 @@ import {
 	saveAdminPayPalIntegration,
 	saveAdminSquareIntegration,
 	updateAdminEventMemory,
+	updateAdminEventRecap,
 	updateAdminEventDetails,
 	updateAdminEventAttendance,
 	updateAdminEventCapacity,
@@ -202,6 +203,7 @@ export async function persistAdminEvents(input: {
 
 export const persistAdminEventCapacity = updateAdminEventCapacity
 export const persistAdminEventMemory = updateAdminEventMemory
+export const persistAdminEventRecap = updateAdminEventRecap
 export const persistAdminEventDetails = updateAdminEventDetails
 export const persistAdminEventAttendance = updateAdminEventAttendance
 export const removeAdminEvent = deleteAdminEvent

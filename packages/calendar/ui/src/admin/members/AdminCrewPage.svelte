@@ -12,6 +12,7 @@
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import AdminCrewInviteModal from '@calendar/ui/admin/members/AdminCrewInviteModal.svelte'
+	import AdminInlineConfirm from '@calendar/ui/admin/shared/AdminInlineConfirm.svelte'
 	import { getActivityEmoji } from '@calendar/ui/shared'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
@@ -59,6 +60,7 @@
 	type InviteFilter = 'all' | InviteStatus
 	let inviteFilter = $state<InviteFilter>('all')
 	let confirmBulkDelete = $state(false)
+	let pendingDeleteInviteId = $state<string | number | null>(null)
 
 	function inviteStatus(invite: InviteRow): InviteStatus {
 		const expiresAt = invite.expires_at
@@ -307,7 +309,7 @@
 			return
 		}
 		const results = await Promise.all(
-			expired.map((it) => members.deleteInvite(it.id, { skipConfirm: true, reload: false }))
+			expired.map((it) => members.deleteInvite(it.id, { reload: false }))
 		)
 		await members.load()
 		confirmBulkDelete = false
@@ -428,18 +430,31 @@
 		}
 	}
 
-	async function deleteInviteWithToast(id: string) {
+	function requestDeleteInvite(id: string | number) {
+		pendingDeleteInviteId = id
+	}
+
+	async function confirmDeleteInvite() {
+		const id = pendingDeleteInviteId
+		pendingDeleteInviteId = null
+		if (id == null) return
 		if (mockMode) {
 			mockInvitesState = mockInvitesState.filter((invite) => invite.id !== id)
 			showToast('Invite deleted')
 			return
 		}
-		await members.deleteInvite(id)
+		await members.deleteInvite(String(id))
 		if (members.error) {
 			showToast(members.error)
 			return
 		}
 		showToast('Invite deleted')
+	}
+
+	function pendingInviteLabel(id: string | number | null) {
+		if (id == null) return ''
+		const invite = inviteItems.find((it) => it.id === id)
+		return invite?.label ? ` for ${invite.label}` : ''
 	}
 
 	function onTopbarCreateInvite(event: { detail?: { anchorRect?: AdminInviteAnchorRect } }) {
@@ -532,11 +547,23 @@
 
 		{#if confirmBulkDelete}
 			<div class="social-crew__notice">
-				<p>Delete all {inviteCounts.expired} expired invite{inviteCounts.expired === 1 ? '' : 's'}?</p>
-				<div class="social-crew__notice-actions">
-					<button type="button" class="admin-ui-btn" onclick={() => { confirmBulkDelete = false }}>Cancel</button>
-					<button type="button" class="admin-ui-btn admin-ui-btn--danger" onclick={() => void deleteAllExpired()}>Delete all</button>
-				</div>
+				<AdminInlineConfirm
+					question={`Delete all ${inviteCounts.expired} expired invite${inviteCounts.expired === 1 ? '' : 's'}?`}
+					confirmLabel="Yes, delete all"
+					onCancel={() => (confirmBulkDelete = false)}
+					onConfirm={() => void deleteAllExpired()}
+				/>
+			</div>
+		{/if}
+
+		{#if pendingDeleteInviteId !== null}
+			<div class="social-crew__notice">
+				<AdminInlineConfirm
+					question={`Delete invite${pendingInviteLabel(pendingDeleteInviteId)}?`}
+					confirmLabel="Yes, delete"
+					onCancel={() => (pendingDeleteInviteId = null)}
+					onConfirm={() => void confirmDeleteInvite()}
+				/>
 			</div>
 		{/if}
 
@@ -559,14 +586,14 @@
 						variant: 'danger' as const,
 						icon: Trash2,
 						ariaLabel: 'Delete invite',
-						onclick: (): void => void deleteInviteWithToast(invite.id)
+						onclick: (): void => requestDeleteInvite(invite.id)
 					}
 				] : [
 					{
 						variant: 'danger' as const,
 						icon: Trash2,
 						ariaLabel: 'Delete invite',
-						onclick: (): void => void deleteInviteWithToast(invite.id)
+						onclick: (): void => requestDeleteInvite(invite.id)
 					}
 				]
 			}))}
@@ -681,14 +708,4 @@
 		font-size: 0.82rem;
 	}
 
-	.social-crew__notice p {
-		margin: 0 0 0.5rem;
-		font-weight: 600;
-	}
-
-	.social-crew__notice-actions {
-		display: flex;
-		gap: 0.4rem;
-		justify-content: flex-end;
-	}
 </style>

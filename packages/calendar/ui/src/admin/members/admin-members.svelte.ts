@@ -71,8 +71,7 @@ export function createAdminMembersController(
 		}
 	}
 
-	async function deleteInvite(id: string, options: { skipConfirm?: boolean; reload?: boolean } = {}) {
-		if (!options.skipConfirm && !confirm('Delete this invite?')) return false
+	async function deleteInvite(id: string, options: { reload?: boolean } = {}) {
 		try {
 			const inviteDeletion = await deleteMemberInvite(id)
 			if (!inviteDeletion.ok) {
