@@ -724,6 +724,33 @@
 	line-height: 1.75;
 }
 
+/* Body images: never upscale beyond intrinsic width. BlogProse defaults
+ * to width: 100% on standalone images, which stretches small diagrams /
+ * screenshots beyond their natural resolution and produces blur on
+ * narrow screens. We respect the intrinsic width (set via the <img>
+ * width/height attributes when present) and only constrain by the
+ * column width. Smaller images stay at their natural size and center. */
+.miko-blog__prose :global(.blog-prose > p:has(> img:only-child)),
+.miko-blog__prose :global(.blog-prose > p:has(> a:only-child > img:only-child)) {
+	text-align: center;
+}
+
+.miko-blog__prose :global(.blog-prose > p:has(> img:only-child) img),
+.miko-blog__prose :global(.blog-prose > p:has(> a:only-child > img:only-child) img) {
+	display: inline-block;
+	width: auto;
+	max-width: 100%;
+	height: auto;
+	margin-inline: auto;
+	object-fit: contain;
+}
+
+/* Inline images that share a paragraph with text or other content: same rule. */
+.miko-blog__prose :global(.blog-prose img) {
+	max-width: 100%;
+	height: auto;
+}
+
 /* ---------- Entry footer band (tags + related + back link) ---------- */
 .miko-blog__entry-footer-section {
 	padding: var(--space-11) 0 var(--space-12);
