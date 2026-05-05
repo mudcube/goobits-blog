@@ -112,6 +112,6 @@
 	.ts__slot--selected { border-color: var(--book-accent); background: color-mix(in srgb, var(--book-accent) 12%, var(--panel-bg, var(--bg)) 88%); }
 	.ts__slot-main { font-size: 0.82rem; font-weight: 650; }
 	.ts__slot-meta { font-size: 0.72rem; color: color-mix(in srgb, var(--text) 55%, transparent); }
-	.ts__confirm { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.7rem 1rem; border: none; border-radius: 999px; background: var(--book-confirm); color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 180ms; box-shadow: 0 2px 10px color-mix(in srgb, var(--book-confirm) 25%, transparent); }
+	.ts__confirm { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.7rem 1rem; border: none; border-radius: 999px; background: var(--book-confirm); color: var(--color-white, #fff); font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 180ms; box-shadow: 0 2px 10px color-mix(in srgb, var(--book-confirm) 25%, transparent); }
 	.ts__confirm:hover { background: var(--book-confirm-hover); box-shadow: 0 4px 16px color-mix(in srgb, var(--book-confirm) 35%, transparent); }
 </style>

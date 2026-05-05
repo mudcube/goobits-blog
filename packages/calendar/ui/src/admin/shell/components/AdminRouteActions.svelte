@@ -89,7 +89,7 @@
 	{/if}
 
 	{#if actions.includes('view-calendar')}
-		<AdminActionButton variant="subtle" icon={CalendarDays} href={hrefWithMock(`${calendarBase}/`)}>Open Calendar</AdminActionButton>
+		<AdminActionButton variant="subtle" icon={CalendarDays} href={hrefWithMock(`${calendarBase}/`)}>Calendar</AdminActionButton>
 	{/if}
 
 	{#if actions.includes('event-edit')}

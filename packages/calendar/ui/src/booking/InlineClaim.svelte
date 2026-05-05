@@ -40,6 +40,6 @@
 	.ic__form { display: grid; grid-template-columns: 1fr auto; gap: 0; }
 	.ic__input { padding: 0.55rem 0.75rem; border: 1px solid color-mix(in srgb, var(--text) 14%, transparent); border-radius: 0.5rem 0 0 0.5rem; border-right: none; background: color-mix(in srgb, var(--bg) 80%, transparent); color: var(--text); font: inherit; font-size: 0.78rem; }
 	.ic__input:focus { outline: none; border-color: color-mix(in srgb, var(--book-accent) 40%, transparent); }
-	.ic__btn { padding: 0.55rem 0.85rem; border: none; border-radius: 0 0.5rem 0.5rem 0; background: var(--gradient-action); color: #fff; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+	.ic__btn { padding: 0.55rem 0.85rem; border: none; border-radius: 0 0.5rem 0.5rem 0; background: var(--gradient-action); color: var(--color-white, #fff); font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
 	.ic__btn:disabled { opacity: 0.35; cursor: default; }
 </style>

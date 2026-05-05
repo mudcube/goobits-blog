@@ -248,7 +248,7 @@
 		font-family: var(--font-display, Georgia);
 		font-size: 1.5rem; font-weight: 500;
 		letter-spacing: -0.03em;
-		color: var(--text, #fff);
+		color: var(--text, var(--color-white, #fff));
 	}
 
 	/* Card */
@@ -289,10 +289,10 @@
 	.bs__cal-list {
 		display: flex; flex-direction: column;
 		margin-top: 1rem;
-		border: 1px solid rgba(167, 139, 250, 0.12);
+		border: 1px solid color-mix(in srgb, var(--book-accent, #a78bfa) 12%, transparent);
 		border-radius: 0.6rem;
 		overflow: hidden;
-		background: rgba(167, 139, 250, 0.03);
+		background: color-mix(in srgb, var(--book-accent, #a78bfa) 3%, transparent);
 	}
 
 	.bs__cal-option {
@@ -304,8 +304,8 @@
 		cursor: pointer; text-decoration: none; text-align: left;
 		transition: background 150ms, color 150ms;
 	}
-	.bs__cal-option:hover { background: rgba(167, 139, 250, 0.08); color: #c4b5fd; }
-	.bs__cal-option + .bs__cal-option { border-top: 1px solid rgba(167, 139, 250, 0.08); }
+	.bs__cal-option:hover { background: color-mix(in srgb, var(--book-accent, #a78bfa) 8%, transparent); color: #c4b5fd; }
+	.bs__cal-option + .bs__cal-option { border-top: 1px solid color-mix(in srgb, var(--book-accent, #a78bfa) 8%, transparent); }
 
 	:global(.bs__cal-icon) { flex-shrink: 0; opacity: 0.4; transition: opacity 150ms; }
 	.bs__cal-option:hover :global(.bs__cal-icon) { opacity: 0.8; }

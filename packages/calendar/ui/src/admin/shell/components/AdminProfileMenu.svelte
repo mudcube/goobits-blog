@@ -106,14 +106,14 @@
 		border: 1px solid var(--admin-control-border);
 		cursor: pointer;
 		transition:
-			background 110ms ease,
-			border-color 110ms ease,
-			box-shadow 110ms ease,
-			transform 110ms ease;
+			background 160ms ease,
+			border-color 160ms ease,
+			box-shadow 160ms ease,
+			transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
 	}
 	.admin-profile-menu__avatar:hover {
 		background: var(--admin-control-bg-hover);
-		box-shadow: 0 4px 14px var(--shadow-soft);
+		box-shadow: 0 2px 8px color-mix(in srgb, var(--text) 8%, transparent);
 		transform: translateY(-1px);
 	}
 	.admin-profile-menu__panel {

@@ -110,7 +110,7 @@
 		color: color-mix(in srgb, var(--calendar-shell-text) 75%, transparent);
 		padding: 0.3rem 0.6rem;
 		border-radius: 999px;
-		font-family: var(--font-serif);
+		font-family: var(--font-ui-sans, var(--font-sans));
 		font-size: 0.84rem;
 		letter-spacing: 0.01em;
 		transition: background 150ms ease, color 150ms ease;

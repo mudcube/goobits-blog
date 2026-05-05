@@ -34,7 +34,7 @@
 	.si__step:disabled { cursor: default; }
 	.si__dot { width: 1.4rem; height: 1.4rem; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 700; flex-shrink: 0; border: 1.5px solid color-mix(in srgb, var(--text) 18%, transparent); color: color-mix(in srgb, var(--text) 40%, transparent); background: transparent; transition: all 150ms; }
 	.si__step--active .si__dot { border-color: var(--book-accent); color: var(--book-accent); background: color-mix(in srgb, var(--book-accent) 8%, transparent); }
-	.si__step--done .si__dot { border-color: var(--book-accent); background: var(--book-accent); color: #fff; }
+	.si__step--done .si__dot { border-color: var(--book-accent); background: var(--book-accent); color: var(--color-white, #fff); }
 	.si__label { font-size: 0.55rem; font-weight: 600; color: color-mix(in srgb, var(--text) 32%, transparent); white-space: nowrap; max-width: 5rem; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 	.si__step--active .si__label { color: color-mix(in srgb, var(--text) 68%, transparent); }
 	.si__step--done .si__label { color: color-mix(in srgb, var(--book-accent) 60%, transparent); }

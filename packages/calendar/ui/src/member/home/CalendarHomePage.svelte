@@ -1,10 +1,11 @@
 <script>
 	import { goto } from '$app/navigation'
+	import { CalendarDays, Sparkles } from '@lucide/svelte'
 	import { joinCalendarEvent, leaveCalendarEvent } from '../../api/calendar'
 	import { applyEventMutationState } from '../booking/feed-state'
 	import { getCalendarUiConfig } from '../../config'
 	import PillButton from '../../primitives/CalendarPillButton.svelte'
-	import Hero from '../../primitives/CalendarHero.svelte'
+	import CalendarPageHero from '../../primitives/CalendarPageHero.svelte'
 	import MonthEventCalendar from '../booking/MonthEventCalendar.svelte'
 	import { EventSessionCard } from '@calendar/ui/shared'
 	import { ChevronRowCard } from '@calendar/ui/shared'
@@ -132,11 +133,7 @@
 </svelte:head>
 
 <div class="calendar-page calendar-home">
-	<Hero
-		className="calendar-page__hero calendar-home__hero"
-		glowClass="calendar-page__hero-glow calendar-home__glow"
-		eyebrowClass="calendar-page__eyebrow calendar-home__eyebrow"
-		subtitleClass="calendar-page__subtitle calendar-home__sub"
+	<CalendarPageHero
 		eyebrow="Members"
 		titleLines={homeTitleLines}
 		subtitle="Pick an activity and get on the schedule."
@@ -167,7 +164,9 @@
 		{/if}
 		{#if upcoming.length === 0}
 			<div class="calendar-home__empty">
-				<span class="calendar-home__empty-icon">📅</span>
+				<span class="calendar-home__empty-icon" aria-hidden="true">
+					<CalendarDays size={28} strokeWidth={1.6} />
+				</span>
 				<p class="calendar-home__empty-text">No events are scheduled yet.</p>
 				<p class="calendar-home__empty-hint">Browse activities above to find something fun.</p>
 			</div>
@@ -184,7 +183,9 @@
 		<h2 class="calendar-home__feed-title">Last Week</h2>
 		{#if recent.length === 0}
 			<div class="calendar-home__empty">
-				<span class="calendar-home__empty-icon">✨</span>
+				<span class="calendar-home__empty-icon" aria-hidden="true">
+					<Sparkles size={26} strokeWidth={1.6} />
+				</span>
 				<p class="calendar-home__empty-text">No completed events yet.</p>
 				<p class="calendar-home__empty-hint">Your past sessions will show up here.</p>
 			</div>
@@ -270,9 +271,11 @@
 	}
 
 	.calendar-home__empty-icon {
-		font-size: 1.8rem;
-		line-height: 1;
-		margin-bottom: 0.25rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		color: color-mix(in srgb, var(--calendar-shell-text) 48%, transparent);
+		margin-bottom: 0.35rem;
 	}
 
 	.calendar-home__empty-text {
