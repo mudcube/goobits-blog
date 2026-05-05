@@ -220,7 +220,7 @@
 		font-weight: 700;
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
-		color: color-mix(in srgb, var(--text) 50%, transparent);
+		color: var(--admin-text-muted);
 	}
 	.admin-datetime__row {
 		display: grid;

@@ -281,7 +281,7 @@
 	}
 
 	.admin-meta-cards__badge--neutral .admin-meta-cards__badge-dot {
-		background: color-mix(in srgb, var(--text) 50%, transparent);
+		background: var(--admin-text-muted);
 	}
 
 	.admin-meta-cards--single-line .admin-meta-cards__body {

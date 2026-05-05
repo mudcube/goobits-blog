@@ -62,7 +62,7 @@
   .calendar-view-settings__field legend {
     font-size: 0.74rem;
     font-weight: 620;
-    color: color-mix(in srgb, var(--text) 60%, transparent);
+    color: var(--admin-text-soft);
     margin-bottom: 0.05rem;
   }
 

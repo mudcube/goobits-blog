@@ -483,7 +483,7 @@
 	.payment-method-row__handle {
 		font-size: 0.78rem;
 		font-weight: 400;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		color: var(--admin-text-soft);
 		font-variant-numeric: tabular-nums;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -512,7 +512,7 @@
 		background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
 	}
 	.payment-method-row__chev {
-		color: color-mix(in srgb, var(--text) 50%, transparent);
+		color: var(--admin-text-muted);
 		display: inline-flex;
 	}
 
@@ -562,7 +562,7 @@
 	.payment-method-row__field-label {
 		font-size: 0.74rem;
 		font-weight: 540;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		color: var(--admin-text-soft);
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;

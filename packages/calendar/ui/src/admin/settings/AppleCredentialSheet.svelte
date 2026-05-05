@@ -113,7 +113,7 @@
 	.apple-sheet__label {
 		font-size: 0.74rem;
 		font-weight: 540;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		color: var(--admin-text-soft);
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;

@@ -153,7 +153,7 @@
 		font-size: 0.78rem;
 		font-weight: 420;
 		font-style: italic;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		color: var(--admin-text-soft);
 		padding: 0.3rem 0;
 		line-height: 1.5;
 		cursor: pointer;

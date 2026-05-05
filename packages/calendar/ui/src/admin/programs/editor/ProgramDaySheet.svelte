@@ -198,7 +198,7 @@
 		appearance: none;
 		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
 		background: transparent;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		color: var(--admin-text-soft);
 		width: 28px;
 		height: 28px;
 		border-radius: 999px;
@@ -234,7 +234,7 @@
 		font-weight: 800;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		color: color-mix(in srgb, var(--text) 50%, transparent);
+		color: var(--admin-text-muted);
 	}
 
 	.program-day-sheet__opt-row,
@@ -285,7 +285,7 @@
 		font-weight: 700;
 		letter-spacing: 0.02em;
 		text-transform: uppercase;
-		color: color-mix(in srgb, var(--text) 50%, transparent);
+		color: var(--admin-text-muted);
 	}
 
 	.program-day-sheet__note {

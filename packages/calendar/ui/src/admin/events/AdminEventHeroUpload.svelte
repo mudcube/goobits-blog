@@ -187,7 +187,7 @@
 		border-radius: 0.75rem;
 		border: 1.5px dashed color-mix(in srgb, var(--text) 16%, transparent);
 		background: color-mix(in srgb, var(--text) 3%, var(--bg) 97%);
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		color: var(--admin-text-soft);
 		cursor: pointer;
 		font: inherit;
 		text-align: center;
@@ -212,7 +212,7 @@
 		font-size: 0.72rem;
 		font-weight: 460;
 		font-style: italic;
-		color: color-mix(in srgb, var(--text) 50%, transparent);
+		color: var(--admin-text-muted);
 	}
 
 	.hero-upload__preview {

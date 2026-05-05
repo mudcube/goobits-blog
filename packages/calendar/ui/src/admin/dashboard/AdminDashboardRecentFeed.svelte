@@ -153,7 +153,7 @@
 	}
 
 	.admin-dashboard-recent__row--empty {
-		color: color-mix(in srgb, var(--text) 50%, transparent);
+		color: var(--admin-text-muted);
 		font-size: 0.75rem;
 	}
 

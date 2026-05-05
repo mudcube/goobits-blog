@@ -253,7 +253,7 @@
 	.admin-new-program__row > span {
 		font-size: 0.78rem;
 		font-weight: 600;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		color: var(--admin-text-soft);
 	}
 
 	.admin-new-program__row--icon {
@@ -285,7 +285,7 @@
 	}
 
 	.admin-new-program__icon--on {
-		border-color: var(--admin-selected-border, color-mix(in srgb, var(--text) 60%, transparent));
+		border-color: var(--admin-selected-border, var(--admin-text-soft));
 		background: var(--admin-selected-bg, color-mix(in srgb, var(--text) 8%, transparent));
 		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-focus-ring, var(--text)) 30%, transparent);
 	}
@@ -320,7 +320,7 @@
 	.admin-new-program__hint {
 		margin: 0;
 		font-size: 0.78rem;
-		color: color-mix(in srgb, var(--text) 50%, transparent);
+		color: var(--admin-text-muted);
 	}
 
 	.admin-new-program__toast {

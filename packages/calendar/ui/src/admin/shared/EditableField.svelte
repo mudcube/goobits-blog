@@ -113,11 +113,11 @@
 	}
 	.editable-field:hover,
 	.editable-field:focus {
-		border-bottom-color: color-mix(in srgb, var(--text) 40%, transparent);
+		border-bottom-color: var(--admin-text-faint);
 	}
 	.editable-field:empty::before {
 		content: attr(data-placeholder);
-		color: color-mix(in srgb, var(--text) 40%, transparent);
+		color: var(--admin-text-faint);
 		font-style: italic;
 	}
 	.editable-field--multiline {

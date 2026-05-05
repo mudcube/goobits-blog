@@ -382,7 +382,7 @@
 	.social-events__time {
 		font-size: 0.78rem;
 		font-weight: 600;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		color: var(--admin-text-soft);
 		white-space: nowrap;
 	}
 
