@@ -161,6 +161,7 @@
 <li
 	class="payment-method-row"
 	class:payment-method-row--primary={isPrimary && configured}
+	class:payment-method-row--expanded={expanded}
 	style="--method-color: {meta.color}"
 >
 	<button
@@ -476,7 +477,8 @@
 	.payment-method-row:last-child {
 		border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
 	}
-	.payment-method-row--primary::before {
+	.payment-method-row--primary::before,
+	.payment-method-row--expanded::before {
 		content: '';
 		position: absolute;
 		left: 0;
@@ -485,6 +487,9 @@
 		width: 2px;
 		border-radius: 1px;
 		background: var(--method-color);
+	}
+	.payment-method-row--expanded:not(.payment-method-row--primary)::before {
+		opacity: 0.55;
 	}
 
 	.payment-method-row__head {
