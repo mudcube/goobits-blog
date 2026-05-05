@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CalendarDays, LayoutDashboard, Users } from '@lucide/svelte'
+	import { CalendarDays, LayoutDashboard, Settings as SettingsIcon, Users } from '@lucide/svelte'
 	import { getCalendarUiConfig } from '../../../config'
 	import type { AdminNavSection } from '../route'
 
@@ -21,7 +21,8 @@
 	const primaryNav: NavItem[] = [
 		{ href: `${adminBase}/`, label: 'Dashboard', icon: LayoutDashboard, section: 'dashboard' },
 		{ href: `${adminBase}/crew/`, label: 'Crew', icon: Users, section: 'crew' },
-		{ href: `${adminBase}/events/`, label: 'Events', icon: CalendarDays, section: 'events' }
+		{ href: `${adminBase}/events/`, label: 'Events', icon: CalendarDays, section: 'events' },
+		{ href: `${adminBase}/settings/`, label: 'Settings', icon: SettingsIcon, section: 'settings' }
 	]
 
 	function normalizePath(pathname: string) {

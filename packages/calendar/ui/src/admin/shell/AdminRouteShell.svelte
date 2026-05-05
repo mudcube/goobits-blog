@@ -2,7 +2,6 @@
 	import '@calendar/theme/admin.scss'
 	import './admin-route-shell.scss'
 	import { page } from '$app/stores'
-	import { Settings as SettingsIcon } from '@lucide/svelte'
 	import { getCalendarUiConfig } from '../../config'
 	import { isAdminMockMode, withAdminMock } from '../mock/mock-mode'
 	import AdminProfileMenu from './components/AdminProfileMenu.svelte'
@@ -20,7 +19,6 @@
 	}>()
 
 	const calendarConfig = getCalendarUiConfig()
-	const adminBase = calendarConfig.routes.adminBase
 	const mockMode = $derived(isAdminMockMode($page.url))
 
 	function hrefWithMock(path: string) {
@@ -49,15 +47,6 @@
 					{hrefWithMock}
 					programSlug={routeInfo.programSlug}
 				/>
-				<a
-					class="social-admin__topbar-icon"
-					class:social-admin__topbar-icon--active={routeInfo.currentSection === 'settings'}
-					href={hrefWithMock(`${adminBase}/settings/`)}
-					aria-label="Settings"
-					aria-current={routeInfo.currentSection === 'settings' ? 'page' : undefined}
-				>
-					<SettingsIcon size={16} strokeWidth={1.8} />
-				</a>
 				{#if user}
 					<AdminProfileMenu {user} />
 				{/if}
