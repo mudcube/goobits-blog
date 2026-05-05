@@ -77,7 +77,6 @@
 	} = $props()
 
 	let expanded = $state(false)
-	let advancedOpen = $state(false)
 	let pendingOn = $state(false)
 
 	const handle = $derived(payment.handles[meta.value] ?? '')
@@ -119,42 +118,23 @@
 	function toggleCheckout() {
 		if (switchOn) {
 			pendingOn = false
-			advancedOpen = false
 			if (checkout.enabled && !mockMode) void payment.disconnectCheckout(railName)
 			return
 		}
 		pendingOn = true
-		advancedOpen = true
 		if (mockMode) return
 		if (usesPayPalRail) payment.openPayPalSetup()
 		else payment.openCashAppPaySetup()
-	}
-
-	function openAdvanced() {
-		advancedOpen = true
-		if (mockMode) return
-		if (usesPayPalRail) payment.openPayPalSetup()
-		else payment.openCashAppPaySetup()
-	}
-
-	function closeAdvanced() {
-		advancedOpen = false
-		if (!checkout.enabled) pendingOn = false
 	}
 
 	async function handleSaveAdvanced() {
 		if (mockMode) {
-			advancedOpen = false
 			pendingOn = false
 			return
 		}
 		if (usesPayPalRail) await payment.savePayPalSetup()
 		else await payment.saveCashAppPaySetup()
-		if (!checkout.enabled) {
-			pendingOn = false
-			return
-		}
-		advancedOpen = false
+		if (!checkout.enabled) pendingOn = false
 	}
 </script>
 
@@ -276,26 +256,7 @@
 					</button>
 				</div>
 
-				{#if switchOn || advancedOpen}
-					<button
-						type="button"
-						class="payment-method-row__disclosure"
-						onclick={() => {
-							if (advancedOpen) closeAdvanced()
-							else openAdvanced()
-						}}
-						aria-expanded={advancedOpen}
-					>
-						{#if advancedOpen}
-							<ChevronDown size={14} />
-						{:else}
-							<ChevronRight size={14} />
-						{/if}
-						Advanced setup
-					</button>
-				{/if}
-
-				{#if advancedOpen}
+				{#if switchOn}
 					<div
 						class="payment-method-row__creds"
 						transition:slide={{ duration: 200, easing: cubicOut }}
@@ -755,24 +716,6 @@
 		color: var(--admin-accent);
 		font-style: normal;
 		font-weight: 580;
-	}
-
-	.payment-method-row__disclosure {
-		justify-self: start;
-		border: none;
-		background: none;
-		font: inherit;
-		font-size: 0.74rem;
-		font-weight: 500;
-		color: color-mix(in srgb, var(--text) 58%, transparent);
-		display: inline-flex;
-		align-items: center;
-		gap: 0.3rem;
-		cursor: pointer;
-		padding: 0.2rem 0;
-	}
-	.payment-method-row__disclosure:hover {
-		color: var(--text);
 	}
 
 	.payment-method-row__creds {
