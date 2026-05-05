@@ -112,6 +112,7 @@ export function createPaymentSettingsController(
   let initialSnapshot = $state(snapshot(blankHandles(), ""));
   let autosaveTimer: ReturnType<typeof setTimeout> | null = null;
   let suspendAutosave = $state(true);
+  let loaded = $state(false);
   let lastTouchedMethod = $state<PaymentMethodKey | "">("");
   let lastSavedMethod = $state<PaymentMethodKey | "">("");
   let savedFlashTimer: ReturnType<typeof setTimeout> | null = null;
@@ -163,6 +164,7 @@ export function createPaymentSettingsController(
           : pickFallbackPrimary();
       initialSnapshot = snapshot(handles, primary);
       suspendAutosave = false;
+      loaded = true;
       return;
     }
     await dashboard.loadStatus();
@@ -182,6 +184,7 @@ export function createPaymentSettingsController(
         : pickFallbackPrimary();
     initialSnapshot = snapshot(handles, primary);
     suspendAutosave = false;
+    loaded = true;
   }
 
   function updateHandle(method: PaymentMethodKey, value: string) {
@@ -390,6 +393,9 @@ export function createPaymentSettingsController(
     },
     get lastSavedMethod() {
       return lastSavedMethod;
+    },
+    get loaded() {
+      return loaded;
     },
     isConfigured,
     updateHandle,

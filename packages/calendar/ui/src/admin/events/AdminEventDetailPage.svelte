@@ -385,7 +385,7 @@
 				/>
 			</div>
 		{/if}
-		{#if loading}
+		{#if loading || (!mockMode && !attemptedLoad)}
 			<p class="admin-event-detail__loading">Loading event detail...</p>
 		{:else if detail}
 			<div class="admin-event-detail__header">

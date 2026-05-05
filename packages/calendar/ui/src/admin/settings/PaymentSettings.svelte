@@ -193,7 +193,7 @@
 		</div>
 	</div>
 
-	{#if configuredCount === 0}
+	{#if payment.loaded && configuredCount === 0}
 		<p class="payment-settings__empty-hint">
 			Add at least one method to accept bookings.
 		</p>

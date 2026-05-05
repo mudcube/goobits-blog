@@ -17,6 +17,7 @@ export function createAdminMembersController(
 	let invites = $state<CalendarAdminInvite[]>([])
 	let users = $state<CalendarAdminUser[]>([])
 	let loading = $state(false)
+	let loaded = $state(false)
 	let error = $state('')
 	let inviteEmail = $state('')
 	let inviteUses = $state(DEFAULT_INVITE_DRAFT.uses)
@@ -43,6 +44,7 @@ export function createAdminMembersController(
 			error = err instanceof Error ? err.message : 'Failed to load members data'
 		} finally {
 			loading = false
+			loaded = true
 		}
 	}
 
@@ -165,6 +167,7 @@ export function createAdminMembersController(
 		get invites() { return invites },
 		get users() { return users },
 		get loading() { return loading },
+		get loaded() { return loaded },
 		get error() { return error },
 		get notice() { return notice },
 		get inviteEmail() { return inviteEmail },

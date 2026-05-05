@@ -240,6 +240,7 @@ export function createAdminDashboardController(
     }>
   >([]);
   let programsLoading = $state(false);
+  let programsLoaded = $state(false);
   let programUpdatingSlug = $state<string | null>(null);
   let programSaving = $state(false);
   let programDeleting = $state(false);
@@ -317,6 +318,7 @@ export function createAdminDashboardController(
     }>
   >([]);
   let eventsLoading = $state(false);
+  let eventsLoaded = $state(false);
   let eventsCreating = $state(false);
   let eventUpdatingId = $state<number | null>(null);
   let syncQueueBusy = $state(false);
@@ -681,6 +683,7 @@ export function createAdminDashboardController(
       error = err instanceof Error ? err.message : "Failed to load programs";
     } finally {
       programsLoading = false;
+      programsLoaded = true;
     }
   }
 
@@ -885,6 +888,7 @@ export function createAdminDashboardController(
       error = err instanceof Error ? err.message : "Failed to load events";
     } finally {
       eventsLoading = false;
+      eventsLoaded = true;
     }
   }
 
@@ -1402,6 +1406,9 @@ export function createAdminDashboardController(
     get programsLoading() {
       return programsLoading;
     },
+    get programsLoaded() {
+      return programsLoaded;
+    },
     get programUpdatingSlug() {
       return programUpdatingSlug;
     },
@@ -1428,6 +1435,9 @@ export function createAdminDashboardController(
     },
     get eventsLoading() {
       return eventsLoading;
+    },
+    get eventsLoaded() {
+      return eventsLoaded;
     },
     get eventsCreating() {
       return eventsCreating;

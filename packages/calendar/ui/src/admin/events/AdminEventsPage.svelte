@@ -159,8 +159,10 @@
 			subtitle="Manage program pages & upcoming sessions."
 		/>
 
-		<h4>PROGRAMS ({programsSource.length})</h4>
-		{#if programsSource.length === 0}
+		<h4>PROGRAMS{#if mockMode || dashboard.programsLoaded} ({programsSource.length}){/if}</h4>
+		{#if !mockMode && !dashboard.programsLoaded}
+			<AdminLoadingText text="Loading programs…" />
+		{:else if programsSource.length === 0}
 			<div class="social-events__empty calendar-ui-card">No activity pages yet.</div>
 		{:else}
 			<div class="social-events__programs">
@@ -206,7 +208,7 @@
 		{/if}
 
 		<h4>UPCOMING</h4>
-		{#if !mockMode && dashboard.eventsLoading}
+		{#if !mockMode && !dashboard.eventsLoaded}
 			<AdminLoadingText text="Loading events…" />
 		{:else}
 			<AdminMetaCards
@@ -244,16 +246,20 @@
 		{/if}
 
 		<h4>PAST</h4>
-		<AdminMetaCards
-			items={recentEventsSource.slice(0, 8).map((recent) => ({
-				id: String(recent.id || recent.title),
-				label: recent.title,
-				detail: `${dayLabel(recent.startsAt)} · ${recent.seatsTaken} went`,
-				dotColor: getActivityColor(recent.activityLabel, recent.activitySlug),
-				dotIcon: getActivityIcon(recent.activityLabel, recent.activitySlug),
-			}))}
-			emptyText="No past events yet."
-		/>
+		{#if !mockMode && !dashboard.eventsLoaded}
+			<AdminLoadingText text="Loading past events…" />
+		{:else}
+			<AdminMetaCards
+				items={recentEventsSource.slice(0, 8).map((recent) => ({
+					id: String(recent.id || recent.title),
+					label: recent.title,
+					detail: `${dayLabel(recent.startsAt)} · ${recent.seatsTaken} went`,
+					dotColor: getActivityColor(recent.activityLabel, recent.activitySlug),
+					dotIcon: getActivityIcon(recent.activityLabel, recent.activitySlug),
+				}))}
+				emptyText="No past events yet."
+			/>
+		{/if}
 	</div>
 {/if}
 

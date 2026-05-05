@@ -7,6 +7,7 @@
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import { createInviteShareLink } from '@calendar/ui/admin/dashboard/admin-dashboard'
 	import { Copy, Trash2, Ticket, Hourglass, CircleDashed } from '@lucide/svelte'
+	import AdminLoadingText from '@calendar/ui/admin/shared/AdminLoadingText.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminToast from '@calendar/ui/admin/shared/AdminToast.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
@@ -522,26 +523,30 @@
 	<div class="social-crew admin-content">
 		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Everyone with access, and everyone who could have it." />
 
-		<h4>MEMBERS ({users.length})</h4>
-		<div class="social-crew__list calendar-ui-card">
-			{#each sortedUsers as user (String(user['id'] || user['email'] || user['name']))}
-				<AdminCrewMemberCard
-					name={displayName(user)}
-					detail={memberDetail(user)}
-					badge={deriveBadge(user)}
-					initials={initials(displayName(user))}
-					isYou={isYou(user)}
-					href={hrefWithMock(withAdminRoute(`crew/${String(user['id'] || '').trim()}/`))}
-					onclick={() => {
-						const id = String(user['id'] || '').trim()
-						if (!id) return
-						void goto(hrefWithMock(withAdminRoute(`crew/${id}/`)))
-					}}
-				/>
-			{/each}
-		</div>
+		<h4>MEMBERS{#if mockMode || members.loaded} ({users.length}){/if}</h4>
+		{#if !mockMode && !members.loaded}
+			<AdminLoadingText text="Loading crew…" />
+		{:else}
+			<div class="social-crew__list calendar-ui-card">
+				{#each sortedUsers as user (String(user['id'] || user['email'] || user['name']))}
+					<AdminCrewMemberCard
+						name={displayName(user)}
+						detail={memberDetail(user)}
+						badge={deriveBadge(user)}
+						initials={initials(displayName(user))}
+						isYou={isYou(user)}
+						href={hrefWithMock(withAdminRoute(`crew/${String(user['id'] || '').trim()}/`))}
+						onclick={() => {
+							const id = String(user['id'] || '').trim()
+							if (!id) return
+							void goto(hrefWithMock(withAdminRoute(`crew/${id}/`)))
+						}}
+					/>
+				{/each}
+			</div>
+		{/if}
 
-		<h4>INVITE LINKS ({inviteCounts.all})</h4>
+		<h4>INVITE LINKS{#if mockMode || members.loaded} ({inviteCounts.all}){/if}</h4>
 
 		{#if inviteCounts.all > 0}
 			<div class="social-crew__filters">
@@ -577,38 +582,42 @@
 			</div>
 		{/if}
 
-		<AdminMetaCards
-			items={visibleInviteItems.map((invite) => ({
-				id: invite.id,
-				label: invite.label,
-				detail: invite.detail,
-				dotIcon: statusIcon(invite.status),
-				dotColor: statusDotColor(invite.status),
-				dimmed: invite.status === 'expired' || invite.status === 'exhausted',
-				actions: invite.status === 'pending' ? [
-					{
-						variant: 'subtle' as const,
-						icon: Copy,
-						ariaLabel: 'Copy invite link',
-						onclick: (): void => void copyInviteWithToast(invite.code)
-					},
-					{
-						variant: 'danger' as const,
-						icon: Trash2,
-						ariaLabel: 'Delete invite',
-						onclick: (): void => requestDeleteInvite(invite.id)
-					}
-				] : [
-					{
-						variant: 'danger' as const,
-						icon: Trash2,
-						ariaLabel: 'Delete invite',
-						onclick: (): void => requestDeleteInvite(invite.id)
-					}
-				]
-			}))}
-			emptyText={inviteFilter === 'all' ? 'No invites yet.' : `No ${inviteFilter} invites.`}
-		/>
+		{#if !mockMode && !members.loaded}
+			<AdminLoadingText text="Loading invites…" />
+		{:else}
+			<AdminMetaCards
+				items={visibleInviteItems.map((invite) => ({
+					id: invite.id,
+					label: invite.label,
+					detail: invite.detail,
+					dotIcon: statusIcon(invite.status),
+					dotColor: statusDotColor(invite.status),
+					dimmed: invite.status === 'expired' || invite.status === 'exhausted',
+					actions: invite.status === 'pending' ? [
+						{
+							variant: 'subtle' as const,
+							icon: Copy,
+							ariaLabel: 'Copy invite link',
+							onclick: (): void => void copyInviteWithToast(invite.code)
+						},
+						{
+							variant: 'danger' as const,
+							icon: Trash2,
+							ariaLabel: 'Delete invite',
+							onclick: (): void => requestDeleteInvite(invite.id)
+						}
+					] : [
+						{
+							variant: 'danger' as const,
+							icon: Trash2,
+							ariaLabel: 'Delete invite',
+							onclick: (): void => requestDeleteInvite(invite.id)
+						}
+					]
+				}))}
+				emptyText={inviteFilter === 'all' ? 'No invites yet.' : `No ${inviteFilter} invites.`}
+			/>
+		{/if}
 
 	</div>
 

@@ -187,9 +187,11 @@
 			</section>
 
 			<section class="admin-crew-member-page__section">
-				<h4>UPCOMING ({memberUpcoming.length})</h4>
+				<h4>UPCOMING{#if mockMode || dashboard.eventsLoaded} ({memberUpcoming.length}){/if}</h4>
 				<div class="admin-crew-member-page__list">
-					{#if memberUpcoming.length === 0}
+					{#if !mockMode && !dashboard.eventsLoaded}
+						<div class="admin-crew-member-page__empty calendar-ui-card">Loading…</div>
+					{:else if memberUpcoming.length === 0}
 						<div class="admin-crew-member-page__empty calendar-ui-card">No upcoming sessions.</div>
 					{:else}
 						{#each memberUpcoming as event (event.id)}
@@ -203,9 +205,11 @@
 			</section>
 
 			<section class="admin-crew-member-page__section">
-				<h4>RECENT ({memberRecent.length})</h4>
+				<h4>RECENT{#if mockMode || dashboard.eventsLoaded} ({memberRecent.length}){/if}</h4>
 				<div class="admin-crew-member-page__list">
-					{#if memberRecent.length === 0}
+					{#if !mockMode && !dashboard.eventsLoaded}
+						<div class="admin-crew-member-page__empty calendar-ui-card">Loading…</div>
+					{:else if memberRecent.length === 0}
 						<div class="admin-crew-member-page__empty calendar-ui-card">No recent sessions.</div>
 					{:else}
 						{#each memberRecent as event (event.id)}

@@ -10,9 +10,13 @@
 <div class="admin-page__section">
 	<div class="admin-page__section-head">
 		<h3 class="admin-page__section-title">Memories</h3>
-		<span class="admin-page__section-count">{dashboard.recentEvents.length} recent</span>
+		{#if dashboard.eventsLoaded}
+			<span class="admin-page__section-count">{dashboard.recentEvents.length} recent</span>
+		{/if}
 	</div>
-	{#if dashboard.recentEvents.length === 0}
+	{#if !dashboard.eventsLoaded}
+		<p class="admin-page__section-description">Loading…</p>
+	{:else if dashboard.recentEvents.length === 0}
 		<p class="admin-page__section-description">No past events yet.</p>
 	{:else}
 		<div class="admin-page__members-list">

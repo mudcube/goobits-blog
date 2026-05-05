@@ -77,7 +77,7 @@ const adminMockCatalog = getAdminMockCatalog()
 				subtitle=""
 			/>
 
-			{#if !mockMode && dashboard.eventsLoading}
+			{#if !mockMode && !dashboard.eventsLoaded}
 				<AdminLoadingText text="Loading dashboard…" />
 			{:else}
 				<AdminDashboardContent
