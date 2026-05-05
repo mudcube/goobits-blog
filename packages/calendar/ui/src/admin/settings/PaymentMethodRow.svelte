@@ -78,6 +78,7 @@
 
 	let expanded = $state(false)
 	let advancedOpen = $state(false)
+	let pendingOn = $state(false)
 
 	const handle = $derived(payment.handles[meta.value] ?? '')
 	const configured = $derived(payment.isConfigured(meta.value))
@@ -88,6 +89,11 @@
 		usesPayPalRail ? 'paypal_checkout' : 'cash_app_pay'
 	)
 	const handleErr = $derived(validateHandle(meta.value, handle))
+	const switchOn = $derived(checkout.enabled || pendingOn)
+
+	$effect(() => {
+		if (checkout.enabled) pendingOn = false
+	})
 
 	function validateHandle(method: PaymentMethodKey, raw: string): string | null {
 		const v = raw.trim()
@@ -111,11 +117,13 @@
 	}
 
 	function toggleCheckout() {
-		if (checkout.enabled) {
-			if (!mockMode) void payment.disconnectCheckout(railName)
+		if (switchOn) {
+			pendingOn = false
 			advancedOpen = false
+			if (checkout.enabled && !mockMode) void payment.disconnectCheckout(railName)
 			return
 		}
+		pendingOn = true
 		advancedOpen = true
 		if (mockMode) return
 		if (usesPayPalRail) payment.openPayPalSetup()
@@ -129,13 +137,23 @@
 		else payment.openCashAppPaySetup()
 	}
 
+	function closeAdvanced() {
+		advancedOpen = false
+		if (!checkout.enabled) pendingOn = false
+	}
+
 	async function handleSaveAdvanced() {
 		if (mockMode) {
 			advancedOpen = false
+			pendingOn = false
 			return
 		}
 		if (usesPayPalRail) await payment.savePayPalSetup()
 		else await payment.saveCashAppPaySetup()
+		if (!checkout.enabled) {
+			pendingOn = false
+			return
+		}
 		advancedOpen = false
 	}
 </script>
@@ -240,10 +258,11 @@
 					<button
 						type="button"
 						class="payment-method-row__switch"
-						class:payment-method-row__switch--on={checkout.enabled}
+						class:payment-method-row__switch--on={switchOn}
+						class:payment-method-row__switch--pending={pendingOn && !checkout.enabled}
 						role="switch"
-						aria-checked={checkout.enabled}
-						aria-label={`${checkout.enabled ? 'Disable' : 'Enable'} ${meta.label} checkout`}
+						aria-checked={switchOn}
+						aria-label={`${switchOn ? 'Disable' : 'Enable'} ${meta.label} checkout`}
 						disabled={payment.paymentIntegrationBusy}
 						onclick={toggleCheckout}
 					>
@@ -251,17 +270,17 @@
 							<span class="payment-method-row__switch-knob"></span>
 						</span>
 						<span class="payment-method-row__switch-label">
-							{checkout.enabled ? 'On' : 'Off'}
+							{pendingOn && !checkout.enabled ? 'Setup…' : switchOn ? 'On' : 'Off'}
 						</span>
 					</button>
 				</div>
 
-				{#if checkout.enabled || advancedOpen}
+				{#if switchOn || advancedOpen}
 					<button
 						type="button"
 						class="payment-method-row__disclosure"
 						onclick={() => {
-							if (advancedOpen) advancedOpen = false
+							if (advancedOpen) closeAdvanced()
 							else openAdvanced()
 						}}
 						aria-expanded={advancedOpen}
