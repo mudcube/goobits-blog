@@ -224,11 +224,12 @@ $admin-mobile-breakpoint: 768px;
   max-width: var(--admin-content-max);
 }
 
-.social-admin .admin-content > h4 {
+.social-admin .admin-content h4 {
   margin: 0;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   font-weight: 700;
+  text-transform: uppercase;
   color: color-mix(in srgb, var(--text) 55%, transparent);
 }
 
@@ -283,7 +284,9 @@ $admin-mobile-breakpoint: 768px;
 }
 
 .social-admin .admin-ui-btn--primary:hover:not(:disabled) {
-  box-shadow: 0 4px 18px color-mix(in srgb, var(--admin-accent) 32%, transparent);
+  background: var(--gradient-action);
+  filter: brightness(1.08) saturate(1.05);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--admin-accent) 38%, transparent);
 }
 
 .social-admin .admin-ui-btn--danger {
@@ -310,6 +313,7 @@ $admin-mobile-breakpoint: 768px;
 }
 
 .social-admin .admin-ui-btn--solid:hover:not(:disabled) {
+  background: var(--admin-accent);
   filter: brightness(1.08);
   box-shadow: 0 4px 18px color-mix(in srgb, var(--admin-accent) 32%, transparent);
 }

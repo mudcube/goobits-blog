@@ -44,7 +44,7 @@
 				const current = members.accessRows.find((item) => item.programSlug === row.programSlug)
 				if (current && current.allowed !== row.allowed) members.toggleAccess(row.programSlug)
 			}
-			accessSaveError = "Couldn't save — try again."
+			accessSaveError = "Couldn't save. Try again."
 		}
 	}
 
@@ -102,7 +102,7 @@
 	const memberRole = $derived(member ? normalizeName(member.role) : '')
 	const joinedDate = $derived.by(() => {
 		const createdAt = Number(member?.created_at || 0)
-		if (!createdAt) return '—'
+		if (!createdAt) return '-'
 		const ms = createdAt > 10_000_000_000 ? createdAt : createdAt * 1000
 		return new Date(ms).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
 	})

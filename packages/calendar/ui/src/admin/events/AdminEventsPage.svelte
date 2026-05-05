@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
-	import { ArrowDown, ArrowUp, Plus } from '@lucide/svelte'
+	import { GripVertical } from '@lucide/svelte'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
@@ -30,7 +30,8 @@
 	)
 	const eventsSource = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
 	const recentEventsSource = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
-	let movingProgramSlug = $state<string | null>(null)
+	let draggingSlug = $state<string | null>(null)
+	let dragOverSlug = $state<string | null>(null)
 
 	type EventCardExtra = {
 		startsAt: string
@@ -95,25 +96,58 @@
 		return item.extra as EventCardExtra
 	}
 
-	async function moveProgram(slug: string, direction: 'up' | 'down') {
-		if (movingProgramSlug) return
+	function currentOrder() {
+		return programsSource.map((program) => program.slug)
+	}
+
+	async function commitOrder(slug: string, targetSlug: string) {
+		if (slug === targetSlug) return
+		const order = currentOrder()
+		const fromIndex = order.indexOf(slug)
+		const toIndex = order.indexOf(targetSlug)
+		if (fromIndex < 0 || toIndex < 0) return
+		const next = [...order]
+		const [item] = next.splice(fromIndex, 1)
+		if (!item) return
+		next.splice(toIndex, 0, item)
 		if (mockMode) {
-			const current = mockProgramOrder.length > 0 ? [...mockProgramOrder] : programsSource.map((program) => program.slug)
-			const index = current.indexOf(slug)
-			const nextIndex = direction === 'up' ? index - 1 : index + 1
-			if (index < 0 || nextIndex < 0 || nextIndex >= current.length) return
-			const [item] = current.splice(index, 1)
-			if (!item) return
-			current.splice(nextIndex, 0, item)
-			mockProgramOrder = current
+			mockProgramOrder = next
 			return
 		}
-		movingProgramSlug = slug
-		try {
-			await dashboard.moveProgram(slug, direction)
-		} finally {
-			movingProgramSlug = null
+		await dashboard.reorderPrograms(next)
+	}
+
+	function onDragStart(event: DragEvent, slug: string) {
+		draggingSlug = slug
+		if (event.dataTransfer) {
+			event.dataTransfer.effectAllowed = 'move'
+			event.dataTransfer.setData('text/plain', slug)
 		}
+	}
+
+	function onDragOver(event: DragEvent, slug: string) {
+		if (!draggingSlug || draggingSlug === slug) return
+		event.preventDefault()
+		if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
+		dragOverSlug = slug
+	}
+
+	function onDragLeave(slug: string) {
+		if (dragOverSlug === slug) dragOverSlug = null
+	}
+
+	function onDrop(event: DragEvent, slug: string) {
+		event.preventDefault()
+		const sourceSlug = draggingSlug
+		draggingSlug = null
+		dragOverSlug = null
+		if (!sourceSlug) return
+		void commitOrder(sourceSlug, slug)
+	}
+
+	function onDragEnd() {
+		draggingSlug = null
+		dragOverSlug = null
 	}
 </script>
 
@@ -125,17 +159,7 @@
 			subtitle="Manage program pages & upcoming sessions."
 		/>
 
-		<div class="social-events__section-head">
-			<h4>PROGRAMS ({programsSource.length})</h4>
-			<button
-				type="button"
-				class="social-events__new-program"
-				onclick={() => goto(hrefWithMock(withAdminRoute('events/program/new/')))}
-			>
-				<Plus size={14} strokeWidth={2.2} aria-hidden="true" />
-				<span>New program</span>
-			</button>
-		</div>
+		<h4>PROGRAMS ({programsSource.length})</h4>
 		{#if programsSource.length === 0}
 			<div class="social-events__empty calendar-ui-card">No activity pages yet.</div>
 		{:else}
@@ -143,7 +167,18 @@
 				{#each programsSource as program, i (program.slug)}
 					{@const ActivityIcon = getActivityIcon(program.label, program.slug)}
 					{#if i > 0}<div class="social-events__program-divider"></div>{/if}
-					<div class="social-events__program">
+					<div
+						class="social-events__program"
+						class:social-events__program--dragging={draggingSlug === program.slug}
+						class:social-events__program--drop-target={dragOverSlug === program.slug && draggingSlug !== program.slug}
+						draggable="true"
+						role="listitem"
+						ondragstart={(event) => onDragStart(event, program.slug)}
+						ondragover={(event) => onDragOver(event, program.slug)}
+						ondragleave={() => onDragLeave(program.slug)}
+						ondrop={(event) => onDrop(event, program.slug)}
+						ondragend={onDragEnd}
+					>
 						<button
 							type="button"
 							class="social-events__program-main"
@@ -162,26 +197,9 @@
 								<div class="social-events__program-detail">{program.enabled ? 'Live' : 'Draft'}</div>
 							</div>
 						</button>
-						<div class="social-events__program-sort" aria-label={`Sort ${program.label}`}>
-							<button
-								type="button"
-								class="social-events__sort-button"
-								aria-label={`Move ${program.label} up`}
-								disabled={i === 0 || movingProgramSlug !== null}
-								onclick={() => void moveProgram(program.slug, 'up')}
-							>
-								<ArrowUp size={14} strokeWidth={2.2} aria-hidden="true" />
-							</button>
-							<button
-								type="button"
-								class="social-events__sort-button"
-								aria-label={`Move ${program.label} down`}
-								disabled={i === programsSource.length - 1 || movingProgramSlug !== null}
-								onclick={() => void moveProgram(program.slug, 'down')}
-							>
-								<ArrowDown size={14} strokeWidth={2.2} aria-hidden="true" />
-							</button>
-						</div>
+						<span class="social-events__program-grip" aria-hidden="true" title="Drag to reorder">
+							<GripVertical size={16} strokeWidth={1.8} />
+						</span>
 					</div>
 				{/each}
 			</div>
@@ -245,37 +263,6 @@
 		gap: 1rem;
 	}
 
-	.social-events__section-head {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem;
-	}
-
-	.social-events__section-head h4 {
-		margin: 0;
-	}
-
-	.social-events__new-program {
-		min-height: 2rem;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		border: 1px solid var(--admin-card-border);
-		border-radius: 0.55rem;
-		background: var(--admin-card-bg);
-		color: var(--text);
-		padding: 0 0.65rem;
-		font: inherit;
-		font-size: 0.74rem;
-		font-weight: 650;
-		cursor: pointer;
-	}
-
-	.social-events__new-program:hover {
-		border-color: color-mix(in srgb, var(--admin-accent) 42%, var(--admin-card-border));
-	}
-
 	.social-events__programs {
 		border: 1px solid var(--admin-card-border);
 		border-radius: 0.875rem;
@@ -293,6 +280,23 @@
 		grid-template-columns: 1fr auto;
 		align-items: stretch;
 		min-height: 4rem;
+		position: relative;
+		transition: background 120ms ease, opacity 120ms ease;
+	}
+
+	.social-events__program--dragging {
+		opacity: 0.4;
+	}
+
+	.social-events__program--drop-target::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: -1px;
+		height: 2px;
+		background: var(--admin-accent);
+		z-index: 1;
 	}
 
 	.social-events__program-main {
@@ -343,34 +347,22 @@
 		color: color-mix(in srgb, var(--text) 42%, transparent);
 	}
 
-	.social-events__program-sort {
-		display: flex;
+	.social-events__program-grip {
+		display: inline-flex;
 		align-items: center;
-		gap: 0.25rem;
-		padding: 0 0.75rem 0 0.25rem;
+		justify-content: center;
+		padding: 0 0.85rem;
+		color: var(--admin-text-faint);
+		cursor: grab;
+		touch-action: none;
 	}
 
-	.social-events__sort-button {
-		width: 1.9rem;
-		height: 1.9rem;
-		display: grid;
-		place-items: center;
-		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
-		border-radius: 0.5rem;
-		background: color-mix(in srgb, var(--bg) 82%, var(--text) 18%);
-		color: color-mix(in srgb, var(--text) 68%, transparent);
-		cursor: pointer;
-		padding: 0;
+	.social-events__program-grip:active {
+		cursor: grabbing;
 	}
 
-	.social-events__sort-button:hover:not(:disabled) {
-		color: var(--text);
-		border-color: color-mix(in srgb, var(--admin-accent) 42%, var(--admin-card-border));
-	}
-
-	.social-events__sort-button:disabled {
-		opacity: 0.35;
-		cursor: not-allowed;
+	.social-events__program:hover .social-events__program-grip {
+		color: var(--admin-text-soft);
 	}
 
 	.social-events__empty {
@@ -419,12 +411,7 @@
 
 	@media (max-width: 720px) {
 		.social-events__program {
-			grid-template-columns: 1fr;
-		}
-
-		.social-events__program-sort {
-			justify-content: flex-end;
-			padding: 0 0.75rem 0.7rem;
+			grid-template-columns: 1fr auto;
 		}
 	}
 

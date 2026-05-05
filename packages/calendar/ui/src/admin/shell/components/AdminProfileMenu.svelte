@@ -93,21 +93,28 @@
 		display: inline-flex;
 	}
 	.admin-profile-menu__avatar {
-		width: 2.4rem;
-		height: 2.4rem;
+		width: 32px;
+		height: 32px;
 		border-radius: 999px;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 0.82rem;
+		font-size: 0.72rem;
 		font-weight: 700;
-		background: color-mix(in srgb, var(--admin-accent) 22%, transparent);
-		color: var(--text);
-		border: none;
+		background: var(--admin-control-bg);
+		color: var(--admin-control-fg);
+		border: 1px solid var(--admin-control-border);
 		cursor: pointer;
+		transition:
+			background 110ms ease,
+			border-color 110ms ease,
+			box-shadow 110ms ease,
+			transform 110ms ease;
 	}
 	.admin-profile-menu__avatar:hover {
-		background: color-mix(in srgb, var(--admin-accent) 32%, transparent);
+		background: var(--admin-control-bg-hover);
+		box-shadow: 0 4px 14px var(--shadow-soft);
+		transform: translateY(-1px);
 	}
 	.admin-profile-menu__panel {
 		position: absolute;

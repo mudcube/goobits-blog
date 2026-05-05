@@ -795,20 +795,10 @@ export function createAdminDashboardController(
     }
   }
 
-  async function moveProgram(slug: string, direction: "up" | "down") {
-    const current = [...programs].sort((a, b) => a.sortOrder - b.sortOrder);
-    const index = current.findIndex((program) => program.slug === slug);
-    const nextIndex = direction === "up" ? index - 1 : index + 1;
-    if (index < 0 || nextIndex < 0 || nextIndex >= current.length) return;
-
-    const reordered = [...current];
-    const [item] = reordered.splice(index, 1);
-    if (!item) return;
-    reordered.splice(nextIndex, 0, item);
-
+  async function persistProgramOrder(orderedSlugs: string[]) {
     const previousPrograms = programs;
-    const orders = reordered.map((program, orderIndex) => ({
-      slug: program.slug,
+    const orders = orderedSlugs.map((slug, orderIndex) => ({
+      slug,
       sortOrder: (orderIndex + 1) * 10,
     }));
     const nextSortOrders = new Map(orders.map((o) => [o.slug, o.sortOrder]));
@@ -834,6 +824,27 @@ export function createAdminDashboardController(
     } finally {
       programSaving = false;
     }
+  }
+
+  async function moveProgram(slug: string, direction: "up" | "down") {
+    const current = [...programs].sort((a, b) => a.sortOrder - b.sortOrder);
+    const index = current.findIndex((program) => program.slug === slug);
+    const nextIndex = direction === "up" ? index - 1 : index + 1;
+    if (index < 0 || nextIndex < 0 || nextIndex >= current.length) return;
+
+    const reordered = [...current];
+    const [item] = reordered.splice(index, 1);
+    if (!item) return;
+    reordered.splice(nextIndex, 0, item);
+
+    await persistProgramOrder(reordered.map((p) => p.slug));
+  }
+
+  async function reorderPrograms(orderedSlugs: string[]) {
+    const known = new Set(programs.map((p) => p.slug));
+    const filtered = orderedSlugs.filter((slug) => known.has(slug));
+    if (filtered.length === 0) return;
+    await persistProgramOrder(filtered);
   }
 
   async function deleteProgram() {
@@ -1460,6 +1471,7 @@ export function createAdminDashboardController(
     newProgramDraft,
     saveProgram,
     moveProgram,
+    reorderPrograms,
     deleteProgram,
     createEvents,
     applyTemplate,

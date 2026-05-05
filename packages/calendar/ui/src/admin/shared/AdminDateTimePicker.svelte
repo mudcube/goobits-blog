@@ -54,7 +54,7 @@
 	function defaultDisplay(start: string, end: string) {
 		const startD = new Date(start)
 		const endD = new Date(end)
-		if (!Number.isFinite(startD.getTime())) return '—'
+		if (!Number.isFinite(startD.getTime())) return '-'
 		const dayLabel = startD.toLocaleDateString(undefined, {
 			weekday: 'short',
 			month: 'short',

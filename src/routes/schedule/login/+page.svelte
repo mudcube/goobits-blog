@@ -151,7 +151,7 @@
   >
   {#if hasValidInvite}
     <meta property="og:title" content="You're invited to {calendarConfig.brand.calendarName}" />
-    <meta property="og:description" content="Join instantly — no account needed. Tap to pick your time." />
+    <meta property="og:description" content="Join instantly. No account needed. Tap to pick your time." />
     <meta property="og:type" content="website" />
   {/if}
 </svelte:head>

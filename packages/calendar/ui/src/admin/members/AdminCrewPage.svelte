@@ -427,7 +427,7 @@
 		try {
 			const ok = await members.copyInvite(code)
 			if (!ok) {
-				showToast("Couldn't copy link — check clipboard permissions")
+				showToast("Couldn't copy link. Check clipboard permissions.")
 				return
 			}
 			if (members.error) {
@@ -520,7 +520,7 @@
 
 {#if authed}
 	<div class="social-crew admin-content">
-		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Everyone with access — and everyone who could have it." />
+		<AdminPageHero eyebrow="Members" title="The Crew" subtitle="Everyone with access, and everyone who could have it." />
 
 		<h4>MEMBERS ({users.length})</h4>
 		<div class="social-crew__list calendar-ui-card">

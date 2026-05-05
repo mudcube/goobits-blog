@@ -23,8 +23,8 @@
 	let tourRef: SpotlightTour
 
 	const tourSteps: TourStep[] = [
-		{ phase: 0, selector: '.cs__grid', message: 'Pick a day that works — purple dots are open.' },
-		{ phase: 1, selector: '.tr__times', message: 'This is your time — tap to type, or use arrow keys.' },
+		{ phase: 0, selector: '.cs__grid', message: 'Pick a day that works. Purple dots are open.' },
+		{ phase: 1, selector: '.tr__times', message: 'This is your time. Tap to type, or use arrow keys.' },
 		{ phase: 1, selector: '.st__lanes', message: 'Drag the handles to resize, or grab the middle to slide.' },
 		{ phase: 1, selector: '.cc__card', message: 'Tap a name to match their time.' },
 		{ phase: 1, selector: '.ts__confirm', message: 'Happy with your time? Lock it in.', position: 'top' },

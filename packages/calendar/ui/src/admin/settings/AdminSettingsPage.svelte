@@ -184,11 +184,6 @@
 
   .admin-settings :global(.admin-settings__section-head h4) {
     margin: 0;
-    font-size: 0.78rem;
-    letter-spacing: 0.09em;
-    font-weight: 680;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--text) 70%, transparent);
   }
 
   .admin-settings :global(.admin-settings__section-sub) {

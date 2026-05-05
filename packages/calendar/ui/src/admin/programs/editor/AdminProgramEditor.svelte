@@ -817,7 +817,7 @@
 	}
 
 	.program-editor {
-		font-family: var(--font-sans);
+		font-family: var(--font-ui-sans, var(--font-sans));
 		--bg: var(--bg);
 		--surface: color-mix(in srgb, var(--panel-bg) 88%, var(--text) 12%);
 		--popover-surface: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);

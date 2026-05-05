@@ -169,7 +169,7 @@
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div class="st-prompt" onpointerdown={(e) => e.stopPropagation()}>
 			<p class="st-prompt__title">Want a quick walkthrough?</p>
-			<p class="st-prompt__copy">See how booking works — takes about 10 seconds.</p>
+			<p class="st-prompt__copy">See how booking works. Takes about 10 seconds.</p>
 			<div class="st-prompt__actions">
 				<button type="button" class="st-prompt__skip" onclick={dismissPrompt}>Skip</button>
 				<button type="button" class="st-prompt__go" onclick={startTour}>Show me around</button>

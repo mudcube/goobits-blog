@@ -106,7 +106,7 @@
 			if (!isEmail && !isMerchant) return 'Use an email or PayPal merchant ID.'
 		} else if (method === 'cashapp') {
 			if (!/^\$?[a-zA-Z][a-zA-Z0-9_-]{0,30}$/.test(v))
-				return 'Cashtag — starts with a letter, no spaces.'
+				return 'Cashtag: starts with a letter, no spaces.'
 		}
 		return null
 	}

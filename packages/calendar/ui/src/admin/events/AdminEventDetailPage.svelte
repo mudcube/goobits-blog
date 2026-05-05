@@ -129,7 +129,7 @@
 	function formatDuration(startsAt: string, endsAt: string) {
 		const startMs = new Date(startsAt).getTime()
 		const endMs = new Date(endsAt).getTime()
-		if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return '—'
+		if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return '-'
 		const minutes = Math.round((endMs - startMs) / 60000)
 		if (minutes < 60) return `${minutes} min`
 		const hours = Math.floor(minutes / 60)
