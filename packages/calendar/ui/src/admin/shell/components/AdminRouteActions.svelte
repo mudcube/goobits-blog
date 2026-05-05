@@ -84,7 +84,7 @@
 			icon={UserPlus}
 			onclick={(event) => $adminActionHandlers.onCrewCreateInvite?.(crewInvitePayload(event))}
 		>
-			Create Invite
+			New Invite
 		</AdminActionButton>
 	{/if}
 

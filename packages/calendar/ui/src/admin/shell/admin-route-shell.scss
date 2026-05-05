@@ -537,7 +537,7 @@ $admin-mobile-breakpoint: 768px;
   justify-content: space-between;
   gap: 0.75rem;
   width: 100%;
-  max-width: var(--admin-content-max);
+  max-width: var(--max-width-readable, 980px);
   min-height: 1.5rem;
 }
 
