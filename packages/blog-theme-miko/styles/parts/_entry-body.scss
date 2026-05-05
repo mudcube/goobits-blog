@@ -1,0 +1,141 @@
+/* ---------- Entry body band ---------- */
+.miko-blog__entry-body-section {
+	position: relative;
+	padding: var(--space-12) 0;
+	isolation: isolate;
+}
+
+.miko-blog__entry-body-section::before {
+	content: '';
+	position: absolute;
+	inset: 0 auto 0 50%;
+	z-index: -1;
+	width: 100vw;
+	transform: translateX(-50%);
+	background: linear-gradient(
+		180deg,
+		color-mix(in srgb, var(--showcase-surface-low) 94%, var(--showcase-surface)) 0%,
+		color-mix(in srgb, var(--showcase-surface-low) 88%, var(--showcase-surface-high)) 100%
+	);
+	pointer-events: none;
+}
+
+.miko-blog__entry-body {
+	width: 100%;
+	max-width: 80rem;
+	margin: 0 auto;
+	padding-inline: clamp(1rem, 4vw, 2rem);
+	color: var(--showcase-text);
+	/* Container query scope so the prose adapts to its actual container
+	 * width, not the viewport — works whether the entry lives at the
+	 * article root or embedded in a sidebar later. */
+	container-type: inline-size;
+	container-name: journal-entry;
+}
+
+.miko-blog__prose {
+	/* Theme-side overrides for BlogProse gallery tiles (see @goobits/blog
+	 * BlogProse.svelte for the full custom-property contract). */
+	--blog-gallery-min-tile: 220px;
+	--blog-gallery-gap: 0.9rem;
+	--blog-gallery-radius: var(--radius-md);
+	--blog-gallery-border: var(--showcase-outline-variant);
+	--blog-gallery-surface: color-mix(in srgb, var(--showcase-surface-high) 60%, transparent);
+	--blog-gallery-shadow:
+		0 20px 45px -28px rgba(0, 0, 0, 0.5),
+		0 0 40px -24px color-mix(in srgb, var(--showcase-primary) 22%, transparent);
+
+	color: var(--showcase-text);
+	font-size: 1.08rem;
+	line-height: 1.75;
+}
+
+/* ---------- Article width tiers ----------
+ * Block flow with max-widths per element type. Text capped at 65ch
+ * for reading comfort; standalone images get a slightly wider 80ch
+ * track. No CSS Grid — keeps inline-block 2-up behavior simple. */
+.miko-blog__prose .blog-prose {
+	display: block;
+}
+
+.miko-blog__prose .blog-prose > * {
+	max-width: 65ch;
+	margin-inline: auto;
+	min-width: 0;
+}
+
+.miko-blog__prose .blog-prose > p:has(> img:only-child),
+.miko-blog__prose .blog-prose > p:has(> a:only-child > img:only-child),
+.miko-blog__prose .blog-prose > figure {
+	max-width: 80ch;
+	text-align: center;
+}
+
+/* Image rules: never upscale past intrinsic width. The track gives
+ * the upper bound; width: auto picks intrinsic up to that. Small
+ * diagrams stay sharp, big photos display at column width. */
+.miko-blog__prose .blog-prose > p:has(> img:only-child) img,
+.miko-blog__prose .blog-prose > p:has(> a:only-child > img:only-child) img,
+.miko-blog__prose .blog-prose > figure img {
+	display: inline-block;
+	width: auto;
+	max-width: 100%;
+	height: auto;
+	margin-inline: auto;
+	object-fit: contain;
+}
+
+/* Inline images that share a paragraph with text. */
+.miko-blog__prose .blog-prose p img {
+	max-width: 100%;
+	height: auto;
+}
+
+/* ---------- 2-up image runs at medium+ widths ----------
+ * When the container is wide enough, runs of consecutive standalone
+ * images pack 2-up so a sequence of photos reads as a gallery
+ * instead of a vertical stack. Below the breakpoint, they collapse
+ * back to one-per-row. */
+@container journal-entry (min-width: 38rem) {
+	.miko-blog__prose .blog-prose > p:has(> img:only-child):has(+ p:has(> img:only-child)),
+	.miko-blog__prose .blog-prose > p:has(> img:only-child) + p:has(> img:only-child),
+	.miko-blog__prose .blog-prose > p:has(> a:only-child > img:only-child):has(+ p:has(> a:only-child > img:only-child)),
+	.miko-blog__prose .blog-prose > p:has(> a:only-child > img:only-child) + p:has(> a:only-child > img:only-child) {
+		display: inline-block;
+		width: calc(50% - 0.5rem);
+		max-width: calc(50% - 0.5rem);
+		vertical-align: top;
+		margin-inline: 0.25rem;
+	}
+}
+
+/* Typography polish: balanced headings, pretty paragraph wrapping. */
+.miko-blog__prose .blog-prose > h1,
+.miko-blog__prose .blog-prose > h2,
+.miko-blog__prose .blog-prose > h3,
+.miko-blog__prose .blog-prose > h4 {
+	text-wrap: balance;
+}
+
+.miko-blog__prose .blog-prose > p {
+	text-wrap: pretty;
+}
+
+/* Drop cap on the first paragraph (purely decorative — drops
+ * automatically if the first child isn't a <p>). */
+.miko-blog__prose .blog-prose > p:first-of-type::first-letter {
+	font-family: var(--font-display, var(--font-serif));
+	font-size: 3.4em;
+	font-weight: 400;
+	line-height: 0.95;
+	float: left;
+	margin: 0.05em 0.18em 0 0;
+	color: color-mix(in srgb, var(--showcase-text) 88%, transparent);
+}
+
+/* Pull the drop cap back at narrow widths so it doesn't dominate. */
+@container journal-entry (max-width: 32rem) {
+	.miko-blog__prose .blog-prose > p:first-of-type::first-letter {
+		font-size: 2.8em;
+	}
+}
