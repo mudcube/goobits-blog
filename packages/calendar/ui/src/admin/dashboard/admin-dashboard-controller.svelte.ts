@@ -1,14 +1,10 @@
 import type { AdminBootstrap } from "@calendar/core";
+import { createSyncController } from "../settings/sync-controller.svelte";
 import { DEFAULT_ADMIN_RULES, DEFAULT_ADMIN_STATS } from "../shared/admin";
 import {
   createAdminEventsBatch,
-  connectAppleCalendarCredentials,
   deletePaymentIntegration,
   deleteDashboardProgram,
-  disconnectAppleCalendarReconnect,
-  disconnectCalendarReconnect,
-  disconnectOutlookCalendarReconnect,
-  getCalendarReconnectUrl,
   loadAdminEventsData,
   loadAdminPrograms,
   loadAdminPaymentDefaults,
@@ -18,9 +14,6 @@ import {
   loadDashboardBookings,
   loadDashboardStatus,
   promoteWaitlistEntry,
-  processDashboardSyncQueue,
-  purgeDashboardSyncDeadLetters,
-  retryDashboardSyncDeadLetters,
   saveAdminPaymentDefaults,
   reorderDashboardPrograms,
   saveDashboardProgram,
@@ -42,16 +35,6 @@ type UnauthorizedHandler = (error: unknown) => boolean;
 
 type DashboardControllerOptions = {
   onUnauthorized?: UnauthorizedHandler;
-};
-
-type SyncProviderKey = "google" | "outlook" | "apple";
-
-type SyncProviderStatus = {
-  connected: boolean;
-  expired: boolean;
-  expiresAt: number | null;
-  refreshFailed: boolean;
-  active: boolean;
 };
 
 type PaymentIntegrations = {
@@ -151,55 +134,7 @@ export function createAdminDashboardController(
   let capacity = $state(DEFAULT_ADMIN_RULES.capacity);
   let saved = $state(false);
   let saving = $state(false);
-  let connected = $state(false);
-  let connectionExpired = $state(false);
-  let connectionRefreshFailed = $state(false);
-  let disconnecting = $state(false);
-  let oauth = $state({
-    googleCalendarRedirectUri: null as string | null,
-    outlookRedirectUri: null as string | null,
-    googleLoginRedirectUri: "",
-    appleLoginRedirectUri: "",
-  });
-  let sync = $state<{
-    activeProvider: SyncProviderKey | null;
-    providers: Record<SyncProviderKey, SyncProviderStatus>;
-  }>({
-    activeProvider: null,
-    providers: {
-      google: {
-        connected: false,
-        expired: false,
-        expiresAt: null,
-        refreshFailed: false,
-        active: false,
-      },
-      outlook: {
-        connected: false,
-        expired: false,
-        expiresAt: null,
-        refreshFailed: false,
-        active: false,
-      },
-      apple: {
-        connected: false,
-        expired: false,
-        expiresAt: null,
-        refreshFailed: false,
-        active: false,
-      },
-    },
-  });
-  let syncQueue = $state({
-    pending: 0,
-    processing: 0,
-    failed: 0,
-    deadLetter: 0,
-    oldestPendingSeconds: 0,
-    oldestDeadLetterSeconds: 0,
-    hasBacklogAlert: false,
-    hasDeadLetterAlert: false,
-  });
+  const syncController = createSyncController({ onUnauthorized });
   let bookings = $state<unknown[]>([]);
   let paymentDefaults = $state<PaymentDefaults>(blankPaymentDefaults());
   let paymentIntegrations = $state<PaymentIntegrations>({
@@ -322,7 +257,6 @@ export function createAdminDashboardController(
   let eventsLoaded = $state(false);
   let eventsCreating = $state(false);
   let eventUpdatingId = $state<number | null>(null);
-  let syncQueueBusy = $state(false);
   let eventDraft = $state({
     activitySlug: "",
     title: "",
@@ -424,21 +358,7 @@ export function createAdminDashboardController(
   async function loadStatus() {
     try {
       const dashboardStatus = await loadDashboardStatus();
-      connected = dashboardStatus.connected;
-      connectionExpired = dashboardStatus.connectionExpired;
-      connectionRefreshFailed = dashboardStatus.connectionRefreshFailed;
-      oauth = dashboardStatus.oauth ?? oauth;
-      sync = dashboardStatus.sync ?? sync;
-      syncQueue = dashboardStatus.syncQueue ?? {
-        pending: 0,
-        processing: 0,
-        failed: 0,
-        deadLetter: 0,
-        oldestPendingSeconds: 0,
-        oldestDeadLetterSeconds: 0,
-        hasBacklogAlert: false,
-        hasDeadLetterAlert: false,
-      };
+      syncController.applyStatus(dashboardStatus);
       paymentDefaults = dashboardStatus.paymentDefaults
         ? normalizePaymentDefaults(dashboardStatus.paymentDefaults)
         : paymentDefaults;
@@ -633,66 +553,8 @@ export function createAdminDashboardController(
     }
   }
 
-  async function reconnect(provider: "google" | "outlook" = "google") {
-    try {
-      const reconnectResult = await getCalendarReconnectUrl(provider);
-      if (reconnectResult.ok) {
-        window.location.href = reconnectResult.authUrl;
-      } else {
-        error = reconnectResult.error;
-      }
-    } catch (err) {
-      if (onUnauthorized?.(err)) return;
-      error =
-        err instanceof Error ? err.message : `Failed to connect to ${provider}`;
-    }
-  }
-
-  async function disconnect(provider: SyncProviderKey = "google") {
-    disconnecting = true;
-    try {
-      const disconnectResult =
-        provider === "outlook"
-          ? await disconnectOutlookCalendarReconnect()
-          : provider === "apple"
-            ? await disconnectAppleCalendarReconnect()
-            : await disconnectCalendarReconnect();
-      if (disconnectResult.ok) {
-        connected = false;
-        connectionExpired = false;
-        connectionRefreshFailed = false;
-        await loadStatus();
-      } else {
-        error = disconnectResult.error;
-      }
-    } catch (err) {
-      if (onUnauthorized?.(err)) return;
-      error =
-        err instanceof Error ? err.message : `Failed to disconnect ${provider}`;
-    } finally {
-      disconnecting = false;
-    }
-  }
-
-  async function connectApple(input: {
-    username: string;
-    appPassword: string;
-    calendarUrl: string;
-  }) {
-    error = "";
-    try {
-      const result = await connectAppleCalendarCredentials(input);
-      if (!result.ok) {
-        error = result.error;
-        return;
-      }
-      await loadStatus();
-    } catch (err) {
-      if (onUnauthorized?.(err)) return;
-      error =
-        err instanceof Error ? err.message : "Failed to connect Apple Calendar";
-    }
-  }
+  // sync provider connect/disconnect lives on syncController; forwarded
+  // below for backwards compat.
 
   async function loadPrograms() {
     programsLoading = true;
@@ -1306,64 +1168,7 @@ export function createAdminDashboardController(
     }
   }
 
-  async function processSyncQueue() {
-    syncQueueBusy = true;
-    error = "";
-    try {
-      const result = await processDashboardSyncQueue(20);
-      if (!result.ok) {
-        error = result.error;
-        return;
-      }
-      await loadStatus();
-    } catch (err) {
-      if (onUnauthorized?.(err)) return;
-      error =
-        err instanceof Error ? err.message : "Failed to process sync queue";
-    } finally {
-      syncQueueBusy = false;
-    }
-  }
-
-  async function retryDeadLetters() {
-    syncQueueBusy = true;
-    error = "";
-    try {
-      const result = await retryDashboardSyncDeadLetters(20);
-      if (!result.ok) {
-        error = result.error;
-        return;
-      }
-      await loadStatus();
-    } catch (err) {
-      if (onUnauthorized?.(err)) return;
-      error =
-        err instanceof Error
-          ? err.message
-          : "Failed to requeue dead-letter jobs";
-    } finally {
-      syncQueueBusy = false;
-    }
-  }
-
-  async function purgeDeadLetters() {
-    syncQueueBusy = true;
-    error = "";
-    try {
-      const result = await purgeDashboardSyncDeadLetters(100);
-      if (!result.ok) {
-        error = result.error;
-        return;
-      }
-      await loadStatus();
-    } catch (err) {
-      if (onUnauthorized?.(err)) return;
-      error =
-        err instanceof Error ? err.message : "Failed to purge dead-letter jobs";
-    } finally {
-      syncQueueBusy = false;
-    }
-  }
+  // sync queue handlers live on syncController; forwarded below.
 
   return {
     get hours() {
@@ -1397,25 +1202,25 @@ export function createAdminDashboardController(
       return saving;
     },
     get connected() {
-      return connected;
+      return syncController.connected;
     },
     get connectionExpired() {
-      return connectionExpired;
+      return syncController.connectionExpired;
     },
     get connectionRefreshFailed() {
-      return connectionRefreshFailed;
+      return syncController.connectionRefreshFailed;
     },
     get disconnecting() {
-      return disconnecting;
+      return syncController.disconnecting;
     },
     get oauth() {
-      return oauth;
+      return syncController.oauth;
     },
     get sync() {
-      return sync;
+      return syncController.sync;
     },
     get syncQueue() {
-      return syncQueue;
+      return syncController.syncQueue;
     },
     get paymentDefaults() {
       return paymentDefaults;
@@ -1436,7 +1241,7 @@ export function createAdminDashboardController(
       return loading;
     },
     get error() {
-      return error;
+      return error || syncController.error;
     },
     get programs() {
       return programs;
@@ -1484,7 +1289,7 @@ export function createAdminDashboardController(
       return eventUpdatingId;
     },
     get syncQueueBusy() {
-      return syncQueueBusy;
+      return syncController.syncQueueBusy;
     },
     get recentEvents() {
       return recentEvents;
@@ -1508,9 +1313,9 @@ export function createAdminDashboardController(
     loadPrograms,
     loadEvents,
     save,
-    reconnect,
-    disconnect,
-    connectApple,
+    reconnect: syncController.reconnect,
+    disconnect: syncController.disconnect,
+    connectApple: syncController.connectApple,
     loadPaymentProviderIntegrations,
     connectPayPal,
     connectSquare,
@@ -1536,8 +1341,8 @@ export function createAdminDashboardController(
     clearEventHero,
     deleteEvent,
     savePaymentDefaults,
-    processSyncQueue,
-    retryDeadLetters,
-    purgeDeadLetters,
+    processSyncQueue: syncController.processQueue,
+    retryDeadLetters: syncController.retryDeadLetters,
+    purgeDeadLetters: syncController.purgeDeadLetters,
   };
 }
