@@ -123,7 +123,7 @@ export function formatAdminDate(timestamp?: number | null) {
 }
 
 export function buildInviteLink(origin: string, code: string) {
-	return `${origin}/i/${code}`
+	return `${origin}/invite/${code}`
 }
 
 export function normalizeRulesInput(state: AdminRulesState): AdminRulesInput {

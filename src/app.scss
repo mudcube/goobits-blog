@@ -393,6 +393,46 @@ html.theme-system-dark.scheme-magic {
 html {
 	background: var(--bg);
 	scrollbar-gutter: stable;
+	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+	scrollbar-width: thin;
+}
+
+:root {
+	--scrollbar-thumb: color-mix(in srgb, var(--text) 22%, transparent);
+	--scrollbar-thumb-hover: color-mix(in srgb, var(--text) 38%, transparent);
+	--scrollbar-track: transparent;
+}
+
+* {
+	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+	scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+	background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-track {
+	background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--scrollbar-thumb);
+	border-radius: 999px;
+	border: 2px solid transparent;
+	background-clip: padding-box;
+	transition: background-color 160ms ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--scrollbar-thumb-hover);
+	background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
 }
 
 body {
