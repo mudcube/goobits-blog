@@ -23,6 +23,7 @@
 
 	let open = $state(false)
 	let rootEl: HTMLDivElement | undefined = $state()
+	let avatarBroken = $state(false)
 
 	const displayName = $derived(user?.name?.trim() || user?.email?.trim() || 'Account')
 	const displayEmail = $derived(user?.email?.trim() || '')
@@ -70,8 +71,15 @@
 		aria-haspopup="menu"
 		onclick={() => (open = !open)}
 	>
-		{#if user?.avatarUrl}
-			<img src={user.avatarUrl} alt="" />
+		{#if user?.avatarUrl && !avatarBroken}
+			<img
+				src={user.avatarUrl}
+				alt=""
+				referrerpolicy="no-referrer"
+				loading="lazy"
+				decoding="async"
+				onerror={() => (avatarBroken = true)}
+			/>
 		{:else}
 			<span>{initials}</span>
 		{/if}
