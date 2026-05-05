@@ -697,24 +697,24 @@
 		margin-left: auto;
 		padding: 0.35rem 0.75rem;
 		border-radius: 999px;
-		border: 1px solid color-mix(in srgb, #b91c1c 32%, transparent);
-		background: color-mix(in srgb, #b91c1c 8%, transparent);
-		color: color-mix(in srgb, #b91c1c 90%, var(--text) 10%);
+		border: 1px solid color-mix(in srgb, var(--admin-danger-strong) 32%, transparent);
+		background: color-mix(in srgb, var(--admin-danger-strong) 8%, transparent);
+		color: color-mix(in srgb, var(--admin-danger-strong) 90%, var(--text) 10%);
 		font-size: 0.72rem;
 		font-weight: 600;
 		cursor: pointer;
 	}
 
 	.social-crew__bulk:hover {
-		background: color-mix(in srgb, #b91c1c 14%, transparent);
+		background: color-mix(in srgb, var(--admin-danger-strong) 14%, transparent);
 	}
 
 	.social-crew__notice {
 		margin: 0 0 1rem;
 		padding: 0.65rem 0.85rem;
 		border-radius: 0.875rem;
-		background: color-mix(in srgb, #f87171 4%, transparent);
-		border: 1px solid color-mix(in srgb, #f87171 14%, transparent);
+		background: color-mix(in srgb, var(--admin-danger-soft) 4%, transparent);
+		border: 1px solid color-mix(in srgb, var(--admin-danger-soft) 14%, transparent);
 		font-size: 0.82rem;
 	}
 

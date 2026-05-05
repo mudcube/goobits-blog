@@ -811,8 +811,8 @@
 	.program-editor__delete-confirm {
 		padding: 0.85rem 1rem;
 		border-radius: 0.7rem;
-		background: color-mix(in srgb, #ef4444 8%, var(--bg) 92%);
-		border: 1px solid color-mix(in srgb, #ef4444 30%, transparent);
+		background: var(--admin-danger-bg-faint);
+		border: 1px solid var(--admin-danger-border);
 		margin-bottom: 0.6rem;
 	}
 
@@ -826,20 +826,20 @@
 		--text-3: color-mix(in srgb, var(--text) 36%, transparent);
 		--border: color-mix(in srgb, var(--text) 9%, transparent);
 		--border-s: color-mix(in srgb, var(--text) 14%, transparent);
-		--green: #34c759;
-		--green-soft: color-mix(in srgb, #34c759 12%, transparent);
-		--green-text: color-mix(in srgb, #34c759 70%, var(--text));
-		--blue: color-mix(in srgb, var(--link) 72%, #7a5af8 28%);
-		--blue-soft: color-mix(in srgb, #0071e3 12%, transparent);
-		--red: #ff3b30;
-		--elev-surface-1: color-mix(in srgb, var(--text) 86%, var(--bg) 14%);
-		--elev-surface-2: color-mix(in srgb, var(--text) 82%, var(--bg) 18%);
-		--elev-border: color-mix(in srgb, var(--blue) 52%, transparent);
-		--elev-text: color-mix(in srgb, var(--bg) 94%, transparent);
-		--elev-subtext: color-mix(in srgb, var(--bg) 74%, transparent);
-		--elev-control: color-mix(in srgb, var(--text) 76%, var(--bg) 24%);
-		--elev-control-hover: color-mix(in srgb, var(--text) 72%, var(--bg) 28%);
-		--elev-control-active: color-mix(in srgb, var(--blue) 44%, var(--text) 56%);
+		--green: var(--admin-success);
+		--green-soft: color-mix(in srgb, var(--admin-success) 12%, transparent);
+		--green-text: color-mix(in srgb, var(--admin-success) 70%, var(--text));
+		--blue: var(--admin-accent);
+		--blue-soft: color-mix(in srgb, var(--admin-accent) 12%, transparent);
+		--red: var(--admin-danger);
+		--elev-surface-1: var(--admin-elev-surface-1);
+		--elev-surface-2: var(--admin-elev-surface-2);
+		--elev-border: var(--admin-elev-border);
+		--elev-text: var(--admin-elev-text);
+		--elev-subtext: var(--admin-elev-subtext);
+		--elev-control: var(--admin-elev-control);
+		--elev-control-hover: var(--admin-elev-control-hover);
+		--elev-control-active: var(--admin-elev-control-active);
 		background:
 			radial-gradient(
 				ellipse 520px 360px at 52% 68px,

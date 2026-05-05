@@ -136,17 +136,17 @@
 		line-height: 1.4;
 	}
 	.sync-card__status--warn {
-		color: var(--admin-status-warn-fg, #c27800);
+		color: var(--admin-status-warn-fg);
 	}
 	.sync-card__dot {
 		width: 0.5rem;
 		height: 0.5rem;
 		border-radius: 999px;
-		background: var(--admin-status-success-dot, #22c55e);
+		background: var(--admin-success);
 		flex-shrink: 0;
 	}
 	.sync-card__dot--warn {
-		background: var(--admin-status-warn-dot, #ff9500);
+		background: var(--admin-status-warn-dot);
 	}
 	.sync-card__actions {
 		display: inline-flex;

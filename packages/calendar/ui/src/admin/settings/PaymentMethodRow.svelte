@@ -587,15 +587,15 @@
 		position: relative;
 	}
 	.payment-method-row__field-control--invalid :global(.ui-form-control) {
-		border-color: color-mix(in srgb, #ef4444 50%, transparent);
-		background: color-mix(in srgb, #ef4444 5%, transparent);
+		border-color: var(--admin-danger-border-strong);
+		background: color-mix(in srgb, var(--admin-danger) 5%, transparent);
 	}
 	.payment-method-row__field-warn {
 		position: absolute;
 		right: 0.6rem;
 		top: 50%;
 		transform: translateY(-50%);
-		color: #c27800;
+		color: var(--admin-warn-strong);
 		display: inline-flex;
 	}
 	.payment-method-row__field-check {
@@ -603,14 +603,14 @@
 		right: 0.6rem;
 		top: 50%;
 		transform: translateY(-50%);
-		color: var(--admin-status-success-dot, #22c55e);
+		color: var(--admin-success);
 		display: inline-flex;
 	}
 	.payment-method-row__field-error {
 		margin: 0.25rem 0 0;
 		font-size: 0.74rem;
 		font-weight: 460;
-		color: #c27800;
+		color: var(--admin-warn-strong);
 	}
 	.payment-method-row__input {
 		font-size: 0.92rem;
@@ -655,7 +655,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.3rem;
-		color: color-mix(in srgb, var(--admin-status-success-dot, #22c55e) 80%, var(--text) 20%);
+		color: var(--admin-success-fg);
 	}
 
 	.payment-method-row__switch {

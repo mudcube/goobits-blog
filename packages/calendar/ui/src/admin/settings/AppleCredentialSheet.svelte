@@ -143,6 +143,6 @@
 		font-style: italic;
 	}
 	.apple-sheet__hint--fail {
-		color: #ef4444;
+		color: var(--admin-danger);
 	}
 </style>

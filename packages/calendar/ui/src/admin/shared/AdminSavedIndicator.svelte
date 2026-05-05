@@ -73,12 +73,12 @@
 		opacity: 0.7;
 	}
 	.admin-saved-indicator--saved {
-		color: color-mix(in srgb, var(--admin-status-success-dot, #22c55e) 80%, var(--text) 20%);
+		color: var(--admin-success-fg);
 	}
 	.admin-saved-indicator--error {
 		font-style: normal;
 		font-weight: 540;
-		color: #ef4444;
+		color: var(--admin-danger);
 		opacity: 1;
 	}
 </style>

@@ -287,7 +287,7 @@
 	.admin-crew-member-page__access-error {
 		margin: 0;
 		font-size: 0.74rem;
-		color: #f87171;
+		color: var(--admin-danger-soft);
 	}
 
 	.admin-crew-member-page__event-title {

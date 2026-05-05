@@ -80,7 +80,7 @@
 		bottom: 1rem;
 	}
 	.admin-toast--error {
-		background: #ef4444;
+		background: var(--admin-danger);
 	}
 	.admin-toast--undo {
 		padding-right: 0.55rem;

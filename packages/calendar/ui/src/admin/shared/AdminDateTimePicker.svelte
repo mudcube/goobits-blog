@@ -231,7 +231,7 @@
 		margin: 0;
 		font-size: 0.74rem;
 		font-weight: 540;
-		color: #ef4444;
+		color: var(--admin-danger);
 	}
 	.admin-datetime__actions {
 		display: flex;

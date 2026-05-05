@@ -589,8 +589,8 @@
 	.admin-event-detail__cancel-confirm {
 		padding: 0.85rem 1rem;
 		border-radius: 0.7rem;
-		background: color-mix(in srgb, #ef4444 8%, var(--bg) 92%);
-		border: 1px solid color-mix(in srgb, #ef4444 30%, transparent);
+		background: var(--admin-danger-bg-faint);
+		border: 1px solid var(--admin-danger-border);
 		margin-bottom: 0.5rem;
 	}
 

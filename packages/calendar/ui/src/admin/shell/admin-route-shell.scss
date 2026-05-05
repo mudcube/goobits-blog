@@ -32,17 +32,34 @@ $admin-mobile-breakpoint: 768px;
   --admin-card-bg: color-mix(in srgb, var(--admin-accent) 6%, var(--bg) 94%);
   --admin-card-border: color-mix(in srgb, var(--admin-accent) 18%, transparent);
   --admin-card-bg-hover: color-mix(in srgb, var(--admin-accent) 10%, var(--bg) 90%);
-  --admin-status-success-bg: color-mix(in srgb, #34c759 12%, transparent);
-  --admin-status-success-fg: color-mix(in srgb, #248a3d 84%, var(--text) 16%);
-  --admin-status-success-dot: #34c759;
-  --admin-status-warn-bg: color-mix(in srgb, #ff9500 10%, transparent);
-  --admin-status-warn-fg: color-mix(in srgb, #c27800 88%, var(--text) 12%);
-  --admin-status-warn-dot: #ff9500;
+  --admin-success: #34c759;
+  --admin-success-strong: #248a3d;
+  --admin-success-fg: color-mix(in srgb, var(--admin-success) 80%, var(--text) 20%);
+  --admin-warn: #ff9500;
+  --admin-warn-strong: #c27800;
+  --admin-warn-fg: color-mix(in srgb, var(--admin-warn-strong) 88%, var(--text) 12%);
+  --admin-danger: #ef4444;
+  --admin-danger-strong: #dc2626;
+  --admin-danger-soft: #f87171;
+  --admin-danger-fg: color-mix(in srgb, var(--admin-danger) 90%, var(--text) 10%);
+  --admin-danger-bg-faint: color-mix(in srgb, var(--admin-danger) 8%, var(--bg) 92%);
+  --admin-danger-bg: color-mix(in srgb, var(--admin-danger) 14%, var(--bg) 86%);
+  --admin-danger-border: color-mix(in srgb, var(--admin-danger) 30%, transparent);
+  --admin-danger-border-strong: color-mix(in srgb, var(--admin-danger) 50%, transparent);
+  --admin-text-soft: color-mix(in srgb, var(--text) 60%, transparent);
+  --admin-text-muted: color-mix(in srgb, var(--text) 50%, transparent);
+  --admin-text-faint: color-mix(in srgb, var(--text) 40%, transparent);
+  --admin-status-success-bg: color-mix(in srgb, var(--admin-success) 12%, transparent);
+  --admin-status-success-fg: color-mix(in srgb, var(--admin-success-strong) 84%, var(--text) 16%);
+  --admin-status-success-dot: var(--admin-success);
+  --admin-status-warn-bg: color-mix(in srgb, var(--admin-warn) 10%, transparent);
+  --admin-status-warn-fg: var(--admin-warn-fg);
+  --admin-status-warn-dot: var(--admin-warn);
   --admin-toast-success-bg: color-mix(in srgb, var(--admin-accent) 14%, var(--bg) 86%);
   --admin-toast-success-border: color-mix(in srgb, var(--admin-accent) 34%, transparent);
   --admin-toast-success-fg: color-mix(in srgb, var(--text) 94%, transparent);
-  --admin-toast-error-bg: color-mix(in srgb, #ef4444 14%, var(--bg) 86%);
-  --admin-toast-error-border: color-mix(in srgb, #ef4444 34%, transparent);
+  --admin-toast-error-bg: var(--admin-danger-bg);
+  --admin-toast-error-border: color-mix(in srgb, var(--admin-danger) 34%, transparent);
   --admin-toast-error-fg: color-mix(in srgb, var(--text) 94%, transparent);
   --admin-elev-surface-1: color-mix(in srgb, var(--text) 86%, var(--bg) 14%);
   --admin-elev-surface-2: color-mix(in srgb, var(--text) 82%, var(--bg) 18%);
@@ -340,20 +357,20 @@ $admin-mobile-breakpoint: 768px;
 }
 
 .social-admin .admin-ui-btn--icon:hover:not(:disabled) {
-  background: color-mix(in srgb, #ef4444 10%, transparent);
-  border-color: color-mix(in srgb, #ef4444 36%, transparent);
-  color: #ef4444;
+  background: color-mix(in srgb, var(--admin-danger) 10%, transparent);
+  border-color: color-mix(in srgb, var(--admin-danger) 36%, transparent);
+  color: var(--admin-danger);
 }
 
 .social-admin .admin-ui-btn--solid-danger {
-  background: #ef4444;
-  border-color: #ef4444;
+  background: var(--admin-danger);
+  border-color: var(--admin-danger);
   color: #fff;
 }
 
 .social-admin .admin-ui-btn--solid-danger:hover:not(:disabled) {
-  background: #dc2626;
-  border-color: #dc2626;
+  background: var(--admin-danger-strong);
+  border-color: var(--admin-danger-strong);
   color: #fff;
 }
 
