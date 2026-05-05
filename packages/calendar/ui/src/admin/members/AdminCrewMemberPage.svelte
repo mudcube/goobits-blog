@@ -63,6 +63,14 @@
 		return String(value || '').trim()
 	}
 
+	function prettyProgramSlug(slug: string) {
+		return slug
+			.split(/[-_\s]+/)
+			.filter(Boolean)
+			.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+			.join(' ')
+	}
+
 	function fallbackNameFromEmail(email: string) {
 		const local = email.split('@')[0] || email
 		const clean = local.replace(/[._-]+/g, ' ').trim()
@@ -178,13 +186,15 @@
 					{:else}
 						<div class="admin-crew-member-page__access-chips">
 							{#each accessRows as row (row.programSlug)}
+								{@const program = dashboard.programs.find((p) => p.slug === row.programSlug)}
+								{@const label = program?.activityName || program?.label || prettyProgramSlug(row.programSlug)}
 								<button
 									type="button"
 									class="admin-ui-chip"
 									class:admin-ui-chip--active={row.allowed}
 									onclick={() => void toggleAccessWithSave(row.programSlug)}
 								>
-									{getActivityEmoji('', row.programSlug)} {row.programSlug}
+									{getActivityEmoji('', row.programSlug)} {label}
 								</button>
 							{/each}
 						</div>

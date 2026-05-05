@@ -72,6 +72,8 @@
 	let inviteModalStep = $state<1 | 2>(1)
 	let inviteNameDraft = $state('')
 	let inviteActivitySlug = $state('gym')
+	let inviteType = $state<'person' | 'group'>('person')
+	let inviteMaxUses = $state(10)
 	let createdInviteId = $state('')
 	let createdInviteCode = $state('')
 	let inviteAnchorRect = $state<AdminInviteAnchorRect | null>(null)
@@ -271,6 +273,9 @@
 			const targetSlug = normalizeName(invite['target_activity_slug'])
 			const targetProgram = dashboard.programs.find((program) => program.slug === targetSlug)
 			const targetLabel = targetProgram?.activityName || targetProgram?.label || targetSlug
+			const timesUsed = Number(invite['times_used'] || 0)
+			const usesRemaining = typeof invite['uses_remaining'] === 'number' ? invite['uses_remaining'] : null
+			const totalUses = usesRemaining === null ? null : usesRemaining + timesUsed
 			const createdAtRaw = Number(invite['created_at'] || invite['createdAt'] || 0)
 			const createdAt = createdAtRaw > 10_000_000_000 ? createdAtRaw : createdAtRaw * 1000
 			const daysAgo = createdAt ? Math.max(0, Math.floor((Date.now() - createdAt) / (24 * 60 * 60 * 1000))) : 0
@@ -279,6 +284,9 @@
 			const sentLabel = `Sent ${daysAgo === 0 ? 'today' : `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago`}`
 			const detailParts: string[] = []
 			if (targetLabel) detailParts.push(`${targetLabel} only`)
+			if (totalUses && totalUses > 1) {
+				detailParts.push(`${timesUsed} used · ${Math.max(0, usesRemaining ?? 0)} left`)
+			}
 			if (status === 'expired') {
 				detailParts.push(`Expired · ${sentLabel.toLowerCase()}`)
 			} else if (status === 'exhausted') {
@@ -369,6 +377,8 @@
 		inviteActivitySlug = dashboard.programs.find((program) => program.slug === 'gym' && program.enabled !== false)?.slug
 			|| dashboard.programs.find((program) => program.enabled !== false)?.slug
 			|| 'gym'
+		inviteType = 'person'
+		inviteMaxUses = 10
 		createdInviteId = ''
 		createdInviteCode = ''
 		inviteModalOpen = true
@@ -377,6 +387,9 @@
 
 	async function createInviteFromModal() {
 		const inviteName = inviteNameDraft.trim() || 'friend'
+		const uses = inviteType === 'group'
+			? Math.min(100, Math.max(2, Math.trunc(inviteMaxUses || 10)))
+			: 1
 		if (mockMode) {
 			const words = ['sunny','cozy','happy','brave','merry','lucky','golden','gentle','sparkly','cheery']
 			const animals = ['fox','owl','bear','swan','bunny','otter','panda','robin','kitten','dolphin']
@@ -394,6 +407,7 @@
 					target_activity_slug: inviteActivitySlug,
 					redirect_path: `/schedule/${inviteActivitySlug}/`,
 					created_at: Math.floor(Date.now() / 1000),
+					uses_remaining: uses,
 					expires_in_days: 7
 				},
 				...mockInvitesState
@@ -407,6 +421,7 @@
 		members.inviteEmail = ''
 		members.inviteLabel = inviteNameDraft.trim()
 		members.inviteActivitySlug = inviteActivitySlug
+		members.inviteUses = uses
 		await members.createInvite()
 		if (members.error) {
 			showToast(members.error)
@@ -661,10 +676,19 @@
 		inviteUrl={createdInviteUrl()}
 		activitySlug={inviteActivitySlug}
 		activities={dashboard.programs}
+		inviteType={inviteType}
+		maxUses={inviteMaxUses}
 		anchorRect={inviteAnchorRect}
 		onClose={() => (inviteModalOpen = false)}
 		onNameChange={(value: string) => (inviteNameDraft = value)}
 		onActivityChange={(value: string) => (inviteActivitySlug = value)}
+		onInviteTypeChange={(value: 'person' | 'group') => {
+			inviteType = value
+			inviteMaxUses = value === 'group' ? Math.max(2, inviteMaxUses || 10) : 1
+		}}
+		onMaxUsesChange={(value: number) => {
+			inviteMaxUses = Math.min(100, Math.max(2, Math.trunc(value || 10)))
+		}}
 		onCreate={() => void createInviteFromModal()}
 		onCopy={() => void copyInviteWithToast(createdInviteCode)}
 		onText={textCreatedInvite}

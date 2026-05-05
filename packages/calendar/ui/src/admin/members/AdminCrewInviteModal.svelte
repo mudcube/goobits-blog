@@ -72,9 +72,14 @@
     return () => window.removeEventListener("resize", updateViewport);
   });
 
+  const enabledActivities = $derived(activities.filter((activity: ActivityOption) => activity.enabled !== false));
+  const isGroupInvite = $derived(inviteType === "group");
+  const selectedActivity = $derived(enabledActivities.find((activity: ActivityOption) => activity.slug === activitySlug));
+  const accessLabel = $derived(selectedActivity?.activityName || selectedActivity?.label || "Selected calendar");
+
   const placement = $derived.by(() => {
     const width = Math.min(popoverWidth, Math.max(288, viewportWidth - 16));
-    const estimatedHeight = step === 1 ? 198 : 286;
+    const estimatedHeight = step === 1 ? (isGroupInvite ? 370 : 310) : 286;
     if (!anchorRect) {
       return {
         width,
@@ -102,10 +107,6 @@
   const popoverStyle = $derived(
     `width:${placement.width}px;left:${placement.left}px;top:${placement.top}px;--invite-arrow-left:${placement.arrowLeft}px;`,
   );
-  const enabledActivities = $derived(activities.filter((activity: ActivityOption) => activity.enabled !== false));
-  const isGroupInvite = $derived(inviteType === "group");
-  const selectedActivity = $derived(enabledActivities.find((activity) => activity.slug === activitySlug));
-  const accessLabel = $derived(selectedActivity?.activityName || selectedActivity?.label || "Selected calendar");
 </script>
 
 <svelte:window
@@ -340,15 +341,48 @@
     gap: 0.32rem;
   }
 
-  .admin-crew-modal__field label {
+  .admin-crew-modal__field label,
+  .admin-crew-modal__field-label {
     font-size: 0.75rem;
     font-weight: 600;
+  }
+
+  .admin-crew-modal__segmented {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid color-mix(in srgb, var(--admin-accent) 16%, transparent);
+    border-radius: 0.7rem;
+    background: color-mix(in srgb, var(--admin-accent) 7%, transparent);
+  }
+
+  .admin-crew-modal__segment {
+    min-height: 2rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: color-mix(in srgb, var(--text) 65%, transparent);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .admin-crew-modal__segment--active {
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: 0 1px 4px color-mix(in srgb, black 10%, transparent);
   }
 
   .admin-crew-modal__hint {
     margin: 0;
     font-size: 0.69rem;
     color: color-mix(in srgb, var(--text) 44%, transparent);
+  }
+
+  .admin-crew-modal__hint--inline {
+    color: color-mix(in srgb, var(--text) 58%, transparent);
   }
 
   .admin-crew-modal__url-box {
