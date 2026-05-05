@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, type Snippet } from 'svelte'
+	import { onDestroy, onMount, type Snippet } from 'svelte'
 
 	type Placement = 'top' | 'bottom' | 'left' | 'right'
 
@@ -17,12 +17,13 @@
 
 	let visible = $state(false)
 	let showTimer: ReturnType<typeof setTimeout> | null = null
+	let dragActive = $state(false)
 
 	function show() {
 		if (showTimer) clearTimeout(showTimer)
-		if (!text) return
+		if (!text || dragActive) return
 		showTimer = setTimeout(() => {
-			visible = true
+			if (!dragActive) visible = true
 		}, delay)
 	}
 
@@ -30,6 +31,30 @@
 		if (showTimer) clearTimeout(showTimer)
 		visible = false
 	}
+
+	onMount(() => {
+		const onDragStart = () => {
+			dragActive = true
+			hide()
+		}
+		const onDragEnd = () => {
+			dragActive = false
+		}
+		// Capture phase so we get the event before any handler can stop propagation,
+		// and bind on document so we hide on ANY drag in the page (not just our subtree).
+		document.addEventListener('dragstart', onDragStart, true)
+		document.addEventListener('dragend', onDragEnd, true)
+		document.addEventListener('drop', onDragEnd, true)
+		// pointerdown also kills the tooltip immediately on click/tap so it doesn't
+		// linger over a button the user just pressed.
+		document.addEventListener('pointerdown', hide, true)
+		return () => {
+			document.removeEventListener('dragstart', onDragStart, true)
+			document.removeEventListener('dragend', onDragEnd, true)
+			document.removeEventListener('drop', onDragEnd, true)
+			document.removeEventListener('pointerdown', hide, true)
+		}
+	})
 
 	onDestroy(() => {
 		if (showTimer) clearTimeout(showTimer)
