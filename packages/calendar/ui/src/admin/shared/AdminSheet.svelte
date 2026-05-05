@@ -112,7 +112,7 @@
 		width: var(--admin-sheet-width, min(26rem, 100%));
 		background: var(--admin-card-bg);
 		border: 1px solid var(--admin-card-border);
-		border-radius: 14px;
+		border-radius: 0.875rem;
 		box-shadow: 0 24px 60px -18px color-mix(in srgb, black 36%, transparent);
 		display: grid;
 		grid-template-rows: auto 1fr auto;

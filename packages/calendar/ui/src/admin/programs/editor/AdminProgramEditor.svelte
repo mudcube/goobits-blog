@@ -856,7 +856,7 @@
 		width: 100%;
 		max-width: var(--admin-content-max, 720px);
 		overflow-x: clip;
-		border-radius: 0.9rem;
+		border-radius: 0.875rem;
 		border: 1px solid var(--border);
 	}
 

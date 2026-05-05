@@ -210,7 +210,7 @@
 
 <style>
 	.calendar-home :global(.calendar-ui-card) {
-		border-radius: 14px;
+		border-radius: 0.875rem;
 		border: 1px solid color-mix(in srgb, var(--calendar-shell-text) 10%, transparent);
 		background: color-mix(in srgb, var(--calendar-panel-bg) 84%, transparent);
 		box-shadow: 0 1px 2px color-mix(in srgb, black 8%, transparent);

@@ -130,6 +130,10 @@
 
 <div class="book">
 	<div class="book__inner">
+		<header class="book__head">
+			<p class="book__eyebrow">{activity.label}</p>
+			<h1 class="book__title">Book a session</h1>
+		</header>
 		<StepIndicator current={stepNum} {maxReached} labels={stepLabels} onNavigate={onStepNav} />
 
 		{#key animKey}
@@ -160,19 +164,47 @@
 
 <style>
 	.book__inner {
-		--book-accent: #a78bfa;
+		/* book-accent / book-confirm / book-confirm-hover / book-dot-green inherited from :root */
 		--book-accent-dim: #8b5cf6;
 		--book-accent-deep: #7a5af8;
 		--book-success: #3cbf8a;
-		--book-confirm: #22c55e;
-		--book-confirm-hover: #16a34a;
 		--book-danger: #f87171;
 		--book-night: #0b1026;
 		--book-night-deep: #080a14;
-		--book-dot-green: #4ade80;
 		--book-horizon-warm: #c4794a;
 		--book-horizon-gold: #d4a85a;
 		max-width: 28rem; margin: 0 auto; padding: 1rem 0.75rem; box-sizing: border-box; width: 100%;
+	}
+	.book__head {
+		text-align: center;
+		margin-bottom: 0.85rem;
+		display: grid;
+		gap: 0.2rem;
+	}
+	.book__eyebrow {
+		margin: 0;
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: 0.74rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		display: inline-block;
+		background-image: linear-gradient(90deg, #ff6b6b 0%, #feca57 20%, #48dbfb 40%, #ff9ff3 60%, #a78bfa 80%, #48dbfb 100%);
+		background-size: 100% 100%;
+		background-repeat: no-repeat;
+		color: transparent;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+	}
+	.book__title {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+		font-weight: 500;
+		letter-spacing: -0.025em;
+		line-height: 1.1;
+		color: var(--text);
 	}
 	.book__panel { position: relative; padding: 1rem; border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); border-radius: 0.75rem; background: color-mix(in srgb, var(--panel-bg, var(--bg)) 60%, transparent); }
 	.book__help { position: absolute; top: 0.6rem; right: 0.6rem; width: 1.2rem; height: 1.2rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); background: transparent; color: color-mix(in srgb, var(--text) 50%, transparent); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 180ms; padding: 0; font: inherit; font-size: 0.5rem; font-weight: 700; z-index: 2; }

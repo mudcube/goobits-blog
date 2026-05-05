@@ -25,28 +25,59 @@
 }
 
 .calendar-login__label {
-	font-size: var(--font-size-xs);
-	font-weight: var(--font-weight-medium);
-	color: color-mix(in srgb, var(--calendar-shell-text) 58%, transparent);
+	font-family: var(--font-ui-sans, var(--font-sans));
+	font-size: 0.82rem;
+	font-weight: 600;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	margin: 0 0 var(--space-4);
+	display: inline-block;
+	background-image: linear-gradient(
+		90deg,
+		#ff6b6b 0%,
+		#feca57 20%,
+		#48dbfb 40%,
+		#ff9ff3 60%,
+		#a78bfa 80%,
+		#48dbfb 100%
+	);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	color: transparent;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	margin: 0 0 0.55rem;
 }
 
 .calendar-login__title {
-	font-family: var(--font-serif);
-	font-weight: 300;
-	font-size: clamp(2rem, 4.2vw, 2.5rem);
-	letter-spacing: -0.025em;
-	line-height: 1.15;
+	position: relative;
+	font-family: var(--font-display);
+	font-weight: 500;
+	font-size: clamp(2rem, 4.2vw, 2.85rem);
+	letter-spacing: -0.035em;
+	line-height: 1.1;
 	color: var(--calendar-shell-text);
-	margin: 0 0 var(--space-2);
+	margin: 0 0 0.75rem;
+	display: inline-block;
+}
+
+.calendar-login__title::after {
+	content: '';
+	display: block;
+	width: 60px;
+	height: 2.5px;
+	border-radius: 2px;
+	margin: 0.6rem auto 0;
+	background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #a78bfa);
+	opacity: 0.35;
 }
 
 .calendar-login__subtitle {
+	font-family: var(--font-ui-sans, var(--font-sans));
 	font-size: var(--font-size-base);
-	color: color-mix(in srgb, var(--calendar-shell-text) 56%, transparent);
-	margin: 0 0 var(--space-10);
+	line-height: 1.55;
+	color: color-mix(in srgb, var(--calendar-shell-text) 64%, transparent);
+	margin: 0 0 var(--space-8);
 }
 
 .calendar-login__buttons {

@@ -234,10 +234,6 @@
 
 <style>
 	.member-booking {
-		--book-accent: color-mix(in srgb, var(--link) 72%, #7a5af8 28%);
-		--book-confirm: #22c55e;
-		--book-confirm-hover: #16a34a;
-		--book-dot-green: #4ade80;
 		width: min(100%, 54rem);
 	}
 

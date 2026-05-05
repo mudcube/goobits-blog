@@ -89,6 +89,12 @@
 	--gradient-movie: linear-gradient(90deg, #fbbf24, #f97316, #ef4444, #ec4899);
 	--gradient-action: linear-gradient(135deg, #a78bfa 0%, #818cf8 50%, #60a5fa 100%);
 
+	/* Booking flow shared accents (used by /schedule/book demo + real BookingCalendar) */
+	--book-accent: color-mix(in srgb, var(--link, #0074d9) 72%, #7a5af8 28%);
+	--book-confirm: #22c55e;
+	--book-confirm-hover: #16a34a;
+	--book-dot-green: #4ade80;
+
 	/* Core colors */
 	--bg: #ffffff;
 	--text: #000000;
