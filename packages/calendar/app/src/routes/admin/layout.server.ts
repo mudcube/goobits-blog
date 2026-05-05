@@ -47,10 +47,20 @@ type BootstrapUser = {
 	provider: string | null
 }
 
+function normalizeAdminUser(raw: unknown) {
+	if (!raw || typeof raw !== 'object') return null
+	const source = raw as Record<string, unknown>
+	const avatar = source['avatarUrl'] ?? source['avatar'] ?? source['avatar_url']
+	return {
+		...source,
+		avatarUrl: typeof avatar === 'string' && avatar.length > 0 ? avatar : null
+	}
+}
+
 export async function load(event: RequestEvent) {
 	const config = getCalendarConfig()
 	const locals = event.locals as { user?: unknown; calendarAdmin?: boolean }
-	const user = locals.calendarAdmin ? (locals.user ?? null) : null
+	const user = locals.calendarAdmin ? normalizeAdminUser(locals.user) : null
 	const isAdminRoot =
 		event.url.pathname === config.routes.adminBase ||
 		event.url.pathname === `${config.routes.adminBase}/`

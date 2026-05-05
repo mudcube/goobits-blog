@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LogOut } from '@lucide/svelte'
+	import { CalendarDays, LogOut } from '@lucide/svelte'
 	import { enhance } from '$app/forms'
 	import { getCalendarUiConfig } from '../../../config'
 	import ProfileMenu from '../../../shared/ProfileMenu.svelte'
@@ -13,10 +13,14 @@
 	const { user } = $props<{ user: AdminUser }>()
 	const calendarConfig = getCalendarUiConfig()
 	const adminBase = calendarConfig.routes.adminBase
+	const calendarBase = calendarConfig.routes.calendarBase
 </script>
 
 <ProfileMenu {user} className="admin-profile-menu">
 	{#snippet menu({ close })}
+		<a class="profile-menu__item" role="menuitem" href={calendarBase} onclick={close}>
+			<CalendarDays size={14} strokeWidth={1.8} /> Calendar
+		</a>
 		<form
 			class="profile-menu__form"
 			method="POST"

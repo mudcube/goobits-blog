@@ -72,7 +72,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 			currentSection: 'dashboard',
 			title: 'Dashboard',
 			breadcrumbs: baseCrumbs,
-			actions: ['view-calendar']
+			actions: []
 		}
 	}
 
