@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte'
-	import { FormControl, FormField, NumberStepper } from '@miko/ui'
+	import { fade } from 'svelte/transition'
 	import { AdminActionButton } from '@calendar/ui/admin'
 
 	type Event = { time: string; capacity: number; filled: number; recurring: boolean }
@@ -78,16 +78,6 @@
 				})
 			: ''
 	)
-
-	const ids = {
-		slug: 'fld-slug',
-		eyebrow: 'fld-eyebrow',
-		titleLine1: 'fld-title1',
-		titleLine2: 'fld-title2',
-		subtitle: 'fld-subtitle',
-		defaultTime: 'fld-default-time',
-		draftTime: 'fld-draft-time'
-	}
 
 	let programHeadingEl: HTMLElement | undefined = $state()
 	let dayHeadingEl: HTMLElement | undefined = $state()
@@ -251,8 +241,9 @@
 			<h1 class="program-head__title">Morning Yoga</h1>
 			<span class="program-head__sub">/{program.slug}</span>
 		</div>
-		<div class="program-head__save">
-			<AdminActionButton variant="primary">Save</AdminActionButton>
+		<div class="program-head__status" aria-live="polite">
+			<span class="program-head__dot" aria-hidden="true"></span>
+			<span>Saved · just now</span>
 		</div>
 	</header>
 
@@ -305,7 +296,9 @@
 												style="width: {Math.min(100, (ev.filled / ev.capacity) * 100)}%"
 											></span>
 										</span>
-										<span class="calendar__chip-text">{ev.filled}/{ev.capacity}</span>
+										<span class="calendar__chip-text">
+											{#if isFull}Full{:else}{ev.filled}/{ev.capacity}{/if}
+										</span>
 									</span>
 								{:else}
 									<span class="calendar__chip-placeholder" aria-hidden="true">+</span>
@@ -324,10 +317,11 @@
 			role="region"
 			aria-label="Settings panel"
 		>
+			{#key inspectorView}
+				<div class="inspector__view" in:fade={{ duration: 140 }}>
 			{#if inspectorView === 'program'}
-				<header class="inspector__head">
-					<span class="inspector__eyebrow">Inspector</span>
-					<h2 class="inspector__title" tabindex="-1" bind:this={programHeadingEl}>Program</h2>
+				<header class="inspector__head inspector__head--minimal">
+					<h2 class="inspector__title sr-only" tabindex="-1" bind:this={programHeadingEl}>Program settings</h2>
 					<button
 						type="button"
 						class="inspector__close"
@@ -337,100 +331,158 @@
 				</header>
 
 				<div class="inspector__body">
-					<section class="ins-sec ins-sec--row">
+					<div class="inline-row">
 						<button
 							type="button"
 							class="switch"
 							class:switch--on={program.enabled}
 							aria-pressed={program.enabled}
-							aria-label={program.enabled ? 'Currently live, click to disable bookings' : 'Currently hidden, click to enable bookings'}
+							aria-label={program.enabled
+								? 'Bookable. Click to hide.'
+								: 'Hidden. Click to make bookable.'}
 							onclick={() => (program.enabled = !program.enabled)}
 						>
 							<span class="switch__thumb">
 								<span class="switch__icon" aria-hidden="true">{program.enabled ? '✓' : ''}</span>
 							</span>
 						</button>
-						<div class="ins-status__copy">
-							<div class="ins-status__label">
-								{program.enabled ? 'Live · accepting bookings' : 'Hidden · not accepting'}
+						<span class="inline-row__label">
+							{program.enabled ? 'Bookable' : 'Hidden'}
+						</span>
+					</div>
+
+					<hr class="ins-divider" />
+
+					<div class="url-pill">
+						<span class="url-pill__host">miko.art/schedule/</span>
+						<input
+							class="url-pill__slug"
+							type="text"
+							bind:value={program.slug}
+							aria-label="URL slug"
+						/>
+						<a
+							class="url-pill__open"
+							href="https://miko.art/schedule/{program.slug}"
+							target="_blank"
+							rel="noopener noreferrer"
+							aria-label="Open public page in a new tab"
+						>
+							<span aria-hidden="true">↗</span>
+						</a>
+					</div>
+
+					<hr class="ins-divider" />
+
+					<section class="hero-edit" aria-label="Public-page hero">
+						<div class="hero-edit__emoji" aria-hidden="true">
+							<span class="hero-edit__emoji-glyph">🧘</span>
+						</div>
+						<input
+							class="inline-edit hero-edit__eyebrow"
+							type="text"
+							bind:value={program.eyebrow}
+							placeholder="Eyebrow"
+							aria-label="Hero eyebrow"
+						/>
+						<div class="hero-edit__title-group">
+							<input
+								class="inline-edit hero-edit__title"
+								type="text"
+								bind:value={program.titleLine1}
+								placeholder="Title line 1"
+								aria-label="Hero title line 1"
+							/>
+							<input
+								class="inline-edit hero-edit__title"
+								type="text"
+								bind:value={program.titleLine2}
+								placeholder="Title line 2"
+								aria-label="Hero title line 2"
+							/>
+						</div>
+						<input
+							class="inline-edit hero-edit__sub"
+							type="text"
+							bind:value={program.subtitle}
+							placeholder="Subtitle"
+							aria-label="Hero subtitle"
+						/>
+						<p class="hero-edit__caption">
+							This is your public page hero. <a class="hero-edit__caption-link" href="https://miko.art/schedule/{program.slug}" target="_blank" rel="noopener noreferrer">Preview ↗</a>
+						</p>
+					</section>
+
+					<hr class="ins-divider" />
+
+					<section class="ins-block">
+						<div class="ins-block__head">
+							<h3 class="ins-block__title">Defaults for new events</h3>
+							<p class="ins-hint">When you click a day to schedule, these are the starting values.</p>
+						</div>
+						<div class="value-row">
+							<label class="value-chip">
+								<span class="value-chip__icon" aria-hidden="true">🕒</span>
+								<input
+									class="value-chip__input value-chip__input--time"
+									type="time"
+									step={900}
+									bind:value={program.defaultTime}
+									aria-label="Default time"
+								/>
+							</label>
+							<div class="value-stepper" role="group" aria-label="Default capacity">
+								<button
+									type="button"
+									class="value-stepper__btn"
+									aria-label="Fewer spots"
+									onclick={() => (program.defaultCapacity = Math.max(1, program.defaultCapacity - 1))}
+								>−</button>
+								<span class="value-stepper__value">
+									{program.defaultCapacity}
+									<span class="value-stepper__unit">spots</span>
+								</span>
+								<button
+									type="button"
+									class="value-stepper__btn"
+									aria-label="More spots"
+									onclick={() => (program.defaultCapacity = Math.min(50, program.defaultCapacity + 1))}
+								>+</button>
 							</div>
-							<div class="ins-status__hint">Toggle to publish or unpublish.</div>
 						</div>
 					</section>
 
 					<hr class="ins-divider" />
 
-					<section class="ins-sec">
-						<FormField label="URL path" forId={ids.slug}>
-							<div class="ins-prefix-group">
-								<span class="ins-prefix-group__prefix">/schedule/</span>
-								<FormControl id={ids.slug} type="text" bind:value={program.slug} />
-							</div>
-						</FormField>
-					</section>
-
-					<hr class="ins-divider" />
-
-					<section class="ins-sec">
-						<div class="hero-preview" aria-hidden="true">
-							<span class="hero-preview__eyebrow">{program.eyebrow || 'Eyebrow'}</span>
-							<div class="hero-preview__title">
-								{program.titleLine1 || 'Title line 1'}
-								<br />
-								<span class="hero-preview__title-2">{program.titleLine2 || 'Title line 2'}</span>
-							</div>
-							<p class="hero-preview__sub">{program.subtitle || 'Subtitle goes here'}</p>
+					<section class="ins-block">
+						<div class="ins-block__head">
+							<h3 class="ins-block__title">Remove this program</h3>
+							<p class="ins-hint">Takes the program and its events offline. Bookings are canceled.</p>
 						</div>
-						<FormField label="Eyebrow" forId={ids.eyebrow}>
-							<FormControl id={ids.eyebrow} type="text" bind:value={program.eyebrow} />
-						</FormField>
-						<div class="ins-defaults">
-							<FormField label="Title line 1" forId={ids.titleLine1}>
-								<FormControl id={ids.titleLine1} type="text" bind:value={program.titleLine1} />
-							</FormField>
-							<FormField label="Title line 2" forId={ids.titleLine2}>
-								<FormControl id={ids.titleLine2} type="text" bind:value={program.titleLine2} />
-							</FormField>
-						</div>
-						<FormField label="Subtitle" forId={ids.subtitle}>
-							<FormControl id={ids.subtitle} type="text" bind:value={program.subtitle} />
-						</FormField>
-					</section>
-
-					<hr class="ins-divider" />
-
-					<section class="ins-sec">
-						<p class="ins-sec__lede">New event defaults</p>
-						<div class="ins-defaults">
-							<FormField label="Time" forId={ids.defaultTime}>
-								<FormControl id={ids.defaultTime} type="time" step={900} bind:value={program.defaultTime} />
-							</FormField>
-							<FormField label="Capacity">
-								<NumberStepper bind:value={program.defaultCapacity} min={1} max={50} ariaLabel="Default capacity" />
-							</FormField>
-						</div>
-						<p class="ins-hint">Used when scheduling new events. Doesn't change events already on the calendar.</p>
-					</section>
-
-					<section class="ins-sec ins-sec--danger">
-						<h3 class="ins-sec__title ins-sec__title--danger">Danger zone</h3>
 						{#if !deleteConfirmOpen}
-							<p class="ins-hint">Permanently removes the program and its events.</p>
-							<AdminActionButton variant="danger" onclick={() => (deleteConfirmOpen = true)}>
-								Delete program
-							</AdminActionButton>
+							<button
+								type="button"
+								class="ins-remove-btn"
+								onclick={() => (deleteConfirmOpen = true)}
+							>
+								Remove program
+							</button>
 						{:else}
-							<p class="ins-hint">This can't be undone. All upcoming events will also be removed.</p>
-							<div class="ins-confirm-row">
-								<AdminActionButton variant="subtle" onclick={() => (deleteConfirmOpen = false)}>
-									Cancel
-								</AdminActionButton>
-								<AdminActionButton variant="danger" onclick={deleteProgram}>
-									Yes, delete
-								</AdminActionButton>
+							<div class="ins-confirm">
+								<p class="ins-confirm__msg">Are you sure? This can't be undone.</p>
+								<div class="ins-confirm-row">
+									<AdminActionButton variant="subtle" onclick={() => (deleteConfirmOpen = false)}>
+										Keep program
+									</AdminActionButton>
+									<AdminActionButton variant="danger" onclick={deleteProgram}>
+										Yes, remove
+									</AdminActionButton>
+								</div>
 							</div>
 						{/if}
 					</section>
+
+					<p class="inspector__footer-meta">Edited 2h ago by Miko</p>
 				</div>
 			{:else}
 				<header class="inspector__head inspector__head--day">
@@ -441,39 +493,64 @@
 						onclick={backToProgram}
 					>← Program</button>
 					<div class="inspector__day-title">
-						<span class="inspector__eyebrow">Event</span>
 						<h2 class="inspector__title" tabindex="-1" bind:this={dayHeadingEl}>{selectedLabel}</h2>
+						<span class="inspector__meta">
+							{selectedDay != null && events[selectedDay] ? 'Editing this class' : 'Schedule a class'}
+						</span>
 					</div>
 				</header>
 
 				{#if pendingDay != null}
 					<div class="ins-discard" role="alertdialog" aria-label="Unsaved changes">
-						<p class="ins-discard__title">Discard your changes?</p>
-						<p class="ins-hint">You have unsaved edits to {selectedLabel}.</p>
+						<p class="ins-discard__title">You have unsaved edits</p>
+						<p class="ins-hint">Your changes to {selectedLabel} aren't saved yet.</p>
 						<div class="ins-confirm-row">
 							<AdminActionButton variant="subtle" onclick={cancelDiscard}>Keep editing</AdminActionButton>
-							<AdminActionButton variant="danger" onclick={confirmDiscard}>Discard changes</AdminActionButton>
+							<AdminActionButton variant="danger" onclick={confirmDiscard}>Switch anyway</AdminActionButton>
 						</div>
 					</div>
 				{:else}
 					<div class="inspector__body">
-						<section class="ins-sec">
-							<div class="ins-defaults">
-								<FormField label="Time" forId={ids.draftTime}>
-									<FormControl id={ids.draftTime} type="time" step={900} bind:value={draft.time} />
-								</FormField>
-								<FormField label="Capacity">
-									<NumberStepper bind:value={draft.capacity} min={1} max={50} ariaLabel="Capacity" />
-								</FormField>
+						<section class="ins-block">
+							<div class="ins-block__head">
+								<h3 class="ins-block__title">When and how big</h3>
+							</div>
+							<div class="value-row">
+								<label class="value-chip">
+									<span class="value-chip__icon" aria-hidden="true">🕒</span>
+									<input
+										class="value-chip__input value-chip__input--time"
+										type="time"
+										step={900}
+										bind:value={draft.time}
+										aria-label="Time"
+									/>
+								</label>
+								<div class="value-stepper" role="group" aria-label="Capacity">
+									<button
+										type="button"
+										class="value-stepper__btn"
+										aria-label="Fewer spots"
+										onclick={() => (draft.capacity = Math.max(1, draft.capacity - 1))}
+									>−</button>
+									<span class="value-stepper__value">
+										{draft.capacity}
+										<span class="value-stepper__unit">spots</span>
+									</span>
+									<button
+										type="button"
+										class="value-stepper__btn"
+										aria-label="More spots"
+										onclick={() => (draft.capacity = Math.min(50, draft.capacity + 1))}
+									>+</button>
+								</div>
 							</div>
 						</section>
 
-						<section class="ins-sec">
-							<label class="ins-check">
-								<input type="checkbox" bind:checked={draft.repeat} />
-								<span>Repeat weekly</span>
-							</label>
-						</section>
+						<label class="ins-check">
+							<input type="checkbox" bind:checked={draft.repeat} />
+							<span>Repeat every {selectedDate ? selectedDate.toLocaleDateString(undefined, { weekday: 'long' }) : 'week'}</span>
+						</label>
 					</div>
 
 					<footer class="inspector__foot">
@@ -489,6 +566,8 @@
 					</footer>
 				{/if}
 			{/if}
+				</div>
+			{/key}
 		</aside>
 
 		{#if inspectorOpen}
@@ -591,7 +670,22 @@
 		color: var(--admin-text-muted);
 	}
 
-	.program-head__save { display: inline-flex; }
+	.program-head__status {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.74rem;
+		color: var(--admin-text-muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.program-head__dot {
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 999px;
+		background: var(--admin-success, #34c759);
+		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-success, #34c759) 22%, transparent);
+	}
 
 	.layout {
 		display: grid;
@@ -815,12 +909,41 @@
 		border-bottom: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
 	}
 
-	.inspector__eyebrow {
-		font-size: 0.62rem;
-		font-weight: 700;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
+	.inspector__head--minimal {
+		justify-content: flex-end;
+		padding-bottom: 0;
+		border-bottom: none;
+	}
+
+	.inspector__meta {
+		font-size: 0.7rem;
 		color: var(--admin-text-muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.inspector__footer-meta {
+		margin: 0.6rem 0 0;
+		padding-top: 0.6rem;
+		border-top: 1px solid color-mix(in srgb, var(--text) 7%, transparent);
+		font-size: 0.7rem;
+		color: var(--admin-text-muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.inspector__view {
+		display: contents;
 	}
 
 	.inspector__title {
@@ -865,57 +988,409 @@
 		gap: 0.85rem;
 	}
 
-	.ins-sec { display: grid; gap: 0.6rem; }
-
-	.ins-sec--row {
-		grid-template-columns: auto 1fr;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
-	.ins-sec__lede {
-		margin: 0;
-		font-size: 0.78rem;
-		font-weight: 650;
-		letter-spacing: -0.005em;
-		color: var(--text);
-	}
-
 	.ins-divider {
 		border: none;
 		border-top: 1px solid color-mix(in srgb, var(--text) 7%, transparent);
 		margin: 0.1rem 0;
 	}
 
-	.ins-sec--danger {
-		margin-top: 0.4rem;
-		padding-top: 0.85rem;
-		border-top: 1px dashed color-mix(in srgb, var(--admin-danger) 28%, transparent);
+	/* Inline-edit primitives */
+	.inline-edit {
+		appearance: none;
+		border: 1px solid transparent;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		padding: 0.15rem 0.35rem;
+		border-radius: 0.45rem;
+		min-width: 0;
+		transition: background 120ms, border-color 120ms, color 120ms;
 	}
 
-	.ins-sec__title {
-		margin: 0;
-		font-size: 0.62rem;
-		font-weight: 800;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
+	.inline-edit:hover {
+		background: color-mix(in srgb, var(--text) 5%, transparent);
+		cursor: text;
+	}
+
+	.inline-edit:focus,
+	.inline-edit:focus-visible {
+		outline: none;
+		background: color-mix(in srgb, var(--admin-accent) 6%, transparent);
+		border-color: color-mix(in srgb, var(--admin-accent) 40%, transparent);
+		cursor: text;
+	}
+
+	.inline-edit::placeholder {
 		color: var(--admin-text-muted);
+		font-style: italic;
+		opacity: 0.65;
 	}
 
-	.ins-sec__title--danger {
-		color: var(--admin-danger-fg);
+	/* Inline rows for status (still uses inline-row pattern) */
+	.inline-row {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		min-width: 0;
+		flex-wrap: nowrap;
 	}
 
-	.ins-status__copy { display: grid; gap: 0.1rem; min-width: 0; }
-
-	.ins-status__label {
+	.inline-row__label {
 		font-size: 0.85rem;
 		font-weight: 600;
+		color: var(--text);
 	}
 
-	.ins-status__hint {
-		font-size: 0.72rem;
+	/* URL pill — single rounded surface containing host + slug + open link */
+	.url-pill {
+		display: flex;
+		align-items: center;
+		gap: 0;
+		padding: 0.3rem 0.4rem 0.3rem 0.75rem;
+		border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+		background: color-mix(in srgb, var(--text) 3%, transparent);
+		border-radius: 999px;
+		font-size: 0.85rem;
+		font-variant-numeric: tabular-nums;
+		min-width: 0;
+		transition: border-color 140ms, background 140ms;
+	}
+
+	.url-pill:hover { border-color: color-mix(in srgb, var(--text) 18%, transparent); }
+
+	.url-pill:focus-within {
+		border-color: color-mix(in srgb, var(--admin-accent) 50%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 6%, transparent);
+	}
+
+	.url-pill__host {
+		color: var(--admin-text-soft);
+		white-space: nowrap;
+	}
+
+	.url-pill__slug {
+		appearance: none;
+		border: none;
+		background: transparent;
+		font: inherit;
+		color: var(--text);
+		font-weight: 600;
+		padding: 0 0.1rem;
+		flex: 1;
+		min-width: 4rem;
+		outline: none;
+	}
+
+	.url-pill__open {
+		display: grid;
+		place-items: center;
+		width: 1.6rem;
+		height: 1.6rem;
+		border-radius: 999px;
 		color: var(--admin-text-muted);
+		text-decoration: none;
+		font-size: 0.78rem;
+		flex: none;
+		transition: background 140ms, color 140ms;
+	}
+
+	.url-pill__open:hover {
+		background: color-mix(in srgb, var(--text) 8%, transparent);
+		color: var(--admin-accent);
+	}
+
+	/* Value row — pill chip for time + stepper for spots */
+	.value-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.value-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.4rem 0.85rem;
+		border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+		background: color-mix(in srgb, var(--text) 3%, transparent);
+		border-radius: 999px;
+		font-variant-numeric: tabular-nums;
+		cursor: pointer;
+		transition: border-color 140ms, background 140ms;
+	}
+
+	.value-chip:hover { border-color: color-mix(in srgb, var(--text) 18%, transparent); }
+
+	.value-chip:focus-within {
+		border-color: color-mix(in srgb, var(--admin-accent) 50%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 6%, transparent);
+	}
+
+	.value-chip__icon {
+		font-size: 0.85rem;
+		opacity: 0.7;
+	}
+
+	.value-chip__input {
+		appearance: none;
+		border: none;
+		background: transparent;
+		font: inherit;
+		color: var(--text);
+		font-size: 0.92rem;
+		font-weight: 600;
+		padding: 0;
+		outline: none;
+		min-width: 0;
+	}
+
+	.value-chip__input--time {
+		width: 5.5rem;
+	}
+
+	.value-chip__input::-webkit-calendar-picker-indicator {
+		opacity: 0.5;
+		cursor: pointer;
+		transition: opacity 140ms;
+	}
+
+	.value-chip__input::-webkit-calendar-picker-indicator:hover {
+		opacity: 1;
+	}
+
+	/* Stepper chip */
+	.value-stepper {
+		display: inline-flex;
+		align-items: stretch;
+		border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+		background: color-mix(in srgb, var(--text) 3%, transparent);
+		border-radius: 999px;
+		overflow: hidden;
+	}
+
+	.value-stepper__btn {
+		appearance: none;
+		border: none;
+		background: transparent;
+		color: var(--admin-text-soft);
+		font: inherit;
+		font-size: 1rem;
+		font-weight: 700;
+		width: 2rem;
+		min-height: 2rem;
+		cursor: pointer;
+		transition: background 140ms, color 140ms;
+	}
+
+	.value-stepper__btn:hover {
+		background: color-mix(in srgb, var(--text) 7%, transparent);
+		color: var(--text);
+	}
+
+	.value-stepper__btn:active {
+		background: color-mix(in srgb, var(--admin-accent) 14%, transparent);
+		color: var(--admin-accent);
+	}
+
+	.value-stepper__value {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.35rem;
+		padding: 0 0.3rem;
+		font-size: 0.92rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: var(--text);
+		min-width: 3.6rem;
+		justify-content: center;
+		align-self: center;
+	}
+
+	.value-stepper__unit {
+		font-size: 0.78rem;
+		font-weight: 500;
+		color: var(--admin-text-soft);
+	}
+
+	/* Hero edit — mirrors the public-page hero treatment */
+	.hero-edit {
+		position: relative;
+		padding: 1.4rem 1rem 1.1rem;
+		border-radius: 0.95rem;
+		background:
+			radial-gradient(
+				ellipse at top,
+				color-mix(in srgb, var(--admin-accent) 14%, transparent) 0%,
+				transparent 60%
+			),
+			color-mix(in srgb, var(--admin-accent) 4%, var(--bg) 96%);
+		border: 1px solid color-mix(in srgb, var(--admin-accent) 18%, transparent);
+		display: grid;
+		justify-items: center;
+		gap: 0.3rem;
+		min-width: 0;
+		text-align: center;
+		overflow: hidden;
+	}
+
+	.hero-edit__emoji {
+		display: grid;
+		place-items: center;
+		width: 2.4rem;
+		height: 2.4rem;
+		border-radius: 999px;
+		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+		background: color-mix(in srgb, var(--text) 88%, var(--bg) 12%);
+		box-shadow: 0 6px 18px -8px color-mix(in srgb, black 38%, transparent);
+		margin-bottom: 0.35rem;
+	}
+
+	.hero-edit__emoji-glyph {
+		font-size: 1.15rem;
+		line-height: 1;
+	}
+
+	.hero-edit__eyebrow {
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: 0.74rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		text-align: center;
+		max-width: 100%;
+		background-image: linear-gradient(
+			90deg,
+			#ff6b6b 0%,
+			#feca57 20%,
+			#48dbfb 40%,
+			#ff9ff3 60%,
+			#a78bfa 80%,
+			#48dbfb 100%
+		);
+		background-clip: text;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		color: transparent;
+	}
+
+	.hero-edit__eyebrow::placeholder {
+		-webkit-text-fill-color: var(--admin-text-muted);
+		color: var(--admin-text-muted);
+	}
+
+	.hero-edit__title-group {
+		display: grid;
+		justify-items: center;
+		gap: 0.05rem;
+		width: 100%;
+		position: relative;
+		padding-bottom: 0.7rem;
+	}
+
+	.hero-edit__title-group::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 48px;
+		height: 2px;
+		border-radius: 2px;
+		background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #a78bfa);
+		opacity: 0.4;
+	}
+
+	.hero-edit__title {
+		font-family: var(--font-display, var(--font-serif, serif));
+		font-size: 1.45rem;
+		font-weight: 500;
+		line-height: 1.08;
+		letter-spacing: -0.035em;
+		color: var(--text);
+		width: 100%;
+		text-align: center;
+	}
+
+	.hero-edit__sub {
+		margin-top: 0.45rem;
+		font-family: var(--font-ui-sans, var(--font-sans));
+		font-size: 0.86rem;
+		line-height: 1.45;
+		color: color-mix(in srgb, var(--text) 68%, transparent);
+		width: 100%;
+		text-align: center;
+	}
+
+	.hero-edit__caption {
+		margin: 0.55rem 0 0;
+		font-size: 0.7rem;
+		color: var(--admin-text-muted);
+	}
+
+	.hero-edit__caption-link {
+		color: var(--admin-text-soft);
+		text-decoration: none;
+		font-weight: 600;
+		transition: color 140ms;
+	}
+
+	.hero-edit__caption-link:hover { color: var(--admin-accent); }
+
+	/* Soft section block (defaults / remove) */
+	.ins-block {
+		display: grid;
+		gap: 0.55rem;
+	}
+
+	.ins-block__head {
+		display: grid;
+		gap: 0.15rem;
+	}
+
+	.ins-block__title {
+		margin: 0;
+		font-size: 0.85rem;
+		font-weight: 650;
+		letter-spacing: -0.005em;
+		color: var(--text);
+	}
+
+	/* Remove button — outlined danger, calmer than solid */
+	.ins-remove-btn {
+		appearance: none;
+		justify-self: start;
+		border: 1px solid var(--admin-danger-border, color-mix(in srgb, var(--admin-danger) 30%, transparent));
+		background: transparent;
+		color: var(--admin-danger-fg);
+		font: inherit;
+		font-size: 0.82rem;
+		font-weight: 600;
+		padding: 0.4rem 0.85rem;
+		border-radius: var(--admin-control-radius, 0.55rem);
+		cursor: pointer;
+		transition: background 140ms, color 140ms, border-color 140ms;
+	}
+
+	.ins-remove-btn:hover {
+		background: var(--admin-danger-bg-faint, color-mix(in srgb, var(--admin-danger) 8%, var(--bg) 92%));
+		border-color: color-mix(in srgb, var(--admin-danger) 50%, transparent);
+		color: var(--admin-danger);
+	}
+
+	.ins-confirm {
+		display: grid;
+		gap: 0.55rem;
+		padding: 0.7rem 0.8rem;
+		border-radius: 0.7rem;
+		background: var(--admin-danger-bg-faint, color-mix(in srgb, var(--admin-danger) 8%, var(--bg) 92%));
+		border: 1px solid color-mix(in srgb, var(--admin-danger) 24%, transparent);
+	}
+
+	.ins-confirm__msg {
+		margin: 0;
+		font-size: 0.82rem;
+		color: var(--text);
 	}
 
 	.switch {
@@ -963,40 +1438,6 @@
 
 	.switch--on .switch__icon { opacity: 1; }
 
-	.ins-prefix-group {
-		display: flex;
-		align-items: stretch;
-		border: 1px solid var(--input-border, color-mix(in srgb, var(--text) 12%, transparent));
-		border-radius: var(--admin-control-radius, 0.55rem);
-		overflow: hidden;
-		background: var(--input-bg, var(--bg));
-	}
-
-	.ins-prefix-group__prefix {
-		display: grid;
-		place-items: center;
-		padding: 0 0.75rem;
-		font-size: var(--font-size-sm, 0.85rem);
-		color: var(--admin-text-muted);
-		background: color-mix(in srgb, var(--text) 4%, transparent);
-		border-right: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-		white-space: nowrap;
-	}
-
-	.ins-prefix-group :global(.ui-form-control) {
-		border: none;
-		flex: 1;
-		min-width: 0;
-		border-radius: 0;
-	}
-
-	.ins-defaults {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		gap: 0.55rem;
-		align-items: end;
-	}
-
 	.ins-hint {
 		margin: 0;
 		font-size: 0.74rem;
@@ -1024,46 +1465,6 @@
 		display: flex;
 		gap: 0.5rem;
 		flex-wrap: wrap;
-	}
-
-	/* Hero preview */
-	.hero-preview {
-		padding: 0.85rem 0.95rem;
-		border-radius: 0.75rem;
-		background: color-mix(in srgb, var(--admin-accent) 5%, var(--bg) 95%);
-		border: 1px solid color-mix(in srgb, var(--admin-accent) 18%, transparent);
-		display: grid;
-		gap: 0.25rem;
-		min-width: 0;
-	}
-
-	.hero-preview__eyebrow {
-		font-size: 0.6rem;
-		font-weight: 700;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: color-mix(in srgb, var(--admin-accent) 80%, var(--text) 20%);
-	}
-
-	.hero-preview__title {
-		font-family: var(--font-display, var(--font-serif, serif));
-		font-size: 1.1rem;
-		font-weight: 700;
-		line-height: 1.15;
-		letter-spacing: -0.01em;
-		color: var(--text);
-	}
-
-	.hero-preview__title-2 {
-		display: inline-block;
-		color: var(--admin-accent);
-	}
-
-	.hero-preview__sub {
-		margin: 0.15rem 0 0;
-		font-size: 0.78rem;
-		line-height: 1.4;
-		color: var(--admin-text-soft);
 	}
 
 	/* Discard prompt */
@@ -1267,7 +1668,7 @@
 	@media (max-width: 720px) {
 		.calendar__cell { min-height: 4rem; }
 		.program-head { grid-template-columns: auto 1fr; gap: 0.65rem; }
-		.program-head__save { grid-column: 1 / -1; justify-self: end; }
+		.program-head__status { grid-column: 1 / -1; justify-self: end; }
 	}
 
 	@media (max-width: 24em) {
