@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { tick } from 'svelte'
 	import { FormControl, FormField, NumberStepper } from '@miko/ui'
 	import { AdminActionButton } from '@calendar/ui/admin'
 
-	type Event = { time: string; capacity: number; recurring: boolean }
+	type Event = { time: string; capacity: number; filled: number; recurring: boolean }
+	type DayDraft = { time: string; capacity: number; repeat: boolean }
 
 	const MONTH = 4 // May (0-indexed)
 	const YEAR = 2026
@@ -13,16 +15,16 @@
 	const daysInMonth = new Date(YEAR, MONTH + 1, 0).getDate()
 
 	const events = $state<Record<number, Event>>({
-		3: { time: '7:00 PM', capacity: 12, recurring: true },
-		4: { time: '7:00 PM', capacity: 12, recurring: true },
-		6: { time: '7:00 PM', capacity: 12, recurring: true },
-		10: { time: '7:00 PM', capacity: 12, recurring: true },
-		11: { time: '7:00 PM', capacity: 12, recurring: true },
-		13: { time: '7:00 PM', capacity: 12, recurring: true },
-		16: { time: '9:00 AM', capacity: 8, recurring: false },
-		17: { time: '7:00 PM', capacity: 12, recurring: true },
-		18: { time: '7:00 PM', capacity: 12, recurring: true },
-		20: { time: '7:00 PM', capacity: 12, recurring: true }
+		3: { time: '7:00 PM', capacity: 12, filled: 9, recurring: true },
+		4: { time: '7:00 PM', capacity: 12, filled: 12, recurring: true },
+		6: { time: '7:00 PM', capacity: 12, filled: 7, recurring: true },
+		10: { time: '7:00 PM', capacity: 12, filled: 11, recurring: true },
+		11: { time: '7:00 PM', capacity: 12, filled: 8, recurring: true },
+		13: { time: '7:00 PM', capacity: 12, filled: 4, recurring: true },
+		16: { time: '9:00 AM', capacity: 8, filled: 5, recurring: false },
+		17: { time: '7:00 PM', capacity: 12, filled: 10, recurring: true },
+		18: { time: '7:00 PM', capacity: 12, filled: 6, recurring: true },
+		20: { time: '7:00 PM', capacity: 12, filled: 3, recurring: true }
 	})
 
 	const cells = (() => {
@@ -37,6 +39,10 @@
 
 	let selectedDay = $state<number | null>(null)
 	let inspectorOpen = $state(false)
+	let deleteConfirmOpen = $state(false)
+	let pendingDay = $state<number | null>(null)
+	let pulseDay = $state<number | null>(null)
+	let pulseTimer: ReturnType<typeof setTimeout> | null = null
 	const inspectorView = $derived<'program' | 'day'>(selectedDay != null ? 'day' : 'program')
 
 	const program = $state({
@@ -50,11 +56,14 @@
 		defaultCapacity: 12
 	})
 
-	const draft = $state({
-		time: '19:00',
-		capacity: 12,
-		repeat: false
-	})
+	const draft = $state<DayDraft>({ time: '19:00', capacity: 12, repeat: false })
+	let originalDraft = $state<DayDraft>({ time: '19:00', capacity: 12, repeat: false })
+
+	const isDraftDirty = $derived(
+		draft.time !== originalDraft.time ||
+			draft.capacity !== originalDraft.capacity ||
+			draft.repeat !== originalDraft.repeat
+	)
 
 	const selectedDate = $derived(
 		selectedDay != null ? new Date(YEAR, MONTH, selectedDay) : null
@@ -70,33 +79,86 @@
 			: ''
 	)
 
-	function openDay(day: number) {
+	const ids = {
+		slug: 'fld-slug',
+		eyebrow: 'fld-eyebrow',
+		titleLine1: 'fld-title1',
+		titleLine2: 'fld-title2',
+		subtitle: 'fld-subtitle',
+		defaultTime: 'fld-default-time',
+		draftTime: 'fld-draft-time'
+	}
+
+	let programHeadingEl: HTMLElement | undefined = $state()
+	let dayHeadingEl: HTMLElement | undefined = $state()
+
+	function timeStringToInputValue(time: string) {
+		const isPM = time.includes('PM')
+		const parts = time.replace(/[^\d:]/g, '').split(':')
+		const rawHour = Number(parts[0] ?? 0)
+		const minute = parts[1] ?? '00'
+		const hour24 = isPM && rawHour < 12 ? rawHour + 12 : !isPM && rawHour === 12 ? 0 : rawHour
+		return `${String(hour24).padStart(2, '0')}:${minute.padStart(2, '0')}`
+	}
+
+	function loadDraft(day: number): DayDraft {
 		const existing = events[day]
 		if (existing) {
-			const isPM = existing.time.includes('PM')
-			const parts = existing.time.replace(/[^\d:]/g, '').split(':')
-			const rawHour = Number(parts[0] ?? 0)
-			const minute = parts[1] ?? '00'
-			const hour24 = isPM && rawHour < 12 ? rawHour + 12 : !isPM && rawHour === 12 ? 0 : rawHour
-			draft.time = `${String(hour24).padStart(2, '0')}:${minute.padStart(2, '0')}`
-			draft.capacity = existing.capacity
-			draft.repeat = existing.recurring
-		} else {
-			draft.time = program.defaultTime
-			draft.capacity = program.defaultCapacity
-			draft.repeat = false
+			return {
+				time: timeStringToInputValue(existing.time),
+				capacity: existing.capacity,
+				repeat: existing.recurring
+			}
 		}
+		return { time: program.defaultTime, capacity: program.defaultCapacity, repeat: false }
+	}
+
+	function applyDraft(day: number) {
+		const next = loadDraft(day)
+		draft.time = next.time
+		draft.capacity = next.capacity
+		draft.repeat = next.repeat
+		originalDraft = { ...next }
 		selectedDay = day
 		inspectorOpen = true
 	}
 
+	function openDay(day: number) {
+		if (selectedDay != null && day !== selectedDay && isDraftDirty) {
+			pendingDay = day
+			return
+		}
+		applyDraft(day)
+	}
+
+	function confirmDiscard() {
+		const next = pendingDay
+		pendingDay = null
+		if (next != null) applyDraft(next)
+	}
+
+	function cancelDiscard() {
+		pendingDay = null
+	}
+
 	function backToProgram() {
 		selectedDay = null
+		pendingDay = null
 	}
 
 	function dismissDay() {
 		selectedDay = null
+		pendingDay = null
 		inspectorOpen = false
+	}
+
+	function flashPulse(day: number) {
+		pulseDay = day
+		if (pulseTimer) clearTimeout(pulseTimer)
+		pulseTimer = setTimeout(() => {
+			pulseDay = null
+			pulseTimer = null
+		}, 1500)
 	}
 
 	function saveEvent() {
@@ -107,7 +169,15 @@
 		const period = hh >= 12 ? 'PM' : 'AM'
 		const displayHour = hh > 12 ? hh - 12 : hh === 0 ? 12 : hh
 		const displayTime = `${displayHour}:${String(mm).padStart(2, '0')} ${period}`
-		events[selectedDay] = { time: displayTime, capacity: draft.capacity, recurring: draft.repeat }
+		const wasNew = !events[selectedDay]
+		const filled = events[selectedDay]?.filled ?? 0
+		events[selectedDay] = {
+			time: displayTime,
+			capacity: draft.capacity,
+			filled,
+			recurring: draft.repeat
+		}
+		if (wasNew) flashPulse(selectedDay)
 		dismissDay()
 	}
 
@@ -117,12 +187,38 @@
 		dismissDay()
 	}
 
+	function deleteProgram() {
+		// mockup: nothing destructive
+		deleteConfirmOpen = false
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
-			if (inspectorView === 'day') backToProgram()
+			if (pendingDay != null) cancelDiscard()
+			else if (deleteConfirmOpen) deleteConfirmOpen = false
+			else if (inspectorView === 'day') backToProgram()
 			else if (inspectorOpen) inspectorOpen = false
 		}
 	}
+
+	function dayAriaLabel(day: number, ev: Event | undefined) {
+		const date = new Date(YEAR, MONTH, day).toLocaleDateString(undefined, {
+			weekday: 'long',
+			month: 'long',
+			day: 'numeric'
+		})
+		if (!ev) return `${date}, no event — click to add`
+		return `${date}, ${ev.time}, ${ev.filled} of ${ev.capacity} booked${ev.recurring ? ', recurring weekly' : ''}`
+	}
+
+	$effect(() => {
+		// move focus to the relevant heading when the inspector view changes
+		if (!inspectorOpen && inspectorView === 'program') return
+		tick().then(() => {
+			if (inspectorView === 'day') dayHeadingEl?.focus()
+			else if (inspectorOpen) programHeadingEl?.focus()
+		})
+	})
 </script>
 
 <svelte:head>
@@ -184,17 +280,32 @@
 						{:else}
 							{@const ev = events[cell.day]}
 							{@const isSelected = selectedDay === cell.day}
+							{@const isPulsing = pulseDay === cell.day}
+							{@const isFull = ev != null && ev.filled >= ev.capacity}
 							<button
 								type="button"
 								class="calendar__cell"
 								class:calendar__cell--has-event={!!ev}
+								class:calendar__cell--full={isFull}
 								class:calendar__cell--selected={isSelected}
+								class:calendar__cell--pulse={isPulsing}
+								aria-label={dayAriaLabel(cell.day, ev)}
 								onclick={() => openDay(cell.day!)}
 							>
 								<span class="calendar__date">{cell.day}</span>
 								{#if ev}
-									<span class="calendar__chip" class:calendar__chip--once={!ev.recurring}>
-										{ev.time}
+									<span
+										class="calendar__chip"
+										class:calendar__chip--once={!ev.recurring}
+										class:calendar__chip--full={isFull}
+									>
+										<span class="calendar__chip-bar" aria-hidden="true">
+											<span
+												class="calendar__chip-fill"
+												style="width: {Math.min(100, (ev.filled / ev.capacity) * 100)}%"
+											></span>
+										</span>
+										<span class="calendar__chip-text">{ev.filled}/{ev.capacity}</span>
 									</span>
 								{:else}
 									<span class="calendar__chip-placeholder" aria-hidden="true">+</span>
@@ -210,86 +321,115 @@
 			class="inspector"
 			class:inspector--open={inspectorOpen}
 			class:inspector--day={inspectorView === 'day'}
-			aria-label={inspectorView === 'day' ? 'Edit event' : 'Program settings'}
+			role="region"
+			aria-label="Settings panel"
 		>
 			{#if inspectorView === 'program'}
 				<header class="inspector__head">
 					<span class="inspector__eyebrow">Inspector</span>
-					<h2 class="inspector__title">Program</h2>
+					<h2 class="inspector__title" tabindex="-1" bind:this={programHeadingEl}>Program</h2>
 					<button
 						type="button"
 						class="inspector__close"
-						aria-label="Close inspector"
+						aria-label="Close settings panel"
 						onclick={() => (inspectorOpen = false)}
 					>✕</button>
 				</header>
 
 				<div class="inspector__body">
-					<section class="ins-sec">
-						<h3 class="ins-sec__title">Status</h3>
-						<div class="ins-row">
-							<div>
-								<div class="ins-row__label">
-									{program.enabled ? 'Live · accepting bookings' : 'Hidden · not accepting'}
-								</div>
-								<div class="ins-row__hint">Toggle to publish or unpublish.</div>
+					<section class="ins-sec ins-sec--row">
+						<button
+							type="button"
+							class="switch"
+							class:switch--on={program.enabled}
+							aria-pressed={program.enabled}
+							aria-label={program.enabled ? 'Currently live, click to disable bookings' : 'Currently hidden, click to enable bookings'}
+							onclick={() => (program.enabled = !program.enabled)}
+						>
+							<span class="switch__thumb">
+								<span class="switch__icon" aria-hidden="true">{program.enabled ? '✓' : ''}</span>
+							</span>
+						</button>
+						<div class="ins-status__copy">
+							<div class="ins-status__label">
+								{program.enabled ? 'Live · accepting bookings' : 'Hidden · not accepting'}
 							</div>
-							<button
-								type="button"
-								class="switch"
-								class:switch--on={program.enabled}
-								aria-pressed={program.enabled}
-								aria-label={program.enabled ? 'Disable bookings' : 'Enable bookings'}
-								onclick={() => (program.enabled = !program.enabled)}
-							>
-								<span></span>
-							</button>
+							<div class="ins-status__hint">Toggle to publish or unpublish.</div>
 						</div>
 					</section>
 
+					<hr class="ins-divider" />
+
 					<section class="ins-sec">
-						<h3 class="ins-sec__title">Address</h3>
-						<FormField label="URL path">
+						<FormField label="URL path" forId={ids.slug}>
 							<div class="ins-prefix-group">
 								<span class="ins-prefix-group__prefix">/schedule/</span>
-								<FormControl type="text" bind:value={program.slug} />
+								<FormControl id={ids.slug} type="text" bind:value={program.slug} />
 							</div>
 						</FormField>
 					</section>
 
+					<hr class="ins-divider" />
+
 					<section class="ins-sec">
-						<h3 class="ins-sec__title">Hero</h3>
-						<FormField label="Eyebrow">
-							<FormControl type="text" bind:value={program.eyebrow} />
+						<div class="hero-preview" aria-hidden="true">
+							<span class="hero-preview__eyebrow">{program.eyebrow || 'Eyebrow'}</span>
+							<div class="hero-preview__title">
+								{program.titleLine1 || 'Title line 1'}
+								<br />
+								<span class="hero-preview__title-2">{program.titleLine2 || 'Title line 2'}</span>
+							</div>
+							<p class="hero-preview__sub">{program.subtitle || 'Subtitle goes here'}</p>
+						</div>
+						<FormField label="Eyebrow" forId={ids.eyebrow}>
+							<FormControl id={ids.eyebrow} type="text" bind:value={program.eyebrow} />
 						</FormField>
-						<FormField label="Title line 1">
-							<FormControl type="text" bind:value={program.titleLine1} />
-						</FormField>
-						<FormField label="Title line 2">
-							<FormControl type="text" bind:value={program.titleLine2} />
-						</FormField>
-						<FormField label="Subtitle">
-							<FormControl type="text" bind:value={program.subtitle} />
+						<div class="ins-defaults">
+							<FormField label="Title line 1" forId={ids.titleLine1}>
+								<FormControl id={ids.titleLine1} type="text" bind:value={program.titleLine1} />
+							</FormField>
+							<FormField label="Title line 2" forId={ids.titleLine2}>
+								<FormControl id={ids.titleLine2} type="text" bind:value={program.titleLine2} />
+							</FormField>
+						</div>
+						<FormField label="Subtitle" forId={ids.subtitle}>
+							<FormControl id={ids.subtitle} type="text" bind:value={program.subtitle} />
 						</FormField>
 					</section>
 
+					<hr class="ins-divider" />
+
 					<section class="ins-sec">
-						<h3 class="ins-sec__title">Defaults</h3>
+						<p class="ins-sec__lede">New event defaults</p>
 						<div class="ins-defaults">
-							<FormField label="Time">
-								<FormControl type="time" step={900} bind:value={program.defaultTime} />
+							<FormField label="Time" forId={ids.defaultTime}>
+								<FormControl id={ids.defaultTime} type="time" step={900} bind:value={program.defaultTime} />
 							</FormField>
 							<FormField label="Capacity">
 								<NumberStepper bind:value={program.defaultCapacity} min={1} max={50} ariaLabel="Default capacity" />
 							</FormField>
 						</div>
-						<p class="ins-hint">Used when scheduling a new event from the calendar.</p>
+						<p class="ins-hint">Used when scheduling new events. Doesn't change events already on the calendar.</p>
 					</section>
 
 					<section class="ins-sec ins-sec--danger">
 						<h3 class="ins-sec__title ins-sec__title--danger">Danger zone</h3>
-						<p class="ins-hint">Permanently removes the program and its events.</p>
-						<AdminActionButton variant="danger">Delete program</AdminActionButton>
+						{#if !deleteConfirmOpen}
+							<p class="ins-hint">Permanently removes the program and its events.</p>
+							<AdminActionButton variant="danger" onclick={() => (deleteConfirmOpen = true)}>
+								Delete program
+							</AdminActionButton>
+						{:else}
+							<p class="ins-hint">This can't be undone. All upcoming events will also be removed.</p>
+							<div class="ins-confirm-row">
+								<AdminActionButton variant="subtle" onclick={() => (deleteConfirmOpen = false)}>
+									Cancel
+								</AdminActionButton>
+								<AdminActionButton variant="danger" onclick={deleteProgram}>
+									Yes, delete
+								</AdminActionButton>
+							</div>
+						{/if}
 					</section>
 				</div>
 			{:else}
@@ -302,42 +442,52 @@
 					>← Program</button>
 					<div class="inspector__day-title">
 						<span class="inspector__eyebrow">Event</span>
-						<h2 class="inspector__title">{selectedLabel}</h2>
+						<h2 class="inspector__title" tabindex="-1" bind:this={dayHeadingEl}>{selectedLabel}</h2>
 					</div>
 				</header>
 
-				<div class="inspector__body">
-					<section class="ins-sec">
-						<h3 class="ins-sec__title">When</h3>
-						<div class="ins-defaults">
-							<FormField label="Time">
-								<FormControl type="time" step={900} bind:value={draft.time} />
-							</FormField>
-							<FormField label="Capacity">
-								<NumberStepper bind:value={draft.capacity} min={1} max={50} ariaLabel="Capacity" />
-							</FormField>
+				{#if pendingDay != null}
+					<div class="ins-discard" role="alertdialog" aria-label="Unsaved changes">
+						<p class="ins-discard__title">Discard your changes?</p>
+						<p class="ins-hint">You have unsaved edits to {selectedLabel}.</p>
+						<div class="ins-confirm-row">
+							<AdminActionButton variant="subtle" onclick={cancelDiscard}>Keep editing</AdminActionButton>
+							<AdminActionButton variant="danger" onclick={confirmDiscard}>Discard changes</AdminActionButton>
 						</div>
-					</section>
+					</div>
+				{:else}
+					<div class="inspector__body">
+						<section class="ins-sec">
+							<div class="ins-defaults">
+								<FormField label="Time" forId={ids.draftTime}>
+									<FormControl id={ids.draftTime} type="time" step={900} bind:value={draft.time} />
+								</FormField>
+								<FormField label="Capacity">
+									<NumberStepper bind:value={draft.capacity} min={1} max={50} ariaLabel="Capacity" />
+								</FormField>
+							</div>
+						</section>
 
-					<section class="ins-sec">
-						<h3 class="ins-sec__title">Repeat</h3>
-						<label class="ins-check">
-							<input type="checkbox" bind:checked={draft.repeat} />
-							<span>Repeat weekly</span>
-						</label>
-					</section>
-				</div>
+						<section class="ins-sec">
+							<label class="ins-check">
+								<input type="checkbox" bind:checked={draft.repeat} />
+								<span>Repeat weekly</span>
+							</label>
+						</section>
+					</div>
 
-				<footer class="inspector__foot">
-					{#if selectedDay != null && events[selectedDay]}
-						<AdminActionButton variant="danger" onclick={removeEvent}>Remove</AdminActionButton>
-					{:else}
+					<footer class="inspector__foot">
 						<AdminActionButton variant="subtle" onclick={dismissDay}>Cancel</AdminActionButton>
-					{/if}
-					<AdminActionButton variant="primary" onclick={saveEvent}>
-						{selectedDay != null && events[selectedDay] ? 'Save' : 'Add event'}
-					</AdminActionButton>
-				</footer>
+						<div class="inspector__foot-right">
+							{#if selectedDay != null && events[selectedDay]}
+								<AdminActionButton variant="danger" onclick={removeEvent}>Remove</AdminActionButton>
+							{/if}
+							<AdminActionButton variant="primary" onclick={saveEvent}>
+								{selectedDay != null && events[selectedDay] ? 'Save' : 'Add event'}
+							</AdminActionButton>
+						</div>
+					</footer>
+				{/if}
 			{/if}
 		</aside>
 
@@ -345,11 +495,8 @@
 			<button
 				type="button"
 				class="mobile-scrim"
-				aria-label="Close inspector"
-				onclick={() => {
-					inspectorOpen = false
-					backToProgram()
-				}}
+				aria-label="Close settings panel"
+				onclick={dismissDay}
 			></button>
 		{/if}
 	</div>
@@ -368,6 +515,9 @@
 		color: var(--text);
 		background: transparent;
 		overflow-x: visible;
+		/* Bump muted text contrast for WCAG AA on tinted card surfaces */
+		--admin-text-muted: color-mix(in srgb, var(--text) 62%, transparent);
+		--admin-text-soft: color-mix(in srgb, var(--text) 70%, transparent);
 	}
 
 	.page__bar {
@@ -382,8 +532,8 @@
 		display: flex;
 		align-items: center;
 		gap: 0.4rem;
-		font-size: 0.75rem;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
+		font-size: 0.78rem;
+		color: var(--admin-text-muted);
 	}
 
 	.page__back {
@@ -438,7 +588,7 @@
 
 	.program-head__sub {
 		font-size: 0.78rem;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
+		color: var(--admin-text-muted);
 	}
 
 	.program-head__save { display: inline-flex; }
@@ -521,11 +671,11 @@
 		border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
 		background: color-mix(in srgb, var(--text) 2%, transparent);
 		border-radius: 0.65rem;
-		min-height: 4.5rem;
+		min-height: 4rem;
 		padding: 0.45rem 0.5rem 0.4rem;
 		display: flex;
 		flex-direction: column;
-		align-items: flex-start;
+		align-items: stretch;
 		gap: 0.35rem;
 		font: inherit;
 		color: var(--text);
@@ -550,9 +700,24 @@
 		border-color: color-mix(in srgb, var(--admin-accent) 26%, transparent);
 	}
 
+	.calendar__cell--full {
+		background: color-mix(in srgb, var(--admin-warn) 8%, var(--bg));
+		border-color: color-mix(in srgb, var(--admin-warn) 30%, transparent);
+	}
+
 	.calendar__cell--selected {
 		outline: 2px solid color-mix(in srgb, var(--admin-accent) 80%, transparent);
 		outline-offset: -1px;
+	}
+
+	.calendar__cell--pulse {
+		animation: cell-pulse 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	@keyframes cell-pulse {
+		0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--admin-accent) 50%, transparent); }
+		60% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--admin-accent) 0%, transparent); }
+		100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--admin-accent) 0%, transparent); }
 	}
 
 	.calendar__date {
@@ -564,19 +729,55 @@
 	.calendar__cell--has-event .calendar__date { color: var(--text); }
 
 	.calendar__chip {
+		display: grid;
+		gap: 0.2rem;
 		font-size: 0.66rem;
 		font-weight: 600;
-		padding: 0.1rem 0.45rem;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--admin-accent) 18%, var(--bg));
-		color: color-mix(in srgb, var(--admin-accent) 90%, var(--text) 10%);
-		border: 1px solid color-mix(in srgb, var(--admin-accent) 36%, transparent);
+		color: color-mix(in srgb, var(--admin-accent) 92%, var(--text) 8%);
 	}
 
 	.calendar__chip--once {
-		background: color-mix(in srgb, var(--text) 8%, var(--bg));
-		color: color-mix(in srgb, var(--text) 75%, transparent);
-		border-color: color-mix(in srgb, var(--text) 18%, transparent);
+		color: var(--admin-text-soft);
+	}
+
+	.calendar__chip--full {
+		color: color-mix(in srgb, var(--admin-warn-strong) 88%, var(--text) 12%);
+	}
+
+	.calendar__chip-bar {
+		height: 3px;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--admin-accent) 16%, transparent);
+		overflow: hidden;
+	}
+
+	.calendar__chip--once .calendar__chip-bar {
+		background: color-mix(in srgb, var(--text) 10%, transparent);
+	}
+
+	.calendar__chip--full .calendar__chip-bar {
+		background: color-mix(in srgb, var(--admin-warn) 18%, transparent);
+	}
+
+	.calendar__chip-fill {
+		display: block;
+		height: 100%;
+		background: var(--admin-accent);
+		border-radius: 999px;
+		transition: width 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.calendar__chip--once .calendar__chip-fill {
+		background: color-mix(in srgb, var(--text) 60%, transparent);
+	}
+
+	.calendar__chip--full .calendar__chip-fill {
+		background: var(--admin-warn);
+	}
+
+	.calendar__chip-text {
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.01em;
 	}
 
 	.calendar__chip-placeholder {
@@ -584,6 +785,7 @@
 		color: color-mix(in srgb, var(--text) 28%, transparent);
 		opacity: 0;
 		transition: opacity 120ms;
+		align-self: center;
 	}
 
 	.calendar__cell:hover .calendar__chip-placeholder { opacity: 1; }
@@ -596,12 +798,13 @@
 		padding: 1rem;
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: 0.85rem;
 		align-self: start;
 		position: sticky;
 		top: 1rem;
 		max-height: calc(100vh - 2rem);
 		overflow: auto;
+		overscroll-behavior: contain;
 	}
 
 	.inspector__head {
@@ -622,10 +825,17 @@
 
 	.inspector__title {
 		margin: 0;
-		font-size: 1rem;
+		font-size: 0.92rem;
 		font-weight: 700;
 		flex: 1;
 		min-width: 0;
+		outline: none;
+	}
+
+	.inspector__title:focus-visible {
+		text-decoration: underline;
+		text-decoration-color: color-mix(in srgb, var(--admin-accent) 60%, transparent);
+		text-underline-offset: 4px;
 	}
 
 	.inspector__close {
@@ -637,8 +847,8 @@
 		font-size: 0.85rem;
 		cursor: pointer;
 		color: var(--admin-text-soft);
-		width: 28px;
-		height: 28px;
+		width: 32px;
+		height: 32px;
 		border-radius: 999px;
 		transition: background 140ms, color 140ms, border-color 140ms;
 	}
@@ -652,10 +862,36 @@
 	.inspector__body {
 		display: flex;
 		flex-direction: column;
-		gap: 1.2rem;
+		gap: 0.85rem;
 	}
 
-	.ins-sec { display: grid; gap: 0.55rem; }
+	.ins-sec { display: grid; gap: 0.6rem; }
+
+	.ins-sec--row {
+		grid-template-columns: auto 1fr;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.ins-sec__lede {
+		margin: 0;
+		font-size: 0.78rem;
+		font-weight: 650;
+		letter-spacing: -0.005em;
+		color: var(--text);
+	}
+
+	.ins-divider {
+		border: none;
+		border-top: 1px solid color-mix(in srgb, var(--text) 7%, transparent);
+		margin: 0.1rem 0;
+	}
+
+	.ins-sec--danger {
+		margin-top: 0.4rem;
+		padding-top: 0.85rem;
+		border-top: 1px dashed color-mix(in srgb, var(--admin-danger) 28%, transparent);
+	}
 
 	.ins-sec__title {
 		margin: 0;
@@ -663,40 +899,29 @@
 		font-weight: 800;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
-	}
-
-	.ins-sec--danger {
-		padding-top: 1rem;
-		border-top: 1px dashed color-mix(in srgb, var(--text) 12%, transparent);
+		color: var(--admin-text-muted);
 	}
 
 	.ins-sec__title--danger {
 		color: var(--admin-danger-fg);
 	}
 
-	.ins-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem;
-	}
+	.ins-status__copy { display: grid; gap: 0.1rem; min-width: 0; }
 
-	.ins-row__label {
-		font-size: 0.82rem;
+	.ins-status__label {
+		font-size: 0.85rem;
 		font-weight: 600;
 	}
 
-	.ins-row__hint {
-		font-size: 0.7rem;
+	.ins-status__hint {
+		font-size: 0.72rem;
 		color: var(--admin-text-muted);
-		margin-top: 0.1rem;
 	}
 
 	.switch {
 		appearance: none;
-		width: 40px;
-		height: 22px;
+		width: 44px;
+		height: 26px;
 		border-radius: 999px;
 		background: color-mix(in srgb, var(--text) 18%, transparent);
 		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
@@ -704,31 +929,45 @@
 		cursor: pointer;
 		transition: background 140ms;
 		flex: none;
+		padding: 0;
 	}
 
-	.switch span {
+	.switch__thumb {
 		position: absolute;
 		top: 2px;
 		left: 2px;
-		width: 16px;
-		height: 16px;
+		width: 20px;
+		height: 20px;
 		border-radius: 999px;
 		background: var(--bg);
 		box-shadow: 0 1px 2px color-mix(in srgb, var(--text) 18%, transparent);
-		transition: left 140ms;
+		transition: left 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+		display: grid;
+		place-items: center;
+	}
+
+	.switch__icon {
+		font-size: 0.65rem;
+		font-weight: 800;
+		line-height: 1;
+		color: var(--admin-accent);
+		opacity: 0;
+		transition: opacity 140ms;
 	}
 
 	.switch--on {
 		background: color-mix(in srgb, var(--admin-accent) 80%, transparent);
 	}
 
-	.switch--on span { left: 20px; }
+	.switch--on .switch__thumb { left: 20px; }
+
+	.switch--on .switch__icon { opacity: 1; }
 
 	.ins-prefix-group {
 		display: flex;
 		align-items: stretch;
 		border: 1px solid var(--input-border, color-mix(in srgb, var(--text) 12%, transparent));
-		border-radius: var(--radius-md, 0.55rem);
+		border-radius: var(--admin-control-radius, 0.55rem);
 		overflow: hidden;
 		background: var(--input-bg, var(--bg));
 	}
@@ -736,9 +975,9 @@
 	.ins-prefix-group__prefix {
 		display: grid;
 		place-items: center;
-		padding: 0 0.6rem;
+		padding: 0 0.75rem;
 		font-size: var(--font-size-sm, 0.85rem);
-		color: var(--muted, color-mix(in srgb, var(--text) 55%, transparent));
+		color: var(--admin-text-muted);
 		background: color-mix(in srgb, var(--text) 4%, transparent);
 		border-right: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
 		white-space: nowrap;
@@ -754,29 +993,93 @@
 	.ins-defaults {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) auto;
-		gap: 0.5rem;
+		gap: 0.55rem;
 		align-items: end;
 	}
 
 	.ins-hint {
 		margin: 0;
-		font-size: 0.72rem;
-		line-height: 1.4;
+		font-size: 0.74rem;
+		line-height: 1.45;
 		color: var(--admin-text-muted);
 	}
 
 	.ins-check {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.82rem;
+		gap: 0.6rem;
+		font-size: 0.85rem;
 		cursor: pointer;
+		padding: 0.35rem 0;
 	}
 
 	.ins-check input {
-		width: 14px;
-		height: 14px;
+		width: 18px;
+		height: 18px;
 		accent-color: var(--admin-accent);
+		flex: none;
+	}
+
+	.ins-confirm-row {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	/* Hero preview */
+	.hero-preview {
+		padding: 0.85rem 0.95rem;
+		border-radius: 0.75rem;
+		background: color-mix(in srgb, var(--admin-accent) 5%, var(--bg) 95%);
+		border: 1px solid color-mix(in srgb, var(--admin-accent) 18%, transparent);
+		display: grid;
+		gap: 0.25rem;
+		min-width: 0;
+	}
+
+	.hero-preview__eyebrow {
+		font-size: 0.6rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--admin-accent) 80%, var(--text) 20%);
+	}
+
+	.hero-preview__title {
+		font-family: var(--font-display, var(--font-serif, serif));
+		font-size: 1.1rem;
+		font-weight: 700;
+		line-height: 1.15;
+		letter-spacing: -0.01em;
+		color: var(--text);
+	}
+
+	.hero-preview__title-2 {
+		display: inline-block;
+		color: var(--admin-accent);
+	}
+
+	.hero-preview__sub {
+		margin: 0.15rem 0 0;
+		font-size: 0.78rem;
+		line-height: 1.4;
+		color: var(--admin-text-soft);
+	}
+
+	/* Discard prompt */
+	.ins-discard {
+		padding: 0.85rem 0.95rem;
+		border-radius: 0.75rem;
+		background: color-mix(in srgb, var(--admin-warn) 8%, var(--bg) 92%);
+		border: 1px solid color-mix(in srgb, var(--admin-warn) 28%, transparent);
+		display: grid;
+		gap: 0.4rem;
+	}
+
+	.ins-discard__title {
+		margin: 0;
+		font-size: 0.88rem;
+		font-weight: 700;
 	}
 
 	/* Day-view header + footer */
@@ -793,14 +1096,15 @@
 		border: 1px solid var(--admin-control-border);
 		background: var(--admin-control-bg);
 		color: var(--admin-control-fg);
-		padding: 0.32rem 0.7rem;
+		padding: 0.36rem 0.75rem;
 		border-radius: var(--admin-control-radius, 0.55rem);
 		font: inherit;
-		font-size: 0.74rem;
+		font-size: 0.76rem;
 		font-weight: 600;
 		letter-spacing: 0.01em;
 		cursor: pointer;
 		transition: background 140ms, color 140ms, border-color 140ms, transform 140ms;
+		flex: none;
 	}
 
 	.inspector__back:hover {
@@ -814,10 +1118,6 @@
 		min-width: 0;
 	}
 
-	.inspector__day-title .inspector__title {
-		font-size: 0.95rem;
-	}
-
 	.inspector__foot {
 		display: flex;
 		align-items: center;
@@ -828,15 +1128,20 @@
 		margin-top: auto;
 	}
 
+	.inspector__foot-right {
+		display: flex;
+		gap: 0.4rem;
+	}
+
 	/* Compact form controls inside the inspector */
 	.inspector :global(.ui-form-field) {
 		gap: 0.3rem;
 	}
 
 	.inspector :global(.ui-form-label) {
-		font-size: 0.66rem;
+		font-size: 0.7rem;
 		font-weight: 700;
-		letter-spacing: 0.06em;
+		letter-spacing: 0.04em;
 		text-transform: uppercase;
 		color: var(--admin-text-muted);
 	}
@@ -916,6 +1221,11 @@
 
 		.page__inspector-toggle { display: inline-flex; }
 
+		.page__inspector-toggle :global(.admin-ui-btn) {
+			min-height: 44px;
+			padding-inline: 1.1rem;
+		}
+
 		.mobile-scrim {
 			display: block;
 			position: fixed;
@@ -944,16 +1254,35 @@
 			transform: translateX(100%);
 			transition: transform 220ms ease;
 			z-index: 50;
+			padding: 1.1rem 1rem;
 		}
 
 		.inspector--open { transform: translateX(0); }
 
 		.inspector__close { display: grid; place-items: center; }
+
+		.inspector__back { min-height: 36px; }
 	}
 
 	@media (max-width: 720px) {
-		.calendar__cell { min-height: 3.5rem; }
+		.calendar__cell { min-height: 4rem; }
 		.program-head { grid-template-columns: auto 1fr; gap: 0.65rem; }
-		.program-head__save { grid-column: 1 / -1; justify-self: stretch; }
+		.program-head__save { grid-column: 1 / -1; justify-self: end; }
+	}
+
+	@media (max-width: 24em) {
+		.inspector {
+			width: 100vw;
+			max-width: 100vw;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.calendar__cell--pulse { animation: none; }
+		.calendar__chip-fill,
+		.switch__thumb,
+		.switch__icon,
+		.inspector,
+		.inspector__back { transition: none; }
 	}
 </style>
