@@ -85,7 +85,7 @@ export const scheduleMockPrograms: MockProgram[] = [
 		eyebrow: 'Rainbow Gym',
 		heroTitleLines: ['Hang out. Work out.', 'Whatever.'],
 		heroSubtitle: "Grab a time slot and let's do something fun together.",
-		description: 'Strength, movement, and play sessions for all levels.',
+		description: 'Strength, movement, and play events for all levels.',
 		enabled: true,
 		sortOrder: 1,
 		pageTitle: 'Rainbow Gym',

@@ -55,7 +55,7 @@
 		<CalendarPageHero
 			eyebrow="Profile"
 			title="Your details"
-			subtitle="Keep your info in one place so sessions run smoother."
+			subtitle="Keep your info in one place so events run smoother."
 		/>
 
 		<section class="calendar-profile__section">

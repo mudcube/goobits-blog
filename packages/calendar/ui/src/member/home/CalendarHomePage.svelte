@@ -7,7 +7,7 @@
 	import PillButton from '../../primitives/CalendarPillButton.svelte'
 	import CalendarPageHero from '../../primitives/CalendarPageHero.svelte'
 	import MonthEventCalendar from '../booking/MonthEventCalendar.svelte'
-	import { EventSessionCard } from '@calendar/ui/shared'
+	import { EventCard } from '@calendar/ui/shared'
 	import { ChevronRowCard } from '@calendar/ui/shared'
 	import { getActivityEmoji } from '../../shared'
 	import { formatEventDayLabel } from '../../shared'
@@ -173,7 +173,7 @@
 		{:else}
 			<div class="social-events__upcoming-grid">
 				{#each upcoming as event}
-					<EventSessionCard event={event} onOpenEvent={() => goto(eventRoute(event))} />
+					<EventCard event={event} onOpenEvent={() => goto(eventRoute(event))} />
 				{/each}
 			</div>
 		{/if}
@@ -187,7 +187,7 @@
 					<Sparkles size={26} strokeWidth={1.6} />
 				</span>
 				<p class="calendar-home__empty-text">No completed events yet.</p>
-				<p class="calendar-home__empty-hint">Your past sessions will show up here.</p>
+				<p class="calendar-home__empty-hint">Your past events will show up here.</p>
 			</div>
 		{:else}
 			<div class="social-events__past-list">

@@ -132,7 +132,7 @@
 	<div class="book__inner">
 		<header class="book__head">
 			<p class="book__eyebrow">{activity.label}</p>
-			<h1 class="book__title">Book a session</h1>
+			<h1 class="book__title">Book an event</h1>
 		</header>
 		<StepIndicator current={stepNum} {maxReached} labels={stepLabels} onNavigate={onStepNav} />
 

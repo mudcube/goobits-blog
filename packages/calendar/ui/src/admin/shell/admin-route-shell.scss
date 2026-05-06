@@ -470,7 +470,7 @@ $admin-mobile-breakpoint: 768px;
   align-items: center;
   padding: 0 0.5rem;
   margin-bottom: 1.2rem;
-  color: color-mix(in srgb, var(--text) 48%, transparent);
+  color: var(--admin-muted);
   text-decoration: none;
   font-family: var(--font-ui-sans, var(--font-sans));
   font-size: 0.71rem;
@@ -481,7 +481,7 @@ $admin-mobile-breakpoint: 768px;
 }
 
 .social-admin__brand:hover {
-  color: color-mix(in srgb, var(--text) 62%, transparent);
+  color: var(--admin-hover-fg);
 }
 
 .social-admin__nav {

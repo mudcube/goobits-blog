@@ -52,7 +52,7 @@ function gymEvent(id: number, title: string, weekday: number, hour: number, minu
 		startsAt: starts, endsAt: addMinutes(starts, durationMin),
 		seatsTaken: taken, capacity: cap, seatsLeft: cap - taken, waitlistCount: 0,
 		costCents: 0, currency: 'USD', paymentProvider: 'venmo',
-		paymentHandle: '@community-gym', paymentNoteTemplate: 'Gym Sessions {{title}}',
+		paymentHandle: '@community-gym', paymentNoteTemplate: 'Gym Program {{title}}',
 		recapText: null, heroImageUrl: null, participants
 	} satisfies AdminEventsResponse['upcoming'][number]
 }
@@ -64,7 +64,7 @@ function circusEvent(id: number, title: string, weekday: number, hour: number, m
 		startsAt: starts, endsAt: addMinutes(starts, durationMin),
 		seatsTaken: taken, capacity: cap, seatsLeft: cap - taken, waitlistCount: 0,
 		costCents: 0, currency: 'USD', paymentProvider: 'venmo',
-		paymentHandle: '@community-gym', paymentNoteTemplate: 'Circus Sessions {{title}}',
+		paymentHandle: '@community-gym', paymentNoteTemplate: 'Circus Program {{title}}',
 		recapText: null, heroImageUrl: null, participants
 	} satisfies AdminEventsResponse['upcoming'][number]
 }
@@ -179,7 +179,7 @@ export const mockDashboardRecentEvents: AdminEventsResponse['recent'] = [
 		currency: 'USD',
 		paymentProvider: 'venmo',
 		paymentHandle: '@community-gym',
-		paymentNoteTemplate: 'Gym Sessions {{title}}',
+		paymentNoteTemplate: 'Gym Program {{title}}',
 		recapText: 'Solid energy and clean finish.',
 		heroImageUrl: null,
 		participants: [marco]
@@ -199,7 +199,7 @@ export const mockDashboardRecentEvents: AdminEventsResponse['recent'] = [
 		currency: 'USD',
 		paymentProvider: 'venmo',
 		paymentHandle: '@community-gym',
-		paymentNoteTemplate: 'Circus Sessions {{title}}',
+		paymentNoteTemplate: 'Circus Program {{title}}',
 		recapText: 'Great progression on fundamentals.',
 		heroImageUrl: null,
 		participants: [ava]
@@ -219,8 +219,8 @@ export const mockDashboardRecentEvents: AdminEventsResponse['recent'] = [
 		currency: 'USD',
 		paymentProvider: 'venmo',
 		paymentHandle: '@community-gym',
-		paymentNoteTemplate: 'Gym Sessions {{title}}',
-		recapText: 'Busy session with mixed circuits.',
+		paymentNoteTemplate: 'Gym Program {{title}}',
+		recapText: 'Busy event with mixed circuits.',
 		heroImageUrl: null,
 		participants: [tyler]
 	},
@@ -287,15 +287,15 @@ export const mockPrograms: AdminProgramsResponse['programs'] = [
 	{
 		slug: 'gym',
 		href: '/schedule/gym',
-		label: 'Gym Sessions',
+		label: 'Gym Program',
 		icon: '💪',
-		eyebrow: 'Gym Sessions',
+		eyebrow: 'Gym Program',
 		heroTitleLines: ['Hang out. Work out.', 'Whatever.'],
 		heroSubtitle: "Grab a time slot and let's do something fun together.",
-		description: 'Strength, movement, and play sessions for all levels.',
+		description: 'Strength, movement, and play events for all levels.',
 		enabled: true,
 		sortOrder: 1,
-		pageTitle: 'Gym Sessions',
+		pageTitle: 'Gym Program',
 		activityName: 'Gym',
 		serviceStatusNote: 'Open for bookings',
 		eyebrowClass: 'eyebrow-gym',
@@ -305,15 +305,15 @@ export const mockPrograms: AdminProgramsResponse['programs'] = [
 	{
 		slug: 'circus',
 		href: '/schedule/circus',
-		label: 'Circus Sessions',
+		label: 'Circus Program',
 		icon: '🎪',
-		eyebrow: 'Circus Sessions',
+		eyebrow: 'Circus Program',
 		heroTitleLines: ['Fly high. Spin fast.', 'Be brave.'],
 		heroSubtitle: 'Aerial arts and circus skills training for all levels.',
 		description: 'Aerial arts and circus skills training for all levels.',
 		enabled: true,
 		sortOrder: 2,
-		pageTitle: 'Circus Sessions',
+		pageTitle: 'Circus Program',
 		activityName: 'Circus',
 		serviceStatusNote: 'Open for bookings',
 		eyebrowClass: 'eyebrow-circus',
@@ -363,8 +363,8 @@ export const mockPrograms: AdminProgramsResponse['programs'] = [
 		icon: '🏺',
 		eyebrow: 'Pottery Studio',
 		heroTitleLines: ['Make a mess.', 'Make a mug.'],
-		heroSubtitle: 'Drop-in pottery sessions on the wheel.',
-		description: 'Drop-in pottery sessions on the wheel.',
+		heroSubtitle: 'Drop-in pottery events on the wheel.',
+		description: 'Drop-in pottery events on the wheel.',
 		enabled: false,
 		sortOrder: 5,
 		pageTitle: 'Pottery Studio',
