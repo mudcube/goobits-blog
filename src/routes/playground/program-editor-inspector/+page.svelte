@@ -131,20 +131,21 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div class="page">
+<div class="page social-admin">
 	<header class="page__bar">
 		<div class="page__crumb">
 			<a href="/playground" class="page__back">← Playground</a>
 			<span class="page__sep">/</span>
 			<span>Program editor</span>
 		</div>
-		<button
-			class="page__inspector-toggle"
-			type="button"
-			onclick={() => (inspectorOpen = !inspectorOpen)}
-		>
-			{inspectorOpen ? 'Close settings' : 'Settings'}
-		</button>
+		<div class="page__inspector-toggle">
+			<AdminActionButton
+				variant="subtle"
+				onclick={() => (inspectorOpen = !inspectorOpen)}
+			>
+				{inspectorOpen ? 'Close settings' : 'Settings'}
+			</AdminActionButton>
+		</div>
 	</header>
 
 	<header class="program-head">
@@ -154,7 +155,9 @@
 			<h1 class="program-head__title">Morning Yoga</h1>
 			<span class="program-head__sub">/{program.slug}</span>
 		</div>
-		<button class="program-head__save" type="button">Save</button>
+		<div class="program-head__save">
+			<AdminActionButton variant="primary">Save</AdminActionButton>
+		</div>
 	</header>
 
 	<div class="layout">
@@ -353,12 +356,18 @@
 </div>
 
 <style>
-	.page {
+	.page.social-admin {
+		display: block;
+		grid-template-columns: none;
+		grid-template-rows: none;
+		min-width: 0;
 		max-width: 76rem;
 		margin: 0 auto;
 		padding: 1rem 1.25rem 6rem;
 		font-family: var(--font-ui-sans, var(--font-sans));
 		color: var(--text);
+		background: transparent;
+		overflow-x: visible;
 	}
 
 	.page__bar {
@@ -388,16 +397,6 @@
 
 	.page__inspector-toggle {
 		display: none;
-		appearance: none;
-		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
-		background: transparent;
-		color: var(--text);
-		padding: 0.4rem 0.85rem;
-		border-radius: 999px;
-		font: inherit;
-		font-size: 0.78rem;
-		font-weight: 600;
-		cursor: pointer;
 	}
 
 	.program-head {
@@ -442,18 +441,7 @@
 		color: color-mix(in srgb, var(--text) 55%, transparent);
 	}
 
-	.program-head__save {
-		appearance: none;
-		border: none;
-		background: var(--text);
-		color: var(--bg);
-		padding: 0.55rem 1.1rem;
-		border-radius: 999px;
-		font: inherit;
-		font-size: 0.82rem;
-		font-weight: 650;
-		cursor: pointer;
-	}
+	.program-head__save { display: inline-flex; }
 
 	.layout {
 		display: grid;
@@ -486,9 +474,9 @@
 
 	.calendar-card__nav-btn {
 		appearance: none;
-		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
-		background: transparent;
-		color: var(--text);
+		border: 1px solid var(--admin-calendar-arrow-border, color-mix(in srgb, var(--text) 22%, transparent));
+		background: var(--admin-calendar-arrow-bg, transparent);
+		color: var(--admin-calendar-arrow-fg, var(--admin-text-soft));
 		width: 28px;
 		height: 28px;
 		border-radius: 999px;
@@ -497,6 +485,13 @@
 		cursor: pointer;
 		display: grid;
 		place-items: center;
+		transition: background 140ms, color 140ms, border-color 140ms;
+	}
+
+	.calendar-card__nav-btn:hover {
+		background: var(--admin-calendar-arrow-hover-bg, color-mix(in srgb, var(--admin-accent) 14%, var(--bg) 86%));
+		color: var(--admin-calendar-arrow-hover-fg, var(--admin-accent));
+		border-color: color-mix(in srgb, var(--admin-accent) 36%, transparent);
 	}
 
 	.calendar { padding: 0.5rem; position: relative; }
@@ -636,14 +631,22 @@
 	.inspector__close {
 		display: none;
 		appearance: none;
-		border: none;
+		border: 1px solid var(--admin-button-border, color-mix(in srgb, var(--text) 14%, transparent));
 		background: transparent;
 		font: inherit;
-		font-size: 0.95rem;
+		font-size: 0.85rem;
 		cursor: pointer;
 		color: var(--admin-text-soft);
 		width: 28px;
 		height: 28px;
+		border-radius: 999px;
+		transition: background 140ms, color 140ms, border-color 140ms;
+	}
+
+	.inspector__close:hover {
+		background: color-mix(in srgb, var(--text) 6%, transparent);
+		color: var(--text);
+		border-color: color-mix(in srgb, var(--text) 22%, transparent);
 	}
 
 	.inspector__body {
@@ -787,23 +790,22 @@
 
 	.inspector__back {
 		appearance: none;
-		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
-		background: transparent;
-		color: var(--admin-text-soft);
-		padding: 0.3rem 0.55rem;
-		border-radius: 999px;
+		border: 1px solid var(--admin-control-border);
+		background: var(--admin-control-bg);
+		color: var(--admin-control-fg);
+		padding: 0.32rem 0.7rem;
+		border-radius: var(--admin-control-radius, 0.55rem);
 		font: inherit;
-		font-size: 0.72rem;
+		font-size: 0.74rem;
 		font-weight: 600;
 		letter-spacing: 0.01em;
 		cursor: pointer;
-		transition: background 120ms, color 120ms, border-color 120ms;
+		transition: background 140ms, color 140ms, border-color 140ms, transform 140ms;
 	}
 
 	.inspector__back:hover {
-		background: color-mix(in srgb, var(--text) 6%, transparent);
-		color: var(--text);
-		border-color: color-mix(in srgb, var(--text) 18%, transparent);
+		background: var(--admin-control-bg-hover);
+		transform: translateY(-1px);
 	}
 
 	.inspector__day-title {
@@ -904,14 +906,7 @@
 	}
 
 	.mobile-scrim {
-		position: fixed;
-		inset: 0;
-		border: none;
-		padding: 0;
-		background: color-mix(in srgb, var(--text) 32%, transparent);
-		backdrop-filter: blur(2px);
-		z-index: 40;
-		cursor: pointer;
+		display: none;
 	}
 
 	@media (max-width: 56em) {
@@ -920,6 +915,18 @@
 		}
 
 		.page__inspector-toggle { display: inline-flex; }
+
+		.mobile-scrim {
+			display: block;
+			position: fixed;
+			inset: 0;
+			border: none;
+			padding: 0;
+			background: color-mix(in srgb, var(--text) 32%, transparent);
+			backdrop-filter: blur(2px);
+			z-index: 40;
+			cursor: pointer;
+		}
 
 		.inspector {
 			position: fixed;
