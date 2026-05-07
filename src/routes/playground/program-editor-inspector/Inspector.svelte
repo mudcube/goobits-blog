@@ -260,6 +260,14 @@
 
 	.inspector__view { display: contents; }
 
+	/* Unify AdminActionButton sizing inside the inspector to match other controls */
+	.inspector :global(.admin-ui-btn) {
+		min-height: var(--ins-control-h);
+		padding-inline: var(--ins-control-pad-x);
+		font-size: var(--ins-control-font-size);
+		border-radius: var(--ins-control-radius);
+	}
+
 	.inspector__head {
 		display: flex;
 		align-items: flex-end;
@@ -395,12 +403,14 @@
 		display: flex;
 		align-items: center;
 		gap: 0.65rem;
+		min-height: var(--ins-control-h);
 	}
 
 	.status-row__label {
-		font-size: 0.9rem;
-		font-weight: 600;
+		font-size: var(--ins-control-font-size);
+		font-weight: var(--ins-control-font-weight);
 		color: var(--text);
+		line-height: 1;
 	}
 
 	/* Switch — proportional to control height (toggle aspect ~1.7:1) */
@@ -521,18 +531,23 @@
 
 	.inspector__back {
 		appearance: none;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		height: var(--ins-control-h);
 		border: 1px solid var(--admin-control-border);
 		background: var(--admin-control-bg);
 		color: var(--admin-control-fg);
-		padding: 0.36rem 0.75rem;
-		border-radius: var(--admin-control-radius, 0.55rem);
+		padding: 0 var(--ins-control-pad-x);
+		border-radius: var(--ins-control-radius);
 		font: inherit;
-		font-size: 0.76rem;
-		font-weight: 600;
+		font-size: var(--ins-control-font-size);
+		font-weight: var(--ins-control-font-weight);
 		letter-spacing: 0.01em;
 		cursor: pointer;
 		transition: background 140ms, color 140ms, border-color 140ms, transform 140ms;
 		flex: none;
+		box-sizing: border-box;
 	}
 
 	.inspector__back:hover {

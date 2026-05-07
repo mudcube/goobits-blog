@@ -59,8 +59,12 @@
 		background: transparent;
 		color: var(--ins-control-fg-muted);
 		font: inherit;
+		/* Slightly bigger than value so the math glyphs read at the right weight,
+		 * paired with align-items: center so the visual center of the glyph
+		 * (math axis for −/+) lines up with the value's optical center. */
 		font-size: 1rem;
-		font-weight: 700;
+		font-weight: 600;
+		line-height: 1;
 		width: var(--ins-control-h);
 		height: 100%;
 		display: inline-flex;
@@ -87,14 +91,16 @@
 
 	.spots-stepper__value {
 		display: inline-flex;
-		align-items: baseline;
-		gap: 0.35rem;
+		align-items: center;
+		justify-content: center;
+		gap: 0.3rem;
 		padding: 0 0.65rem;
 		font-variant-numeric: tabular-nums;
-		align-self: center;
 		border-left: 1px solid var(--ins-control-bg-soft-divider);
 		border-right: 1px solid var(--ins-control-bg-soft-divider);
 		height: 100%;
+		line-height: 1;
+		white-space: nowrap;
 		box-sizing: border-box;
 	}
 
@@ -102,7 +108,6 @@
 		font-size: var(--ins-control-font-size);
 		font-weight: var(--ins-control-font-weight);
 		color: var(--ins-control-fg);
-		align-self: center;
 		line-height: 1;
 	}
 
@@ -110,7 +115,6 @@
 		font-size: 0.78rem;
 		font-weight: 500;
 		color: var(--ins-control-fg-muted);
-		align-self: center;
 		line-height: 1;
 	}
 </style>

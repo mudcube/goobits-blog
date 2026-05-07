@@ -46,6 +46,7 @@
 	.time-chip__icon {
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		color: var(--ins-control-fg-muted);
 		flex: none;
 	}
@@ -53,7 +54,7 @@
 	.time-chip__input {
 		appearance: none;
 		-webkit-appearance: none;
-		border: none;
+		border: 0;
 		background: transparent;
 		color: var(--ins-control-fg);
 		font: inherit;
@@ -61,15 +62,14 @@
 		font-weight: var(--ins-control-font-weight);
 		font-variant-numeric: tabular-nums;
 		padding: 0;
+		margin: 0;
 		outline: none;
+		/* line-height: 1 keeps input's intrinsic height tight; chip's
+		 * align-items:center centers it next to the icon. */
 		line-height: 1;
 		min-width: 5.6rem;
 	}
 
-	/* Hide the native picker indicator — our clock icon is the affordance */
-	.time-chip__input::-webkit-calendar-picker-indicator {
-		display: none;
-	}
-
+	.time-chip__input::-webkit-calendar-picker-indicator { display: none; }
 	.time-chip__input::-webkit-date-and-time-value { text-align: left; }
 </style>
