@@ -58,35 +58,36 @@
 	/* Single rounded surface containing host + slug + open link.
 	 * Solid resting state so the pill reads as a discrete control even
 	 * when it sits on a gradient panel. */
+	/* Two-zone pill: fixed host on the left (recessed/muted, divider on right),
+	 * editable slug on the right (clean editable surface). The visual split
+	 * makes it obvious which segment is interactive. */
 	.url-pill {
 		display: flex;
-		align-items: center;
+		align-items: stretch;
 		gap: 0;
 		flex: 0 1 22rem;
 		min-width: 12rem;
-		padding: 0.3rem 0.35rem 0.3rem 0.75rem;
-		/* Solid (non-alpha-mixed) bg + border so the pill reads as a discrete
-		 * control on any backdrop — gradient panels, dark mode, light mode. */
-		border: 1px solid color-mix(in srgb, var(--text) 70%, var(--bg));
-		background: color-mix(in srgb, var(--bg) 88%, var(--text) 12%);
+		/* No padding on the pill itself — segments fill it edge-to-edge so
+		 * the host's recessed bg can read as a distinct zone. */
+		padding: 0;
+		border: 2px solid var(--admin-accent);
+		background: var(--bg);
 		border-radius: 999px;
 		font-size: 0.82rem;
 		font-variant-numeric: tabular-nums;
 		min-width: 0;
-		box-shadow: 0 1px 2px color-mix(in srgb, var(--text) 12%, transparent),
-			inset 0 1px 0 color-mix(in srgb, var(--bg) 70%, transparent);
-		transition: border-color 140ms, background 140ms, box-shadow 140ms;
+		overflow: hidden;
+		box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 12%, transparent);
+		transition: border-color 140ms, box-shadow 140ms;
 	}
 
 	.url-pill:hover {
-		border-color: color-mix(in srgb, var(--text) 80%, var(--bg));
-		background: color-mix(in srgb, var(--bg) 82%, var(--text) 18%);
+		box-shadow: 0 2px 8px color-mix(in srgb, var(--admin-accent) 22%, transparent);
 	}
 
 	.url-pill:focus-within {
-		border-color: color-mix(in srgb, var(--admin-accent) 55%, transparent);
-		background: color-mix(in srgb, var(--admin-accent) 6%, var(--bg));
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-accent) 18%, transparent);
+		border-color: color-mix(in srgb, var(--admin-accent) 80%, var(--text));
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--admin-accent) 24%, transparent);
 	}
 
 	.url-pill__seg {
@@ -95,14 +96,30 @@
 		box-sizing: border-box;
 	}
 
+	/* Fixed host zone: tinted bg + right divider make it read as
+	 * "this part isn't editable". Italic + muted text reinforces. */
 	.url-pill__host {
+		padding: 0 0.7rem 0 0.85rem;
 		color: color-mix(in srgb, var(--text) 55%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 12%, var(--bg) 88%);
+		border-right: 1px solid color-mix(in srgb, var(--admin-accent) 32%, transparent);
 		white-space: nowrap;
+		font-style: italic;
+		user-select: none;
 	}
 
+	/* Editable slug zone: clean white-ish surface so the input feels
+	 * crisp and editable. Subtle accent tint on focus. */
 	.url-pill__slug-wrap {
 		flex: 1;
 		min-width: 0;
+		padding: 0 0.45rem;
+		background: var(--bg);
+		transition: background 140ms;
+	}
+
+	.url-pill:focus-within .url-pill__slug-wrap {
+		background: color-mix(in srgb, var(--admin-accent) 5%, var(--bg) 95%);
 	}
 
 	.url-pill__slug {
@@ -113,28 +130,28 @@
 		font: inherit;
 		color: var(--text);
 		font-weight: 600;
-		padding: 0 0.1rem;
+		padding: 0.32rem 0.1rem;
 		margin: 0;
 		min-width: 4rem;
 		outline: none;
-		line-height: 1;
+		line-height: 1.2;
 	}
 
 	.url-pill__open {
 		display: grid;
 		place-items: center;
-		width: 1.6rem;
-		height: 1.6rem;
-		border-radius: 999px;
+		width: 2rem;
+		flex: none;
 		color: color-mix(in srgb, var(--text) 55%, transparent);
 		text-decoration: none;
 		font-size: 0.78rem;
-		flex: none;
+		background: color-mix(in srgb, var(--admin-accent) 12%, var(--bg) 88%);
+		border-left: 1px solid color-mix(in srgb, var(--admin-accent) 32%, transparent);
 		transition: background 140ms, color 140ms;
 	}
 
 	.url-pill__open:hover {
-		background: color-mix(in srgb, var(--text) 8%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 22%, var(--bg) 78%);
 		color: var(--admin-accent);
 	}
 </style>

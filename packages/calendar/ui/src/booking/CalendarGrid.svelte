@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ChevronLeft, ChevronRight } from '@lucide/svelte'
+	import { ChevronLeft, ChevronRight, Star } from '@lucide/svelte'
 	import { onMount } from 'svelte'
 	import type { CalendarDay } from './types'
 
@@ -109,6 +109,11 @@
 					aria-label={day.ariaLabel ?? day.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
 					onclick={(e) => handleClick(day, e)}
 				>
+					{#if day.isToday}
+						<span class="cg__today-star" aria-hidden="true">
+							<Star size={variant === 'member' ? 12 : 10} strokeWidth={2.2} fill="currentColor" />
+						</span>
+					{/if}
 					<span class={`cg__num ${variant === 'member' ? 'member-calendar__day-num' : ''}`.trim()}>{day.date.getDate()}</span>
 					{#if day.capacity}
 						{@const cap = day.capacity}
@@ -162,6 +167,14 @@
 	.cg__cell--other { opacity: 0.15; }
 	.cg__cell--past { opacity: 0.25; }
 	.cg__cell--today { border-color: color-mix(in srgb, var(--text) 18%, transparent); }
+	.cg__today-star {
+		position: absolute;
+		top: 0.35rem;
+		left: 0.4rem;
+		display: inline-flex;
+		color: color-mix(in srgb, var(--text) 18%, transparent);
+		pointer-events: none;
+	}
 	.cg__cell--selected { border-color: var(--cg-accent, var(--book-accent, #a78bfa)); background: color-mix(in srgb, var(--cg-accent, var(--book-accent, #a78bfa)) 32%, var(--panel-bg, var(--bg)) 68%); box-shadow: inset 0 0 0 2px var(--cg-accent, var(--book-accent, #a78bfa)), 0 4px 14px color-mix(in srgb, var(--cg-accent, var(--book-accent, #a78bfa)) 30%, transparent); color: var(--text); opacity: 1 !important; }
 
 	.cg__num { position: absolute; top: 0.35rem; right: 0.4rem; font-size: var(--cg-num-size, 0.78rem); font-weight: 600; }
@@ -323,6 +336,12 @@
 
 	.cg--member .cg__cell--today {
 		border-color: color-mix(in srgb, var(--text) 24%, transparent);
+	}
+
+	.cg--member .cg__today-star {
+		top: 0.66rem;
+		left: 0.66rem;
+		color: color-mix(in srgb, var(--text) 24%, transparent);
 	}
 
 	.cg--member .cg__cell--active {
