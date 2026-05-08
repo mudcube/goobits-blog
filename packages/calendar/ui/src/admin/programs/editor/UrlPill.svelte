@@ -55,27 +55,37 @@
 </div>
 
 <style>
+	/* Single rounded surface containing host + slug + open link.
+	 * Solid resting state so the pill reads as a discrete control even
+	 * when it sits on a gradient panel. */
 	.url-pill {
 		display: flex;
-		align-items: stretch;
+		align-items: center;
+		gap: 0;
 		flex: 0 1 22rem;
 		min-width: 12rem;
-		height: 32px;
-		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
-		border-radius: var(--admin-control-radius, 0.625rem);
-		overflow: hidden;
-		background: var(--bg);
+		padding: 0.3rem 0.35rem 0.3rem 0.75rem;
+		/* Solid (non-alpha-mixed) bg + border so the pill reads as a discrete
+		 * control on any backdrop — gradient panels, dark mode, light mode. */
+		border: 1px solid color-mix(in srgb, var(--text) 70%, var(--bg));
+		background: color-mix(in srgb, var(--bg) 88%, var(--text) 12%);
+		border-radius: 999px;
 		font-size: 0.82rem;
 		font-variant-numeric: tabular-nums;
-		transition: border-color 140ms, box-shadow 140ms;
+		min-width: 0;
+		box-shadow: 0 1px 2px color-mix(in srgb, var(--text) 12%, transparent),
+			inset 0 1px 0 color-mix(in srgb, var(--bg) 70%, transparent);
+		transition: border-color 140ms, background 140ms, box-shadow 140ms;
 	}
 
 	.url-pill:hover {
-		border-color: color-mix(in srgb, var(--text) 22%, transparent);
+		border-color: color-mix(in srgb, var(--text) 80%, var(--bg));
+		background: color-mix(in srgb, var(--bg) 82%, var(--text) 18%);
 	}
 
 	.url-pill:focus-within {
-		border-color: color-mix(in srgb, var(--admin-accent) 50%, transparent);
+		border-color: color-mix(in srgb, var(--admin-accent) 55%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 6%, var(--bg));
 		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-accent) 18%, transparent);
 	}
 
@@ -86,10 +96,7 @@
 	}
 
 	.url-pill__host {
-		padding: 0 0.6rem;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
-		background: color-mix(in srgb, var(--text) 5%, transparent);
-		border-right: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+		color: color-mix(in srgb, var(--text) 55%, transparent);
 		white-space: nowrap;
 	}
 
@@ -106,24 +113,28 @@
 		font: inherit;
 		color: var(--text);
 		font-weight: 600;
-		padding: 0 0.55rem;
+		padding: 0 0.1rem;
 		margin: 0;
-		min-width: 0;
+		min-width: 4rem;
 		outline: none;
 		line-height: 1;
 	}
 
 	.url-pill__open {
-		min-width: 32px;
-		justify-content: center;
-		border-left: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-		color: color-mix(in srgb, var(--text) 60%, transparent);
+		display: grid;
+		place-items: center;
+		width: 1.6rem;
+		height: 1.6rem;
+		border-radius: 999px;
+		color: color-mix(in srgb, var(--text) 55%, transparent);
 		text-decoration: none;
+		font-size: 0.78rem;
+		flex: none;
 		transition: background 140ms, color 140ms;
 	}
 
 	.url-pill__open:hover {
-		background: color-mix(in srgb, var(--text) 5%, transparent);
+		background: color-mix(in srgb, var(--text) 8%, transparent);
 		color: var(--admin-accent);
 	}
 </style>
