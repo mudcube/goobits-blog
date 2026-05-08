@@ -621,45 +621,59 @@
 		</div>
 	{/if}
 
+	{#if deleteConfirmOpen}
+		<div class="program-editor-chrome__confirm">
+			<AdminInlineConfirm
+				question="Delete program {dashboard.programDraft?.label || dashboard.selectedProgramSlug || ''}? This cannot be undone."
+				confirmLabel="Yes, delete"
+				onCancel={() => (deleteConfirmOpen = false)}
+				onConfirm={() => void deleteProgram()}
+			/>
+		</div>
+	{/if}
+
+	<!-- Admin chrome: bookable toggle, public URL, remove. Lives outside
+	 * the editor card because it isn't part of what users see on the
+	 * public page — it's program-level admin metadata. -->
+	<div class="program-editor-chrome">
+		<div class="program-editor-chrome__left">
+			<button
+				type="button"
+				class="program-editor__publish-toggle"
+				class:program-editor__publish-toggle--on={dashboard.programDraft.enabled}
+				aria-pressed={dashboard.programDraft.enabled}
+				aria-label={dashboard.programDraft.enabled
+					? 'Bookable. Click to hide.'
+					: 'Hidden. Click to make bookable.'}
+				onclick={() => updateProgramDraft({ enabled: !dashboard.programDraft.enabled }, 'enabled')}
+			>
+				<span class="program-editor__publish-thumb"></span>
+				<span class="program-editor__publish-label">
+					{dashboard.programDraft.enabled ? 'Bookable' : 'Hidden'}
+				</span>
+			</button>
+
+			<UrlPill
+				slug={dashboard.programDraft.slug}
+				onInput={(value) => handleSettingInput('slug', value)}
+				onCommit={() => pushEditorHistory('slug')}
+			/>
+		</div>
+
+		<button
+			type="button"
+			class="program-editor-chrome__remove"
+			onclick={requestDeleteProgram}
+			disabled={dashboard.programDeleting}
+		>
+			{dashboard.programDeleting ? 'Removing…' : 'Remove this program'}
+		</button>
+	</div>
+
 	<div class="program-editor admin-content">
-		{#if deleteConfirmOpen}
-			<div class="program-editor__delete-confirm">
-				<AdminInlineConfirm
-					question="Delete program {dashboard.programDraft?.label || dashboard.selectedProgramSlug || ''}? This cannot be undone."
-					confirmLabel="Yes, delete"
-					onCancel={() => (deleteConfirmOpen = false)}
-					onConfirm={() => void deleteProgram()}
-				/>
-			</div>
-		{/if}
 		<div class="program-editor__canvas-wrap">
 			<div class="program-editor__canvas">
 				<div class="program-editor__panel calendar-ui-card">
-					<!-- Program-level metadata: publish toggle + URL slug. Replaces the old ProgramSettingsDrawer. -->
-					<div class="program-editor__settings-strip">
-						<button
-							type="button"
-							class="program-editor__publish-toggle"
-							class:program-editor__publish-toggle--on={dashboard.programDraft.enabled}
-							aria-pressed={dashboard.programDraft.enabled}
-							aria-label={dashboard.programDraft.enabled
-								? 'Bookable. Click to hide.'
-								: 'Hidden. Click to make bookable.'}
-							onclick={() => updateProgramDraft({ enabled: !dashboard.programDraft.enabled }, 'enabled')}
-						>
-							<span class="program-editor__publish-thumb"></span>
-							<span class="program-editor__publish-label">
-								{dashboard.programDraft.enabled ? 'Bookable' : 'Hidden'}
-							</span>
-						</button>
-
-						<UrlPill
-							slug={dashboard.programDraft.slug}
-							onInput={(value) => handleSettingInput('slug', value)}
-							onCommit={() => pushEditorHistory('slug')}
-						/>
-					</div>
-
 					<section class="program-editor__hero">
 						<div class="program-editor__hero-glow" aria-hidden="true"></div>
 
@@ -819,17 +833,6 @@
 					<span>Click text to edit, click a day to schedule it.</span>
 				</p>
 			</div>
-
-			<footer class="program-editor__remove-footer">
-				<button
-					type="button"
-					class="program-editor__remove-btn"
-					onclick={requestDeleteProgram}
-					disabled={dashboard.programDeleting}
-				>
-					{dashboard.programDeleting ? 'Removing…' : 'Remove this program'}
-				</button>
-			</footer>
 		</div>
 	</div>
 {/if}
@@ -839,12 +842,14 @@
 		overflow-x: clip;
 	}
 
-	.program-editor__delete-confirm {
+	/* Inline confirm shown above the chrome bar when Remove is clicked. */
+	.program-editor-chrome__confirm {
+		max-width: var(--admin-content-max, 720px);
+		margin: 0 auto 0.65rem;
 		padding: 0.85rem 1rem;
 		border-radius: 0.7rem;
 		background: var(--admin-danger-bg-faint);
 		border: 1px solid var(--admin-danger-border);
-		margin-bottom: 0.6rem;
 	}
 
 	.program-editor {
@@ -888,7 +893,9 @@
 		max-width: var(--admin-content-max, 720px);
 		overflow-x: clip;
 		border-radius: 0.875rem;
-		border: 1px solid var(--border);
+		/* Dashed border signals "this is the editable preview". Everything
+		 * inside is what users will see on the public page. */
+		border: 1px dashed color-mix(in srgb, var(--admin-accent) 38%, transparent);
 	}
 
 	.program-editor__canvas-wrap {
@@ -926,17 +933,60 @@
 		box-shadow: none;
 	}
 
-	/* Settings strip — publish toggle + URL slug, replaces ProgramSettingsDrawer */
-	.program-editor__settings-strip {
+	/* Admin chrome bar — sits ABOVE the editor card, holds program-level
+	 * controls that aren't part of the public-page visualization. */
+	.program-editor-chrome {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		max-width: var(--admin-content-max, 720px);
+		margin: 0 auto 0.85rem;
+		padding: 0.5rem 0.65rem;
+		border-radius: 0.7rem;
+		background: var(--admin-card-bg);
+		border: 1px solid var(--admin-card-border);
+		flex-wrap: wrap;
+	}
+
+	.program-editor-chrome__left {
 		display: flex;
 		align-items: center;
 		gap: 0.65rem;
-		padding: 0.5rem 0.65rem;
-		margin-bottom: 0.4rem;
-		border-radius: 0.65rem;
-		background: color-mix(in srgb, var(--text) 4%, transparent);
-		border: 1px solid color-mix(in srgb, var(--text) 9%, transparent);
 		flex-wrap: wrap;
+		min-width: 0;
+		flex: 1;
+	}
+
+	/* In the chrome bar, keep the URL pill compact so toggle + URL +
+	 * Remove all fit on one line within the editor's max-width. */
+	.program-editor-chrome__left :global(.url-pill) {
+		flex: 0 1 18rem;
+	}
+
+	.program-editor-chrome__remove {
+		appearance: none;
+		border: none;
+		background: transparent;
+		color: var(--admin-danger);
+		font: inherit;
+		font-size: 0.78rem;
+		font-weight: 600;
+		padding: 0.4rem 0.75rem;
+		border-radius: 0.5rem;
+		cursor: pointer;
+		flex: none;
+		transition: background 140ms, color 140ms;
+	}
+
+	.program-editor-chrome__remove:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--admin-danger) 12%, transparent);
+		color: var(--admin-danger-strong, var(--admin-danger));
+	}
+
+	.program-editor-chrome__remove:disabled {
+		opacity: 0.5;
+		cursor: default;
 	}
 
 	.program-editor__publish-toggle {
@@ -996,47 +1046,14 @@
 
 	/* URL pill styles live in UrlPill.svelte. */
 
-	/* Quiet "Remove this program" footer — replaces ProgramSettingsDrawer's Delete */
-	.program-editor__remove-footer {
-		display: flex;
-		justify-content: center;
-		width: 100%;
-		padding: 0.85rem 0.5rem 1.25rem;
-		border-top: 1px dashed color-mix(in srgb, var(--text) 10%, transparent);
-		margin-top: 0.5rem;
-	}
-
-	.program-editor__remove-btn {
-		appearance: none;
-		border: none;
-		background: transparent;
-		color: var(--admin-danger);
-		font: inherit;
-		font-size: 0.82rem;
-		font-weight: 600;
-		padding: 0.4rem 0.85rem;
-		border-radius: 0.5rem;
-		cursor: pointer;
-		transition: background 140ms, color 140ms;
-	}
-
-	.program-editor__remove-btn:hover:not(:disabled) {
-		background: color-mix(in srgb, var(--admin-danger) 12%, transparent);
-		color: var(--admin-danger-strong, var(--admin-danger));
-	}
-
-	.program-editor__remove-btn:disabled {
-		opacity: 0.5;
-		cursor: default;
-	}
-
 	@media (max-width: 480px) {
-		.program-editor__settings-strip {
+		.program-editor-chrome {
 			flex-direction: column;
 			align-items: stretch;
 		}
-		.program-editor__publish-toggle { align-self: flex-start; }
-		.program-editor__settings-strip :global(.url-pill) { width: 100%; flex: 1 1 auto; }
+		.program-editor-chrome__left { flex-direction: column; align-items: stretch; }
+		.program-editor-chrome__left :global(.url-pill) { width: 100%; flex: 1 1 auto; }
+		.program-editor-chrome__remove { align-self: flex-end; }
 	}
 
 	.program-editor__hero {
@@ -1077,13 +1094,15 @@
 		line-height: 0;
 		border-radius: 999px;
 		padding: 0.42rem;
-		border: 1px solid color-mix(in srgb, #7a5af8 24%, transparent);
-		background: color-mix(in srgb, #efe7ff 74%, var(--bg) 26%);
+		border: 1px solid color-mix(in srgb, var(--admin-accent) 28%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 10%, var(--admin-card-bg) 90%);
 		cursor: pointer;
+		transition: background 140ms, border-color 140ms;
 	}
 
 	.program-editor__emoji:hover {
-		background: color-mix(in srgb, var(--bg) 80%, var(--text) 20%);
+		background: color-mix(in srgb, var(--admin-accent) 18%, var(--admin-card-bg) 82%);
+		border-color: color-mix(in srgb, var(--admin-accent) 44%, transparent);
 	}
 
 	.program-editor__emoji-glyph {

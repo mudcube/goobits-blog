@@ -39,6 +39,20 @@
 	})
 
 	let removeConfirmOpen = $state(false)
+	let emojiPickerOpen = $state(false)
+	const emojiOptions = ['💪', '🏋️', '🎪', '🧘', '🤸', '🌈', '✨', '🎯', '🔥', '🎶']
+
+	function pickEmoji(emoji: string) {
+		program.icon = emoji
+		emojiPickerOpen = false
+	}
+
+	function onGlobalClick(event: MouseEvent) {
+		const target = event.target as HTMLElement
+		if (!target.closest('.program-editor__emoji-wrap')) {
+			emojiPickerOpen = false
+		}
+	}
 
 	const draft = $state<DayDraft>(blankDraft(program.defaultTime, program.defaultCapacity))
 	let originalDraft = $state<DayDraft>(blankDraft(program.defaultTime, program.defaultCapacity))
@@ -215,7 +229,7 @@
 	<title>Program editor — playground</title>
 </svelte:head>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} onclick={onGlobalClick} />
 
 <div class="page social-admin">
 	<header class="page__bar">
@@ -226,29 +240,52 @@
 		</div>
 	</header>
 
+	{#if removeConfirmOpen}
+		<div class="program-editor-chrome__confirm">
+			<p class="program-editor-chrome__confirm-msg">Remove this program and all its events? This can't be undone.</p>
+			<div class="program-editor-chrome__confirm-row">
+				<button class="program-editor-chrome__remove" type="button" onclick={() => (removeConfirmOpen = false)}>
+					Keep program
+				</button>
+				<button class="program-editor-chrome__remove program-editor-chrome__remove--danger" type="button" onclick={() => (removeConfirmOpen = false)}>
+					Yes, remove
+				</button>
+			</div>
+		</div>
+	{/if}
+
+	<div class="program-editor-chrome">
+		<div class="program-editor-chrome__left">
+			<button
+				type="button"
+				class="program-editor__publish-toggle"
+				class:program-editor__publish-toggle--on={program.enabled}
+				aria-pressed={program.enabled}
+				aria-label={program.enabled ? 'Bookable. Click to hide.' : 'Hidden. Click to make bookable.'}
+				onclick={() => (program.enabled = !program.enabled)}
+			>
+				<span class="program-editor__publish-thumb"></span>
+				<span class="program-editor__publish-label">
+					{program.enabled ? 'Bookable' : 'Hidden'}
+				</span>
+			</button>
+
+			<UrlPill bind:slug={program.slug} />
+		</div>
+
+		<button
+			type="button"
+			class="program-editor-chrome__remove"
+			onclick={() => (removeConfirmOpen = true)}
+		>
+			Remove this program
+		</button>
+	</div>
+
 	<div class="program-editor admin-content">
 		<div class="program-editor__canvas-wrap">
 			<div class="program-editor__canvas">
 				<div class="program-editor__panel calendar-ui-card">
-					<!-- Settings strip: publish toggle + URL slug -->
-					<div class="program-editor__settings-strip">
-						<button
-							type="button"
-							class="program-editor__publish-toggle"
-							class:program-editor__publish-toggle--on={program.enabled}
-							aria-pressed={program.enabled}
-							aria-label={program.enabled ? 'Bookable. Click to hide.' : 'Hidden. Click to make bookable.'}
-							onclick={() => (program.enabled = !program.enabled)}
-						>
-							<span class="program-editor__publish-thumb"></span>
-							<span class="program-editor__publish-label">
-								{program.enabled ? 'Bookable' : 'Hidden'}
-							</span>
-						</button>
-
-						<UrlPill bind:slug={program.slug} />
-					</div>
-
 					<section class="program-editor__hero">
 						<div class="program-editor__hero-glow" aria-hidden="true"></div>
 
@@ -258,6 +295,7 @@
 								type="button"
 								title="Change icon"
 								aria-label={`Current icon ${program.icon}`}
+								onclick={() => (emojiPickerOpen = !emojiPickerOpen)}
 							>
 								<img
 									class="program-editor__emoji-glyph"
@@ -267,6 +305,26 @@
 									decoding="async"
 								/>
 							</button>
+							{#if emojiPickerOpen}
+								<div class="program-editor__emoji-picker">
+									{#each emojiOptions as emoji}
+										<button
+											type="button"
+											class="program-editor__emoji-option"
+											aria-label={`Use ${emoji}`}
+											onclick={() => pickEmoji(emoji)}
+										>
+											<img
+												class="program-editor__emoji-option-glyph"
+												src={emojiToTwemojiUrl(emoji)}
+												alt=""
+												loading="lazy"
+												decoding="async"
+											/>
+										</button>
+									{/each}
+								</div>
+							{/if}
 						</div>
 
 						<div
@@ -329,30 +387,6 @@
 					<span aria-hidden="true">💡</span>
 					Click any day to schedule an event.
 				</p>
-
-				<footer class="program-editor__remove-footer">
-					{#if !removeConfirmOpen}
-						<button
-							type="button"
-							class="program-editor__remove-btn"
-							onclick={() => (removeConfirmOpen = true)}
-						>
-							Remove this program
-						</button>
-					{:else}
-						<div class="program-editor__remove-confirm">
-							<span class="program-editor__remove-msg">Remove this program and all its events?</span>
-							<div class="program-editor__remove-row">
-								<button class="program-editor__remove-btn" type="button" onclick={() => (removeConfirmOpen = false)}>
-									Keep program
-								</button>
-								<button class="program-editor__remove-btn program-editor__remove-btn--danger" type="button" onclick={() => (removeConfirmOpen = false)}>
-									Yes, remove
-								</button>
-							</div>
-						</div>
-					{/if}
-				</footer>
 			</div>
 		</div>
 	</div>
@@ -461,7 +495,7 @@
 		margin: 0 auto;
 		overflow-x: clip;
 		border-radius: 0.875rem;
-		border: 1px solid var(--border);
+		border: 1px dashed color-mix(in srgb, var(--admin-accent) 38%, transparent);
 	}
 
 	.program-editor__canvas-wrap {
@@ -535,13 +569,52 @@
 		line-height: 0;
 		border-radius: 999px;
 		padding: 0.42rem;
-		border: 1px solid color-mix(in srgb, #7a5af8 24%, transparent);
-		background: color-mix(in srgb, #efe7ff 74%, var(--bg) 26%);
+		border: 1px solid color-mix(in srgb, var(--admin-accent) 28%, transparent);
+		background: color-mix(in srgb, var(--admin-accent) 10%, var(--admin-card-bg) 90%);
 		cursor: pointer;
+		transition: background 140ms, border-color 140ms;
 	}
 
 	.program-editor__emoji:hover {
-		background: color-mix(in srgb, var(--bg) 80%, var(--text) 20%);
+		background: color-mix(in srgb, var(--admin-accent) 18%, var(--admin-card-bg) 82%);
+		border-color: color-mix(in srgb, var(--admin-accent) 44%, transparent);
+	}
+
+	.program-editor__emoji-picker {
+		position: absolute;
+		top: calc(100% + 0.4rem);
+		left: 50%;
+		transform: translateX(-50%);
+		background: var(--admin-card-bg);
+		border: 1px solid var(--admin-card-border);
+		border-radius: 0.875rem;
+		padding: 0.6rem;
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		gap: 0.25rem;
+		z-index: 9992;
+		box-shadow: 0 8px 24px color-mix(in srgb, var(--text) 16%, transparent);
+	}
+
+	.program-editor__emoji-option {
+		width: 34px;
+		height: 34px;
+		border: none;
+		border-radius: 0.5rem;
+		background: transparent;
+		padding: 0;
+		cursor: pointer;
+	}
+
+	.program-editor__emoji-option:hover {
+		background: color-mix(in srgb, var(--text) 6%, transparent);
+	}
+
+	.program-editor__emoji-option-glyph {
+		width: 1.35rem;
+		height: 1.35rem;
+		display: block;
+		margin: 0 auto;
 	}
 
 	.program-editor__emoji-glyph {
@@ -693,17 +766,79 @@
 		width: 100%;
 	}
 
-	/* Settings strip — publish toggle + URL slug */
-	.program-editor__settings-strip {
+	/* Admin chrome bar — sits above the editor card. */
+	.program-editor-chrome {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		max-width: var(--admin-content-max, 720px);
+		margin: 0 auto 0.85rem;
+		padding: 0.5rem 0.65rem;
+		border-radius: 0.7rem;
+		background: var(--admin-card-bg);
+		border: 1px solid var(--admin-card-border);
+		flex-wrap: wrap;
+	}
+
+	.program-editor-chrome__left {
 		display: flex;
 		align-items: center;
 		gap: 0.65rem;
-		padding: 0.5rem 0.65rem;
-		margin-bottom: 0.4rem;
-		border-radius: 0.65rem;
-		background: color-mix(in srgb, var(--text) 4%, transparent);
-		border: 1px solid color-mix(in srgb, var(--text) 9%, transparent);
 		flex-wrap: wrap;
+		min-width: 0;
+		flex: 1;
+	}
+
+	.program-editor-chrome__left :global(.url-pill) {
+		flex: 0 1 18rem;
+	}
+
+	.program-editor-chrome__remove {
+		appearance: none;
+		border: none;
+		background: transparent;
+		color: var(--admin-danger);
+		font: inherit;
+		font-size: 0.78rem;
+		font-weight: 600;
+		padding: 0.4rem 0.75rem;
+		border-radius: 0.5rem;
+		cursor: pointer;
+		flex: none;
+		transition: background 140ms, color 140ms;
+	}
+
+	.program-editor-chrome__remove:hover {
+		background: color-mix(in srgb, var(--admin-danger) 12%, transparent);
+		color: var(--admin-danger-strong, var(--admin-danger));
+	}
+
+	.program-editor-chrome__remove--danger {
+		color: var(--admin-danger);
+	}
+
+	.program-editor-chrome__confirm {
+		max-width: var(--admin-content-max, 720px);
+		margin: 0 auto 0.65rem;
+		padding: 0.85rem 1rem;
+		border-radius: 0.7rem;
+		background: var(--admin-danger-bg-faint, color-mix(in srgb, var(--admin-danger) 8%, var(--bg) 92%));
+		border: 1px solid var(--admin-danger-border, color-mix(in srgb, var(--admin-danger) 28%, transparent));
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.program-editor-chrome__confirm-msg {
+		margin: 0;
+		font-size: 0.85rem;
+		color: var(--text);
+	}
+
+	.program-editor-chrome__confirm-row {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
 	}
 
 	.program-editor__publish-toggle {
@@ -763,63 +898,14 @@
 
 	/* URL pill styles live in UrlPill.svelte. */
 
-	/* Quiet "Remove this program" footer */
-	.program-editor__remove-footer {
-		display: flex;
-		justify-content: center;
-		width: 100%;
-		padding: 0.85rem 0.5rem 1.25rem;
-		border-top: 1px dashed color-mix(in srgb, var(--text) 10%, transparent);
-		margin-top: 0.5rem;
-	}
-
-	.program-editor__remove-btn {
-		appearance: none;
-		border: none;
-		background: transparent;
-		color: var(--admin-danger);
-		font: inherit;
-		font-size: 0.82rem;
-		font-weight: 600;
-		padding: 0.4rem 0.85rem;
-		border-radius: 0.5rem;
-		cursor: pointer;
-		transition: background 140ms, color 140ms;
-	}
-
-	.program-editor__remove-btn:hover:not(:disabled) {
-		background: color-mix(in srgb, var(--admin-danger) 12%, transparent);
-		color: var(--admin-danger-strong, var(--admin-danger));
-	}
-
-	.program-editor__remove-btn--danger {
-		color: var(--admin-danger);
-	}
-
-	.program-editor__remove-confirm {
-		display: grid;
-		gap: 0.5rem;
-		text-align: center;
-	}
-
-	.program-editor__remove-msg {
-		font-size: 0.82rem;
-		color: color-mix(in srgb, var(--text) 70%, transparent);
-	}
-
-	.program-editor__remove-row {
-		display: flex;
-		justify-content: center;
-		gap: 0.5rem;
-	}
-
 	@media (max-width: 480px) {
-		.program-editor__settings-strip {
+		.program-editor-chrome {
 			flex-direction: column;
 			align-items: stretch;
 		}
-		.program-editor__publish-toggle { align-self: flex-start; }
-		.program-editor__settings-strip :global(.url-pill) { width: 100%; flex: 1 1 auto; }
+		.program-editor-chrome__left { flex-direction: column; align-items: stretch; }
+		.program-editor-chrome__left :global(.url-pill) { width: 100%; flex: 1 1 auto; }
+		.program-editor-chrome__remove { align-self: flex-end; }
 	}
 
 	/* Day-edit overlay scrim — dims toward black so it works in both themes */
