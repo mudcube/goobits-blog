@@ -857,7 +857,7 @@
 		max-width: var(--admin-content-max, 720px);
 		margin: 0 auto 0.65rem;
 		padding: 0.85rem 1rem;
-		border-radius: 0.7rem;
+		border-radius: 0.875rem;
 		background: var(--admin-danger-bg-faint);
 		border: 1px solid var(--admin-danger-border);
 	}
@@ -1117,7 +1117,7 @@
 
 	.program-editor__editable {
 		outline: none;
-		border-radius: 0.7rem;
+		border-radius: var(--admin-control-radius, 0.625rem);
 		padding: 0.2rem 0.75rem;
 		text-align: center;
 		transition:
@@ -1237,7 +1237,7 @@
 		border: 1px solid color-mix(in srgb, var(--blue) 38%, transparent);
 		background: color-mix(in srgb, var(--blue) 14%, var(--bg) 86%);
 		color: color-mix(in srgb, var(--blue) 78%, var(--text) 22%);
-		border-radius: 999px;
+		border-radius: var(--admin-control-radius, 0.625rem);
 		padding: 0.36rem 0.85rem;
 		font: inherit;
 		font-size: 0.78rem;

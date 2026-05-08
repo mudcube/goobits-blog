@@ -607,7 +607,7 @@
 		width: 34px;
 		height: 34px;
 		border: none;
-		border-radius: 0.5rem;
+		border-radius: var(--admin-control-radius, 0.625rem);
 		background: transparent;
 		padding: 0;
 		cursor: pointer;
@@ -632,7 +632,7 @@
 
 	.program-editor__editable {
 		outline: none;
-		border-radius: 0.7rem;
+		border-radius: var(--admin-control-radius, 0.625rem);
 		padding: 0.2rem 0.75rem;
 		text-align: center;
 		transition:
@@ -749,7 +749,7 @@
 		border: 1px solid color-mix(in srgb, var(--blue) 38%, transparent);
 		background: color-mix(in srgb, var(--blue) 14%, var(--bg) 86%);
 		color: color-mix(in srgb, var(--blue) 78%, var(--text) 22%);
-		border-radius: 999px;
+		border-radius: var(--admin-control-radius, 0.625rem);
 		padding: 0.36rem 0.85rem;
 		font: inherit;
 		font-size: 0.78rem;
@@ -841,7 +841,7 @@
 		max-width: var(--admin-content-max, 720px);
 		margin: 0 auto 0.65rem;
 		padding: 0.85rem 1rem;
-		border-radius: 0.7rem;
+		border-radius: 0.875rem;
 		background: var(--admin-danger-bg-faint, color-mix(in srgb, var(--admin-danger) 8%, var(--bg) 92%));
 		border: 1px solid var(--admin-danger-border, color-mix(in srgb, var(--admin-danger) 28%, transparent));
 		display: grid;

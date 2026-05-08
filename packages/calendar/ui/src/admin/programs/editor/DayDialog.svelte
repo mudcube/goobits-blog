@@ -142,7 +142,8 @@
 		width: min(22rem, calc(100vw - 2rem));
 		background: var(--admin-card-bg);
 		border: 1px solid var(--admin-card-border);
-		border-radius: 0.95rem;
+		/* Card radius — matches editor panel + emoji picker. */
+		border-radius: 0.875rem;
 		box-shadow: 0 24px 60px color-mix(in srgb, var(--text) 20%, transparent);
 		z-index: 50;
 		display: flex;

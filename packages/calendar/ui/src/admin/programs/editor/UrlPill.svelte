@@ -62,7 +62,7 @@
 		min-width: 12rem;
 		height: 32px;
 		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
-		border-radius: 0.5rem;
+		border-radius: var(--admin-control-radius, 0.625rem);
 		overflow: hidden;
 		background: var(--bg);
 		font-size: 0.82rem;
