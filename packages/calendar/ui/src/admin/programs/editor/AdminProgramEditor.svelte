@@ -5,7 +5,8 @@
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import AdminCalendar from '../../dashboard/AdminCalendar.svelte'
 	import AdminInlineConfirm from '../../shared/AdminInlineConfirm.svelte'
-	import ProgramDaySheet from './ProgramDaySheet.svelte'
+	import DayDialog from './DayDialog.svelte'
+	import { blankDraft, draftsEqual, type DayDraft } from './day-dialog.types'
 	import ProgramSettingsDrawer from './ProgramSettingsDrawer.svelte'
 	import { getAdminMockCatalog } from '../../mock/catalog'
 	import { createHistory } from '../../history/create-history'
@@ -55,13 +56,8 @@
 	let selectedDayDate = $state<Date | null>(null)
 	let popOpen = $state(false)
 	let selectedEventId = $state<number | null>(null)
-	let originalPopTime = $state('')
-	let originalPopCap = $state(0)
-	let newMode = $state<'once' | 'repeat'>('once')
-	let untilMode = $state<'ongoing' | 'date'>('ongoing')
-	let untilDate = $state('')
-	let popTime = $state('10:30')
-	let popCap = $state(8)
+	const popDraft = $state<DayDraft>(blankDraft('10:30', 8))
+	let originalPopDraft = $state<DayDraft>(blankDraft('10:30', 8))
 
 	let activeDays = $state<Record<string, ActiveDay>>({})
 	const adminMockCatalog = getAdminMockCatalog()
@@ -190,13 +186,13 @@
 		const dayKey = isoDay(selectedDayDate)
 		if (!activeDays[dayKey]) return
 		const current = activeDays[dayKey] as ActiveDay
-		if (current.time === popTime && current.capacity === popCap) return
+		if (current.time === popDraft.time && current.capacity === popDraft.capacity) return
 		activeDays = {
 			...activeDays,
 			[dayKey]: {
 				...current,
-				time: popTime,
-				capacity: popCap
+				time: popDraft.time,
+				capacity: popDraft.capacity
 			}
 		}
 	})
@@ -333,11 +329,12 @@
 		emojiPickerOpen = false
 		selectedDayDate = dayDate
 		const existing = activeDays[isoDay(dayDate)]
-		popTime = existing?.time ?? '10:30'
-		popCap = existing?.capacity ?? 8
-		newMode = existing ? (existing.repeatLabel ? 'repeat' : 'once') : 'once'
-		originalPopTime = popTime
-		originalPopCap = popCap
+		popDraft.time = existing?.time ?? '10:30'
+		popDraft.capacity = existing?.capacity ?? 8
+		popDraft.repeat = existing ? !!existing.repeatLabel : false
+		popDraft.untilMode = 'ongoing'
+		popDraft.untilDate = ''
+		originalPopDraft = { ...popDraft }
 		const eventForDay = eventsSource.find((ev: { activitySlug: string; startsAt: string; id: number }) => {
 			if (ev.activitySlug !== slug) return false
 			const d = new Date(ev.startsAt)
@@ -358,9 +355,9 @@
 	}
 
 	function computeRepeatWeeks(startDate: Date) {
-		if (newMode !== 'repeat') return 0
-		if (untilMode === 'ongoing') return 12
-		const target = Date.parse(untilDate)
+		if (!popDraft.repeat) return 0
+		if (popDraft.untilMode === 'ongoing') return 12
+		const target = Date.parse(popDraft.untilDate)
 		if (!Number.isFinite(target)) return 12
 		const diffMs = target - startDate.getTime()
 		if (diffMs <= 0) return 0
@@ -372,10 +369,10 @@
 		if (mockMode) {
 			const dayKey = isoDay(selectedDayDate)
 			const nextDay: ActiveDay = {
-				time: popTime,
-				capacity: popCap,
+				time: popDraft.time,
+				capacity: popDraft.capacity,
 				count: activeDays[dayKey]?.count || 1,
-				...(newMode === 'repeat'
+				...(popDraft.repeat
 					? {
 							repeatLabel: `Every ${selectedDayDate.toLocaleDateString(undefined, { weekday: 'long' })}`
 						}
@@ -389,7 +386,7 @@
 			closePop()
 			return
 		}
-		const [hours, minutes] = popTime.split(':').map((part) => Number.parseInt(part, 10))
+		const [hours, minutes] = popDraft.time.split(':').map((part) => Number.parseInt(part, 10))
 		const safeHours = Number.isFinite(hours) ? (hours as number) : 10
 		const safeMinutes = Number.isFinite(minutes) ? (minutes as number) : 30
 		const start = new Date(selectedDayDate)
@@ -404,7 +401,7 @@
 			title,
 			startsAt: start.toISOString(),
 			endsAt: end.toISOString(),
-			capacity: popCap,
+			capacity: popDraft.capacity,
 			repeatWeeks: computeRepeatWeeks(start),
 			costCents: dashboard.eventDraft.costCents || 0,
 			currency: dashboard.eventDraft.currency || 'USD',
@@ -464,15 +461,15 @@
 		const selectedEvent = eventsSource.find((ev: { id: number }) => ev.id === selectedEventId) as
 			| { title: string; startsAt: string; endsAt: string }
 			| undefined
-		if (popCap !== originalPopCap) {
-			await dashboard.updateEventCapacity(selectedEventId, popCap)
+		if (popDraft.capacity !== originalPopDraft.capacity) {
+			await dashboard.updateEventCapacity(selectedEventId, popDraft.capacity)
 			if (dashboard.error) {
 				flash(dashboard.error, true)
 				return
 			}
 		}
-		if (popTime !== originalPopTime && selectedDayDate && selectedEvent) {
-			const [hours, minutes] = popTime.split(':').map((part) => Number.parseInt(part, 10))
+		if (popDraft.time !== originalPopDraft.time && selectedDayDate && selectedEvent) {
+			const [hours, minutes] = popDraft.time.split(':').map((part) => Number.parseInt(part, 10))
 			const safeHours = Number.isFinite(hours) ? (hours as number) : 10
 			const safeMinutes = Number.isFinite(minutes) ? (minutes as number) : 30
 			const originalStartMs = new Date(selectedEvent.startsAt).getTime()
@@ -491,7 +488,7 @@
 				return
 			}
 		}
-		if (popCap !== originalPopCap || popTime !== originalPopTime) flash('Event updated')
+		if (!draftsEqual(popDraft, originalPopDraft)) flash('Event updated')
 		closePop()
 	}
 
@@ -597,7 +594,8 @@
 
 	onMount(() => {
 		const now = new Date()
-		untilDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-30`
+		// Default until-date for repeat = end of current month-ish
+		popDraft.untilDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-30`
 		return () => {
 			if (autosaveTimer) clearTimeout(autosaveTimer)
 		}
@@ -761,25 +759,59 @@
 						isActive={(date) => !!activeDays[isoDay(date)]}
 						eventCount={(date) => activeDays[isoDay(date)]?.count || 0}
 						eventTone={() => slug}
+						eventCapacity={(date) => {
+							const ev = eventsSource.find((e: { activitySlug: string; startsAt: string; capacity: number; seatsTaken: number }) => {
+								if (e.activitySlug !== slug) return false
+								const d = new Date(e.startsAt)
+								return (
+									d.getFullYear() === date.getFullYear() &&
+									d.getMonth() === date.getMonth() &&
+									d.getDate() === date.getDate()
+								)
+							})
+							if (!ev) return null
+							return { filled: ev.seatsTaken ?? 0, capacity: ev.capacity, recurring: true }
+						}}
 						compact={true}
 						interactive="all-future"
 					/>
 				</div>
 
-				<ProgramDaySheet
-					open={popOpen}
-					selectedDayDate={selectedDayDate}
-					activeDay={selectedDayDate ? (activeDays[isoDay(selectedDayDate)] ?? null) : null}
-					bind:newMode
-					bind:untilMode
-					bind:untilDate
-					bind:popTime
-					bind:popCap
-					onClose={closePop}
-					onAdd={() => void persistDaySchedule()}
-					onRemove={() => void removeDay()}
-					onDone={() => void persistExistingDayEdits()}
-				/>
+				{#if popOpen}
+					<button
+						type="button"
+						class="program-editor__day-scrim"
+						aria-label="Close day editor"
+						onclick={closePop}
+					></button>
+					{@const selectedDayActive = selectedDayDate ? activeDays[isoDay(selectedDayDate)] ?? null : null}
+					<DayDialog
+						draft={popDraft}
+						selectedDate={selectedDayDate}
+						selectedLabel={selectedDayDate
+							? selectedDayDate.toLocaleDateString(undefined, {
+									weekday: 'short',
+									month: 'short',
+									day: 'numeric'
+								})
+							: ''}
+						hasEventOnSelected={!!selectedEventId || !!selectedDayActive}
+						filledOnSelected={0}
+						capacityOnSelected={selectedDayActive?.capacity ?? 0}
+						pendingDay={false}
+						onDismiss={closePop}
+						onSave={() => {
+							if (selectedEventId) {
+								void persistExistingDayEdits()
+							} else {
+								void persistDaySchedule()
+							}
+						}}
+						onRemove={() => void removeDay()}
+						onCancelDiscard={() => {}}
+						onConfirmDiscard={() => {}}
+					/>
+				{/if}
 
 				<p class="program-editor__hint">
 					<Lightbulb class="program-editor__hint-icon" size={14} strokeWidth={1.9} aria-hidden="true" />
@@ -881,17 +913,18 @@
 		align-items: flex-start;
 	}
 
-	.program-editor__panel {
+	/* The panel is transparent on top of `.program-editor`'s radial gradients
+	 * (lavender + pink glows) so the colored backdrop shows through clearly.
+	 * Chained class beats the global `.social-admin .calendar-ui-card`
+	 * `background: var(--admin-card-bg)` rule. */
+	.program-editor__panel.calendar-ui-card {
 		width: 100%;
 		padding: 1.1rem 1rem 1.65rem;
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
-		background: linear-gradient(
-			180deg,
-			color-mix(in srgb, #efe7ff 78%, var(--bg) 22%) 0%,
-			color-mix(in srgb, #f8f4ff 86%, var(--bg) 14%) 100%
-		);
+		background: transparent;
+		box-shadow: none;
 	}
 
 	.program-editor__hero {
@@ -1138,5 +1171,18 @@
 	.program-editor__toast {
 		bottom: 1rem;
 		z-index: 9995;
+	}
+
+	.program-editor__day-scrim {
+		position: fixed;
+		inset: 0;
+		border: none;
+		padding: 0;
+		/* Dark scrim — dims the page toward black in both themes,
+		 * not toward `--text` which is light in dark mode and looks washed out. */
+		background: rgba(0, 0, 0, 0.5);
+		backdrop-filter: blur(2px);
+		z-index: 40;
+		cursor: pointer;
 	}
 </style>

@@ -102,6 +102,25 @@ $admin-mobile-breakpoint: 768px;
   --admin-calendar-selected-bg: color-mix(in srgb, var(--admin-accent) 11%, transparent);
   --admin-calendar-selected-ring: color-mix(in srgb, var(--admin-accent) 16%, transparent);
   --admin-calendar-dot: color-mix(in srgb, var(--admin-accent) 76%, var(--text) 24%);
+
+  /* Inspector-control tokens — shared by the day-dialog primitives
+   * (DayDialog, TimeChip, SpotsStepper). Defined here so any admin
+   * page that mounts those components has them available. */
+  --ins-control-h: 2.25rem;
+  --ins-control-radius: var(--admin-control-radius, 0.625rem);
+  --ins-control-pad-x: 0.7rem;
+  --ins-control-font-size: 0.85rem;
+  --ins-control-font-weight: 600;
+  --ins-control-border: color-mix(in srgb, var(--text) 12%, transparent);
+  --ins-control-border-hover: color-mix(in srgb, var(--text) 22%, transparent);
+  --ins-control-border-focus: color-mix(in srgb, var(--admin-accent) 50%, transparent);
+  --ins-control-bg: var(--bg);
+  --ins-control-bg-soft: color-mix(in srgb, var(--text) 5%, transparent);
+  --ins-control-bg-soft-divider: color-mix(in srgb, var(--text) 10%, transparent);
+  --ins-control-fg: var(--text);
+  --ins-control-fg-muted: color-mix(in srgb, var(--text) 70%, transparent);
+  --ins-control-focus-ring: 0 0 0 2px color-mix(in srgb, var(--admin-accent) 18%, transparent);
+
   min-width: 0;
   display: grid;
   grid-template-columns: $admin-sidebar-width 1fr;
