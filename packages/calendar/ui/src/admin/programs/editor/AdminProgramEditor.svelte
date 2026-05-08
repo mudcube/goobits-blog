@@ -67,7 +67,20 @@
 		coalesceMs: 700
 	})
 
-	const emojiOptions = ['💪', '🏋️', '🎪', '🧘', '🤸', '🌈', '✨', '🎯', '🔥', '🎶']
+	const emojiOptions = [
+		// Fitness / movement
+		'💪', '🏋️', '🤸', '🧘', '🏃', '🚴', '🏊', '⛹️', '🤽', '🤾',
+		// Sports
+		'⚽', '🏀', '🎾', '🏈', '⚾', '🏐', '🏓', '🏸', '🥊', '🥋',
+		// Arts / performance
+		'🎨', '🎭', '🎪', '🎬', '🎤', '🎵', '🎶', '🎹', '🎸', '🥁',
+		// Food / drink
+		'🍕', '🍔', '🌮', '🍣', '🍰', '🍪', '☕', '🍷', '🍺', '🍱',
+		// Travel / outdoors
+		'✈️', '🚗', '🚲', '🏖️', '🏕️', '🌄', '🗺️', '⛺', '🌳', '🏔️',
+		// Symbols / vibes
+		'✨', '🌈', '🔥', '🎯', '⭐', '💫', '🎉', '❤️', '💡', '🌱'
+	]
 
 	function emojiToTwemojiUrl(emoji: string) {
 		const code = Array.from(emoji.replace(/\uFE0F/g, ''))
@@ -893,9 +906,7 @@
 		max-width: var(--admin-content-max, 720px);
 		overflow-x: clip;
 		border-radius: 0.875rem;
-		/* Dashed border signals "this is the editable preview". Everything
-		 * inside is what users will see on the public page. */
-		border: 1px dashed color-mix(in srgb, var(--admin-accent) 38%, transparent);
+		border: none;
 	}
 
 	.program-editor__canvas-wrap {
@@ -920,9 +931,9 @@
 	}
 
 	/* The panel is transparent on top of `.program-editor`'s radial gradients
-	 * (lavender + pink glows) so the colored backdrop shows through clearly.
-	 * Chained class beats the global `.social-admin .calendar-ui-card`
-	 * `background: var(--admin-card-bg)` rule. */
+	 * so the colored backdrop shows through. The dashed border lives here
+	 * (not on the outer .program-editor) so the hint below sits outside it.
+	 * Chained class beats the global `.social-admin .calendar-ui-card`. */
 	.program-editor__panel.calendar-ui-card {
 		width: 100%;
 		padding: 1.1rem 1rem 1.65rem;
@@ -930,6 +941,8 @@
 		flex-direction: column;
 		align-items: stretch;
 		background: transparent;
+		border: 1px dashed color-mix(in srgb, var(--admin-accent) 38%, transparent);
+		border-radius: 0.875rem;
 		box-shadow: none;
 	}
 
@@ -1087,7 +1100,9 @@
 	.program-editor__emoji-wrap {
 		position: relative;
 		margin-bottom: 0.5rem;
-		z-index: 1;
+		/* Higher than .program-editor__editable (z-index: 1) so the picker
+		 * paints over the title/subtitle below. */
+		z-index: 20;
 	}
 
 	.program-editor__emoji {
@@ -1116,14 +1131,17 @@
 		top: calc(100% + 0.4rem);
 		left: 50%;
 		transform: translateX(-50%);
-		background: var(--surface);
-		border: 1px solid var(--border-s);
+		background: var(--admin-card-bg);
+		border: 1px solid var(--admin-card-border);
 		border-radius: 0.875rem;
 		padding: 0.6rem;
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
 		gap: 0.25rem;
+		max-height: 16rem;
+		overflow-y: auto;
 		z-index: 9992;
+		box-shadow: 0 12px 32px color-mix(in srgb, var(--text) 18%, transparent);
 	}
 
 	.program-editor__emoji-option {

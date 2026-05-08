@@ -40,7 +40,14 @@
 
 	let removeConfirmOpen = $state(false)
 	let emojiPickerOpen = $state(false)
-	const emojiOptions = ['💪', '🏋️', '🎪', '🧘', '🤸', '🌈', '✨', '🎯', '🔥', '🎶']
+	const emojiOptions = [
+		'💪', '🏋️', '🤸', '🧘', '🏃', '🚴', '🏊', '⛹️', '🤽', '🤾',
+		'⚽', '🏀', '🎾', '🏈', '⚾', '🏐', '🏓', '🏸', '🥊', '🥋',
+		'🎨', '🎭', '🎪', '🎬', '🎤', '🎵', '🎶', '🎹', '🎸', '🥁',
+		'🍕', '🍔', '🌮', '🍣', '🍰', '🍪', '☕', '🍷', '🍺', '🍱',
+		'✈️', '🚗', '🚲', '🏖️', '🏕️', '🌄', '🗺️', '⛺', '🌳', '🏔️',
+		'✨', '🌈', '🔥', '🎯', '⭐', '💫', '🎉', '❤️', '💡', '🌱'
+	]
 
 	function pickEmoji(emoji: string) {
 		program.icon = emoji
@@ -495,7 +502,7 @@
 		margin: 0 auto;
 		overflow-x: clip;
 		border-radius: 0.875rem;
-		border: 1px dashed color-mix(in srgb, var(--admin-accent) 38%, transparent);
+		border: none;
 	}
 
 	.program-editor__canvas-wrap {
@@ -528,6 +535,8 @@
 		flex-direction: column;
 		align-items: stretch;
 		background: transparent;
+		border: 1px dashed color-mix(in srgb, var(--admin-accent) 38%, transparent);
+		border-radius: 0.875rem;
 		box-shadow: none;
 	}
 
@@ -562,7 +571,7 @@
 	.program-editor__emoji-wrap {
 		position: relative;
 		margin-bottom: 0.5rem;
-		z-index: 1;
+		z-index: 20;
 	}
 
 	.program-editor__emoji {
@@ -592,8 +601,10 @@
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
 		gap: 0.25rem;
+		max-height: 16rem;
+		overflow-y: auto;
 		z-index: 9992;
-		box-shadow: 0 8px 24px color-mix(in srgb, var(--text) 16%, transparent);
+		box-shadow: 0 12px 32px color-mix(in srgb, var(--text) 18%, transparent);
 	}
 
 	.program-editor__emoji-option {
