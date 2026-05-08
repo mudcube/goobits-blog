@@ -645,37 +645,24 @@
 		</div>
 	{/if}
 
-	<!-- Admin chrome: bookable toggle, public URL, remove. Lives outside
-	 * the editor card because it isn't part of what users see on the
-	 * public page — it's program-level admin metadata. -->
+	<!-- Admin chrome: program-level actions. Outside the editor card
+	 * because they aren't part of what users see on the public page. -->
 	<div class="program-editor-chrome">
-		<div class="program-editor-chrome__left">
-			<button
-				type="button"
-				class="program-editor__publish-toggle"
-				class:program-editor__publish-toggle--on={dashboard.programDraft.enabled}
-				aria-pressed={dashboard.programDraft.enabled}
-				aria-label={dashboard.programDraft.enabled
-					? 'Bookable. Click to hide.'
-					: 'Hidden. Click to make bookable.'}
-				onclick={() => updateProgramDraft({ enabled: !dashboard.programDraft.enabled }, 'enabled')}
-			>
-				<span class="program-editor__publish-thumb"></span>
-				<span class="program-editor__publish-label">
-					{dashboard.programDraft.enabled ? 'Bookable' : 'Hidden'}
-				</span>
-			</button>
-
-			<UrlPill
-				slug={dashboard.programDraft.slug}
-				onInput={(value) => handleSettingInput('slug', value)}
-				onCommit={() => pushEditorHistory('slug')}
-			/>
-		</div>
+		<button
+			type="button"
+			class="program-editor-chrome__btn"
+			aria-pressed={!dashboard.programDraft.enabled}
+			aria-label={dashboard.programDraft.enabled
+				? 'Click to pause bookings'
+				: 'Click to resume bookings'}
+			onclick={() => updateProgramDraft({ enabled: !dashboard.programDraft.enabled }, 'enabled')}
+		>
+			{dashboard.programDraft.enabled ? 'Pause' : 'Resume'}
+		</button>
 
 		<button
 			type="button"
-			class="program-editor-chrome__remove"
+			class="program-editor-chrome__btn program-editor-chrome__btn--danger"
 			onclick={requestDeleteProgram}
 			disabled={dashboard.programDeleting}
 		>
@@ -687,6 +674,16 @@
 		<div class="program-editor__canvas-wrap">
 			<div class="program-editor__canvas">
 				<div class="program-editor__panel calendar-ui-card">
+					<!-- URL is part of the editable preview — sits at the top
+					 * of the dashed area so it reads as program identity. -->
+					<div class="program-editor__url-row">
+						<UrlPill
+							slug={dashboard.programDraft.slug}
+							onInput={(value) => handleSettingInput('slug', value)}
+							onCommit={() => pushEditorHistory('slug')}
+						/>
+					</div>
+
 					<section class="program-editor__hero">
 						<div class="program-editor__hero-glow" aria-hidden="true"></div>
 
@@ -947,126 +944,79 @@
 	}
 
 	/* Admin chrome bar — sits ABOVE the editor card, holds program-level
-	 * controls that aren't part of the public-page visualization. */
+	 * actions (Pause/Resume + Remove). URL editing lives inside the
+	 * dashed editor card now since it's part of the program identity. */
 	.program-editor-chrome {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 1rem;
+		gap: 0.5rem;
 		max-width: var(--admin-content-max, 720px);
 		margin: 0 auto 0.85rem;
-		padding: 0.5rem 0.65rem;
-		border-radius: 0.7rem;
-		background: var(--admin-card-bg);
-		border: 1px solid var(--admin-card-border);
 		flex-wrap: wrap;
 	}
 
-	.program-editor-chrome__left {
-		display: flex;
-		align-items: center;
-		gap: 0.65rem;
-		flex-wrap: wrap;
-		min-width: 0;
-		flex: 1;
-	}
-
-	/* In the chrome bar, keep the URL pill compact so toggle + URL +
-	 * Remove all fit on one line within the editor's max-width. */
-	.program-editor-chrome__left :global(.url-pill) {
-		flex: 0 1 18rem;
-	}
-
-	.program-editor-chrome__remove {
+	.program-editor-chrome__btn {
 		appearance: none;
-		border: none;
-		background: transparent;
-		color: var(--admin-danger);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		min-height: 32px;
+		border: 1px solid var(--admin-control-border, color-mix(in srgb, var(--admin-accent) 34%, transparent));
+		background: var(--admin-control-bg, transparent);
+		color: var(--admin-control-fg, var(--text));
 		font: inherit;
-		font-size: 0.78rem;
+		font-size: 0.82rem;
 		font-weight: 600;
-		padding: 0.4rem 0.75rem;
-		border-radius: 0.5rem;
+		padding: 0 0.95rem;
+		border-radius: var(--admin-control-radius, 0.625rem);
 		cursor: pointer;
 		flex: none;
-		transition: background 140ms, color 140ms;
+		transition: background 140ms, color 140ms, border-color 140ms;
 	}
 
-	.program-editor-chrome__remove:hover:not(:disabled) {
-		background: color-mix(in srgb, var(--admin-danger) 12%, transparent);
-		color: var(--admin-danger-strong, var(--admin-danger));
+	.program-editor-chrome__btn:hover:not(:disabled) {
+		background: var(--admin-control-bg-hover, color-mix(in srgb, var(--admin-accent) 14%, transparent));
+		transform: translateY(-1px);
 	}
 
-	.program-editor-chrome__remove:disabled {
+	.program-editor-chrome__btn:disabled {
 		opacity: 0.5;
 		cursor: default;
 	}
 
-	.program-editor__publish-toggle {
-		appearance: none;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.18rem 0.6rem 0.18rem 0.18rem;
-		border: 1px solid transparent;
+	.program-editor-chrome__btn--danger {
+		border-color: color-mix(in srgb, var(--admin-danger) 40%, transparent);
+		color: var(--admin-danger);
 		background: transparent;
-		font: inherit;
-		font-size: 0.82rem;
-		font-weight: 600;
-		color: var(--text);
-		cursor: pointer;
-		border-radius: 999px;
-		transition: background 140ms;
-		flex: none;
 	}
 
-	.program-editor__publish-toggle:hover {
-		background: color-mix(in srgb, var(--text) 5%, transparent);
+	.program-editor-chrome__btn--danger:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--admin-danger) 12%, transparent);
+		border-color: var(--admin-danger);
+		color: var(--admin-danger-strong, var(--admin-danger));
 	}
 
-	.program-editor__publish-thumb {
-		position: relative;
-		width: 36px;
-		height: 22px;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--text) 18%, transparent);
-		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
-		display: inline-block;
-		flex: none;
-		transition: background 140ms;
+	/* URL row inside the editor panel — quietly sits at the top of the
+	 * dashed area so it reads as part of program identity. */
+	.program-editor__url-row {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 0.85rem;
 	}
 
-	.program-editor__publish-thumb::before {
-		content: '';
-		position: absolute;
-		top: 2px;
-		left: 2px;
-		width: 16px;
-		height: 16px;
-		border-radius: 999px;
-		background: var(--bg);
-		box-shadow: 0 1px 2px color-mix(in srgb, var(--text) 18%, transparent);
-		transition: left 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
-	}
-
-	.program-editor__publish-toggle--on .program-editor__publish-thumb {
-		background: color-mix(in srgb, var(--admin-accent) 80%, transparent);
-	}
-
-	.program-editor__publish-toggle--on .program-editor__publish-thumb::before {
-		left: 16px;
+	.program-editor__url-row :global(.url-pill) {
+		flex: 0 1 24rem;
+		min-width: 14rem;
 	}
 
 	/* URL pill styles live in UrlPill.svelte. */
 
 	@media (max-width: 480px) {
-		.program-editor-chrome {
-			flex-direction: column;
-			align-items: stretch;
-		}
-		.program-editor-chrome__left { flex-direction: column; align-items: stretch; }
-		.program-editor-chrome__left :global(.url-pill) { width: 100%; flex: 1 1 auto; }
-		.program-editor-chrome__remove { align-self: flex-end; }
+		.program-editor-chrome { gap: 0.4rem; }
+		.program-editor-chrome__btn { flex: 1; }
+		.program-editor__url-row :global(.url-pill) { width: 100%; flex: 1 1 auto; }
 	}
 
 	.program-editor__hero {
@@ -1181,11 +1131,16 @@
 
 	.program-editor__editable:hover {
 		background-color: color-mix(in srgb, var(--text) 3.5%, transparent);
+		/* Dashed outline echoes the panel border — signals this region is
+		 * editable. Subtle accent so it doesn't compete with hero copy. */
+		outline: 1px dashed color-mix(in srgb, var(--admin-accent) 32%, transparent);
+		outline-offset: 2px;
 	}
 
 	.program-editor__editable:focus {
 		background-color: color-mix(in srgb, var(--text) 5%, transparent);
 		box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 18%, transparent);
+		outline: none;
 	}
 
 	.program-editor__eyebrow {
