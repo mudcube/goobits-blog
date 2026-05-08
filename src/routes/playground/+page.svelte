@@ -15,15 +15,7 @@
 		tags: string[]
 	}
 
-	const featuredMeta: Record<string, Featured> = {
-		'/playground/program-editor-inspector': {
-			eyebrow: 'In progress · mockup',
-			title: 'Program editor — inspector + day popover',
-			blurb:
-				'Replaces the two competing right-rail drawers with one persistent inspector for program metadata, plus a popover anchored to day cells for scheduling events. Full mobile + desktop story.',
-			tags: ['Program editor', 'Inspector pattern', 'Mobile + desktop']
-		}
-	}
+	const featuredMeta: Record<string, Featured> = {}
 
 	const currentHrefs = new Set<string>(Object.keys(featuredMeta))
 	const isCurrentItem = (item: ParkingItem) => currentHrefs.has(item.href)

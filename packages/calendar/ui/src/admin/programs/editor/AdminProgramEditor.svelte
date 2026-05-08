@@ -56,6 +56,7 @@
 	let selectedEventId = $state<number | null>(null)
 	const popDraft = $state<DayDraft>(blankDraft('10:30', 8))
 	let originalPopDraft = $state<DayDraft>(blankDraft('10:30', 8))
+	let pendingDayDate = $state<Date | null>(null)
 
 	let activeDays = $state<Record<string, ActiveDay>>({})
 	const adminMockCatalog = getAdminMockCatalog()
@@ -334,8 +335,15 @@
 		closePop()
 	}
 
-	function openDay(dayDate: Date, _dayEl?: HTMLButtonElement) {
-		if (isPast(dayDate)) return
+	function isSameDay(a: Date, b: Date) {
+		return (
+			a.getFullYear() === b.getFullYear() &&
+			a.getMonth() === b.getMonth() &&
+			a.getDate() === b.getDate()
+		)
+	}
+
+	function applyDraft(dayDate: Date) {
 		emojiPickerOpen = false
 		selectedDayDate = dayDate
 		const existing = activeDays[isoDay(dayDate)]
@@ -358,10 +366,37 @@
 		popOpen = true
 	}
 
+	function openDay(dayDate: Date, _dayEl?: HTMLButtonElement) {
+		if (isPast(dayDate)) return
+		// If a dialog is open with unsaved edits for a different day,
+		// prompt the user before swapping context.
+		if (
+			popOpen &&
+			selectedDayDate &&
+			!isSameDay(selectedDayDate, dayDate) &&
+			!draftsEqual(popDraft, originalPopDraft)
+		) {
+			pendingDayDate = dayDate
+			return
+		}
+		applyDraft(dayDate)
+	}
+
+	function cancelDiscard() {
+		pendingDayDate = null
+	}
+
+	function confirmDiscard() {
+		const next = pendingDayDate
+		pendingDayDate = null
+		if (next) applyDraft(next)
+	}
+
 	function closePop() {
 		popOpen = false
 		selectedDayDate = null
 		selectedEventId = null
+		pendingDayDate = null
 	}
 
 	function computeRepeatWeeks(startDate: Date) {
@@ -810,6 +845,9 @@
 						onclick={closePop}
 					></button>
 					{@const selectedDayActive = selectedDayDate ? activeDays[isoDay(selectedDayDate)] ?? null : null}
+					{@const selectedEvent = selectedEventId
+						? eventsSource.find((e: { id: number }) => e.id === selectedEventId) as { seatsTaken?: number; capacity?: number } | undefined
+						: undefined}
 					<DayDialog
 						draft={popDraft}
 						selectedDate={selectedDayDate}
@@ -821,9 +859,9 @@
 								})
 							: ''}
 						hasEventOnSelected={!!selectedEventId || !!selectedDayActive}
-						filledOnSelected={0}
-						capacityOnSelected={selectedDayActive?.capacity ?? 0}
-						pendingDay={false}
+						filledOnSelected={selectedEvent?.seatsTaken ?? 0}
+						capacityOnSelected={selectedEvent?.capacity ?? selectedDayActive?.capacity ?? 0}
+						pendingDay={pendingDayDate != null}
 						onDismiss={closePop}
 						onSave={() => {
 							if (selectedEventId) {
@@ -833,8 +871,8 @@
 							}
 						}}
 						onRemove={() => void removeDay()}
-						onCancelDiscard={() => {}}
-						onConfirmDiscard={() => {}}
+						onCancelDiscard={cancelDiscard}
+						onConfirmDiscard={confirmDiscard}
 					/>
 				{/if}
 
