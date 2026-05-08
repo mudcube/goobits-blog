@@ -34,6 +34,13 @@ export type TourStep = {
 	phase: number
 }
 
+export type CalendarDayCapacity = {
+	filled: number
+	capacity: number
+	/** When true, render as a recurring (purple) chip; when false, neutral/once-off styling. */
+	recurring?: boolean
+}
+
 export type CalendarDay = {
 	date: Date
 	inMonth: boolean
@@ -43,4 +50,6 @@ export type CalendarDay = {
 	dotCount?: number
 	dotColor?: string
 	ariaLabel?: string
+	/** Optional capacity-utilization indicator. When present, renders a chip + progress bar in the cell instead of (or in addition to) dots. */
+	capacity?: CalendarDayCapacity
 }

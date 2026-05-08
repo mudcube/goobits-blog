@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import CalendarGrid from '../../booking/CalendarGrid.svelte'
-	import type { CalendarDay } from '../../booking/types'
+	import type { CalendarDay, CalendarDayCapacity } from '../../booking/types'
 	import { createCalendarSurface, type CalendarWeekStart } from '../../booking/calendar-surface.svelte'
 	import {
 		CALENDAR_WEEK_START_CHANGED_EVENT,
@@ -23,6 +23,7 @@
 		isActive,
 		eventCount = () => 0,
 		eventTone = () => '',
+		eventCapacity,
 		compact = false,
 		interactive = 'active-only'
 	} = $props<{
@@ -39,6 +40,8 @@
 		isActive: (date: Date) => boolean
 		eventCount?: (date: Date) => number
 		eventTone?: (date: Date) => string
+		/** When provided, each day with capacity info renders a chip (filled/total) instead of dots. */
+		eventCapacity?: (date: Date) => CalendarDayCapacity | null | undefined
 		compact?: boolean
 		interactive?: 'active-only' | 'all-future'
 	}>()
@@ -64,6 +67,7 @@
 		isActive: (date) => isActive(date),
 		eventCount: (date) => eventCount(date),
 		dotColor: (date) => dotColorForTone(eventTone(date)) || '',
+		capacity: (date) => eventCapacity?.(date),
 		title: () => title
 	})
 

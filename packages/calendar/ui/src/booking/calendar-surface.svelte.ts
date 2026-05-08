@@ -1,4 +1,4 @@
-import type { CalendarDay } from './types'
+import type { CalendarDay, CalendarDayCapacity } from './types'
 
 export type CalendarWeekStart = 'monday' | 'sunday'
 export type CalendarTone = '' | 'circus' | 'movies' | 'outdoors' | 'gym'
@@ -13,6 +13,8 @@ type CalendarSurfaceOptions = {
 	dotColor?: (date: Date) => string
 	ariaLabel?: (date: Date) => string
 	title?: () => string
+	/** Optional: return capacity info to render the chip indicator instead of dots. */
+	capacity?: (date: Date) => CalendarDayCapacity | null | undefined
 }
 
 const WEEKDAYS_MONDAY = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -71,7 +73,8 @@ export function createCalendarSurface({
 	eventCount = () => 0,
 	dotColor = () => '',
 	ariaLabel,
-	title = () => ''
+	title = () => '',
+	capacity
 }: CalendarSurfaceOptions) {
 	let currentMonth = $state(startOfMonth(initialMonth))
 
@@ -116,8 +119,10 @@ export function createCalendarSurface({
 		}
 		const color = dotColor(date)
 		const label = ariaLabel?.(date)
+		const cap = capacity?.(date)
 		if (color) day.dotColor = color
 		if (label) day.ariaLabel = label
+		if (cap) day.capacity = cap
 		return day
 	}
 

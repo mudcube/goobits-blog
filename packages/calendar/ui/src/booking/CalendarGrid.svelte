@@ -110,7 +110,25 @@
 					onclick={(e) => handleClick(day, e)}
 				>
 					<span class={`cg__num ${variant === 'member' ? 'member-calendar__day-num' : ''}`.trim()}>{day.date.getDate()}</span>
-					{#if day.isActive && !day.isPast && (day.dotCount ?? 0) >= 0}
+					{#if day.capacity}
+						{@const cap = day.capacity}
+						{@const isFull = cap.filled >= cap.capacity}
+						<span
+							class="cg__chip"
+							class:cg__chip--full={isFull}
+							class:cg__chip--once={cap.recurring === false}
+						>
+							<span class="cg__chip-bar" aria-hidden="true">
+								<span
+									class="cg__chip-fill"
+									style="width: {Math.min(100, (cap.filled / Math.max(cap.capacity, 1)) * 100)}%"
+								></span>
+							</span>
+							<span class="cg__chip-text">
+								{#if isFull}Full{:else}{cap.filled}/{cap.capacity}{/if}
+							</span>
+						</span>
+					{:else if day.isActive && !day.isPast && (day.dotCount ?? 0) >= 0}
 						<span
 							class={`cg__dots ${variant === 'member' ? 'member-calendar__event-dots' : ''}`.trim()}
 							style={day.dotColor ? `--member-calendar-dot-override:${day.dotColor};` : ''}
@@ -150,6 +168,70 @@
 	.cg__dots { position: absolute; bottom: 0.32rem; left: 0.4rem; display: flex; gap: 0.16rem; }
 	.cg__dot { width: 0.26rem; height: 0.26rem; border-radius: 999px; background: var(--cg-accent, var(--book-accent, #a78bfa)); }
 	.cg__dot--secondary { background: var(--cg-dot-secondary, var(--book-dot-green, #4ade80)); }
+
+	/* Capacity chip — replaces dots when day.capacity is provided. Shows
+	 * a thin progress bar + filled/total text (or "Full" when at capacity). */
+	.cg__chip {
+		position: absolute;
+		bottom: 0.32rem;
+		left: 0.4rem;
+		right: 0.4rem;
+		display: grid;
+		gap: 0.18rem;
+		font-size: 0.6rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		text-align: center;
+		color: color-mix(in srgb, var(--cg-accent, var(--book-accent, #a78bfa)) 92%, var(--text) 8%);
+	}
+
+	.cg__chip--once {
+		color: color-mix(in srgb, var(--text) 60%, transparent);
+	}
+
+	.cg__chip--full {
+		color: color-mix(in srgb, var(--admin-warn-strong, #c27800) 90%, var(--text) 10%);
+	}
+
+	.cg__chip-bar {
+		height: 3px;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--cg-accent, var(--book-accent, #a78bfa)) 16%, transparent);
+		overflow: hidden;
+	}
+
+	.cg__chip--once .cg__chip-bar {
+		background: color-mix(in srgb, var(--text) 10%, transparent);
+	}
+
+	.cg__chip--full .cg__chip-bar {
+		background: color-mix(in srgb, var(--admin-warn, #ff9500) 18%, transparent);
+	}
+
+	.cg__chip-fill {
+		display: block;
+		height: 100%;
+		background: var(--cg-accent, var(--book-accent, #a78bfa));
+		border-radius: 999px;
+		transition: width 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.cg__chip--once .cg__chip-fill {
+		background: color-mix(in srgb, var(--text) 60%, transparent);
+	}
+
+	.cg__chip--full .cg__chip-fill {
+		background: var(--admin-warn, #ff9500);
+	}
+
+	.cg__chip-text {
+		letter-spacing: 0.01em;
+		line-height: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.cg__chip-fill { transition: none; }
+	}
 
 	.cg--member {
 		--member-calendar-dot: color-mix(in srgb, var(--link) 72%, var(--text) 28%);
