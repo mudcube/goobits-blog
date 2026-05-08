@@ -31,9 +31,13 @@
 		title: 'Hang out. Work out.\nWhatever.',
 		subtitle: "Grab a time slot and let's do something fun together.",
 		icon: '💪',
+		slug: 'gym',
+		enabled: true,
 		defaultTime: '19:00',
 		defaultCapacity: 12
 	})
+
+	let removeConfirmOpen = $state(false)
 
 	const draft = $state<DayDraft>(blankDraft(program.defaultTime, program.defaultCapacity))
 	let originalDraft = $state<DayDraft>(blankDraft(program.defaultTime, program.defaultCapacity))
@@ -225,6 +229,45 @@
 		<div class="program-editor__canvas-wrap">
 			<div class="program-editor__canvas">
 				<div class="program-editor__panel calendar-ui-card">
+					<!-- Settings strip: publish toggle + URL slug -->
+					<div class="program-editor__settings-strip">
+						<button
+							type="button"
+							class="program-editor__publish-toggle"
+							class:program-editor__publish-toggle--on={program.enabled}
+							aria-pressed={program.enabled}
+							aria-label={program.enabled ? 'Bookable. Click to hide.' : 'Hidden. Click to make bookable.'}
+							onclick={() => (program.enabled = !program.enabled)}
+						>
+							<span class="program-editor__publish-thumb">
+								<span class="program-editor__publish-icon" aria-hidden="true">{program.enabled ? '✓' : ''}</span>
+							</span>
+							<span class="program-editor__publish-label">
+								{program.enabled ? 'Bookable' : 'Hidden'}
+							</span>
+						</button>
+
+						<div class="program-editor__url-pill">
+							<span class="program-editor__url-host">miko.art/schedule/</span>
+							<input
+								class="program-editor__url-slug"
+								type="text"
+								bind:value={program.slug}
+								spellcheck="false"
+								aria-label="URL slug"
+							/>
+							<a
+								class="program-editor__url-open"
+								href="https://miko.art/schedule/{program.slug}"
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label="Open public page in a new tab"
+							>
+								<span aria-hidden="true">↗</span>
+							</a>
+						</div>
+					</div>
+
 					<section class="program-editor__hero">
 						<div class="program-editor__hero-glow" aria-hidden="true"></div>
 
@@ -305,6 +348,30 @@
 					<span aria-hidden="true">💡</span>
 					Click any day to schedule an event.
 				</p>
+
+				<footer class="program-editor__remove-footer">
+					{#if !removeConfirmOpen}
+						<button
+							type="button"
+							class="program-editor__remove-btn"
+							onclick={() => (removeConfirmOpen = true)}
+						>
+							Remove this program
+						</button>
+					{:else}
+						<div class="program-editor__remove-confirm">
+							<span class="program-editor__remove-msg">Remove this program and all its events?</span>
+							<div class="program-editor__remove-row">
+								<button class="program-editor__remove-btn" type="button" onclick={() => (removeConfirmOpen = false)}>
+									Keep program
+								</button>
+								<button class="program-editor__remove-btn program-editor__remove-btn--danger" type="button" onclick={() => (removeConfirmOpen = false)}>
+									Yes, remove
+								</button>
+							</div>
+						</div>
+					{/if}
+				</footer>
 			</div>
 		</div>
 	</div>
@@ -643,6 +710,217 @@
 		font-style: italic;
 		color: var(--text-3);
 		width: 100%;
+	}
+
+	/* Settings strip — publish toggle + URL slug */
+	.program-editor__settings-strip {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		padding: 0.5rem 0.65rem;
+		margin-bottom: 0.4rem;
+		border-radius: 0.65rem;
+		background: color-mix(in srgb, var(--text) 4%, transparent);
+		border: 1px solid color-mix(in srgb, var(--text) 9%, transparent);
+		flex-wrap: wrap;
+	}
+
+	.program-editor__publish-toggle {
+		appearance: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.18rem 0.6rem 0.18rem 0.18rem;
+		border: 1px solid transparent;
+		background: transparent;
+		font: inherit;
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: var(--text);
+		cursor: pointer;
+		border-radius: 999px;
+		transition: background 140ms;
+		flex: none;
+	}
+
+	.program-editor__publish-toggle:hover {
+		background: color-mix(in srgb, var(--text) 5%, transparent);
+	}
+
+	.program-editor__publish-thumb {
+		position: relative;
+		width: 36px;
+		height: 22px;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--text) 18%, transparent);
+		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+		display: inline-block;
+		flex: none;
+		transition: background 140ms;
+	}
+
+	.program-editor__publish-thumb::before {
+		content: '';
+		position: absolute;
+		top: 2px;
+		left: 2px;
+		width: 16px;
+		height: 16px;
+		border-radius: 999px;
+		background: var(--bg);
+		box-shadow: 0 1px 2px color-mix(in srgb, var(--text) 18%, transparent);
+		transition: left 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.program-editor__publish-toggle--on .program-editor__publish-thumb {
+		background: color-mix(in srgb, var(--admin-accent) 80%, transparent);
+	}
+
+	.program-editor__publish-toggle--on .program-editor__publish-thumb::before {
+		left: 16px;
+	}
+
+	.program-editor__publish-icon {
+		position: absolute;
+		top: 2px;
+		left: 2px;
+		width: 16px;
+		height: 16px;
+		display: grid;
+		place-items: center;
+		font-size: 0.62rem;
+		font-weight: 800;
+		line-height: 1;
+		color: var(--admin-accent);
+		opacity: 0;
+		transition: opacity 140ms, left 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.program-editor__publish-toggle--on .program-editor__publish-icon {
+		opacity: 1;
+		left: 16px;
+	}
+
+	.program-editor__url-pill {
+		display: flex;
+		align-items: stretch;
+		flex: 1;
+		min-width: 0;
+		height: 32px;
+		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+		border-radius: 0.5rem;
+		overflow: hidden;
+		background: var(--bg);
+		font-size: 0.82rem;
+		font-variant-numeric: tabular-nums;
+		transition: border-color 140ms, box-shadow 140ms;
+	}
+
+	.program-editor__url-pill:hover {
+		border-color: color-mix(in srgb, var(--text) 22%, transparent);
+	}
+
+	.program-editor__url-pill:focus-within {
+		border-color: color-mix(in srgb, var(--admin-accent) 50%, transparent);
+		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-accent) 18%, transparent);
+	}
+
+	.program-editor__url-host {
+		display: inline-flex;
+		align-items: center;
+		padding: 0 0.6rem;
+		color: color-mix(in srgb, var(--text) 60%, transparent);
+		background: color-mix(in srgb, var(--text) 5%, transparent);
+		border-right: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+		white-space: nowrap;
+	}
+
+	.program-editor__url-slug {
+		appearance: none;
+		border: 0;
+		background: transparent;
+		font: inherit;
+		color: var(--text);
+		font-weight: 600;
+		padding: 0 0.55rem;
+		flex: 1;
+		min-width: 0;
+		outline: none;
+	}
+
+	.program-editor__url-open {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 32px;
+		border-left: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+		color: color-mix(in srgb, var(--text) 60%, transparent);
+		text-decoration: none;
+		transition: background 140ms, color 140ms;
+	}
+
+	.program-editor__url-open:hover {
+		background: color-mix(in srgb, var(--text) 5%, transparent);
+		color: var(--admin-accent);
+	}
+
+	/* Quiet "Remove this program" footer */
+	.program-editor__remove-footer {
+		display: flex;
+		justify-content: center;
+		width: 100%;
+		padding: 0.85rem 0.5rem 1.25rem;
+		border-top: 1px dashed color-mix(in srgb, var(--text) 10%, transparent);
+		margin-top: 0.5rem;
+	}
+
+	.program-editor__remove-btn {
+		appearance: none;
+		border: none;
+		background: transparent;
+		color: color-mix(in srgb, var(--admin-danger) 80%, var(--text) 20%);
+		font: inherit;
+		font-size: 0.82rem;
+		font-weight: 500;
+		padding: 0.4rem 0.85rem;
+		border-radius: 0.5rem;
+		cursor: pointer;
+		transition: background 140ms, color 140ms;
+	}
+
+	.program-editor__remove-btn:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--admin-danger) 8%, transparent);
+		color: var(--admin-danger);
+	}
+
+	.program-editor__remove-btn--danger {
+		color: var(--admin-danger);
+	}
+
+	.program-editor__remove-confirm {
+		display: grid;
+		gap: 0.5rem;
+		text-align: center;
+	}
+
+	.program-editor__remove-msg {
+		font-size: 0.82rem;
+		color: color-mix(in srgb, var(--text) 70%, transparent);
+	}
+
+	.program-editor__remove-row {
+		display: flex;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	@media (max-width: 480px) {
+		.program-editor__settings-strip {
+			flex-direction: column;
+			align-items: stretch;
+		}
+		.program-editor__publish-toggle { align-self: flex-start; }
+		.program-editor__url-pill { width: 100%; }
 	}
 
 	/* Day-edit overlay scrim — dims toward black so it works in both themes */

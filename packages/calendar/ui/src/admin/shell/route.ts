@@ -138,7 +138,7 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 				{ label: 'Programs & Events', href: hrefWithMock(`${adminBase}/events/`) },
 				{ label: prettySegment(programSlug) }
 			],
-			actions: ['view-program', 'program-settings'],
+			actions: ['view-program'],
 			programSlug
 		}
 	}
