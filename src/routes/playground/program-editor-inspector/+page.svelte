@@ -248,16 +248,18 @@
 						</button>
 
 						<div class="program-editor__url-pill">
-							<span class="program-editor__url-host">miko.art/schedule/</span>
-							<input
-								class="program-editor__url-slug"
-								type="text"
-								bind:value={program.slug}
-								spellcheck="false"
-								aria-label="URL slug"
-							/>
+							<span class="program-editor__url-seg program-editor__url-host">miko.art/schedule/</span>
+							<span class="program-editor__url-seg program-editor__url-slug-wrap">
+								<input
+									class="program-editor__url-slug"
+									type="text"
+									bind:value={program.slug}
+									spellcheck="false"
+									aria-label="URL slug"
+								/>
+							</span>
 							<a
-								class="program-editor__url-open"
+								class="program-editor__url-seg program-editor__url-open"
 								href="https://miko.art/schedule/{program.slug}"
 								target="_blank"
 								rel="noopener noreferrer"
@@ -804,8 +806,8 @@
 	.program-editor__url-pill {
 		display: flex;
 		align-items: stretch;
-		flex: 1;
-		min-width: 0;
+		flex: 0 1 22rem;
+		min-width: 12rem;
 		height: 32px;
 		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
 		border-radius: 0.5rem;
@@ -825,9 +827,13 @@
 		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-accent) 18%, transparent);
 	}
 
-	.program-editor__url-host {
-		display: inline-flex;
+	.program-editor__url-seg {
+		display: flex;
 		align-items: center;
+		box-sizing: border-box;
+	}
+
+	.program-editor__url-host {
 		padding: 0 0.6rem;
 		color: color-mix(in srgb, var(--text) 60%, transparent);
 		background: color-mix(in srgb, var(--text) 5%, transparent);
@@ -835,7 +841,13 @@
 		white-space: nowrap;
 	}
 
+	.program-editor__url-slug-wrap {
+		flex: 1;
+		min-width: 0;
+	}
+
 	.program-editor__url-slug {
+		width: 100%;
 		appearance: none;
 		border: 0;
 		background: transparent;
@@ -843,16 +855,15 @@
 		color: var(--text);
 		font-weight: 600;
 		padding: 0 0.55rem;
-		flex: 1;
+		margin: 0;
 		min-width: 0;
 		outline: none;
+		line-height: 1;
 	}
 
 	.program-editor__url-open {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
 		min-width: 32px;
+		justify-content: center;
 		border-left: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
 		color: color-mix(in srgb, var(--text) 60%, transparent);
 		text-decoration: none;
