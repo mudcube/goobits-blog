@@ -229,6 +229,18 @@
 		line-height: 1;
 	}
 
+	/* On tiny cells (mobile), hide the chip text and let the progress bar do
+	 * the talking — the digits become illegible below ~50px cell width. */
+	@container (max-width: 320px) {
+		.cg__chip-text { display: none; }
+		.cg__chip { gap: 0; }
+	}
+
+	@media (max-width: 480px) {
+		.cg__chip-text { display: none; }
+		.cg__chip { gap: 0; }
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.cg__chip-fill { transition: none; }
 	}

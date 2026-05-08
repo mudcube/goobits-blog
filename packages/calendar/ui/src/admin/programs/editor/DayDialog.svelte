@@ -280,10 +280,20 @@
 		gap: 0.4rem;
 		font-size: 0.78rem;
 		cursor: pointer;
+		/* Match line-height to the radio glyph height so flex centering
+		 * lines up the native input's optical center with the text. */
+		line-height: 16px;
 	}
 
+	.dd-radio > span { line-height: 16px; }
+
 	.dd-radio input {
+		width: 16px;
+		height: 16px;
+		margin: 0;
 		accent-color: var(--admin-accent);
+		flex: none;
+		display: block;
 	}
 
 	.dd-until-date {

@@ -6,6 +6,7 @@
 	import AdminCalendar from '../../dashboard/AdminCalendar.svelte'
 	import AdminInlineConfirm from '../../shared/AdminInlineConfirm.svelte'
 	import DayDialog from './DayDialog.svelte'
+	import UrlPill from './UrlPill.svelte'
 	import { blankDraft, draftsEqual, type DayDraft } from './day-dialog.types'
 	import { getAdminMockCatalog } from '../../mock/catalog'
 	import { createHistory } from '../../history/create-history'
@@ -646,37 +647,17 @@
 								: 'Hidden. Click to make bookable.'}
 							onclick={() => updateProgramDraft({ enabled: !dashboard.programDraft.enabled }, 'enabled')}
 						>
-							<span class="program-editor__publish-thumb">
-								<span class="program-editor__publish-icon" aria-hidden="true">{dashboard.programDraft.enabled ? '✓' : ''}</span>
-							</span>
+							<span class="program-editor__publish-thumb"></span>
 							<span class="program-editor__publish-label">
 								{dashboard.programDraft.enabled ? 'Bookable' : 'Hidden'}
 							</span>
 						</button>
 
-						<div class="program-editor__url-pill">
-							<span class="program-editor__url-seg program-editor__url-host">miko.art/schedule/</span>
-							<span class="program-editor__url-seg program-editor__url-slug-wrap">
-								<input
-									class="program-editor__url-slug"
-									type="text"
-									value={dashboard.programDraft.slug}
-									spellcheck="false"
-									aria-label="URL slug"
-									oninput={(event) => handleSettingInput('slug', event.currentTarget.value)}
-									onblur={() => pushEditorHistory('slug')}
-								/>
-							</span>
-							<a
-								class="program-editor__url-seg program-editor__url-open"
-								href="https://miko.art/schedule/{dashboard.programDraft.slug}"
-								target="_blank"
-								rel="noopener noreferrer"
-								aria-label="Open public page in a new tab"
-							>
-								<span aria-hidden="true">↗</span>
-							</a>
-						</div>
+						<UrlPill
+							slug={dashboard.programDraft.slug}
+							onInput={(value) => handleSettingInput('slug', value)}
+							onCommit={() => pushEditorHistory('slug')}
+						/>
 					</div>
 
 					<section class="program-editor__hero">
@@ -1013,102 +994,7 @@
 		left: 16px;
 	}
 
-	.program-editor__publish-icon {
-		position: absolute;
-		top: 2px;
-		left: 2px;
-		width: 16px;
-		height: 16px;
-		display: grid;
-		place-items: center;
-		font-size: 0.62rem;
-		font-weight: 800;
-		line-height: 1;
-		color: var(--admin-accent);
-		opacity: 0;
-		transition: opacity 140ms, left 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
-	}
-
-	.program-editor__publish-toggle--on .program-editor__publish-icon {
-		opacity: 1;
-		left: 16px;
-	}
-
-	.program-editor__url-pill {
-		display: flex;
-		align-items: stretch;
-		/* Don't grow to fill the strip — slug is short, more width = empty space. */
-		flex: 0 1 22rem;
-		min-width: 12rem;
-		height: 32px;
-		border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
-		border-radius: 0.5rem;
-		overflow: hidden;
-		background: var(--bg);
-		font-size: 0.82rem;
-		font-variant-numeric: tabular-nums;
-		transition: border-color 140ms, box-shadow 140ms;
-	}
-
-	.program-editor__url-pill:hover {
-		border-color: color-mix(in srgb, var(--text) 22%, transparent);
-	}
-
-	.program-editor__url-pill:focus-within {
-		border-color: color-mix(in srgb, var(--admin-accent) 50%, transparent);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-accent) 18%, transparent);
-	}
-
-	/* Each segment centers its content vertically. Wrapping the input in
-	 * a flex span fixes the native-input baseline drift we saw earlier
-	 * (slug text floated above the host text). */
-	.program-editor__url-seg {
-		display: flex;
-		align-items: center;
-		box-sizing: border-box;
-	}
-
-	.program-editor__url-host {
-		padding: 0 0.6rem;
-		color: color-mix(in srgb, var(--text) 60%, transparent);
-		background: color-mix(in srgb, var(--text) 5%, transparent);
-		border-right: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-		white-space: nowrap;
-	}
-
-	.program-editor__url-slug-wrap {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.program-editor__url-slug {
-		width: 100%;
-		appearance: none;
-		border: 0;
-		background: transparent;
-		font: inherit;
-		color: var(--text);
-		font-weight: 600;
-		padding: 0 0.55rem;
-		margin: 0;
-		min-width: 0;
-		outline: none;
-		line-height: 1;
-	}
-
-	.program-editor__url-open {
-		min-width: 32px;
-		justify-content: center;
-		border-left: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-		color: color-mix(in srgb, var(--text) 60%, transparent);
-		text-decoration: none;
-		transition: background 140ms, color 140ms;
-	}
-
-	.program-editor__url-open:hover {
-		background: color-mix(in srgb, var(--text) 5%, transparent);
-		color: var(--admin-accent);
-	}
+	/* URL pill styles live in UrlPill.svelte. */
 
 	/* Quiet "Remove this program" footer — replaces ProgramSettingsDrawer's Delete */
 	.program-editor__remove-footer {
@@ -1124,10 +1010,10 @@
 		appearance: none;
 		border: none;
 		background: transparent;
-		color: color-mix(in srgb, var(--admin-danger) 80%, var(--text) 20%);
+		color: var(--admin-danger);
 		font: inherit;
 		font-size: 0.82rem;
-		font-weight: 500;
+		font-weight: 600;
 		padding: 0.4rem 0.85rem;
 		border-radius: 0.5rem;
 		cursor: pointer;
@@ -1135,8 +1021,8 @@
 	}
 
 	.program-editor__remove-btn:hover:not(:disabled) {
-		background: color-mix(in srgb, var(--admin-danger) 8%, transparent);
-		color: var(--admin-danger);
+		background: color-mix(in srgb, var(--admin-danger) 12%, transparent);
+		color: var(--admin-danger-strong, var(--admin-danger));
 	}
 
 	.program-editor__remove-btn:disabled {
@@ -1150,7 +1036,7 @@
 			align-items: stretch;
 		}
 		.program-editor__publish-toggle { align-self: flex-start; }
-		.program-editor__url-pill { width: 100%; }
+		.program-editor__settings-strip :global(.url-pill) { width: 100%; flex: 1 1 auto; }
 	}
 
 	.program-editor__hero {
