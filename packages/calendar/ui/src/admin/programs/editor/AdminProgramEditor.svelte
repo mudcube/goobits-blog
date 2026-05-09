@@ -283,6 +283,7 @@
 		busyLabel="Removing…"
 		danger
 		busy={dashboard.programDeleting}
+		align="content"
 		onCancel={() => (deleteConfirmOpen = false)}
 		onConfirm={() => void deleteProgram()}
 	/>

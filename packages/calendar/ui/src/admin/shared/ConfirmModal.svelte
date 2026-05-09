@@ -10,6 +10,9 @@
 		danger?: boolean
 		busy?: boolean
 		busyLabel?: string
+		/** 'viewport' centers in the screen; 'content' centers within the
+		 * admin content column (uses --admin-content-center-x). */
+		align?: 'viewport' | 'content'
 		onCancel: () => void
 		onConfirm: () => void
 	}
@@ -23,6 +26,7 @@
 		danger = false,
 		busy = false,
 		busyLabel,
+		align = 'viewport',
 		onCancel,
 		onConfirm
 	}: Props = $props()
@@ -40,6 +44,7 @@
 	></button>
 	<div
 		class="admin-confirm-modal"
+		class:admin-confirm-modal--content={align === 'content'}
 		role="alertdialog"
 		aria-modal="true"
 		aria-labelledby={titleId}
@@ -100,6 +105,13 @@
 		flex-direction: column;
 		gap: 0.7rem;
 		padding: 1.1rem 1.1rem 1rem;
+	}
+
+	/* Content-centered: align horizontally to the admin content column
+	 * rather than the viewport. Falls back to viewport-center when the
+	 * variable isn't defined (e.g. outside .social-admin__main). */
+	.admin-confirm-modal--content {
+		left: var(--admin-content-center-x, 50%);
 	}
 
 	.admin-confirm-modal__title {
