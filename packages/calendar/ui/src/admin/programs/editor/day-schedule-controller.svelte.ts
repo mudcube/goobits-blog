@@ -27,7 +27,6 @@ type Options = {
 	isReady: () => boolean
 	isMockMode: () => boolean
 	flash: (message: string, isError?: boolean) => void
-	pushHistory: (scope: string) => void
 }
 
 export function isoDay(date: Date): string {
@@ -66,11 +65,8 @@ export function createDayScheduleController({
 	getEventsSource,
 	isReady,
 	isMockMode,
-	flash,
-	pushHistory: _pushHistory
+	flash
 }: Options) {
-	void _pushHistory // reserved for future scope-aware mutations
-
 	let currentMonth = $state(new Date())
 	let selectedDayDate = $state<Date | null>(null)
 	let popOpen = $state(false)
@@ -227,30 +223,32 @@ export function createDayScheduleController({
 		const start = new Date(selectedDayDate)
 		start.setHours(safeHours, safeMinutes, 0, 0)
 		const end = new Date(start.getTime() + 2 * 60 * 60 * 1000)
-		const slug = getSlug()
-		const activity = getDashboard().programDraft.slug || slug
-		const title = getDashboard().programDraft.label ? `${getDashboard().programDraft.label} Event` : 'Event'
+		const dashboard = getDashboard()
+		const draft = dashboard.programDraft
+		const eventDraft = dashboard.eventDraft
+		const activity = draft.slug || getSlug()
+		const title = draft.label ? `${draft.label} Event` : 'Event'
 
-		getDashboard().eventDraft = {
-			...getDashboard().eventDraft,
+		dashboard.eventDraft = {
+			...eventDraft,
 			activitySlug: activity,
 			title,
 			startsAt: start.toISOString(),
 			endsAt: end.toISOString(),
 			capacity: popDraft.capacity,
 			repeatWeeks: computeRepeatWeeks(start),
-			costCents: getDashboard().eventDraft.costCents || 0,
-			currency: getDashboard().eventDraft.currency || 'USD',
-			paymentProvider: getDashboard().eventDraft.paymentProvider || 'venmo',
-			paymentHandle: getDashboard().eventDraft.paymentHandle || '',
-			paymentNoteTemplate: getDashboard().eventDraft.paymentNoteTemplate || '',
-			location: getDashboard().eventDraft.location || '',
-			note: getDashboard().eventDraft.note || ''
+			costCents: eventDraft.costCents || 0,
+			currency: eventDraft.currency || 'USD',
+			paymentProvider: eventDraft.paymentProvider || 'venmo',
+			paymentHandle: eventDraft.paymentHandle || '',
+			paymentNoteTemplate: eventDraft.paymentNoteTemplate || '',
+			location: eventDraft.location || '',
+			note: eventDraft.note || ''
 		}
 
-		await getDashboard().createEvents()
-		if (getDashboard().error) {
-			flash(getDashboard().error, true)
+		await dashboard.createEvents()
+		if (dashboard.error) {
+			flash(dashboard.error, true)
 			return
 		}
 		flash('Event schedule added')
@@ -268,9 +266,10 @@ export function createDayScheduleController({
 			return
 		}
 		if (selectedEventId) {
-			await getDashboard().deleteEvent(selectedEventId)
-			if (getDashboard().error) {
-				flash(getDashboard().error, true)
+			const dashboard = getDashboard()
+			await dashboard.deleteEvent(selectedEventId)
+			if (dashboard.error) {
+				flash(dashboard.error, true)
 				return
 			}
 			flash('Event removed')
@@ -294,11 +293,12 @@ export function createDayScheduleController({
 			closePop()
 			return
 		}
+		const dashboard = getDashboard()
 		const selectedEvent = getEventsSource().find((ev) => ev.id === selectedEventId)
 		if (popDraft.capacity !== originalPopDraft.capacity) {
-			await getDashboard().updateEventCapacity(selectedEventId, popDraft.capacity)
-			if (getDashboard().error) {
-				flash(getDashboard().error, true)
+			await dashboard.updateEventCapacity(selectedEventId, popDraft.capacity)
+			if (dashboard.error) {
+				flash(dashboard.error, true)
 				return
 			}
 		}
@@ -312,13 +312,13 @@ export function createDayScheduleController({
 			const nextStart = new Date(selectedDayDate)
 			nextStart.setHours(safeHours, safeMinutes, 0, 0)
 			const nextEnd = new Date(nextStart.getTime() + durationMs)
-			await getDashboard().updateEventDetails(selectedEventId, {
+			await dashboard.updateEventDetails(selectedEventId, {
 				title: selectedEvent.title,
 				startsAt: nextStart.toISOString(),
 				endsAt: nextEnd.toISOString()
 			})
-			if (getDashboard().error) {
-				flash(getDashboard().error, true)
+			if (dashboard.error) {
+				flash(dashboard.error, true)
 				return
 			}
 		}

@@ -12,14 +12,12 @@
 		slug = $bindable('morning-yoga'),
 		host = 'miko.art/schedule/',
 		ariaLabel = 'URL slug',
-		previewLabel = 'Open public page in a new tab',
 		onInput,
 		onCommit
 	} = $props<{
 		slug?: string
 		host?: string
 		ariaLabel?: string
-		previewLabel?: string
 		/** Fired on every keystroke. Use this when the parent needs to write
 		 * through a getter/setter (e.g. a controller `programDraft` proxy)
 		 * rather than bind directly. */
@@ -48,7 +46,7 @@
 		href={previewHref}
 		target="_blank"
 		rel="noopener noreferrer"
-		aria-label={previewLabel}
+		aria-label="Open public page in a new tab"
 	>
 		<span aria-hidden="true">↗</span>
 	</a>

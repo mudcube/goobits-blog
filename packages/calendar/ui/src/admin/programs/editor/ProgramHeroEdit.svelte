@@ -136,8 +136,8 @@
 		border-radius: 50%;
 		background: radial-gradient(
 			circle,
-			color-mix(in srgb, #c084fc 14%, transparent) 0%,
-			color-mix(in srgb, #a78bfa 8%, transparent) 42%,
+			color-mix(in srgb, var(--admin-accent) 14%, transparent) 0%,
+			color-mix(in srgb, var(--admin-accent) 8%, transparent) 42%,
 			transparent 72%
 		);
 		pointer-events: none;

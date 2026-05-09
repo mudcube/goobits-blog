@@ -56,8 +56,7 @@
 		getEventsSource: () => eventsSource,
 		isReady: () => authed && initialized,
 		isMockMode: () => mockMode,
-		flash,
-		pushHistory: pushEditorHistory
+		flash
 	})
 
 
@@ -400,30 +399,13 @@
 		 * are cyclic references that CSS treats as invalid, collapsing every
 		 * descendant's `var(--bg)` / `var(--text)` (and any color-mix using
 		 * them) to transparent. Variables inherit by default; let them. */
-		--surface: color-mix(in srgb, var(--panel-bg) 88%, var(--text) 12%);
-		--popover-surface: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
-		--text-2: color-mix(in srgb, var(--text) 55%, transparent);
-		--text-3: color-mix(in srgb, var(--text) 36%, transparent);
-		--border: color-mix(in srgb, var(--text) 9%, transparent);
-		--border-s: color-mix(in srgb, var(--text) 14%, transparent);
-		--green: var(--admin-success);
-		--green-soft: color-mix(in srgb, var(--admin-success) 12%, transparent);
-		--green-text: color-mix(in srgb, var(--admin-success) 70%, var(--text));
-		--blue: var(--admin-accent);
-		--blue-soft: color-mix(in srgb, var(--admin-accent) 12%, transparent);
-		--red: var(--admin-danger);
-		--elev-surface-1: var(--admin-elev-surface-1);
-		--elev-surface-2: var(--admin-elev-surface-2);
-		--elev-border: var(--admin-elev-border);
-		--elev-text: var(--admin-elev-text);
-		--elev-subtext: var(--admin-elev-subtext);
-		--elev-control: var(--admin-elev-control);
-		--elev-control-hover: var(--admin-elev-control-hover);
-		--elev-control-active: var(--admin-elev-control-active);
+		/* Two-stop atmospheric backdrop: accent purple top-left, pink top-right.
+		 * The pink (#f0abfc) is hardcoded — sister to --admin-accent but we
+		 * don't have a secondary brand token yet. */
 		background:
 			radial-gradient(
 				ellipse 520px 360px at 52% 68px,
-				color-mix(in srgb, #a78bfa 16%, transparent) 0%,
+				color-mix(in srgb, var(--admin-accent) 16%, transparent) 0%,
 				transparent 72%
 			),
 			radial-gradient(
@@ -442,7 +424,7 @@
 	}
 
 	.program-editor__canvas-wrap {
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid color-mix(in srgb, var(--text) 9%, transparent);
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: flex-start;
@@ -615,7 +597,7 @@
 
 	/* URL pill styles live in UrlPill.svelte. */
 
-	@media (max-width: 480px) {
+	@media (max-width: 30em) {
 		.program-editor-chrome { gap: 0.4rem; }
 		.program-editor-chrome__btn { flex: 1; }
 		.program-editor__url-row :global(.url-pill) { width: 100%; flex: 1 1 auto; }
@@ -630,13 +612,13 @@
 		text-align: center;
 		font-size: 0.74rem;
 		font-style: italic;
-		color: var(--text-3);
+		color: color-mix(in srgb, var(--text) 36%, transparent);
 		width: 100%;
 		font-family: var(--font-ui-sans, var(--font-sans));
 	}
 
 	:global(.program-editor__hint-icon) {
-		color: color-mix(in srgb, #f5b700 56%, var(--blue) 44%);
+		color: color-mix(in srgb, var(--admin-warn, #d97706) 56%, var(--admin-accent) 44%);
 		opacity: 0.95;
 		transform: translateY(-0.35px);
 		flex-shrink: 0;
