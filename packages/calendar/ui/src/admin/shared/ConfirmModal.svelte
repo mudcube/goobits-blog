@@ -164,11 +164,15 @@
 	.admin-confirm-modal__btn--danger {
 		background: var(--admin-danger);
 		border-color: var(--admin-danger);
-		color: var(--admin-danger-fg, #fff);
+		/* `--admin-danger-fg` is a red-tinted color meant for danger TEXT
+		 * (red labels), not white-on-red buttons — would render invisible.
+		 * Hardcode #fff for guaranteed contrast on the red fill. */
+		color: #fff;
 	}
 
 	.admin-confirm-modal__btn--danger:hover:not(:disabled) {
 		background: var(--admin-danger-strong, var(--admin-danger));
 		border-color: var(--admin-danger-strong, var(--admin-danger));
+		color: #fff;
 	}
 </style>

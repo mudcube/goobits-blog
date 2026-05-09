@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
-	import { Lightbulb, Pause, Play, Trash2 } from '@lucide/svelte'
+	import { CalendarPlus, Lightbulb, Pause, Play, Trash2 } from '@lucide/svelte'
 	import { onMount } from 'svelte'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import ConfirmModal from '../../shared/ConfirmModal.svelte'
@@ -289,25 +289,46 @@
 	/>
 
 	<!-- Admin chrome: program-level actions. Outside the editor card
-	 * because they aren't part of what users see on the public page. -->
+	 * because they aren't part of what users see on the public page.
+	 * Pause/Resume + New event group on the left; Remove (destructive)
+	 * on the far right. -->
 	<div class="program-editor-chrome">
-		<button
-			type="button"
-			class="program-editor-chrome__btn"
-			aria-pressed={!dashboard.programDraft.enabled}
-			aria-label={dashboard.programDraft.enabled
-				? 'Click to pause bookings'
-				: 'Click to resume bookings'}
-			onclick={() => updateProgramDraft({ enabled: !dashboard.programDraft.enabled }, 'enabled')}
-		>
-			{#if dashboard.programDraft.enabled}
-				<Pause size={14} strokeWidth={2.2} fill="currentColor" />
-				Pause
-			{:else}
-				<Play size={14} strokeWidth={2.2} fill="currentColor" />
-				Resume
-			{/if}
-		</button>
+		<div class="program-editor-chrome__group">
+			<button
+				type="button"
+				class="program-editor-chrome__btn"
+				aria-pressed={!dashboard.programDraft.enabled}
+				aria-label={dashboard.programDraft.enabled
+					? 'Click to pause bookings'
+					: 'Click to resume bookings'}
+				onclick={() => updateProgramDraft({ enabled: !dashboard.programDraft.enabled }, 'enabled')}
+			>
+				{#if dashboard.programDraft.enabled}
+					<Pause size={14} strokeWidth={2.2} fill="currentColor" />
+					Pause
+				{:else}
+					<Play size={14} strokeWidth={2.2} fill="currentColor" />
+					Resume
+				{/if}
+			</button>
+
+			<button
+				type="button"
+				class="program-editor-chrome__btn program-editor-chrome__btn--accent"
+				aria-label="Schedule a new event"
+				onclick={() => {
+					const target = new Date()
+					target.setHours(0, 0, 0, 0)
+					if (target < new Date(new Date().setHours(0, 0, 0, 0))) {
+						target.setDate(target.getDate() + 1)
+					}
+					dayController.openDay(target)
+				}}
+			>
+				<CalendarPlus size={14} strokeWidth={2.2} />
+				New event
+			</button>
+		</div>
 
 		<button
 			type="button"
@@ -375,10 +396,12 @@
 
 	.program-editor {
 		font-family: var(--font-ui-sans, var(--font-sans));
-		--bg: var(--bg);
+		/* NEVER add `--bg: var(--bg)` or `--text: var(--text)` here — those
+		 * are cyclic references that CSS treats as invalid, collapsing every
+		 * descendant's `var(--bg)` / `var(--text)` (and any color-mix using
+		 * them) to transparent. Variables inherit by default; let them. */
 		--surface: color-mix(in srgb, var(--panel-bg) 88%, var(--text) 12%);
 		--popover-surface: color-mix(in srgb, var(--bg) 94%, var(--text) 6%);
-		--text: var(--text);
 		--text-2: color-mix(in srgb, var(--text) 55%, transparent);
 		--text-3: color-mix(in srgb, var(--text) 36%, transparent);
 		--border: color-mix(in srgb, var(--text) 9%, transparent);
@@ -457,26 +480,21 @@
 		transition: opacity 220ms ease, filter 220ms ease, border-color 220ms ease;
 	}
 
-	/* Paused state — softly ghosts the editable content so the admin sees
-	 * at a glance the program isn't taking bookings, while still being
-	 * able to read and edit fields. The badge in the corner makes the
-	 * state explicit so the dim isn't easily missed. The dim applies to
-	 * the panel's children (not the panel itself) so the badge stays
-	 * full-opacity. */
+	/* Paused state — fade the whole panel (badge included) so the dim is
+	 * uniform. The badge sits at full color saturation but rides the same
+	 * opacity, which still reads clearly because the badge has its own
+	 * solid bg + amber dot for explicit signal. The dashed accent border
+	 * stays untouched so the editor's identity doesn't shift. */
 	.program-editor__panel--paused.calendar-ui-card {
-		border-color: color-mix(in srgb, var(--text) 22%, transparent);
-	}
-
-	.program-editor__panel--paused.calendar-ui-card > *:not(.program-editor__paused-badge) {
 		opacity: 0.62;
-		filter: saturate(0.55);
+		filter: saturate(0.6);
 		transition: opacity 220ms ease, filter 220ms ease;
 	}
 
-	.program-editor__panel--paused.calendar-ui-card:hover > *:not(.program-editor__paused-badge),
-	.program-editor__panel--paused.calendar-ui-card:focus-within > *:not(.program-editor__paused-badge) {
-		opacity: 0.9;
-		filter: saturate(0.85);
+	.program-editor__panel--paused.calendar-ui-card:hover,
+	.program-editor__panel--paused.calendar-ui-card:focus-within {
+		opacity: 0.92;
+		filter: saturate(0.9);
 	}
 
 	.program-editor__paused-badge {
@@ -521,6 +539,13 @@
 		flex-wrap: wrap;
 	}
 
+	.program-editor-chrome__group {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		flex-wrap: wrap;
+	}
+
 	.program-editor-chrome__btn {
 		appearance: none;
 		display: inline-flex;
@@ -549,6 +574,18 @@
 	.program-editor-chrome__btn:disabled {
 		opacity: 0.5;
 		cursor: default;
+	}
+
+	.program-editor-chrome__btn--accent {
+		border-color: color-mix(in srgb, var(--admin-accent) 40%, transparent);
+		color: color-mix(in srgb, var(--admin-accent) 80%, var(--text) 20%);
+		background: color-mix(in srgb, var(--admin-accent) 12%, var(--bg) 88%);
+	}
+
+	.program-editor-chrome__btn--accent:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--admin-accent) 22%, var(--bg) 78%);
+		border-color: var(--admin-accent);
+		box-shadow: 0 2px 10px color-mix(in srgb, var(--admin-accent) 22%, transparent);
 	}
 
 	.program-editor-chrome__btn--danger {

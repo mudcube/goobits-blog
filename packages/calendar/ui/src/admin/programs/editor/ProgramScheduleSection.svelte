@@ -27,22 +27,6 @@
 	} = $props()
 </script>
 
-<div class="program-schedule-section__head">
-	<h4 class="program-schedule-section__title">Events</h4>
-	<button
-		type="button"
-		class="program-schedule-section__new-event"
-		onclick={() => {
-			const target = new Date()
-			target.setHours(0, 0, 0, 0)
-			if (isPast(target)) target.setDate(target.getDate() + 1)
-			dayController.openDay(target)
-		}}
-	>
-		+ New event
-	</button>
-</div>
-
 <AdminCalendar
 	currentMonth={dayController.currentMonth}
 	selectedDateIso={dayController.selectedDayDate ? isoDay(dayController.selectedDayDate) : null}
@@ -115,44 +99,6 @@
 {/if}
 
 <style>
-	.program-schedule-section__head {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem;
-		width: 100%;
-		margin: 1.4rem 0 0.4rem;
-		padding: 0 0.1rem;
-	}
-
-	.program-schedule-section__title {
-		margin: 0;
-		font-size: 0.78rem;
-		font-weight: 700;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
-	}
-
-	.program-schedule-section__new-event {
-		appearance: none;
-		border: 1px solid color-mix(in srgb, var(--admin-accent) 38%, transparent);
-		background: color-mix(in srgb, var(--admin-accent) 14%, var(--bg) 86%);
-		color: color-mix(in srgb, var(--admin-accent) 78%, var(--text) 22%);
-		border-radius: var(--admin-control-radius, 0.625rem);
-		padding: 0.36rem 0.85rem;
-		font: inherit;
-		font-size: 0.78rem;
-		font-weight: 650;
-		cursor: pointer;
-		transition: background 140ms, box-shadow 140ms;
-	}
-
-	.program-schedule-section__new-event:hover {
-		background: color-mix(in srgb, var(--admin-accent) 22%, var(--bg) 78%);
-		box-shadow: 0 2px 10px color-mix(in srgb, var(--admin-accent) 22%, transparent);
-	}
-
 	.program-schedule-section__scrim {
 		position: fixed;
 		inset: 0;

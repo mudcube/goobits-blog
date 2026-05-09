@@ -70,24 +70,26 @@
 		/* No padding on the pill itself — segments fill it edge-to-edge so
 		 * the host's recessed bg can read as a distinct zone. */
 		padding: 0;
-		border: 2px solid var(--admin-accent);
+		/* Outer border matches the segment dividers (text 28% mixed) so the
+		 * pill reads as a quiet, unified shape — the structure comes from
+		 * the host/slug/open zones, not a loud accent ring. */
+		border: 1px solid color-mix(in srgb, var(--text) 28%, transparent);
 		background: var(--bg);
 		border-radius: 999px;
 		font-size: 0.82rem;
 		font-variant-numeric: tabular-nums;
 		min-width: 0;
 		overflow: hidden;
-		box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 12%, transparent);
 		transition: border-color 140ms, box-shadow 140ms;
 	}
 
 	.url-pill:hover {
-		box-shadow: 0 2px 8px color-mix(in srgb, var(--admin-accent) 22%, transparent);
+		border-color: color-mix(in srgb, var(--text) 40%, transparent);
 	}
 
 	.url-pill:focus-within {
-		border-color: color-mix(in srgb, var(--admin-accent) 80%, var(--text));
-		box-shadow: 0 0 0 3px color-mix(in srgb, var(--admin-accent) 24%, transparent);
+		border-color: color-mix(in srgb, var(--admin-accent) 60%, transparent);
+		box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-accent) 18%, transparent);
 	}
 
 	.url-pill__seg {
@@ -100,9 +102,11 @@
 	 * clearly NOT an input. Italic + muted text + no-select reinforces. */
 	.url-pill__host {
 		padding: 0 0.7rem 0 0.85rem;
-		color: color-mix(in srgb, var(--text) 60%, var(--bg));
-		background: color-mix(in srgb, var(--text) 10%, var(--bg) 90%);
-		border-right: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+		color: color-mix(in srgb, var(--text) 65%, var(--bg));
+		/* Strong solid fill — ~22% text on bg reads as a clearly tinted chip
+		 * even on top of gradient panels. Don't drop below 18%. */
+		background: color-mix(in srgb, var(--text) 22%, var(--bg) 78%);
+		border-right: 1px solid color-mix(in srgb, var(--text) 28%, transparent);
 		white-space: nowrap;
 		font-style: italic;
 		user-select: none;
@@ -142,11 +146,11 @@
 		place-items: center;
 		width: 2rem;
 		flex: none;
-		color: color-mix(in srgb, var(--text) 60%, var(--bg));
+		color: color-mix(in srgb, var(--text) 65%, var(--bg));
 		text-decoration: none;
 		font-size: 0.78rem;
-		background: color-mix(in srgb, var(--text) 10%, var(--bg) 90%);
-		border-left: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+		background: color-mix(in srgb, var(--text) 22%, var(--bg) 78%);
+		border-left: 1px solid color-mix(in srgb, var(--text) 28%, transparent);
 		transition: background 140ms, color 140ms;
 	}
 
