@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
-	import { Lightbulb } from '@lucide/svelte'
+	import { Lightbulb, Pause, Play, Trash2 } from '@lucide/svelte'
 	import { onMount } from 'svelte'
 	import type { createAdminDashboardController } from '../../dashboard/admin-dashboard-controller.svelte'
 	import ConfirmModal from '../../shared/ConfirmModal.svelte'
@@ -300,7 +300,13 @@
 				: 'Click to resume bookings'}
 			onclick={() => updateProgramDraft({ enabled: !dashboard.programDraft.enabled }, 'enabled')}
 		>
-			{dashboard.programDraft.enabled ? 'Pause' : 'Resume'}
+			{#if dashboard.programDraft.enabled}
+				<Pause size={14} strokeWidth={2.2} fill="currentColor" />
+				Pause
+			{:else}
+				<Play size={14} strokeWidth={2.2} fill="currentColor" />
+				Resume
+			{/if}
 		</button>
 
 		<button
@@ -309,7 +315,8 @@
 			onclick={requestDeleteProgram}
 			disabled={dashboard.programDeleting}
 		>
-			{dashboard.programDeleting ? 'Removing…' : 'Remove this program'}
+			<Trash2 size={14} strokeWidth={2.2} />
+			{dashboard.programDeleting ? 'Removing…' : 'Remove'}
 		</button>
 	</div>
 

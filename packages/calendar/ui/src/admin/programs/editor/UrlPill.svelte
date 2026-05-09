@@ -96,13 +96,13 @@
 		box-sizing: border-box;
 	}
 
-	/* Fixed host zone: tinted bg + right divider make it read as
-	 * "this part isn't editable". Italic + muted text reinforces. */
+	/* Fixed host zone: solid muted-gray bg makes it visually heavy and
+	 * clearly NOT an input. Italic + muted text + no-select reinforces. */
 	.url-pill__host {
 		padding: 0 0.7rem 0 0.85rem;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
-		background: color-mix(in srgb, var(--admin-accent) 12%, var(--bg) 88%);
-		border-right: 1px solid color-mix(in srgb, var(--admin-accent) 32%, transparent);
+		color: color-mix(in srgb, var(--text) 60%, var(--bg));
+		background: color-mix(in srgb, var(--text) 10%, var(--bg) 90%);
+		border-right: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
 		white-space: nowrap;
 		font-style: italic;
 		user-select: none;
@@ -142,11 +142,11 @@
 		place-items: center;
 		width: 2rem;
 		flex: none;
-		color: color-mix(in srgb, var(--text) 55%, transparent);
+		color: color-mix(in srgb, var(--text) 60%, var(--bg));
 		text-decoration: none;
 		font-size: 0.78rem;
-		background: color-mix(in srgb, var(--admin-accent) 12%, var(--bg) 88%);
-		border-left: 1px solid color-mix(in srgb, var(--admin-accent) 32%, transparent);
+		background: color-mix(in srgb, var(--text) 10%, var(--bg) 90%);
+		border-left: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
 		transition: background 140ms, color 140ms;
 	}
 
