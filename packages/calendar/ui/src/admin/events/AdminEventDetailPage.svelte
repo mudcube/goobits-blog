@@ -5,21 +5,24 @@
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
-	import { Users } from '@lucide/svelte'
 	import { ArrowUpRight } from '@lucide/svelte'
-	import { ArrowUp, Check, X as XIcon } from '@lucide/svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminToast from '@calendar/ui/admin/shared/AdminToast.svelte'
 	import EditableField from '@calendar/ui/admin/shared/EditableField.svelte'
 	import AdminDateTimePicker from '@calendar/ui/admin/shared/AdminDateTimePicker.svelte'
-	import AdminInlineConfirm from '@calendar/ui/admin/shared/AdminInlineConfirm.svelte'
+	import ConfirmModal from '@calendar/ui/admin/shared/ConfirmModal.svelte'
 	import AdminEventHeroUpload from './AdminEventHeroUpload.svelte'
-	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
-	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
+	import EventAttendeesList from './EventAttendeesList.svelte'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { withAdminRoute } from '@calendar/ui/config'
-	import { adminActionHandlers, adminEventDetailBreadcrumb } from '../shell/state'
+	import { adminActionHandlers, adminDetailCrumbLabel } from '../shell/state'
+	import {
+		formatEventRange,
+		formatDayLabel,
+		formatTimeOnly,
+		formatDuration
+	} from './event-detail-helpers'
 
 	const { data } = $props<{ data: { user: unknown | null; eventId: string; bootstrap?: AdminBootstrap | null } }>()
 
@@ -97,78 +100,8 @@
 		}, 2400)
 	}
 
-	function formatEventRange(startsAt: string, endsAt: string) {
-		const start = new Date(startsAt)
-		const end = new Date(endsAt)
-		const sameDay = start.toDateString() === end.toDateString()
-		const dayLabel = start.toLocaleDateString(undefined, {
-			weekday: 'short',
-			month: 'short',
-			day: 'numeric'
-		})
-		const startTime = start.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
-		const endTime = end.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
-		if (sameDay) return `${dayLabel} at ${startTime} – ${endTime}`
-		const endLabel = end.toLocaleDateString(undefined, {
-			weekday: 'short',
-			month: 'short',
-			day: 'numeric'
-		})
-		return `${dayLabel} at ${startTime} – ${endLabel} at ${endTime}`
-	}
-
-	function formatDayLabel(iso: string) {
-		return new Date(iso).toLocaleDateString(undefined, {
-			month: 'short',
-			day: 'numeric'
-		})
-	}
-
-	function formatTimeOnly(iso: string) {
-		return new Date(iso).toLocaleTimeString(undefined, {
-			hour: 'numeric',
-			minute: '2-digit'
-		})
-	}
-
-	function formatDuration(startsAt: string, endsAt: string) {
-		const startMs = new Date(startsAt).getTime()
-		const endMs = new Date(endsAt).getTime()
-		if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return '-'
-		const minutes = Math.round((endMs - startMs) / 60000)
-		if (minutes < 60) return `${minutes} min`
-		const hours = Math.floor(minutes / 60)
-		const rem = minutes % 60
-		return rem === 0 ? `${hours} hr${hours === 1 ? '' : 's'}` : `${hours}h ${rem}m`
-	}
-
-	function attendeeInitials(name: string) {
-		const parts = name.split(/\s+/).filter(Boolean)
-		const first = parts[0]?.[0] || ''
-		const second = parts[1]?.[0] || (parts[0]?.[1] || 'X')
-		return `${first}${second}`.toUpperCase()
-	}
-
 	function crewMemberHref(userId: string) {
 		return hrefWithMock(withAdminRoute(`crew/${userId}/`))
-	}
-
-	function attendeeBadge(attendee: { status: string; waitlistPosition: number | null; attendanceStatus: string }) {
-		if (attendee.status === 'waitlist' || attendee.waitlistPosition) return 'Waitlist'
-		if (!eventEnded) return 'Joined'
-		if (attendee.attendanceStatus === 'attended') return 'Attended'
-		if (attendee.attendanceStatus === 'flaked') return 'Flaked'
-		return 'Joined'
-	}
-
-	function attendeeDetail(attendee: { status: string; waitlistPosition: number | null; attendanceStatus: string }) {
-		if (attendee.status === 'waitlist' || attendee.waitlistPosition) {
-			return attendee.waitlistPosition ? `Position #${attendee.waitlistPosition}` : 'Pending opening'
-		}
-		if (!eventEnded) return 'Booking confirmed'
-		if (attendee.attendanceStatus === 'attended') return 'Marked attended'
-		if (attendee.attendanceStatus === 'flaked') return 'Marked no-show'
-		return 'Booking confirmed'
 	}
 
 	async function handlePromote(entryId: number) {
@@ -370,8 +303,8 @@
 
 	$effect(() => {
 		const label = detail?.event.title?.trim() || null
-		adminEventDetailBreadcrumb.set(label)
-		return () => adminEventDetailBreadcrumb.set(null)
+		adminDetailCrumbLabel.set(label)
+		return () => adminDetailCrumbLabel.set(null)
 	})
 </script>
 
@@ -380,16 +313,16 @@
 		{#if toast}
 			<AdminToast message={toast} variant={toastError ? 'error' : 'status'} />
 		{/if}
-		{#if cancelConfirmOpen}
-			<div class="admin-event-detail__cancel-confirm">
-				<AdminInlineConfirm
-					question="Cancel this event? This action cannot be undone."
-					confirmLabel="Yes, cancel"
-					onCancel={() => (cancelConfirmOpen = false)}
-					onConfirm={() => void performCancelEvent()}
-				/>
-			</div>
-		{/if}
+		<ConfirmModal
+			open={cancelConfirmOpen}
+			title="Cancel this event?"
+			body="Attendees will lose their booking. This action cannot be undone."
+			confirmLabel="Yes, cancel"
+			danger
+			align="content"
+			onCancel={() => (cancelConfirmOpen = false)}
+			onConfirm={() => void performCancelEvent()}
+		/>
 		{#if loading || (!mockMode && !attemptedLoad)}
 			<p class="admin-event-detail__loading">Loading event detail...</p>
 		{:else if detail}
@@ -468,79 +401,14 @@
 				/>
 			</section>
 
-			<section class="admin-event-detail__section">
-				<div class="admin-event-detail__attendee-header">
-					<div class="admin-event-detail__section-label">Attendees</div>
-				</div>
-				{#if detail.attendees.length === 0}
-					<p class="admin-event-detail__loading">No attendees yet.</p>
-				{:else}
-					<ul class="admin-event-detail__attendee-list">
-						{#each detail.attendees as attendee}
-							<li class="admin-event-detail__attendee-item">
-								<AdminCrewMemberCard
-									name={attendee.name || attendee.email || attendee.userId}
-									initials={attendeeInitials(attendee.name || attendee.email || attendee.userId)}
-									badge={attendeeBadge(attendee)}
-									detail={attendeeDetail(attendee)}
-									href={crewMemberHref(attendee.userId)}
-								/>
-								{#if attendee.status === 'waitlist' || attendee.waitlistPosition}
-									<div class="admin-event-detail__attendee-actions">
-										<button
-											type="button"
-											class="admin-ui-btn admin-ui-btn--accent"
-											onclick={() => void handlePromote(attendee.entryId)}
-										>
-											<ArrowUp size={13} strokeWidth={2} /> Promote
-										</button>
-									</div>
-								{:else if eventEnded && attendee.status === 'joined'}
-									<div class="admin-event-detail__attendee-actions">
-										<button
-											type="button"
-											class="admin-ui-btn"
-											class:admin-ui-btn--accent={attendee.attendanceStatus === 'attended'}
-											onclick={() =>
-												void handleAttendance(
-													attendee.userId,
-													attendee.attendanceStatus === 'attended' ? 'unknown' : 'attended'
-												)}
-										>
-											<Check size={13} strokeWidth={2} /> Attended
-										</button>
-										<button
-											type="button"
-											class="admin-ui-btn"
-											class:admin-ui-btn--warn={attendee.attendanceStatus === 'flaked'}
-											onclick={() =>
-												void handleAttendance(
-													attendee.userId,
-													attendee.attendanceStatus === 'flaked' ? 'unknown' : 'flaked'
-												)}
-										>
-											<XIcon size={13} strokeWidth={2} /> No-show
-										</button>
-									</div>
-								{/if}
-							</li>
-						{/each}
-					</ul>
-				{/if}
-				{#if openSpots > 0}
-					<AdminMetaCards
-						items={[
-							{
-								id: 'open-spots',
-								label: `${openSpots} spot${openSpots === 1 ? '' : 's'} open`,
-								detail: '',
-								icon: Users
-							}
-						]}
-						singleLine={true}
-					/>
-				{/if}
-			</section>
+			<EventAttendeesList
+				attendees={detail.attendees}
+				{eventEnded}
+				{openSpots}
+				{crewMemberHref}
+				onPromote={(entryId) => void handlePromote(entryId)}
+				onAttendance={(userId, status) => void handleAttendance(userId, status)}
+			/>
 
 			<a class="admin-event-detail__editor-link" href={hrefWithMock(withAdminRoute(`events/program/${activitySlug || 'events'}/`))}>
 				<ArrowUpRight size={14} strokeWidth={2} />
@@ -589,14 +457,6 @@
 		font: inherit;
 		color: inherit;
 		display: inline;
-	}
-
-	.admin-event-detail__cancel-confirm {
-		padding: 0.85rem 1rem;
-		border-radius: 0.7rem;
-		background: var(--admin-danger-bg-faint);
-		border: 1px solid var(--admin-danger-border);
-		margin-bottom: 0.5rem;
 	}
 
 	.admin-event-detail__section {
@@ -654,33 +514,6 @@
 		color: color-mix(in srgb, var(--text) 58%, transparent);
 		min-height: 1.5em;
 	}
-
-	.admin-event-detail__attendee-header {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.admin-event-detail__attendee-list {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-		display: grid;
-		gap: 0.35rem;
-	}
-
-	.admin-event-detail__attendee-item {
-		list-style: none;
-		display: grid;
-		gap: 0.4rem;
-	}
-
-	.admin-event-detail__attendee-actions {
-		display: inline-flex;
-		gap: 0.4rem;
-		padding-left: 3rem;
-	}
-
 
 	.admin-event-detail__editor-link {
 		display: inline-flex;

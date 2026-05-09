@@ -400,9 +400,8 @@
 		 * are cyclic references that CSS treats as invalid, collapsing every
 		 * descendant's `var(--bg)` / `var(--text)` (and any color-mix using
 		 * them) to transparent. Variables inherit by default; let them. */
-		/* Two-stop atmospheric backdrop: accent purple top-left, pink top-right.
-		 * The pink (#f0abfc) is hardcoded — sister to --admin-accent but we
-		 * don't have a secondary brand token yet. */
+		/* Two-stop atmospheric backdrop: accent purple top-left,
+		 * accent-secondary pink top-right. */
 		background:
 			radial-gradient(
 				ellipse 520px 360px at 52% 68px,
@@ -411,7 +410,7 @@
 			),
 			radial-gradient(
 				ellipse 500px 320px at 78% 22%,
-				color-mix(in srgb, #f0abfc 10%, transparent) 0%,
+				color-mix(in srgb, var(--admin-accent-secondary) 10%, transparent) 0%,
 				transparent 72%
 			),
 			var(--bg);

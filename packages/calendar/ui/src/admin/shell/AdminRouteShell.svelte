@@ -10,7 +10,7 @@
 	import AdminRouteActions from './components/AdminRouteActions.svelte'
 	import AdminRouteSidebar from './components/AdminRouteSidebar.svelte'
 	import { getAdminRoute } from './route'
-	import { adminEventDetailBreadcrumb } from './state'
+	import { adminDetailCrumbLabel } from './state'
 
 	type AdminUser = { name?: string | null; email?: string | null } | null
 
@@ -28,7 +28,7 @@
 
 	const routeInfo = $derived(
 		getAdminRoute($page.url.pathname, {
-			detailLabel: $adminEventDetailBreadcrumb,
+			detailLabel: $adminDetailCrumbLabel,
 			hrefWithMock
 		})
 	)

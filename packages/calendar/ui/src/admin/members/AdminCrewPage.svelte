@@ -6,20 +6,26 @@
 	import { createAdminMembersController } from '@calendar/ui/admin/members/admin-members.svelte'
 	import { createAdminDashboardController } from '@calendar/ui/admin/dashboard/admin-dashboard-controller.svelte'
 	import { createInviteShareLink } from '@calendar/ui/admin/dashboard/admin-dashboard'
-	import { Copy, Trash2, Ticket, Hourglass, CircleDashed } from '@lucide/svelte'
 	import AdminLoadingText from '@calendar/ui/admin/shared/AdminLoadingText.svelte'
 	import AdminPageHero from '@calendar/ui/admin/shared/AdminPageHero.svelte'
 	import AdminToast from '@calendar/ui/admin/shared/AdminToast.svelte'
 	import AdminCrewMemberCard from '@calendar/ui/admin/members/AdminCrewMemberCard.svelte'
-	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import AdminCrewInviteModal from '@calendar/ui/admin/members/AdminCrewInviteModal.svelte'
-	import AdminInlineConfirm from '@calendar/ui/admin/shared/AdminInlineConfirm.svelte'
+	import CrewInvitesSection from '@calendar/ui/admin/members/CrewInvitesSection.svelte'
 	import { getActivityEmoji } from '@calendar/ui/shared'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { withAdminRoute } from '@calendar/ui/config'
 	import type { CalendarAdminUser } from '@calendar/ui/api/calendar'
 	import { adminActionHandlers, type AdminInviteAnchorRect } from '../shell/state'
+	import {
+		normalizeName,
+		fallbackNameFromEmail,
+		safeInviteNameFromEmail,
+		initials,
+		categoryBadgeText,
+		type InviteStatus
+	} from './crew-helpers'
 
 	type CrewBootstrap = {
 		programs?: unknown[]
@@ -78,7 +84,6 @@
 	let createdInviteCode = $state('')
 	let inviteAnchorRect = $state<AdminInviteAnchorRect | null>(null)
 
-	type InviteStatus = 'pending' | 'expired' | 'exhausted'
 	type InviteFilter = 'all' | InviteStatus
 	let inviteFilter = $state<InviteFilter>('all')
 	let confirmBulkDelete = $state(false)
@@ -100,47 +105,8 @@
 		dashboard.loadPrograms()
 	})
 
-	function normalizeName(value: unknown) {
-		return String(value || '').trim()
-	}
-
 	function hrefWithMock(path: string) {
 		return withAdminMock(path, mockMode)
-	}
-
-	function fallbackNameFromEmail(email: string) {
-		const local = email.split('@')[0] || email
-		const clean = local.replace(/[._-]+/g, ' ').trim()
-		if (!clean) return 'Member'
-		return clean
-			.split(/\s+/)
-			.filter(Boolean)
-			.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-			.join(' ')
-	}
-
-	function isTokenLikeName(value: string) {
-		const compact = value.replace(/\s+/g, '').toLowerCase()
-		if (!compact) return true
-		if (compact.length >= 10 && /^[a-f0-9]+$/.test(compact)) return true
-		if (compact.length >= 10 && /^[a-z0-9]+$/.test(compact) && /\d/.test(compact)) return true
-		return false
-	}
-
-	function safeInviteNameFromEmail(email: string) {
-		const name = fallbackNameFromEmail(email)
-		return isTokenLikeName(name) ? '' : name
-	}
-
-	function initials(name: string) {
-		const parts = name.split(/\s+/).filter(Boolean)
-		const a = parts[0]?.[0] ?? ''
-		let b = parts[1]?.[0] ?? ''
-		if (!b) {
-			const first = (parts[0] || name || '').trim()
-			b = first.length > 1 ? (first[1] || 'X') : 'X'
-		}
-		return `${a}${b}`.toUpperCase()
 	}
 
 	function isYou(user: MemberUser) {
@@ -163,16 +129,6 @@
 			return displayName(a).localeCompare(displayName(b))
 		})
 	})
-
-	function categoryBadgeText(label: string) {
-		const key = label.toLowerCase()
-		if (key.includes('gym')) return 'Gym Regular'
-		if (key.includes('movie')) return 'Movie Buff'
-		if (key.includes('adventure') || key.includes('hike')) return 'Explorer'
-		if (key.includes('circus')) return 'Acrobat'
-		if (key.includes('social')) return 'Social Butterfly'
-		return `${label} Regular`
-	}
 
 	function calculateStreak(userId: string) {
 		const userEvents = recentEventsSource
@@ -318,18 +274,6 @@
 		const order: Record<InviteStatus, number> = { pending: 0, expired: 1, exhausted: 2 }
 		return [...filtered].sort((a, b) => order[a.status] - order[b.status])
 	})
-
-	function statusIcon(status: InviteStatus) {
-		if (status === 'expired') return Hourglass
-		if (status === 'exhausted') return CircleDashed
-		return Ticket
-	}
-
-	function statusDotColor(status: InviteStatus) {
-		if (status === 'expired') return '#9ca3af'
-		if (status === 'exhausted') return '#d97706'
-		return '#a78bfa'
-	}
 
 	async function deleteAllExpired() {
 		const expired = inviteItems.filter((it) => it.status === 'expired')
@@ -488,10 +432,6 @@
 		}
 	}
 
-	function requestDeleteInvite(id: string | number) {
-		pendingDeleteInviteId = id
-	}
-
 	async function confirmDeleteInvite() {
 		const id = pendingDeleteInviteId
 		pendingDeleteInviteId = null
@@ -594,78 +534,19 @@
 			</div>
 		{/if}
 
-		<h4>INVITE LINKS{#if mockMode || members.loaded} ({inviteCounts.all}){/if}</h4>
-
-		{#if inviteCounts.all > 0}
-			<div class="social-crew__filters">
-				<button type="button" class="social-crew__chip" class:social-crew__chip--active={inviteFilter === 'all'} onclick={() => { inviteFilter = 'all' }}>All ({inviteCounts.all})</button>
-				<button type="button" class="social-crew__chip" class:social-crew__chip--active={inviteFilter === 'pending'} onclick={() => { inviteFilter = 'pending' }}>Pending ({inviteCounts.pending})</button>
-				<button type="button" class="social-crew__chip" class:social-crew__chip--active={inviteFilter === 'expired'} onclick={() => { inviteFilter = 'expired' }}>Expired ({inviteCounts.expired})</button>
-				<button type="button" class="social-crew__chip" class:social-crew__chip--active={inviteFilter === 'exhausted'} onclick={() => { inviteFilter = 'exhausted' }}>Exhausted ({inviteCounts.exhausted})</button>
-				{#if inviteCounts.expired > 0}
-					<button type="button" class="social-crew__bulk" onclick={() => { confirmBulkDelete = true }}>Delete {inviteCounts.expired} expired</button>
-				{/if}
-			</div>
-		{/if}
-
-		{#if confirmBulkDelete}
-			<div class="social-crew__notice">
-				<AdminInlineConfirm
-					question={`Delete all ${inviteCounts.expired} expired invite${inviteCounts.expired === 1 ? '' : 's'}?`}
-					confirmLabel="Yes, delete all"
-					onCancel={() => (confirmBulkDelete = false)}
-					onConfirm={() => void deleteAllExpired()}
-				/>
-			</div>
-		{/if}
-
-		{#if pendingDeleteInviteId !== null}
-			<div class="social-crew__notice">
-				<AdminInlineConfirm
-					question={`Delete invite${pendingInviteLabel(pendingDeleteInviteId)}?`}
-					confirmLabel="Yes, delete"
-					onCancel={() => (pendingDeleteInviteId = null)}
-					onConfirm={() => void confirmDeleteInvite()}
-				/>
-			</div>
-		{/if}
-
-		{#if !mockMode && !members.loaded}
-			<AdminLoadingText text="Loading invites…" />
-		{:else}
-			<AdminMetaCards
-				items={visibleInviteItems.map((invite) => ({
-					id: invite.id,
-					label: invite.label,
-					detail: invite.detail,
-					dotIcon: statusIcon(invite.status),
-					dotColor: statusDotColor(invite.status),
-					dimmed: invite.status === 'expired' || invite.status === 'exhausted',
-					actions: invite.status === 'pending' ? [
-						{
-							variant: 'subtle' as const,
-							icon: Copy,
-							ariaLabel: 'Copy invite link',
-							onclick: (): void => void copyInviteWithToast(invite.code)
-						},
-						{
-							variant: 'danger' as const,
-							icon: Trash2,
-							ariaLabel: 'Delete invite',
-							onclick: (): void => requestDeleteInvite(invite.id)
-						}
-					] : [
-						{
-							variant: 'danger' as const,
-							icon: Trash2,
-							ariaLabel: 'Delete invite',
-							onclick: (): void => requestDeleteInvite(invite.id)
-						}
-					]
-				}))}
-				emptyText={inviteFilter === 'all' ? 'No invites yet.' : `No ${inviteFilter} invites.`}
-			/>
-		{/if}
+		<CrewInvitesSection
+			bind:filter={inviteFilter}
+			counts={inviteCounts}
+			visibleItems={visibleInviteItems}
+			loaded={members.loaded}
+			{mockMode}
+			bind:confirmBulkOpen={confirmBulkDelete}
+			bind:pendingDeleteId={pendingDeleteInviteId}
+			pendingDeleteLabel={pendingInviteLabel(pendingDeleteInviteId)}
+			onDeleteAllExpired={() => void deleteAllExpired()}
+			onConfirmDelete={() => void confirmDeleteInvite()}
+			onCopy={(code) => void copyInviteWithToast(code)}
+		/>
 
 	</div>
 
@@ -727,64 +608,6 @@
 
 	.social-crew__list :global(.calendar-ui-card + .calendar-ui-card) {
 		border-top: 1px solid color-mix(in srgb, var(--admin-card-border) 60%, transparent);
-	}
-
-	.social-crew__filters {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-		margin: 0 0 0.85rem;
-		align-items: center;
-	}
-
-	.social-crew__chip {
-		appearance: none;
-		padding: 0.35rem 0.75rem;
-		border-radius: 999px;
-		border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
-		background: transparent;
-		color: color-mix(in srgb, var(--text) 65%, transparent);
-		font-size: 0.74rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: background 140ms, color 140ms, border-color 140ms;
-	}
-
-	.social-crew__chip:hover {
-		background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
-		color: var(--text);
-	}
-
-	.social-crew__chip--active {
-		background: color-mix(in srgb, var(--admin-accent) 14%, transparent);
-		border-color: color-mix(in srgb, var(--admin-accent) 36%, transparent);
-		color: color-mix(in srgb, var(--admin-accent) 86%, var(--text) 14%);
-	}
-
-	.social-crew__bulk {
-		appearance: none;
-		margin-left: auto;
-		padding: 0.35rem 0.75rem;
-		border-radius: 999px;
-		border: 1px solid color-mix(in srgb, var(--admin-danger-strong) 32%, transparent);
-		background: color-mix(in srgb, var(--admin-danger-strong) 8%, transparent);
-		color: color-mix(in srgb, var(--admin-danger-strong) 90%, var(--text) 10%);
-		font-size: 0.72rem;
-		font-weight: 600;
-		cursor: pointer;
-	}
-
-	.social-crew__bulk:hover {
-		background: color-mix(in srgb, var(--admin-danger-strong) 14%, transparent);
-	}
-
-	.social-crew__notice {
-		margin: 0 0 1rem;
-		padding: 0.65rem 0.85rem;
-		border-radius: 0.875rem;
-		background: color-mix(in srgb, var(--admin-danger-soft) 4%, transparent);
-		border: 1px solid color-mix(in srgb, var(--admin-danger-soft) 14%, transparent);
-		font-size: 0.82rem;
 	}
 
 </style>

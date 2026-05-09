@@ -43,6 +43,7 @@ const CalendarAdminUserSchema = z.object({
   name: z.union([z.string(), z.null()]),
   avatar_url: z.union([z.string(), z.null()]),
   email_verified: z.union([z.number(), z.boolean()]),
+  created_at: z.union([z.number(), z.null()]).optional(),
   last_login_at: z.union([z.number(), z.null()]),
   provider: z.union([z.string(), z.null()]),
 });

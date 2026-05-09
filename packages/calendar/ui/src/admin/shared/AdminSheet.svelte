@@ -93,7 +93,10 @@
 	.admin-sheet {
 		position: fixed;
 		inset: 0;
-		background: color-mix(in srgb, var(--text) 30%, transparent);
+		/* Solid black scrim — dims toward black in both themes. Matches
+		 * ConfirmModal so the two primitives read as design-system siblings
+		 * (color-mix with --text drifts to washed-out in dark mode). */
+		background: rgba(0, 0, 0, 0.5);
 		backdrop-filter: blur(2px);
 		display: flex;
 		align-items: center;
@@ -113,7 +116,9 @@
 		background: var(--admin-card-bg);
 		border: 1px solid var(--admin-card-border);
 		border-radius: 0.875rem;
-		box-shadow: 0 24px 60px -18px color-mix(in srgb, black 36%, transparent);
+		/* Drop shadow matches ConfirmModal so both primitives elevate the
+		 * same way against the scrim. */
+		box-shadow: 0 24px 60px color-mix(in srgb, var(--text) 20%, transparent);
 		display: grid;
 		grid-template-rows: auto 1fr auto;
 		max-height: 90vh;

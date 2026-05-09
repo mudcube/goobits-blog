@@ -27,6 +27,9 @@ $admin-mobile-breakpoint: 768px;
   --admin-selected-bg: color-mix(in srgb, var(--text) 11%, var(--bg) 89%);
   --admin-focus-ring: color-mix(in srgb, #0a84ff 52%, transparent);
   --admin-accent: color-mix(in srgb, var(--link) 72%, #7a5af8 28%);
+  /* Secondary brand accent — pink companion to --admin-accent (purple).
+   * Used for atmospheric backdrops and dual-tone gradients. */
+  --admin-accent-secondary: #f0abfc;
   --admin-content-max: 720px;
   --admin-content-pad-x: clamp(1.5rem, 2.2vw, 2rem);
   --admin-card-bg: color-mix(in srgb, var(--admin-accent) 6%, var(--bg) 94%);
@@ -565,25 +568,40 @@ $admin-mobile-breakpoint: 768px;
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  gap: 0.35rem;
+  gap: 0.4rem;
   min-width: 0;
   overflow: hidden;
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   margin-left: var(--admin-breadcrumb-offset);
 }
 
-.social-admin__breadcrumbs-body > a {
-  color: var(--admin-hover-fg);
-  text-decoration: none;
+.social-admin__breadcrumbs-body > a,
+.social-admin__breadcrumbs-body .social-admin__crumb-current {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.social-admin__breadcrumbs-body span {
+.social-admin__breadcrumbs-body > a {
   color: var(--admin-muted);
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+
+.social-admin__breadcrumbs-body > a:hover {
+  color: var(--admin-hover-fg);
+}
+
+.social-admin__breadcrumbs-body .social-admin__crumb-current {
+  color: var(--text);
+  font-weight: 600;
+  max-width: 22ch;
 }
 
 .social-admin__breadcrumbs-body .social-admin__crumb-sep {
   color: var(--admin-muted);
-  opacity: 0.65;
+  opacity: 0.55;
+  flex-shrink: 0;
 }
 
 .social-admin__breadcrumbs-actions {

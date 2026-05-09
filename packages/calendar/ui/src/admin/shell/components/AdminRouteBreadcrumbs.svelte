@@ -9,10 +9,10 @@
 		{#if item.href && i < items.length - 1}
 			<a href={item.href}>{item.label}</a>
 		{:else}
-			<span>{item.label}</span>
+			<span class="social-admin__crumb-current" aria-current={i === items.length - 1 ? 'page' : undefined}>{item.label}</span>
 		{/if}
 		{#if i < items.length - 1}
-			<span class="social-admin__crumb-sep">&rsaquo;</span>
+			<span class="social-admin__crumb-sep" aria-hidden="true">&rsaquo;</span>
 		{/if}
 	{/each}
 </div>

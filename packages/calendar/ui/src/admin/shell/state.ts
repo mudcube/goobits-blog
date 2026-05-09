@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store'
 
-export const adminEventDetailBreadcrumb = writable<string | null>(null)
+export const adminDetailCrumbLabel = writable<string | null>(null)
 
 export type AdminInviteAnchorRect = {
 	left: number

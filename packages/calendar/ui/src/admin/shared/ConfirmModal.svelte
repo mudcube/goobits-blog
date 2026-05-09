@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition'
+	import { tick } from 'svelte'
 
 	type Props = {
 		open: boolean
@@ -31,18 +32,75 @@
 		onConfirm
 	}: Props = $props()
 
-	const titleId = `admin-confirm-${Math.random().toString(36).slice(2, 9)}`
+	const titleId = `admin-confirm-${
+		typeof crypto !== 'undefined' && 'randomUUID' in crypto
+			? crypto.randomUUID().slice(0, 8)
+			: Math.random().toString(36).slice(2, 10)
+	}`
 	const bodyId = `${titleId}-body`
+
+	let dialogEl: HTMLDivElement | undefined = $state()
+	let cancelBtn: HTMLButtonElement | undefined = $state()
+	let triggerEl: HTMLElement | null = null
+	let prevBodyOverflow = ''
+
+	$effect(() => {
+		if (open) {
+			// Capture the element that opened us so we can restore focus on close.
+			triggerEl = (document.activeElement as HTMLElement) ?? null
+			// Lock body scroll while modal is up. Restore exact previous value
+			// rather than '' so theme stylesheets that set their own overflow
+			// don't get clobbered.
+			prevBodyOverflow = document.body.style.overflow
+			document.body.style.overflow = 'hidden'
+			// Default focus to Cancel — destructive confirms shouldn't make
+			// it possible to confirm by accident with Enter.
+			void tick().then(() => cancelBtn?.focus())
+		} else {
+			document.body.style.overflow = prevBodyOverflow
+			triggerEl?.focus?.()
+			triggerEl = null
+		}
+	})
+
+	function onKeydown(event: KeyboardEvent) {
+		if (!open) return
+		if (event.key === 'Escape') {
+			event.preventDefault()
+			if (!busy) onCancel()
+			return
+		}
+		if (event.key !== 'Tab' || !dialogEl) return
+		// Focus trap: keep Tab/Shift+Tab cycling inside the dialog.
+		const focusables = dialogEl.querySelectorAll<HTMLElement>(
+			'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+		)
+		if (focusables.length === 0) return
+		const first = focusables[0] as HTMLElement
+		const last = focusables[focusables.length - 1] as HTMLElement
+		const active = document.activeElement as HTMLElement | null
+		if (event.shiftKey && active === first) {
+			event.preventDefault()
+			last.focus()
+		} else if (!event.shiftKey && active === last) {
+			event.preventDefault()
+			first.focus()
+		}
+	}
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 {#if open}
 	<button
 		type="button"
 		class="admin-confirm-modal__scrim"
 		aria-label={cancelLabel}
+		tabindex="-1"
 		onclick={onCancel}
 	></button>
 	<div
+		bind:this={dialogEl}
 		class="admin-confirm-modal"
 		class:admin-confirm-modal--content={align === 'content'}
 		role="alertdialog"
@@ -57,6 +115,7 @@
 		{/if}
 		<div class="admin-confirm-modal__actions">
 			<button
+				bind:this={cancelBtn}
 				type="button"
 				class="admin-confirm-modal__btn"
 				onclick={onCancel}
@@ -155,6 +214,11 @@
 
 	.admin-confirm-modal__btn:hover:not(:disabled) {
 		background: var(--admin-control-bg-hover, color-mix(in srgb, var(--text) 6%, transparent));
+	}
+
+	.admin-confirm-modal__btn:focus-visible {
+		outline: 2px solid color-mix(in srgb, var(--admin-accent) 60%, transparent);
+		outline-offset: 2px;
 	}
 
 	.admin-confirm-modal__btn:disabled {

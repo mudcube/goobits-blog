@@ -89,14 +89,15 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 	const crewDetailMatch = normalized.match(new RegExp(`^${adminBasePattern}/crew/([^/]+)$`))
 	if (crewDetailMatch) {
 		const userId = crewDetailMatch[1]!
+		const crumbLabel = options.detailLabel?.trim() || 'Member'
 		return {
 			kind: 'crew-detail',
 			currentSection: 'crew',
-			title: 'Crew',
+			title: crumbLabel,
 			breadcrumbs: [
 				...baseCrumbs,
 				{ label: 'Crew', href: hrefWithMock(`${adminBase}/crew/`) },
-				{ label: prettySegment(userId) }
+				{ label: crumbLabel }
 			],
 			actions: [],
 			userId
@@ -146,14 +147,15 @@ export function getAdminRoute(pathname: string, options: GetAdminRouteOptions = 
 	const eventDetailMatch = normalized.match(new RegExp(`^${adminBasePattern}/events/detail/([^/]+)$`))
 	if (eventDetailMatch) {
 		const eventId = eventDetailMatch[1]!
+		const crumbLabel = options.detailLabel?.trim() || 'Event'
 		return {
 			kind: 'event-detail',
 			currentSection: 'events',
-			title: 'Event',
+			title: crumbLabel,
 			breadcrumbs: [
 				...baseCrumbs,
 				{ label: 'Programs & Events', href: hrefWithMock(`${adminBase}/events/`) },
-				{ label: options.detailLabel?.trim() || 'Event Detail' }
+				{ label: crumbLabel }
 			],
 			actions: ['event-edit', 'event-cancel'],
 			eventId

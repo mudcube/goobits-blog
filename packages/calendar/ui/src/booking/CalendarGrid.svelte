@@ -133,15 +133,19 @@
 								{#if isFull}Full{:else}{cap.filled}/{cap.capacity}{/if}
 							</span>
 						</span>
-					{:else if day.isActive && !day.isPast && (day.dotCount ?? 0) >= 0}
+					{:else if day.isActive && !day.isPast && (day.dotCount ?? 0) > 0}
+						{@const visibleDots = Math.min(day.dotCount ?? 0, 3)}
 						<span
 							class={`cg__dots ${variant === 'member' ? 'member-calendar__event-dots' : ''}`.trim()}
 							style={day.dotColor ? `--member-calendar-dot-override:${day.dotColor};` : ''}
+							aria-label={`${day.dotCount} event${day.dotCount === 1 ? '' : 's'}`}
 						>
-							<span class={`cg__dot ${variant === 'member' ? 'member-calendar__event-dot' : ''}`.trim()} style={day.dotColor ? `background:${day.dotColor}` : ''}></span>
-							{#if (day.dotCount ?? 0) > 0}
-								<span class={`cg__dot cg__dot--secondary ${variant === 'member' ? 'member-calendar__event-dot' : ''}`.trim()}></span>
-							{/if}
+							{#each Array.from({ length: visibleDots }) as _, i (i)}
+								<span
+									class={`cg__dot ${day.dotColor ? '' : i > 0 ? 'cg__dot--secondary' : ''} ${variant === 'member' ? 'member-calendar__event-dot' : ''}`.trim()}
+									style={day.dotColor ? `background:${day.dotColor}` : ''}
+								></span>
+							{/each}
 						</span>
 					{/if}
 				</button>

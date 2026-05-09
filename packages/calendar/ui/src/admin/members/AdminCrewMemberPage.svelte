@@ -10,6 +10,7 @@
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { withAdminRoute } from '@calendar/ui/config'
+	import { adminDetailCrumbLabel } from '../shell/state'
 	import type { CalendarAdminUser } from '@calendar/ui/api/calendar'
 
 	const { data } = $props<{ data: { user: unknown | null; userId: string; bootstrap?: AdminBootstrap | null } }>()
@@ -26,7 +27,7 @@
 	const userId = $derived(data.userId)
 	const mockMode = $derived(isAdminMockMode($page.url))
 	const adminMockCatalog = getAdminMockCatalog()
-	type CrewMember = CalendarAdminUser & { role?: string; isSelf?: boolean; created_at?: number }
+	type CrewMember = CalendarAdminUser & { role?: string; isSelf?: boolean }
 	const users = $derived.by(() => (mockMode ? (adminMockCatalog.crewUsers as CrewMember[]) : (members.users as CrewMember[])))
 	const upcomingEvents = $derived((mockMode ? adminMockCatalog.dashboardEvents : dashboard.events))
 	const recentEvents = $derived((mockMode ? adminMockCatalog.dashboardRecentEvents : dashboard.recentEvents))
@@ -147,6 +148,12 @@
 			void dashboard.loadEvents()
 		}
 		void members.openAccess(userId)
+	})
+
+	$effect(() => {
+		const label = member ? memberName : null
+		adminDetailCrumbLabel.set(label)
+		return () => adminDetailCrumbLabel.set(null)
 	})
 </script>
 

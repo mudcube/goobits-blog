@@ -4,11 +4,14 @@ async function resolveInviteConsumeFailure(db: D1DatabaseLike, inviteId: number)
 	const invite = await db.prepare(
 		`SELECT uses_remaining, expires_at FROM calendar_invites WHERE id = ? LIMIT 1`
 	).bind(inviteId).first<{ uses_remaining: number | null; expires_at: number | null }>()
+	if (!invite) {
+		return { ok: false as const, reason: 'not_found' as const }
+	}
 	const now = Math.floor(Date.now() / 1000)
-	if (invite?.expires_at && now >= invite.expires_at) {
+	if (invite.expires_at && now >= invite.expires_at) {
 		return { ok: false as const, reason: 'expired' as const }
 	}
-	if (invite?.uses_remaining !== null && (invite?.uses_remaining ?? 0) <= 0) {
+	if (invite.uses_remaining !== null && invite.uses_remaining <= 0) {
 		return { ok: false as const, reason: 'exhausted' as const }
 	}
 	return { ok: false as const, reason: 'exhausted' as const }
