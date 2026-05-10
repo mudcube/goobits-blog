@@ -119,6 +119,15 @@ function paymentHandleFor(
 	return PAYMENT_PROVIDER_KEYS.includes(key) ? defaults.handles[key] : ''
 }
 
+/**
+ * Convert an `<input type="datetime-local">` value (e.g. "2026-05-09T14:00")
+ * to an ISO UTC string. Per ECMA-262, date-time strings without a TZ
+ * designator are parsed as LOCAL time, so calling `.toISOString()` produces
+ * the correct UTC equivalent for the user's browser timezone — i.e. an LA
+ * admin entering 2pm gets stored as 21:00Z, which renders back as 2pm in LA.
+ * Returns the original string unchanged when parsing fails so downstream
+ * validation can surface the error.
+ */
 function normalizeLocalDateTimeInput(value: string) {
 	const date = new Date(value)
 	return Number.isFinite(date.getTime()) ? date.toISOString() : value

@@ -1,6 +1,7 @@
 import type { D1DatabaseLike } from '../storage/d1.ts'
 import type { CalendarProgramSlug } from '../social/programs.ts'
 import { hasUserProgramAccess } from '../access/user-program-access.ts'
+import { addWeeksInVenueTime } from '../social/venue.ts'
 
 type EventRow = {
 	id: number
@@ -266,10 +267,11 @@ export async function createEventsBatch(
 	const repeat = Math.max(0, Math.min(24, input.repeatWeeks ?? 0))
 	const created: number[] = []
 	for (let i = 0; i <= repeat; i++) {
-		const start = new Date(input.startsAt)
-		const end = new Date(input.endsAt)
-		start.setUTCDate(start.getUTCDate() + i * 7)
-		end.setUTCDate(end.getUTCDate() + i * 7)
+		// DST-safe: previously used setUTCDate(+7*i), which drifted the venue
+		// wall clock by ±1 hour after spring-forward / fall-back. addWeeksInVenueTime
+		// preserves the venue-local clock across DST transitions.
+		const startsAt = addWeeksInVenueTime(input.startsAt, i)
+		const endsAt = addWeeksInVenueTime(input.endsAt, i)
 		const result = await db
 			.prepare(
 				`INSERT INTO calendar_events (
@@ -282,8 +284,8 @@ export async function createEventsBatch(
 			.bind(
 				input.activitySlug,
 				input.title,
-				start.toISOString(),
-				end.toISOString(),
+				startsAt,
+				endsAt,
 				input.capacity,
 				input.location ?? null,
 				input.note ?? null,

@@ -32,6 +32,7 @@ import {
 	listCalendarUsers
 } from './storage/d1.ts'
 import { toErrorResponse } from './utils/errors.ts'
+import { isoDay } from './utils/time.ts'
 import {
 	canBootstrapCalendarAdmin,
 	getCalendarAdminCount,
@@ -65,6 +66,7 @@ import {
 	type CalendarActivityDefinition
 } from './social/activities.ts'
 import { isKnownProgramSlug, isValidProgramSlug, type CalendarProgramSlug } from './social/programs.ts'
+import { VENUE_TIMEZONE, addWeeksInVenueTime } from './social/venue.ts'
 import { buildPaymentLink, type PaymentProvider } from './services/pay.ts'
 import {
 	loadCalendarMemberShellData,
@@ -283,6 +285,9 @@ export {
 	resetCalendarActivityCatalog,
 	isKnownProgramSlug,
 	isValidProgramSlug,
+	VENUE_TIMEZONE,
+	addWeeksInVenueTime,
+	isoDay,
 	buildPaymentLink,
 	loadCalendarMemberShellData,
 	loadCalendarMemberHomeData,

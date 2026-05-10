@@ -2,6 +2,7 @@ import type { CalendarActivityConfig } from '../social/activities.ts'
 import { isValidProgramSlug, type CalendarProgramSlug } from '../social/programs.ts'
 import type { D1DatabaseLike } from '../storage/d1.ts'
 import { getCalendarConfig } from '../config/calendar.ts'
+import { TransportValidationError } from '../transport/errors.ts'
 
 export type CalendarProgramState = CalendarActivityConfig & {
 	enabled: boolean
@@ -179,10 +180,28 @@ export async function upsertCalendarProgram(db: D1DatabaseLike, input: CalendarP
 	).run()
 }
 
+/**
+ * Refuses to delete a program that still has any events attached. Events
+ * carry `activity_slug` as plain TEXT (no FK to calendar_programs.slug), so
+ * deletion would silently orphan them. Cancelling/deleting the events first
+ * is an explicit admin choice — not a side effect of removing the program.
+ */
 export async function deleteCalendarProgram(db: D1DatabaseLike, slug: string) {
-	await db.prepare(
-		`DELETE FROM calendar_programs WHERE slug = ?`
-	).bind(slug).run()
+	const eventCount = await db
+		.prepare(
+			`SELECT COUNT(*) AS n FROM calendar_events
+			 WHERE activity_slug = ? AND status NOT IN ('cancelled', 'canceled')`
+		)
+		.bind(slug)
+		.first<{ n: number }>()
+	const n = eventCount?.n ?? 0
+	if (n > 0) {
+		throw new TransportValidationError(
+			`Program has ${n} event${n === 1 ? '' : 's'}. Cancel them first, then delete the program.`,
+			409
+		)
+	}
+	await db.prepare(`DELETE FROM calendar_programs WHERE slug = ?`).bind(slug).run()
 }
 
 export async function reorderCalendarPrograms(

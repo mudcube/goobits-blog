@@ -24,14 +24,10 @@ export async function GET(event: RequestEvent) {
       return apiError("Invalid OAuth callback request", { status: 400, code: "invalid_request" });
     }
 
-    const isAdminOauthState =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-        state,
-      );
-    if (!isAdminOauthState) {
-      return apiError("Invalid OAuth state", { status: 400, code: "invalid_state" });
-    }
-
+    // No format pre-check: consumeOauthState's DB lookup is the authoritative
+    // validation. A regex format guard adds no security (parameterized queries
+    // already block injection) and is a minor information leak about state
+    // shape. Trust the lookup.
     const env = await buildEnv(event.platform);
     const validState = await consumeOauthState({ db: env.DB, state });
     if (!validState) {

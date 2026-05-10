@@ -1,5 +1,12 @@
 import type { D1DatabaseLike } from '../storage/d1.ts'
 
+/**
+ * Diagnose why a counted-uses invite failed to consume. Caller is `consumeInvite`
+ * after its conditional UPDATE returned 0 changed rows; the failure must be one
+ * of: not-found, expired, or exhausted (those are the only branches the UPDATE
+ * filters out). The race between UPDATE-failure and this SELECT is benign: a
+ * concurrent deletion still resolves to a sensible error.
+ */
 async function resolveInviteConsumeFailure(db: D1DatabaseLike, inviteId: number) {
 	const invite = await db.prepare(
 		`SELECT uses_remaining, expires_at FROM calendar_invites WHERE id = ? LIMIT 1`
@@ -11,9 +18,8 @@ async function resolveInviteConsumeFailure(db: D1DatabaseLike, inviteId: number)
 	if (invite.expires_at && now >= invite.expires_at) {
 		return { ok: false as const, reason: 'expired' as const }
 	}
-	if (invite.uses_remaining !== null && invite.uses_remaining <= 0) {
-		return { ok: false as const, reason: 'exhausted' as const }
-	}
+	// Default to 'exhausted' — the only remaining UPDATE-filter is uses_remaining
+	// having gone to 0 between the row being fetched for validation and now.
 	return { ok: false as const, reason: 'exhausted' as const }
 }
 
