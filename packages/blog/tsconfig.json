@@ -1,17 +1,12 @@
 {
   "compilerOptions": {
-    // ===== STRICT TYPE CHECKING =====
+    // Strict checking. `strict: true` enables noImplicitAny / strictNullChecks
+    // / strictFunctionTypes / strictBindCallApply / strictPropertyInitialization
+    // / noImplicitThis / useUnknownInCatchVariables / alwaysStrict — those
+    // don't need to be re-listed.
     "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "useUnknownInCatchVariables": true,
-    "alwaysStrict": true,
 
-    // ===== ADDITIONAL STRICT CHECKS =====
+    // Stricter checks not implied by `strict`.
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "exactOptionalPropertyTypes": true,
@@ -21,37 +16,23 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
 
-    // ===== MODULE SETTINGS =====
+    // Module resolution. `moduleResolution: bundler` lets consumers'
+    // bundlers resolve our .ts source files; `isolatedModules` keeps
+    // each file independently compilable.
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "verbatimModuleSyntax": false,
-
-    // ===== EMIT SETTINGS =====
-    "noEmit": true,
-    "declaration": true,
-    "declarationMap": true,
-
-    // ===== OTHER SETTINGS =====
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
+    "resolveJsonModule": true,
 
-    // ===== PATH ALIASES =====
+    "noEmit": true,
+    "skipLibCheck": true,
+
     "paths": {
       "@blog/*": ["./__tests__/fixtures/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.svelte"
-  ],
-  "exclude": [
-    "node_modules",
-    ".svelte-kit",
-    "dist"
-  ]
+  "include": ["**/*.ts", "**/*.svelte"],
+  "exclude": ["node_modules", ".svelte-kit", "dist"]
 }
