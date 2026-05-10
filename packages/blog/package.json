@@ -23,28 +23,22 @@
       "svelte": "./src/ui/index.ts",
       "default": "./src/ui/index.ts"
     },
-    "./ui/*": {
-      "svelte": "./src/ui/*",
-      "default": "./src/ui/*"
-    },
     "./utils": {
       "types": "./src/utils/index.ts",
       "svelte": "./src/utils/index.ts",
       "default": "./src/utils/index.ts"
     },
-    "./utils/*": {
-      "types": "./src/utils/*",
-      "svelte": "./src/utils/*",
-      "default": "./src/utils/*"
+    "./utils/remark-table-of-contents": {
+      "types": "./src/utils/remark-table-of-contents.d.ts",
+      "default": "./src/utils/remark-table-of-contents.js"
+    },
+    "./utils/rehype-webp-picture": {
+      "default": "./src/utils/rehype-webp-picture.js"
     },
     "./config": {
       "types": "./src/config/index.ts",
       "svelte": "./src/config/index.ts",
       "default": "./src/config/index.ts"
-    },
-    "./config/*": {
-      "svelte": "./src/config/*",
-      "default": "./src/config/*"
     },
     "./config/defaults": {
       "types": "./src/config/defaults.ts",
@@ -55,10 +49,6 @@
       "types": "./src/handlers/index.ts",
       "svelte": "./src/handlers/index.ts",
       "default": "./src/handlers/index.ts"
-    },
-    "./handlers/*": {
-      "svelte": "./src/handlers/*",
-      "default": "./src/handlers/*"
     },
     "./i18n": {
       "types": "./src/i18n/index.ts",

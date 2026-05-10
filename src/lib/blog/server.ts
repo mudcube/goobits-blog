@@ -5,9 +5,9 @@ import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import { getAllPosts, type ProcessedPost } from '@goobits/blog/utils'
 import { getBlogConfig } from '@goobits/blog/config'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
-import { remarkTableOfContents } from '@goobits/blog/utils/remark-table-of-contents.js'
+import { remarkTableOfContents } from '@goobits/blog/utils/remark-table-of-contents'
 // @ts-expect-error -- JS rehype plugin, no type declarations
-import { rehypeWebpPicture } from '@goobits/blog/utils/rehype-webp-picture.js'
+import { rehypeWebpPicture } from '@goobits/blog/utils/rehype-webp-picture'
 import type { JournalMetadata, JournalPost } from '$lib/blog/viewmodel'
 
 const sanitizeSchema = {
