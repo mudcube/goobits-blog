@@ -70,7 +70,9 @@
     "src",
     "tsconfig.json",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md",
+    "UPGRADE.md"
   ],
   "license": "MIT",
   "type": "module",
