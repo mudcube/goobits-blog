@@ -2,4 +2,4 @@ export {
 	contactSchema,
 	getContactFormDefaults,
 	type ContactFormData
-} from './src/core/contact'
+} from './core/contact'

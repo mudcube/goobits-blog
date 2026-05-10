@@ -3,14 +3,14 @@ export {
 	createContactSuccessResponse,
 	parseContactRequest,
 	redirectForContactForm
-} from './src/server/api'
+} from './server/api'
 export {
 	deliverContactMessage,
 	type ContactDeliveryConfig,
 	type ContactDeliveryResult
-} from './src/server/deliver'
+} from './server/deliver'
 export {
 	submitContactMessage,
 	type ContactAntiAbuseResult,
 	type ContactSubmitResult
-} from './src/server/submit'
+} from './server/submit'
