@@ -4,7 +4,7 @@ import {
   parseAdminPaymentDefaultsInput,
   parseAdminProgramMutationInput,
   TransportValidationError,
-} from "../../src/index.ts";
+} from "../../src/transport.ts";
 
 describe("admin transport validation", () => {
   it("accepts valid program upsert payload", () => {
