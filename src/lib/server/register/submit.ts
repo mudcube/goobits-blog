@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { mergeRuntimeEnv, resolveBaseUrl, resolveRuntimeDb } from '$lib/server/runtime'
 import { runRegisterAntiAbuse } from '$lib/server/antiabuse'
-import { registerUser } from '$lib/server/calendar/auth/register'
+import { registerUser } from '@calendar/app'
 import { getAsn, getClientIp } from '$lib/server/request-meta'
 import type { RegisterFormData } from '@src/domains/register/schema'
 

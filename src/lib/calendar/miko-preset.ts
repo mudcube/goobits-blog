@@ -1,4 +1,17 @@
-import { configureCalendarActivityCatalog, configureCalendarConfig, type CalendarActivityDefinition } from '@calendar/core'
+/**
+ * Miko-specific calendar preset — site brand strings, route paths, ICS
+ * identity, and the activity catalog. Lives in `src/lib/` rather than
+ * `packages/calendar/presets/` because these are site-level decisions
+ * (miko.art brand, /schedule paths, miko-calendar UIDs); the calendar
+ * package is meant to be reusable, the preset is not.
+ *
+ * Loaded once at app startup via hooks.server.ts and +layout.ts.
+ */
+import {
+	configureCalendarActivityCatalog,
+	configureCalendarConfig,
+	type CalendarActivityDefinition
+} from '@calendar/core'
 
 export const mikoCalendarPreset = {
 	brand: {

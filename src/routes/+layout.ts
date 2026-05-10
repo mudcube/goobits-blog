@@ -1,4 +1,4 @@
-import { applyMikoCalendarPreset } from '@calendar/preset-miko'
+import { applyMikoCalendarPreset } from '$lib/calendar/miko-preset'
 import { configureAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 import {
 	mockCrewInvites,

@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 import { resolveRuntimeDb } from '$lib/server/runtime'
-import { consumeEmailVerificationToken } from '$lib/server/calendar/email/verification'
+import { consumeEmailVerificationToken } from '@calendar/app'
 import { getCalendarConfig } from '@calendar/core'
 
 export const GET: RequestHandler = async ({ url, platform }) => {
