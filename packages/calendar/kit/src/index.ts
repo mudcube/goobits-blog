@@ -6,16 +6,15 @@ import {
 	createCalendarSessionAdapter,
 	createCalendarUserAdapter
 } from './auth/calendar-adapters'
-import {
-	clearCalendarLoginContext,
-	getCalendarAuth,
-	getCalendarLoginContext,
-	getCalendarRedirect,
-	normalizeCalendarRedirect,
-	setCalendarLoginContext
-} from './auth/calendar'
 import { getDevDb } from './dev/devDb'
 import type { D1DatabaseLike, D1PreparedStatement, R2BucketLike, R2PutOptions } from './dev/types'
+
+// NOTE: Calendar-specific auth wiring (getCalendarAuth, login context, etc.)
+// used to live here but reaches into @calendar/core domain logic, which would
+// invert the desired core ← kit layering. It now lives in
+// @calendar/app/src/server/auth/calendar.ts where domain-aware auth setup
+// belongs. kit stays as cross-cutting infra (HTTP, runtime, dev shim, auth
+// adapters that only depend on @goobits/auth).
 
 export {
 	apiError,
@@ -31,12 +30,6 @@ export {
 	createCalendarAuthAdapters,
 	createCalendarSessionAdapter,
 	createCalendarUserAdapter,
-	getCalendarAuth,
-	getCalendarLoginContext,
-	getCalendarRedirect,
-	normalizeCalendarRedirect,
-	clearCalendarLoginContext,
-	setCalendarLoginContext,
 	getDevDb
 }
 

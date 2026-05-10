@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit'
-import { getCalendarRedirect } from '@calendar/kit'
+import { getCalendarRedirect } from '../../../../server/auth/calendar'
 import { getCalendarConfig } from '@calendar/core'
 import type { RequestHandler } from '@sveltejs/kit'
 

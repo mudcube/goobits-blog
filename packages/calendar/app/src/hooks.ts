@@ -1,9 +1,9 @@
 import { redirect } from '@sveltejs/kit'
 import type { Handle } from '@sveltejs/kit'
 import { building, dev } from '$app/environment'
-import { getCalendarAuth } from '@calendar/kit'
 import { getCalendarConfig, isCalendarAdmin, type CalendarConfigInput } from '@calendar/core'
 import { buildEnv } from '@calendar/kit'
+import { getCalendarAuth } from './server/auth/calendar'
 import { ensureCalendarProgramCatalog } from './server/runtime/calendar-program-catalog'
 import { ensureCalendarUserByEmail, setCalendarSessionCookie } from './server/auth/calendar-session'
 

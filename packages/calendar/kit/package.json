@@ -9,7 +9,6 @@
     "svelte": "^5.0.0"
   },
   "dependencies": {
-    "@calendar/core": "workspace:*",
     "@calendar/migrations": "workspace:*",
     "@goobits/auth": "workspace:*",
     "better-sqlite3": "^12.9.0"

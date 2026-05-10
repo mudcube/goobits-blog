@@ -1,4 +1,4 @@
-import { getCalendarAuth, setCalendarLoginContext } from '@calendar/kit'
+import { getCalendarAuth, setCalendarLoginContext } from '../../../server/auth/calendar'
 import {
 	buildCalendarLoginErrorPath,
 	getRedirectLocationFromError,

@@ -17,7 +17,9 @@ the domain layer."
 
 ## Layering
 
-`kit` should depend only on `@goobits/*` packages and `@sveltejs/kit` —
-**not** on `@calendar/core`. There's a documented inversion today
-(`kit/auth/calendar.ts` reaches into `core` for invite/config logic) which
-is on the cleanup list.
+`kit` depends only on `@goobits/*` packages, `@sveltejs/kit`, and
+`@calendar/migrations` — **not** on `@calendar/core`. Calendar-specific
+auth wiring (login context, invite-claim hook) used to live in
+`kit/auth/calendar.ts` but inverted that rule by importing core domain
+logic; it now lives in `@calendar/app/src/server/auth/calendar.ts` where
+domain-aware setup belongs.
