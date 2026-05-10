@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AdminBootstrap } from '@calendar/core'
+	import type { AdminBootstrap } from '@calendar/core/admin'
 import { goto } from '$app/navigation'
 import { page } from '$app/stores'
 import { withAdminRoute } from '@calendar/ui/config'

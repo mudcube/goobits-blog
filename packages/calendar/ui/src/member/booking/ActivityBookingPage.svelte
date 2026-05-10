@@ -1,7 +1,7 @@
 <script lang="ts">
 	import BookingCalendar from './BookingCalendar.svelte'
 	import CalendarPageHero from '../../primitives/CalendarPageHero.svelte'
-	import type { CalendarActivityConfig } from '@calendar/core'
+	import type { CalendarActivityConfig } from '@calendar/core/config'
 	import type { CalendarEventsResponse } from '../../api/calendar'
 
 	const {

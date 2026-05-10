@@ -2,7 +2,7 @@
 	import { Calendar, Apple, Mail, Download } from '@lucide/svelte'
 	import type { Person } from './types'
 	import { ft, formatDate } from './time'
-	import { getCalendarConfig } from '@calendar/core'
+	import { getCalendarConfig } from '@calendar/core/config'
 	import { onMount } from 'svelte'
 	import PaymentCheckout from '../member/booking/PaymentCheckout.svelte'
 

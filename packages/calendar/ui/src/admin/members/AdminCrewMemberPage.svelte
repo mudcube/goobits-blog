@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AdminBootstrap } from '@calendar/core'
+	import type { AdminBootstrap } from '@calendar/core/admin'
 	import { untrack } from 'svelte'
 	import { page } from '$app/stores'
 	import { handleUnauthorizedSessionError } from '@calendar/ui/routing/auth'

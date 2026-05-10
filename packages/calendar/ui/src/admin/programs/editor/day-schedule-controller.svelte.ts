@@ -36,7 +36,8 @@ type Options = {
 }
 
 // Re-export the canonical isoDay from @calendar/core; previously
-// duplicated locally before the consolidation.
+// duplicated locally before the consolidation. isoDay lives at the root
+// because it's a tiny utility that crosses every domain.
 import { isoDay } from '@calendar/core'
 export { isoDay }
 

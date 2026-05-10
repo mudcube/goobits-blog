@@ -1,4 +1,4 @@
-import type { AdminBootstrap } from '@calendar/core'
+import type { AdminBootstrap } from '@calendar/core/admin'
 import { DEFAULT_INVITE_DRAFT } from '../shared/admin'
 import {
 	createInviteShareLink,

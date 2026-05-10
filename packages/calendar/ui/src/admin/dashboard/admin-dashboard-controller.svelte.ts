@@ -1,4 +1,4 @@
-import type { AdminBootstrap } from '@calendar/core'
+import type { AdminBootstrap } from '@calendar/core/admin'
 import { createEventsController } from '../events/events-controller.svelte'
 import { createProgramsController } from '../programs/programs-controller.svelte'
 import { createSyncController } from '../settings/sync-controller.svelte'

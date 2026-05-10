@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AdminBootstrap } from '@calendar/core'
+	import type { AdminBootstrap } from '@calendar/core/admin'
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
