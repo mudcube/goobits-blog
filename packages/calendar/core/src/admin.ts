@@ -56,4 +56,4 @@ export {
 	getAdminPaymentDefaults,
 	setAdminPaymentDefaults,
 	type AdminPaymentDefaults
-} from './payments/admin-payment-defaults.ts'
+} from './services/payments/admin-payment-defaults.ts'

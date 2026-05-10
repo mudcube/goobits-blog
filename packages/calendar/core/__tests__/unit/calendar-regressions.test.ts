@@ -12,11 +12,11 @@ import {
   getPaymentCheckoutContext,
   savePayPalPaymentCredentials,
   saveSquarePaymentCredentials,
-} from "../../src/payments/checkout.ts";
+} from "../../src/services/payments/checkout.ts";
 import {
   getAdminPaymentDefaults,
   setAdminPaymentDefaults,
-} from "../../src/payments/admin-payment-defaults.ts";
+} from "../../src/services/payments/admin-payment-defaults.ts";
 import {
   enqueueCalendarSyncJob,
   processCalendarSyncQueue,

@@ -1,4 +1,4 @@
-import type { AdminPaymentDefaults } from '../payments/admin-payment-defaults.ts'
+import type { AdminPaymentDefaults } from '../services/payments/admin-payment-defaults.ts'
 import type { CalendarFeedEvent } from '../services/bookings/social.ts'
 import type { CalendarProgramState } from '../services/admin/programs.ts'
 

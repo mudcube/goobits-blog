@@ -144,7 +144,7 @@ import {
 	getAdminPaymentDefaults,
 	setAdminPaymentDefaults,
 	type AdminPaymentDefaults
-} from './payments/admin-payment-defaults.ts'
+} from './services/payments/admin-payment-defaults.ts'
 import {
 	capturePayPalCheckoutOrder,
 	createPayPalCheckoutOrder,
@@ -156,7 +156,7 @@ import {
 	saveSquarePaymentCredentials,
 	type CheckoutProvider,
 	type PaymentCheckoutContext
-} from './payments/checkout.ts'
+} from './services/payments/checkout.ts'
 import { listEventTemplates, type CalendarEventTemplate } from './events/event-templates.ts'
 import { promoteWaitlistedParticipant, type PromoteWaitlistResult } from './events/promote-waitlist.ts'
 import { getAdminEventDetail, type AdminEventDetail } from './events/event-detail.ts'
