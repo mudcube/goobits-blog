@@ -8,7 +8,7 @@
 	},
 	"dependencies": {
 		"@calendar/core": "workspace:*",
-		"@lucide/svelte": "^1.8.0",
+		"@lucide/svelte": "^1.14.0",
 		"zod": "^4.4.3"
 	}
 }
