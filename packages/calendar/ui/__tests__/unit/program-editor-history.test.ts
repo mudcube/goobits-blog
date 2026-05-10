@@ -34,7 +34,7 @@ function setup() {
 	return {
 		history,
 		getDraft: () => draft,
-		setField<K extends keyof ProgramDraft>(field: K, value: ProgramDraft[K]) {
+		setField: <K extends keyof ProgramDraft>(field: K, value: ProgramDraft[K]) => {
 			draft = { ...draft, [field]: value }
 		}
 	}

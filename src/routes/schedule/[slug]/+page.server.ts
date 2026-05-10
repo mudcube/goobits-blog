@@ -6,10 +6,9 @@ import { scheduleMockPrograms, scheduleMockRecent, scheduleMockUpcoming } from '
 import type { RequestEvent } from './$types'
 
 export async function load(event: RequestEvent) {
-	const mockMode = isScheduleDesignMode(event.url)
 	const slug = event.params.slug
 
-	if (mockMode) {
+	if (isScheduleDesignMode(event.url)) {
 		const activity = scheduleMockPrograms.find((program) => program.slug === slug)
 		if (!activity) throw error(404, 'Program not found')
 
@@ -25,15 +24,9 @@ export async function load(event: RequestEvent) {
 	const activity = await getCalendarProgramBySlug(env.DB, slug)
 	if (!activity) throw error(404, 'Program not found')
 
-	const rawUserId = event.locals.user?.id
-	const userId =
-		typeof rawUserId === 'string'
-			? rawUserId
-			: typeof rawUserId === 'number'
-				? String(rawUserId)
-				: ''
-
+	const userId = event.locals.user?.id ?? ''
 	const feed = userId ? await listEventsFeed(env.DB, userId, false) : { upcoming: [], recent: [] }
+
 	const upcoming = feed.upcoming
 		.filter((entry) => entry.activitySlug === activity.slug)
 		.map((entry) => ({

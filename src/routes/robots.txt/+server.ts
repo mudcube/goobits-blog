@@ -3,71 +3,56 @@ import { getBaseUrl, getPlatformEnv, resolveSiteOrigin } from '@goobits/sitemap/
 
 export const prerender = true
 
+const RULES = [
+	'Allow: /',
+	'Disallow: /admin',
+	'Disallow: /schedule/admin',
+	'Disallow: /api',
+	'Disallow: /dev',
+	'Disallow: /health'
+]
+
+// Generative Engine Optimization: explicitly name AI crawlers so the journal
+// and apps surfaces are discoverable by ChatGPT, Claude, Perplexity, and
+// friends. The Disallow list still applies to them.
+const AI_BOTS = [
+	'GPTBot',
+	'ChatGPT-User',
+	'OAI-SearchBot',
+	'ClaudeBot',
+	'Claude-Web',
+	'PerplexityBot',
+	'Perplexity-User',
+	'Google-Extended',
+	'GoogleOther',
+	'CCBot',
+	'Applebot-Extended',
+	'Amazonbot',
+	'Bytespider',
+	'Meta-ExternalAgent',
+	'FacebookBot',
+	'YouBot',
+	'cohere-ai',
+	'Diffbot'
+]
+
+const block = (userAgent: string) => [`User-agent: ${userAgent}`, ...RULES].join('\n')
+
 export const GET: RequestHandler = ({ platform, url }) => {
 	const baseUrl = getBaseUrl(getPlatformEnv(platform))
 	const origin = resolveSiteOrigin(baseUrl ? { baseUrl, requestUrl: url, fallbackOrigin: 'https://miko.art' } : { requestUrl: url, fallbackOrigin: 'https://miko.art' })
 
-	// Generative Engine Optimization: explicitly allow AI crawlers so the
-	// journal and apps surfaces are discoverable by ChatGPT, Claude,
-	// Perplexity, and friends. The Disallow list still applies to them.
-	const aiBots = [
-		'GPTBot',
-		'ChatGPT-User',
-		'OAI-SearchBot',
-		'ClaudeBot',
-		'Claude-Web',
-		'PerplexityBot',
-		'Perplexity-User',
-		'Google-Extended',
-		'GoogleOther',
-		'CCBot',
-		'Applebot-Extended',
-		'Amazonbot',
-		'Bytespider',
-		'Meta-ExternalAgent',
-		'FacebookBot',
-		'YouBot',
-		'cohere-ai',
-		'Diffbot'
-	]
-
-	const blocks: string[] = []
-
-	const defaultBlock = [
-		'User-agent: *',
-		'Allow: /',
-		'Disallow: /admin',
-		'Disallow: /schedule/admin',
-		'Disallow: /api',
-		'Disallow: /dev',
-		'Disallow: /health'
-	]
-	blocks.push(defaultBlock.join('\n'))
-
-	for (const bot of aiBots) {
-		const block = [
-			`User-agent: ${bot}`,
-			'Allow: /',
-			'Disallow: /admin',
-			'Disallow: /schedule/admin',
-			'Disallow: /api',
-			'Disallow: /dev',
-			'Disallow: /health'
-		]
-		blocks.push(block.join('\n'))
-	}
-
 	// `LLM-Content` and `LLM-Full-Content` are not standard robots.txt
-	// directives, so we keep them as comments — crawlers that recognize
-	// the convention still find them, and Lighthouse stops flagging them
-	// as unknown directives.
+	// directives, so we keep them as comments — crawlers that recognize the
+	// convention still find them, and Lighthouse stops flagging them as
+	// unknown directives.
 	const trailer = [
 		`Sitemap: ${origin}/sitemap.xml`,
 		`# LLM-Content: ${origin}/llms.txt`,
 		`# LLM-Full-Content: ${origin}/llms-full.txt`
-	]
+	].join('\n')
 
-	const robots = [ ...blocks, trailer.join('\n') ].join('\n\n')
+	const robots = [block('*'), ...AI_BOTS.map(block), trailer].join('\n\n')
 
 	return new Response(robots, {
 		headers: {
