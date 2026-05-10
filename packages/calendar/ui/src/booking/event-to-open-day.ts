@@ -31,9 +31,15 @@ export function eventToOpenDay(
 
 	const days: OpenDay[] = []
 	for (const [dateStr, dayEvents] of byDate) {
-		const first = dayEvents[0]!
-		const windowStart = venueDecimalHour(first.startsAt)
-		const windowEnd = venueDecimalHour(first.endsAt)
+		// Span the full booking window across all events for the day so days
+		// with multiple sessions show the full availability, not just the
+		// first session's window.
+		let windowStart = Infinity
+		let windowEnd = -Infinity
+		for (const ev of dayEvents) {
+			windowStart = Math.min(windowStart, venueDecimalHour(ev.startsAt))
+			windowEnd = Math.max(windowEnd, venueDecimalHour(ev.endsAt))
+		}
 
 		const bookings: Person[] = []
 		for (const ev of dayEvents) {
@@ -47,6 +53,7 @@ export function eventToOpenDay(
 			}
 		}
 
+		const first = dayEvents[0]!
 		days.push({
 			date: venueDayDate(dateStr),
 			eventId: first.id,

@@ -48,19 +48,26 @@ export const GET: RequestHandler = async ({ params }) => {
 	const categories = (fm.categories ?? (fm.category ? [fm.category] : [])) as string[]
 	const tags = (fm.tags ?? []) as string[]
 
+	// YAML double-quoted strings need both backslash and double-quote
+	// escapes; raw newlines also break the quoting. Convert CR/LF to \n
+	// escape sequences and escape backslashes first so the quoting stays
+	// valid for any title/excerpt content.
+	const yamlString = (value: string) =>
+		`"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r?\n/g, '\\n')}"`
+
 	const frontmatter = [
 		'---',
-		`title: "${title.replace(/"/g, '\\"')}"`,
+		`title: ${yamlString(title)}`,
 		date ? `date: "${date}"` : '',
 		`url: "${url}"`,
-		`author: "${SITE_AUTHOR}"`,
+		`author: ${yamlString(SITE_AUTHOR)}`,
 		categories.length > 0
-			? `categories: [${categories.map(c => `"${formatLabel(c)}"`).join(', ')}]`
+			? `categories: [${categories.map(c => yamlString(formatLabel(c))).join(', ')}]`
 			: '',
 		tags.length > 0
-			? `tags: [${tags.map(t => `"${formatLabel(t)}"`).join(', ')}]`
+			? `tags: [${tags.map(t => yamlString(formatLabel(t))).join(', ')}]`
 			: '',
-		fm.excerpt ? `excerpt: "${fm.excerpt.replace(/"/g, '\\"')}"` : '',
+		fm.excerpt ? `excerpt: ${yamlString(fm.excerpt)}` : '',
 		'---',
 		''
 	].filter(Boolean).join('\n')

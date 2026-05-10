@@ -1,17 +1,11 @@
 /**
  * Pure helpers for the Crew page — string normalization, name derivation,
- * category badge mapping, and invite-status presentation. Extracted so
- * AdminCrewPage stays focused on orchestration.
+ * category badge mapping, and invite-status types. Kept icon-free so this
+ * module can be unit-tested without a Svelte/lucide loader. The matching
+ * Lucide icon lookup lives in `./crew-status-icons.ts`.
  */
-import { CircleDashed, Hourglass, Ticket, type Icon as LucideIcon } from '@lucide/svelte'
 
 export type InviteStatus = 'pending' | 'expired' | 'exhausted'
-
-export function statusIcon(status: InviteStatus): typeof LucideIcon {
-	if (status === 'expired') return Hourglass
-	if (status === 'exhausted') return CircleDashed
-	return Ticket
-}
 
 export function statusDotColor(status: InviteStatus): string {
 	if (status === 'expired') return '#9ca3af'
@@ -24,7 +18,7 @@ export function normalizeName(value: unknown): string {
 }
 
 export function fallbackNameFromEmail(email: string): string {
-	const local = email.split('@')[0] || email
+	const local = email.split('@')[0] ?? ''
 	const clean = local.replace(/[._-]+/g, ' ').trim()
 	if (!clean) return 'Member'
 	return clean
