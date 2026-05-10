@@ -57,6 +57,14 @@ If you genuinely need to import a single internal file by path, you
 can still do so — the source is laid out the same way under `src/`,
 but it's no longer part of the published `exports` surface.
 
+### Added
+
+- `DeepPartial<T>` type and a `DeepPartial<BlogConfig>` parameter type
+  for `initBlogConfig`. Callers can now provide a deeply-nested
+  override object (e.g. `{ posts: { contentBasePath: '...' } }`)
+  without re-stating the full `PostsConfig` shape and without an
+  `as unknown as Partial<BlogConfig>` cast.
+
 ### Changed
 
 - Markdown post-processing: anchor `rel` now includes
@@ -68,6 +76,10 @@ but it's no longer part of the published `exports` surface.
   containing `&` previously produced invalid feeds).
 - Slugify NFKD-folds diacritics and expands `&` → `and` (resolves
   `Q&A` vs `QA` collisions).
+- `initBlogConfig` parameter type relaxed from `Partial<BlogConfig>`
+  to `DeepPartial<BlogConfig>`. Existing callers passing top-level
+  partials still type-check; deeply-nested partials no longer need
+  a cast.
 
 ### Fixed
 

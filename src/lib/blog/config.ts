@@ -1,8 +1,8 @@
-import { initBlogConfig, type BlogConfig } from '@goobits/blog/config'
+import { initBlogConfig, type BlogConfig, type DeepPartial } from '@goobits/blog/config'
 
 let initialized = false
 
-const journalBlogConfig = {
+const journalBlogConfig: DeepPartial<BlogConfig> = {
 	name: 'Miko Journal',
 	appName: 'Miko',
 	description: 'Ideas, process, and notes from Miko.',
@@ -31,11 +31,7 @@ const journalBlogConfig = {
 		'zendala.app',
 		'beheremeow.app'
 	]
-// Cast: BlogConfig's nested types (PostsConfig, PaginationConfig, etc.) are
-// declared as required, but initBlogConfig accepts deeply-partial overrides.
-// Until the blog package exposes a DeepPartial<BlogConfig>, this site-level
-// override needs the cast.
-} as unknown as Partial<BlogConfig>
+}
 
 export function ensureJournalBlogConfig() {
 	if (initialized) return

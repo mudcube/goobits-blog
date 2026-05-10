@@ -12,6 +12,24 @@ import { loadCategoryDescriptions as loadDefaultCategoryDescriptions } from '../
 export { defaultMessages } from './defaultMessages.js'
 export type { BlogConfig, GlobImportRecord } from './defaults.js'
 
+/**
+ * Recursive Partial — every property at every depth becomes optional.
+ * Functions and arrays are kept as-is (Partial<T> on a function would
+ * make calling it impossible; Partial<T> on an array would let you
+ * pass tuples with `undefined` slots).
+ *
+ * Used as the input type for `initBlogConfig` so callers can override
+ * any subset of nested config keys without re-stating the full shape.
+ */
+export type DeepPartial<T> =
+	T extends (...args: never[]) => unknown
+		? T
+		: T extends readonly (infer U)[]
+			? readonly U[]
+			: T extends object
+				? { [K in keyof T]?: DeepPartial<T[K]> }
+				: T
+
 const logger = createLogger('Config')
 
 /** Function type for getting blog post files */
@@ -59,7 +77,7 @@ const customFunctions: CustomFunctions = {
  * @returns Merged configuration
  */
 export function initBlogConfig(
-	userConfig: Partial<BlogConfig> = {},
+	userConfig: DeepPartial<BlogConfig> = {},
 	options: InitBlogConfigOptions = {}
 ): BlogConfig {
 	// Store functions separately
