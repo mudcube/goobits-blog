@@ -1,13 +1,12 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
+import { joinEvent } from '@calendar/core/booking'
+import { enqueueCalendarSyncJob, processCalendarSyncQueue } from '@calendar/core/sync'
 import {
-	enqueueCalendarSyncJob,
-	joinEvent,
 	parseCalendarJoinEventInput,
 	parsePositiveInteger,
-	processCalendarSyncQueue,
 	TransportValidationError
-} from '@calendar/core'
+} from '@calendar/core/transport'
 import { apiError, apiOk, apiValidationError, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
 

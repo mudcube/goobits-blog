@@ -1,14 +1,9 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { buildEnv, apiError, logApiError } from "@calendar/kit";
-import {
-  consumeOauthState,
-  exchangeGoogleCode,
-  exchangeOutlookCode,
-  getCalendarConfig,
-  requireEnv,
-  saveConnection,
-  setActiveCalendarSyncProvider,
-} from "@calendar/core";
+import { exchangeGoogleCode, exchangeOutlookCode } from "@calendar/core/providers";
+import { consumeOauthState, saveConnection } from "@calendar/core/storage";
+import { setActiveCalendarSyncProvider } from "@calendar/core/sync";
+import { getCalendarConfig, requireEnv } from "@calendar/core/config";
 
 function withAdminSettingsRedirect(url: URL) {
   const adminBase = getCalendarConfig().routes.adminBase.replace(/\/$/, "");

@@ -1,7 +1,5 @@
-import {
-	getSlotAvailability,
-	TransportValidationError
-} from '@calendar/core'
+import { getSlotAvailability } from '@calendar/core/booking'
+import { TransportValidationError } from '@calendar/core/transport'
 import { apiError, apiOk, apiValidationError, buildEnv } from '@calendar/kit'
 import type { RequestEvent } from '@sveltejs/kit'
 
@@ -22,7 +20,7 @@ export async function GET(event: RequestEvent) {
 			return apiError('Missing activity parameter', { status: 400, code: 'missing_activity' })
 		}
 
-		const { hasUserProgramAccess } = await import('@calendar/core')
+		const { hasUserProgramAccess } = await import('@calendar/core/invites')
 		const hasAccess = await hasUserProgramAccess(env.DB, String(user.id), activitySlug)
 		if (!hasAccess) {
 			return apiError('Access denied for this program', { status: 403, code: 'forbidden' })

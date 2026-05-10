@@ -13,7 +13,7 @@ export {
 	deleteInvite,
 	deleteInviteByCode,
 	hasUserRedeemedAnyInvite
-} from './calendar/invites.ts'
+} from './services/invites/invites.ts'
 
 export {
 	listUserProgramAccess,

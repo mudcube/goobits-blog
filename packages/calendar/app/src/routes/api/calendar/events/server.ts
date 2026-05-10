@@ -1,6 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { buildPaymentLink, listEventsFeed } from '@calendar/core'
+import { listEventsFeed } from '@calendar/core/booking'
+import { buildPaymentLink } from '@calendar/core/payments'
 import { apiOk, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 
 export async function GET(event: RequestEvent) {

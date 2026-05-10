@@ -1,11 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import {
-	createPayPalCheckoutOrder,
-	getPaymentCheckoutContext,
-	parsePositiveInteger,
-	TransportValidationError
-} from '@calendar/core'
+import { createPayPalCheckoutOrder, getPaymentCheckoutContext } from '@calendar/core/payments'
+import { parsePositiveInteger, TransportValidationError } from '@calendar/core/transport'
 import { apiError, apiOk, apiValidationError, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
 

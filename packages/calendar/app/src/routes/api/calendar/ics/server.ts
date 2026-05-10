@@ -1,6 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { getCalendarConfig, listUpcomingEvents } from '@calendar/core'
+import { getCalendarConfig } from '@calendar/core/config'
+import { listUpcomingEvents } from '@calendar/core/booking'
 import { requireCalendarUserId } from '@calendar/kit'
 
 function escapeIcsText(value: string) {

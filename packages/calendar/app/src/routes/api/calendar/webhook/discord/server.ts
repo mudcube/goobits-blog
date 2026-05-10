@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
-import { parseDiscordWebhookTextInput, TransportValidationError } from '@calendar/core'
+import { parseDiscordWebhookTextInput, TransportValidationError } from '@calendar/core/transport'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
 
 export async function POST(event: RequestEvent) {

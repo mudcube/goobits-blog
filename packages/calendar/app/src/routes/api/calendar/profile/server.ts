@@ -1,6 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { getCalendarProfile, parseCalendarProfileInput, saveCalendarProfile, TransportValidationError } from '@calendar/core'
+import { getCalendarProfile, saveCalendarProfile } from '@calendar/core/booking'
+import { parseCalendarProfileInput, TransportValidationError } from '@calendar/core/transport'
 import { apiOk, apiValidationError, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
 

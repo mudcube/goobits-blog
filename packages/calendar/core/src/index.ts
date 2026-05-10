@@ -132,7 +132,7 @@ import {
 	deleteInvite,
 	deleteInviteByCode,
 	hasUserRedeemedAnyInvite
-} from './calendar/invites.ts'
+} from './services/invites/invites.ts'
 import {
 	listUserProgramAccess,
 	setUserProgramAccess,

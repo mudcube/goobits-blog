@@ -1,4 +1,4 @@
-import type { D1DatabaseLike } from '../storage/d1.ts'
+import type { D1DatabaseLike } from '../../storage/d1.ts'
 
 /**
  * Diagnose why a counted-uses invite failed to consume. Caller is `consumeInvite`
