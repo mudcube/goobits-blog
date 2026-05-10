@@ -4,7 +4,7 @@
 		top: var(--spacing-xxlarge, 4rem);
 		overflow: hidden;
 
-		@media (max-width: 767px) {
+		@media (max-width: 48em) {
 			width: 100%;
 		}
 	}

@@ -24,7 +24,7 @@
 		&--compact &-layout {
 			flex-direction: row;
 
-			@media (max-width: 640px) {
+			@media (max-width: 40em) {
 				flex-direction: column;
 			}
 		}
@@ -38,7 +38,7 @@
 			min-width: 30%;
 			margin-top: 1rem;
 
-			@media (max-width: 640px) {
+			@media (max-width: 40em) {
 				width: 100%;
 				margin-top: 1rem;
 			}
@@ -163,7 +163,7 @@
 			font-weight: 600;
 			font-size: 1.25rem;
 
-			@media (min-width: 768px) {
+			@media (min-width: 48em) {
 				font-size: 1.5rem;
 			}
 		}
@@ -171,7 +171,7 @@
 		&--compact &-title {
 			font-size: 1.125rem;
 
-			@media (min-width: 768px) {
+			@media (min-width: 48em) {
 				font-size: 1.25rem;
 			}
 		}

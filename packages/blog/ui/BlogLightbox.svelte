@@ -200,6 +200,16 @@
 </dialog>
 
 <style>
+	/*
+	 * Theme contract: override these custom properties from a host stylesheet to
+	 * reskin the lightbox without forking the component.
+	 *   --blog-lightbox-overlay         backdrop fill   (default rgba(6,14,32,0.92))
+	 *   --blog-lightbox-accent          accent color    (default #4cd7f6)
+	 *   --blog-lightbox-text            primary text    (default #dee5ff)
+	 *   --blog-lightbox-muted           muted text      (default #9baad6)
+	 *   --blog-lightbox-control-bg      control fill    (default rgba(23,43,84,0.6))
+	 *   --blog-lightbox-control-hover   control hover   (default rgba(76,215,246,0.2))
+	 */
 	.blog-lightbox {
 		--blog-lightbox-overlay: rgba(6, 14, 32, 0.92);
 		--blog-lightbox-accent: #4cd7f6;
@@ -351,7 +361,7 @@
 		white-space: nowrap;
 	}
 
-	@media (max-width: 640px) {
+	@media (max-width: 40em) {
 		.blog-lightbox__frame {
 			grid-template-columns: 1fr;
 			grid-template-rows: 1fr auto;

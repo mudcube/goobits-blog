@@ -388,7 +388,8 @@
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 960px) {
+/* 60em (≈960px): preserves the wide-screen archive grid until between md (48em) and lg (64em). */
+@media (max-width: 60em) {
 	.miko-blog__thead {
 		display: none;
 	}

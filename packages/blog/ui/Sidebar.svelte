@@ -47,67 +47,48 @@
 	const categories = $derived.by(() => getAllCategories(posts, maxCategories))
 	const tags = $derived.by(() => getAllTags(posts, maxTags))
 
-	// Use the active tag/category directly from props
-	// No need for complex URL parsing since the server already provides the correct values
+	const tagsSection = $derived.by(() => ({
+		key: 'tags',
+		heading: getMessage('tags', 'Tags'),
+		items: tags,
+		currentItem: activeTag,
+		type: 'tags',
+		baseUrl: `${blogConfig.uri}/tag`,
+		showHashtag: true,
+		className: 'goo__sidebar-tags'
+	}))
+
+	const categoriesSection = $derived.by(() => ({
+		key: 'categories',
+		heading: getMessage('categories', 'Categories'),
+		items: categories,
+		currentItem: activeCategory,
+		type: 'categories',
+		baseUrl: `${blogConfig.uri}/category`,
+		showHashtag: false,
+		className: 'goo__sidebar-categories'
+	}))
+
+	// Tag pages lead with tags; everywhere else leads with categories.
+	const sections = $derived.by(() =>
+		activeTag ? [tagsSection, categoriesSection] : [categoriesSection, tagsSection]
+	)
 </script>
 
-{#if activeTag}
-	<!-- Popular tags first when viewing a tag page -->
-	<h2 class="goo__sidebar-heading">{getMessage('tags', 'Tags')}</h2>
+{#each sections as section (section.key)}
+	<h2 class="goo__sidebar-heading">{section.heading}</h2>
 	<TagsCategories
-			items={tags}
-			currentItem={activeTag}
-			type="tags"
-			baseUrl={`${blogConfig.uri}/tag`}
+			items={section.items}
+			currentItem={section.currentItem}
+			type={section.type}
+			baseUrl={section.baseUrl}
 			variant="sidebar"
-			showHashtag={true}
-			className="goo__sidebar-tags"
+			showHashtag={section.showHashtag}
+			className={section.className}
 			{messages}
 			{locale}
 	/>
-
-	<!-- Categories -->
-	<h2 class="goo__sidebar-heading">{getMessage('categories', 'Categories')}</h2>
-	<TagsCategories
-			items={categories}
-			currentItem={activeCategory}
-			type="categories"
-			baseUrl={`${blogConfig.uri}/category`}
-			variant="sidebar"
-			showHashtag={false}
-			className="goo__sidebar-categories"
-			{messages}
-			{locale}
-	/>
-{:else}
-	<!-- Categories first on other pages -->
-	<h2 class="goo__sidebar-heading">{getMessage('categories', 'Categories')}</h2>
-	<TagsCategories
-			items={categories}
-			currentItem={activeCategory}
-			type="categories"
-			baseUrl={`${blogConfig.uri}/category`}
-			variant="sidebar"
-			showHashtag={false}
-			className="goo__sidebar-categories"
-			{messages}
-			{locale}
-	/>
-
-	<!-- Popular tags -->
-	<h2 class="goo__sidebar-heading">{getMessage('tags', 'Tags')}</h2>
-	<TagsCategories
-			items={tags}
-			currentItem={activeTag}
-			type="tags"
-			baseUrl={`${blogConfig.uri}/tag`}
-			variant="sidebar"
-			showHashtag={true}
-			className="goo__sidebar-tags"
-			{messages}
-			{locale}
-	/>
-{/if}
+{/each}
 
 <!-- RSS Feed Link -->
 <div class="goo__sidebar-rss-container">

@@ -85,24 +85,26 @@ export function createBlogPageLoad(options: BlogPageLoadOptions = {}): (params: 
 	const log = customLogger || logger
 
 	return async function load({ data }: ClientLoadParams): Promise<ClientLoadResult> {
-		// If this is a blog post, try to load the content
+		// If this is a blog post, try to load the content. The server load has already
+		// supplied metadata; this enhances with the rendered component when available
+		// and falls back to null on error so the page can still render.
 		let postContent: unknown = null
 
-			if (data.pageType === 'post' && data.post?.path) {
-				log.log('[ClientLoad] Attempting to load blog post content from path:', data.post.path)
-				try {
-					postContent = await loadPostContent({
-						path: data.post.path,
-						data,
-						logger: log
-					})
-					if (postContent !== null && postContent !== undefined) {
-						log.log('[ClientLoad] Successfully loaded blog post content')
-					} else {
-						log.log('[ClientLoad] Post content loader returned no content')
-					}
-				} catch (error) {
-					log.error('[ClientLoad] Error loading blog post content during prerendering:', error)
+		if (data.pageType === 'post' && data.post?.path) {
+			log.log('[ClientLoad] Attempting to load blog post content from path:', data.post.path)
+			try {
+				postContent = await loadPostContent({
+					path: data.post.path,
+					data,
+					logger: log
+				})
+				if (postContent !== null && postContent !== undefined) {
+					log.log('[ClientLoad] Successfully loaded blog post content')
+				} else {
+					log.log('[ClientLoad] Post content loader returned no content')
+				}
+			} catch (error) {
+				log.error('[ClientLoad] Error loading blog post content during prerendering:', error)
 			}
 		} else {
 			log.log('[ClientLoad] Not a post page or missing path:', {

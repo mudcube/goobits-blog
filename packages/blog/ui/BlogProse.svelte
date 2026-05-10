@@ -119,7 +119,7 @@
 		outline-offset: 2px;
 	}
 
-	@media (max-width: 480px) {
+	@media (max-width: 30em) {
 		.blog-prose {
 			--blog-gallery-min-tile: 140px;
 			--blog-gallery-gap: 0.5rem;

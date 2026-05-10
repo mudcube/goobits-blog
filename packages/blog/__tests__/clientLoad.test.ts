@@ -44,6 +44,26 @@ describe('createBlogPageLoad', () => {
 		expect(result.postContent).toBeNull()
 	})
 
+	it('returns null post content and logs when the loader throws', async () => {
+		const error = new Error('boom')
+		const loadPostContent = vi.fn().mockRejectedValue(error)
+		const log = { log: vi.fn(), error: vi.fn() }
+		const load = createBlogPageLoad({ loadPostContent, logger: log })
+
+		const result = await load({
+			data: {
+				pageType: 'post',
+				post: { path: '/throws/post.md' }
+			}
+		})
+
+		expect(result.postContent).toBeNull()
+		expect(log.error).toHaveBeenCalledWith(
+			'[ClientLoad] Error loading blog post content during prerendering:',
+			error
+		)
+	})
+
 	it('skips content loading for non-post pages', async () => {
 		const loadPostContent = vi.fn()
 		const load = createBlogPageLoad({ loadPostContent })

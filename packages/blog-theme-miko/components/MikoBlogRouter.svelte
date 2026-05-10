@@ -1,5 +1,5 @@
 <script>
-	import { BlogSEO } from '@goobits/blog'
+	import { BlogSEO } from '@goobits/blog/ui'
 	import MikoArchivePage from './MikoArchivePage.svelte'
 	import MikoEntryPage from './MikoEntryPage.svelte'
 	import '../styles/miko-theme.scss'
