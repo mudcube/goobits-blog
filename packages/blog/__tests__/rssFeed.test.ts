@@ -7,10 +7,10 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { generateRssFeed, type ProcessedPost, type RssFeedOptions } from '../utils/blogUtils.js'
+import { generateRssFeed, type ProcessedPost, type RssFeedOptions } from '../src/utils/blogUtils.js'
 
 // Mock the blog config
-vi.mock('../config/index.js', () => ({
+vi.mock('../src/config/index.js', () => ({
 	blogConfig: {
 		name: 'Test Blog',
 		description: 'A test blog description',

@@ -2,68 +2,68 @@
   "name": "@goobits/blog",
   "version": "1.2.0",
   "description": "Reusable blog components for Svelte 5 projects",
-  "main": "index.ts",
-  "svelte": "./index.ts",
-  "types": "./index.ts",
+  "main": "./src/index.ts",
+  "svelte": "./src/index.ts",
+  "types": "./src/index.ts",
   "publishConfig": {
     "access": "public"
   },
   "exports": {
     ".": {
-      "types": "./index.ts",
-      "svelte": "./index.ts",
-      "default": "./index.ts"
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./core": {
-      "types": "./core.ts",
-      "default": "./core.ts"
+      "types": "./src/core.ts",
+      "default": "./src/core.ts"
     },
     "./ui": {
-      "types": "./ui/index.ts",
-      "svelte": "./ui/index.ts",
-      "default": "./ui/index.ts"
+      "types": "./src/ui/index.ts",
+      "svelte": "./src/ui/index.ts",
+      "default": "./src/ui/index.ts"
     },
     "./ui/*": {
-      "svelte": "./ui/*",
-      "default": "./ui/*"
+      "svelte": "./src/ui/*",
+      "default": "./src/ui/*"
     },
     "./utils": {
-      "types": "./utils/index.ts",
-      "svelte": "./utils/index.ts",
-      "default": "./utils/index.ts"
+      "types": "./src/utils/index.ts",
+      "svelte": "./src/utils/index.ts",
+      "default": "./src/utils/index.ts"
     },
     "./utils/*": {
-      "types": "./utils/*",
-      "svelte": "./utils/*",
-      "default": "./utils/*"
+      "types": "./src/utils/*",
+      "svelte": "./src/utils/*",
+      "default": "./src/utils/*"
     },
     "./config": {
-      "types": "./config/index.ts",
-      "svelte": "./config/index.ts",
-      "default": "./config/index.ts"
+      "types": "./src/config/index.ts",
+      "svelte": "./src/config/index.ts",
+      "default": "./src/config/index.ts"
     },
     "./config/*": {
-      "svelte": "./config/*",
-      "default": "./config/*"
+      "svelte": "./src/config/*",
+      "default": "./src/config/*"
     },
     "./config/defaults": {
-      "types": "./config/defaults.ts",
-      "svelte": "./config/defaults.ts",
-      "default": "./config/defaults.ts"
+      "types": "./src/config/defaults.ts",
+      "svelte": "./src/config/defaults.ts",
+      "default": "./src/config/defaults.ts"
     },
     "./handlers": {
-      "types": "./handlers/index.ts",
-      "svelte": "./handlers/index.ts",
-      "default": "./handlers/index.ts"
+      "types": "./src/handlers/index.ts",
+      "svelte": "./src/handlers/index.ts",
+      "default": "./src/handlers/index.ts"
     },
     "./handlers/*": {
-      "svelte": "./handlers/*",
-      "default": "./handlers/*"
+      "svelte": "./src/handlers/*",
+      "default": "./src/handlers/*"
     },
     "./i18n": {
-      "types": "./i18n/index.ts",
-      "svelte": "./i18n/index.ts",
-      "default": "./i18n/index.ts"
+      "types": "./src/i18n/index.ts",
+      "svelte": "./src/i18n/index.ts",
+      "default": "./src/i18n/index.ts"
     }
   },
   "sideEffects": [
@@ -77,16 +77,8 @@
     "typecheck": "tsc --noEmit"
   },
   "files": [
-    "index.ts",
-    "core.ts",
-    "config.ts",
-    "svelte.d.ts",
+    "src",
     "tsconfig.json",
-    "ui",
-    "utils",
-    "config",
-    "handlers",
-    "i18n",
     "LICENSE",
     "README.md"
   ],

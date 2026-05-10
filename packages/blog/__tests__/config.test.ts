@@ -3,7 +3,7 @@ import {
 	initBlogConfig,
 	buildPostsApiUrl,
 	loadConfiguredCategoryDescriptions
-} from '../config/index.js'
+} from '../src/config/index.js'
 
 describe('blog config integration hooks', () => {
 	it('builds posts API URLs from a custom hook', () => {

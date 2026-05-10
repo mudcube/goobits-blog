@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createBlogPageLoad } from '../handlers/clientLoad.js'
+import { createBlogPageLoad } from '../src/handlers/clientLoad.js'
 
 describe('createBlogPageLoad', () => {
 	it('uses a custom post-content loader when provided', async () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { secureDeepMerge, isSafeKey } from '../config/secureDeepMerge.js'
+import { secureDeepMerge, isSafeKey } from '../src/config/secureDeepMerge.js'
 
 describe('secureDeepMerge', () => {
   describe('isSafeKey', () => {

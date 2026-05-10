@@ -27,12 +27,12 @@ import {
 	getAllPosts,
 	clearBlogCache,
 	type ProcessedPost
-} from '../utils/blogUtils.js'
+} from '../src/utils/blogUtils.js'
 
 let mockGetBlogPostFiles: () => Record<string, () => Promise<unknown>> = () => ({})
 
 // Mock the blog config to avoid external dependencies
-vi.mock('../config/index.js', () => ({
+vi.mock('../src/config/index.js', () => ({
 	blogConfig: {
 		name: 'Test Blog',
 		description: 'A test blog',
@@ -660,7 +660,7 @@ describe('getAllPosts path handling', () => {
 			'/content/Blog/2024/01/bad-post.md': () => Promise.reject(new Error('boom'))
 		})
 
-		const { blogConfig } = await import('../config/index.js')
+		const { blogConfig } = await import('../src/config/index.js')
 		blogConfig.posts.importFailureMode = 'throw'
 
 		await expect(getAllPosts()).rejects.toThrow('Failed to import blog post')

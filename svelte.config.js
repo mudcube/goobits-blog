@@ -3,8 +3,8 @@ import adapterCloudflare from '@sveltejs/adapter-cloudflare'
 import { mdsvex } from 'mdsvex'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import { handlePrerenderHttpError } from './src/lib/app/config/runtime/sveltekit.runtime.js'
-import { remarkTableOfContents } from './packages/blog/utils/remark-table-of-contents.js'
-import { rehypeWebpPicture } from './packages/blog/utils/rehype-webp-picture.js'
+import { remarkTableOfContents } from './packages/blog/src/utils/remark-table-of-contents.js'
+import { rehypeWebpPicture } from './packages/blog/src/utils/rehype-webp-picture.js'
 
 // Allow heading anchor ids (set by remarkTableOfContents) and our img perf attrs.
 const sanitizeSchema = {
@@ -73,7 +73,7 @@ export default {
 			'@src': './src',
 			'@static': './static',
 			'@packages': './packages',
-			'@goobits/blog-theme-miko': './packages/blog-theme-miko/index.ts',
+			'@goobits/blog-theme-miko': './packages/blog-theme-miko/src/index.ts',
 			'@miko/ui': './packages/ui/src',
 			'@calendar/app': './packages/calendar/app/src',
 			'@calendar/ui': './packages/calendar/ui/src'

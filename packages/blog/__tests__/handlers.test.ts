@@ -13,10 +13,10 @@ import {
 	createRSSFeedHandler,
 	type ServerLoadEvent,
 	type Locals
-} from '../handlers/index.js'
+} from '../src/handlers/index.js'
 
 // Mock dependencies
-vi.mock('../utils/index.js', () => ({
+vi.mock('../src/utils/index.js', () => ({
 	getAllPosts: vi.fn().mockResolvedValue([
 		{
 			metadata: { fm: { title: 'Test Post', date: '2024-01-15' } },
@@ -27,7 +27,7 @@ vi.mock('../utils/index.js', () => ({
 	generateRssFeed: vi.fn().mockReturnValue('<?xml version="1.0"?><rss></rss>')
 }))
 
-vi.mock('../handlers/routeUtils.js', () => ({
+vi.mock('../src/handlers/routeUtils.js', () => ({
 	loadBlogIndex: vi.fn().mockResolvedValue({
 		pageType: 'index',
 		posts: [],
@@ -93,7 +93,7 @@ vi.mock('../handlers/routeUtils.js', () => ({
 	])
 }))
 
-vi.mock('../config/index.js', () => ({
+vi.mock('../src/config/index.js', () => ({
 	blogConfig: {
 		name: 'Test Blog',
 		description: 'A test blog',
@@ -132,7 +132,7 @@ describe('createBlogIndexHandler', () => {
 	})
 
 	it('defaults to paraglideLocale from locals', async () => {
-		const { loadBlogIndex } = await import('../handlers/routeUtils.js')
+		const { loadBlogIndex } = await import('../src/handlers/routeUtils.js')
 		const handler = createBlogIndexHandler()
 
 		await handler.load(createEvent('', { paraglideLocale: 'de' }))
@@ -141,7 +141,7 @@ describe('createBlogIndexHandler', () => {
 	})
 
 	it('defaults to "en" when no locale in locals', async () => {
-		const { loadBlogIndex } = await import('../handlers/routeUtils.js')
+		const { loadBlogIndex } = await import('../src/handlers/routeUtils.js')
 		const handler = createBlogIndexHandler()
 
 		await handler.load({ params: {}, locals: {} })
@@ -153,7 +153,7 @@ describe('createBlogIndexHandler', () => {
 describe('createBlogSlugHandler', () => {
 	describe('Route Pattern Matching', () => {
 		it('routes empty slug to blog index', async () => {
-			const { loadBlogIndex } = await import('../handlers/routeUtils.js')
+			const { loadBlogIndex } = await import('../src/handlers/routeUtils.js')
 			const handler = createBlogSlugHandler()
 
 			await handler.load(createEvent(''))
@@ -162,7 +162,7 @@ describe('createBlogSlugHandler', () => {
 		})
 
 		it('routes undefined slug to blog index', async () => {
-			const { loadBlogIndex } = await import('../handlers/routeUtils.js')
+			const { loadBlogIndex } = await import('../src/handlers/routeUtils.js')
 			const handler = createBlogSlugHandler()
 
 			await handler.load({ params: {}, locals: {} })
@@ -171,7 +171,7 @@ describe('createBlogSlugHandler', () => {
 		})
 
 		it('routes category/ prefix to category handler', async () => {
-			const { loadCategory } = await import('../handlers/routeUtils.js')
+			const { loadCategory } = await import('../src/handlers/routeUtils.js')
 			const handler = createBlogSlugHandler()
 
 			await handler.load(createEvent('category/javascript'))
@@ -180,7 +180,7 @@ describe('createBlogSlugHandler', () => {
 		})
 
 		it('routes tag/ prefix to tag handler', async () => {
-			const { loadTag } = await import('../handlers/routeUtils.js')
+			const { loadTag } = await import('../src/handlers/routeUtils.js')
 			const handler = createBlogSlugHandler()
 
 			await handler.load(createEvent('tag/react'))
@@ -189,7 +189,7 @@ describe('createBlogSlugHandler', () => {
 		})
 
 		it('routes YYYY/MM/slug pattern to post handler', async () => {
-			const { loadPost } = await import('../handlers/routeUtils.js')
+			const { loadPost } = await import('../src/handlers/routeUtils.js')
 			const handler = createBlogSlugHandler()
 
 			await handler.load(createEvent('2024/03/my-post'))
@@ -200,7 +200,7 @@ describe('createBlogSlugHandler', () => {
 
 	describe('Trailing Slash Handling', () => {
 		it('strips trailing slashes from slugs', async () => {
-			const { loadCategory } = await import('../handlers/routeUtils.js')
+			const { loadCategory } = await import('../src/handlers/routeUtils.js')
 			const handler = createBlogSlugHandler()
 
 			await handler.load(createEvent('category/javascript/'))
@@ -209,7 +209,7 @@ describe('createBlogSlugHandler', () => {
 		})
 
 		it('handles multiple trailing slashes', async () => {
-			const { loadCategory } = await import('../handlers/routeUtils.js')
+			const { loadCategory } = await import('../src/handlers/routeUtils.js')
 			const handler = createBlogSlugHandler()
 
 			// The regex only removes one trailing slash, but this tests the behavior
@@ -346,7 +346,7 @@ describe('createBlogSlugHandler', () => {
 
 	describe('Language Support', () => {
 		it('passes language from custom getLanguage to loaders', async () => {
-			const { loadPost } = await import('../handlers/routeUtils.js')
+			const { loadPost } = await import('../src/handlers/routeUtils.js')
 			const handler = createBlogSlugHandler({
 				getLanguage: () => 'fr'
 			})
@@ -374,7 +374,7 @@ describe('createRSSFeedHandler', () => {
 	})
 
 	it('uses custom feedPath when provided', async () => {
-		const { generateRssFeed } = await import('../utils/index.js')
+		const { generateRssFeed } = await import('../src/utils/index.js')
 		const handler = createRSSFeedHandler({ feedPath: '/custom/feed.xml' })
 
 		await handler({ url: new URL('https://example.com/blog/rss.xml') })
@@ -386,7 +386,7 @@ describe('createRSSFeedHandler', () => {
 	})
 
 	it('uses custom error handler when provided', async () => {
-		const { getAllPosts } = await import('../utils/index.js')
+		const { getAllPosts } = await import('../src/utils/index.js')
 		vi.mocked(getAllPosts).mockRejectedValueOnce(new Error('Database error'))
 
 		const customErrorHandler = vi.fn().mockReturnValue(
@@ -400,7 +400,7 @@ describe('createRSSFeedHandler', () => {
 	})
 
 	it('returns fallback error response when no custom handler', async () => {
-		const { getAllPosts } = await import('../utils/index.js')
+		const { getAllPosts } = await import('../src/utils/index.js')
 		vi.mocked(getAllPosts).mockRejectedValueOnce(new Error('Database error'))
 
 		const handler = createRSSFeedHandler()
@@ -414,7 +414,7 @@ describe('createRSSFeedHandler', () => {
 	})
 
 	it('passes origin from request URL to feed generator', async () => {
-		const { generateRssFeed } = await import('../utils/index.js')
+		const { generateRssFeed } = await import('../src/utils/index.js')
 		const handler = createRSSFeedHandler()
 
 		await handler({ url: new URL('https://myblog.com/blog/rss.xml') })

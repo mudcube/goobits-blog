@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { bemClasses, dynamicClasses, propertyModifier, ClassNames } from '../utils/classUtils.js'
+import { bemClasses, dynamicClasses, propertyModifier, ClassNames } from '../src/utils/classUtils.js'
 
 describe('classUtils', () => {
   describe('bemClasses', () => {

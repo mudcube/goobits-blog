@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculateReadTime, getPostReadTime, DEFAULT_READ_TIME_CONFIG } from '../utils/readTimeUtils.js'
+import { calculateReadTime, getPostReadTime, DEFAULT_READ_TIME_CONFIG } from '../src/utils/readTimeUtils.js'
 
 describe('readTimeUtils', () => {
   describe('calculateReadTime', () => {
