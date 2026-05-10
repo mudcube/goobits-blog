@@ -1,18 +1,17 @@
 import {
 	getAdminPaymentDefaults,
 	getAdminViewSettings,
-	getCalendarConfig,
 	getCalendarPrograms,
 	getDefaultAdminViewSettings,
-	getPaymentCheckoutConfig,
-	listEventsFeed,
-	listInvites,
-	listCalendarUsers,
-	requireEnv,
 	type AdminBootstrap,
 	type AdminBootstrapUser,
 	type AdminViewSettings
-} from '@calendar/core'
+} from '@calendar/core/admin'
+import { getCalendarConfig, requireEnv } from '@calendar/core/config'
+import { getPaymentCheckoutConfig } from '@calendar/core/payments'
+import { listEventsFeed } from '@calendar/core/booking'
+import { listInvites } from '@calendar/core/invites'
+import { listCalendarUsers } from '@calendar/core/storage'
 import { buildEnv } from '@calendar/kit'
 import { redirect } from '@sveltejs/kit'
 import type { RequestEvent } from '@sveltejs/kit'

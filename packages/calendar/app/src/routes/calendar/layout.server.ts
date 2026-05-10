@@ -1,5 +1,6 @@
 import { buildEnv } from '@calendar/kit'
-import { isCalendarAdmin, loadCalendarMemberShellData } from '@calendar/core'
+import { isCalendarAdmin } from '@calendar/core/admin'
+import { loadCalendarMemberShellData } from '@calendar/core/booking'
 
 type CalendarUser = {
 	id?: string | number

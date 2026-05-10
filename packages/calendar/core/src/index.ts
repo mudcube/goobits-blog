@@ -40,14 +40,14 @@ import {
 	grantCalendarAdmin,
 	grantCalendarAdminByEmail,
 	isCalendarAdmin
-} from './admin/permissions.ts'
+} from './access/admin-permissions.ts'
 import {
 	isAdminBootstrap,
 	type AdminBootstrap,
 	type AdminBootstrapUser,
 	type AdminBootstrapInvite,
 	type AdminBootstrapPaymentIntegrations
-} from './admin/bootstrap-types.ts'
+} from './services/admin/bootstrap-types.ts'
 import {
 	configureCalendarConfig,
 	getCalendarConfig,

@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit'
 import { getCalendarRedirect } from '../../../../server/auth/calendar'
-import { getCalendarConfig } from '@calendar/core'
+import { getCalendarConfig } from '@calendar/core/config'
 import type { RequestHandler } from '@sveltejs/kit'
 
 export const GET: RequestHandler = ({ cookies }) => {

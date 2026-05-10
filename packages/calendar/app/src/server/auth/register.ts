@@ -1,6 +1,6 @@
 import { CredentialsProvider } from '@goobits/auth/providers'
 import { createCalendarUserAdapter, type D1DatabaseLike } from '@calendar/kit'
-import { setUserProgramAccess } from '@calendar/core'
+import { setUserProgramAccess } from '@calendar/core/invites'
 import { issueEmailVerification } from '../email/verification'
 
 export type RegisterUserInput = {

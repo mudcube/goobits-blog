@@ -1,5 +1,6 @@
 import { dev } from '$app/environment'
-import { getCalendarConfig, validateInvite } from '@calendar/core'
+import { getCalendarConfig } from '@calendar/core/config'
+import { validateInvite } from '@calendar/core/invites'
 import { buildEnv } from '@calendar/kit'
 import { getCalendarLoginContext, normalizeCalendarRedirect } from '../../../server/auth/calendar'
 import { redirect } from '@sveltejs/kit'

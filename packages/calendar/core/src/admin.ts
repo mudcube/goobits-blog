@@ -12,7 +12,7 @@ export {
 	grantCalendarAdmin,
 	grantCalendarAdminByEmail,
 	isCalendarAdmin
-} from './admin/permissions.ts'
+} from './access/admin-permissions.ts'
 
 export {
 	isAdminBootstrap,
@@ -20,7 +20,7 @@ export {
 	type AdminBootstrapUser,
 	type AdminBootstrapInvite,
 	type AdminBootstrapPaymentIntegrations
-} from './admin/bootstrap-types.ts'
+} from './services/admin/bootstrap-types.ts'
 
 export {
 	getAdminPreference,

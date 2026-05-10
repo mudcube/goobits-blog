@@ -1,4 +1,5 @@
-import { getCalendarActivityList, type CalendarActivityConfig, upsertCalendarProgram } from '@calendar/core'
+import { getCalendarActivityList, type CalendarActivityConfig } from '@calendar/core/config'
+import { upsertCalendarProgram } from '@calendar/core/admin'
 import type { D1DatabaseLike } from '@calendar/kit'
 
 function toProgramInput(program: CalendarActivityConfig, sortOrder: number) {

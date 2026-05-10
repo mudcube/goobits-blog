@@ -1,5 +1,5 @@
 import { buildEnv } from '@calendar/kit'
-import { loadCalendarMemberHomeData } from '@calendar/core'
+import { loadCalendarMemberHomeData } from '@calendar/core/booking'
 
 export async function load({ platform, locals, url }: { platform: App.Platform; locals: { user?: { id?: string | number } }; url: URL }) {
 	const env = await buildEnv(platform)

@@ -1,12 +1,9 @@
 import { buildEnv, createCalendarSessionAdapter } from '@calendar/kit'
 import { createLogoutHandler } from '@goobits/auth/handlers'
 import { hashAdminApiKey, timingSafeEqual } from '@goobits/auth/security'
-import {
-	canBootstrapCalendarAdmin,
-	checkRateLimit,
-	getCalendarConfig,
-	grantCalendarAdmin
-} from '@calendar/core'
+import { canBootstrapCalendarAdmin, grantCalendarAdmin } from '@calendar/core/admin'
+import { checkRateLimit } from '@calendar/core/storage'
+import { getCalendarConfig } from '@calendar/core/config'
 import { enforceSameOrigin, logAdminEvent } from '@calendar/app/admin-api-helpers'
 import { fail, redirect } from '@sveltejs/kit'
 import type { Actions, RequestEvent } from '@sveltejs/kit'

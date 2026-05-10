@@ -1,5 +1,5 @@
 import type { Cookies } from '@sveltejs/kit'
-import { getCalendarConfig } from '@calendar/core'
+import { getCalendarConfig } from '@calendar/core/config'
 
 const AUTH_RESERVED = new Set(['auth', 'signout', 'logout', 'magic-link', 'passkey', 'sessions'])
 
