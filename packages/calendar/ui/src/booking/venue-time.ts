@@ -1,7 +1,7 @@
 // Re-export from core so the UI and server share one canonical venue TZ.
 // Previously declared independently here AND in member/booking/formatWhen.ts.
-export { VENUE_TIMEZONE } from '@calendar/core'
-import { VENUE_TIMEZONE } from '@calendar/core'
+export { VENUE_TIMEZONE } from '@calendar/core/config'
+import { VENUE_TIMEZONE } from '@calendar/core/config'
 
 const venueDateFormatter = new Intl.DateTimeFormat('en-US', {
 	timeZone: VENUE_TIMEZONE,

@@ -1,4 +1,4 @@
-import { getCalendarActivityList, type CalendarActivityConfig } from '@calendar/core'
+import { getCalendarActivityList, type CalendarActivityConfig } from '@calendar/core/config'
 import type { CalendarProviderName } from '../../auth/ui/providers'
 
 export function resolveCalendarLoginTargetActivity(path: string): CalendarActivityConfig | null {

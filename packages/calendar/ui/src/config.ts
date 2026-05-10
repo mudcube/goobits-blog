@@ -1,4 +1,4 @@
-import { getCalendarConfig } from "@calendar/core";
+import { getCalendarConfig } from "@calendar/core/config";
 
 function stripTrailingSlash(path: string) {
   return path.endsWith("/") ? path.slice(0, -1) : path;

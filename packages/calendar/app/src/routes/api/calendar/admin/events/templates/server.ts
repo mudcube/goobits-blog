@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { listEventTemplates } from '@calendar/core'
+import { listEventTemplates } from '@calendar/core/booking'
 import { apiOk } from '@calendar/kit'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 

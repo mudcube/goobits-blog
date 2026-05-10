@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 import { resolveRuntimeDb } from '$lib/server/runtime'
 import { consumeEmailVerificationToken } from '@calendar/app'
-import { getCalendarConfig } from '@calendar/core'
+import { getCalendarConfig } from '@calendar/core/config'
 
 export const GET: RequestHandler = async ({ url, platform }) => {
 	const calendarLoginPath = getCalendarConfig().routes.calendarLoginPath

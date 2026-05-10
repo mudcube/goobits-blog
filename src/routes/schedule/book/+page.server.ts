@@ -1,7 +1,8 @@
 import { redirect } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 import { buildEnv } from '@calendar/kit'
-import { listUpcomingEvents, fetchDayForecast } from '@calendar/core'
+import { listUpcomingEvents } from '@calendar/core/booking'
+import { fetchDayForecast } from '@calendar/core/weather'
 import { isScheduleDesignMode } from '$lib/app/schedule/design-mode'
 import { eventToOpenDay } from '@calendar/ui'
 

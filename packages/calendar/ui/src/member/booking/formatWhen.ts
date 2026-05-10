@@ -1,4 +1,4 @@
-import { VENUE_TIMEZONE } from '@calendar/core'
+import { VENUE_TIMEZONE } from '@calendar/core/config'
 
 const LOCALE = 'en-US'
 // Explicit timeZone keeps SSR/CSR formatting deterministic (avoids hydration mismatch / CLS).

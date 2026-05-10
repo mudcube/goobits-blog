@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit'
-import { validateInvite } from '@calendar/core'
+import { validateInvite } from '@calendar/core/invites'
 import { buildEnv } from '@calendar/kit'
 import type { RequestHandler } from './$types'
 

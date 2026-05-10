@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { buildEnv } from '@calendar/kit'
-import { listCalendarUsers } from '@calendar/core'
+import { listCalendarUsers } from '@calendar/core/storage'
 import { apiOk } from '@calendar/kit'
 
 export async function GET(event: RequestEvent) {

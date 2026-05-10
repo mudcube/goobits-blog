@@ -1,4 +1,4 @@
-import { getCalendarActivityDefinitions } from '@calendar/core'
+import { getCalendarActivityDefinitions } from '@calendar/core/config'
 import {
 	Dumbbell, Film, Tent, Mountain, Music, Coffee, Utensils, Bike, Waves,
 	Palette, Gamepad2, Sparkles, BookOpen, Camera, Flower2

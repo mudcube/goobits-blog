@@ -3,7 +3,7 @@
 	import { page } from '$app/stores'
 	import { CalendarShellLayout } from '@calendar/ui'
 	import NoIndexHead from '$lib/app/seo/NoIndexHead.svelte'
-	import { getCalendarConfig } from '@calendar/core'
+	import { getCalendarConfig } from '@calendar/core/config'
 
 	const { data, children } = $props()
 	const isAdminRoute = $derived($page.url.pathname.startsWith('/schedule/admin'))

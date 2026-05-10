@@ -11,7 +11,7 @@ import {
 	configureCalendarActivityCatalog,
 	configureCalendarConfig,
 	type CalendarActivityDefinition
-} from '@calendar/core'
+} from '@calendar/core/config'
 
 export const mikoCalendarPreset = {
 	brand: {

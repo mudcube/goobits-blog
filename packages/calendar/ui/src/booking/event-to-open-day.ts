@@ -1,4 +1,4 @@
-import type { CalendarFeedEvent } from '@calendar/core'
+import type { CalendarFeedEvent } from '@calendar/core/booking'
 import type { OpenDay, Person } from './types'
 import { venueDayDate, venueDayKey, venueDecimalHour } from './venue-time'
 

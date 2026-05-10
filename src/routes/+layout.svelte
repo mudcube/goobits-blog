@@ -8,7 +8,7 @@
 	import { browser } from '$app/environment'
 	import { onMount } from 'svelte'
 	import { Topbar, FooterNav } from '@miko/ui'
-	import { getCalendarConfig } from '@calendar/core'
+	import { getCalendarConfig } from '@calendar/core/config'
 	import ReleaseTargetSwitcher from '$lib/app/release/ReleaseTargetSwitcher.svelte'
 	import {
 		footerBrand,

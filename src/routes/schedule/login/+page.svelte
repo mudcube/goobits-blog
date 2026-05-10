@@ -6,7 +6,7 @@
   } from "@calendar/ui/auth/ui/providers";
   import { buildProviderLoginHref } from "@calendar/ui/auth/ui/redirects";
   import { PillButton } from "@calendar/ui";
-  import { getCalendarConfig } from "@calendar/core";
+  import { getCalendarConfig } from "@calendar/core/config";
   import {
     resolveCalendarLoginTargetActivity,
     resolveFirstAvailableProvider,

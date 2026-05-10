@@ -1,6 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { fetchWeatherForEvent, getAdminEventDetail, parsePositiveInteger } from '@calendar/core'
+import { getAdminEventDetail } from '@calendar/core/admin'
+import { fetchWeatherForEvent } from '@calendar/core/weather'
+import { parsePositiveInteger } from '@calendar/core/transport'
 import { apiError, apiOk } from '@calendar/kit'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 

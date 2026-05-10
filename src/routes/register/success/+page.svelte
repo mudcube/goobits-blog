@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Seo } from '$lib/app/seo'
 	import { SuccessPage } from '@miko/ui'
-	import { getCalendarConfig } from '@calendar/core'
+	import { getCalendarConfig } from '@calendar/core/config'
 	const calendarConfig = getCalendarConfig()
 </script>
 
