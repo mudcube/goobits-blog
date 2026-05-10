@@ -10,7 +10,13 @@
     "./booking": "./src/booking.ts",
     "./sync": "./src/sync.ts",
     "./providers": "./src/providers.ts",
-    "./transport": "./src/transport.ts"
+    "./transport": "./src/transport.ts",
+    "./config": "./src/config.ts",
+    "./storage": "./src/storage.ts",
+    "./invites": "./src/invites.ts",
+    "./payments": "./src/payments.ts",
+    "./weather": "./src/weather.ts",
+    "./media": "./src/media.ts"
   },
   "dependencies": {
     "@goobits/auth": "workspace:*"
