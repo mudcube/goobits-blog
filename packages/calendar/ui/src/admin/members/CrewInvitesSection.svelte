@@ -4,7 +4,8 @@
 	import AdminMetaCards from '@calendar/ui/admin/shared/AdminMetaCards.svelte'
 	import AdminInlineConfirm from '@calendar/ui/admin/shared/AdminInlineConfirm.svelte'
 	import ConfirmModal from '@calendar/ui/admin/shared/ConfirmModal.svelte'
-	import { statusIcon, statusDotColor, type InviteStatus } from './crew-helpers'
+	import { statusDotColor, type InviteStatus } from './crew-helpers'
+	import { statusIcon } from './crew-status-icons'
 
 	export type InviteFilter = 'all' | InviteStatus
 

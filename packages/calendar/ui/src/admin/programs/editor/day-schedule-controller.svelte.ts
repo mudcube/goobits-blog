@@ -192,14 +192,18 @@ export function createDayScheduleController({
 		closePop()
 	}
 
-	function computeRepeatWeeks(startDate: Date): number {
-		if (!popDraft.repeat) return 0
-		if (popDraft.untilMode === 'ongoing') return 12
+	type RepeatPlan = { weeks: number } | { error: string }
+
+	function computeRepeatWeeks(startDate: Date): RepeatPlan {
+		if (!popDraft.repeat) return { weeks: 0 }
+		if (popDraft.untilMode === 'ongoing') return { weeks: 12 }
 		const target = Date.parse(popDraft.untilDate)
-		if (!Number.isFinite(target)) return 12
+		if (!Number.isFinite(target)) return { weeks: 12 }
 		const diffMs = target - startDate.getTime()
-		if (diffMs <= 0) return 0
-		return Math.max(0, Math.min(52, Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000))))
+		if (diffMs <= 0) {
+			return { error: 'Repeat-until date must be after the start date.' }
+		}
+		return { weeks: Math.min(52, Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000))) }
 	}
 
 	async function persistDaySchedule() {
@@ -227,6 +231,11 @@ export function createDayScheduleController({
 		const start = new Date(selectedDayDate)
 		start.setHours(safeHours, safeMinutes, 0, 0)
 		const end = new Date(start.getTime() + 2 * 60 * 60 * 1000)
+		const repeatPlan = computeRepeatWeeks(start)
+		if ('error' in repeatPlan) {
+			flash(repeatPlan.error, true)
+			return
+		}
 		const dashboard = getDashboard()
 		const draft = dashboard.programDraft
 		const eventDraft = dashboard.eventDraft
@@ -240,7 +249,7 @@ export function createDayScheduleController({
 			startsAt: start.toISOString(),
 			endsAt: end.toISOString(),
 			capacity: popDraft.capacity,
-			repeatWeeks: computeRepeatWeeks(start),
+			repeatWeeks: repeatPlan.weeks,
 			costCents: eventDraft.costCents || 0,
 			currency: eventDraft.currency || 'USD',
 			paymentProvider: eventDraft.paymentProvider || 'venmo',

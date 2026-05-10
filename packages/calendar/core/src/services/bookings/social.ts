@@ -1,7 +1,7 @@
-import type { D1DatabaseLike } from '../storage/d1.ts'
-import type { CalendarProgramSlug } from '../social/programs.ts'
-import { hasUserProgramAccess } from '../access/user-program-access.ts'
-import { addWeeksInVenueTime } from '../social/venue.ts'
+import type { D1DatabaseLike } from '../../storage/d1.ts'
+import type { CalendarProgramSlug } from '../../social/programs.ts'
+import { hasUserProgramAccess } from '../../access/user-program-access.ts'
+import { addWeeksInVenueTime } from '../../social/venue.ts'
 
 type EventRow = {
 	id: number
@@ -440,7 +440,7 @@ export async function joinEvent(
 	// Assign confirmation ID if not already set
 	let confirmationId: string | null = null
 	if (participant && !participant.confirmation_id) {
-		const { setConfirmationId } = await import('./booking-confirmation.ts')
+		const { setConfirmationId } = await import('./confirmation.ts')
 		confirmationId = await setConfirmationId(db, participant.id)
 	} else if (participant?.confirmation_id) {
 		confirmationId = participant.confirmation_id as string
