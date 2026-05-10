@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getActivityEmoji } from '../activity-display'
+	import { formatEventDayLabel } from '../date-format'
 
 	type Participant = {
 		name?: string | null
@@ -24,6 +25,24 @@
 		event: DashboardEvent
 		onOpenEvent: (eventId: number) => void
 	}>()
+
+	function isGenericTitle(title: string, activityLabel: string) {
+		const normalized = (title || '').trim().toLowerCase()
+		if (!normalized) return true
+		const activity = (activityLabel || '').trim().toLowerCase()
+		if (!activity) return false
+		return normalized === activity
+			|| normalized === `${activity} event`
+			|| normalized === `${activity} session`
+			|| normalized === 'event'
+	}
+
+	function displayTitle() {
+		if (isGenericTitle(event.title, event.activityLabel)) {
+			return formatEventDayLabel(event.startsAt)
+		}
+		return event.title
+	}
 
 	function timeLabel(iso: string) {
 		const date = new Date(iso)
@@ -72,7 +91,7 @@
 	<div class="event-card__icon">{getActivityEmoji(event.activityLabel, event.activitySlug || undefined)}</div>
 	<div class="event-card__body">
 		<div class="event-card__top">
-			<div class="event-card__name">{event.title}</div>
+			<div class="event-card__name">{displayTitle()}</div>
 			<div class="event-card__time">{timeLabel(event.startsAt)}</div>
 		</div>
 		<div class="event-card__desc">

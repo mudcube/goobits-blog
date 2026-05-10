@@ -49,6 +49,8 @@ export type CalendarDay = {
 	isPast: boolean
 	dotCount?: number
 	dotColor?: string
+	/** Per-dot colors for mixed-activity days. When set, takes precedence over `dotColor`. */
+	dotColors?: string[]
 	ariaLabel?: string
 	/** Optional capacity-utilization indicator. When present, renders a chip + progress bar in the cell instead of (or in addition to) dots. */
 	capacity?: CalendarDayCapacity

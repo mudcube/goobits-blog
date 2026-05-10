@@ -23,6 +23,7 @@
 		isActive,
 		eventCount = () => 0,
 		eventTone = () => '',
+		eventTones,
 		eventCapacity,
 		compact = false,
 		interactive = 'active-only'
@@ -40,6 +41,8 @@
 		isActive: (date: Date) => boolean
 		eventCount?: (date: Date) => number
 		eventTone?: (date: Date) => string
+		/** Per-day list of activity slugs/tones for mixed-activity days. */
+		eventTones?: (date: Date) => string[]
 		/** When provided, each day with capacity info renders a chip (filled/total) instead of dots. */
 		eventCapacity?: (date: Date) => CalendarDayCapacity | null | undefined
 		compact?: boolean
@@ -67,6 +70,7 @@
 		isActive: (date) => isActive(date),
 		eventCount: (date) => eventCount(date),
 		dotColor: (date) => dotColorForTone(eventTone(date)) || '',
+		dotColors: (date) => eventTones?.(date).map((tone: string) => dotColorForTone(tone) || '') ?? [],
 		capacity: (date) => eventCapacity?.(date),
 		title: () => title
 	})

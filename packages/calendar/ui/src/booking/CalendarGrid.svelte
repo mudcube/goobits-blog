@@ -135,15 +135,17 @@
 						</span>
 					{:else if day.isActive && !day.isPast && (day.dotCount ?? 0) > 0}
 						{@const visibleDots = Math.min(day.dotCount ?? 0, 3)}
+						{@const perDotColors = day.dotColors ?? []}
 						<span
 							class={`cg__dots ${variant === 'member' ? 'member-calendar__event-dots' : ''}`.trim()}
 							style={day.dotColor ? `--member-calendar-dot-override:${day.dotColor};` : ''}
 							aria-label={`${day.dotCount} event${day.dotCount === 1 ? '' : 's'}`}
 						>
 							{#each Array.from({ length: visibleDots }) as _, i (i)}
+								{@const dotColor = perDotColors[i] || perDotColors[perDotColors.length - 1] || day.dotColor || ''}
 								<span
-									class={`cg__dot ${day.dotColor ? '' : i > 0 ? 'cg__dot--secondary' : ''} ${variant === 'member' ? 'member-calendar__event-dot' : ''}`.trim()}
-									style={day.dotColor ? `background:${day.dotColor}` : ''}
+									class={`cg__dot ${dotColor ? '' : i > 0 ? 'cg__dot--secondary' : ''} ${variant === 'member' ? 'member-calendar__event-dot' : ''}`.trim()}
+									style={dotColor ? `background:${dotColor}` : ''}
 								></span>
 							{/each}
 						</span>

@@ -11,6 +11,8 @@ type CalendarSurfaceOptions = {
 	isActive: (date: Date) => boolean
 	eventCount?: (date: Date) => number
 	dotColor?: (date: Date) => string
+	/** Per-dot colors for mixed-activity days. Takes precedence over `dotColor` when non-empty. */
+	dotColors?: (date: Date) => string[]
 	ariaLabel?: (date: Date) => string
 	title?: () => string
 	/** Optional: return capacity info to render the chip indicator instead of dots. */
@@ -72,6 +74,7 @@ export function createCalendarSurface({
 	isActive,
 	eventCount = () => 0,
 	dotColor = () => '',
+	dotColors,
 	ariaLabel,
 	title = () => '',
 	capacity
@@ -118,9 +121,11 @@ export function createCalendarSurface({
 			dotCount: eventCount(date)
 		}
 		const color = dotColor(date)
+		const colors = dotColors?.(date)
 		const label = ariaLabel?.(date)
 		const cap = capacity?.(date)
 		if (color) day.dotColor = color
+		if (colors && colors.some(Boolean)) day.dotColors = colors
 		if (label) day.ariaLabel = label
 		if (cap) day.capacity = cap
 		return day

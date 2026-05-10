@@ -55,6 +55,14 @@
 		return first?.activitySlug || ''
 	}
 
+	function eventTonesFor(date: Date) {
+		const key = isoDay(date)
+		return events
+			.filter((event: DashboardEvent) => isoDay(new Date(event.startsAt)) === key)
+			.sort((a: DashboardEvent, b: DashboardEvent) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
+			.map((event: DashboardEvent) => event.activitySlug || '')
+	}
+
 	function prevMonth() {
 		currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
 	}
@@ -109,6 +117,7 @@
 		isActive={(date) => eventCountFor(date) > 0}
 		eventCount={eventCountFor}
 		eventTone={eventToneFor}
+		eventTones={eventTonesFor}
 		compact={true}
 	/>
 
