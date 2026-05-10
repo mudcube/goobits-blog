@@ -21,6 +21,7 @@ type EventRow = {
 	payment_note_template: string | null
 	recap_text: string | null
 	hero_image_url: string | null
+	timezone: string | null
 }
 
 type ParticipantRow = {
@@ -69,6 +70,14 @@ export type CalendarFeedEvent = {
 	paymentNoteTemplate: string | null
 	recapText: string | null
 	heroImageUrl: string | null
+	/**
+	 * IANA timezone the event is anchored to. Always populated — events that
+	 * predate the per-event-tz migration have been backfilled with the venue
+	 * default. Display surfaces should format `startsAt` / `endsAt` in this
+	 * timezone (the event's locale) rather than the viewer's, unless the UX
+	 * explicitly opts into viewer-local display.
+	 */
+	timezone: string
 	participants: Array<{
 		userId: string
 		name: string | null
@@ -118,7 +127,7 @@ async function listEventsByRange(
 		.prepare(
 			`SELECT e.id, e.activity_slug, p.label AS activity_label, e.title, e.starts_at, e.ends_at, e.capacity, e.status, e.location, e.note,
 		        e.cost_cents, e.currency, e.payment_provider, e.payment_handle, e.payment_note_template,
-		        e.recap_text, e.hero_image_url
+		        e.recap_text, e.hero_image_url, e.timezone
 		 FROM calendar_events e
 		 LEFT JOIN calendar_programs p ON p.slug = e.activity_slug
 		 WHERE ${input.whereSql}
@@ -199,6 +208,7 @@ async function listEventsByRange(
 				paymentNoteTemplate: row.payment_note_template ?? null,
 				recapText: row.recap_text ?? null,
 				heroImageUrl: row.hero_image_url ?? null,
+				timezone: row.timezone || VENUE_TIMEZONE,
 				participants: joined.slice(0, 6).map((participant) => ({
 					userId: participant.user_id,
 					name: participant.name,

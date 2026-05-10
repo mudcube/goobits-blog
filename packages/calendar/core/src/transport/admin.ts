@@ -56,6 +56,14 @@ export type AdminCreateEventsBatchInput = {
   paymentNoteTemplate: string | null;
   location: string | null;
   note: string | null;
+  /**
+   * IANA timezone the event is anchored to. Optional on the wire — the
+   * service layer falls back to VENUE_TIMEZONE when absent. Validated
+   * loosely: must be a non-empty string with a slash, e.g. 'America/
+   * Los_Angeles'. Real validation happens against Intl.DateTimeFormat
+   * downstream when the value is actually used.
+   */
+  timezone: string | null;
 };
 
 export type AdminEventUpdateInput =
@@ -279,7 +287,23 @@ export function parseAdminCreateEventsBatchInput(
     }),
     location: readOptionalString(body, "location", { maxLength: 120 }),
     note: readOptionalString(body, "note", { maxLength: 300 }),
+    timezone: readOptionalTimezone(body, "timezone"),
   };
+}
+
+/**
+ * Loose IANA-ish validation: requires a non-empty string with at least
+ * one slash so we reject obviously bogus input ("foo", "bar"), but defer
+ * canonical validation to Intl.DateTimeFormat at point of use. Returns
+ * null when absent so callers can fall back to the venue default.
+ */
+function readOptionalTimezone(body: Record<string, unknown>, key: string): string | null {
+  const raw = readOptionalString(body, key, { maxLength: 64 });
+  if (!raw) return null;
+  if (!/^[A-Za-z]+\/[A-Za-z0-9_+-]+(?:\/[A-Za-z0-9_+-]+)?$/.test(raw)) {
+    throw new TransportValidationError("Invalid timezone");
+  }
+  return raw;
 }
 
 export function parseAdminEventUpdateInput(

@@ -58,7 +58,8 @@ export async function POST(event: RequestEvent) {
 			paymentNoteTemplate: input.paymentNoteTemplate,
 			location: input.location,
 			note: input.note,
-			repeatWeeks: input.repeatWeeks
+			repeatWeeks: input.repeatWeeks,
+			...(input.timezone ? { timezone: input.timezone } : {})
 		})
 		await enqueueCreatedEventsSync(env, ids)
 
