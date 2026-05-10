@@ -220,9 +220,11 @@ async function markJobRetry(db: D1DatabaseLike, id: number, attemptCount: number
 }
 
 async function moveJobToDeadLetter(db: D1DatabaseLike, job: SyncJobRow, attemptCount: number, errorMessage: string) {
+	// INSERT OR IGNORE makes this safe to retry if a transient failure occurs
+	// between the insert and the delete — the unique index on job_id prevents duplicates.
 	await db
 		.prepare(
-			`INSERT INTO calendar_sync_dead_letters (
+			`INSERT OR IGNORE INTO calendar_sync_dead_letters (
 			job_id, event_id, trigger, requested_by_user_id, payload_json, attempt_count, last_error, created_at, moved_at
 		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, unixepoch())`
 		)

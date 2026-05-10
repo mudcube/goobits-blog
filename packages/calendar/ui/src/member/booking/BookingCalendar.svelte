@@ -29,7 +29,7 @@
 	}>()
 
 	let localUpcoming = $state<CalendarEventsResponse['upcoming'] | null>(null)
-	let upcoming = $derived(localUpcoming ?? initialUpcoming)
+	const upcoming = $derived(localUpcoming ?? initialUpcoming)
 	let stepNum = $state(0)
 	let maxReached = $state(0)
 	let selectedDay = $state<OpenDay | null>(null)
