@@ -5,6 +5,67 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Program editor inspector playground (`/playground/program-editor-inspector`) with extracted inspector primitives.
+- Live shift drag reorder for programs, with shared `Tooltip` primitive and tooltip suppression during drag.
+- `joinedAt` column in admin dashboard and humanized admin breadcrumbs.
+
+### Changed
+- Unified schedule visual language across booking and admin surfaces; refined editor chrome (URL pill fixed/editable zones, Pause/Play/Trash icons, dashed preview border, themed emoji picker).
+- Split `AdminProgramEditor` into cohesive modules and shared modal/credentials primitives; consolidated program settings into the editor and retired `ProgramSettingsDrawer`.
+- Standardized border-radius across editor controls; tokenized colors and simplified controller API.
+- Redesigned profile page with topbar width parity; surfaced admin avatar and Calendar link in profile menu.
+- `ConfirmModal` accepts configurable horizontal alignment (viewport vs content).
+- Mark today with a star icon in calendar grids.
+
+### Fixed
+- `--bg`/`--text` color cycle in the editor; quieted URL pill border; relocated New event affordance.
+- URL pill alignment and width inside settings strip; vertical alignment of inputs inside inspector controls.
+- Wired discard-changes prompt; retired migration playground.
+- Blog: sanitized markdown, hardened anchors, fixed RSS escaping and slug collisions.
+
+### Security
+- Hardened Apple SSRF surface and added magic-byte validation for image uploads; dropped dead booking code paths.
+
+## [1.3.1] - 2026-05-05
+
+### Added
+- Production booking flow at `/schedule/book` with crew cards, weather data, real APIs (join/leave/cancel), and Add-to-Calendar dropdown for Google/Apple/Outlook.
+- Friendly invite codes (`word-word-number`), short invite URLs (`/invite/[code]`), and admin Invites page with bulk delete and confirm dialogs.
+- Admin event-detail editing: inline title/date/time/capacity/description edits, hero image uploads, and persistent week-start preference.
+- Admin payment, calendar sync, and program settings sections with grouped cards, inline handle validation, and a floating "All saved" timestamp.
+- Standalone `@goobits/blog` package with Miko theme, journal RSS at `/journal/rss.xml`, sitemap pills, and section dividers.
+- AI/GEO support: `/llms.txt`, `/llms-full.txt`, journal markdown mirrors, and AI-crawler allowlist in `robots.txt`.
+- Open Graph meta tags for invite link previews; structured SEO metadata.
+- Programs reorder endpoint with atomic `moveProgram`.
+- Shared admin primitives: `AdminInlineConfirm`, `AdminToast`, `AdminMetaCard`, `AdminGroupedCard`, `EditableField`, `SyncCard`, `PaymentMethodRow`, `CalendarGrid`, `UrlPill`, `DayDialog`.
+
+### Changed
+- Reorganized admin information architecture: unified topbar profile menu across admin/member, sticky full-height sidebar, fixed-height topbar (3rem), and consistent row heights (4rem).
+- Promoted booking design (v6) to `BookedStep`; retired prototype iterations v1–v5; renamed `dev` routes to `playground`.
+- Standardized journal cover images across all 49 posts; restored higher-resolution variants; letterboxed small heroes instead of upscaling.
+- Bootstrapped admin data on the server so pages appear ready (no empty-state flashes).
+- Consolidated weather system; moved mock data into `@calendar/ui`; removed site-specific data from the calendar package.
+- Migrated to nonce-based CSP for scripts; allowed Google avatar URLs through CSP.
+- Promoted `formatLabel` to the `@goobits/blog` engine; humanized journal tag/category labels.
+
+### Fixed
+- UTC day grouping in `/schedule/book`; program editor drawer overlap.
+- Mobile responsiveness across admin pages and footer (44px touch targets, 12px minimum text).
+- Lighthouse 100/100/100/100 across all categories.
+- Invite delete failing for legacy non-numeric IDs; legacy invite codes purged via migration.
+- Layout shift on initial booking load and journal hero images; party emoji vertical alignment.
+- Prerender recursion for WebP image paths and generated image errors.
+- Auth callback routing and magic-link redirects; admin mock redirects.
+- Numerous blog/journal warnings, build issues, and rendering stability after package extraction.
+
+### Security
+- Hardened auth and calendar production security; CSRF on join/leave and profile POST; availability program-access check.
+- Closed data-leak, entropy, and N+1 findings from booking audit.
+- Sitemap and anti-abuse flow hardening; calendar auth session and invite-claim rollback hardening.
+
 ## [1.3.0-rc.1] - 2026-04-08
 
 ### Added
