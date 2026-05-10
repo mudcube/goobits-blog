@@ -7,10 +7,15 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./admin": "./src/admin/index.ts",
+		"./admin/*": "./src/admin/*",
 		"./booking": "./src/booking/index.ts",
+		"./booking/*": "./src/booking/*",
 		"./shared": "./src/shared/index.ts",
-		"./config": "./src/config.ts",
-		"./*": "./src/*"
+		"./shared/*": "./src/shared/*",
+		"./member/*": "./src/member/*",
+		"./api/*": "./src/api/*",
+		"./routing/*": "./src/routing/*",
+		"./config": "./src/config.ts"
 	},
 	"peerDependencies": {
 		"svelte": "^5.0.0"

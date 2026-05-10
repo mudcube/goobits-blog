@@ -5,6 +5,85 @@ All notable changes to the `@goobits/blog` package will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-05-09
+
+### Breaking changes
+
+The package now ships from a `src/` subdirectory and the public surface
+has been narrowed. Most consumers won't need code changes — the named
+entries (`@goobits/blog`, `/core`, `/ui`, `/utils`, `/config`,
+`/handlers`, `/i18n`, `/config/defaults`) all still resolve to the same
+exports as 1.x. The breaking changes affect consumers using deep-path
+wildcard imports.
+
+#### Layout
+
+- All source moved under `src/`. The published tarball is now
+  `src/`-only — no top-level `index.ts` / `core.ts` / `config.ts` /
+  `ui/` / `utils/` / `config/` / `handlers/` / `i18n/`.
+- `package.json` `main`, `types`, `svelte`, `exports`, `files` all
+  repointed at `./src/*`.
+
+#### Dropped exports
+
+The following wildcard sub-entries have been removed:
+
+  - `./ui/*`        → use `./ui` (the curated barrel) for components
+  - `./config/*`    → use `./config` (the index) for config exports
+  - `./handlers/*`  → use `./handlers` (the index)
+
+Two narrow explicit entries replace the previously implicit access via
+`./utils/*` for the mdsvex plugins, which need stable module identity:
+
+  - `./utils/remark-table-of-contents`
+  - `./utils/rehype-webp-picture`
+
+The `./utils` barrel itself is unchanged.
+
+#### Migration
+
+| 1.x import | 2.0 import |
+| --- | --- |
+| `@goobits/blog/ui/BlogCard.svelte` | `@goobits/blog/ui` (then named export) |
+| `@goobits/blog/utils/blogUtils.js` | `@goobits/blog/utils` |
+| `@goobits/blog/utils/remark-table-of-contents.js` | `@goobits/blog/utils/remark-table-of-contents` |
+| `@goobits/blog/utils/rehype-webp-picture.js` | `@goobits/blog/utils/rehype-webp-picture` |
+| `@goobits/blog/config/defaults` | unchanged |
+
+If you genuinely need to import a single internal file by path, you
+can still do so — the source is laid out the same way under `src/`,
+but it's no longer part of the published `exports` surface.
+
+### Changed
+
+- Markdown post-processing: anchor `rel` now includes
+  `noopener noreferrer` in addition to `nofollow`; `javascript:`,
+  `data:`, `vbscript:`, `file:` link protocols are stripped.
+- TOC heading-id deduplication (`-2`, `-3` suffixes) on duplicate
+  heading text.
+- RSS `<link>` and `<guid>` are XML-escaped (slug-derived URLs
+  containing `&` previously produced invalid feeds).
+- Slugify NFKD-folds diacritics and expands `&` → `and` (resolves
+  `Q&A` vs `QA` collisions).
+
+### Fixed
+
+- `clientLoad.ts`: corrected indentation and locked the graceful
+  null-fallback contract with a regression test.
+- Sidebar: collapsed two near-identical render branches into a single
+  section-descriptor + `#each` loop.
+
+### Removed
+
+- 64 lines of dead Tailwind-style utility classes (`.mb-*`, `.px-*`,
+  `.flex`, `.text-*`, etc.) from `Blog.scss`. Zero consumers found
+  in the repo or in journal content. If you relied on these in your
+  markdown, declare them in your host stylesheet.
+- `galleryLightbox` action and `GalleryItem` / `GalleryOpenDetail`
+  types from the `@goobits/blog/ui` barrel — they're sibling-only
+  internals. Reachable via the explicit
+  `@goobits/blog/ui/actions/galleryLightbox` path if needed.
+
 ## [1.2.0] - 2026-02-05
 
 ### Added
