@@ -1,4 +1,4 @@
-import type { D1DatabaseLike } from '../storage/d1.ts'
+import type { D1DatabaseLike } from '../../storage/d1.ts'
 
 export async function getAdminPreference(
 	db: D1DatabaseLike,

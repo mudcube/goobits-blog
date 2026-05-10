@@ -1,9 +1,9 @@
-import type { CalendarActivityConfig } from '../social/activities.ts'
-import { buildPaymentLink } from './pay.ts'
-import { getEnabledCalendarPrograms } from './programs.ts'
-import { getCalendarProfile, listEventsFeed, listUpcomingEvents, type CalendarFeedEvent, type CalendarProfile } from './social.ts'
-import { listUserProgramAccess } from '../access/user-program-access.ts'
-import type { D1DatabaseLike } from '../storage/d1.ts'
+import type { CalendarActivityConfig } from '../../social/activities.ts'
+import { buildPaymentLink } from '../payments/pay.ts'
+import { getEnabledCalendarPrograms } from '../admin/programs.ts'
+import { getCalendarProfile, listEventsFeed, listUpcomingEvents, type CalendarFeedEvent, type CalendarProfile } from '../bookings/social.ts'
+import { listUserProgramAccess } from '../../access/user-program-access.ts'
+import type { D1DatabaseLike } from '../../storage/d1.ts'
 
 export type CalendarHomeFeedEvent = CalendarFeedEvent & {
 	payUrl: string | null

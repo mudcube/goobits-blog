@@ -20,7 +20,7 @@ import {
 import {
   enqueueCalendarSyncJob,
   processCalendarSyncQueue,
-} from "../../src/services/sync-queue.ts";
+} from "../../src/services/sync/queue.ts";
 import {
   setActiveCalendarSyncProvider,
   type CalendarSyncProvider,

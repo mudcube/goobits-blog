@@ -1,5 +1,5 @@
-import type { D1DatabaseLike } from '../storage/d1.ts'
-import { getAdminPreferences, setAdminPreference } from './admin-preferences.ts'
+import type { D1DatabaseLike } from '../../storage/d1.ts'
+import { getAdminPreferences, setAdminPreference } from './preferences.ts'
 
 export type WeekStart = 'sunday' | 'monday'
 

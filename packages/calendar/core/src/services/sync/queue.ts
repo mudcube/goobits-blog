@@ -1,10 +1,10 @@
-import type { D1DatabaseLike } from '../storage/d1.ts'
-import { ensureValidGoogleToken, googleCreateEvent, googleDeleteEvent } from '../providers/google/index.ts'
-import { appleCreateEvent, appleDeleteEvent, type AppleCalDavConnection } from '../providers/apple/caldav.ts'
-import { ensureValidOutlookToken, outlookCreateEvent, outlookDeleteEvent } from '../providers/outlook/index.ts'
-import { getConnection, saveConnection } from '../storage/d1.ts'
-import { getEnv } from '../config/env.ts'
-import { getActiveCalendarSyncProvider, type CalendarSyncProvider } from '../sync/settings.ts'
+import type { D1DatabaseLike } from '../../storage/d1.ts'
+import { ensureValidGoogleToken, googleCreateEvent, googleDeleteEvent } from '../../providers/google/index.ts'
+import { appleCreateEvent, appleDeleteEvent, type AppleCalDavConnection } from '../../providers/apple/caldav.ts'
+import { ensureValidOutlookToken, outlookCreateEvent, outlookDeleteEvent } from '../../providers/outlook/index.ts'
+import { getConnection, saveConnection } from '../../storage/d1.ts'
+import { getEnv } from '../../config/env.ts'
+import { getActiveCalendarSyncProvider, type CalendarSyncProvider } from '../../sync/settings.ts'
 
 type SyncJobRow = {
 	id: number

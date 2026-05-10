@@ -1,4 +1,4 @@
-import { addMinutes, overlaps } from '../utils/time.ts'
+import { addMinutes, overlaps } from '../../utils/time.ts'
 
 export function buildSlots({
 	timeMin,

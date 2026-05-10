@@ -67,7 +67,7 @@ import {
 } from './social/activities.ts'
 import { isKnownProgramSlug, isValidProgramSlug, type CalendarProgramSlug } from './social/programs.ts'
 import { VENUE_TIMEZONE, addWeeksInVenueTime } from './social/venue.ts'
-import { buildPaymentLink, type PaymentProvider } from './services/pay.ts'
+import { buildPaymentLink, type PaymentProvider } from './services/payments/pay.ts'
 import {
 	loadCalendarMemberShellData,
 	loadCalendarMemberHomeData,
@@ -77,7 +77,7 @@ import {
 	type CalendarShellUser,
 	type CalendarMemberShellData,
 	type CalendarMemberProfileData
-} from './services/member-pages.ts'
+} from './services/member/pages.ts'
 import {
 	getCalendarPrograms,
 	getEnabledCalendarPrograms,
@@ -90,7 +90,7 @@ import {
 	reorderCalendarPrograms,
 	type CalendarProgramState,
 	type CalendarProgramInput
-} from './services/programs.ts'
+} from './services/admin/programs.ts'
 import {
 	listUpcomingEvents,
 	listRecentEvents,
@@ -115,14 +115,14 @@ import {
 	type CalendarEventsFeed,
 	type CalendarProfile,
 	type CalendarEventMutationState
-} from './services/social.ts'
+} from './services/bookings/social.ts'
 import {
 	enqueueCalendarSyncJob,
 	getCalendarSyncQueueHealth,
 	retryCalendarSyncDeadLetters,
 	purgeCalendarSyncDeadLetters,
 	processCalendarSyncQueue
-} from './services/sync-queue.ts'
+} from './services/sync/queue.ts'
 import {
 	generateInviteCode,
 	createInvite,
@@ -173,20 +173,20 @@ import {
 	setConfirmationId,
 	getBookingByConfirmation,
 	cancelBookingByConfirmation
-} from './services/booking-confirmation.ts'
-import { getSlotAvailability, type SlotAvailabilityResult } from './services/slot-availability.ts'
+} from './services/bookings/confirmation.ts'
+import { getSlotAvailability, type SlotAvailabilityResult } from './services/bookings/slot-availability.ts'
 import {
 	getAdminPreference,
 	getAdminPreferences,
 	setAdminPreference
-} from './services/admin-preferences.ts'
+} from './services/admin/preferences.ts'
 import {
 	getAdminViewSettings,
 	setAdminViewSettings,
 	getDefaultAdminViewSettings,
 	type AdminViewSettings,
 	type WeekStart
-} from './services/admin-view-settings.ts'
+} from './services/admin/view-settings.ts'
 import {
 	putEventHero,
 	deleteEventHero,
