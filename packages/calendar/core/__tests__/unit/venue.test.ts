@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { addWeeksInVenueTime, VENUE_TIMEZONE } from '../../src/config/venue'
+import {
+	addWeeksInTimezone,
+	addWeeksInVenueTime,
+	VENUE_TIMEZONE
+} from '../../src/config/venue'
 
 const venueClock = new Intl.DateTimeFormat('en-GB', {
 	timeZone: VENUE_TIMEZONE,
@@ -57,5 +61,38 @@ describe('addWeeksInVenueTime', () => {
 		// Week 5 (March 15) is in PDT.
 		const week5 = addWeeksInVenueTime(start, 5)
 		expect(localHourMin(week5)).toBe('09:00')
+	})
+})
+
+describe('addWeeksInTimezone (per-event timezone)', () => {
+	const nyClock = new Intl.DateTimeFormat('en-GB', {
+		timeZone: 'America/New_York',
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: false
+	})
+	const nyHourMin = (iso: string) => {
+		const parts = Object.fromEntries(
+			nyClock.formatToParts(new Date(iso)).map((p) => [p.type, p.value])
+		)
+		return `${parts['hour']}:${parts['minute']}`
+	}
+
+	it('preserves wall clock in non-default timezones across DST', () => {
+		// 2026 spring-forward in US Eastern: clocks jump 2026-03-08 02:00 → 03:00.
+		// Anchor: 9am ET on March 7 (= 14:00 UTC, EST).
+		const start = '2026-03-07T14:00:00.000Z'
+		expect(nyHourMin(start)).toBe('09:00')
+		const result = addWeeksInTimezone(start, 1, 'America/New_York')
+		expect(nyHourMin(result)).toBe('09:00')
+		// March 14 in NY is in EDT (UTC-4), so 9am ET = 13:00 UTC.
+		expect(result).toBe('2026-03-14T13:00:00.000Z')
+	})
+
+	it('addWeeksInVenueTime delegates to the venue timezone', () => {
+		const start = '2026-03-07T17:00:00.000Z'
+		const wrapped = addWeeksInVenueTime(start, 1)
+		const direct = addWeeksInTimezone(start, 1, VENUE_TIMEZONE)
+		expect(wrapped).toBe(direct)
 	})
 })

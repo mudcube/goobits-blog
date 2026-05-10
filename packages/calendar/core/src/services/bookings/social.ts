@@ -1,7 +1,7 @@
 import type { D1DatabaseLike } from '../../storage/d1.ts'
 import type { CalendarProgramSlug } from '../../config/programs.ts'
 import { hasUserProgramAccess } from '../../access/user-program-access.ts'
-import { addWeeksInVenueTime } from '../../config/venue.ts'
+import { VENUE_TIMEZONE, addWeeksInTimezone } from '../../config/venue.ts'
 
 type EventRow = {
 	id: number
@@ -262,24 +262,34 @@ export async function createEventsBatch(
 		paymentNoteTemplate?: string | null
 		repeatWeeks?: number
 		createdByUserId?: string | null
+		/**
+		 * IANA timezone the event is anchored to (e.g. 'America/Los_Angeles',
+		 * 'America/New_York'). Recurrence preserves the wall clock in this
+		 * timezone across DST transitions; display surfaces use it to render
+		 * "9am" relative to the event's locale rather than the viewer's.
+		 * Defaults to VENUE_TIMEZONE for back-compat with callers that
+		 * haven't been updated to pass it explicitly.
+		 */
+		timezone?: string
 	}
 ) {
 	const repeat = Math.max(0, Math.min(24, input.repeatWeeks ?? 0))
+	const tz = input.timezone || VENUE_TIMEZONE
 	const created: number[] = []
 	for (let i = 0; i <= repeat; i++) {
-		// DST-safe: previously used setUTCDate(+7*i), which drifted the venue
-		// wall clock by ±1 hour after spring-forward / fall-back. addWeeksInVenueTime
-		// preserves the venue-local clock across DST transitions.
-		const startsAt = addWeeksInVenueTime(input.startsAt, i)
-		const endsAt = addWeeksInVenueTime(input.endsAt, i)
+		// DST-safe: previously used setUTCDate(+7*i), which drifted the
+		// wall clock by ±1 hour after spring-forward / fall-back.
+		// addWeeksInTimezone preserves the local clock in `tz` across DST.
+		const startsAt = addWeeksInTimezone(input.startsAt, i, tz)
+		const endsAt = addWeeksInTimezone(input.endsAt, i, tz)
 		const result = await db
 			.prepare(
 				`INSERT INTO calendar_events (
 			  activity_slug, title, starts_at, ends_at, capacity, location, note,
 			  cost_cents, currency, payment_provider, payment_handle, payment_note_template,
-			  created_by_user_id, created_at, updated_at
+			  created_by_user_id, timezone, created_at, updated_at
 			 )
-			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), unixepoch())`
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), unixepoch())`
 			)
 			.bind(
 				input.activitySlug,
@@ -294,7 +304,8 @@ export async function createEventsBatch(
 				input.paymentProvider ?? null,
 				input.paymentHandle ?? null,
 				input.paymentNoteTemplate ?? null,
-				input.createdByUserId ?? null
+				input.createdByUserId ?? null,
+				tz
 			)
 			.run()
 		created.push(result.meta.last_row_id)
