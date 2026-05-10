@@ -4,27 +4,24 @@
   "description": "Reusable sitemap core and server helpers for SvelteKit sites",
   "private": true,
   "type": "module",
-  "main": "index.ts",
-  "svelte": "./index.ts",
-  "types": "./index.ts",
+  "main": "./src/index.ts",
+  "svelte": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./index.ts",
-      "default": "./index.ts"
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./core": {
-      "types": "./core.ts",
-      "default": "./core.ts"
+      "types": "./src/core.ts",
+      "default": "./src/core.ts"
     },
     "./server": {
-      "types": "./server.ts",
-      "default": "./server.ts"
+      "types": "./src/server.ts",
+      "default": "./src/server.ts"
     }
   },
   "files": [
-    "index.ts",
-    "core.ts",
-    "server.ts",
     "src",
     "tsconfig.json",
     "README.md"

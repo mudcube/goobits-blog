@@ -6,4 +6,4 @@ export {
 	getPlatformEnv,
 	resolveSiteOrigin,
 	toAbsoluteUrl
-} from './src/server/xml'
+} from './server/xml'

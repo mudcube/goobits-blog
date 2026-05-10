@@ -8,7 +8,7 @@ export type {
 	SitemapEntry,
 	SitemapRoute,
 	SitemapSort
-} from './src/core/types'
+} from './core/types'
 export {
 	baseSitemapTags,
 	getFilteredSitemapCount,
@@ -17,4 +17,4 @@ export {
 	getSitemapAudiencesForVisibility,
 	getSitemapAvailableTags,
 	internalSitemapTags
-} from './src/core/viewmodel'
+} from './core/viewmodel'
