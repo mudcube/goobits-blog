@@ -323,9 +323,6 @@ importers:
 
   packages/calendar/kit:
     dependencies:
-      '@calendar/core':
-        specifier: workspace:*
-        version: link:../core
       '@calendar/migrations':
         specifier: workspace:*
         version: link:../migrations
