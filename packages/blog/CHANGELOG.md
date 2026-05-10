@@ -26,11 +26,14 @@ wildcard imports.
 
 #### Dropped exports
 
-The following wildcard sub-entries have been removed:
+The following sub-entries have been removed:
 
   - `./ui/*`        → use `./ui` (the curated barrel) for components
   - `./config/*`    → use `./config` (the index) for config exports
   - `./handlers/*`  → use `./handlers` (the index)
+  - `./handlers`    → handler functions are also re-exported from `./core`,
+                      which is the canonical entry. `./handlers` was a
+                      redundant duplicate.
 
 Two narrow explicit entries replace the previously implicit access via
 `./utils/*` for the mdsvex plugins, which need stable module identity:

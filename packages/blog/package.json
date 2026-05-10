@@ -45,11 +45,6 @@
       "svelte": "./src/config/defaults.ts",
       "default": "./src/config/defaults.ts"
     },
-    "./handlers": {
-      "types": "./src/handlers/index.ts",
-      "svelte": "./src/handlers/index.ts",
-      "default": "./src/handlers/index.ts"
-    },
     "./i18n": {
       "types": "./src/i18n/index.ts",
       "svelte": "./src/i18n/index.ts",

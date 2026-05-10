@@ -11,9 +11,7 @@
     ".": "./src/index.ts",
     "./admin-api-helpers": "./src/admin-api-helpers.ts",
     "./oauth-routing": "./src/oauth-routing.ts",
-    "./hooks": "./src/hooks.ts",
-    "./routes/*": "./src/routes/*",
-    "./server/*": "./src/server/*"
+    "./routes/*": "./src/routes/*"
   },
   "peerDependencies": {
     "@sveltejs/kit": "^2.0.0",

@@ -22,10 +22,12 @@ deep-path imports**.
   `config.ts` / `ui/` / `utils/` / `config/` / `handlers/` / `i18n/`.
   All source lives under `./src/*`. `package.json` `main`, `types`,
   `svelte`, `exports`, and `files` all repointed accordingly.
-- The `exports` map dropped four wildcard sub-entries:
-  `./ui/*`, `./config/*`, `./handlers/*`, and the bulk of
-  `./utils/*` (two narrow replacements added for the mdsvex plugins
-  that need stable module identity).
+- The `exports` map dropped four wildcard sub-entries
+  (`./ui/*`, `./config/*`, `./handlers/*`, and the bulk of `./utils/*`)
+  plus the redundant `./handlers` named entry. Two narrow replacements
+  added for the mdsvex plugins that need stable module identity
+  (`./utils/remark-table-of-contents`, `./utils/rehype-webp-picture`).
+  Handler functions are still available via `./core`.
 - Anchor `rel` on rendered post HTML now includes `noopener noreferrer`
   in addition to `nofollow`. Dangerous link protocols (`javascript:`,
   `data:`, `vbscript:`, `file:`) are stripped.
@@ -54,7 +56,8 @@ change.
 | `@goobits/blog/utils/rehype-webp-picture.js` | `@goobits/blog/utils/rehype-webp-picture` |
 | `@goobits/blog/config/index.js` | `@goobits/blog/config` |
 | `@goobits/blog/config/defaults` | unchanged |
-| `@goobits/blog/handlers/index.js` | `@goobits/blog/handlers` |
+| `@goobits/blog/handlers` | `@goobits/blog/core` |
+| `@goobits/blog/handlers/index.js` | `@goobits/blog/core` |
 
 #### Walking through your codebase
 
