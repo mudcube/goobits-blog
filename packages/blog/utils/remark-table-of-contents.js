@@ -1,18 +1,40 @@
+/**
+ * Remark plugin: replaces a `## TOC` (or `## TOC:N` for max depth N)
+ * heading with a generated table of contents linking to subsequent headings.
+ * Assigns each heading an `id` attribute, deduplicating collisions with
+ * a numeric suffix (e.g. `introduction`, `introduction-2`, `introduction-3`).
+ *
+ * @typedef {{ type: 'text', value: string }} MdText
+ * @typedef {{
+ *   type: 'heading',
+ *   depth: number,
+ *   children: Array<MdText | { type: string, [key: string]: unknown }>,
+ *   data?: { hProperties?: { id?: string } }
+ * }} MdHeading
+ * @typedef {MdHeading | { type: string, [key: string]: unknown }} MdNode
+ * @typedef {{ children: MdNode[] }} MdRoot
+ */
+
+/** @returns {(tree: MdRoot) => MdRoot} */
 export function remarkTableOfContents() {
 	return (tree) => {
+		/** @type {Array<{ depth: number, text: string, id: string }>} */
 		const headings = []
+		/** @type {Map<string, number>} */
+		const seenIds = new Map()
 		let tocIndex = -1
 		let tocDepth = 2
 		let tocLevel = 2
 
 		tree.children.forEach((node, index) => {
 			if (node.type === 'heading') {
-				const first = node.children[0]
-				const headingText = first && first.type === 'text' ? first.value : ''
+				const headingNode = /** @type {MdHeading} */ (node)
+				const first = headingNode.children[0]
+				const headingText = first && first.type === 'text' ? /** @type {MdText} */ (first).value : ''
 				const tocMatch = headingText.match(/^TOC(?::(\d+))?$/)
 				if (tocMatch) {
 					tocIndex = index
-					tocLevel = node.depth
+					tocLevel = headingNode.depth
 					if (tocMatch[1]) {
 						tocDepth = Math.min(6, Math.max(0, parseInt(tocMatch[1], 10)))
 					}
@@ -21,15 +43,12 @@ export function remarkTableOfContents() {
 				}
 
 				if (tocIndex !== -1 && index > tocIndex) {
-					const id = toId(headingText)
-					node.data = {
-						hProperties: { id }
-					}
-					headings.push({
-						depth: node.depth,
-						text: headingText,
-						id
-					})
+					const baseId = toId(headingText)
+					const seen = seenIds.get(baseId) ?? 0
+					const id = seen === 0 ? baseId : `${baseId}-${seen + 1}`
+					seenIds.set(baseId, seen + 1)
+					headingNode.data = { hProperties: { id } }
+					headings.push({ depth: headingNode.depth, text: headingText, id })
 				}
 			}
 		})
@@ -38,12 +57,7 @@ export function remarkTableOfContents() {
 			const tocHeading = {
 				type: 'heading',
 				depth: tocLevel,
-				children: [
-					{
-						type: 'text',
-						value: 'Table of Contents'
-					}
-				]
+				children: [{ type: 'text', value: 'Table of Contents' }]
 			}
 
 			const tocList = {
@@ -60,12 +74,7 @@ export function remarkTableOfContents() {
 									{
 										type: 'link',
 										url: `#${heading.id}`,
-										children: [
-											{
-												type: 'text',
-												value: heading.text
-											}
-										]
+										children: [{ type: 'text', value: heading.text }]
 									}
 								]
 							}
@@ -80,6 +89,10 @@ export function remarkTableOfContents() {
 	}
 }
 
+/**
+ * @param {string} text
+ * @returns {string}
+ */
 function toId(text) {
 	return text
 		.toLowerCase()

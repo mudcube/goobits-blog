@@ -1,13 +1,23 @@
 import { readFileSync, accessSync } from 'fs'
 import { join, dirname } from 'path'
 import { compile } from 'mdsvex'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import { getAllPosts, type ProcessedPost } from '@goobits/blog/utils'
 import { getBlogConfig } from '@goobits/blog/config'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
-import { remarkTableOfContents } from '@goobits/blog/utils/remark-table-of-contents.ts'
+import { remarkTableOfContents } from '@goobits/blog/utils/remark-table-of-contents.js'
 // @ts-expect-error -- JS rehype plugin, no type declarations
 import { rehypeWebpPicture } from '@goobits/blog/utils/rehype-webp-picture.js'
 import type { JournalMetadata, JournalPost } from '$lib/blog/viewmodel'
+
+const sanitizeSchema = {
+	...defaultSchema,
+	attributes: {
+		...defaultSchema.attributes,
+		'*': [...(defaultSchema.attributes?.['*'] ?? []), 'id'],
+		img: [...(defaultSchema.attributes?.['img'] ?? []), 'loading', 'decoding', 'width', 'height']
+	}
+}
 
 type Frontmatter = Record<string, unknown> & {
 	date?: string | Date
@@ -130,6 +140,23 @@ function mergeRelAttribute(existingRel: string | null, requiredTokens: string[])
 	return [...relTokens].join(' ')
 }
 
+const DANGEROUS_HREF_PROTOCOL = /^\s*(javascript|data|vbscript|file):/i
+
+function isDangerousHref(href: string) {
+	const decoded = href
+		.replace(/&#x([0-9a-f]+);?/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+		.replace(/&#(\d+);?/g, (_, dec) => String.fromCharCode(parseInt(dec, 10)))
+	return DANGEROUS_HREF_PROTOCOL.test(decoded)
+}
+
+function neutralizeDangerousAnchors(html: string) {
+	return html.replace(/<a\b[^>]*\bhref=(['"])(.*?)\1[^>]*>/gi, (anchorTag, quote, href: string) => {
+		if (!isDangerousHref(href)) return anchorTag
+		console.warn('[journal-blog] Stripped dangerous anchor href:', href)
+		return anchorTag.replace(/\bhref=(['"])(.*?)\1/i, `href=${quote}#${quote}`)
+	})
+}
+
 function normalizeExternalAnchorRel(html: string) {
 	return html.replace(/<a\b[^>]*\bhref=(['"])(.*?)\1[^>]*>/gi, (anchorTag, quote, href: string) => {
 		if (!/^https?:\/\//i.test(href) || isOwnedExternalUrl(href)) {
@@ -137,7 +164,7 @@ function normalizeExternalAnchorRel(html: string) {
 		}
 
 		const relMatch = anchorTag.match(/\brel=(['"])(.*?)\1/i)
-		const mergedRel = mergeRelAttribute(relMatch?.[2] ?? null, ['nofollow'])
+		const mergedRel = mergeRelAttribute(relMatch?.[2] ?? null, ['nofollow', 'noopener', 'noreferrer'])
 
 		if (relMatch) {
 			return anchorTag.replace(/\brel=(['"])(.*?)\1/i, `rel=${quote}${mergedRel}${quote}`)
@@ -181,13 +208,15 @@ export async function getPost({
 		const mdContent = readFileSync(getJournalPostFilePath(year, month, slug), 'utf-8')
 		const compiled = (await compile(mdContent, {
 			remarkPlugins: [remarkTableOfContents],
-			rehypePlugins: [rehypeWebpPicture]
+			rehypePlugins: [[rehypeSanitize, sanitizeSchema], rehypeWebpPicture]
 		})) as MdsvexCompileResult
 		const renderedContent = (compiled?.code ?? '').replace(/{@html `(.*?)`}/gs, '$1')
 		const postFilePath = getJournalPostFilePath(year, month, slug)
 		const postDir = dirname(postFilePath)
 		const strippedContent = upgradeImagesToWebpPicture(
-			normalizeExternalAnchorRel(stripScriptTags(upgradeInsecureMediaUrls(renderedContent))),
+			normalizeExternalAnchorRel(
+				neutralizeDangerousAnchors(stripScriptTags(upgradeInsecureMediaUrls(renderedContent)))
+			),
 			postDir
 		)
 		const fallbackDate = () => new Date(`${year}-${month}-01`)

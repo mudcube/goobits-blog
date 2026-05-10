@@ -330,11 +330,15 @@ function extractFirstImageFromMarkdown(markdown: string): string {
  */
 export function slugify(text: string): string {
 	return text
+		.normalize('NFKD')
+		.replace(/[̀-ͯ]/g, '')
 		.toLowerCase()
 		.trim()
+		.replace(/&/g, ' and ')
 		.replace(/\s+/g, '-')
 		.replace(/[^\w-]+/g, '')
 		.replace(/--+/g, '-')
+		.replace(/^-+|-+$/g, '')
 }
 
 /**
@@ -1248,6 +1252,7 @@ export function generateRssFeed(posts: ProcessedPost[], options: RssFeedOptions)
 	limitedPosts.forEach(post => {
 		try {
 			const postUrl = `${ baseUrl }${ getPostUrl(post) }`
+			const postUrlXml = escapeXml(postUrl)
 			const pubDate = new Date(post.date).toUTCString()
 			const title = post.metadata.fm.title || 'Untitled Post'
 			const excerpt = getPostExcerpt(post, 300) || 'No description available'
@@ -1259,8 +1264,8 @@ export function generateRssFeed(posts: ProcessedPost[], options: RssFeedOptions)
 
 			xml += `  <item>
     <title>${ escapeXml(title) }</title>
-    <link>${ postUrl }</link>
-    <guid isPermaLink="true">${ postUrl }</guid>
+    <link>${ postUrlXml }</link>
+    <guid isPermaLink="true">${ postUrlXml }</guid>
     <pubDate>${ pubDate }</pubDate>
 ${ modifiedDate ? `    <lastBuildDate>${ modifiedDate }</lastBuildDate>\n` : '' }
     <description>${ escapeXml(excerpt) }</description>

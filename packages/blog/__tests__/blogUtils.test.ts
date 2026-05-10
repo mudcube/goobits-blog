@@ -137,6 +137,11 @@ describe('slugify', () => {
 		expect(slugify('hello@world#test$foo')).toBe('helloworldtestfoo')
 	})
 
+	it('expands & to "and" so "Q&A" and "QA" do not collide', () => {
+		expect(slugify('Q&A')).toBe('q-and-a')
+		expect(slugify('Rock & Roll')).toBe('rock-and-roll')
+	})
+
 	it('preserves hyphens but collapses them', () => {
 		// Bug: "hello--world" double hyphens look unprofessional
 		expect(slugify('hello--world')).toBe('hello-world')
@@ -148,9 +153,9 @@ describe('slugify', () => {
 		expect(slugify('')).toBe('')
 	})
 
-	it('handles unicode characters by stripping them', () => {
-		// Bug: Unicode in URLs causes encoding issues
-		expect(slugify('café résumé')).toBe('caf-rsum')
+	it('folds diacritics so meaning survives in the slug', () => {
+		// "café" → "cafe" (not "caf"), "résumé" → "resume" (not "rsum")
+		expect(slugify('café résumé')).toBe('cafe-resume')
 	})
 
 	it('handles strings that become empty after processing', () => {

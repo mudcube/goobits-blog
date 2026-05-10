@@ -1,9 +1,20 @@
 import 'dotenv/config'
 import adapterCloudflare from '@sveltejs/adapter-cloudflare'
 import { mdsvex } from 'mdsvex'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import { handlePrerenderHttpError } from './src/lib/app/config/runtime/sveltekit.runtime.js'
 import { remarkTableOfContents } from './packages/blog/utils/remark-table-of-contents.js'
 import { rehypeWebpPicture } from './packages/blog/utils/rehype-webp-picture.js'
+
+// Allow heading anchor ids (set by remarkTableOfContents) and our img perf attrs.
+const sanitizeSchema = {
+	...defaultSchema,
+	attributes: {
+		...defaultSchema.attributes,
+		'*': [...(defaultSchema.attributes?.['*'] ?? []), 'id'],
+		img: [...(defaultSchema.attributes?.img ?? []), 'loading', 'decoding', 'width', 'height']
+	}
+}
 
 export default {
 	kit: {
@@ -73,7 +84,7 @@ export default {
 		mdsvex({
 			extensions: ['.md'],
 			remarkPlugins: [remarkTableOfContents],
-			rehypePlugins: [rehypeWebpPicture],
+			rehypePlugins: [[rehypeSanitize, sanitizeSchema], rehypeWebpPicture],
 			smartypants: {
 				dashes: 'oldschool'
 			}
