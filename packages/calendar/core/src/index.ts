@@ -157,9 +157,9 @@ import {
 	type CheckoutProvider,
 	type PaymentCheckoutContext
 } from './services/payments/checkout.ts'
-import { listEventTemplates, type CalendarEventTemplate } from './events/event-templates.ts'
-import { promoteWaitlistedParticipant, type PromoteWaitlistResult } from './events/promote-waitlist.ts'
-import { getAdminEventDetail, type AdminEventDetail } from './events/event-detail.ts'
+import { listEventTemplates, type CalendarEventTemplate } from './services/admin/event-templates.ts'
+import { promoteWaitlistedParticipant, type PromoteWaitlistResult } from './services/bookings/promote-waitlist.ts'
+import { getAdminEventDetail, type AdminEventDetail } from './services/admin/event-detail.ts'
 import {
 	fetchWeatherForEvent,
 	fetchDayForecast,

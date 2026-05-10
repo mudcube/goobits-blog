@@ -3,10 +3,10 @@ import { buildEnv } from '@calendar/kit'
 import {
 	deletePaymentCredentials,
 	getPaymentCheckoutConfig,
-	requireEnv,
 	savePayPalPaymentCredentials,
 	saveSquarePaymentCredentials
-} from '@calendar/core'
+} from '@calendar/core/payments'
+import { requireEnv } from '@calendar/core/config'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiError, apiOk } from '@calendar/kit'
 

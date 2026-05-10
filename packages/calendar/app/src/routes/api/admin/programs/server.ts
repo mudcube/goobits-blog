@@ -1,6 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { deleteCalendarProgram, getCalendarPrograms, parseAdminProgramMutationInput, reorderCalendarPrograms, TransportValidationError, upsertCalendarProgram } from '@calendar/core'
+import { deleteCalendarProgram, getCalendarPrograms, reorderCalendarPrograms, upsertCalendarProgram } from '@calendar/core/admin'
+import { parseAdminProgramMutationInput, TransportValidationError } from '@calendar/core/transport'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiError, apiOk, apiValidationError } from '@calendar/kit'
 

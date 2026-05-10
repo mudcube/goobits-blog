@@ -50,7 +50,7 @@ export {
 	type CalendarProgramInput
 } from './services/admin/programs.ts'
 
-export { getAdminEventDetail, type AdminEventDetail } from './events/event-detail.ts'
+export { getAdminEventDetail, type AdminEventDetail } from './services/admin/event-detail.ts'
 
 export {
 	getAdminPaymentDefaults,

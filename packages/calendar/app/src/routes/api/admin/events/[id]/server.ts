@@ -2,17 +2,18 @@ import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import {
 	cancelEvent,
-	enqueueCalendarSyncJob,
-	parseAdminEventUpdateInput,
-	parsePositiveInteger,
-	processCalendarSyncQueue,
 	setAttendanceStatus,
-	TransportValidationError,
 	updateEventCapacity,
 	updateEventDetails,
 	updateEventMemory,
 	updateEventRecapText
-} from '@calendar/core'
+} from '@calendar/core/booking'
+import { enqueueCalendarSyncJob, processCalendarSyncQueue } from '@calendar/core/sync'
+import {
+	parseAdminEventUpdateInput,
+	parsePositiveInteger,
+	TransportValidationError
+} from '@calendar/core/transport'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
 

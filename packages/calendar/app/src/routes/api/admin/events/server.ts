@@ -1,8 +1,10 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { createEventsBatch, enqueueCalendarSyncJob, getAdminPaymentDefaults, listEventsFeed, processCalendarSyncQueue } from '@calendar/core'
+import { createEventsBatch, listEventsFeed } from '@calendar/core/booking'
+import { enqueueCalendarSyncJob, processCalendarSyncQueue } from '@calendar/core/sync'
+import { getAdminPaymentDefaults, getCalendarProgramBySlug } from '@calendar/core/admin'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
-import { getCalendarProgramBySlug, parseAdminCreateEventsBatchInput, TransportValidationError } from '@calendar/core'
+import { parseAdminCreateEventsBatchInput, TransportValidationError } from '@calendar/core/transport'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
 
 async function enqueueCreatedEventsSync(env: Awaited<ReturnType<typeof buildEnv>>, eventIds: number[]) {

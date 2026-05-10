@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { parseAdminRulesInput, TransportValidationError } from '@calendar/core'
+import { parseAdminRulesInput, TransportValidationError } from '@calendar/core/transport'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk, apiValidationError } from '@calendar/kit'
 

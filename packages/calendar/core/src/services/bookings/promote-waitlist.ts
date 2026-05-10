@@ -1,4 +1,4 @@
-import type { D1DatabaseLike } from '../storage/d1.ts'
+import type { D1DatabaseLike } from '../../storage/d1.ts'
 
 export type PromoteWaitlistResult = {
 	status: 'promoted' | 'already_joined' | 'full' | 'not_found'

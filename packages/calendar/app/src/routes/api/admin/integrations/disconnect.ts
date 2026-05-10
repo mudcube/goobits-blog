@@ -1,6 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { deleteConnection, getActiveCalendarSyncProvider, requireEnv, setActiveCalendarSyncProvider } from '@calendar/core'
+import { deleteConnection } from '@calendar/core/storage'
+import { getActiveCalendarSyncProvider, setActiveCalendarSyncProvider } from '@calendar/core/sync'
+import { requireEnv } from '@calendar/core/config'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk } from '@calendar/kit'
 

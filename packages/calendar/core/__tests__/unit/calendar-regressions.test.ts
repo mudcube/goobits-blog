@@ -3,8 +3,8 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { createSqliteDb } from "../../../kit/src/dev/sqliteDb.ts";
-import { getAdminEventDetail } from "../../src/events/event-detail.ts";
-import { promoteWaitlistedParticipant } from "../../src/events/promote-waitlist.ts";
+import { getAdminEventDetail } from "../../src/services/admin/event-detail.ts";
+import { promoteWaitlistedParticipant } from "../../src/services/bookings/promote-waitlist.ts";
 import {
   createPayPalCheckoutOrder,
   createSquareCashAppPayment,

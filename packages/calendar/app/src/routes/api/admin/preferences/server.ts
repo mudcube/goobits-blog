@@ -1,11 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { z } from 'zod'
 import { buildEnv } from '@calendar/kit'
-import {
-	getAdminViewSettings,
-	setAdminViewSettings,
-	TransportValidationError
-} from '@calendar/core'
+import { getAdminViewSettings, setAdminViewSettings } from '@calendar/core/admin'
+import { TransportValidationError } from '@calendar/core/transport'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
 

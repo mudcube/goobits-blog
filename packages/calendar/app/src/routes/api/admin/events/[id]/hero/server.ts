@@ -3,13 +3,12 @@ import { buildEnv } from '@calendar/kit'
 import {
 	deleteEventHero,
 	extractHeroKeyFromUrl,
-	getEventHeroImage,
 	HeroUploadError,
 	MAX_HERO_BYTES,
-	parsePositiveInteger,
-	putEventHero,
-	updateEventHeroImage
-} from '@calendar/core'
+	putEventHero
+} from '@calendar/core/media'
+import { getEventHeroImage, updateEventHeroImage } from '@calendar/core/booking'
+import { parsePositiveInteger } from '@calendar/core/transport'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk, apiError } from '@calendar/kit'
 

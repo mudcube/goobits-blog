@@ -38,8 +38,8 @@ export {
 
 export { getSlotAvailability, type SlotAvailabilityResult } from './services/bookings/slot-availability.ts'
 
-export { listEventTemplates, type CalendarEventTemplate } from './events/event-templates.ts'
-export { promoteWaitlistedParticipant, type PromoteWaitlistResult } from './events/promote-waitlist.ts'
+export { listEventTemplates, type CalendarEventTemplate } from './services/admin/event-templates.ts'
+export { promoteWaitlistedParticipant, type PromoteWaitlistResult } from './services/bookings/promote-waitlist.ts'
 
 export {
 	loadCalendarMemberShellData,

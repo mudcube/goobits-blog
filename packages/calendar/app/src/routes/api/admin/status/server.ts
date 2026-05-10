@@ -1,16 +1,10 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import {
-	ensureValidGoogleToken,
-	ensureValidOutlookToken,
-	getConnection,
-	getActiveCalendarSyncProvider,
-	saveConnection,
-	requireEnv,
-	getCalendarSyncQueueHealth,
-	getAdminPaymentDefaults,
-	getPaymentCheckoutConfig
-} from '@calendar/core'
+import { ensureValidGoogleToken, ensureValidOutlookToken } from '@calendar/core/providers'
+import { getConnection, saveConnection } from '@calendar/core/storage'
+import { getActiveCalendarSyncProvider, getCalendarSyncQueueHealth } from '@calendar/core/sync'
+import { requireEnv } from '@calendar/core/config'
+import { getAdminPaymentDefaults, getPaymentCheckoutConfig } from '@calendar/core/payments'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiOk } from '@calendar/kit'
 
