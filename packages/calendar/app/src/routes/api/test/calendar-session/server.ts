@@ -1,6 +1,6 @@
 import { json, type RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { parseCalendarSessionBootstrapInput, TransportValidationError } from '@calendar/core'
+import { parseCalendarSessionBootstrapInput, TransportValidationError } from '@calendar/core/transport'
 import { apiError, apiValidationError } from '@calendar/kit'
 import { ensureCalendarUserByEmail, setCalendarSessionCookie } from '../../../../server/auth/calendar-session'
 

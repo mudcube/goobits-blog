@@ -1,14 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { buildEnv } from '@calendar/kit'
-import {
-	createInvite,
-	deleteInvite,
-	deleteInviteByCode,
-	listInvites,
-	parseCalendarInviteCreateInput,
-	TransportValidationError
-} from '@calendar/core'
+import { createInvite, deleteInvite, deleteInviteByCode, listInvites } from '@calendar/core/invites'
+import { parseCalendarInviteCreateInput, TransportValidationError } from '@calendar/core/transport'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
 
 export async function GET(event: RequestEvent) {

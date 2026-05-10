@@ -1,6 +1,7 @@
 import { json, type RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { parseSyncQueueProcessLimitInput, processCalendarSyncQueue, TransportValidationError } from '@calendar/core'
+import { processCalendarSyncQueue } from '@calendar/core/sync'
+import { parseSyncQueueProcessLimitInput, TransportValidationError } from '@calendar/core/transport'
 import { apiError, apiValidationError } from '@calendar/kit'
 
 export async function POST(event: RequestEvent) {

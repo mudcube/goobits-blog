@@ -1,13 +1,12 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
+import { getCalendarPrograms } from '@calendar/core/admin'
+import { listUserProgramAccess, setUserProgramAccess } from '@calendar/core/invites'
 import {
-	getCalendarPrograms,
-	listUserProgramAccess,
 	parseAdminUserProgramAccessInput,
 	parsePositiveInteger,
-	setUserProgramAccess,
 	TransportValidationError
-} from '@calendar/core'
+} from '@calendar/core/transport'
 import { apiError, apiOk, apiValidationError } from '@calendar/kit'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 

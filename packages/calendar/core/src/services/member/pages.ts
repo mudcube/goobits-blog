@@ -1,4 +1,4 @@
-import type { CalendarActivityConfig } from '../../social/activities.ts'
+import type { CalendarActivityConfig } from '../../config/activities.ts'
 import { buildPaymentLink } from '../payments/pay.ts'
 import { getEnabledCalendarPrograms } from '../admin/programs.ts'
 import { getCalendarProfile, listEventsFeed, listUpcomingEvents, type CalendarFeedEvent, type CalendarProfile } from '../bookings/social.ts'

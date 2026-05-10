@@ -1,7 +1,7 @@
 import type { D1DatabaseLike } from '../../storage/d1.ts'
-import type { CalendarProgramSlug } from '../../social/programs.ts'
+import type { CalendarProgramSlug } from '../../config/programs.ts'
 import { hasUserProgramAccess } from '../../access/user-program-access.ts'
-import { addWeeksInVenueTime } from '../../social/venue.ts'
+import { addWeeksInVenueTime } from '../../config/venue.ts'
 
 type EventRow = {
 	id: number

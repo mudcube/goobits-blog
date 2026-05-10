@@ -1,6 +1,7 @@
 import { json, type RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import { getCalendarConfig, grantCalendarAdmin } from '@calendar/core'
+import { getCalendarConfig } from '@calendar/core/config'
+import { grantCalendarAdmin } from '@calendar/core/admin'
 import { apiError } from '@calendar/kit'
 import { ensureCalendarUserByEmail, setCalendarSessionCookie } from '../../../../server/auth/calendar-session'
 

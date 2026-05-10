@@ -1,5 +1,5 @@
-import type { CalendarActivityConfig } from '../../social/activities.ts'
-import { isValidProgramSlug, type CalendarProgramSlug } from '../../social/programs.ts'
+import type { CalendarActivityConfig } from '../../config/activities.ts'
+import { isValidProgramSlug, type CalendarProgramSlug } from '../../config/programs.ts'
 import type { D1DatabaseLike } from '../../storage/d1.ts'
 import { getCalendarConfig } from '../../config/calendar.ts'
 import { TransportValidationError } from '../../transport/errors.ts'

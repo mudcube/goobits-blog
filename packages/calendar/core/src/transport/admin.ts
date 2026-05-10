@@ -1,4 +1,4 @@
-import { isValidProgramSlug } from "../social/programs.ts";
+import { isValidProgramSlug } from "../config/programs.ts";
 import { TransportValidationError } from "./errors.ts";
 import {
   asJsonObject,

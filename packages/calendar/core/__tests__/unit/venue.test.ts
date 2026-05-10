@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { addWeeksInVenueTime, VENUE_TIMEZONE } from '../../src/social/venue'
+import { addWeeksInVenueTime, VENUE_TIMEZONE } from '../../src/config/venue'
 
 const venueClock = new Intl.DateTimeFormat('en-GB', {
 	timeZone: VENUE_TIMEZONE,

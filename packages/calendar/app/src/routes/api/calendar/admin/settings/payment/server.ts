@@ -1,11 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import {
-	getAdminPaymentDefaults,
-	parseAdminPaymentDefaultsInput,
-	setAdminPaymentDefaults,
-	TransportValidationError
-} from '@calendar/core'
+import { getAdminPaymentDefaults, setAdminPaymentDefaults } from '@calendar/core/admin'
+import { parseAdminPaymentDefaultsInput, TransportValidationError } from '@calendar/core/transport'
 import { apiOk, apiValidationError } from '@calendar/kit'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 

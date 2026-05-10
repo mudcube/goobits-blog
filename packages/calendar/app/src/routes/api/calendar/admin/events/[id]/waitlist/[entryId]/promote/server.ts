@@ -1,11 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
-import {
-	enqueueCalendarSyncJob,
-	parsePositiveInteger,
-	processCalendarSyncQueue,
-	promoteWaitlistedParticipant
-} from '@calendar/core'
+import { promoteWaitlistedParticipant } from '@calendar/core/booking'
+import { enqueueCalendarSyncJob, processCalendarSyncQueue } from '@calendar/core/sync'
+import { parsePositiveInteger } from '@calendar/core/transport'
 import { apiError, apiOk } from '@calendar/kit'
 import { requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 

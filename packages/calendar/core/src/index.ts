@@ -64,9 +64,9 @@ import {
 	resetCalendarActivityCatalog,
 	type CalendarActivityConfig,
 	type CalendarActivityDefinition
-} from './social/activities.ts'
-import { isKnownProgramSlug, isValidProgramSlug, type CalendarProgramSlug } from './social/programs.ts'
-import { VENUE_TIMEZONE, addWeeksInVenueTime } from './social/venue.ts'
+} from './config/activities.ts'
+import { isKnownProgramSlug, isValidProgramSlug, type CalendarProgramSlug } from './config/programs.ts'
+import { VENUE_TIMEZONE, addWeeksInVenueTime } from './config/venue.ts'
 import { buildPaymentLink, type PaymentProvider } from './services/payments/pay.ts'
 import {
 	loadCalendarMemberShellData,

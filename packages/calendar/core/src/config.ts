@@ -23,8 +23,8 @@ export {
 	resetCalendarActivityCatalog,
 	type CalendarActivityConfig,
 	type CalendarActivityDefinition
-} from './social/activities.ts'
+} from './config/activities.ts'
 
-export { isKnownProgramSlug, isValidProgramSlug, type CalendarProgramSlug } from './social/programs.ts'
+export { isKnownProgramSlug, isValidProgramSlug, type CalendarProgramSlug } from './config/programs.ts'
 
-export { VENUE_TIMEZONE, addWeeksInVenueTime } from './social/venue.ts'
+export { VENUE_TIMEZONE, addWeeksInVenueTime } from './config/venue.ts'
