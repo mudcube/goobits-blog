@@ -159,10 +159,13 @@ export async function getStoredPayPalPaymentCredentials({
     provider: "paypal_checkout",
     base64Key,
   });
-  if (connection?.accessToken && connection.refreshToken) {
+  // PayPal stores clientId/clientSecret in primary/secondary credentials.
+  // (The accessToken/refreshToken aliases on `connection` map to the same
+  // bytes, but the names lie about the semantics for non-OAuth providers.)
+  if (connection?.primaryCredential && connection.secondaryCredential) {
     return {
-      clientId: connection.accessToken,
-      clientSecret: connection.refreshToken,
+      clientId: connection.primaryCredential,
+      clientSecret: connection.secondaryCredential,
       environment: normalizeEnvironment(connection.scope),
       source: "stored",
     };
@@ -198,13 +201,15 @@ export async function getStoredSquarePaymentCredentials({
     provider: "square_cashapp",
     base64Key,
   });
-  if (connection?.accessToken && connection.refreshToken) {
+  // Square stores applicationId/accessToken in primary/secondary
+  // credentials. locationId + environment ride along in the scope JSON.
+  if (connection?.primaryCredential && connection.secondaryCredential) {
     const scope = parseSquareScope(connection.scope);
     if (scope.locationId) {
       return {
-        applicationId: connection.accessToken,
+        applicationId: connection.primaryCredential,
         locationId: scope.locationId,
-        accessToken: connection.refreshToken,
+        accessToken: connection.secondaryCredential,
         environment: scope.environment,
         source: "stored",
       };
@@ -280,8 +285,11 @@ export async function savePayPalPaymentCredentials({
     provider: "paypal_checkout",
     base64Key,
     token: {
-      accessToken: clientId,
-      refreshToken: clientSecret,
+      // primary = clientId (public-ish), secondary = clientSecret (must
+      // never leak). FAR_FUTURE_EXPIRES_AT is a sentinel — these are
+      // long-lived API credentials, not OAuth tokens.
+      primaryCredential: clientId,
+      secondaryCredential: clientSecret,
       expiresAt: FAR_FUTURE_EXPIRES_AT,
       scope: environment,
     },
@@ -308,8 +316,11 @@ export async function saveSquarePaymentCredentials({
     provider: "square_cashapp",
     base64Key,
     token: {
-      accessToken: applicationId,
-      refreshToken: accessToken,
+      // primary = applicationId (public-ish), secondary = accessToken
+      // (the long-lived Square API token). locationId + environment travel
+      // in the scope blob since the columns can't carry them.
+      primaryCredential: applicationId,
+      secondaryCredential: accessToken,
       expiresAt: FAR_FUTURE_EXPIRES_AT,
       scope: JSON.stringify({ locationId, environment }),
     },

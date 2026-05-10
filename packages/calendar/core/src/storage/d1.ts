@@ -11,6 +11,26 @@ export type D1DatabaseLike = {
 	prepare: (sql: string) => D1PreparedStatement
 }
 
+/**
+ * `connections` rows are dual-named during the credentials migration window:
+ *
+ *   • Old columns: `access_token` / `refresh_token` — accurate for OAuth
+ *     providers (Google/Outlook/Apple) where the stored values really are
+ *     access + refresh tokens.
+ *   • New columns: `primary_credential` / `secondary_credential` — neutral
+ *     names that don't lie about the contents for non-OAuth callers
+ *     (PayPal/Square store clientId/clientSecret-shaped values here).
+ *
+ * Reads coalesce new ?? old so nothing breaks if a row predates the
+ * migration backfill. Writes go to BOTH columns during the transition so
+ * code that's still running the old read path keeps working. Phase 2
+ * (a follow-up migration) drops the old columns once the rollout is
+ * verified, after which this file can simplify to single-column reads.
+ *
+ * The returned object exposes both name pairs so OAuth callers can keep
+ * the semantically-meaningful `accessToken/refreshToken` while payment
+ * callers use `primaryCredential/secondaryCredential`.
+ */
 export async function getConnection({
 	db,
 	provider,
@@ -21,20 +41,34 @@ export async function getConnection({
 	base64Key: string
 }) {
 	const row = await db.prepare(
-		`SELECT provider, access_token, refresh_token, expires_at, scope FROM connections WHERE provider = ? LIMIT 1`
+		`SELECT provider, access_token, refresh_token, primary_credential, secondary_credential, expires_at, scope FROM connections WHERE provider = ? LIMIT 1`
 	).bind(provider).first<{
 		provider: string
-		access_token: string
-		refresh_token: string
+		access_token: string | null
+		refresh_token: string | null
+		primary_credential: string | null
+		secondary_credential: string | null
 		expires_at: number | null
 		scope: string | null
 	}>()
 	if (!row) return null
 
+	const primaryCipher = row.primary_credential ?? row.access_token
+	const secondaryCipher = row.secondary_credential ?? row.refresh_token
+	if (!primaryCipher || !secondaryCipher) return null
+
+	const primary = await decryptString({ ciphertext: primaryCipher, base64Key })
+	const secondary = await decryptString({ ciphertext: secondaryCipher, base64Key })
+
 	return {
 		provider: row.provider,
-		accessToken: await decryptString({ ciphertext: row.access_token, base64Key }),
-		refreshToken: await decryptString({ ciphertext: row.refresh_token, base64Key }),
+		// OAuth-friendly aliases — the bytes are the same as primary/secondary.
+		accessToken: primary,
+		refreshToken: secondary,
+		// Neutral names — preferred for payment integrations where the
+		// values aren't really OAuth tokens.
+		primaryCredential: primary,
+		secondaryCredential: secondary,
 		expiresAt: row.expires_at,
 		scope: row.scope
 	}
@@ -49,27 +83,40 @@ export async function saveConnection({
 	db: D1DatabaseLike
 	provider: string
 	token: {
-		accessToken: string
-		refreshToken: string
+		// Accept either name pair; semantic equivalents.
+		accessToken?: string
+		refreshToken?: string
+		primaryCredential?: string
+		secondaryCredential?: string
 		expiresAt?: number | null
 		scope?: string | null
 	}
 	base64Key: string
 }) {
-	const encAccess = await encryptString({ plaintext: token.accessToken, base64Key })
-	const encRefresh = await encryptString({ plaintext: token.refreshToken, base64Key })
+	const primary = token.primaryCredential ?? token.accessToken
+	const secondary = token.secondaryCredential ?? token.refreshToken
+	if (primary === undefined || secondary === undefined) {
+		throw new Error('saveConnection requires either accessToken/refreshToken or primaryCredential/secondaryCredential')
+	}
+	const encPrimary = await encryptString({ plaintext: primary, base64Key })
+	const encSecondary = await encryptString({ plaintext: secondary, base64Key })
 
+	// Dual-write: populate both column pairs during the transition window so
+	// rolling back to the pre-Phase-1 codebase remains safe. Phase 2 drops the
+	// old columns and this branch collapses to single-column writes.
 	await db.prepare(
-		`INSERT INTO connections (provider, access_token, refresh_token, expires_at, scope, updated_at)
-		 VALUES (?, ?, ?, ?, ?, strftime('%s','now'))
+		`INSERT INTO connections (provider, access_token, refresh_token, primary_credential, secondary_credential, expires_at, scope, updated_at)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%s','now'))
 		 ON CONFLICT(provider) DO UPDATE SET
 		  access_token = excluded.access_token,
 		  refresh_token = excluded.refresh_token,
+		  primary_credential = excluded.primary_credential,
+		  secondary_credential = excluded.secondary_credential,
 		  expires_at = excluded.expires_at,
 		  scope = excluded.scope,
 		  updated_at = strftime('%s','now')`
 	)
-		.bind(provider, encAccess, encRefresh, token.expiresAt, token.scope ?? null)
+		.bind(provider, encPrimary, encSecondary, encPrimary, encSecondary, token.expiresAt, token.scope ?? null)
 		.run()
 }
 
