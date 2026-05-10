@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { withAdminRoute } from '@calendar/ui/config'
+	import { initials } from '@calendar/ui/admin/members/crew-helpers'
 
 	type Participant = {
 		name?: string | null
@@ -46,13 +47,6 @@
 		if (diff < day) return `${Math.max(1, Math.floor(diff / hour))}h ago`
 		if (diff < day * 2) return 'yesterday'
 		return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-	}
-
-	function initials(name: string) {
-		const parts = name.trim().split(/\s+/).filter(Boolean)
-		const a = parts[0]?.[0] ?? ''
-		const b = parts[1]?.[0] ?? ''
-		return `${a}${b}`.toUpperCase() || name.slice(0, 2).toUpperCase()
 	}
 
 	function firstName(name: string) {

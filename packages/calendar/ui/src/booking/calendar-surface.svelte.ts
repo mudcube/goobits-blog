@@ -38,12 +38,9 @@ export function isSameDay(a: Date, b: Date) {
 	)
 }
 
-export function isoDay(date: Date) {
-	const y = date.getFullYear()
-	const m = `${date.getMonth() + 1}`.padStart(2, '0')
-	const d = `${date.getDate()}`.padStart(2, '0')
-	return `${y}-${m}-${d}`
-}
+// Re-export the canonical isoDay from @calendar/core so admin + booking
+// share one implementation.
+export { isoDay } from '@calendar/core'
 
 export function dominantAxisValue(vector: [number, number, number]) {
 	return Math.abs(vector[1]) >= Math.abs(vector[0]) ? vector[1] : vector[0]

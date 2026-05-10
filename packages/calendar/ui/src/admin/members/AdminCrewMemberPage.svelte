@@ -9,6 +9,7 @@
 	import { ChevronRowCard, getActivityEmoji } from '@calendar/ui/shared'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
+	import { initials, normalizeName, fallbackNameFromEmail } from '@calendar/ui/admin/members/crew-helpers'
 	import { withAdminRoute } from '@calendar/ui/config'
 	import { adminDetailCrumbLabel } from '../shell/state'
 	import type { CalendarAdminUser } from '@calendar/ui/api/calendar'
@@ -61,24 +62,9 @@
 		return withAdminMock(path, mockMode)
 	}
 
-	function normalizeName(value: unknown) {
-		return String(value || '').trim()
-	}
-
 	function prettyProgramSlug(slug: string) {
 		return slug
 			.split(/[-_\s]+/)
-			.filter(Boolean)
-			.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-			.join(' ')
-	}
-
-	function fallbackNameFromEmail(email: string) {
-		const local = email.split('@')[0] || email
-		const clean = local.replace(/[._-]+/g, ' ').trim()
-		if (!clean) return 'Member'
-		return clean
-			.split(/\s+/)
 			.filter(Boolean)
 			.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
 			.join(' ')
@@ -90,17 +76,6 @@
 		const byEmail = normalizeName(user['email'])
 		if (byEmail) return fallbackNameFromEmail(byEmail)
 		return String(user['id'] || 'Member')
-	}
-
-	function initials(name: string) {
-		const parts = name.split(/\s+/).filter(Boolean)
-		const a = parts[0]?.[0] ?? ''
-		let b = parts[1]?.[0] ?? ''
-		if (!b) {
-			const first = (parts[0] || name || '').trim()
-			b = first.length > 1 ? (first[1] || 'X') : 'X'
-		}
-		return `${a}${b}`.toUpperCase()
 	}
 
 	function formatWhen(iso: string) {

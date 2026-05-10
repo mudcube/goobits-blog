@@ -1,22 +1,23 @@
-export { default as AdminLoginCard } from "./auth/AdminLoginCard.svelte";
-export { default as AdminCalendarPanel } from "./availability/AdminCalendarPanel.svelte";
-export { default as AdminDashboardPage } from "./dashboard/AdminDashboardPage.svelte";
-export { default as AdminMemoriesRail } from "./dashboard/AdminMemoriesRail.svelte";
-export { default as AdminWeekGrid } from "./dashboard/AdminWeekGrid.svelte";
-export { default as AdminEventDetailSheet } from "./events/AdminEventDetailSheet.svelte";
-export { default as AdminEventDetailPage } from "./events/AdminEventDetailPage.svelte";
-export { default as AdminEventsPage } from "./events/AdminEventsPage.svelte";
-export { EventCard } from "../shared";
-export { default as AdminCrewInviteModal } from "./members/AdminCrewInviteModal.svelte";
-export { default as AdminCrewPage } from "./members/AdminCrewPage.svelte";
-export { default as AdminCrewMemberCard } from "./members/AdminCrewMemberCard.svelte";
-export { default as AdminCrewMemberPage } from "./members/AdminCrewMemberPage.svelte";
-export { default as AdminProgramPage } from "./programs/AdminProgramPage.svelte";
-export { default as AdminNewProgramPage } from "./programs/AdminNewProgramPage.svelte";
-export { default as AdminProgramEditor } from "./programs/editor/AdminProgramEditor.svelte";
-export { default as AdminSettingsPage } from "./settings/AdminSettingsPage.svelte";
-export { default as AdminActionButton } from "./shared/AdminActionButton.svelte";
-export { ChevronRowCard } from "../shared";
-export { default as AdminMetaCards } from "./shared/AdminMetaCards.svelte";
-export { default as AdminPageHero } from "./shared/AdminPageHero.svelte";
-export * from "./shared/admin";
+// Admin barrel — admin-specific surfaces only. Shared primitives (EventCard,
+// ChevronRowCard) live in `@calendar/ui/shared` and are imported from there
+// directly rather than re-exported here, so this barrel stays focused.
+export { default as AdminLoginCard } from './auth/AdminLoginCard.svelte'
+export { default as AdminCalendarPanel } from './availability/AdminCalendarPanel.svelte'
+export { default as AdminDashboardPage } from './dashboard/AdminDashboardPage.svelte'
+export { default as AdminMemoriesRail } from './dashboard/AdminMemoriesRail.svelte'
+export { default as AdminWeekGrid } from './dashboard/AdminWeekGrid.svelte'
+export { default as AdminEventDetailSheet } from './events/AdminEventDetailSheet.svelte'
+export { default as AdminEventDetailPage } from './events/AdminEventDetailPage.svelte'
+export { default as AdminEventsPage } from './events/AdminEventsPage.svelte'
+export { default as AdminCrewInviteModal } from './members/AdminCrewInviteModal.svelte'
+export { default as AdminCrewPage } from './members/AdminCrewPage.svelte'
+export { default as AdminCrewMemberCard } from './members/AdminCrewMemberCard.svelte'
+export { default as AdminCrewMemberPage } from './members/AdminCrewMemberPage.svelte'
+export { default as AdminProgramPage } from './programs/AdminProgramPage.svelte'
+export { default as AdminNewProgramPage } from './programs/AdminNewProgramPage.svelte'
+export { default as AdminProgramEditor } from './programs/editor/AdminProgramEditor.svelte'
+export { default as AdminSettingsPage } from './settings/AdminSettingsPage.svelte'
+export { default as AdminActionButton } from './shared/AdminActionButton.svelte'
+export { default as AdminMetaCards } from './shared/AdminMetaCards.svelte'
+export { default as AdminPageHero } from './shared/AdminPageHero.svelte'
+export * from './shared/admin'

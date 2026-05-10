@@ -4,23 +4,17 @@
  * page focuses on orchestration.
  */
 
+import { TIME_FORMAT_OPTIONS, DAY_LABEL_OPTIONS } from '../../shared/date-format'
+
 export function formatEventRange(startsAt: string, endsAt: string): string {
 	const start = new Date(startsAt)
 	const end = new Date(endsAt)
 	const sameDay = start.toDateString() === end.toDateString()
-	const dayLabel = start.toLocaleDateString(undefined, {
-		weekday: 'short',
-		month: 'short',
-		day: 'numeric'
-	})
-	const startTime = start.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
-	const endTime = end.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+	const dayLabel = start.toLocaleDateString(undefined, DAY_LABEL_OPTIONS)
+	const startTime = start.toLocaleTimeString(undefined, TIME_FORMAT_OPTIONS)
+	const endTime = end.toLocaleTimeString(undefined, TIME_FORMAT_OPTIONS)
 	if (sameDay) return `${dayLabel} at ${startTime} – ${endTime}`
-	const endLabel = end.toLocaleDateString(undefined, {
-		weekday: 'short',
-		month: 'short',
-		day: 'numeric'
-	})
+	const endLabel = end.toLocaleDateString(undefined, DAY_LABEL_OPTIONS)
 	return `${dayLabel} at ${startTime} – ${endLabel} at ${endTime}`
 }
 
@@ -32,10 +26,7 @@ export function formatDayLabel(iso: string): string {
 }
 
 export function formatTimeOnly(iso: string): string {
-	return new Date(iso).toLocaleTimeString(undefined, {
-		hour: 'numeric',
-		minute: '2-digit'
-	})
+	return new Date(iso).toLocaleTimeString(undefined, TIME_FORMAT_OPTIONS)
 }
 
 export function formatDuration(startsAt: string, endsAt: string): string {
@@ -49,12 +40,11 @@ export function formatDuration(startsAt: string, endsAt: string): string {
 	return rem === 0 ? `${hours} hr${hours === 1 ? '' : 's'}` : `${hours}h ${rem}m`
 }
 
-export function attendeeInitials(name: string): string {
-	const parts = name.split(/\s+/).filter(Boolean)
-	const first = parts[0]?.[0] || ''
-	const second = parts[1]?.[0] || parts[0]?.[1] || 'X'
-	return `${first}${second}`.toUpperCase()
-}
+// Delegates to the canonical `initials()` in crew-helpers — attendee names
+// and crew member names are the same shape, so no need for a parallel
+// implementation. Re-exported under this name for the EventAttendeesList
+// caller's readability.
+export { initials as attendeeInitials } from '../members/crew-helpers'
 
 type AttendeeView = {
 	status: string

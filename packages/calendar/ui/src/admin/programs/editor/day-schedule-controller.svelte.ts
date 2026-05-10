@@ -10,7 +10,13 @@ export type ActiveDay = {
 	count: number
 }
 
-type EventRecord = {
+/**
+ * Narrow view of the event record this controller consumes. The events
+ * controller's full `EventRecord` type satisfies this structurally — naming
+ * the projection separately keeps the dependency surface explicit (so it's
+ * obvious which event fields the day-schedule logic actually reads).
+ */
+type EventRecordView = {
 	id: number
 	activitySlug: string
 	startsAt: string
@@ -23,18 +29,16 @@ type EventRecord = {
 type Options = {
 	getDashboard: () => DashboardController
 	getSlug: () => string
-	getEventsSource: () => readonly EventRecord[]
+	getEventsSource: () => readonly EventRecordView[]
 	isReady: () => boolean
 	isMockMode: () => boolean
 	flash: (message: string, isError?: boolean) => void
 }
 
-export function isoDay(date: Date): string {
-	const y = date.getFullYear()
-	const m = `${date.getMonth() + 1}`.padStart(2, '0')
-	const d = `${date.getDate()}`.padStart(2, '0')
-	return `${y}-${m}-${d}`
-}
+// Re-export the canonical isoDay from @calendar/core; previously
+// duplicated locally before the consolidation.
+import { isoDay } from '@calendar/core'
+export { isoDay }
 
 export function isPast(date: Date): boolean {
 	const today = new Date()
