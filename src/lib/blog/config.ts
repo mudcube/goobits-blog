@@ -31,6 +31,10 @@ const journalBlogConfig = {
 		'zendala.app',
 		'beheremeow.app'
 	]
+// Cast: BlogConfig's nested types (PostsConfig, PaginationConfig, etc.) are
+// declared as required, but initBlogConfig accepts deeply-partial overrides.
+// Until the blog package exposes a DeepPartial<BlogConfig>, this site-level
+// override needs the cast.
 } as unknown as Partial<BlogConfig>
 
 export function ensureJournalBlogConfig() {
