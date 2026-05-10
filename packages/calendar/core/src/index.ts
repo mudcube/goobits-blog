@@ -1,9 +1,7 @@
-// @calendar/core root barrel.
+// @calendar/core root.
 //
-// This entry intentionally exposes only the tiny set of cross-domain
-// utilities that don't fit under any single sub-entry. Everything else
-// lives in a focused sub-entry — import from there to make intent
-// explicit:
+// Intentionally empty — every export lives under a focused sub-entry.
+// Pick the matching one for the import you need:
 //
 //   @calendar/core/admin     → permissions, bootstrap, prefs, programs,
 //                               event-detail, payment defaults
@@ -20,11 +18,10 @@
 //   @calendar/core/payments  → checkout, payment-link, admin defaults
 //   @calendar/core/weather   → weather provider abstraction + impls
 //   @calendar/core/media     → hero image upload helpers
+//   @calendar/core/utils     → tiny cross-domain helpers (isoDay,
+//                               toErrorResponse)
 //
 // New code should NOT add re-exports to this file; add them to the
-// matching sub-entry instead. The flat root used to mirror everything
-// for legacy reasons; it has now been pared back to the few items
-// that genuinely cross every domain.
+// matching sub-entry instead.
 
-export { isoDay } from './utils/time.ts'
-export { toErrorResponse } from './utils/errors.ts'
+export {}

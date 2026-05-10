@@ -35,10 +35,9 @@ type Options = {
 	flash: (message: string, isError?: boolean) => void
 }
 
-// Re-export the canonical isoDay from @calendar/core; previously
-// duplicated locally before the consolidation. isoDay lives at the root
-// because it's a tiny utility that crosses every domain.
-import { isoDay } from '@calendar/core'
+// Re-export the canonical isoDay from @calendar/core/utils; previously
+// duplicated locally before the consolidation.
+import { isoDay } from '@calendar/core/utils'
 export { isoDay }
 
 export function isPast(date: Date): boolean {

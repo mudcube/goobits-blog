@@ -18,7 +18,8 @@
     "./invites": "./src/invites.ts",
     "./payments": "./src/payments.ts",
     "./weather": "./src/weather.ts",
-    "./media": "./src/media.ts"
+    "./media": "./src/media.ts",
+    "./utils": "./src/utils.ts"
   },
   "dependencies": {
     "@goobits/auth": "workspace:*"

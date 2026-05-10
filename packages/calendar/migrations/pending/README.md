@@ -10,4 +10,4 @@ same PR).
 
 | File | Blocked on |
 |---|---|
-| `0028_drop_legacy_credential_columns.sql` | Migration `0027` live in production + every running build reads `primary_credential` first |
+| `0029_drop_legacy_credential_columns.sql` | Migration `0027` live in production + every running build reads `primary_credential` first |

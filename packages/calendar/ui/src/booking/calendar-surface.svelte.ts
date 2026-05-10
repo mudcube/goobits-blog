@@ -40,7 +40,7 @@ export function isSameDay(a: Date, b: Date) {
 
 // Re-export the canonical isoDay from @calendar/core so admin + booking
 // share one implementation.
-export { isoDay } from '@calendar/core'
+export { isoDay } from '@calendar/core/utils'
 
 export function dominantAxisValue(vector: [number, number, number]) {
 	return Math.abs(vector[1]) >= Math.abs(vector[0]) ? vector[1] : vector[0]
