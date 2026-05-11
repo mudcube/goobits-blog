@@ -20,4 +20,7 @@ export { default as AdminSettingsPage } from './settings/AdminSettingsPage.svelt
 export { default as AdminActionButton } from './shared/AdminActionButton.svelte'
 export { default as AdminMetaCards } from './shared/AdminMetaCards.svelte'
 export { default as AdminPageHero } from './shared/AdminPageHero.svelte'
-export * from './shared/admin'
+// Helpers in ./shared/admin (config catalog, persist*, etc.) are imported
+// via deep path `@calendar/ui/admin/shared/admin` by the pages that need
+// them — they're not re-exported here. The admin barrel exposes admin
+// PAGES + a few primitives only.

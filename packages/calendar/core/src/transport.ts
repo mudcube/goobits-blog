@@ -42,5 +42,5 @@ export {
 	type CalendarBookingLookupInput
 } from './transport/calendar.ts'
 
-export { parsePositiveInteger } from './transport/parse.ts'
+export { parsePositiveInteger, readStringOrEmpty } from './transport/parse.ts'
 export { TransportValidationError, asTransportErrorMessage } from './transport/errors.ts'

@@ -1,5 +1,4 @@
 import {
-	getAdminPaymentDefaults,
 	getAdminViewSettings,
 	getCalendarPrograms,
 	getDefaultAdminViewSettings,
@@ -8,7 +7,7 @@ import {
 	type AdminViewSettings
 } from '@calendar/core/admin'
 import { getCalendarConfig, requireEnv } from '@calendar/core/config'
-import { getPaymentCheckoutConfig } from '@calendar/core/payments'
+import { getAdminPaymentDefaults, getPaymentCheckoutConfig } from '@calendar/core/payments'
 import { listEventsFeed } from '@calendar/core/booking'
 import { listInvites } from '@calendar/core/invites'
 import { listCalendarUsers } from '@calendar/core/storage'

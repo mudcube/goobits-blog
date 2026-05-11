@@ -27,4 +27,4 @@ export {
 
 export { isKnownProgramSlug, isValidProgramSlug, type CalendarProgramSlug } from './config/programs.ts'
 
-export { VENUE_TIMEZONE, addWeeksInVenueTime } from './config/venue.ts'
+export { VENUE_TIMEZONE, addWeeksInTimezone } from './config/venue.ts'

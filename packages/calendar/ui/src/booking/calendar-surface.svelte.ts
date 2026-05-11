@@ -30,16 +30,10 @@ export function startOfDay(date: Date) {
 	return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
 
-export function isSameDay(a: Date, b: Date) {
-	return (
-		a.getFullYear() === b.getFullYear() &&
-		a.getMonth() === b.getMonth() &&
-		a.getDate() === b.getDate()
-	)
-}
-
-// Re-export the canonical isoDay from @calendar/core so admin + booking
-// share one implementation.
+// Re-export canonical date helpers so admin + booking share one
+// implementation. isSameDay lives in @calendar/ui/shared/date-checks;
+// isoDay lives in @calendar/core/utils.
+export { isSameDay } from '../shared/date-checks'
 export { isoDay } from '@calendar/core/utils'
 
 export function dominantAxisValue(vector: [number, number, number]) {

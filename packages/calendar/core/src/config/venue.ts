@@ -71,11 +71,3 @@ export function addWeeksInTimezone(iso: string, weeks: number, tz: string): stri
 	return new Date(candidate.getTime() - driftMinutes * 60 * 1000).toISOString()
 }
 
-/**
- * Convenience wrapper: same as `addWeeksInTimezone` but using the venue
- * default. Kept for back-compat with callers that haven't been updated to
- * pass a timezone yet.
- */
-export function addWeeksInVenueTime(iso: string, weeks: number): string {
-	return addWeeksInTimezone(iso, weeks, VENUE_TIMEZONE)
-}

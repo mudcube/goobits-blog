@@ -38,30 +38,10 @@ type Options = {
 // Re-export the canonical isoDay from @calendar/core/utils; previously
 // duplicated locally before the consolidation.
 import { isoDay } from '@calendar/core/utils'
-export { isoDay }
-
-export function isPast(date: Date): boolean {
-	const today = new Date()
-	today.setHours(0, 0, 0, 0)
-	return date < today
-}
-
-export function isToday(date: Date): boolean {
-	const now = new Date()
-	return (
-		date.getFullYear() === now.getFullYear() &&
-		date.getMonth() === now.getMonth() &&
-		date.getDate() === now.getDate()
-	)
-}
-
-export function isSameDay(a: Date, b: Date): boolean {
-	return (
-		a.getFullYear() === b.getFullYear() &&
-		a.getMonth() === b.getMonth() &&
-		a.getDate() === b.getDate()
-	)
-}
+import { isPast, isToday, isSameDay } from '../../../shared/date-checks'
+// Re-exported for consumers (ProgramScheduleSection, tests) that grab
+// these alongside the controller.
+export { isoDay, isPast, isToday, isSameDay }
 
 export function createDayScheduleController({
 	getDashboard,

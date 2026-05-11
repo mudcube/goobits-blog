@@ -94,3 +94,16 @@ export function readEnum<T extends string>(input: JsonObject, key: string, allow
 	}
 	return raw as T
 }
+
+/**
+ * Lenient string reader: trims, truncates to `maxLength`, and returns ''
+ * for missing / non-string input. Unlike `readRequiredString` (which throws
+ * on missing) and `readOptionalString` (which returns null), this is for
+ * "best-effort string with safe truncation" — appropriate when downstream
+ * code can tolerate empty strings (e.g., payment-rail credential parsing
+ * where empty means "not provided, fall back to env vars").
+ */
+export function readStringOrEmpty(input: JsonObject, key: string, maxLength: number): string {
+	const value = input[key]
+	return typeof value === 'string' ? value.trim().slice(0, maxLength) : ''
+}

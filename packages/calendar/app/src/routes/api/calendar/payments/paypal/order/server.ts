@@ -1,14 +1,9 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { buildEnv } from '@calendar/kit'
 import { createPayPalCheckoutOrder, getPaymentCheckoutContext } from '@calendar/core/payments'
-import { parsePositiveInteger, TransportValidationError } from '@calendar/core/transport'
+import { parsePositiveInteger, readStringOrEmpty, TransportValidationError } from '@calendar/core/transport'
 import { apiError, apiOk, apiValidationError, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
-
-function readString(body: Record<string, unknown>, key: string, maxLength: number) {
-	const value = body[key]
-	return typeof value === 'string' ? value.trim().slice(0, maxLength) : ''
-}
 
 export async function POST(event: RequestEvent) {
 	return runCalendarRequest(
@@ -22,8 +17,8 @@ export async function POST(event: RequestEvent) {
 			if (!body || typeof body !== 'object') return apiError('Invalid payment request', { status: 400 })
 			const eventId = parsePositiveInteger(body['eventId'])
 			if (!eventId) return apiError('Invalid event id', { status: 400 })
-			const confirmationId = readString(body, 'confirmationId', 64) || null
-			const rawFunding = readString(body, 'fundingSource', 24).toLowerCase()
+			const confirmationId = readStringOrEmpty(body, 'confirmationId', 64) || null
+			const rawFunding = readStringOrEmpty(body, 'fundingSource', 24).toLowerCase()
 			const fundingSource = rawFunding === 'venmo' ? 'venmo' : 'paypal'
 			const env = await buildEnv(event.platform)
 			const context = await getPaymentCheckoutContext(env.DB, {

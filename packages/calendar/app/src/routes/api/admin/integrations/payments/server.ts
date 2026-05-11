@@ -7,16 +7,12 @@ import {
 	saveSquarePaymentCredentials
 } from '@calendar/core/payments'
 import { requireEnv } from '@calendar/core/config'
+import { readStringOrEmpty } from '@calendar/core/transport'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { apiError, apiOk } from '@calendar/kit'
 
-function readString(body: Record<string, unknown>, key: string, maxLength: number) {
-	const value = body[key]
-	return typeof value === 'string' ? value.trim().slice(0, maxLength) : ''
-}
-
 function readEnvironment(body: Record<string, unknown>) {
-	return readString(body, 'environment', 24).toLowerCase() === 'live' ? 'live' : 'sandbox'
+	return readStringOrEmpty(body, 'environment', 24).toLowerCase() === 'live' ? 'live' : 'sandbox'
 }
 
 export async function GET(event: RequestEvent) {
@@ -39,12 +35,12 @@ export async function PUT(event: RequestEvent) {
 		if (guard) return guard
 		const body = (await event.request.json().catch(() => null)) as Record<string, unknown> | null
 		if (!body || typeof body !== 'object') return apiError('Invalid payment integration settings', { status: 400 })
-		const provider = readString(body, 'provider', 24)
+		const provider = readStringOrEmpty(body, 'provider', 24)
 		const env = await buildEnv(event.platform)
 		const base64Key = requireEnv(env, 'TOKEN_ENC_KEY')
 		if (provider === 'paypal') {
-			const clientId = readString(body, 'clientId', 240)
-			const clientSecret = readString(body, 'clientSecret', 240)
+			const clientId = readStringOrEmpty(body, 'clientId', 240)
+			const clientSecret = readStringOrEmpty(body, 'clientSecret', 240)
 			if (!clientId || !clientSecret) {
 				return apiError('PayPal client ID and client secret are required', { status: 400 })
 			}
@@ -59,9 +55,9 @@ export async function PUT(event: RequestEvent) {
 			return apiOk({})
 		}
 		if (provider === 'square') {
-			const applicationId = readString(body, 'applicationId', 240)
-			const locationId = readString(body, 'locationId', 160)
-			const accessToken = readString(body, 'accessToken', 300)
+			const applicationId = readStringOrEmpty(body, 'applicationId', 240)
+			const locationId = readStringOrEmpty(body, 'locationId', 160)
+			const accessToken = readStringOrEmpty(body, 'accessToken', 300)
 			if (!applicationId || !locationId || !accessToken) {
 				return apiError('Square application ID, location ID, and access token are required', { status: 400 })
 			}
