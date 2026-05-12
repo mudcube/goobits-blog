@@ -1,5 +1,5 @@
 import { getCalendarActivityList, type CalendarActivityConfig } from '@calendar/core/config'
-import type { CalendarProviderName } from '../../auth/ui/providers'
+import type { CalendarProviderName } from '../../routing/auth-providers'
 
 export function resolveCalendarLoginTargetActivity(path: string): CalendarActivityConfig | null {
 	const pathname = path.split('?')[0]?.replace(/\/+$/, '') || ''

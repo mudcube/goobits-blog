@@ -19,6 +19,5 @@ export {
 	getUserForVerificationToken,
 } from "./tokens.js";
 export { VerificationTokenAdapter } from "../adapters/verification-token/base.js";
-export { MemoryRateLimitStore, createRateLimiter } from "./rate-limit.js";
 export { redactObject, DEFAULT_REDACT_KEYS } from "./redact.js";
 export { isSafeRedirectPath, normalizeSafeRedirectPath } from "./redirect.js";

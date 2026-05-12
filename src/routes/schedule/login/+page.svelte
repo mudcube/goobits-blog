@@ -3,8 +3,8 @@
   import {
     getProviderErrorMessage,
     type CalendarProviderName,
-  } from "@calendar/ui/auth/ui/providers";
-  import { buildProviderLoginHref } from "@calendar/ui/auth/ui/redirects";
+  } from "@calendar/ui/routing/auth-providers";
+  import { buildProviderLoginHref } from "@calendar/ui/routing/auth-redirects";
   import { PillButton } from "@calendar/ui";
   import { getCalendarConfig } from "@calendar/core/config";
   import {

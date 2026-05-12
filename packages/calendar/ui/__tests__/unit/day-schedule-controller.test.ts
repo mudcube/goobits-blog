@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { isoDay, isPast, isToday, isSameDay } from '../../src/admin/programs/editor/day-schedule-controller.svelte'
+import { isoDay } from '@calendar/core/utils'
+import { isPast, isToday, isSameDay } from '../../src/shared/date-checks'
 
 describe('day-schedule-controller helpers', () => {
 	describe('isoDay', () => {

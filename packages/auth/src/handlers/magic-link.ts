@@ -4,7 +4,7 @@ import {
 	generateOtp,
 	hashToken,
 } from "../utils/magic-link.js";
-import { createRateLimiter } from "../utils/rate-limit.js";
+import { createRateLimiter } from "../security/rate-limit.js";
 import { sanitizeUser as defaultSanitizeUser } from "../utils/sanitize.js";
 import { jsonResponse, parseRequestData } from "../utils/http.js";
 import type { RequestHandler } from "@sveltejs/kit";

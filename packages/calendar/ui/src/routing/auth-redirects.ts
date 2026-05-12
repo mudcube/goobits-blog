@@ -1,5 +1,5 @@
-import type { CalendarProviderName } from './providers'
-import { getCalendarUiConfig } from '../../config'
+import type { CalendarProviderName } from './auth-providers'
+import { getCalendarUiConfig } from '../config'
 
 export type AuthRedirectOptions = {
 	inviteCode?: string

@@ -3,11 +3,11 @@
 	import {
 		createCalendarSurface,
 		dotColorForTone,
-		isSameDay,
 		isoDay,
 		startOfDay,
 		type CalendarTone
 	} from '../../booking/calendar-surface.svelte'
+	import { isToday } from '../../shared/date-checks'
 	import { venueDayKey } from '../../booking/venue-time'
 	import type { CalendarEventsResponse } from '../../api/calendar'
 
@@ -31,10 +31,6 @@
 
 	function isPast(date: Date) {
 		return date < startOfDay(new Date())
-	}
-
-	function isToday(date: Date) {
-		return isSameDay(date, new Date())
 	}
 
 	const eventsByDate = $derived.by(() => {

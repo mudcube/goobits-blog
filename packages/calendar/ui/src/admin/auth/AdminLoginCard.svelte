@@ -1,8 +1,13 @@
 <script>
   import Button from "../../primitives/CalendarButton.svelte";
+  import { getCalendarUiConfig } from "../../config";
+
+  const calendarConfig = getCalendarUiConfig();
+  const defaultLoginUrl = `${calendarConfig.routes.calendarLoginPath}?redirect=${encodeURIComponent(`${calendarConfig.routes.adminBase}/`)}`;
+
   const {
     form,
-    loginUrl = '/schedule/login?redirect=%2Fschedule%2Fadmin%2F',
+    loginUrl = defaultLoginUrl,
     currentUser = null,
     canBootstrapAdmin = false
   } = $props();

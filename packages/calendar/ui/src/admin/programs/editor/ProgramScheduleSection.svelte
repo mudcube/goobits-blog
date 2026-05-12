@@ -1,12 +1,9 @@
 <script lang="ts">
 	import AdminCalendar from '../../dashboard/AdminCalendar.svelte'
 	import DayDialog from './DayDialog.svelte'
-	import {
-		isoDay,
-		isPast,
-		isToday,
-		type DayScheduleController
-	} from './day-schedule-controller.svelte'
+	import { isoDay } from '@calendar/core/utils'
+	import { isPast, isToday } from '../../../shared/date-checks'
+	import type { DayScheduleController } from './day-schedule-controller.svelte'
 
 	type EventRecord = {
 		id: number

@@ -52,6 +52,8 @@ export {
 
 export { getAdminEventDetail, type AdminEventDetail } from './services/admin/event-detail.ts'
 
+export { listEventTemplates, type CalendarEventTemplate } from './services/admin/event-templates.ts'
+
 // Admin-set payment defaults live in @calendar/core/payments (their domain
 // home). Import them from there rather than re-exposing here — the previous
 // duplicate re-export was unused by any admin caller.

@@ -35,13 +35,8 @@ type Options = {
 	flash: (message: string, isError?: boolean) => void
 }
 
-// Re-export the canonical isoDay from @calendar/core/utils; previously
-// duplicated locally before the consolidation.
 import { isoDay } from '@calendar/core/utils'
-import { isPast, isToday, isSameDay } from '../../../shared/date-checks'
-// Re-exported for consumers (ProgramScheduleSection, tests) that grab
-// these alongside the controller.
-export { isoDay, isPast, isToday, isSameDay }
+import { isPast, isSameDay } from '../../../shared/date-checks'
 
 export function createDayScheduleController({
 	getDashboard,
