@@ -43,7 +43,6 @@
 		/>
 
 		<Prose className="legal__page legal">
-			<p class="legal__updated">Last updated {updatedAt}</p>
 			{@render children?.()}
 			{#if showNotice}
 				<p class="legal__notice">This page is informational and is not legal advice.</p>
@@ -77,8 +76,6 @@
 
 	:global(.legal__page) {
 		width: 100%;
-		max-width: var(--max-width-readable);
 		justify-self: center;
-		padding-top: var(--space-6);
 	}
 </style>
