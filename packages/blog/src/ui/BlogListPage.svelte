@@ -2,9 +2,8 @@
 	import './BlogListPage.scss'
 	import PostList from './PostList.svelte'
 	import Sidebar from './Sidebar.svelte'
-	import { blogConfig, defaultMessages, buildPostsApiUrl } from '@goobits/blog/config/index.js'
-	import { createMessageGetter } from '@goobits/blog/utils/index.js'
-	import { createLogger } from '@goobits/blog/utils/logger.js'
+	import { blogConfig, defaultMessages, buildPostsApiUrl } from '@goobits/blog/config'
+	import { createLogger, createMessageGetter } from '@goobits/blog/utils'
 	import { onMount } from 'svelte'
 
 	const logger = createLogger('BlogListPage')

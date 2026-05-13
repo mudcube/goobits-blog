@@ -20,8 +20,8 @@
 	import './Sidebar.scss'
 	import Newsletter from './Newsletter.svelte'
 	import TagsCategories from './TagCategoryList.svelte'
-	import { blogConfig, defaultMessages } from '@goobits/blog/config/index.js'
-	import { getAllCategories, getAllTags, createMessageGetter } from '@goobits/blog/utils/index.js'
+	import { blogConfig, defaultMessages } from '@goobits/blog/config'
+	import { getAllCategories, getAllTags, createMessageGetter } from '@goobits/blog/utils'
 
 	/**
 	 * @typedef {Object} Props

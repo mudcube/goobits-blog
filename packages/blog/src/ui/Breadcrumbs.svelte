@@ -13,8 +13,8 @@
 	 * @property {boolean} [firstItemIsCurrent] - When true, the first item is treated as current
 	 */
 
-	import { createMessageGetter } from '@goobits/blog/utils/index.js'
-	import { defaultMessages, blogConfig } from '@goobits/blog/config/index.js'
+	import { createMessageGetter } from '@goobits/blog/utils'
+	import { defaultMessages, blogConfig } from '@goobits/blog/config'
 
 	// Get the configured blog URI
 	const blogUri = blogConfig.uri || '/blog'

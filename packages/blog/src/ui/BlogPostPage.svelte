@@ -2,10 +2,10 @@
 	import './BlogPostPage.scss'
 	import SocialShare from './SocialShare.svelte'
 	import TagCategoryList from './TagCategoryList.svelte'
-	import { blogConfig, defaultMessages } from '@goobits/blog/config/index.js'
+	import { blogConfig, defaultMessages } from '@goobits/blog/config'
 	import { Calendar, Clock, Share2, ChevronLeft } from '@lucide/svelte'
-	import { createLogger } from '@goobits/blog/utils/logger.js'
 	import {
+		createLogger,
 		formatDate as utilFormatDate,
 		slugify,
 		getCoverImageUrl,
@@ -14,7 +14,7 @@
 		getSimilarPosts,
 		getPostUrl,
 		createMessageGetter
-	} from '@goobits/blog/utils/index.js'
+	} from '@goobits/blog/utils'
 
 	const logger = createLogger('BlogPostPage')
 

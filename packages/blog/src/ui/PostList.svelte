@@ -21,8 +21,8 @@
 	 */
 	import './PostList.scss'
 	import BlogCard from './BlogCard.svelte'
-	import { ClassNames, bemClasses, propertyModifier, createMessageGetter } from '@goobits/blog/utils/index.js'
-	import { defaultMessages } from '@goobits/blog/config/index.js'
+	import { ClassNames, bemClasses, propertyModifier, createMessageGetter } from '@goobits/blog/utils'
+	import { defaultMessages } from '@goobits/blog/config'
 
 	/**
 	 * @typedef {Object} PostListProps

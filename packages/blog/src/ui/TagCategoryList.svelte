@@ -19,8 +19,8 @@
 	 * @component
 	 */
 	import './TagCategoryList.scss'
-	import { bemClasses, createMessageGetter, slugify } from '@goobits/blog/utils/index.js'
-	import { blogConfig, defaultMessages } from '@goobits/blog/config/index.js'
+	import { bemClasses, createMessageGetter, slugify } from '@goobits/blog/utils'
+	import { blogConfig, defaultMessages } from '@goobits/blog/config'
 
 	/**
 	 * @typedef {Object} Props

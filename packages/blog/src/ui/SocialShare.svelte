@@ -16,9 +16,8 @@
 	 */
 	import './SocialShare.scss'
 	import { onDestroy } from 'svelte'
-	import { createMessageGetter } from '@goobits/blog/utils/index.js'
-	import { defaultMessages } from '@goobits/blog/config/index.js'
-	import { createLogger } from '@goobits/blog/utils/logger.js'
+	import { createLogger, createMessageGetter } from '@goobits/blog/utils'
+	import { defaultMessages } from '@goobits/blog/config'
 
 	const logger = createLogger('SocialShare')
 
