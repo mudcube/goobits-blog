@@ -1,7 +1,6 @@
 import { readFileSync, accessSync } from 'fs'
 import { join, dirname } from 'path'
 import { compile } from 'mdsvex'
-import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import { getAllPosts, type ProcessedPost } from '@goobits/blog/utils'
 import { getBlogConfig } from '@goobits/blog/config'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
@@ -9,15 +8,6 @@ import { remarkTableOfContents } from '@goobits/blog/utils/remark-table-of-conte
 // @ts-expect-error -- JS rehype plugin, no type declarations
 import { rehypeWebpPicture } from '@goobits/blog/utils/rehype-webp-picture'
 import type { JournalMetadata, JournalPost } from '$lib/blog/viewmodel'
-
-const sanitizeSchema = {
-	...defaultSchema,
-	attributes: {
-		...defaultSchema.attributes,
-		'*': [...(defaultSchema.attributes?.['*'] ?? []), 'id'],
-		img: [...(defaultSchema.attributes?.['img'] ?? []), 'loading', 'decoding', 'width', 'height']
-	}
-}
 
 type Frontmatter = Record<string, unknown> & {
 	date?: string | Date
@@ -208,7 +198,7 @@ export async function getPost({
 		const mdContent = readFileSync(getJournalPostFilePath(year, month, slug), 'utf-8')
 		const compiled = (await compile(mdContent, {
 			remarkPlugins: [remarkTableOfContents],
-			rehypePlugins: [[rehypeSanitize, sanitizeSchema], rehypeWebpPicture]
+			rehypePlugins: [rehypeWebpPicture]
 		})) as MdsvexCompileResult
 		const renderedContent = (compiled?.code ?? '').replace(/{@html `(.*?)`}/gs, '$1')
 		const postFilePath = getJournalPostFilePath(year, month, slug)

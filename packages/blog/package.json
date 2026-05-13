@@ -23,6 +23,11 @@
       "svelte": "./src/ui/index.ts",
       "default": "./src/ui/index.ts"
     },
+    "./ui/elements": {
+      "types": "./src/ui/elements/index.ts",
+      "svelte": "./src/ui/elements/index.ts",
+      "default": "./src/ui/elements/index.ts"
+    },
     "./utils": {
       "types": "./src/utils/index.ts",
       "svelte": "./src/utils/index.ts",
