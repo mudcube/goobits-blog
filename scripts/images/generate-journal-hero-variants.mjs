@@ -9,7 +9,7 @@ const OUTPUT_DIR_NAME = 'generated'
 const OUTPUT_BASENAME = 'hero'
 const WIDTH_CANDIDATES = [320, 640, 960, 1280, 1600]
 const COVER_WIDTH_CANDIDATES = [320, 640, 960, 1280, 1600]
-const MANIFEST_PATH = path.join(ROOT, 'packages', 'blog-theme-miko', 'utils', 'generated', 'journal-image-manifest.ts')
+const MANIFEST_PATH = path.join(ROOT, 'packages', 'blog-theme-miko', 'src', 'utils', 'generated', 'journal-image-manifest.ts')
 
 async function walk(dir) {
 	const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => null)
