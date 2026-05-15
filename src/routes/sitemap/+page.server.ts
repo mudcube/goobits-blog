@@ -1,13 +1,12 @@
 import { dev } from '$app/environment'
+import { getSitemapAudiencesForVisibility, type HumanSitemapVisibility } from '@goobits/sitemap/core'
 import { getActiveReleaseStage } from '$lib/app/release'
 import { getTarget } from '$lib/app/target'
 import { isLocalPreviewHost } from '$lib/app/is-local-preview-host'
 import {
 	filterRouteInventoryBySitemapAudiences,
 	getPublicHumanSitemapInventory,
-	getRouteInventory,
-	getSitemapAudiencesForVisibility,
-	type HumanSitemapVisibility
+	getRouteInventory
 } from '$lib/app/routes/route-index.server'
 
 export const prerender = false

@@ -6,11 +6,16 @@ import {
 } from '@goobits/contact/server'
 import { submitContactData } from '$lib/server/contact/submit'
 import { contactSchema } from '@goobits/contact/core'
-
-const CONTACT_FORM_PATH = '/contact/'
-const CONTACT_THANK_YOU_PATH = '/contact/thank-you/'
+import { mergeRuntimeEnv } from '$lib/server/runtime'
 
 export const POST: RequestHandler = async ({ request, platform, getClientAddress }) => {
+	const env = mergeRuntimeEnv(platform?.env)
+	const CONTACT_FORM_PATH =
+		(typeof env['CONTACT_FORM_PATH'] === 'string' && env['CONTACT_FORM_PATH']) || '/contact/'
+	const CONTACT_THANK_YOU_PATH =
+		(typeof env['CONTACT_THANK_YOU_PATH'] === 'string' && env['CONTACT_THANK_YOU_PATH']) ||
+		'/contact/thank-you/'
+
 	const { expectsJson, payload, errorResponse } = await parseContactRequest(request, {
 		invalidBodyRedirectPath: CONTACT_FORM_PATH
 	})

@@ -74,8 +74,6 @@ type SitemapRoute = {
 	lastModified: string
 }
 
-export type HumanSitemapVisibility = 'public' | 'internal'
-
 const SITEMAP_AUDIENCE_MATCHERS: Array<{ path: string; sitemap: SitemapAudience; matchPrefix?: boolean }> = [
 	{ path: '/api/admin/dev', sitemap: 'hidden', matchPrefix: true },
 	{ path: '/api/internal', sitemap: 'hidden', matchPrefix: true },
@@ -433,10 +431,6 @@ export function filterRouteInventoryBySitemapAudiences(
 			protected: pageRoutes.filter((route) => route.hasAuth).length
 		}
 	}
-}
-
-export function getSitemapAudiencesForVisibility(visibility: HumanSitemapVisibility): SitemapAudience[] {
-	return visibility === 'internal' ? ['public', 'internal'] : ['public']
 }
 
 function isPublicHumanSitemapRoute(route: RouteEntry) {

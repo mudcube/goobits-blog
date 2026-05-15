@@ -39,11 +39,13 @@ export async function submitContactData(
 				typeof env['CONTACT_WEBHOOK_URL'] === 'string'
 					? env['CONTACT_WEBHOOK_URL']
 					: ''
+			const source = typeof env['CONTACT_SOURCE'] === 'string' ? env['CONTACT_SOURCE'] : ''
+			const eventName = typeof env['CONTACT_EVENT'] === 'string' ? env['CONTACT_EVENT'] : ''
 
 				return deliverContactMessage(payload, {
 					webhook,
-					source: 'miko.art',
-					event: 'miko-contact-form',
+					source,
+					event: eventName,
 					secret: env['CONTACT_WEBHOOK_SECRET'] || '',
 					timeoutMs: 5000
 				})
