@@ -28,9 +28,10 @@ deep-path imports**.
   added for the mdsvex plugins that need stable module identity
   (`./utils/remark-table-of-contents`, `./utils/rehype-webp-picture`).
   Handler functions are still available via `./core`.
-- Anchor `rel` on rendered post HTML now includes `noopener noreferrer`
-  in addition to `nofollow`. Dangerous link protocols (`javascript:`,
-  `data:`, `vbscript:`, `file:`) are stripped.
+- Anchor `rel` on shipped components (`SocialShare`, `Sidebar`) includes
+  `noopener noreferrer` in addition to `nofollow`. Anchor sanitization
+  on rendered markdown bodies is the consuming site's responsibility
+  (see "Markdown post-processing" below).
 - Slugify NFKD-folds diacritics and expands `&` → `and`.
 - TOC heading IDs deduplicate when the same heading text appears
   multiple times (`-2`, `-3` suffixes).
@@ -89,11 +90,15 @@ extension and use the new explicit entry:
 
 #### Markdown post-processing
 
-If you rendered untrusted markdown and were relying on the package
-*not* sanitizing scripts or stripping `javascript:` links, you need
-to revisit your security model — 2.0 sanitizes by default. There is
-no opt-out at the API level; if you need raw HTML through, run your
-own pipeline outside the package.
+The package does **not** sanitize rendered markdown — that's left to
+the consuming site's mdsvex preprocess pipeline. Sites with untrusted
+markdown sources should add `rehype-sanitize` (or equivalent) to their
+own `svelte.config.js`. Sites with first-party authored markdown
+(typical for journal/blog content under version control) usually do
+their own anchor hardening (`noopener`, `nofollow`, dangerous-protocol
+neutralization) in the rendered HTML rather than at the AST level,
+because rehype-sanitize strips raw HTML nodes — including any custom
+Svelte component tags imported via `<script>` blocks in `.md` files.
 
 #### Removed Tailwind-style utility classes
 
@@ -106,10 +111,11 @@ adopt Tailwind itself.
 ### What didn't change
 
 - All public *named* exports keep the same names and signatures.
-- The post-content HTML pipeline (mdsvex remark/rehype + sanitize +
-  picture upgrade + dangerous-href neutralization) renders the same
-  results unless you were depending on the specific bugs that 2.0
-  fixes (raw `&` in slugs, duplicate heading IDs, etc.).
+- The post-content HTML pipeline (mdsvex remark/rehype + picture
+  upgrade) renders the same results unless you were depending on the
+  specific bugs that 2.0 fixes (raw `&` in slugs, duplicate heading
+  IDs, etc.). Anchor hardening / sanitization remain site
+  responsibilities — see "Markdown post-processing" above.
 - The configuration shape (`BlogConfig`) and `initBlogConfig`
   semantics are unchanged.
 - All 182 unit tests continue to pass after the migration.

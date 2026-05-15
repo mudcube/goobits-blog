@@ -17,7 +17,7 @@ Journal image pipeline:
 - Journal hero source images should live at `static/journal/**/images/hero.(png|jpg|jpeg|webp)`.
 - `pnpm build` runs `pnpm images:journal:generate` first.
 - Responsive hero variants are emitted to sibling `images/generated/`.
-- `packages/blog-theme-miko/utils/generated/journal-image-manifest.ts` is generated and should not be edited by hand.
+- `packages/blog-theme-miko/src/utils/generated/journal-image-manifest.ts` is generated and should not be edited by hand.
 
 Audit notes:
 

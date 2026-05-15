@@ -8,5 +8,11 @@
   "exports": {
     "./member.scss": "./member.scss",
     "./admin.scss": "./admin.scss"
-  }
+  },
+  "files": [
+    "src",
+    "admin.scss",
+    "member.scss",
+    "README.md"
+  ]
 }

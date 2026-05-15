@@ -9,6 +9,11 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "files": [
+    "src",
+    "tsconfig.json",
+    "README.md"
+  ],
   "peerDependencies": {
     "@sveltejs/kit": "^2.0.0",
     "svelte": "^5.0.0"

@@ -21,6 +21,11 @@
     "./media": "./src/media.ts",
     "./utils": "./src/utils.ts"
   },
+  "files": [
+    "src",
+    "tsconfig.json",
+    "README.md"
+  ],
   "dependencies": {
     "@goobits/auth": "workspace:*"
   }

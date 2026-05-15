@@ -20,6 +20,11 @@
 		"./routing/*": "./src/routing/*",
 		"./config": "./src/config.ts"
 	},
+	"files": [
+		"src",
+		"tsconfig.json",
+		"README.md"
+	],
 	"peerDependencies": {
 		"svelte": "^5.0.0"
 	},

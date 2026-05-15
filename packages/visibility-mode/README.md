@@ -146,6 +146,8 @@ snippet:
 | Release stage override | `site-release-preview` | `RELEASE_STAGE_COOKIE` |
 | Target | `site-target` | `TARGET_COOKIE` |
 | Stage env var | `PUBLIC_RELEASE_STAGE` | `RELEASE_STAGE_ENV_VAR` |
+| Default stage | `live` | `DEFAULT_RELEASE_STAGE` |
+| Default target | `dev` | `DEFAULT_TARGET` |
 
 All can be overridden by passing `cookieName` / `envVarName` / `stageCookieName` /
 `targetCookieName` to the relevant call. Useful when migrating a site that
@@ -156,17 +158,35 @@ legacy cookie.
 
 | Export | Purpose |
 |---|---|
-| `getActiveReleaseStage({ cookies, enablePreview, env, cookieName, envVarName })` | Resolve the request's active stage |
+| `getActiveReleaseStage({ cookies, enablePreview, env, cookieName, envVarName })` | Resolve the request's active stage. **This is the safe entry point** — it gates the cookie behind `enablePreview` so prod visitors can't override stage via cookie. |
 | `getConfiguredReleaseStage(env, envVarName)` | Read just the env var |
-| `getPreviewReleaseStage(cookies, cookieName)` | Read just the cookie |
+| `getPreviewReleaseStage(cookies, cookieName)` | Read just the cookie. **Footgun:** unconditional read. Most sites should use `getActiveReleaseStage` instead so the prod safety gate applies. |
 | `getTarget(cookies, cookieName)` | Read the target cookie |
 | `isRouteReleased(pathname, routes, activeStage)` | Gate check for a request path |
 | `isNavItemVisibleInStage(item, activeStage)` | Gate check for a nav item |
 | `isVisibleInStage(itemStage, activeStage)` | Low-level stage check |
-| `isLocalPreviewHost(hostname)` | Hostname allow-list (`localhost`, `127.0.0.1`, `*.local`) |
+| `isLocalPreviewHost(hostname)` | Hostname allow-list (`localhost`, `127.0.0.1`, `0.0.0.0`, `::1`, `*.local`, `*.localhost`, plus `10.*`/`172.16-31.*`/`192.168.*` LAN IPs) |
 | `normalizeReleaseStage(value)` / `normalizeTarget(value)` | Coerce arbitrary input to a valid stage/target |
-| `RELEASE_STAGE_COOKIE`, `TARGET_COOKIE`, `RELEASE_STAGE_ENV_VAR` | Name constants |
+| `RELEASE_STAGE_COOKIE`, `TARGET_COOKIE`, `RELEASE_STAGE_ENV_VAR`, `DEFAULT_RELEASE_STAGE`, `DEFAULT_TARGET` | Name + default constants |
 | `ReleaseStage`, `Target`, `ReleasedRoute`, `ReleasedNavItem` | Types |
+
+### Theme integration
+
+The shipped `ReleaseTargetSwitcher` styles itself with `currentColor` and the
+CSS system colors (`Canvas`, `CanvasText`) so it adapts to whatever surface
+it's mounted on. On a site where the OS-level color scheme doesn't match the
+site theme (e.g. a dark site visited from a light-mode OS), the widget may
+still look slightly off. Acceptable for a dev-only affordance; if you need
+exact theme matching, wrap the component or pass your own colors via CSS
+custom properties on its parent.
+
+### Cloudflare Workers
+
+The package's `getRuntimeEnv()` reads `process.env`. On Cloudflare Workers
+sites, `PUBLIC_*` vars typically come from `$env/static/public` instead.
+Pass `env` explicitly to `getActiveReleaseStage` / `getConfiguredReleaseStage`
+in those environments, otherwise the env-var lookup silently misses and the
+stage falls back to `'live'`.
 
 UI exports (from `@goobits/visibility-mode/ui`):
 
