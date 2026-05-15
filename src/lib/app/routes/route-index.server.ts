@@ -12,7 +12,8 @@ import type {
 import { getJournalPosts } from '$lib/blog/server'
 import type { JournalPost } from '$lib/blog/viewmodel'
 import { getConfiguredReleaseStage, isRouteReleased, type ReleaseStage } from '$lib/app/release'
-import type { RouteMeta, SitemapAudience } from '$lib/app/routes/meta'
+import type { SitemapAudience } from '@goobits/sitemap/core'
+import type { RouteMeta } from '$lib/app/routes/meta'
 
 export type { ApiRoute, PageRoute, RouteEntry }
 

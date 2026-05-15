@@ -49,7 +49,7 @@
     "e2e:admin:promote": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 packages/calendar/core/__tests__/e2e/admin-waitlist-promote.test.ts",
     "e2e:admin:templates": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 packages/calendar/core/__tests__/e2e/admin-new-event-copy-from.test.ts",
     "e2e:calendar:booking": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 packages/calendar/core/__tests__/e2e/calendar-booking-calendar-smoke.test.ts",
-    "test:unit": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/unit packages/calendar/core/__tests__/unit",
+    "test:unit": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/unit packages/calendar/core/__tests__/unit packages/visibility-mode/__tests__",
     "test:packages": "pnpm --dir packages/auth test && pnpm --dir packages/blog test",
     "audit:cf-routes": "node scripts/audit/check-cloudflare-routes.mjs",
     "audit:calendar-boundaries": "node scripts/audit/check-calendar-boundaries.mjs",

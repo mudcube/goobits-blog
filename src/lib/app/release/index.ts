@@ -20,12 +20,23 @@ export {
 	type ReleaseStage
 } from '@goobits/visibility-mode'
 
+/**
+ * Site-local extension of {@link ReleasedNavItem} that carries the extra
+ * fields the site's nav rendering needs (`matchPrefix`, `external`, ...).
+ * The package's type only owns the gating mechanism (`stages`).
+ */
+export type SiteReleasedNavItem = ReleasedNavItem & {
+	matchPrefix?: boolean
+	external?: boolean
+	nofollow?: boolean
+}
+
 export const releasedRoutes: ReleasedRoute[] = [
 	{ path: '/art', stage: 'preview' },
 	{ path: '/music', stage: 'preview' }
 ]
 
-export const releasedHeaderNavItems: ReleasedNavItem[] = [
+export const releasedHeaderNavItems: SiteReleasedNavItem[] = [
 	{ href: '/', label: 'Apps', stages: ['live', 'preview'] },
 	{ href: '/art', label: 'Art', matchPrefix: true, stages: ['preview'] },
 	{ href: '/music', label: 'Music', matchPrefix: true, stages: ['preview'] },

@@ -2,8 +2,7 @@ import { dev } from '$app/environment'
 import { loadBlogIndex } from '@goobits/blog/core'
 import type { ServerLoad } from '@sveltejs/kit'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
-import { getActiveReleaseStage } from '$lib/app/release'
-import { isLocalPreviewHost } from '$lib/app/is-local-preview-host'
+import { getActiveReleaseStage, isLocalPreviewHost } from '$lib/app/release'
 
 ensureJournalBlogConfig()
 

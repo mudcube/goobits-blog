@@ -8,7 +8,14 @@
 	} from '../index.js'
 
 	type RowOption = { value: string; label: string }
-	type RowSnippet = Snippet<[string, RowOption[], string, (value: string) => void, string]>
+	type RowProps = {
+		label: string
+		options: RowOption[]
+		active: string
+		onSelect: (value: string) => void
+		ariaLabel: string
+	}
+	type RowSnippet = Snippet<[RowProps]>
 
 	type Props = {
 		activeStage: ReleaseStage
@@ -19,8 +26,9 @@
 		/**
 		 * Optional extra rows rendered below Stage + Target. Use this for
 		 * site-specific toggles (e.g. sitemap visibility) so the switcher stays
-		 * a single floating widget. The snippet receives a helper that builds a
-		 * row in the same visual style: `Row(label, options, active, onSelect, ariaLabel)`.
+		 * a single floating widget. The snippet receives a `Row` helper that
+		 * renders a row in the same visual style — pass it a single object:
+		 * `{ label, options, active, onSelect, ariaLabel }`.
 		 */
 		extraRows?: Snippet<[{ Row: RowSnippet }]>
 	}
@@ -44,7 +52,8 @@
 	]
 
 	function writeCookie(name: string, value: string) {
-		document.cookie = `${name}=${value}; Path=/; Max-Age=31536000; SameSite=Lax`
+		const secure = typeof location !== 'undefined' && location.protocol === 'https:' ? '; Secure' : ''
+		document.cookie = `${name}=${value}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`
 	}
 
 	function setStage(stage: ReleaseStage) {
@@ -58,7 +67,7 @@
 	}
 </script>
 
-{#snippet Row(label: string, options: { value: string; label: string }[], active: string, onSelect: (value: string) => void, rowAria: string)}
+{#snippet Row({ label, options, active, onSelect, ariaLabel: rowAria }: RowProps)}
 	<div class="visibility-switcher__row">
 		<span class="visibility-switcher__label">{label}</span>
 		<div class="visibility-switcher__toggle" role="group" aria-label={rowAria}>
@@ -78,8 +87,20 @@
 {/snippet}
 
 <aside class="visibility-switcher" aria-label={ariaLabel}>
-	{@render Row('Release', stages, activeStage, (v) => setStage(v as ReleaseStage), 'Release stage')}
-	{@render Row('Target', targets, activeTarget, (v) => setTarget(v as Target), 'Target environment')}
+	{@render Row({
+		label: 'Release',
+		options: stages,
+		active: activeStage,
+		onSelect: (v) => setStage(v as ReleaseStage),
+		ariaLabel: 'Release stage'
+	})}
+	{@render Row({
+		label: 'Target',
+		options: targets,
+		active: activeTarget,
+		onSelect: (v) => setTarget(v as Target),
+		ariaLabel: 'Target environment'
+	})}
 	{@render extraRows?.({ Row })}
 </aside>
 

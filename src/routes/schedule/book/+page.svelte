@@ -4,7 +4,7 @@
 		ft, formatDate, buildMockOpenDays,
 	} from '@calendar/ui'
 	import type { OpenDay, Person, TourStep, Activity } from '@calendar/ui'
-	import { createMockWeatherProvider } from '$lib/app/weather'
+	import { createMockWeatherProvider } from '@calendar/core/weather'
 
 	const { data } = $props()
 

@@ -5,8 +5,11 @@ import { createCalendarAuthHandles } from '@calendar/app'
 import { getCalendarConfig } from '@calendar/core/config'
 import { applyMikoCalendarPreset } from '$lib/calendar/miko-preset'
 import { configureAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
-import { getActiveReleaseStage, isRouteReleased } from '$lib/app/release'
-import { isLocalPreviewHost as isAllowedLocalPreviewHost } from '$lib/app/is-local-preview-host'
+import {
+	getActiveReleaseStage,
+	isLocalPreviewHost as isAllowedLocalPreviewHost,
+	isRouteReleased
+} from '$lib/app/release'
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import { dev } from '$app/environment'
 import type { Handle } from '@sveltejs/kit'

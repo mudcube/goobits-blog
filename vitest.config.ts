@@ -5,7 +5,8 @@ export default defineConfig({
 		include: [
 			'__tests__/**/*.test.ts',
 			'packages/calendar/core/__tests__/**/*.test.ts',
-			'packages/calendar/ui/__tests__/**/*.test.ts'
+			'packages/calendar/ui/__tests__/**/*.test.ts',
+			'packages/visibility-mode/__tests__/**/*.test.ts'
 		],
 		fileParallelism: false,
 		testTimeout: 180_000,

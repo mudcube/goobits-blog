@@ -1,7 +1,9 @@
 import { dev } from '$app/environment'
-import { getActiveReleaseStage } from '$lib/app/release'
+import {
+	getActiveReleaseStage,
+	isLocalPreviewHost as isAllowedLocalPreviewHost
+} from '$lib/app/release'
 import { getTarget } from '$lib/app/target'
-import { isLocalPreviewHost as isAllowedLocalPreviewHost } from '$lib/app/is-local-preview-host'
 
 const fixedThemePreferences = {
 	theme: 'dark',

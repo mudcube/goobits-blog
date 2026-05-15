@@ -1,8 +1,7 @@
 import { dev } from '$app/environment'
 import { getSitemapAudiencesForVisibility, type HumanSitemapVisibility } from '@goobits/sitemap/core'
-import { getActiveReleaseStage } from '$lib/app/release'
+import { getActiveReleaseStage, isLocalPreviewHost } from '$lib/app/release'
 import { getTarget } from '$lib/app/target'
-import { isLocalPreviewHost } from '$lib/app/is-local-preview-host'
 import {
 	filterRouteInventoryBySitemapAudiences,
 	getPublicHumanSitemapInventory,

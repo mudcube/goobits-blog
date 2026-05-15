@@ -44,13 +44,13 @@
 <PackageSwitcher {activeStage} {activeTarget}>
 	{#snippet extraRows({ Row })}
 		{#if showVisibilityToggle}
-			{@render Row(
-				'Visibility',
-				visibilityOptions,
-				activeVisibility,
-				(value: string) => void setVisibility(value as HumanSitemapVisibility),
-				'Sitemap visibility'
-			)}
+			{@render Row({
+				label: 'Visibility',
+				options: visibilityOptions,
+				active: activeVisibility,
+				onSelect: (value: string) => void setVisibility(value as HumanSitemapVisibility),
+				ariaLabel: 'Sitemap visibility'
+			})}
 		{/if}
 	{/snippet}
 </PackageSwitcher>

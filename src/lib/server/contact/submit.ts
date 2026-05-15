@@ -39,8 +39,21 @@ export async function submitContactData(
 				typeof env['CONTACT_WEBHOOK_URL'] === 'string'
 					? env['CONTACT_WEBHOOK_URL']
 					: ''
-			const source = typeof env['CONTACT_SOURCE'] === 'string' ? env['CONTACT_SOURCE'] : ''
-			const eventName = typeof env['CONTACT_EVENT'] === 'string' ? env['CONTACT_EVENT'] : ''
+			const requestHost = (() => {
+				try {
+					return new URL(event.request.url).hostname
+				} catch {
+					return 'unknown-host'
+				}
+			})()
+			const source =
+				typeof env['CONTACT_SOURCE'] === 'string' && env['CONTACT_SOURCE'].length > 0
+					? env['CONTACT_SOURCE']
+					: requestHost
+			const eventName =
+				typeof env['CONTACT_EVENT'] === 'string' && env['CONTACT_EVENT'].length > 0
+					? env['CONTACT_EVENT']
+					: 'contact-form'
 
 				return deliverContactMessage(payload, {
 					webhook,
