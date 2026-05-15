@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero } from '@miko/ui'
+	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero } from '@goobits/ui'
 	import { formatDateMonthDayYearShort } from '$lib/utils/date'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 	import { featuredTrack, getMusicPortfolioEntries, musicPlatforms, type MusicPageData } from './viewmodel'

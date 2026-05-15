@@ -1,5 +1,5 @@
 <script>
-	import { ShowcaseHero } from '@miko/ui'
+	import { ShowcaseHero } from '@goobits/ui'
 	import { blogConfig, getAllCategories, slugify } from '@goobits/blog/core'
 	import MikoArchiveRow from './MikoArchiveRow.svelte'
 	import { formatLabel } from '../utils/formatLabel.ts'

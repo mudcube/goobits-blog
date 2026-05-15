@@ -1,6 +1,6 @@
 <script>
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
-	import { LegalPage } from '@miko/ui'
+	import { LegalPage } from '@goobits/ui'
 
 	const description =
 		'Terms of use for MIKO.ART, including site usage, bookings, accounts, intellectual property, third-party services, and liability.'

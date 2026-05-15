@@ -18,7 +18,7 @@
 		ShowcaseHero,
 		ShowcaseSection,
 		SitemapCategory
-	} from '@miko/ui'
+	} from '@goobits/ui'
 	import { formatDateMmDdYyyy } from '$lib/utils/date'
 	import {
 		getFilteredSitemapCount,

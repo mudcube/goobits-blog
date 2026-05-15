@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Seo } from '$lib/app/seo'
-	import { SuccessPage } from '@miko/ui'
+	import { SuccessPage } from '@goobits/ui'
 </script>
 
 <Seo

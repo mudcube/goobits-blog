@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Breadcrumbs, Hero } from '@miko/ui'
+	import { Breadcrumbs, Hero } from '@goobits/ui'
 	import type { Snippet } from 'svelte'
 
 	type BreadcrumbItem = {

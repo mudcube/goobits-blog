@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import { Seo } from '$lib/app/seo'
-	import { FormField, Hero, PillButton } from '@miko/ui'
+	import { FormField, Hero, PillButton } from '@goobits/ui'
 	import { superForm } from 'sveltekit-superforms'
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters'
 	import AntiAbuseFields from '$lib/forms/AntiAbuseFields.svelte'

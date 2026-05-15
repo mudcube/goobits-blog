@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PageShell } from '@miko/ui'
+	import { PageShell } from '@goobits/ui'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 	import { appsCollection, appsDescription, getAppImage, getAppMeta } from './catalog'
 

@@ -1,5 +1,5 @@
 <script>
-	import { PageShell } from '@miko/ui'
+	import { PageShell } from '@goobits/ui'
 	import { MikoBlogRouter } from '@goobits/blog-theme-miko'
 	import JournalSeo from '$lib/app/seo/JournalSeo.svelte'
 

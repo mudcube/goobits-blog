@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero } from '@miko/ui'
+	import { PageShell, ShowcaseCard, ShowcaseCTA, ShowcaseGrid, ShowcaseHero } from '@goobits/ui'
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
 	import { artWorks, artWorkTypes } from './content'
 

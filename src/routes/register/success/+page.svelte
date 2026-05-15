@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Seo } from '$lib/app/seo'
-	import { SuccessPage } from '@miko/ui'
+	import { SuccessPage } from '@goobits/ui'
 	import { getCalendarConfig } from '@calendar/core/config'
 	const calendarConfig = getCalendarConfig()
 </script>

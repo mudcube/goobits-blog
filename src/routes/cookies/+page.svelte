@@ -1,6 +1,6 @@
 <script>
 	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
-	import { LegalPage } from '@miko/ui'
+	import { LegalPage } from '@goobits/ui'
 
 	const description =
 		'Cookie policy for MIKO.ART, including essential cookies, authentication sessions, theme preferences, and browser storage.'

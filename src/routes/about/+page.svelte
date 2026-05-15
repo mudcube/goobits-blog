@@ -1,5 +1,5 @@
 <script>
-	import { Hero, PageShell } from '@miko/ui'
+	import { Hero, PageShell } from '@goobits/ui'
 	import { Seo, buildPersonJsonLd, buildWebPageJsonLd } from '$lib/app/seo'
 
 	const description =

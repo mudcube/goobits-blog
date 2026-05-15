@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Hero } from '@miko/ui'
+	import { Hero } from '@goobits/ui'
 	import { ChevronRowCard } from '@calendar/ui/shared'
 
 	type ParkingItem = { href: string; title: string; vibe: string; date?: string }

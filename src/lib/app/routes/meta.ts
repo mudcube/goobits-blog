@@ -1,4 +1,6 @@
-export type SitemapAudience = 'public' | 'internal' | 'hidden'
+import type { SitemapAudience } from '@goobits/sitemap/core'
+
+export type { SitemapAudience }
 
 export type RouteMeta = {
 	sitemap?: SitemapAudience

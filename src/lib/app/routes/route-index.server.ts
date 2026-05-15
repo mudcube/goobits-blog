@@ -2,10 +2,19 @@ import fs from 'fs'
 import path from 'path'
 import { execFileSync } from 'child_process'
 import { slugify } from '@goobits/blog/utils'
+import type {
+	ApiRouteEntry as ApiRoute,
+	PageRouteEntry as PageRoute,
+	RouteInventory,
+	SitemapEntry as RouteEntry,
+	SitemapRoute
+} from '@goobits/sitemap/core'
 import { getJournalPosts } from '$lib/blog/server'
 import type { JournalPost } from '$lib/blog/viewmodel'
 import { getConfiguredReleaseStage, isRouteReleased, type ReleaseStage } from '$lib/app/release'
 import type { RouteMeta, SitemapAudience } from '$lib/app/routes/meta'
+
+export type { ApiRoute, PageRoute, RouteEntry }
 
 const ROUTES_DIR = 'src/routes'
 const ROUTES_DIR_ABS = path.resolve(ROUTES_DIR)
@@ -23,55 +32,9 @@ for (const [modulePath, moduleExports] of Object.entries(routeMetaModules)) {
 
 export const DEV_ONLY_CATEGORIES = ['Admin Pages', 'API Routes', 'Utility Pages']
 
-export type PageRoute = {
-	path: string
-	name: string
-	type: 'page'
-	hasServerLoad: boolean
-	hasClientLoad: boolean
-	hasLayout: boolean
-	isDynamic: boolean
-	hasAuth: boolean
-	isNoIndex: boolean
-	sitemap: SitemapAudience
-	lastModified: string
-	category: string
-}
-
-export type ApiRoute = {
-	path: string
-	name: string
-	type: 'api'
-	httpMethods: string[]
-	isDynamic: boolean
-	sitemap: SitemapAudience
-	lastModified: string
-	category: string
-}
-
-export type RouteEntry = PageRoute | ApiRoute
-
-type RouteInventory = {
-	routes: RouteEntry[]
-	grouped: Record<string, RouteEntry[]>
-	stats: {
-		total: number
-		pages: number
-		api: number
-		dynamic: number
-		ssr: number
-		protected: number
-	}
-}
-
 type RouteInventoryOptions = {
 	includeDevOnlyCategories?: boolean
 	activeStage?: ReleaseStage
-}
-
-type SitemapRoute = {
-	path: string
-	lastModified: string
 }
 
 const SITEMAP_AUDIENCE_MATCHERS: Array<{ path: string; sitemap: SitemapAudience; matchPrefix?: boolean }> = [
