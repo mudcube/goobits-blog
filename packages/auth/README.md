@@ -94,7 +94,8 @@ const credentials = new CredentialsProvider({
 
 ## Docs
 
-- `docs/quickstart.md`
+- `docs/quickstart.md` — 5-minute SvelteKit wire-up
+- `docs/integration.md` — adapter contract for custom storage backends
 - `docs/public-api.md`
 - `docs/security-contract.md`
 - `docs/schema.md`
