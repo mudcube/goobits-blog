@@ -113,16 +113,8 @@
 
 	.showcase-grid__items {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, var(--project-card-width)));
-		justify-content: space-between;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 		gap: var(--space-8);
-	}
-
-	@media (max-width: 1024px) {
-		.showcase-grid__items {
-			grid-template-columns: repeat(2, minmax(0, var(--project-card-width)));
-			justify-content: center;
-		}
 	}
 
 	@media (max-width: 768px) {
@@ -134,12 +126,6 @@
 		.showcase-grid__head {
 			align-items: stretch;
 			flex-direction: column;
-		}
-	}
-
-	@media (max-width: 640px) {
-		.showcase-grid__items {
-			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 </style>

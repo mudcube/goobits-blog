@@ -291,8 +291,7 @@
 
 	.apps-page__grid {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, var(--project-card-width)));
-		justify-content: space-between;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 		gap: var(--space-8);
 	}
 
@@ -450,13 +449,6 @@
 		line-height: 1.6;
 	}
 
-	@media (max-width: 1024px) {
-		.apps-page__grid {
-			grid-template-columns: repeat(2, minmax(0, var(--project-card-width)));
-			justify-content: center;
-		}
-	}
-
 	@media (max-width: 768px) {
 		:global(.ui-page-shell.apps-page) {
 			padding-top: var(--page-shell-space-top-mobile);
@@ -476,9 +468,4 @@
 		}
 	}
 
-	@media (max-width: 640px) {
-		.apps-page__grid {
-			grid-template-columns: minmax(0, 1fr);
-		}
-	}
 </style>
