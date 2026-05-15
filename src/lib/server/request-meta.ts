@@ -27,3 +27,19 @@ export function getAsn(request: Request) {
 	const asn = cfRequest.cf?.asn
 	return typeof asn === 'number' ? String(asn) : 'unknown'
 }
+
+/**
+ * True if the request carries the Cloudflare metadata we need to scope
+ * per-IP / per-ASN rate limits. False on requests that bypass Cloudflare
+ * (direct origin hits, misrouted internal traffic, etc.).
+ *
+ * In production, callers that depend on these for spam control should
+ * refuse the request rather than collapse everyone into the shared
+ * `'unknown'` bucket — see security audit M5.
+ */
+export function hasCloudflareMetadata(request: Request): boolean {
+	const hasIp = (request.headers.get('cf-connecting-ip')?.trim().length ?? 0) > 0
+	const cfRequest = request as Request & { cf?: { asn?: number } }
+	const hasAsn = typeof cfRequest.cf?.asn === 'number'
+	return hasIp || hasAsn
+}

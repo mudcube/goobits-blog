@@ -37,7 +37,9 @@ describe('anti-abuse turnstile configuration', () => {
 			asn: 'AS64501',
 			deviceId: 'device-contact-default',
 			honeypot: '',
-			startedAtMs: Date.now() - 1000,
+			// Past the CONTACT_MIN_SUBMIT_MS default (1500ms) so the timing
+			// check passes and we actually exercise the Turnstile branch.
+			startedAtMs: Date.now() - 3000,
 			turnstileToken: '',
 			env: createEnv()
 		})

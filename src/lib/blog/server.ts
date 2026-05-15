@@ -1,5 +1,5 @@
 import { readFileSync, accessSync } from 'fs'
-import { join, dirname } from 'path'
+import { join, dirname, normalize, sep } from 'path'
 import { compile } from 'mdsvex'
 import { getAllPosts, type ProcessedPost } from '@goobits/blog/utils'
 import { getBlogConfig } from '@goobits/blog/config'
@@ -55,12 +55,34 @@ function stripScriptTags(html: string) {
 	return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
 }
 
+function escapeHtmlAttr(value: string) {
+	return value
+		.replace(/&/g, '&amp;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#39;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+}
+
+/**
+ * True if `candidatePath` resolves to a location at or under `rootPath`.
+ * Both arguments must be absolute. Used to defend against path-traversal in
+ * author-controlled image src values.
+ */
+function isPathInside(candidatePath: string, rootPath: string): boolean {
+	const normalizedRoot = normalize(rootPath)
+	const normalizedCandidate = normalize(candidatePath)
+	const rootWithSep = normalizedRoot.endsWith(sep) ? normalizedRoot : normalizedRoot + sep
+	return normalizedCandidate === normalizedRoot || normalizedCandidate.startsWith(rootWithSep)
+}
+
 /**
  * Wrap <img> tags in <picture> elements with WebP sources when a .webp
  * sibling file exists on disk. Preserves the original <img> as fallback
  * for older browsers.
  */
 function upgradeImagesToWebpPicture(html: string, postDir: string) {
+	const staticRoot = join(process.cwd(), 'static')
 	return html.replace(/<img\b([^>]*)>/gi, (imgTag, attrs: string) => {
 		const srcMatch = attrs.match(/\bsrc=["']([^"']+)["']/)
 		if (!srcMatch?.[1]) return imgTag
@@ -76,8 +98,17 @@ function upgradeImagesToWebpPicture(html: string, postDir: string) {
 		const ext = src.substring(src.lastIndexOf('.'))
 		const webpSrc = src.substring(0, src.length - ext.length) + '.webp'
 
-		// Check if the WebP file exists on disk
-		const webpDiskPath = src.startsWith('/') ? join(process.cwd(), 'static', webpSrc) : join(postDir, webpSrc)
+		// Resolve where the WebP would live on disk and refuse anything that
+		// escapes its expected root (`static/` for absolute srcs, the post dir
+		// for relative srcs). Without this, an author-controlled
+		// `<img src="/../../etc/passwd.png">` could probe arbitrary filesystem
+		// locations via `accessSync`. See journal audit J5.
+		const isAbsolute = src.startsWith('/')
+		const webpDiskPath = isAbsolute ? join(staticRoot, webpSrc) : join(postDir, webpSrc)
+		const allowedRoot = isAbsolute ? staticRoot : postDir
+		if (!isPathInside(webpDiskPath, allowedRoot)) {
+			return imgTag
+		}
 
 		try {
 			accessSync(webpDiskPath)
@@ -86,7 +117,7 @@ function upgradeImagesToWebpPicture(html: string, postDir: string) {
 		}
 
 		// Resolve public path for the WebP source
-		const webpPublicPath = src.startsWith('/') ? webpSrc : webpSrc
+		const webpPublicPath = isAbsolute ? webpSrc : webpSrc
 
 		// Add loading="lazy" and decoding="async" if not already present
 		let enhancedAttrs = attrs
@@ -97,7 +128,10 @@ function upgradeImagesToWebpPicture(html: string, postDir: string) {
 			enhancedAttrs += ' decoding="async"'
 		}
 
-		return `<picture><source type="image/webp" srcset="${webpPublicPath}"><img${enhancedAttrs}></picture>`
+		// Escape the srcset value — it's derived from author-controlled `src`,
+		// and even though we just refused dangerous paths, an embedded `"` or
+		// `<` could break out of the attribute quoting. See journal audit J6.
+		return `<picture><source type="image/webp" srcset="${escapeHtmlAttr(webpPublicPath)}"><img${enhancedAttrs}></picture>`
 	})
 }
 
@@ -107,7 +141,9 @@ function upgradeInsecureMediaUrls(html: string) {
 
 function isOwnedExternalUrl(href: string) {
 	try {
-		const url = new URL(href)
+		// Resolve relative-to-the-base for protocol-relative URLs (`//example.com`).
+		// `new URL('//example.com', 'https://anchor')` → `https://example.com`.
+		const url = new URL(href, 'https://anchor.invalid')
 		const ownedDomains = getBlogConfig().ownedDomains ?? []
 		return ownedDomains.some((domain) => url.hostname === domain || url.hostname.endsWith(`.${domain}`))
 	} catch {
@@ -130,12 +166,29 @@ function mergeRelAttribute(existingRel: string | null, requiredTokens: string[])
 	return [...relTokens].join(' ')
 }
 
-const DANGEROUS_HREF_PROTOCOL = /^\s*(javascript|data|vbscript|file):/i
+// Schemes that can execute or otherwise escape the page context. `data:` is
+// included because of `data:text/html,…` payloads. `blob:` and `filesystem:`
+// can host scripts. `intent://` and `chrome-extension://` only do anything in
+// specific clients but offer no benefit in journal anchors.
+const DANGEROUS_HREF_PROTOCOL =
+	/^\s*(javascript|data|vbscript|file|blob|filesystem|intent|chrome-extension):/i
+
+const NAMED_ENTITY_DECODE: Record<string, string> = {
+	tab: '\t',
+	newline: '\n',
+	lf: '\n',
+	cr: '\r',
+	nbsp: ' '
+}
 
 function isDangerousHref(href: string) {
 	const decoded = href
 		.replace(/&#x([0-9a-f]+);?/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
 		.replace(/&#(\d+);?/g, (_, dec) => String.fromCharCode(parseInt(dec, 10)))
+		.replace(/&([a-zA-Z]+);?/g, (match, name: string) => {
+			const lower = name.toLowerCase()
+			return NAMED_ENTITY_DECODE[lower] ?? match
+		})
 	return DANGEROUS_HREF_PROTOCOL.test(decoded)
 }
 
@@ -147,9 +200,13 @@ function neutralizeDangerousAnchors(html: string) {
 	})
 }
 
+// Match http(s):// and protocol-relative `//host/...`. Don't match site-
+// internal `/foo`, fragments, mailto:, tel:, etc.
+const EXTERNAL_HREF = /^(?:https?:)?\/\//i
+
 function normalizeExternalAnchorRel(html: string) {
 	return html.replace(/<a\b[^>]*\bhref=(['"])(.*?)\1[^>]*>/gi, (anchorTag, quote, href: string) => {
-		if (!/^https?:\/\//i.test(href) || isOwnedExternalUrl(href)) {
+		if (!EXTERNAL_HREF.test(href) || isOwnedExternalUrl(href)) {
 			return anchorTag
 		}
 

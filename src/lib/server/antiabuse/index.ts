@@ -219,7 +219,12 @@ export async function runContactAntiAbuse(input: ContactAntiAbuseInput): Promise
 		return genericFailure()
 	}
 
-	const minSubmitMs = toInt(input.env['CONTACT_MIN_SUBMIT_MS'], 100)
+	// Default submit-time floor: 1500ms. The 100ms baseline used to be effectively
+	// no-op — any scripted submitter trivially waits 100ms between fetching the
+	// page and POSTing. 1500ms is roughly the slowest "paste your message and
+	// click send" path a real human takes, while still high enough to block the
+	// dumb-bot tier without per-IP / per-email backoff.
+	const minSubmitMs = toInt(input.env['CONTACT_MIN_SUBMIT_MS'], 1500)
 	if (!Number.isFinite(input.startedAtMs) || input.startedAtMs <= 0 || now - input.startedAtMs < minSubmitMs) {
 		return genericFailure()
 	}

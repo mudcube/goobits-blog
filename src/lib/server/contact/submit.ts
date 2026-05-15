@@ -39,17 +39,14 @@ export async function submitContactData(
 				typeof env['CONTACT_WEBHOOK_URL'] === 'string'
 					? env['CONTACT_WEBHOOK_URL']
 					: ''
-			const requestHost = (() => {
-				try {
-					return new URL(event.request.url).hostname
-				} catch {
-					return 'unknown-host'
-				}
-			})()
+			// Use a literal fallback rather than deriving from `event.request.url`'s
+			// hostname — on Workers that's the inbound `Host` header, which is
+			// attacker-controlled and would let a poisoned Host inject the value
+			// forwarded to the email webhook (see security audit M2).
 			const source =
 				typeof env['CONTACT_SOURCE'] === 'string' && env['CONTACT_SOURCE'].length > 0
 					? env['CONTACT_SOURCE']
-					: requestHost
+					: 'contact-source-unset'
 			const eventName =
 				typeof env['CONTACT_EVENT'] === 'string' && env['CONTACT_EVENT'].length > 0
 					? env['CONTACT_EVENT']
