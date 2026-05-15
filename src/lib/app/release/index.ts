@@ -1,30 +1,24 @@
-import type { Cookies } from '@sveltejs/kit'
+import {
+	type ReleasedNavItem,
+	type ReleasedRoute,
+	isRouteReleased as isRouteReleasedAgainst
+} from '@goobits/visibility-mode'
+import type { ReleaseStage } from '@goobits/visibility-mode'
 
-export type ReleaseStage = 'live' | 'preview'
-
-export type ReleasedRoute = {
-	path: string
-	stage: ReleaseStage
-}
-
-export type ReleasedNavItem = {
-	href: string
-	label: string
-	matchPrefix?: boolean
-	external?: boolean
-	stages: ReleaseStage[]
-}
-
-export const RELEASE_STAGE_COOKIE = 'site-release-preview'
-export const DEFAULT_RELEASE_STAGE: ReleaseStage = 'live'
-
-function getRuntimeEnv() {
-	if (typeof process !== 'undefined' && process.env) {
-		return process.env as Record<string, string | undefined>
-	}
-
-	return {}
-}
+export {
+	DEFAULT_RELEASE_STAGE,
+	RELEASE_STAGE_COOKIE,
+	getActiveReleaseStage,
+	getConfiguredReleaseStage,
+	getPreviewReleaseStage,
+	isLocalPreviewHost,
+	isNavItemVisibleInStage,
+	isVisibleInStage,
+	normalizeReleaseStage,
+	type ReleasedNavItem,
+	type ReleasedRoute,
+	type ReleaseStage
+} from '@goobits/visibility-mode'
 
 export const releasedRoutes: ReleasedRoute[] = [
 	{ path: '/art', stage: 'preview' },
@@ -39,48 +33,7 @@ export const releasedHeaderNavItems: ReleasedNavItem[] = [
 	{ href: '/about', label: 'Profile', stages: ['live', 'preview'] }
 ]
 
-export function normalizeReleaseStage(value: string | null | undefined): ReleaseStage {
-	return value === 'preview' ? 'preview' : 'live'
-}
-
-export function getConfiguredReleaseStage(
-	env: Record<string, string | undefined> = getRuntimeEnv()
-): ReleaseStage {
-	return normalizeReleaseStage(env['PUBLIC_RELEASE_STAGE'])
-}
-
-export function getPreviewReleaseStage(cookies: Cookies): ReleaseStage | null {
-	const value = cookies.get(RELEASE_STAGE_COOKIE)
-	return value ? normalizeReleaseStage(value) : null
-}
-
-export function getActiveReleaseStage({
-	cookies,
-	enablePreview = false,
-	env = getRuntimeEnv()
-}: {
-	cookies?: Cookies
-	enablePreview?: boolean
-	env?: Record<string, string | undefined>
-} = {}): ReleaseStage {
-	if (enablePreview && cookies) {
-		const preview = getPreviewReleaseStage(cookies)
-		if (preview) return preview
-	}
-
-	return getConfiguredReleaseStage(env)
-}
-
-export function isVisibleInStage(itemStage: ReleaseStage, activeStage: ReleaseStage) {
-	return itemStage === 'live' || activeStage === 'preview'
-}
-
-export function isNavItemVisibleInStage(item: ReleasedNavItem, activeStage: ReleaseStage) {
-	return item.stages.includes(activeStage)
-}
-
-export function isRouteReleased(pathname: string, activeStage: ReleaseStage) {
-	const route = releasedRoutes.find((entry) => pathname === entry.path || pathname.startsWith(`${entry.path}/`))
-	if (!route) return true
-	return isVisibleInStage(route.stage, activeStage)
+/** Site-bound convenience: the package's `isRouteReleased` takes the registry. */
+export function isRouteReleased(pathname: string, activeStage: ReleaseStage): boolean {
+	return isRouteReleasedAgainst(pathname, releasedRoutes, activeStage)
 }
