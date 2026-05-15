@@ -310,7 +310,7 @@ describe('generateRssFeed', () => {
 		it('filters out posts without date', () => {
 			const posts = [
 				createPost({ title: 'Valid Post' }),
-				{ ...createPost({}), date: '' } as ProcessedPost
+				{ ...createPost({}), date: '' }
 			]
 			const xml = generateRssFeed(posts, defaultOptions)
 
@@ -321,7 +321,7 @@ describe('generateRssFeed', () => {
 
 	describe('Edge Cases', () => {
 		it('handles posts with missing urlPath gracefully', () => {
-			const posts = [{ ...createPost({}), urlPath: '' } as ProcessedPost]
+			const posts = [{ ...createPost({}), urlPath: '' }]
 			// Should not throw
 			expect(() => generateRssFeed(posts, defaultOptions)).not.toThrow()
 		})

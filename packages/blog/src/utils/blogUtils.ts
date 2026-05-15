@@ -133,9 +133,6 @@ interface PostModule {
 	metadata: PostMetadata
 }
 
-// Type for post files from getBlogPostFiles
-type PostFilesRecord = Record<string, () => Promise<unknown>>
-
 // In-memory cache for blog posts to avoid re-reading files on every request
 interface CacheEntry {
 	posts: ProcessedPost[]
@@ -987,7 +984,7 @@ export async function getAllPosts(options: GetAllPostsOptions = {}): Promise<Pro
 	logger.info(`[BlogUtils] Loading blog posts from disk${ lang !== 'en' ? ` for language: ${ lang }` : '' }`)
 
 	// Use the abstracted function to get blog post files
-	const posts = getBlogPostFiles() as PostFilesRecord
+	const posts = getBlogPostFiles()
 
 	const processedPosts = await Promise.all(
 		Object.entries(posts).map(async ([ filePath, resolver ]): Promise<ProcessedPost | ProcessedPost[] | null> => {

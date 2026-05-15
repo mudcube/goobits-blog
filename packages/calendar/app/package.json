@@ -28,6 +28,6 @@
     "@goobits/auth": "workspace:*"
   },
   "devDependencies": {
-    "@sveltejs/kit": "^2.57.1"
+    "@sveltejs/kit": "^2.60.1"
   }
 }

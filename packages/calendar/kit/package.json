@@ -21,9 +21,9 @@
   "dependencies": {
     "@calendar/migrations": "workspace:*",
     "@goobits/auth": "workspace:*",
-    "better-sqlite3": "^12.9.0"
+    "better-sqlite3": "^12.10.0"
   },
   "devDependencies": {
-    "@sveltejs/kit": "^2.57.1"
+    "@sveltejs/kit": "^2.60.1"
   }
 }

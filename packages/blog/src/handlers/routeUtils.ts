@@ -384,7 +384,7 @@ export async function loadPost(
 					return p
 				}
 				const { content: _content, ...rest } = p
-				return rest as ProcessedPost
+				return rest
 			})
 
 		return {
