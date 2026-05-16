@@ -5,7 +5,8 @@ let initialized = false
 const journalBlogConfig: DeepPartial<BlogConfig> = {
 	name: 'Miko Journal',
 	appName: 'Miko',
-	description: 'Ideas, process, and notes from Miko.',
+	description:
+		'Notes on Sketchpad, Color Piano, MIDI.js, and creative coding — process, design, and code behind browser-native tools.',
 	uri: '/journal',
 	posts: {
 		contentBasePath: '/static/journal',

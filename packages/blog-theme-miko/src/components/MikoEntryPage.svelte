@@ -181,7 +181,7 @@
 		<div class="miko-blog__entry-footer">
 			{#if tags.length > 0}
 				<div class="miko-blog__entry-tags">
-					<h2>Tags</h2>
+					<h3>Tags</h3>
 					<ul>
 						{#each tags as tag}
 							<li>
@@ -194,7 +194,7 @@
 
 			{#if relatedPosts.length > 0}
 				<div class="miko-blog__related">
-					<h2>Related entries</h2>
+					<h3>Related entries</h3>
 					<div class="miko-blog__related-grid">
 						{#each relatedPosts as relatedPost (relatedPost.urlPath)}
 							<a class="miko-blog__related-card" href={postHref(relatedPost)}>

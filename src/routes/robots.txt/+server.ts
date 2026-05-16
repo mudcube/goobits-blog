@@ -3,12 +3,14 @@ import { getBaseUrl, getPlatformEnv, resolveSiteOrigin } from '@goobits/sitemap/
 
 export const prerender = true
 
+// Disallow entries use trailing slashes so they scope to the directory and
+// don't accidentally block sibling paths like `/admin-style` or `/apilog`.
 const RULES = [
 	'Allow: /',
-	'Disallow: /admin',
-	'Disallow: /schedule/admin',
-	'Disallow: /api',
-	'Disallow: /dev',
+	'Disallow: /admin/',
+	'Disallow: /schedule/admin/',
+	'Disallow: /api/',
+	'Disallow: /dev/',
 	'Disallow: /health'
 ]
 

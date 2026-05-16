@@ -24,4 +24,10 @@
 	]}
 />
 
+<svelte:head>
+	<!-- Turnstile widget lives on this page only; warming the TLS handshake
+	     here (rather than globally) keeps every other route lean. -->
+	<link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin="anonymous" />
+</svelte:head>
+
 <ContactForm form={data.form} turnstileSiteKey={data.turnstileSiteKey} />

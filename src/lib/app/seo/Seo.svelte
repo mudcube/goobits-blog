@@ -15,6 +15,9 @@
 		description?: string
 		path?: string
 		image?: string
+		imageWidth?: number
+		imageHeight?: number
+		imageAlt?: string
 		type?: 'website' | 'article'
 		noindex?: boolean
 		jsonLd?: JsonLdNode[]
@@ -27,6 +30,9 @@
 		description = '',
 		path = '/',
 		image = SITE_DEFAULT_IMAGE,
+		imageWidth,
+		imageHeight,
+		imageAlt = '',
 		type = 'website',
 		noindex = false,
 		jsonLd = [],
@@ -56,6 +62,7 @@
 	<link rel="canonical" href={canonicalUrl} />
 
 	<meta property="og:site_name" content={SITE_NAME} />
+	<meta property="og:locale" content="en_US" />
 	<meta property="og:type" content={type} />
 	<meta property="og:title" content={pageTitle} />
 	{#if description}
@@ -63,6 +70,13 @@
 	{/if}
 	<meta property="og:url" content={canonicalUrl} />
 	<meta property="og:image" content={imageUrl} />
+	{#if imageWidth && imageHeight}
+		<meta property="og:image:width" content={String(imageWidth)} />
+		<meta property="og:image:height" content={String(imageHeight)} />
+	{/if}
+	{#if imageAlt}
+		<meta property="og:image:alt" content={imageAlt} />
+	{/if}
 	{#if type === 'article' && publishedTime}
 		<meta property="article:published_time" content={publishedTime} />
 	{/if}
@@ -76,6 +90,9 @@
 		<meta name="twitter:description" content={description} />
 	{/if}
 	<meta name="twitter:image" content={imageUrl} />
+	{#if imageAlt}
+		<meta name="twitter:image:alt" content={imageAlt} />
+	{/if}
 
 	{@html jsonLdMarkup}
 </svelte:head>

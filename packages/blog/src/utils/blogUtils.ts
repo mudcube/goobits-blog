@@ -620,7 +620,11 @@ export function getPostUrl(post: ProcessedPost | null | undefined, withLanguage 
 	const config = blogConfig
 	if (!post?.urlPath) { return withLanguage ? _localizeUrl(config.uri) : config.uri }
 	const url = getMountedPostUrlPath(post)
-	return withLanguage ? _localizeUrl(url) : url
+	// Always emit the trailing slash so internal links match the canonical
+	// trailing-slash policy and don't 308-redirect on click. Sites that
+	// prefer no-trailing-slash should strip in the consumer.
+	const withTrailing = url.endsWith('/') ? url : `${url}/`
+	return withLanguage ? _localizeUrl(withTrailing) : withTrailing
 }
 
 /**

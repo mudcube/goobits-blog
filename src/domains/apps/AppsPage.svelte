@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PageShell } from '@goobits/ui'
-	import { Seo, buildWebPageJsonLd } from '$lib/app/seo'
+	import { Seo, buildWebPageJsonLd, buildWebsiteJsonLd } from '$lib/app/seo'
 	import { appsCollection, appsDescription, getAppImage, getAppMeta } from './catalog'
 
 	const heroImage = getAppImage(appsCollection[0]?.id ?? 'sketchpad')
@@ -12,6 +12,7 @@
 	path="/"
 	image={heroImage}
 	jsonLd={[
+		buildWebsiteJsonLd(),
 		buildWebPageJsonLd({
 			path: '/',
 			title: 'Apps, Tools & Interactive Software',
@@ -62,7 +63,7 @@
 
 			<div class="apps-page__grid">
 				{#each appsCollection as app, idx}
-					<a href={app.url} class="apps-page__card">
+					<a href={app.url} class="apps-page__card" rel="me noopener">
 						<div class="apps-page__card-art">
 							<img
 								src={getAppImage(app.id)}

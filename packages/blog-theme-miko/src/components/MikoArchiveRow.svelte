@@ -1,6 +1,6 @@
 <script>
 	import { blogConfig, formatDate, getCoverImageUrl, getPostUrl, slugify } from '@goobits/blog/core'
-	import { getJournalImageVariants } from '../utils/journalImageVariants.ts'
+	import { getJournalImageThumbnailSrc, getJournalImageVariants } from '../utils/journalImageVariants.ts'
 	import { formatLabel } from '../utils/formatLabel.ts'
 
 	const { post } = $props()
@@ -8,6 +8,7 @@
 	const postUrl = $derived(getPostUrl(post))
 	const coverImage = $derived(getCoverImageUrl(post, ''))
 	const coverVariants = $derived(getJournalImageVariants(coverImage))
+	const thumbSrc = $derived(getJournalImageThumbnailSrc(coverVariants))
 	const categories = $derived(post.metadata?.fm?.categories || [])
 	const primaryCategory = $derived(post.metadata?.fm?.category || categories[0] || '')
 	const tags = $derived(post.metadata?.fm?.tags || [])
@@ -48,8 +49,10 @@
 						{/if}
 						<img
 							class="miko-blog__row-thumb"
-							src={coverVariants.fallbackSrc}
+							src={thumbSrc}
 							alt={thumbAlt}
+							width={coverVariants.width}
+							height={coverVariants.height}
 							loading="lazy"
 							decoding="async"
 						/>

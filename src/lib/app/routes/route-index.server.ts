@@ -447,11 +447,18 @@ export async function getPublicHumanSitemapInventory(activeStage?: ReleaseStage)
 	}
 }
 
+// Sitemap.xml should list HTML pages, not feeds or text endpoints. Filter
+// anything with a non-HTML extension before emitting — search engines treat
+// .xml/.txt entries as content URLs and may index them oddly (e.g.,
+// /journal/rss.xml competing with the journal index for the same query).
+const NON_HTML_SITEMAP_PATH = /\.(?:xml|txt|json|rss|atom)$/i
+
 export async function getPublicSitemapRoutes(activeStage?: ReleaseStage) {
 	const inventory = await getPublicHumanSitemapInventory(activeStage)
 
 	const deduped = new Map<string, SitemapRoute>()
 	for (const route of inventory.routes) {
+		if (NON_HTML_SITEMAP_PATH.test(route.path)) continue
 		deduped.set(route.path, { path: route.path, lastModified: route.lastModified })
 	}
 

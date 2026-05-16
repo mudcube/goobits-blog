@@ -3,9 +3,11 @@
 	import { toProcessedPost, type JournalPost } from '$lib/blog/viewmodel'
 	import Seo from './Seo.svelte'
 	import {
+		SITE_AUTHOR,
 		buildArticleJsonLd,
 		buildBreadcrumbJsonLd,
 		buildWebPageJsonLd,
+		toIso8601Datetime,
 		toPlainTextExcerpt,
 		type JsonLdNode
 	} from './meta'
@@ -14,6 +16,7 @@
 		data: {
 			pageType?: 'index' | 'category' | 'tag' | 'post' | string
 			post?: JournalPost | null
+			posts?: Array<{ metadata?: { fm?: { title?: string } } }>
 			category?: string
 			categoryDescription?: string
 			tag?: string
@@ -49,12 +52,26 @@
 			jsonLd: [] as JsonLdNode[]
 		}
 
+		// For category/tag pages, weave a short list of the actual post titles
+		// into the description so each collection has a unique SERP snippet
+		// instead of the boilerplate "Journal entries tagged #Foo." that an
+		// audit would (rightly) flag as thin/duplicate content.
+		const samplePostTitles = (data.posts ?? [])
+			.map((p) => p.metadata?.fm?.title)
+			.filter((t): t is string => typeof t === 'string' && t.length > 0)
+			.slice(0, 3)
+		const postCount = data.posts?.length ?? 0
+
 		if (data.pageType === 'category' && data.category) {
 			const label = formatLabel(data.category)
 			const path = `${journalBase}/category/${slugify(data.category)}/`
-			const description =
-				data.categoryDescription ||
-				`Journal entries filed under ${label}.`
+			const titleSummary = samplePostTitles.length > 0
+				? samplePostTitles.join(', ')
+				: ''
+			const description = data.categoryDescription
+				|| (postCount > 0 && titleSummary
+					? `${postCount} journal ${postCount === 1 ? 'entry' : 'entries'} on ${label.toLowerCase()}: ${titleSummary}.`
+					: `Journal entries filed under ${label}.`)
 			return {
 				...fallback,
 				title: `${label} — Journal`,
@@ -74,7 +91,12 @@
 		if (data.pageType === 'tag' && data.tag) {
 			const label = formatLabel(data.tag)
 			const path = `${journalBase}/tag/${slugify(data.tag)}/`
-			const description = `Journal entries tagged #${label}.`
+			const titleSummary = samplePostTitles.length > 0
+				? samplePostTitles.join(', ')
+				: ''
+			const description = postCount > 0 && titleSummary
+				? `${postCount} journal ${postCount === 1 ? 'entry' : 'entries'} tagged #${label}: ${titleSummary}.`
+				: `Journal entries tagged #${label}.`
 			return {
 				...fallback,
 				title: `#${label} — Journal`,
@@ -111,11 +133,12 @@
 			const description =
 				derivedExcerpt || `${title} — a journal entry from Miko Meow.`
 			const image = getCoverImageUrl(processed, '') || fallback.image
-			const datePublished = data.post.date instanceof Date
-				? data.post.date.toISOString()
-				: String(data.post.date ?? '')
-			const dateModified = fm.updated || datePublished
+			const datePublished = toIso8601Datetime(data.post.date)
+			const dateModified = fm.updated ? toIso8601Datetime(fm.updated) : datePublished
 			const primaryCategory = fm.category || (fm.categories ?? [])[0] || ''
+			const tags = Array.isArray(fm.tags)
+				? fm.tags.filter((t): t is string => typeof t === 'string')
+				: []
 
 			const breadcrumbItems = [
 				{ name: 'Journal', path: journalIndexPath }
@@ -135,7 +158,11 @@
 					description,
 					datePublished,
 					dateModified,
-					image
+					image,
+					...(primaryCategory ? { articleSection: formatLabel(primaryCategory) } : {}),
+					...(tags.length > 0
+						? { keywords: tags.map((tag) => formatLabel(tag)) }
+						: {})
 				}),
 				buildBreadcrumbJsonLd(breadcrumbItems)
 			]
@@ -153,13 +180,18 @@
 			}
 		}
 
-		// index / unknown
+		// index / unknown — title doubles as the SERP <title>, so spend the
+		// available characters on intent terms (creative coding / drawing
+		// tools / music) rather than just the brand. blogConfig.name stays
+		// short for header/RSS reuse.
+		const indexTitle = `Journal — Sketchpad, Color Piano, creative coding by ${SITE_AUTHOR}`
 		return {
 			...fallback,
+			title: indexTitle,
 			jsonLd: [
 				buildWebPageJsonLd({
 					path: journalIndexPath,
-					title: fallback.title,
+					title: indexTitle,
 					description: fallback.description,
 					type: 'CollectionPage'
 				})

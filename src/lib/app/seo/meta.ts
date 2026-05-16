@@ -75,6 +75,23 @@ export function toPlainTextExcerpt(value: string, maxLength = 155) {
 		.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
 		.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
 		.replace(/<[^>]+>/g, ' ')
+		// Strip common markdown syntax so SERP descriptions don't leak raw
+		// `[label](url)`, `**bold**`, fenced code, etc. Order matters: image
+		// syntax first (so its `[alt]` doesn't get half-stripped), then link,
+		// then headings/emphasis/code/list markers. The `[*]` allows empty
+		// label/alt forms (`[]`/`![]`) so they're dropped entirely instead of
+		// leaking the bare brackets and URL into the SERP.
+		.replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1') // ![alt](url) → alt
+		.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // [text](url) → text (incl. [](url))
+		.replace(/\[([^\]]*)\]\[[^\]]*\]/g, '$1') // [text][ref] → text
+		.replace(/```[\s\S]*?```/g, ' ') // fenced code blocks
+		.replace(/`([^`]+)`/g, '$1') // inline code
+		.replace(/^\s{0,3}#{1,6}\s+/gm, '') // ATX headings
+		.replace(/(\*\*|__)(.*?)\1/g, '$2') // bold
+		.replace(/(\*|_)(.*?)\1/g, '$2') // italic
+		.replace(/^\s*>\s?/gm, '') // blockquote marker
+		.replace(/^\s*[-*+]\s+/gm, '') // bullet list marker
+		.replace(/^\s*\d+\.\s+/gm, '') // ordered list marker
 		.replace(/\s+/g, ' ')
 		.trim()
 
@@ -119,6 +136,16 @@ export function buildWebsiteJsonLd(): JsonLdNode {
 			'@type': 'Person',
 			name: SITE_AUTHOR,
 			url: SITE_ORIGIN
+		},
+		// Enables the Google sitelinks search box on the brand SERP. Wires to
+		// the human sitemap page which already accepts a ?q=… intent.
+		potentialAction: {
+			'@type': 'SearchAction',
+			target: {
+				'@type': 'EntryPoint',
+				urlTemplate: `${SITE_ORIGIN}/sitemap/?q={search_term_string}`
+			},
+			'query-input': 'required name=search_term_string'
 		}
 	}
 }
@@ -167,29 +194,48 @@ export function buildBreadcrumbJsonLd(items: Array<{ name: string; path: string 
 	}
 }
 
+/**
+ * Coerce a Date | ISO string | date-only string to a full ISO-8601 datetime.
+ * OG validators (Facebook debugger, LinkedIn) and Google rich-result test
+ * prefer full datetimes; date-only `YYYY-MM-DD` is accepted but fragile.
+ */
+export function toIso8601Datetime(value: Date | string | undefined): string {
+	if (!value) return ''
+	if (value instanceof Date) return value.toISOString()
+	const parsed = new Date(value)
+	if (!Number.isNaN(parsed.getTime())) return parsed.toISOString()
+	return String(value)
+}
+
 export function buildArticleJsonLd({
 	path,
 	title,
 	description,
 	datePublished,
 	dateModified,
-	image
+	image,
+	articleSection,
+	keywords
 }: {
 	path: string
 	title: string
 	description: string
-	datePublished: string
-	dateModified?: string
+	datePublished: string | Date
+	dateModified?: string | Date
 	image?: string
+	articleSection?: string
+	keywords?: readonly string[]
 }): JsonLdNode {
-	return {
+	const publishedIso = toIso8601Datetime(datePublished)
+	const modifiedIso = dateModified ? toIso8601Datetime(dateModified) : publishedIso
+	const node: JsonLdNode = {
 		'@context': 'https://schema.org',
 		'@type': 'BlogPosting',
 		headline: title,
 		description,
 		url: toAbsoluteSiteUrl(path),
-		datePublished,
-		dateModified: dateModified ?? datePublished,
+		datePublished: publishedIso,
+		dateModified: modifiedIso,
 		image: toAbsoluteAssetUrl(image ?? SITE_DEFAULT_IMAGE),
 		author: {
 			'@type': 'Person',
@@ -210,4 +256,7 @@ export function buildArticleJsonLd({
 			'@id': toAbsoluteSiteUrl(path)
 		}
 	}
+	if (articleSection) node['articleSection'] = articleSection
+	if (keywords && keywords.length > 0) node['keywords'] = keywords.join(', ')
+	return node
 }
