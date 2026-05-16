@@ -1,0 +1,3 @@
+[submodule "packages/auth"]
+	path = packages/auth
+	url = https://github.com/goobits/auth.git

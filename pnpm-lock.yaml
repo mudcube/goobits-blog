@@ -226,6 +226,9 @@ importers:
       postgres:
         specifier: ^3.4.9
         version: 3.4.9
+      svelte:
+        specifier: ^5.55.7
+        version: 5.55.7(patch_hash=592cf5bc791530e01ed28ced6d9b11c12bb4121aa0f1b1d914277fbf23e70242)(@typescript-eslint/types@8.59.3)
       tsup:
         specifier: ^8.5.1
         version: 8.5.1(postcss@8.5.14)(typescript@6.0.3)
