@@ -12,8 +12,8 @@
 	import { getActivityEmoji } from '../../shared'
 	import { formatEventDayLabel } from '../../shared'
 	let { data } = $props()
-	let upcoming = $state(Array.isArray(data?.upcoming) ? data.upcoming : [])
-	let recent = $state(Array.isArray(data?.recent) ? data.recent : [])
+	let upcoming = $state([])
+	let recent = $state([])
 	let pendingEventId = $state(null)
 	let feedError = $state('')
 	const calendarConfig = getCalendarUiConfig()

@@ -75,6 +75,9 @@ start_server() {
 	if [[ "${BASE_URL+x}" == "x" ]]; then env_overrides+=("BASE_URL=${BASE_URL}"); fi
 	if [[ "${TURNSTILE_SECRET_KEY+x}" == "x" ]]; then env_overrides+=("TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}"); fi
 	if [[ "${PUBLIC_TURNSTILE_SITE_KEY+x}" == "x" ]]; then env_overrides+=("PUBLIC_TURNSTILE_SITE_KEY=${PUBLIC_TURNSTILE_SITE_KEY}"); fi
+	if [[ "${TURNSTILE_ENABLE_LOCALHOST+x}" == "x" ]]; then env_overrides+=("TURNSTILE_ENABLE_LOCALHOST=${TURNSTILE_ENABLE_LOCALHOST}"); fi
+	if [[ "${TURNSTILE_REQUIRED+x}" == "x" ]]; then env_overrides+=("TURNSTILE_REQUIRED=${TURNSTILE_REQUIRED}"); fi
+	if [[ "${CONTACT_MIN_SUBMIT_MS+x}" == "x" ]]; then env_overrides+=("CONTACT_MIN_SUBMIT_MS=${CONTACT_MIN_SUBMIT_MS}"); fi
 	if [[ "${ANTIABUSE_ENABLED+x}" == "x" ]]; then env_overrides+=("ANTIABUSE_ENABLED=${ANTIABUSE_ENABLED}"); fi
 	if [[ "${E2E_RUN+x}" == "x" ]]; then env_overrides+=("E2E_RUN=${E2E_RUN}"); fi
 

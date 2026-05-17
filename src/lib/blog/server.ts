@@ -101,8 +101,8 @@ function upgradeImagesToWebpPicture(html: string, postDir: string) {
 		// Resolve where the WebP would live on disk and refuse anything that
 		// escapes its expected root (`static/` for absolute srcs, the post dir
 		// for relative srcs). Without this, an author-controlled
-		// `<img src="/../../etc/passwd.png">` could probe arbitrary filesystem
-		// locations via `accessSync`. See journal audit J5.
+		// path-traversal image source could probe arbitrary filesystem locations
+		// via `accessSync`. See journal audit J5.
 		const isAbsolute = src.startsWith('/')
 		const webpDiskPath = isAbsolute ? join(staticRoot, webpSrc) : join(postDir, webpSrc)
 		const allowedRoot = isAbsolute ? staticRoot : postDir
