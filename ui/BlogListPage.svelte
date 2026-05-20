@@ -17,11 +17,11 @@
 
 	const POSTS_PER_BATCH = blogConfig.pagination.postsPerBatch
 
-	// State for infinite scroll
-	let allPosts = $state([]) // Start with SSR posts
+	// State for infinite scroll. Initialize from props so SSR renders posts.
+	let allPosts = $state(data.posts ? [...data.posts] : [])
 	let isLoading = $state(false)
 	let currentPage = $state(1) // Track current page for API calls
-	let hasMorePosts = $state(true) // Use server data or default to true
+	let hasMorePosts = $state(data.hasMorePosts !== false) // Use server data or default to true
 
 	// Use allPosts as the visible posts (no more slicing)
 	let visiblePosts = $derived(allPosts)
@@ -66,10 +66,11 @@
 			}
 
 			const result = await response.json()
-			if (result.posts && result.posts.length > 0) {
-				allPosts = [...allPosts, ...result.posts]
+			const payload = result.data ?? result
+			if (payload.posts && payload.posts.length > 0) {
+				allPosts = [...allPosts, ...payload.posts]
 				currentPage = nextPage
-				hasMorePosts = result.pagination.hasNextPage
+				hasMorePosts = payload.pagination.hasNextPage
 			} else {
 				hasMorePosts = false
 			}
