@@ -13,6 +13,10 @@ Each release groups changes by audience:
 ## [Unreleased]
 
 ### User-facing
+- Calendar recurrence and venue-time correctness improvements, including DST-safe recurrence handling, per-event timezone persistence, and repeat-until validation.
+- Improved journal and SEO behavior: Worker-served journal routes, restored journal flourish components, richer titles/JSON-LD/Open Graph metadata, ISO dates, and Core Web Vitals polish.
+- Apps/showcase grids now flow continuously across viewport sizes.
+- Legal pages no longer duplicate "Last updated" copy and better match the site hero gutter on mobile.
 - Live shift drag reorder for programs, with shared `Tooltip` primitive and tooltip suppression during drag and pointerdown.
 - Unified schedule visual language across booking and admin surfaces; refined editor chrome (URL pill fixed/editable zones, Pause/Play/Trash icons, dashed preview border, themed emoji picker).
 - Redesigned profile page with topbar width parity; admin avatar and Calendar link in profile menu.
@@ -24,6 +28,12 @@ Each release groups changes by audience:
 - Wired discard-changes prompt; blog: sanitized markdown rendering, hardened anchors, fixed RSS escaping and slug collisions.
 
 ### Internal
+- Converted `@goobits/auth`, `@goobits/sitemap`, and the nano-banana image-generation utility from in-tree copies to package submodules.
+- Migrated blog, blog theme, contact, sitemap, and calendar packages toward `src/` package layouts with tighter export maps, package metadata, READMEs, and package-level `tsconfig.json` files.
+- Split `@calendar/core` into explicit sub-entry exports (`/admin`, `/booking`, `/config`, `/storage`, `/invites`, `/payments`, `/weather`, `/media`, `/transport`, `/utils`) and slimmed the root barrel.
+- Reworked calendar package boundaries: moved site-specific Miko preset code to the app, relocated calendar-aware auth into `@calendar/app`, and co-located payment/admin service modules.
+- Extracted release-target gating into `@goobits/visibility-mode` with tests and removed dead visibility/weather shims.
+- Updated dependencies, including `@lucide/svelte` and `@google/genai` v2; stabilized the full test suite and dev/e2e scripts.
 - Program editor inspector playground (`/playground/program-editor-inspector`) with extracted inspector primitives.
 - Split `AdminProgramEditor` into cohesive modules; shared modal and credentials primitives.
 - Consolidated program settings into the editor and retired `ProgramSettingsDrawer`; retired migration playground.
@@ -31,6 +41,9 @@ Each release groups changes by audience:
 - Added unit tests for editor controllers and included `@calendar/ui` in vitest.
 
 ### Security
+- Hardened contact and journal flows with stricter request metadata handling, anti-abuse coverage, safe journal import checks, and route visibility hardening.
+- Added calendar correctness and security guardrails for mock-mode access, program deletion, recurrence windows, YAML escaping, and OAuth callback behavior.
+- Introduced neutral payment credential column migration support with dual-read/write compatibility before legacy column cleanup.
 - Hardened Apple SSRF surface and added magic-byte validation for image uploads.
 - Sanitized blog markdown to close XSS vectors.
 
