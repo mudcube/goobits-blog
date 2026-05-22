@@ -1,3 +1,9 @@
 [submodule "packages/auth"]
 	path = packages/auth
 	url = https://github.com/goobits/auth.git
+[submodule "packages/nano-banana"]
+	path = packages/nano-banana
+	url = https://github.com/goobits/nano-banana.git
+[submodule "packages/sitemap"]
+	path = packages/sitemap
+	url = https://github.com/goobits/sitemap.git
