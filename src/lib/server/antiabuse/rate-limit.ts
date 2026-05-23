@@ -1,3 +1,17 @@
+/**
+ * In-memory rate limiter for anti-abuse — fallback path when D1 isn't
+ * available (e.g. local dev without `pnpm dev:wrangler`, or test runs).
+ *
+ * Wraps `@goobits/security/rate-limit` so the underlying timestamp-window
+ * accounting and store cleanup come from the canonical implementation.
+ * Per-call `(limit, windowMs)` tuples are supported via a small limiter
+ * cache — v2's `createRateLimiter` takes its windows at construction time,
+ * but anti-abuse calls in `./index.ts` pass different limits per check
+ * (per-IP / per-email / per-device / per-ASN).
+ */
+
+import { createRateLimiter, MemoryRateLimitStore } from '@goobits/security/rate-limit'
+
 export type RateLimitCheckResult = {
 	allowed: boolean
 	remaining: number
@@ -5,41 +19,46 @@ export type RateLimitCheckResult = {
 	count: number
 }
 
-type Bucket = {
-	count: number
-	resetAt: number
-}
+const sharedStore = new MemoryRateLimitStore()
+const limiterCache = new Map<string, ReturnType<typeof createRateLimiter>>()
 
-const buckets = new Map<string, Bucket>()
-const MAX_BUCKETS = 5000
-
-function nowMs() {
-	return Date.now()
-}
-
-function touchBucket(key: string, windowMs: number): Bucket {
-	const now = nowMs()
-	const existing = buckets.get(key)
-	if (!existing || existing.resetAt <= now) {
-		const next: Bucket = { count: 0, resetAt: now + windowMs }
-		buckets.set(key, next)
-		return next
+function getOrCreateLimiter(limit: number, windowMs: number) {
+	const cacheKey = `${limit}:${windowMs}`
+	let limiter = limiterCache.get(cacheKey)
+	if (!limiter) {
+		limiter = createRateLimiter({
+			windows: [ { name: cacheKey, windowMs, maxEvents: limit } ],
+			store: sharedStore,
+			keyPrefix: `antiabuse:${cacheKey}`
+		})
+		limiterCache.set(cacheKey, limiter)
 	}
-	return existing
+	return limiter
 }
 
-export function checkRateLimit(key: string, limit: number, windowMs: number): RateLimitCheckResult {
-	compactRateLimitBuckets()
-	if (!buckets.has(key) && buckets.size >= MAX_BUCKETS) evictOldestBucket()
-	const bucket = touchBucket(key, windowMs)
-	bucket.count += 1
-	const allowed = bucket.count <= limit
-	const remaining = Math.max(0, limit - bucket.count)
+export async function checkRateLimit(
+	key: string,
+	limit: number,
+	windowMs: number
+): Promise<RateLimitCheckResult> {
+	const limiter = getOrCreateLimiter(limit, windowMs)
+	const result = await limiter.check(key)
+	if (result.allowed) {
+		return {
+			allowed: true,
+			remaining: result.remaining,
+			resetAt: result.resetAtMs,
+			count: limit - result.remaining
+		}
+	}
+	// Denied: caller's risk-scoring branches don't fire on this path
+	// (the consumer short-circuits with a generic failure), so the exact
+	// over-limit count doesn't matter — report `limit + 1` to signal "exceeded".
 	return {
-		allowed,
-		remaining,
-		resetAt: bucket.resetAt,
-		count: bucket.count
+		allowed: false,
+		remaining: 0,
+		resetAt: result.resetAtMs,
+		count: limit + 1
 	}
 }
 
@@ -47,25 +66,10 @@ export function keyForRateLimit(prefix: string, value: string) {
 	return `${prefix}:${value.trim().toLowerCase()}`
 }
 
-export function compactRateLimitBuckets(maxSize = 5000) {
-	if (buckets.size <= maxSize) return
-	const now = nowMs()
-	for (const [key, bucket] of buckets.entries()) {
-		if (bucket.resetAt <= now) {
-			buckets.delete(key)
-		}
-		if (buckets.size <= maxSize) break
-	}
-}
-
-function evictOldestBucket() {
-	let oldestKey = ''
-	let oldestReset = Number.POSITIVE_INFINITY
-	for (const [key, bucket] of buckets.entries()) {
-		if (bucket.resetAt < oldestReset) {
-			oldestReset = bucket.resetAt
-			oldestKey = key
-		}
-	}
-	if (oldestKey) buckets.delete(oldestKey)
+/**
+ * No-op kept for source-compatibility with the prior bespoke implementation.
+ * v2's `MemoryRateLimitStore` handles its own opportunistic cleanup.
+ */
+export function compactRateLimitBuckets(_maxSize = 5000) {
+	// no-op
 }

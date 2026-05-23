@@ -128,6 +128,7 @@
     "@goobits/blog-theme-miko": "workspace:*",
     "@goobits/contact": "workspace:*",
     "@goobits/nano-banana": "workspace:*",
+    "@goobits/security": "workspace:*",
     "@goobits/sitemap": "workspace:*",
     "@goobits/themes": "^1.3.2",
     "@goobits/ui": "workspace:*",

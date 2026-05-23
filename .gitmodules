@@ -7,3 +7,6 @@
 [submodule "packages/sitemap"]
 	path = packages/sitemap
 	url = https://github.com/goobits/sitemap.git
+[submodule "packages/security"]
+	path = packages/security
+	url = https://github.com/goobits/security.git
