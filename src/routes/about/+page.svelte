@@ -116,6 +116,18 @@
 		</section>
 	</Hero>
 
+	<section class="about-page__advisory" aria-labelledby="about-advisory-title">
+		<p class="about-page__advisory-label">Available for select advisory work</p>
+		<h2 id="about-advisory-title">Need a senior product and technical read?</h2>
+		<p>
+			I take on a small number of short consulting engagements for founders and teams building software, creative tools, educational products, and interactive experiences.
+		</p>
+		<p>
+			Useful for product direction, technical review, launch triage, vendor review, and "what should we do next?" decisions.
+		</p>
+		<a href="/advisory">Product & Technical Advisory</a>
+	</section>
+
 	<section class="about-page__columns">
 		<article>
 			<h2>Exhibits, Selected</h2>

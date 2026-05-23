@@ -15,6 +15,7 @@ export function getHeaderNavItems(activeStage: ReleaseStage): NavItem[] {
 }
 
 export const footerPrimaryItems: NavItem[] = [
+	{ href: '/advisory', label: 'Advisory' },
 	{ href: '/labs', label: 'Labs' }
 ]
 

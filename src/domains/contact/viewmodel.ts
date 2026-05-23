@@ -8,6 +8,7 @@ export function getContactContextLabel(data: Pick<ContactFormData, 'from' | 'top
 export function getContactMessagePlaceholder(data: Pick<ContactFormData, 'from' | 'topic'>) {
 	if (data.from === 'music' && data.topic) return 'Tell me what you need and include any links...'
 	if (data.from === 'art') return 'Tell me about the piece, timeline, and any reference links...'
+	if (data.from === 'advisory') return "Tell me what's stuck, what you've tried, and what kind of decision you need to make..."
 	if (data.from === 'about' && data.topic) {
 		return 'Tell me a bit about your project and what you are looking for...'
 	}
