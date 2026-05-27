@@ -1,12 +1,12 @@
 [submodule "packages/auth"]
 	path = packages/auth
-	url = https://github.com/goobits/auth.git
+	url = git@github.com:goobits/auth.git
 [submodule "packages/nano-banana"]
 	path = packages/nano-banana
-	url = https://github.com/goobits/nano-banana.git
+	url = git@github.com:goobits/nano-banana.git
 [submodule "packages/sitemap"]
 	path = packages/sitemap
-	url = https://github.com/goobits/sitemap.git
+	url = git@github.com:goobits/sitemap.git
 [submodule "packages/security"]
 	path = packages/security
-	url = https://github.com/goobits/security.git
+	url = git@github.com:goobits/security.git
