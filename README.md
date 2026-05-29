@@ -87,4 +87,5 @@ pnpm deploy:prod:full
 - **`packages/auth`** - Auth library used by this repo (its own README + tests)
 
 ## 📝 License
-MIT
+
+Proprietary. Copyright (c) 2026 Goobits. All rights reserved. See [`LICENSE`](./LICENSE).
