@@ -1,14 +1,19 @@
 # @goobits/blog
 
-🚀 **STABLE RELEASE - v1.0.1**
-
 Markdown-based blog framework with flexible i18n support and content categorization.
 
-## 🔒 Security Notice
+## TL;DR
+
+- Install and call `initBlogConfig` in `src/app.js` with your content glob and settings.
+- Copy route templates from `node_modules/@goobits/blog/templates/` into your SvelteKit routes.
+- Use `PostList`, `Sidebar`, and other components from `@goobits/blog/ui`.
+- Pass a `messages` prop or wire `handleBlogI18n` for internationalization.
+
+## Security Notice
 
 This package processes user-generated markdown content. Always sanitize markdown on the server-side before rendering. Do not trust user input.
 
-## ✨ Features
+## Features
 
 - Content in `src/content/Blog/{year}/{month}/`
 - Frontmatter for metadata (title, date, categories, tags)
@@ -18,13 +23,11 @@ This package processes user-generated markdown content. Always sanitize markdown
 - Pagination and search
 - Responsive layouts
 
-## 📦 Installation
+## Usage
 
 ```bash
 npm install @goobits/blog
 ```
-
-## 🚀 Quick Start
 
 ### 1. Configure Your Blog
 
@@ -92,7 +95,7 @@ src/routes/
 </div>
 ```
 
-## 🌐 Internationalization (i18n)
+## Internationalization (i18n)
 
 The blog package supports full internationalization through multiple integration methods:
 
@@ -164,7 +167,7 @@ const getMessage = createMessageGetter({
 })
 ```
 
-## 🧩 Components
+## Components
 
 - `BlogRouter` - Main router component
 - `BlogListPage` - Blog index/archive page
@@ -177,7 +180,7 @@ const getMessage = createMessageGetter({
 - `Newsletter` - Newsletter subscription form
 - `Breadcrumbs` - Navigation breadcrumbs
 
-## 🎨 Styling
+## Styling
 
 Import component-specific SCSS files:
 
@@ -186,7 +189,7 @@ import '@goobits/blog/ui/BlogCard.scss'
 import '@goobits/blog/ui/Sidebar.scss'
 ```
 
-## 🔧 Configuration Options
+## Configuration Options
 
 The blog can be configured with many options:
 
@@ -222,10 +225,10 @@ initBlogConfig({
 })
 ```
 
-## ♿ Accessibility
+## Accessibility
 
 Components include proper ARIA attributes, semantic HTML, and keyboard navigation support.
 
-## 📄 License
+## License
 
 MIT
