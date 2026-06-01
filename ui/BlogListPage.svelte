@@ -5,7 +5,7 @@
 	import { blogConfig, defaultMessages } from '@goobits/blog/config/index.js'
 	import { createMessageGetter } from '@goobits/blog/utils/index.js'
 	import { createLogger } from '@goobits/blog/utils/logger.js'
-	import { onMount } from 'svelte'
+	import { onMount, untrack } from 'svelte'
 	import { slugify } from '@goobits/blog/utils/index.js'
 
 	const logger = createLogger('BlogListPage')
@@ -18,10 +18,10 @@
 	const POSTS_PER_BATCH = blogConfig.pagination.postsPerBatch
 
 	// State for infinite scroll. Initialize from props so SSR renders posts.
-	let allPosts = $state(data.posts ? [...data.posts] : [])
+	let allPosts = $state(untrack(() => data.posts ? [...data.posts] : []))
 	let isLoading = $state(false)
 	let currentPage = $state(1) // Track current page for API calls
-	let hasMorePosts = $state(data.hasMorePosts !== false) // Use server data or default to true
+	let hasMorePosts = $state(untrack(() => data.hasMorePosts !== false)) // Use server data or default to true
 
 	// Use allPosts as the visible posts (no more slicing)
 	let visiblePosts = $derived(allPosts)
