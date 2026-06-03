@@ -50,3 +50,8 @@ Env files in `config/env/`, encrypted with dotenvx. Template: `config/env/.env.e
 - Prefer nested SCSS under a block root so selectors stay scoped and readable.
 - Avoid introducing new legacy/flat selector patterns when adding or refactoring UI.
 - Breakpoints: prefer `em` units (honors user font scaling). Tier convention documented at the top of `src/lib/app/theme/layout.css`: `30em` xs / `40em` sm / `48em` md / `64em` lg. Custom values are allowed when a component genuinely needs them — colocate with a one-line comment explaining why.
+
+## Shared-Folder Git
+
+- Shared macOS/Linux checkouts should use `core.filemode=false`; chmod-only changes will not be noticed reliably.
+- When a script must be executable, run `git update-index --chmod=+x path/to/script.sh` and include that in the commit.
