@@ -1,26 +1,23 @@
-import { load as coreLoad } from '@calendar/app/routes/calendar/page.server'
-import { isScheduleDesignMode, withScheduleDesignMode } from '$lib/schedule/design-mode'
-import { scheduleMockPrograms, scheduleMockRecent, scheduleMockUpcoming } from '$lib/schedule/mock-data'
+import { buildEnv } from '@calendar/kit'
+import { getEnabledCalendarPrograms } from '@calendar/core/admin'
+import { getDefaultCalendarTenant, listPublicCalendarTenantEvents } from '@calendar/core/tenants'
+import type { PageServerLoad } from './$types'
 
-export async function load(event: Parameters<typeof coreLoad>[0]) {
-	const mockMode = isScheduleDesignMode(event.url)
-	if (!mockMode) return coreLoad(event)
-
-	const baseData = await coreLoad(event)
-	const activities = scheduleMockPrograms.map((program) => ({
-		id: program.slug,
-		slug: program.slug,
-		label: program.activityName || program.label,
-		icon: program.icon,
-		description: program.description,
-		href: withScheduleDesignMode(`/${program.slug}/`, mockMode)
-	}))
+export const load: PageServerLoad = async ({ platform }) => {
+	const env = await buildEnv(platform)
+	const [activities, defaultTenant] = await Promise.all([
+		getEnabledCalendarPrograms(env.DB),
+		getDefaultCalendarTenant(env.DB)
+	])
+	const upcoming = defaultTenant
+		? await listPublicCalendarTenantEvents(env.DB, {
+			tenantId: defaultTenant.id,
+			limit: 6
+		})
+		: []
 
 	return {
-		...baseData,
-		mockMode: true,
 		activities,
-		upcoming: scheduleMockUpcoming,
-		recent: scheduleMockRecent
+		upcoming
 	}
 }
