@@ -25,6 +25,7 @@ export {
 } from './transport/admin.ts'
 
 export {
+	parseCalendarCreateEventInput,
 	parseCalendarJoinEventInput,
 	parseCalendarProfileInput,
 	parseCalendarInviteCreateInput,
@@ -33,6 +34,7 @@ export {
 	parseCalendarAvailabilityInput,
 	parseCalendarBookingLookupInput,
 	parseDiscordWebhookTextInput,
+	type CalendarCreateEventInput,
 	type CalendarJoinEventInput,
 	type CalendarProfileInput,
 	type CalendarInviteCreateInput,

@@ -7,6 +7,70 @@ export type CalendarJoinEventInput = {
 	note: string | null
 }
 
+export type CalendarCreateEventInput = {
+	activitySlug: string
+	title: string
+	startsAt: string
+	endsAt: string
+	capacity: number
+	location: string | null
+	note: string | null
+	timezone: string | null
+}
+
+function readZonedDateTime(body: Record<string, unknown>, key: string) {
+	const value = readRequiredString(body, key, {
+		trim: true,
+		maxLength: 64,
+		message: 'Invalid event times'
+	})
+	if (!/(?:z|[+-]\d{2}:\d{2})$/i.test(value)) {
+		throw new TransportValidationError('Invalid event times')
+	}
+	return value
+}
+
+function readOptionalTimezone(body: Record<string, unknown>, key: string): string | null {
+	const raw = readOptionalString(body, key, { maxLength: 64 })
+	if (!raw) return null
+	if (!/^[A-Za-z]+\/[A-Za-z0-9_+-]+(?:\/[A-Za-z0-9_+-]+)?$/.test(raw)) {
+		throw new TransportValidationError('Invalid timezone')
+	}
+	return raw
+}
+
+export function parseCalendarCreateEventInput(input: unknown): CalendarCreateEventInput {
+	const body = asJsonObject(input)
+	const startsAt = readZonedDateTime(body, 'startsAt')
+	const endsAt = readZonedDateTime(body, 'endsAt')
+	const startsMs = Date.parse(startsAt)
+	const endsMs = Date.parse(endsAt)
+	if (!Number.isFinite(startsMs) || !Number.isFinite(endsMs) || endsMs <= startsMs) {
+		throw new TransportValidationError('Invalid event times')
+	}
+	const activitySlug = readRequiredString(body, 'activitySlug', {
+		trim: true,
+		maxLength: 64
+	})
+	if (!isValidProgramSlug(activitySlug)) {
+		throw new TransportValidationError('Invalid activitySlug')
+	}
+	return {
+		activitySlug,
+		title: readRequiredString(body, 'title', { trim: true, maxLength: 80 }),
+		startsAt,
+		endsAt,
+		capacity: readIntInRange(body, 'capacity', {
+			min: 1,
+			max: 250,
+			message: 'Invalid capacity'
+		}),
+		location: readOptionalString(body, 'location', { maxLength: 120 }),
+		note: readOptionalString(body, 'note', { maxLength: 300 }),
+		timezone: readOptionalTimezone(body, 'timezone')
+	}
+}
+
 export function parseCalendarJoinEventInput(input: unknown): CalendarJoinEventInput {
 	const body = input == null ? {} : asJsonObject(input)
 	return {

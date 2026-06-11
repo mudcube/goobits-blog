@@ -5,6 +5,9 @@ import { VENUE_TIMEZONE, addWeeksInTimezone } from '../../config/venue.ts'
 
 type EventRow = {
 	id: number
+	tenant_id: number
+	tenant_slug: string | null
+	tenant_name: string | null
 	activity_slug: string
 	activity_label: string | null
 	title: string
@@ -50,6 +53,9 @@ export type CalendarEventParticipant = {
 
 export type CalendarFeedEvent = {
 	id: number
+	tenantId: number
+	tenantSlug: string | null
+	tenantName: string | null
 	activitySlug: CalendarProgramSlug
 	activityLabel: string
 	title: string
@@ -125,11 +131,13 @@ async function listEventsByRange(
 
 	const eventResult = await db
 		.prepare(
-			`SELECT e.id, e.activity_slug, p.label AS activity_label, e.title, e.starts_at, e.ends_at, e.capacity, e.status, e.location, e.note,
+			`SELECT e.id, e.tenant_id, t.slug AS tenant_slug, t.name AS tenant_name,
+		        e.activity_slug, p.label AS activity_label, e.title, e.starts_at, e.ends_at, e.capacity, e.status, e.location, e.note,
 		        e.cost_cents, e.currency, e.payment_provider, e.payment_handle, e.payment_note_template,
 		        e.recap_text, e.hero_image_url, e.timezone
 		 FROM calendar_events e
 		 LEFT JOIN calendar_programs p ON p.slug = e.activity_slug
+		 LEFT JOIN calendar_tenants t ON t.id = e.tenant_id
 		 WHERE ${input.whereSql}
 		   AND (
 		   	NOT EXISTS (
@@ -188,6 +196,9 @@ async function listEventsByRange(
 		return [
 			{
 				id: row.id,
+				tenantId: row.tenant_id ?? 1,
+				tenantSlug: row.tenant_slug ?? null,
+				tenantName: row.tenant_name ?? null,
 				activitySlug,
 				activityLabel: row.activity_label || row.activity_slug,
 				title: row.title,
@@ -271,6 +282,7 @@ export async function createEventsBatch(
 		paymentHandle?: string | null
 		paymentNoteTemplate?: string | null
 		repeatWeeks?: number
+		tenantId?: number
 		createdByUserId?: string | null
 		/**
 		 * IANA timezone the event is anchored to (e.g. 'America/Los_Angeles',
@@ -295,13 +307,14 @@ export async function createEventsBatch(
 		const result = await db
 			.prepare(
 				`INSERT INTO calendar_events (
-			  activity_slug, title, starts_at, ends_at, capacity, location, note,
+			  tenant_id, activity_slug, title, starts_at, ends_at, capacity, location, note,
 			  cost_cents, currency, payment_provider, payment_handle, payment_note_template,
 			  created_by_user_id, timezone, created_at, updated_at
 			 )
-			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), unixepoch())`
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), unixepoch())`
 			)
 			.bind(
+				input.tenantId ?? 1,
 				input.activitySlug,
 				input.title,
 				startsAt,

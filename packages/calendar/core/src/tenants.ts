@@ -11,6 +11,20 @@ export type CalendarTenant = {
 	role?: CalendarTenantRole
 }
 
+export type CalendarTenantPublicEvent = {
+	id: number
+	title: string
+	activitySlug: string
+	activityLabel: string
+	startsAt: string
+	endsAt: string
+	capacity: number
+	seatsTaken: number
+	waitlistCount: number
+	location: string | null
+	note: string | null
+}
+
 type TenantRow = {
 	id: number
 	slug: string
@@ -18,6 +32,20 @@ type TenantRow = {
 	owner_user_id: string | null
 	visibility: string
 	role?: string | null
+}
+
+type TenantPublicEventRow = {
+	id: number
+	title: string
+	activity_slug: string
+	activity_label: string | null
+	starts_at: string
+	ends_at: string
+	capacity: number
+	seats_taken: number
+	waitlist_count: number
+	location: string | null
+	note: string | null
 }
 
 const DEFAULT_TENANT_ID = 1
@@ -178,4 +206,47 @@ export async function getCalendarTenantRole(db: D1DatabaseLike, input: { tenantI
 export async function canManageCalendarTenant(db: D1DatabaseLike, input: { tenantId: number; userId: string }) {
 	const role = await getCalendarTenantRole(db, input)
 	return role === 'owner' || role === 'admin'
+}
+
+export async function listPublicCalendarTenantEvents(
+	db: D1DatabaseLike,
+	input: { tenantId: number; limit?: number }
+): Promise<CalendarTenantPublicEvent[]> {
+	const result = await db
+		.prepare(
+			`SELECT e.id, e.title, e.activity_slug, p.label AS activity_label, e.starts_at, e.ends_at,
+			        e.capacity, e.location, e.note,
+			        COALESCE((
+			        	SELECT SUM(1 + participant.guest_count)
+			        	FROM calendar_event_participants participant
+			        	WHERE participant.event_id = e.id AND participant.status = 'joined'
+			        ), 0) AS seats_taken,
+			        COALESCE((
+			        	SELECT COUNT(*)
+			        	FROM calendar_event_participants participant
+			        	WHERE participant.event_id = e.id AND participant.status = 'waitlist'
+			        ), 0) AS waitlist_count
+			 FROM calendar_events e
+			 LEFT JOIN calendar_programs p ON p.slug = e.activity_slug
+			 WHERE e.tenant_id = ?
+			   AND e.status = 'scheduled'
+			   AND datetime(e.ends_at) >= datetime('now')
+			 ORDER BY datetime(e.starts_at) ASC
+			 LIMIT ?`
+		)
+		.bind(input.tenantId, input.limit ?? 40)
+		.all<TenantPublicEventRow>()
+	return (result.results ?? []).map((row) => ({
+		id: row.id,
+		title: row.title,
+		activitySlug: row.activity_slug,
+		activityLabel: row.activity_label || row.activity_slug,
+		startsAt: row.starts_at,
+		endsAt: row.ends_at,
+		capacity: row.capacity,
+		seatsTaken: row.seats_taken ?? 0,
+		waitlistCount: row.waitlist_count ?? 0,
+		location: row.location,
+		note: row.note
+	}))
 }
