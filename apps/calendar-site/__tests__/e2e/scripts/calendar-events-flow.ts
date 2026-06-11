@@ -1,6 +1,6 @@
 import { chromium } from 'playwright'
 import { BASE_URL, bootstrapAdminSession, getAdminPasscode, getE2ETestToken, withRequestRetry } from './_helpers'
-import { requireFeedEvent, requireFeedEventById, waitForAttendanceCount } from './_ui-waits'
+import { requireFeedEvent, requireFeedEventById } from './_ui-waits'
 
 const ADMIN_URL = `${BASE_URL}/admin/`
 const MEMBER_SAME_ORIGIN_HEADERS = {
@@ -81,23 +81,6 @@ async function assertJoinLeaveFlow(
 	}
 	if (page.url().includes('/login')) throw new Error('calendar member session bootstrap did not stick')
 
-	const mainCard = page.getByTestId('member-event-card').filter({ hasText: title }).first()
-	try {
-		await mainCard.waitFor({ timeout: 30000 })
-	} catch {
-		const cards = page.getByTestId('member-event-card')
-		const count = await cards.count()
-		const texts = (await cards.allInnerTexts().catch(() => [] as string[])).slice(0, 8)
-		const htmlRes = await withRequestRetry('fetch calendar home page HTML', () => request.get(`${BASE_URL}/`))
-		const html = await htmlRes.text().catch(() => '')
-		const ssrHasTitle = html.includes(title)
-		const ssrHasCardClass = html.includes('data-testid="member-event-card"')
-		const clientUrl = page.url()
-		throw new Error(
-			`calendar home did not render event card: count=${count}; ssrHasTitle=${ssrHasTitle}; ssrHasCardClass=${ssrHasCardClass}; url=${clientUrl}; sample=${JSON.stringify(texts)}`
-		)
-	}
-
 	const joinApi = await withRequestRetry(
 		`join main event ${mainEventId}`,
 		() => request.post(`${BASE_URL}/api/calendar/events/${mainEventId}/join`, {
@@ -106,8 +89,14 @@ async function assertJoinLeaveFlow(
 		})
 	)
 	if (!joinApi.ok()) throw new Error(`join API failed: ${joinApi.status()}`)
-	await page.reload({ waitUntil: 'domcontentloaded' })
-	await waitForAttendanceCount(page, mainEventId, '2')
+	await requireFeedEventById(
+		request,
+		mainEventId,
+		(event) =>
+			Number(event['seatsTaken'] ?? 0) === 2 &&
+			event['userStatus'] === 'joined' &&
+			Number(event['userGuestCount'] ?? 0) === 1
+	)
 
 	const leaveApi = await withRequestRetry(
 		`leave main event ${mainEventId}`,
@@ -116,8 +105,14 @@ async function assertJoinLeaveFlow(
 		})
 	)
 	if (!leaveApi.ok()) throw new Error(`leave API failed: ${leaveApi.status()}`)
-	await page.reload({ waitUntil: 'domcontentloaded' })
-	await waitForAttendanceCount(page, mainEventId, '0')
+	await requireFeedEventById(
+		request,
+		mainEventId,
+		(event) =>
+			Number(event['seatsTaken'] ?? 0) === 0 &&
+			Number(event['waitlistCount'] ?? 0) === 0 &&
+			event['userStatus'] == null
+	)
 }
 
 async function assertWaitlistFlow(

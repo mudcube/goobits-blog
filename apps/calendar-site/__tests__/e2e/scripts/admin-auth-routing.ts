@@ -7,6 +7,8 @@ import {
 	withBrowserContext
 } from './_helpers'
 
+const DEV_DB_FILE = process.env['DEV_DB_FILE'] || '../../.dev/calendar-site.sqlite'
+
 async function expectStatus(label: string, response: { status: () => number }, expected: number) {
 	const status = response.status()
 	if (status !== expected) {
@@ -18,7 +20,7 @@ function ensureDevCalendarSession(
 	context: import('playwright').BrowserContext,
 	input: { email: string; name: string; admin?: boolean }
 ) {
-	const db = new Database('.dev/db.sqlite')
+	const db = new Database(DEV_DB_FILE)
 	const existing = db
 		.prepare('SELECT id FROM calendar_users WHERE lower(email) = lower(?) LIMIT 1')
 		.get(input.email) as { id: number } | undefined
@@ -81,7 +83,7 @@ export async function runAdminAuthRouting() {
 	const page = await context.newPage()
 	try {
 		await ensureDevCalendarSession(context, {
-			email: 'hello@miko.art',
+			email: 'hello@pdx.fun',
 			name: 'Miko Admin',
 			admin: true
 		})
