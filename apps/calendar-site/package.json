@@ -7,7 +7,9 @@
     "check": "pnpm exec svelte-kit sync && pnpm exec tsc --noEmit",
     "build": "pnpm exec svelte-kit sync && vite build",
     "dev": "vite dev --host 0.0.0.0 --port 3611",
-    "calendar:sync": "node ops/cron/calendar-sync.mjs"
+    "calendar:sync": "node ops/cron/calendar-sync.mjs",
+    "seed:calendar": "node scripts/seed/calendar-social.mjs",
+    "e2e:oauth:google": "node scripts/e2e/check-google-oauth.mjs"
   },
   "dependencies": {
     "@calendar/app": "workspace:*",
