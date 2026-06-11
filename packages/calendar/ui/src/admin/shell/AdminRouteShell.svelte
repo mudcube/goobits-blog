@@ -45,9 +45,8 @@
 <div class="social-admin">
 	<ShellNav
 		homeHref="/"
-		showLogo={true}
-		logoSrc="/media/brand/logo.svg"
-		logoAlt={calendarConfig.brand.siteName}
+		brandLabel={calendarConfig.brand.siteName}
+		brandHref={calendarBase || '/'}
 	>
 		{#snippet left()}
 			<AdminRouteBreadcrumbs items={routeInfo.breadcrumbs} />

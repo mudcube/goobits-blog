@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { getCalendarUiConfig } from '../../../config'
+
 	/**
 	 * URL pill: host prefix + editable slug + open-link arrow.
 	 *
@@ -10,7 +12,7 @@
 	 */
 	let {
 		slug = $bindable('morning-yoga'),
-		host = 'miko.art/schedule/',
+		host,
 		ariaLabel = 'URL slug',
 		onInput,
 		onCommit
@@ -25,11 +27,17 @@
 		onCommit?: () => void
 	}>()
 
-	const previewHref = $derived(`https://${host}${slug}`)
+	const defaultHost = $derived.by(() => {
+		const calendarBase = getCalendarUiConfig().routes.calendarBase
+		const hostName = typeof window === 'undefined' ? 'calendar.local' : window.location.host
+		return `${hostName}${calendarBase ? `${calendarBase}/` : '/'}`
+	})
+	const displayHost = $derived(host ?? defaultHost)
+	const previewHref = $derived(`https://${displayHost}${slug}`)
 </script>
 
 <div class="url-pill">
-	<span class="url-pill__seg url-pill__host">{host}</span>
+	<span class="url-pill__seg url-pill__host">{displayHost}</span>
 	<span class="url-pill__seg url-pill__slug-wrap">
 		<input
 			class="url-pill__slug"

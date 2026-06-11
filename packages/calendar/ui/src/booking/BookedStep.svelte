@@ -158,7 +158,7 @@
 	<p class="bs__greeting">
 		{status === 'waitlist' ? "We'll let you know if a spot opens" : 'See you there'}
 		{#if status === 'booked'}
-			<img src="/media/page-icons/holidays-party.png" alt="" class="bs__greeting-icon" loading="eager" decoding="async" />
+			<span class="bs__greeting-icon" aria-hidden="true">!</span>
 		{/if}
 	</p>
 

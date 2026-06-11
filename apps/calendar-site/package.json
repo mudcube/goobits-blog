@@ -15,13 +15,16 @@
     "@calendar/theme": "workspace:*",
     "@calendar/ui": "workspace:*",
     "@goobits/auth": "workspace:*",
+    "@goobits/security": "workspace:*",
     "@goobits/ui": "workspace:*",
     "@lucide/svelte": "^1.16.0",
     "@sveltejs/adapter-cloudflare": "^7.2.8",
     "@sveltejs/kit": "^2.60.1",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "svelte": "^5.55.7",
+    "sveltekit-superforms": "^2.30.1",
     "vite": "^8.0.11",
-    "svelte": "^5.55.7"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "typescript": "^6.0.3",

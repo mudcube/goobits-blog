@@ -15,7 +15,7 @@
 	import { getActivityEmoji } from '@calendar/ui/shared'
 	import { getAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 	import { isAdminMockMode, withAdminMock } from '@calendar/ui/admin/mock/mock-mode'
-	import { withAdminRoute } from '@calendar/ui/config'
+	import { withAdminRoute, withCalendarRoute } from '@calendar/ui/config'
 	import type { CalendarAdminUser } from '@calendar/ui/api/calendar'
 	import { adminActionHandlers, type AdminInviteAnchorRect } from '../shell/state'
 	import {
@@ -349,7 +349,7 @@
 					email: null,
 					label: inviteName,
 					target_activity_slug: inviteActivitySlug,
-					redirect_path: `/schedule/${inviteActivitySlug}/`,
+					redirect_path: withCalendarRoute(`${inviteActivitySlug}/`),
 					created_at: Math.floor(Date.now() / 1000),
 					uses_remaining: uses,
 					expires_in_days: 7

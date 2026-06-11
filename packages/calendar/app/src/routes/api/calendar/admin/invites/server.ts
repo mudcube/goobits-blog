@@ -2,8 +2,14 @@ import type { RequestEvent } from '@sveltejs/kit'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
 import { buildEnv } from '@calendar/kit'
 import { createInvite, deleteInvite, deleteInviteByCode, listInvites } from '@calendar/core/invites'
+import { getCalendarConfig } from '@calendar/core/config'
 import { parseCalendarInviteCreateInput, TransportValidationError } from '@calendar/core/transport'
 import { apiOk, apiError, apiValidationError } from '@calendar/kit'
+
+function activityRedirectPath(activitySlug: string) {
+	const base = getCalendarConfig().routes.calendarBase.replace(/\/+$/, '')
+	return `${base}/${activitySlug}/`.replace(/^\/\//, '/')
+}
 
 export async function GET(event: RequestEvent) {
 	return runApiRequest('admin.invites.list', async () => {
@@ -34,7 +40,7 @@ export async function POST(event: RequestEvent) {
 			expiresAt,
 			label: input.label,
 			targetActivitySlug: input.activitySlug,
-			redirectPath: input.activitySlug ? `/schedule/${input.activitySlug}/` : null
+			redirectPath: input.activitySlug ? activityRedirectPath(input.activitySlug) : null
 		})
 
 		logAdminEvent(event, 'invite_create', { inviteId: invite?.id, email: invite?.email ?? null })
