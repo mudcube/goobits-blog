@@ -6,9 +6,9 @@ import {
 
 export const calendarSitePreset = {
 	brand: {
-		siteName: 'Calendar',
-		calendarName: 'Community Calendar',
-		adminEmail: 'admin@example.com',
+		siteName: 'pdx.fun',
+		calendarName: 'pdx.fun',
+		adminEmail: 'hello@pdx.fun',
 		inviteBypassDomain: ''
 	},
 	routes: {
@@ -22,10 +22,10 @@ export const calendarSitePreset = {
 		calendarLoginRedirectPath: '/login/redirect'
 	},
 	ics: {
-		productId: '-//CALENDAR//Community Calendar//EN',
-		uidPrefix: 'calendar',
-		uidDomain: 'calendar.local',
-		filename: 'calendar-events.ics'
+		productId: '-//PDX.FUN//Events//EN',
+		uidPrefix: 'pdx-fun',
+		uidDomain: 'pdx.fun',
+		filename: 'pdx-fun-events.ics'
 	}
 } as const
 
@@ -33,24 +33,24 @@ export const calendarSiteActivities: CalendarActivityDefinition[] = [
 	{
 		slug: 'gym',
 		label: 'Gym',
-		activityName: 'Community Gym',
-		eyebrow: 'Community Gym',
+		activityName: 'Movement',
+		eyebrow: 'Movement',
 		heroTitleLines: ['Hang out. Work out.', 'Have fun.'],
-		heroSubtitle: "Grab a time slot and let's do something fun together.",
-		description: 'Book events and work out together',
+		heroSubtitle: 'Find open gyms, movement jams, and active things around Portland.',
+		description: 'Open gyms and movement events',
 		icon: '💪',
 		serviceStatusNote: 'Open for bookings'
 	},
 	{
 		slug: 'circus',
 		label: 'Circus',
-		activityName: 'Community Circus',
-		eyebrow: 'Community Circus',
+		activityName: 'Circus',
+		eyebrow: 'Circus',
 		eyebrowClass: 'eyebrow-circus',
 		glowClass: 'glow-circus',
 		formGlowClass: 'form-glow-circus',
 		heroTitleLines: ['Fly high. Spin fast.', 'Be brave.'],
-		heroSubtitle: 'Aerial arts and circus skills training for all levels.',
+		heroSubtitle: 'Aerial arts, circus skills, and playful training for all levels.',
 		description: 'Aerial arts and circus skills',
 		icon: '🎪',
 		serviceStatusNote: 'Open for bookings'
@@ -58,14 +58,14 @@ export const calendarSiteActivities: CalendarActivityDefinition[] = [
 	{
 		slug: 'adventure',
 		label: 'Adventure',
-		activityName: 'Community Adventure',
-		eyebrow: 'Community Adventure',
+		activityName: 'Adventure',
+		eyebrow: 'Adventure',
 		eyebrowClass: 'eyebrow-adventure',
 		glowClass: 'glow-adventure',
 		formGlowClass: 'form-glow-adventure',
 		heroTitleLines: ['Get outside.', 'Find something new.'],
-		heroSubtitle: 'Weekend adventures, hikes, and trips with the crew.',
-		description: 'Outdoor excursions and trips',
+		heroSubtitle: 'Weekend adventures, hikes, rides, and trips with local crews.',
+		description: 'Outdoor trips and local excursions',
 		icon: '🏔️',
 		serviceStatusNote: 'Open for bookings'
 	},

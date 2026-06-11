@@ -12,6 +12,7 @@
 	const calendarConfig = getCalendarUiConfig()
 	const calendarBase = calendarConfig.routes.calendarBase
 	const adminBase = calendarConfig.routes.adminBase
+	const brandLabel = calendarConfig.brand.siteName
 
 	async function handleLogout(close: () => void) {
 		close()
@@ -23,6 +24,8 @@
 <div class="calendar-shell">
 	<ShellNav
 		homeHref="/"
+		brandLabel={brandLabel}
+		brandHref="/"
 		showLogo={true}
 		{logoSrc}
 		logoAlt={logoAlt}

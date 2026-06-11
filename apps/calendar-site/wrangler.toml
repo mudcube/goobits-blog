@@ -18,9 +18,9 @@ bucket_name = "calendar-site-media"
 preview_bucket_name = "calendar-site-media-preview"
 
 [vars]
-PUBLIC_BASE_URL = "https://calendar.example.com"
+PUBLIC_BASE_URL = "https://pdx.fun"
 PUBLIC_TURNSTILE_SITE_KEY = ""
-MEDIA_PUBLIC_BASE = "https://media.calendar.example.com"
+MEDIA_PUBLIC_BASE = "https://media.pdx.fun"
 
 # Secrets belong in the environment manager for this app:
 # GOOGLE_CLIENT_SECRET, PAYPAL_CLIENT_SECRET, SQUARE_ACCESS_TOKEN,

@@ -27,12 +27,13 @@ let calendarActivityDefinitions: CalendarActivityDefinition[] = DEFAULT_CALENDAR
 
 function toActivityConfig(activity: CalendarActivityDefinition): CalendarActivityConfig {
 	const config = getCalendarConfig()
-	const calendarBase = config.routes.calendarBase
+	const calendarBase = config.routes.calendarBase.replace(/\/+$/, '')
 	const calendarName = config.brand.calendarName
 	const siteName = config.brand.siteName
+	const activityHref = `${calendarBase}/${activity.slug}`.replace(/^\/{2,}/, '/')
 	return {
 		slug: activity.slug,
-		href: `${calendarBase}/${activity.slug}`,
+		href: activityHref,
 		label: activity.label,
 		activityName: activity.activityName,
 		pageTitle: `${activity.titleLabel ?? activity.label} | ${calendarName} | ${siteName}`,

@@ -1,4 +1,4 @@
-const PRODUCTION_FALLBACK_CALENDAR_SITE_URL = 'https://calendar.example.com'
+const PRODUCTION_FALLBACK_CALENDAR_SITE_URL = 'https://pdx.fun'
 const LOCAL_FALLBACK_CALENDAR_SITE_URL = 'http://127.0.0.1:3611'
 
 type PlatformEnv = Record<string, string | undefined> | undefined
