@@ -51,7 +51,9 @@
 						</div>
 						<div class="tenant-page__event-main">
 							<p class="tenant-page__event-kicker">{event.activityLabel}</p>
-							<h3>{event.title}</h3>
+							<h3>
+								<a href={`/t/${data.tenant.slug}/events/${event.id}`}>{event.title}</a>
+							</h3>
 							<div class="tenant-page__meta">
 								<span><UsersRound size={15} strokeWidth={1.8} /> {event.seatsTaken}/{event.capacity}</span>
 								{#if event.location}
@@ -187,6 +189,12 @@
 			color: var(--calendar-shell-text);
 			font-size: 1.25rem;
 			line-height: 1.15;
+
+			a {
+				color: inherit;
+				text-decoration-thickness: 0.08em;
+				text-underline-offset: 0.18em;
+			}
 		}
 	}
 

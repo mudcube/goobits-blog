@@ -152,33 +152,49 @@ export async function ensureDevCalendarSession(
 	input: { email: string; name: string; admin?: boolean }
 ) {
 	const db = new Database(DEV_DB_FILE)
-	const existing = db
-		.prepare('SELECT id FROM calendar_users WHERE lower(email) = lower(?) LIMIT 1')
-		.get(input.email) as { id: number } | undefined
-	let userId = existing?.id
-	if (!userId) {
-		const result = db
+	let sessionId = ''
+	let expiresAt = new Date()
+	try {
+		const existing = db
+			.prepare('SELECT id FROM calendar_users WHERE lower(email) = lower(?) LIMIT 1')
+			.get(input.email) as { id: number } | undefined
+		let userId = existing?.id
+		if (!userId) {
+			const result = db
+				.prepare(
+					`INSERT INTO calendar_users (email, name, email_verified, created_at, last_login_at)
+					 VALUES (?, ?, 1, unixepoch(), unixepoch())`
+				)
+				.run(input.email, input.name)
+			userId = Number(result.lastInsertRowid)
+		}
+
+		if (input.admin) {
+			db.prepare('INSERT OR IGNORE INTO calendar_admins (user_id) VALUES (?)').run(userId)
+		} else {
+			db.prepare('DELETE FROM calendar_admins WHERE user_id = ?').run(userId)
+		}
+
+		const programs = db.prepare('SELECT slug FROM calendar_programs WHERE enabled = 1').all() as Array<{ slug: string }>
+		const setAccess = db.prepare(
+			`INSERT INTO calendar_user_program_access (user_id, program_slug, allowed, updated_at)
+			 VALUES (?, ?, 1, unixepoch())
+			 ON CONFLICT(user_id, program_slug) DO UPDATE SET allowed = 1, updated_at = unixepoch()`
+		)
+		for (const program of programs) {
+			setAccess.run(userId, program.slug)
+		}
+
+		sessionId = randomBytes(20).toString('base64url')
+		expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+		db
 			.prepare(
-				`INSERT INTO calendar_users (email, name, email_verified, created_at, last_login_at)
-				 VALUES (?, ?, 1, unixepoch(), unixepoch())`
+				'INSERT INTO calendar_sessions (id, user_id, expires_at) VALUES (?, ?, ?)'
 			)
-			.run(input.email, input.name)
-		userId = Number(result.lastInsertRowid)
+			.run(sessionId, userId, expiresAt.toISOString())
+	} finally {
+		db.close()
 	}
-
-	if (input.admin) {
-		db.prepare('INSERT OR IGNORE INTO calendar_admins (user_id) VALUES (?)').run(userId)
-	} else {
-		db.prepare('DELETE FROM calendar_admins WHERE user_id = ?').run(userId)
-	}
-
-	const sessionId = randomBytes(20).toString('base64url')
-	const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-	db.prepare('INSERT INTO calendar_sessions (id, user_id, expires_at) VALUES (?, ?, ?)').run(
-		sessionId,
-		userId,
-		expiresAt.toISOString()
-	)
 
 	await context.addCookies([
 		{

@@ -76,6 +76,22 @@ function toTenant(row: TenantRow): CalendarTenant {
 	return tenant
 }
 
+function toPublicTenantEvent(row: TenantPublicEventRow): CalendarTenantPublicEvent {
+	return {
+		id: row.id,
+		title: row.title,
+		activitySlug: row.activity_slug,
+		activityLabel: row.activity_label || row.activity_slug,
+		startsAt: row.starts_at,
+		endsAt: row.ends_at,
+		capacity: row.capacity,
+		seatsTaken: row.seats_taken ?? 0,
+		waitlistCount: row.waitlist_count ?? 0,
+		location: row.location,
+		note: row.note
+	}
+}
+
 export function slugifyTenantName(input: string) {
 	return input
 		.trim()
@@ -265,19 +281,37 @@ export async function listPublicCalendarTenantEvents(
 		)
 		.bind(input.tenantId, input.limit ?? 40)
 		.all<TenantPublicEventRow>()
-	return (result.results ?? []).map((row) => ({
-		id: row.id,
-		title: row.title,
-		activitySlug: row.activity_slug,
-		activityLabel: row.activity_label || row.activity_slug,
-		startsAt: row.starts_at,
-		endsAt: row.ends_at,
-		capacity: row.capacity,
-		seatsTaken: row.seats_taken ?? 0,
-		waitlistCount: row.waitlist_count ?? 0,
-		location: row.location,
-		note: row.note
-	}))
+	return (result.results ?? []).map(toPublicTenantEvent)
+}
+
+export async function getPublicCalendarTenantEvent(
+	db: D1DatabaseLike,
+	input: { tenantId: number; eventId: number }
+): Promise<CalendarTenantPublicEvent | null> {
+	const row = await db
+		.prepare(
+			`SELECT e.id, e.title, e.activity_slug, p.label AS activity_label, e.starts_at, e.ends_at,
+			        e.capacity, e.location, e.note,
+			        COALESCE((
+			        	SELECT SUM(1 + participant.guest_count)
+			        	FROM calendar_event_participants participant
+			        	WHERE participant.event_id = e.id AND participant.status = 'joined'
+			        ), 0) AS seats_taken,
+			        COALESCE((
+			        	SELECT COUNT(*)
+			        	FROM calendar_event_participants participant
+			        	WHERE participant.event_id = e.id AND participant.status = 'waitlist'
+			        ), 0) AS waitlist_count
+			 FROM calendar_events e
+			 LEFT JOIN calendar_programs p ON p.slug = e.activity_slug
+			 WHERE e.tenant_id = ?
+			   AND e.id = ?
+			   AND e.status = 'scheduled'
+			 LIMIT 1`
+		)
+		.bind(input.tenantId, input.eventId)
+		.first<TenantPublicEventRow>()
+	return row ? toPublicTenantEvent(row) : null
 }
 
 export async function listCalendarTenantOrganizerEvents(
@@ -307,17 +341,7 @@ export async function listCalendarTenantOrganizerEvents(
 		.bind(input.tenantId, input.limit ?? 80)
 		.all<TenantOrganizerEventRow>()
 	return (result.results ?? []).map((row) => ({
-		id: row.id,
-		title: row.title,
-		activitySlug: row.activity_slug,
-		activityLabel: row.activity_label || row.activity_slug,
-		startsAt: row.starts_at,
-		endsAt: row.ends_at,
-		capacity: row.capacity,
-		seatsTaken: row.seats_taken ?? 0,
-		waitlistCount: row.waitlist_count ?? 0,
-		location: row.location,
-		note: row.note,
+		...toPublicTenantEvent(row),
 		status: row.status
 	}))
 }
