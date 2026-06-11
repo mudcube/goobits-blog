@@ -9,7 +9,9 @@
 /software/zen-bg/.parcel-cache
 /.yarn
 /.svelte-kit
+**/.svelte-kit/
 /build
+**/build/
 node_modules/
 
 # Workspace build artifacts (never commit)
