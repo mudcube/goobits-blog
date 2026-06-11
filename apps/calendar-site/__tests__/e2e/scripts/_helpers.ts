@@ -1,9 +1,12 @@
 import { chromium, type BrowserContext, type Page } from 'playwright'
 import { execFileSync } from 'node:child_process'
+import { existsSync } from 'node:fs'
 
 export const BASE_URL = process.env['E2E_BASE_URL'] || 'http://localhost:3611'
 export const ADMIN_URL = `${BASE_URL}/admin/`
-const ENV_FILE = process.env['CALENDAR_SITE_ENV_FILE'] || 'config/env/.env.calendar'
+const ENV_FILE =
+	process.env['CALENDAR_SITE_ENV_FILE'] ||
+	(existsSync('config/env/.env.calendar') ? 'config/env/.env.calendar' : '../../config/env/.env.calendar')
 
 export function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
@@ -44,31 +47,34 @@ export async function withRequestRetry<T>(
 	throw lastError instanceof Error ? lastError : new Error(`request failed: ${label}`)
 }
 
-export function getAdminPasscode() {
-	if (process.env['ADMIN_PASSCODE']) return process.env['ADMIN_PASSCODE']
+function normalizeEnvValue(value: string | undefined) {
+	const trimmed = value?.trim() ?? ''
+	if (!trimmed || trimmed.startsWith('encrypted:') || trimmed.startsWith('☠')) return ''
+	return trimmed
+}
+
+function getEnvValue(name: string) {
+	const processValue = normalizeEnvValue(process.env[name])
+	if (processValue) return processValue
+
 	try {
 		// Pull the decrypted value from the same env file used by dev/build scripts.
-		return execFileSync('pnpm', ['exec', 'dotenvx', 'get', 'ADMIN_PASSCODE', '-f', ENV_FILE], {
+		const decrypted = execFileSync('pnpm', ['exec', 'dotenvx', 'get', name, '-f', ENV_FILE], {
 			stdio: ['ignore', 'pipe', 'ignore']
 		})
 			.toString('utf8')
-			.trim()
+		return normalizeEnvValue(decrypted)
 	} catch {
 		return ''
 	}
 }
 
+export function getAdminPasscode() {
+	return getEnvValue('ADMIN_PASSCODE')
+}
+
 export function getE2ETestToken() {
-	if (process.env['E2E_TEST_TOKEN']) return process.env['E2E_TEST_TOKEN']
-	try {
-		return execFileSync('pnpm', ['exec', 'dotenvx', 'get', 'E2E_TEST_TOKEN', '-f', ENV_FILE], {
-			stdio: ['ignore', 'pipe', 'ignore']
-		})
-			.toString('utf8')
-			.trim()
-	} catch {
-		return getAdminPasscode()
-	}
+	return getEnvValue('E2E_TEST_TOKEN') || getAdminPasscode()
 }
 
 export async function bootstrapAdminSession(request: import('playwright').APIRequestContext) {
