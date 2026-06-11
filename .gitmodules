@@ -10,3 +10,6 @@
 [submodule "packages/security"]
 	path = packages/security
 	url = git@github.com:goobits/security.git
+[submodule "infra/aw"]
+	path = infra/aw
+	url = https://github.com/goobits/aw.git
