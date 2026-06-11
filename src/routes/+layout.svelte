@@ -8,7 +8,6 @@
 	import { browser } from '$app/environment'
 	import { onMount } from 'svelte'
 	import { Topbar, FooterNav } from '@goobits/ui'
-	import { getCalendarConfig } from '@calendar/core/config'
 	import ReleaseTargetSwitcher from '$lib/app/release/ReleaseTargetSwitcher.svelte'
 	import {
 		footerBrand,
@@ -22,12 +21,7 @@
 	import { enableLayoutShiftDebug } from '$lib/client/debug/layoutShift'
 
 	const { data, children } = $props()
-	const calendarConfig = getCalendarConfig()
 
-	const isCalendarRoute = $derived(
-		$page.url.pathname.startsWith(calendarConfig.routes.calendarBase) ||
-			$page.url.pathname.startsWith(calendarConfig.routes.adminBase)
-	)
 	const showSitemapVisibilityToggle = $derived(
 		$page.url.pathname.startsWith('/sitemap') && Boolean($page.data.canViewInternalRoutes)
 	)
@@ -51,53 +45,48 @@
 
 <ThemeProvider config={themeConfig} serverPreferences={data.preferences}>
 	<div class="code-theme">
-		{#if isCalendarRoute}
+		<a href="#main-content" class="layout-skip-link">Skip to main content</a>
+		<Topbar
+			items={topbarItems}
+			currentPath={$page.url.pathname}
+			logoSrc="/media/brand/logo.svg"
+			logoAlt="MIKO.ART"
+		>
+			{#snippet utility()}
+				<a
+					href={headerUtilityLink.href}
+					class="layout-header__utility-link"
+					class:layout-header__utility-link--active={$page.url.pathname.startsWith('/contact')}
+					aria-label={headerUtilityLink.label}
+					title={headerUtilityLink.label}
+				>
+					<Mail size={24} strokeWidth={1.9} aria-hidden="true" />
+				</a>
+			{/snippet}
+		</Topbar>
+
+		<main id="main-content">
 			{@render children()}
-		{:else}
-			<a href="#main-content" class="layout-skip-link">Skip to main content</a>
-			<Topbar
-				items={topbarItems}
-				currentPath={$page.url.pathname}
-				logoSrc="/media/brand/logo.svg"
-				logoAlt="MIKO.ART"
-				disablePrefetchPrefixes={[calendarConfig.routes.calendarBase, calendarConfig.routes.adminBase]}
-			>
-				{#snippet utility()}
-					<a
-						href={headerUtilityLink.href}
-						class="layout-header__utility-link"
-						class:layout-header__utility-link--active={$page.url.pathname.startsWith('/contact')}
-						aria-label={headerUtilityLink.label}
-						title={headerUtilityLink.label}
-					>
-						<Mail size={24} strokeWidth={1.9} aria-hidden="true" />
-					</a>
-				{/snippet}
-			</Topbar>
+		</main>
 
-			<main id="main-content">
-				{@render children()}
-			</main>
+		<FooterNav
+			brandName={footerBrand.name}
+			brandHref={footerBrand.href}
+			tagline={footerBrand.tagline}
+			copyrightLabel={footerBrand.copyrightLabel}
+			primaryItems={footerPrimaryItems}
+			supplementalPrimaryItems={footerSupplementalPrimaryItems}
+			elsewhereItems={footerElsewhereItems}
+			legalItems={footerLegalItems}
+		/>
 
-			<FooterNav
-				brandName={footerBrand.name}
-				brandHref={footerBrand.href}
-				tagline={footerBrand.tagline}
-				copyrightLabel={footerBrand.copyrightLabel}
-				primaryItems={footerPrimaryItems}
-				supplementalPrimaryItems={footerSupplementalPrimaryItems}
-				elsewhereItems={footerElsewhereItems}
-				legalItems={footerLegalItems}
+		{#if data.showVersionSwitcher}
+			<ReleaseTargetSwitcher
+				activeStage={data.activeStage}
+				activeTarget={data.activeTarget}
+				activeVisibility={$page.data.activeVisibility}
+				showVisibilityToggle={showSitemapVisibilityToggle}
 			/>
-
-			{#if data.showVersionSwitcher}
-				<ReleaseTargetSwitcher
-					activeStage={data.activeStage}
-					activeTarget={data.activeTarget}
-					activeVisibility={$page.data.activeVisibility}
-					showVisibilityToggle={showSitemapVisibilityToggle}
-				/>
-			{/if}
 		{/if}
 	</div>
 </ThemeProvider>

@@ -2,7 +2,7 @@
 import { BASE_URL } from './_config'
 import { withBrowserContext } from './_helpers'
 
-const ROUTES = ['/', '/about', '/journal', '/labs', '/schedule/login']
+const ROUTES = ['/', '/about', '/journal', '/labs', '/contact']
 
 const VIEWPORTS = [
 	{ name: 'mobile-375', width: 375, height: 800 },

@@ -42,11 +42,8 @@ const SITEMAP_AUDIENCE_MATCHERS: Array<{ path: string; sitemap: SitemapAudience;
 	{ path: '/api/admin/dev', sitemap: 'hidden', matchPrefix: true },
 	{ path: '/api/internal', sitemap: 'hidden', matchPrefix: true },
 	{ path: '/api/test', sitemap: 'hidden', matchPrefix: true },
-	{ path: '/api/calendar/oauth-callback', sitemap: 'hidden' },
-	{ path: '/api/calendar/webhook/discord', sitemap: 'hidden' },
 	{ path: '/auth', sitemap: 'hidden', matchPrefix: true },
-	{ path: '/dev', sitemap: 'internal', matchPrefix: true },
-	{ path: '/schedule/admin', sitemap: 'internal', matchPrefix: true }
+	{ path: '/dev', sitemap: 'internal', matchPrefix: true }
 ]
 
 function readRouteMeta(dir: string) {
@@ -233,8 +230,6 @@ function getRouteName(routePath: string) {
 
 function categorizeRoute(routePath: string) {
 	if (routePath === '/') return 'Main Pages'
-	if (routePath.startsWith('/schedule')) return 'Scheduling'
-	if (routePath.startsWith('/api/calendar')) return 'Scheduling API'
 	if (routePath.startsWith('/api')) return 'API Routes'
 	if (routePath.startsWith('/journal')) return 'Journal Pages'
 	if (routePath === '/health' || routePath === '/sitemap') return 'Utility Pages'

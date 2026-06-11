@@ -8,9 +8,7 @@ export const SHARED_LAYOUT_ROUTES = [
 	'/contact',
 	'/privacy',
 	'/terms',
-	'/cookies',
-	'/schedule/login',
-	'/schedule/admin'
+	'/cookies'
 ]
 
 export const NAV_TIMEOUT_MS = Number(process.env.E2E_NAV_TIMEOUT_MS || 20_000)

@@ -8,7 +8,7 @@ Operational assets only:
 
 Current cron jobs:
 
-- `calendar-sync.mjs` processes pending Google Calendar sync jobs from the internal queue.
+- None in the root `miko.art` app.
 
 Current deploy scripts:
 
@@ -18,10 +18,9 @@ Current deploy scripts:
 Run manually:
 
 ```bash
-pnpm calendar:sync
+pnpm deploy:prod
 ```
 
 Required env:
 
 - `PUBLIC_BASE_URL`
-- `CALENDAR_SYNC_CRON_SECRET`

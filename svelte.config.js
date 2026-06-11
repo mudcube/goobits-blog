@@ -11,23 +11,15 @@ export default {
 			routes: {
 				include: [
 					'/api/*',
-					'/auth/*',
-					'/admin',
-					'/admin/*',
-					'/calendar',
-					'/calendar/*',
 					'/schedule',
 					'/schedule/*',
+					'/invite/*',
 					'/blog',
 					'/blog/*',
 					'/journal',
 					'/journal/*',
 					'/contact',
-					'/contact/*',
-					'/register',
-					'/register/*',
-					'/verify-email',
-					'/verify-email/*'
+					'/contact/*'
 				],
 				exclude: [
 					'/_app/*',
@@ -64,9 +56,7 @@ export default {
 			'@static': './static',
 			'@packages': './packages',
 			'@goobits/blog-theme-miko': './packages/blog-theme-miko/src/index.ts',
-			'@goobits/ui': './packages/ui/src',
-			'@calendar/app': './packages/calendar/app/src',
-			'@calendar/ui': './packages/calendar/ui/src'
+			'@goobits/ui': './packages/ui/src'
 		}
 	},
 	extensions: ['.svelte', '.md'],

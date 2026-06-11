@@ -26,27 +26,6 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.1047.0
         version: 3.1047.0
-      '@calendar/app':
-        specifier: workspace:*
-        version: link:packages/calendar/app
-      '@calendar/core':
-        specifier: workspace:*
-        version: link:packages/calendar/core
-      '@calendar/kit':
-        specifier: workspace:*
-        version: link:packages/calendar/kit
-      '@calendar/migrations':
-        specifier: workspace:*
-        version: link:packages/calendar/migrations
-      '@calendar/theme':
-        specifier: workspace:*
-        version: link:packages/calendar/theme
-      '@calendar/ui':
-        specifier: workspace:*
-        version: link:packages/calendar/ui
-      '@goobits/auth':
-        specifier: workspace:*
-        version: link:packages/auth
       '@goobits/blog':
         specifier: workspace:*
         version: link:packages/blog

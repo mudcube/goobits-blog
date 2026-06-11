@@ -7,7 +7,6 @@ const TARGET_DIRS = [
   'src/styles',
   'src/lib/theme',
   'src/routes/admin/styles',
-  'src/routes/calendar/styles',
   'src/routes/art',
   'src/routes/music',
   'src/routes/about',

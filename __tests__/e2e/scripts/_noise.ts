@@ -9,7 +9,7 @@ export function shouldIgnoreKnownConsoleError(text: string) {
 }
 
 export function shouldIgnoreTurnstileNoise(url: string, detail: string) {
-	if (!url.includes('/contact') && !url.includes('/register')) return false
+	if (!url.includes('/contact')) return false
 	return (
 		detail.includes('[Cloudflare Turnstile] Error: 110200') ||
 		detail.includes('Failed to load resource: the server responded with a status of 400') ||

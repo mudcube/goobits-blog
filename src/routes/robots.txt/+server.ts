@@ -8,7 +8,6 @@ export const prerender = true
 const RULES = [
 	'Allow: /',
 	'Disallow: /admin/',
-	'Disallow: /schedule/admin/',
 	'Disallow: /api/',
 	'Disallow: /dev/',
 	'Disallow: /health'

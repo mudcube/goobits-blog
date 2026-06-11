@@ -89,12 +89,6 @@
 	--gradient-movie: linear-gradient(90deg, #fbbf24, #f97316, #ef4444, #ec4899);
 	--gradient-action: linear-gradient(135deg, #a78bfa 0%, #818cf8 50%, #60a5fa 100%);
 
-	/* Booking flow shared accents (used by /schedule/book demo + real BookingCalendar) */
-	--book-accent: color-mix(in srgb, var(--link, #0074d9) 72%, #7a5af8 28%);
-	--book-confirm: #22c55e;
-	--book-confirm-hover: #16a34a;
-	--book-dot-green: #4ade80;
-
 	/* Core colors */
 	--bg: #ffffff;
 	--text: #000000;
@@ -170,27 +164,6 @@
 	--tag-bg: #f2f2f2;
 	--tag-hover-bg: #e5e5e5;
 
-	/* Calendar Gym page */
-	--calendar-shell-bg: #0a0a0c;
-	--calendar-shell-text: #f5f5f7;
-	--calendar-body-bg: radial-gradient(circle at top left, #f8f7f4 0%, #f2f4f8 45%, #eef0f6 100%);
-	--calendar-text: #1f2937;
-	--calendar-muted: #64748b;
-	--calendar-subhead: #475569;
-	--calendar-tz: #94a3b8;
-	--calendar-panel-bg: rgba(255, 255, 255, 0.7);
-	--calendar-panel-shadow: rgba(15, 23, 42, 0.08);
-	--calendar-slot-bg: #f1f5f9;
-	--calendar-slot-text: #0f172a;
-	--calendar-slot-selected-bg: #0f172a;
-	--calendar-slot-selected-text: #ffffff;
-	--calendar-slot-selected-muted: rgba(255, 255, 255, 0.7);
-	--calendar-slot-disabled-bg: #e2e8f0;
-	--calendar-slot-disabled-text: #94a3b8;
-	--calendar-input-border: #e2e8f0;
-	--calendar-input-bg: #ffffff;
-	--calendar-btn-ghost-border: #cbd5e1;
-	--calendar-success: #047857;
 }
 
 html,
@@ -266,26 +239,6 @@ html.theme-system-dark,
 	--tag-bg: #2a2f3a;
 	--tag-hover-bg: #3a4050;
 
-	/* Calendar Gym page */
-	--calendar-shell-bg: #0a0a0c;
-	--calendar-shell-text: #f5f5f7;
-	--calendar-body-bg: radial-gradient(circle at top left, #0f1115 0%, #151821 45%, #1a1f2a 100%);
-	--calendar-text: var(--text);
-	--calendar-muted: #8a8a9a;
-	--calendar-subhead: #b0b0c0;
-	--calendar-tz: #6a6a7a;
-	--calendar-panel-bg: rgba(30, 35, 45, 0.85);
-	--calendar-panel-shadow: rgba(0, 0, 0, 0.35);
-	--calendar-slot-bg: #252a36;
-	--calendar-slot-text: var(--text);
-	--calendar-slot-selected-bg: #5f38b6;
-	--calendar-slot-disabled-bg: var(--card-bg);
-	--calendar-slot-disabled-text: #6a6a7a;
-	--calendar-input-border: #3a4050;
-	--calendar-input-bg: var(--card-bg);
-	--calendar-btn-ghost-border: #4a5060;
-	--calendar-success: #62d391;
-
 	/* Override @goobits/themes bundle variables */
 	--bg-primary: var(--bg);
 	--bg-secondary: var(--panel-bg);
@@ -360,26 +313,6 @@ html.theme-system-dark.scheme-magic {
 	/* Tags */
 	--tag-bg: #3b2c71;
 	--tag-hover-bg: #4c3a8f;
-
-	/* Calendar Gym page */
-	--calendar-shell-bg: #0f0b20;
-	--calendar-shell-text: #f8f7ff;
-	--calendar-body-bg: radial-gradient(circle at top left, #180f35 0%, #1e1440 45%, #251a4c 100%);
-	--calendar-text: var(--text);
-	--calendar-muted: #b3a8dc;
-	--calendar-subhead: #cbc2ee;
-	--calendar-tz: #8d82bb;
-	--calendar-panel-bg: rgba(28, 20, 57, 0.88);
-	--calendar-panel-shadow: rgba(0, 0, 0, 0.35);
-	--calendar-slot-bg: #32255f;
-	--calendar-slot-text: var(--text);
-	--calendar-slot-selected-bg: #7a5cff;
-	--calendar-slot-disabled-bg: #2a1f51;
-	--calendar-slot-disabled-text: #8d82bb;
-	--calendar-input-border: #4a3b81;
-	--calendar-input-bg: #281d50;
-	--calendar-btn-ghost-border: #5a4a91;
-	--calendar-success: #74e3bc;
 
 	/* Override @goobits/themes bundle variables */
 	--bg-primary: var(--bg);

@@ -1,10 +1,6 @@
 import { error, redirect } from '@sveltejs/kit'
 import { redirects } from '@src/redirects.ts'
 import { sequence } from '@sveltejs/kit/hooks'
-import { createCalendarAuthHandles } from '@calendar/app'
-import { getCalendarConfig } from '@calendar/core/config'
-import { applyMikoCalendarPreset } from '$lib/calendar/miko-preset'
-import { configureAdminMockCatalog } from '@calendar/ui/admin/mock/catalog'
 import {
 	getActiveReleaseStage,
 	isLocalPreviewHost as isAllowedLocalPreviewHost,
@@ -13,25 +9,8 @@ import {
 import { ensureJournalBlogConfig } from '$lib/blog/config'
 import { dev } from '$app/environment'
 import type { Handle } from '@sveltejs/kit'
-import {
-	mockCrewInvites,
-	mockCrewUsers,
-	mockDashboardEvents,
-	mockDashboardRecentEvents,
-	mockPaymentDefaults,
-	mockPrograms
-} from '$lib/app/schedule/admin/mock-data'
-applyMikoCalendarPreset()
-configureAdminMockCatalog({
-	dashboardEvents: mockDashboardEvents,
-	dashboardRecentEvents: mockDashboardRecentEvents,
-	programs: mockPrograms,
-	crewUsers: mockCrewUsers,
-	crewInvites: mockCrewInvites,
-	paymentDefaults: mockPaymentDefaults
-})
+
 ensureJournalBlogConfig()
-const calendarConfig = getCalendarConfig()
 const forcedThemePreferences = {
 	theme: 'dark',
 	themeScheme: 'default'
@@ -115,17 +94,6 @@ const releaseVisibilityHandle: Handle = async ({ event, resolve }) => {
 	return resolve(event)
 }
 
-const { handleAdminAuth, handleCalendarAuth, requireCalendarUser } = createCalendarAuthHandles({
-	adminBase: calendarConfig.routes.adminBase,
-	apiAdminBase: calendarConfig.routes.apiAdminBase,
-	apiCalendarAdminBase: calendarConfig.routes.apiCalendarAdminBase,
-	calendarBase: calendarConfig.routes.calendarBase,
-	apiCalendarBase: calendarConfig.routes.apiCalendarBase,
-	authBase: calendarConfig.routes.authBase,
-	calendarLoginPath: calendarConfig.routes.calendarLoginPath,
-	calendarLoginRedirectPath: calendarConfig.routes.calendarLoginRedirectPath
-})
-
 function setIfMissing(headers: Headers, key: string, value: string) {
 	if (!headers.has(key)) headers.set(key, value)
 }
@@ -161,13 +129,9 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 	const isHttps = url?.protocol === 'https:'
 	const noindexPrefixes = [
 		'/api',
-		'/auth',
 		'/contact/thank-you',
-		'/playground',
 		'/health',
-		'/register',
-		'/schedule',
-		'/verify-email'
+		'/schedule'
 	]
 	const shouldNoindex = noindexPrefixes.some(prefix => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`))
 
@@ -176,12 +140,12 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 		"base-uri 'self'",
 		"form-action 'self'",
 		"frame-ancestors 'none'",
-			"img-src 'self' data: blob: https://miko.art https://www.miko.art https://media.miko.art https://cdn.jsdelivr.net https://challenges.cloudflare.com https://*.googleusercontent.com",
-			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
-			`script-src 'self' https://challenges.cloudflare.com https://www.paypal.com https://www.paypalobjects.com https://web.squarecdn.com https://sandbox.web.squarecdn.com 'nonce-${nonce}'${dev ? " 'unsafe-eval'" : ''}`,
-			"frame-src 'self' https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com",
-			"connect-src 'self' https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com https://api-m.paypal.com https://api-m.sandbox.paypal.com https://connect.squareup.com https://connect.squareupsandbox.com https://web.squarecdn.com https://sandbox.web.squarecdn.com",
-			"font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com"
+		"img-src 'self' data: blob: https://miko.art https://www.miko.art https://cdn.jsdelivr.net https://challenges.cloudflare.com https://*.googleusercontent.com",
+		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+		`script-src 'self' https://challenges.cloudflare.com 'nonce-${nonce}'${dev ? " 'unsafe-eval'" : ''}`,
+		"frame-src 'self' https://challenges.cloudflare.com",
+		"connect-src 'self' https://challenges.cloudflare.com",
+		"font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com"
 	].join('; ')
 
 	const applySecurityHeaders = (target: Response) => {
@@ -217,8 +181,5 @@ export const handle = sequence(
 	securityHeadersHandle,
 	themeHandle,
 	handleRedirects,
-	releaseVisibilityHandle,
-	handleAdminAuth,
-	handleCalendarAuth,
-	requireCalendarUser
+	releaseVisibilityHandle
 )

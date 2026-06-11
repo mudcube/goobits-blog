@@ -24,12 +24,8 @@ trap cleanup EXIT
 # Always reset the dedicated E2E server before replacing its database file.
 PORT="${E2E_PORT}" bash scripts/dev/dev-server.sh stop >/dev/null 2>&1 || true
 
-# Ensure tests never reuse a dev DB that might have live Google tokens/connections.
-rm -f "${E2E_DB_FILE}" || true
-
 PORT="${E2E_PORT}" \
 DEV_DB_FILE="${E2E_DB_FILE}" \
-CALENDAR_SYNC_MODE="mock" \
 CONTACT_WEBHOOK_URL="" \
 PUBLIC_BASE_URL="${E2E_BASE_URL}" \
 BASE_URL="${E2E_BASE_URL}" \

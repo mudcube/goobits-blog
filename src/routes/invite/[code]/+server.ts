@@ -1,23 +1,10 @@
 import { redirect } from '@sveltejs/kit'
-import { validateInvite } from '@calendar/core/invites'
-import { buildEnv } from '@calendar/kit'
+import { buildCalendarRedirectUrl } from '$lib/app/calendar-redirect'
 import type { RequestHandler } from './$types'
 
-export const GET: RequestHandler = async ({ params, platform }) => {
-	let target = `/schedule/login/?invite=${encodeURIComponent(params.code)}`
-	try {
-		const env = await buildEnv(platform)
-		const result = await validateInvite({ db: env.DB, code: params.code })
-		const redirectPath = result.valid ? result.invite?.redirect_path : null
-		if (redirectPath?.startsWith('/schedule/')) {
-			target += `&redirect=${encodeURIComponent(redirectPath)}`
-		} else if (params.code.startsWith('gym-')) {
-			target += `&redirect=${encodeURIComponent('/schedule/gym/')}`
-		}
-	} catch {
-		if (params.code.startsWith('gym-')) {
-			target += `&redirect=${encodeURIComponent('/schedule/gym/')}`
-		}
-	}
-	redirect(302, target)
+export const prerender = false
+
+export const GET: RequestHandler = ({ params, platform }) => {
+	const search = `?invite=${encodeURIComponent(params.code)}`
+	redirect(302, buildCalendarRedirectUrl('/schedule/login/', search, platform?.env))
 }

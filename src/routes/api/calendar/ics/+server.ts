@@ -1,1 +1,0 @@
-export { GET } from '@calendar/app/routes/api/calendar/ics/server'

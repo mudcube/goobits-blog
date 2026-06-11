@@ -3,7 +3,7 @@
 	import { LegalPage } from '@goobits/ui'
 
 	const description =
-		'Privacy policy for MIKO.ART, including contact forms, calendar bookings, account sessions, cookies, and data retention.'
+		'Privacy policy for MIKO.ART, including contact forms, cookies, and data retention.'
 </script>
 
 <Seo
@@ -38,23 +38,18 @@
 	<h2 class="legal__section-title">What we collect</h2>
 	<ul class="legal__list">
 		<li class="legal__list-item">Contact form details: name, email address, and message.</li>
-		<li class="legal__list-item">Booking details: name, email address, seats, notes, time selection, and timezone.</li>
-		<li class="legal__list-item">Account data for calendar login (when enabled): email, name, avatar, and provider account IDs.</li>
 		<li class="legal__list-item">Technical data sent by browsers and infrastructure: IP address, user agent, and request metadata.</li>
 	</ul>
 
 	<h2 class="legal__section-title">How we use data</h2>
 	<ul class="legal__list">
 		<li class="legal__list-item">To respond to contact messages.</li>
-		<li class="legal__list-item">To provide and manage calendar bookings.</li>
-		<li class="legal__list-item">To create and maintain login sessions.</li>
 		<li class="legal__list-item">To secure the site, prevent abuse, and debug issues.</li>
 	</ul>
 
 	<h2 class="legal__section-title">Cookies and similar storage</h2>
 	<p class="legal__copy">
-		This site uses cookies for session and login flows. These cookies are used for authentication and redirects,
-		not for ad targeting.
+		This site may use cookies or browser storage for security checks and display preferences, not for ad targeting.
 	</p>
 	<p class="legal__copy">
 		See the <a href="/cookies">Cookie Policy</a> for more detail.
@@ -63,8 +58,6 @@
 	<h2 class="legal__section-title">Third parties</h2>
 	<ul class="legal__list">
 		<li class="legal__list-item">Cloudflare (hosting and edge infrastructure).</li>
-		<li class="legal__list-item">Google Calendar APIs for booking and calendar event creation.</li>
-		<li class="legal__list-item">OAuth providers such as Google or Apple for login, if enabled.</li>
 		<li class="legal__list-item">The contact form submits to the configured contact API endpoint.</li>
 	</ul>
 

@@ -6,27 +6,12 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 # Pages will be deployed via `wrangler pages deploy`
 # For local development, use `wrangler pages dev`
 
-[[d1_databases]]
-binding = "DB"
-database_name = "miko-art-calendar-db"
-database_id = "cc86b2fc-459d-462f-bff3-e188e6650398"
-migrations_dir = "packages/calendar/migrations/sql"
-
-# R2 bucket for admin-uploaded media (event hero images, etc.)
-# Public reads served from the custom domain configured below.
-[[r2_buckets]]
-binding = "MEDIA"
-bucket_name = "miko-art-media"
-preview_bucket_name = "miko-art-media-preview"
-
 [vars]
 # Non-sensitive environment variables
 PUBLIC_BASE_URL = "https://miko.art"
+PUBLIC_CALENDAR_SITE_URL = "https://calendar.example.com"
 PUBLIC_TURNSTILE_SITE_KEY = "0x4AAAAAACcov9RbE21ayWD0"
 CONTACT_WEBHOOK_URL = "https://email-handler.pufflewiggins.workers.dev"
-MEDIA_PUBLIC_BASE = "https://media.miko.art"
-# BOOKING_CAPACITY = "8"
-# BOOKING_SLOT_MINUTES = "30"
 
 # Secrets are encrypted in config/env/.env.production (via dotenvx).
 # Push to Cloudflare with: pnpm deploy:secrets
