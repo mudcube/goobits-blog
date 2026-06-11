@@ -26,12 +26,17 @@ pnpm dev:wrangler
 ## ⚙️ Configuration
 ```bash
 # View the available env vars
-ls -la config/env/.env.example
+ls -la config/env/.env.example config/env/.env.calendar.example
 
-# Edit local dev secrets (encrypted at rest via dotenvx)
+# Edit miko.art local dev secrets (encrypted at rest via dotenvx)
 pnpm exec dotenvx decrypt -f config/env/.env
 # edit config/env/.env
 pnpm exec dotenvx encrypt -f config/env/.env
+
+# Edit calendar-site local dev secrets
+pnpm exec dotenvx decrypt -f config/env/.env.calendar
+# edit config/env/.env.calendar
+pnpm exec dotenvx encrypt -f config/env/.env.calendar
 ```
 
 ### Path Aliases

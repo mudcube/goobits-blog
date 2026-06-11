@@ -7,6 +7,7 @@
   import { buildProviderLoginHref } from "@calendar/ui/routing/auth-redirects";
   import { PillButton } from "@calendar/ui";
   import { getCalendarConfig } from "@calendar/core/config";
+  import { calendarSiteActivities } from "$lib/calendar-site-preset";
   import {
     resolveCalendarLoginTargetActivity,
     resolveFirstAvailableProvider,
@@ -49,6 +50,18 @@
   let claimError = $state("");
 
   const targetActivity = $derived(resolveCalendarLoginTargetActivity(redirectTo));
+  const quickLinks = [
+    { href: "/login", label: "Login" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/events", label: "Events" },
+    { href: "/admin/crew", label: "Crew" },
+    { href: "/admin/settings", label: "Settings" },
+    { href: "/book", label: "Book" },
+    ...calendarSiteActivities.map((activity) => ({
+      href: `/${activity.slug}`,
+      label: activity.label
+    }))
+  ];
   const inviteStatus = $derived(data.inviteStatus);
   const hasValidInvite = $derived(!!inviteCode && inviteStatus === "valid");
   const inviteStatusMessage = $derived.by(() => {
@@ -354,6 +367,12 @@
           Don't have a code? Invites are shared directly by an admin.
         </p>
       {/if}
+
+      <nav class="calendar-login__quick-links" aria-label="Calendar pages">
+        {#each quickLinks as item}
+          <a class="calendar-login__quick-link" href={item.href}>{item.label}</a>
+        {/each}
+      </nav>
     </section>
   </div>
 </div>
@@ -438,6 +457,46 @@
   .calendar-login__invite-submit:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  .calendar-login__quick-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid color-mix(in srgb, var(--calendar-shell-text, var(--text)) 12%, transparent);
+  }
+
+  .calendar-login__quick-link {
+    min-width: 0;
+    padding: 0.58rem 0.7rem;
+    border: 1px solid color-mix(in srgb, var(--calendar-shell-text, var(--text)) 14%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--calendar-shell-text, var(--text)) 5%, transparent);
+    color: color-mix(in srgb, var(--calendar-shell-text, var(--text)) 82%, transparent);
+    font-size: 0.78rem;
+    font-weight: 650;
+    line-height: 1.15;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background 140ms ease,
+      border-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .calendar-login__quick-link:hover {
+    border-color: color-mix(in srgb, var(--calendar-shell-text, var(--text)) 28%, transparent);
+    background: color-mix(in srgb, var(--calendar-shell-text, var(--text)) 10%, transparent);
+    color: var(--calendar-shell-text, var(--text));
+  }
+
+  @media (max-width: 30em) {
+    .calendar-login__quick-links {
+      grid-template-columns: 1fr;
+    }
   }
 
 </style>

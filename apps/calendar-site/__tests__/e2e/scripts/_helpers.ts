@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process'
 
 export const BASE_URL = process.env['E2E_BASE_URL'] || 'http://localhost:3611'
 export const ADMIN_URL = `${BASE_URL}/admin/`
-const ENV_FILE = process.env['CALENDAR_SITE_ENV_FILE'] || 'config/env/.env'
+const ENV_FILE = process.env['CALENDAR_SITE_ENV_FILE'] || 'config/env/.env.calendar'
 
 export function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms))

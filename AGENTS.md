@@ -42,7 +42,7 @@ SvelteKit 5 + Cloudflare Pages monorepo (pnpm workspaces).
 
 ## Environment
 
-Env files in `config/env/`, encrypted with dotenvx. Template: `config/env/.env.example`. Production secrets: `pnpm deploy:secrets`.
+Env files in `config/env/`, encrypted with dotenvx. Root miko.art uses `config/env/.env` with template `config/env/.env.example`; calendar-site uses `config/env/.env.calendar` with template `config/env/.env.calendar.example`. Production secrets: root `pnpm deploy:secrets`, calendar `pnpm --dir apps/calendar-site deploy:secrets`.
 
 ## CSS Conventions
 

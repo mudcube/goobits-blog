@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import { sveltekit } from '@sveltejs/kit/vite'
 
 dotenv.config({
-	path: './config/env/.env'
+	path: '../../config/env/.env.calendar'
 })
 
 export default defineConfig({
@@ -52,7 +52,7 @@ export default defineConfig({
 		open: false,
 		port: 3611,
 		watch: {
-			ignored: ['**/.svelte-kit-old/**']
+			ignored: ['**/.svelte-kit-old/**', '../../.svelte-kit/**']
 		},
 		fs: {
 			allow: [path.resolve('.'), path.resolve('../..')]

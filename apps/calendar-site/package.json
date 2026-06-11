@@ -6,7 +6,7 @@
   "scripts": {
     "check": "pnpm exec svelte-kit sync && pnpm exec tsc --noEmit",
     "build": "pnpm exec svelte-kit sync && vite build",
-    "dev": "vite dev --host 0.0.0.0 --port 3611",
+    "dev": "../../node_modules/.bin/dotenvx run -f ../../config/env/.env.calendar -- vite dev --host 0.0.0.0 --port 3611 --strictPort",
     "test": "pnpm run check && pnpm run test:unit",
     "test:unit": "pnpm --dir ../.. exec vitest run --maxWorkers=1 packages/calendar/core/__tests__/unit",
     "test:e2e": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e",
@@ -18,7 +18,8 @@
     "e2e:admin:payment": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-payment-defaults.test.ts",
     "e2e:admin:promote": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-waitlist-promote.test.ts",
     "e2e:admin:templates": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-new-event-copy-from.test.ts",
-    "calendar:sync": "node ops/cron/calendar-sync.mjs",
+    "calendar:sync": "../../node_modules/.bin/dotenvx run -f ../../config/env/.env.calendar -- node ops/cron/calendar-sync.mjs",
+    "deploy:secrets": "../../node_modules/.bin/dotenvx run -f ../../config/env/.env.calendar.production -- node ../../ops/deploy/deploy-secrets.mjs --env-file config/env/.env.calendar.production --project-name calendar-site",
     "seed:calendar": "node scripts/seed/calendar-social.mjs",
     "e2e:oauth:google": "node scripts/e2e/check-google-oauth.mjs"
   },

@@ -1,12 +1,15 @@
-const FALLBACK_CALENDAR_SITE_URL = 'https://calendar.example.com'
+const PRODUCTION_FALLBACK_CALENDAR_SITE_URL = 'https://calendar.example.com'
+const LOCAL_FALLBACK_CALENDAR_SITE_URL = 'http://127.0.0.1:3611'
 
 type PlatformEnv = Record<string, string | undefined> | undefined
 
 function getCalendarSiteBase(env: PlatformEnv) {
-	const raw =
-		env?.['PUBLIC_CALENDAR_SITE_URL'] ||
-		process.env['PUBLIC_CALENDAR_SITE_URL'] ||
-		FALLBACK_CALENDAR_SITE_URL
+	const isDevelopment = process.env['NODE_ENV'] === 'development'
+	const raw = isDevelopment
+		? process.env['PUBLIC_CALENDAR_SITE_DEV_URL'] || LOCAL_FALLBACK_CALENDAR_SITE_URL
+		: env?.['PUBLIC_CALENDAR_SITE_URL'] ||
+			process.env['PUBLIC_CALENDAR_SITE_URL'] ||
+			PRODUCTION_FALLBACK_CALENDAR_SITE_URL
 
 	return raw.replace(/\/+$/, '')
 }
