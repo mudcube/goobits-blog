@@ -17,6 +17,7 @@
     "./storage": "./src/storage.ts",
     "./invites": "./src/invites.ts",
     "./payments": "./src/payments.ts",
+    "./tenants": "./src/tenants.ts",
     "./weather": "./src/weather.ts",
     "./media": "./src/media.ts",
     "./utils": "./src/utils.ts"

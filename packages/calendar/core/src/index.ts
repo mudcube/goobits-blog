@@ -16,6 +16,7 @@
 //   @calendar/core/invites   → invite generate/validate/consume +
 //                               user-program-access
 //   @calendar/core/payments  → checkout, payment-link, admin defaults
+//   @calendar/core/tenants   → organizer tenants + membership helpers
 //   @calendar/core/weather   → weather provider abstraction + impls
 //   @calendar/core/media     → hero image upload helpers
 //   @calendar/core/utils     → tiny cross-domain helpers (isoDay,
