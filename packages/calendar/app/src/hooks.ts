@@ -41,6 +41,7 @@ async function tryBootstrapDevCalendarSession(event: Parameters<Handle>[0]['even
 export type CalendarAppHookConfig = CalendarConfigInput['routes']
 
 function isRouteUnder(pathname: string, base: string) {
+	if (base === '/') return pathname.startsWith('/') && !pathname.startsWith('/api')
 	return pathname === base || pathname.startsWith(`${base}/`)
 }
 

@@ -1,65 +1,16 @@
 import { chromium } from 'playwright'
-import { randomBytes } from 'node:crypto'
-import Database from 'better-sqlite3'
 import {
 	ADMIN_URL,
 	BASE_URL,
+	ensureDevCalendarSession,
 	withBrowserContext
 } from './_helpers'
-
-const DEV_DB_FILE = process.env['DEV_DB_FILE'] || '../../.dev/calendar-site.sqlite'
 
 async function expectStatus(label: string, response: { status: () => number }, expected: number) {
 	const status = response.status()
 	if (status !== expected) {
 		throw new Error(`${label}: expected ${expected}, got ${status}`)
 	}
-}
-
-function ensureDevCalendarSession(
-	context: import('playwright').BrowserContext,
-	input: { email: string; name: string; admin?: boolean }
-) {
-	const db = new Database(DEV_DB_FILE)
-	const existing = db
-		.prepare('SELECT id FROM calendar_users WHERE lower(email) = lower(?) LIMIT 1')
-		.get(input.email) as { id: number } | undefined
-	let userId = existing?.id
-	if (!userId) {
-		const result = db
-			.prepare(
-				`INSERT INTO calendar_users (email, name, email_verified, created_at, last_login_at)
-				 VALUES (?, ?, 1, unixepoch(), unixepoch())`
-			)
-			.run(input.email, input.name)
-		userId = Number(result.lastInsertRowid)
-	}
-
-	if (input.admin) {
-		db.prepare('INSERT OR IGNORE INTO calendar_admins (user_id) VALUES (?)').run(userId)
-	} else {
-		db.prepare('DELETE FROM calendar_admins WHERE user_id = ?').run(userId)
-	}
-
-	const sessionId = randomBytes(20).toString('base64url')
-	const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-	db.prepare('INSERT INTO calendar_sessions (id, user_id, expires_at) VALUES (?, ?, ?)').run(
-		sessionId,
-		userId,
-		expiresAt.toISOString()
-	)
-
-	return context.addCookies([
-		{
-			name: 'calendar_session',
-			value: sessionId,
-			url: BASE_URL,
-			httpOnly: true,
-			secure: BASE_URL.startsWith('https:'),
-			sameSite: 'Lax',
-			expires: Math.floor(expiresAt.getTime() / 1000)
-		}
-	])
 }
 
 export async function runAdminAuthRouting() {

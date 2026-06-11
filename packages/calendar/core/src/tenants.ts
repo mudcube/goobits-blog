@@ -25,6 +25,10 @@ export type CalendarTenantPublicEvent = {
 	note: string | null
 }
 
+export type CalendarTenantOrganizerEvent = CalendarTenantPublicEvent & {
+	status: string
+}
+
 type TenantRow = {
 	id: number
 	slug: string
@@ -46,6 +50,10 @@ type TenantPublicEventRow = {
 	waitlist_count: number
 	location: string | null
 	note: string | null
+}
+
+type TenantOrganizerEventRow = TenantPublicEventRow & {
+	status: string
 }
 
 const DEFAULT_TENANT_ID = 1
@@ -190,6 +198,27 @@ export async function ensureCalendarTenantForUser(db: D1DatabaseLike, input: { u
 	return createCalendarTenantForUser(db, input)
 }
 
+export function buildCalendarTenantNameForUser(name: string) {
+	const trimmed = name.trim() || 'Organizer'
+	return trimmed.endsWith('s') ? `${trimmed} events` : `${trimmed}'s events`
+}
+
+export async function getCalendarUserDisplayName(db: D1DatabaseLike, userId: string) {
+	const row = await db
+		.prepare(`SELECT name FROM calendar_users WHERE id = ? LIMIT 1`)
+		.bind(userId)
+		.first<{ name: string | null }>()
+	return row?.name?.trim() || 'Organizer'
+}
+
+export async function ensureCalendarCreatorTenant(db: D1DatabaseLike, input: { userId: string }) {
+	const name = await getCalendarUserDisplayName(db, input.userId)
+	return ensureCalendarTenantForUser(db, {
+		userId: input.userId,
+		name: buildCalendarTenantNameForUser(name)
+	})
+}
+
 export async function getCalendarTenantRole(db: D1DatabaseLike, input: { tenantId: number; userId: string }) {
 	const row = await db
 		.prepare(
@@ -248,5 +277,47 @@ export async function listPublicCalendarTenantEvents(
 		waitlistCount: row.waitlist_count ?? 0,
 		location: row.location,
 		note: row.note
+	}))
+}
+
+export async function listCalendarTenantOrganizerEvents(
+	db: D1DatabaseLike,
+	input: { tenantId: number; limit?: number }
+): Promise<CalendarTenantOrganizerEvent[]> {
+	const result = await db
+		.prepare(
+			`SELECT e.id, e.title, e.activity_slug, p.label AS activity_label, e.starts_at, e.ends_at,
+			        e.capacity, e.location, e.note, e.status,
+			        COALESCE((
+			        	SELECT SUM(1 + participant.guest_count)
+			        	FROM calendar_event_participants participant
+			        	WHERE participant.event_id = e.id AND participant.status = 'joined'
+			        ), 0) AS seats_taken,
+			        COALESCE((
+			        	SELECT COUNT(*)
+			        	FROM calendar_event_participants participant
+			        	WHERE participant.event_id = e.id AND participant.status = 'waitlist'
+			        ), 0) AS waitlist_count
+			 FROM calendar_events e
+			 LEFT JOIN calendar_programs p ON p.slug = e.activity_slug
+			 WHERE e.tenant_id = ?
+			 ORDER BY datetime(e.starts_at) DESC
+			 LIMIT ?`
+		)
+		.bind(input.tenantId, input.limit ?? 80)
+		.all<TenantOrganizerEventRow>()
+	return (result.results ?? []).map((row) => ({
+		id: row.id,
+		title: row.title,
+		activitySlug: row.activity_slug,
+		activityLabel: row.activity_label || row.activity_slug,
+		startsAt: row.starts_at,
+		endsAt: row.ends_at,
+		capacity: row.capacity,
+		seatsTaken: row.seats_taken ?? 0,
+		waitlistCount: row.waitlist_count ?? 0,
+		location: row.location,
+		note: row.note,
+		status: row.status
 	}))
 }

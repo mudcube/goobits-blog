@@ -3,19 +3,11 @@ import { buildEnv } from '@calendar/kit'
 import { createEventsBatch, listEventsFeed } from '@calendar/core/booking'
 import { getCalendarProgramBySlug } from '@calendar/core/admin'
 import { buildPaymentLink } from '@calendar/core/payments'
-import { ensureCalendarTenantForUser } from '@calendar/core/tenants'
+import { ensureCalendarCreatorTenant } from '@calendar/core/tenants'
 import { parseCalendarCreateEventInput, TransportValidationError } from '@calendar/core/transport'
 import { enqueueCalendarSyncJob, processCalendarSyncQueue } from '@calendar/core/sync'
 import { apiError, apiOk, apiValidationError, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
 import { enforceSameOrigin } from '@calendar/app/admin-api-helpers'
-
-async function getCalendarUserName(db: Awaited<ReturnType<typeof buildEnv>>['DB'], userId: string) {
-	const row = await db
-		.prepare(`SELECT name FROM calendar_users WHERE id = ? LIMIT 1`)
-		.bind(userId)
-		.first<{ name: string | null }>()
-	return row?.name?.trim() || 'Organizer'
-}
 
 export async function GET(event: RequestEvent) {
 	return runCalendarRequest('calendar.events.list', async () => {
@@ -56,11 +48,7 @@ export async function POST(event: RequestEvent) {
 			const program = await getCalendarProgramBySlug(env.DB, input.activitySlug)
 			if (!program) return apiError('Program not found', { status: 404 })
 
-			const name = await getCalendarUserName(env.DB, userId)
-			const tenant = await ensureCalendarTenantForUser(env.DB, {
-				userId,
-				name: name.endsWith('s') ? `${name} events` : `${name}'s events`
-			})
+			const tenant = await ensureCalendarCreatorTenant(env.DB, { userId })
 			const ids = await createEventsBatch(env.DB, {
 				tenantId: tenant.id,
 				createdByUserId: userId,
