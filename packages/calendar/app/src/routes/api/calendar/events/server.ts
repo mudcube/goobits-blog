@@ -3,7 +3,7 @@ import { buildEnv } from '@calendar/kit'
 import { createEventsBatch, listEventsFeed } from '@calendar/core/booking'
 import { getCalendarProgramBySlug } from '@calendar/core/admin'
 import { buildPaymentLink } from '@calendar/core/payments'
-import { ensureCalendarCreatorTenant } from '@calendar/core/tenants'
+import { canManageCalendarTenant, ensureCalendarCreatorTenant } from '@calendar/core/tenants'
 import { parseCalendarCreateEventInput, TransportValidationError } from '@calendar/core/transport'
 import { enqueueCalendarSyncJob, processCalendarSyncQueue } from '@calendar/core/sync'
 import { apiError, apiOk, apiValidationError, requireCalendarUserId, runCalendarRequest } from '@calendar/kit'
@@ -49,6 +49,9 @@ export async function POST(event: RequestEvent) {
 			if (!program) return apiError('Program not found', { status: 404 })
 
 			const tenant = await ensureCalendarCreatorTenant(env.DB, { userId })
+			if (!(await canManageCalendarTenant(env.DB, { tenantId: tenant.id, userId }))) {
+				return apiError('Access denied for this organizer', { status: 403, code: 'forbidden' })
+			}
 			const ids = await createEventsBatch(env.DB, {
 				tenantId: tenant.id,
 				createdByUserId: userId,

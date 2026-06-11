@@ -1,4 +1,5 @@
 import type { D1DatabaseLike } from './storage/d1.ts'
+import { isCalendarAdmin } from './access/admin-permissions.ts'
 
 export type CalendarTenantRole = 'owner' | 'admin' | 'member'
 
@@ -28,6 +29,10 @@ export type CalendarTenantPublicEvent = {
 export type CalendarTenantOrganizerEvent = CalendarTenantPublicEvent & {
 	status: string
 }
+
+export type CalendarTenantEventManageAccess =
+	| { ok: true; tenantId: number; role: CalendarTenantRole | 'global-admin' }
+	| { ok: false; reason: 'not_found' | 'forbidden' }
 
 type TenantRow = {
 	id: number
@@ -251,6 +256,30 @@ export async function getCalendarTenantRole(db: D1DatabaseLike, input: { tenantI
 export async function canManageCalendarTenant(db: D1DatabaseLike, input: { tenantId: number; userId: string }) {
 	const role = await getCalendarTenantRole(db, input)
 	return role === 'owner' || role === 'admin'
+}
+
+export async function getCalendarEventTenantId(db: D1DatabaseLike, eventId: number) {
+	const row = await db
+		.prepare(`SELECT tenant_id FROM calendar_events WHERE id = ? LIMIT 1`)
+		.bind(eventId)
+		.first<{ tenant_id: number }>()
+	return row?.tenant_id ?? null
+}
+
+export async function canManageCalendarEvent(
+	db: D1DatabaseLike,
+	input: { eventId: number; userId: string; allowGlobalAdmin?: boolean }
+): Promise<CalendarTenantEventManageAccess> {
+	const tenantId = await getCalendarEventTenantId(db, input.eventId)
+	if (!tenantId) return { ok: false, reason: 'not_found' }
+
+	if (input.allowGlobalAdmin !== false && await isCalendarAdmin({ db, userId: input.userId })) {
+		return { ok: true, tenantId, role: 'global-admin' }
+	}
+
+	const role = await getCalendarTenantRole(db, { tenantId, userId: input.userId })
+	if (role === 'owner' || role === 'admin') return { ok: true, tenantId, role }
+	return { ok: false, reason: 'forbidden' }
 }
 
 export async function listPublicCalendarTenantEvents(

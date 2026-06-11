@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { createSqliteDb } from "../../../kit/src/dev/sqliteDb.ts";
+import { grantCalendarAdmin } from "../../src/access/admin-permissions.ts";
 import { getAdminEventDetail } from "../../src/services/admin/event-detail.ts";
 import { promoteWaitlistedParticipant } from "../../src/services/bookings/promote-waitlist.ts";
 import {
@@ -26,6 +27,7 @@ import {
   type CalendarSyncProvider,
 } from "../../src/sync/settings.ts";
 import {
+  canManageCalendarEvent,
   createCalendarTenantForUser,
   listPublicCalendarTenantEvents,
 } from "../../src/tenants.ts";
@@ -48,14 +50,14 @@ function createTestDb() {
 
 async function createEvent(
   db: D1DatabaseLike,
-  input: { capacity: number; status?: string },
+  input: { capacity: number; status?: string; tenantId?: number },
 ) {
   const result = await db
     .prepare(
-      `INSERT INTO calendar_events (activity_slug, title, starts_at, ends_at, capacity, status, location, note)
-		 VALUES ('studio', 'Test Event', '2026-04-29T10:00:00.000Z', '2026-04-29T11:00:00.000Z', ?, ?, 'Studio', 'Bring water')`,
+      `INSERT INTO calendar_events (tenant_id, activity_slug, title, starts_at, ends_at, capacity, status, location, note)
+		 VALUES (?, 'studio', 'Test Event', '2026-04-29T10:00:00.000Z', '2026-04-29T11:00:00.000Z', ?, ?, 'Studio', 'Bring water')`,
     )
-    .bind(input.capacity, input.status ?? "scheduled")
+    .bind(input.tenantId ?? 1, input.capacity, input.status ?? "scheduled")
     .run();
   return result.meta.last_row_id;
 }
@@ -594,5 +596,66 @@ describe("calendar regression coverage", () => {
       seatsTaken: 2,
       capacity: 10,
     });
+  });
+
+  it("allows only tenant managers or global admins to manage tenant events", async () => {
+    const db = createTestDb();
+    const tenant = await createCalendarTenantForUser(db, {
+      userId: "owner-1",
+      name: "Owner Crew",
+    });
+    const otherTenant = await createCalendarTenantForUser(db, {
+      userId: "owner-2",
+      name: "Other Crew",
+    });
+    await db
+      .prepare(
+        `INSERT INTO calendar_tenant_members (tenant_id, user_id, role, created_at, updated_at)
+         VALUES (?, 'admin-1', 'admin', unixepoch(), unixepoch()),
+                (?, 'member-1', 'member', unixepoch(), unixepoch())`,
+      )
+      .bind(tenant.id, tenant.id)
+      .run();
+    const eventId = await createEvent(db, {
+      capacity: 10,
+      tenantId: tenant.id,
+    });
+    const otherEventId = await createEvent(db, {
+      capacity: 10,
+      tenantId: otherTenant.id,
+    });
+    const adminUser = await db
+      .prepare(
+        `INSERT INTO calendar_users (email, name, email_verified, created_at, last_login_at)
+         VALUES ('global-admin@example.com', 'Global Admin', 1, unixepoch(), unixepoch())`,
+      )
+      .run();
+    const globalAdminId = String(adminUser.meta.last_row_id);
+    await grantCalendarAdmin({ db, userId: globalAdminId });
+
+    await expect(canManageCalendarEvent(db, {
+      eventId,
+      userId: "owner-1",
+    })).resolves.toMatchObject({ ok: true, role: "owner", tenantId: tenant.id });
+    await expect(canManageCalendarEvent(db, {
+      eventId,
+      userId: "admin-1",
+    })).resolves.toMatchObject({ ok: true, role: "admin", tenantId: tenant.id });
+    await expect(canManageCalendarEvent(db, {
+      eventId,
+      userId: "member-1",
+    })).resolves.toEqual({ ok: false, reason: "forbidden" });
+    await expect(canManageCalendarEvent(db, {
+      eventId: otherEventId,
+      userId: "owner-1",
+    })).resolves.toEqual({ ok: false, reason: "forbidden" });
+    await expect(canManageCalendarEvent(db, {
+      eventId,
+      userId: globalAdminId,
+    })).resolves.toMatchObject({ ok: true, role: "global-admin", tenantId: tenant.id });
+    await expect(canManageCalendarEvent(db, {
+      eventId: 999999,
+      userId: "owner-1",
+    })).resolves.toEqual({ ok: false, reason: "not_found" });
   });
 });

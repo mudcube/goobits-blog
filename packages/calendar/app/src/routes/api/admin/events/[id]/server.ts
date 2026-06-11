@@ -8,6 +8,7 @@ import {
 	updateEventMemory,
 	updateEventRecapText
 } from '@calendar/core/booking'
+import { canManageCalendarEvent } from '@calendar/core/tenants'
 import { enqueueCalendarSyncJob, processCalendarSyncQueue } from '@calendar/core/sync'
 import {
 	parseAdminEventUpdateInput,
@@ -15,7 +16,7 @@ import {
 	TransportValidationError
 } from '@calendar/core/transport'
 import { logAdminEvent, requireAdminRequest, runApiRequest } from '@calendar/app/admin-api-helpers'
-import { apiOk, apiError, apiValidationError } from '@calendar/kit'
+import { apiOk, apiError, apiValidationError, getCalendarUserId } from '@calendar/kit'
 
 async function enqueueEventSync(env: Awaited<ReturnType<typeof buildEnv>>, eventId: number, trigger: string) {
 	try {
@@ -49,6 +50,20 @@ export async function POST(event: RequestEvent) {
 			}
 
 			const env = await buildEnv(event.platform)
+			const adminUserId = getCalendarUserId(event)
+			if (!adminUserId) return apiError('Unauthorized', { status: 401 })
+			const access = await canManageCalendarEvent(env.DB, {
+				eventId,
+				userId: adminUserId,
+				allowGlobalAdmin: true
+			})
+			if (!access.ok) {
+				return apiError(access.reason === 'not_found' ? 'Event not found' : 'Access denied', {
+					status: access.reason === 'not_found' ? 404 : 403,
+					code: access.reason
+				})
+			}
+
 			const input = parseAdminEventUpdateInput(await event.request.json().catch(() => null))
 			if (input.action === 'capacity') {
 				const changed = await updateEventCapacity(env.DB, {
