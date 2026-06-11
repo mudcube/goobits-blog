@@ -1,16 +1,27 @@
 <script lang="ts">
 	import { CalendarCheck, Clock, MapPin, UserPlus, UsersRound } from '@lucide/svelte'
+	import type { CalendarEventMutationState } from '@calendar/core/booking'
 
 	let { data } = $props()
 
-	let seatsTaken = $state(data.state?.seatsTaken ?? data.event.seatsTaken)
-	let seatsLeft = $state(data.state?.seatsLeft ?? Math.max(0, data.event.capacity - data.event.seatsTaken))
-	let waitlistCount = $state(data.state?.waitlistCount ?? data.event.waitlistCount)
-	let userStatus = $state(data.state?.userStatus ?? null)
-	let guestCount = $state(data.state?.userGuestCount ?? 0)
+	let eventState = $state<CalendarEventMutationState | null>(null)
+	let guestCount = $state(0)
 	let submitting = $state(false)
 	let errorMessage = $state('')
 	let successMessage = $state('')
+
+	let seatsTaken = $derived(eventState?.seatsTaken ?? data.state?.seatsTaken ?? data.event.seatsTaken)
+	let seatsLeft = $derived(
+		eventState?.seatsLeft ?? data.state?.seatsLeft ?? Math.max(0, data.event.capacity - data.event.seatsTaken)
+	)
+	let waitlistCount = $derived(eventState?.waitlistCount ?? data.state?.waitlistCount ?? data.event.waitlistCount)
+	let userStatus = $derived(eventState?.userStatus ?? data.state?.userStatus ?? null)
+
+	$effect(() => {
+		if (guestCount === 0 && data.state?.userGuestCount) {
+			guestCount = data.state.userGuestCount
+		}
+	})
 
 	function dateLabel(value: string) {
 		return new Date(value).toLocaleDateString('en-US', {
@@ -45,11 +56,8 @@
 				errorMessage = result?.error?.message || 'Could not join this event.'
 				return
 			}
-			userStatus = result.status
 			if (result.state) {
-				seatsTaken = result.state.seatsTaken
-				seatsLeft = result.state.seatsLeft
-				waitlistCount = result.state.waitlistCount
+				eventState = result.state
 				guestCount = result.state.userGuestCount
 			}
 			successMessage = result.status === 'waitlist' ? 'Added to the waitlist.' : 'You joined this event.'

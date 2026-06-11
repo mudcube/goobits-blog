@@ -3,10 +3,9 @@
 	import { CalendarPlus, Clock, MapPin, UsersRound } from '@lucide/svelte'
 
 	let { data } = $props()
-	const firstProgram = data.programs[0]
 
 	let title = $state('')
-	let activitySlug = $state(firstProgram?.slug ?? '')
+	let activitySlug = $state('')
 	let startsAt = $state('')
 	let endsAt = $state('')
 	let capacity = $state(12)
@@ -14,6 +13,12 @@
 	let note = $state('')
 	let submitting = $state(false)
 	let error = $state('')
+
+	$effect(() => {
+		if (!activitySlug && data.programs[0]) {
+			activitySlug = data.programs[0].slug
+		}
+	})
 
 	function toIso(value: string) {
 		const date = new Date(value)
@@ -104,7 +109,7 @@
 
 		<label class="event-create__field event-create__field--full">
 			<span>Notes</span>
-			<textarea bind:value={note} name="note" maxlength="300" rows="5" placeholder="What should people know before they join?" />
+			<textarea bind:value={note} name="note" maxlength="300" rows="5" placeholder="What should people know before they join?"></textarea>
 		</label>
 
 		{#if error}

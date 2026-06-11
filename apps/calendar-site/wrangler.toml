@@ -4,7 +4,8 @@ compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".svelte-kit/cloudflare"
 
 # Pages will be deployed via `wrangler pages deploy`.
-# Replace placeholder resource names/IDs during the production cutover phase.
+# Production cutover must replace placeholder resource IDs and confirm bucket
+# names match the Cloudflare account before deployment.
 
 [[d1_databases]]
 binding = "DB"
