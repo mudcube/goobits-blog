@@ -13,7 +13,7 @@
 <SuccessPage
 	className="register-page register-success-page"
 	title="Check your email"
-	copy="Your account is ready. Open your inbox and confirm your email to finish setup before signing in."
+	copy="Your account and organizer page are ready. Open your inbox and confirm your email before signing in."
 	buttonHref={calendarConfig.routes.calendarLoginPath}
 	buttonLabel="Go to sign in"
 	buttonIcon="login"

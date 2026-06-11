@@ -1,6 +1,7 @@
 import { CredentialsProvider } from '@goobits/auth/providers'
 import { createCalendarUserAdapter, type D1DatabaseLike } from '@calendar/kit'
 import { setUserProgramAccess } from '@calendar/core/invites'
+import { ensureCalendarTenantForUser } from '@calendar/core/tenants'
 import { issueEmailVerification } from '../email/verification'
 
 export type RegisterUserInput = {
@@ -43,6 +44,7 @@ function createCredentialsProvider() {
 
 async function rollbackRegistration(db: D1DatabaseLike, userId: string) {
 	await db.prepare('DELETE FROM calendar_email_verifications WHERE user_id = ?').bind(userId).run()
+	await db.prepare('DELETE FROM calendar_tenants WHERE owner_user_id = ?').bind(userId).run()
 	await db.prepare('DELETE FROM calendar_users WHERE id = ?').bind(userId).run()
 }
 
@@ -92,6 +94,10 @@ export async function registerUser(db: D1DatabaseLike, input: RegisterUserInput)
 			allowed: true
 		}))
 	)
+	await ensureCalendarTenantForUser(db, {
+		userId,
+		name: name.endsWith('s') ? `${name} events` : `${name}'s events`
+	})
 
 	const verification = await issueEmailVerification({
 		db,
