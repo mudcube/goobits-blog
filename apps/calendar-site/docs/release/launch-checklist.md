@@ -3,9 +3,9 @@
 ## DNS And Hosting
 
 - [ ] Create Cloudflare Pages project for `apps/calendar-site`.
-- [ ] Set production domain.
+- [ ] Set production domain to `pdx.fun`.
 - [ ] Set preview domain.
-- [ ] Confirm `PUBLIC_BASE_URL`.
+- [ ] Confirm `PUBLIC_BASE_URL=https://pdx.fun`.
 
 ## Data And Storage
 
@@ -17,10 +17,12 @@
 
 ## Auth
 
-- [ ] Google OAuth redirect: `/auth/google/callback`.
-- [ ] Apple OAuth redirect if enabled: `/auth/apple/callback`.
-- [ ] Calendar provider OAuth redirect: `/api/calendar/oauth-callback`.
+- [ ] Google OAuth redirect: `https://pdx.fun/auth/google/callback`.
+- [ ] Apple OAuth redirect if enabled: `https://pdx.fun/auth/apple/callback`.
+- [ ] Calendar provider OAuth redirect: `https://pdx.fun/api/calendar/oauth-callback`.
 - [ ] Confirm invite/login redirects use `/login` and clean root program URLs.
+- [ ] Confirm registered users get an organizer page at `/t/<slug>`.
+- [ ] Confirm signed-in users can create events from `/events/new`.
 
 ## Payments
 

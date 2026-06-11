@@ -3,6 +3,7 @@ import {
   parseAdminCreateEventsBatchInput,
   parseAdminPaymentDefaultsInput,
   parseAdminProgramMutationInput,
+  parseCalendarCreateEventInput,
   TransportValidationError,
 } from "../../src/transport.ts";
 
@@ -43,6 +44,42 @@ describe("admin transport validation", () => {
         startsAt: "2026-02-18T10:00:00.000Z",
         endsAt: "2026-02-18T09:00:00.000Z",
         capacity: 2,
+      }),
+    ).toThrow(TransportValidationError);
+  });
+
+  it("accepts member event creation payload", () => {
+    expect(
+      parseCalendarCreateEventInput({
+        activitySlug: "gym",
+        title: "Friday movement jam",
+        startsAt: "2026-02-18T10:00:00.000Z",
+        endsAt: "2026-02-18T11:00:00.000Z",
+        capacity: 20,
+        location: "Portland",
+        note: "Bring water.",
+        timezone: "America/Los_Angeles",
+      }),
+    ).toEqual({
+      activitySlug: "gym",
+      title: "Friday movement jam",
+      startsAt: "2026-02-18T10:00:00.000Z",
+      endsAt: "2026-02-18T11:00:00.000Z",
+      capacity: 20,
+      location: "Portland",
+      note: "Bring water.",
+      timezone: "America/Los_Angeles",
+    });
+  });
+
+  it("rejects invalid member event creation payload", () => {
+    expect(() =>
+      parseCalendarCreateEventInput({
+        activitySlug: "bad slug",
+        title: "Bad event",
+        startsAt: "2026-02-18T10:00:00.000Z",
+        endsAt: "2026-02-18T11:00:00.000Z",
+        capacity: 20,
       }),
     ).toThrow(TransportValidationError);
   });

@@ -2,12 +2,12 @@
 
 ## Inputs To Fill Before Launch
 
-- Calendar domain: `TODO`
+- Calendar domain: `pdx.fun`
 - Cloudflare Pages project: `TODO`
 - D1 database name/id: `TODO`
 - R2 media bucket and public base URL: `TODO`
-- OAuth callback origins: `TODO`
-- Payment callback origins: `TODO`
+- OAuth callback origins: `https://pdx.fun`
+- Payment callback origins: `https://pdx.fun`
 - Session policy: existing sessions will not carry across domains unless a shared-cookie/domain strategy is chosen.
 
 ## Export From Current Production
@@ -36,8 +36,11 @@ pnpm --dir apps/calendar-site calendar:sync
 
 Manual smoke checks:
 
-- `/` loads program list.
+- `/` loads the `pdx.fun` homepage.
 - `/login` starts OAuth.
+- `/register` creates an account and organizer tenant.
+- `/events/new` creates a tenant-owned event for signed-in users.
+- `/t/pdx-fun` loads the default public organizer page.
 - `/admin` requires login.
 - `/api/calendar/ics` returns an ICS response.
 - Admin can list programs, events, crew, payment settings, and sync queue.

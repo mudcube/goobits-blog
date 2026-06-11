@@ -25,6 +25,10 @@ import {
   setActiveCalendarSyncProvider,
   type CalendarSyncProvider,
 } from "../../src/sync/settings.ts";
+import {
+  createCalendarTenantForUser,
+  listPublicCalendarTenantEvents,
+} from "../../src/tenants.ts";
 import type { D1DatabaseLike } from "../../src/storage/d1.ts";
 
 const dbDirs: string[] = [];
@@ -552,5 +556,43 @@ describe("calendar regression coverage", () => {
         sourceId: "cnon:test",
       }),
     ).rejects.toThrow("Payment method is not available");
+  });
+
+  it("creates user tenant pages with public event listings", async () => {
+    const db = createTestDb();
+    const tenant = await createCalendarTenantForUser(db, {
+      userId: "organizer-1",
+      name: "Portland Jams",
+    });
+    const eventId = await createEvent(db, { capacity: 10 });
+    await db
+      .prepare(
+        `UPDATE calendar_events
+         SET tenant_id = ?, activity_slug = 'gym', title = 'Open jam',
+             starts_at = '2036-04-29T10:00:00.000Z',
+             ends_at = '2036-04-29T11:00:00.000Z'
+         WHERE id = ?`,
+      )
+      .bind(tenant.id, eventId)
+      .run();
+    await createParticipant(db, {
+      eventId,
+      userId: "joined-user",
+      status: "joined",
+      guestCount: 1,
+    });
+
+    const events = await listPublicCalendarTenantEvents(db, {
+      tenantId: tenant.id,
+    });
+
+    expect(tenant.slug).toBe("portland-jams");
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      id: eventId,
+      title: "Open jam",
+      seatsTaken: 2,
+      capacity: 10,
+    });
   });
 });
