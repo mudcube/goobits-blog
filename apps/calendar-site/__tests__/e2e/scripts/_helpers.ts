@@ -1,8 +1,9 @@
 import { chromium, type BrowserContext, type Page } from 'playwright'
-import { execSync } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 
-export const BASE_URL = process.env['E2E_BASE_URL'] || 'http://localhost:3610'
-export const ADMIN_URL = `${BASE_URL}/schedule/admin/`
+export const BASE_URL = process.env['E2E_BASE_URL'] || 'http://localhost:3611'
+export const ADMIN_URL = `${BASE_URL}/admin/`
+const ENV_FILE = process.env['CALENDAR_SITE_ENV_FILE'] || 'config/env/.env'
 
 export function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
@@ -47,7 +48,7 @@ export function getAdminPasscode() {
 	if (process.env['ADMIN_PASSCODE']) return process.env['ADMIN_PASSCODE']
 	try {
 		// Pull the decrypted value from the same env file used by dev/build scripts.
-		return execSync('pnpm exec dotenvx get ADMIN_PASSCODE -f config/env/.env', {
+		return execFileSync('pnpm', ['exec', 'dotenvx', 'get', 'ADMIN_PASSCODE', '-f', ENV_FILE], {
 			stdio: ['ignore', 'pipe', 'ignore']
 		})
 			.toString('utf8')
@@ -60,7 +61,7 @@ export function getAdminPasscode() {
 export function getE2ETestToken() {
 	if (process.env['E2E_TEST_TOKEN']) return process.env['E2E_TEST_TOKEN']
 	try {
-		return execSync('pnpm exec dotenvx get E2E_TEST_TOKEN -f config/env/.env', {
+		return execFileSync('pnpm', ['exec', 'dotenvx', 'get', 'E2E_TEST_TOKEN', '-f', ENV_FILE], {
 			stdio: ['ignore', 'pipe', 'ignore']
 		})
 			.toString('utf8')

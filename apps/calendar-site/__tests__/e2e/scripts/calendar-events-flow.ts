@@ -2,10 +2,10 @@ import { chromium } from 'playwright'
 import { BASE_URL, bootstrapAdminSession, getAdminPasscode, getE2ETestToken, withRequestRetry } from './_helpers'
 import { requireFeedEvent, requireFeedEventById, waitForAttendanceCount } from './_ui-waits'
 
-const ADMIN_URL = `${BASE_URL}/schedule/admin/`
+const ADMIN_URL = `${BASE_URL}/admin/`
 const MEMBER_SAME_ORIGIN_HEADERS = {
 	origin: BASE_URL,
-	referer: `${BASE_URL}/schedule`
+	referer: `${BASE_URL}/`
 }
 
 async function createAdminEvent(
@@ -75,11 +75,11 @@ async function assertJoinLeaveFlow(
 	const mainEvent = await requireFeedEvent(request, title)
 	const mainEventId = Number(mainEvent['id'])
 	if (!Number.isFinite(mainEventId)) throw new Error(`main event missing numeric id: ${JSON.stringify(mainEvent)}`)
-	const calendarRes = await page.goto(`${BASE_URL}/schedule`, { waitUntil: 'domcontentloaded', timeout: 30000 })
+	const calendarRes = await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 	if (!calendarRes || !calendarRes.ok()) {
 		throw new Error(`calendar home failed to load: status=${calendarRes?.status() ?? 'no_response'}`)
 	}
-	if (page.url().includes('/schedule/login')) throw new Error('calendar member session bootstrap did not stick')
+	if (page.url().includes('/login')) throw new Error('calendar member session bootstrap did not stick')
 
 	const mainCard = page.getByTestId('member-event-card').filter({ hasText: title }).first()
 	try {
@@ -88,7 +88,7 @@ async function assertJoinLeaveFlow(
 		const cards = page.getByTestId('member-event-card')
 		const count = await cards.count()
 		const texts = (await cards.allInnerTexts().catch(() => [] as string[])).slice(0, 8)
-		const htmlRes = await withRequestRetry('fetch schedule page HTML', () => request.get(`${BASE_URL}/schedule`))
+		const htmlRes = await withRequestRetry('fetch calendar home page HTML', () => request.get(`${BASE_URL}/`))
 		const html = await htmlRes.text().catch(() => '')
 		const ssrHasTitle = html.includes(title)
 		const ssrHasCardClass = html.includes('data-testid="member-event-card"')
@@ -237,7 +237,7 @@ export async function runCalendarEventsFlow() {
 			{ attempts: 4, delayMs: 500 }
 		).catch(() => null)
 
-		await page.goto(`${BASE_URL}/schedule/admin/?preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
+		await page.goto(`${BASE_URL}/admin/?preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 		await page.getByTestId('admin-dashboard-main').waitFor({ timeout: 30000 })
 
 		const title = `E2E Calendar Event ${Date.now()}`

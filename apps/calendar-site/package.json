@@ -7,6 +7,17 @@
     "check": "pnpm exec svelte-kit sync && pnpm exec tsc --noEmit",
     "build": "pnpm exec svelte-kit sync && vite build",
     "dev": "vite dev --host 0.0.0.0 --port 3611",
+    "test": "pnpm run check && pnpm run test:unit",
+    "test:unit": "pnpm --dir ../.. exec vitest run --maxWorkers=1 packages/calendar/core/__tests__/unit",
+    "test:e2e": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e",
+    "e2e:calendar": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/calendar-events-flow.test.ts",
+    "e2e:calendar:booking": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/calendar-booking-calendar-smoke.test.ts",
+    "e2e:admin": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-login-smoke.test.ts",
+    "e2e:admin:sync": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-sync-queue-smoke.test.ts",
+    "e2e:admin:people": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-people-access.test.ts",
+    "e2e:admin:payment": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-payment-defaults.test.ts",
+    "e2e:admin:promote": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-waitlist-promote.test.ts",
+    "e2e:admin:templates": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-new-event-copy-from.test.ts",
     "calendar:sync": "node ops/cron/calendar-sync.mjs",
     "seed:calendar": "node scripts/seed/calendar-social.mjs",
     "e2e:oauth:google": "node scripts/e2e/check-google-oauth.mjs"
@@ -30,8 +41,11 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "typescript": "^6.0.3",
+    "@types/node": "^25.8.0",
+    "playwright": "^1.60.0",
     "sass": "^1.99.0",
-    "sass-embedded": "^1.99.0"
+    "sass-embedded": "^1.99.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.6"
   }
 }

@@ -117,9 +117,9 @@ export async function runCalendarBookingCalendarSmoke() {
 			}
 		})
 
-		await page.goto(`${BASE_URL}/schedule/gym/?mock=1&preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
+		await page.goto(`${BASE_URL}/gym/?mock=1&preview=1`, { waitUntil: 'domcontentloaded', timeout: 30000 })
 
-		if (page.url().includes('/schedule/login')) {
+		if (page.url().includes('/login')) {
 			throw new Error('calendar member session bootstrap did not stick')
 		}
 
@@ -128,7 +128,7 @@ export async function runCalendarBookingCalendarSmoke() {
 		await page.locator('.cg__nav-label').waitFor({ timeout: 10000 })
 		await expectNextButtonToAdvanceExactlyOneMonth(page)
 		await expectSecondNextClickToAdvanceOneMoreMonth(page)
-		await page.goto(`${BASE_URL}/schedule/gym/?mock=1&preview=1`, {
+		await page.goto(`${BASE_URL}/gym/?mock=1&preview=1`, {
 			waitUntil: 'domcontentloaded',
 			timeout: 30000
 		})
@@ -136,7 +136,7 @@ export async function runCalendarBookingCalendarSmoke() {
 		await page.locator('.cg__nav-label').waitFor({ timeout: 10000 })
 		await expectBackwardButtonPagingToRemainMonthAccurate(page)
 
-		await page.goto(`${BASE_URL}/schedule/gym/?mock=1&preview=1`, {
+		await page.goto(`${BASE_URL}/gym/?mock=1&preview=1`, {
 			waitUntil: 'domcontentloaded',
 			timeout: 30000
 		})

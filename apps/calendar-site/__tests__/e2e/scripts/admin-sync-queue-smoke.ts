@@ -8,7 +8,7 @@ export async function runAdminSyncQueueSmoke() {
 		const deadLetterCount = Number(statusPayload?.syncQueue?.deadLetter || 0)
 		const sameOriginHeaders = {
 			origin: BASE_URL,
-			referer: `${BASE_URL}/schedule/admin/`
+			referer: `${BASE_URL}/admin/`
 		}
 
 		const processRes = await context.request.post(`${BASE_URL}/api/admin/sync-queue`, {
