@@ -34,6 +34,25 @@ export type CalendarTenantEventManageAccess =
 	| { ok: true; tenantId: number; role: CalendarTenantRole | 'global-admin' }
 	| { ok: false; reason: 'not_found' | 'forbidden' }
 
+export type CalendarTenantMember = {
+	userId: string
+	role: CalendarTenantRole
+	name: string | null
+	email: string | null
+}
+
+export type CalendarTenantInvite = {
+	id: number
+	email: string
+	role: CalendarTenantRole
+	code: string
+	invitedByUserId: string | null
+	acceptedUserId: string | null
+	acceptedAt: number | null
+	expiresAt: number | null
+	createdAt: number
+}
+
 type TenantRow = {
 	id: number
 	slug: string
@@ -59,6 +78,25 @@ type TenantPublicEventRow = {
 
 type TenantOrganizerEventRow = TenantPublicEventRow & {
 	status: string
+}
+
+type TenantMemberRow = {
+	user_id: string
+	role: string
+	name: string | null
+	email: string | null
+}
+
+type TenantInviteRow = {
+	id: number
+	email: string
+	role: string
+	code: string
+	invited_by_user_id: string | null
+	accepted_user_id: string | null
+	accepted_at: number | null
+	expires_at: number | null
+	created_at: number
 }
 
 const DEFAULT_TENANT_ID = 1
@@ -94,6 +132,20 @@ function toPublicTenantEvent(row: TenantPublicEventRow): CalendarTenantPublicEve
 		waitlistCount: row.waitlist_count ?? 0,
 		location: row.location,
 		note: row.note
+	}
+}
+
+function toTenantInvite(row: TenantInviteRow): CalendarTenantInvite {
+	return {
+		id: row.id,
+		email: row.email,
+		role: normalizeTenantRole(row.role),
+		code: row.code,
+		invitedByUserId: row.invited_by_user_id,
+		acceptedUserId: row.accepted_user_id,
+		acceptedAt: row.accepted_at,
+		expiresAt: row.expires_at,
+		createdAt: row.created_at
 	}
 }
 
@@ -213,6 +265,28 @@ export async function createCalendarTenantForUser(
 	}
 }
 
+export async function updateCalendarTenantSettings(
+	db: D1DatabaseLike,
+	input: { tenantId: number; name: string; slug: string }
+) {
+	const name = input.name.trim()
+	const slug = slugifyTenantName(input.slug)
+	if (!name) return { ok: false as const, reason: 'invalid_name' as const }
+	if (!slug) return { ok: false as const, reason: 'invalid_slug' as const }
+
+	const existing = await db
+		.prepare(`SELECT id FROM calendar_tenants WHERE slug = ? AND id <> ? LIMIT 1`)
+		.bind(slug, input.tenantId)
+		.first<{ id: number }>()
+	if (existing) return { ok: false as const, reason: 'slug_taken' as const }
+
+	await db
+		.prepare(`UPDATE calendar_tenants SET name = ?, slug = ?, updated_at = unixepoch() WHERE id = ?`)
+		.bind(name, slug, input.tenantId)
+		.run()
+	return { ok: true as const, tenant: await getCalendarTenantBySlug(db, slug) }
+}
+
 export async function ensureCalendarTenantForUser(db: D1DatabaseLike, input: { userId: string; name: string }) {
 	const existing = await getCalendarTenantForUser(db, input.userId)
 	if (existing && existing.id !== DEFAULT_TENANT_ID) return existing
@@ -280,6 +354,89 @@ export async function canManageCalendarEvent(
 	const role = await getCalendarTenantRole(db, { tenantId, userId: input.userId })
 	if (role === 'owner' || role === 'admin') return { ok: true, tenantId, role }
 	return { ok: false, reason: 'forbidden' }
+}
+
+export async function listCalendarTenantMembers(db: D1DatabaseLike, input: { tenantId: number }) {
+	const result = await db
+		.prepare(
+			`SELECT m.user_id, m.role, u.name, u.email
+			 FROM calendar_tenant_members m
+			 LEFT JOIN calendar_users u ON CAST(u.id AS TEXT) = CAST(m.user_id AS TEXT)
+			 WHERE m.tenant_id = ?
+			 ORDER BY CASE m.role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END, lower(COALESCE(u.name, u.email, m.user_id)) ASC`
+		)
+		.bind(input.tenantId)
+		.all<TenantMemberRow>()
+	return (result.results ?? []).map((row): CalendarTenantMember => ({
+		userId: row.user_id,
+		role: normalizeTenantRole(row.role),
+		name: row.name,
+		email: row.email
+	}))
+}
+
+export async function listCalendarTenantInvites(db: D1DatabaseLike, input: { tenantId: number }) {
+	const result = await db
+		.prepare(
+			`SELECT id, email, role, code, invited_by_user_id, accepted_user_id, accepted_at, expires_at, created_at
+			 FROM calendar_tenant_invites
+			 WHERE tenant_id = ?
+			 ORDER BY created_at DESC, id DESC`
+		)
+		.bind(input.tenantId)
+		.all<TenantInviteRow>()
+	return (result.results ?? []).map(toTenantInvite)
+}
+
+export async function createCalendarTenantInvite(
+	db: D1DatabaseLike,
+	input: { tenantId: number; email: string; role: CalendarTenantRole; invitedByUserId: string }
+) {
+	const email = input.email.trim().toLowerCase()
+	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false as const, reason: 'invalid_email' as const }
+	const role = normalizeTenantRole(input.role)
+	const code = crypto.randomUUID().replace(/-/g, '').slice(0, 24)
+	const existingUser = await db
+		.prepare(`SELECT id FROM calendar_users WHERE lower(email) = lower(?) LIMIT 1`)
+		.bind(email)
+		.first<{ id: string | number }>()
+	const acceptedUserId = existingUser?.id != null ? String(existingUser.id) : null
+	const acceptedAt = acceptedUserId ? Math.floor(Date.now() / 1000) : null
+
+	if (acceptedUserId) {
+		await db
+			.prepare(
+				`INSERT INTO calendar_tenant_members (tenant_id, user_id, role, created_at, updated_at)
+				 VALUES (?, ?, ?, unixepoch(), unixepoch())
+				 ON CONFLICT(tenant_id, user_id) DO UPDATE SET role = excluded.role, updated_at = unixepoch()`
+			)
+			.bind(input.tenantId, acceptedUserId, role)
+			.run()
+	}
+
+	const result = await db
+		.prepare(
+			`INSERT INTO calendar_tenant_invites (
+				tenant_id, email, role, code, invited_by_user_id, accepted_user_id, accepted_at, expires_at, created_at, updated_at
+			 )
+			 VALUES (?, ?, ?, ?, ?, ?, ?, unixepoch() + 1209600, unixepoch(), unixepoch())`
+		)
+		.bind(input.tenantId, email, role, code, input.invitedByUserId, acceptedUserId, acceptedAt)
+		.run()
+	return {
+		ok: true as const,
+		invite: {
+			id: result.meta.last_row_id,
+			email,
+			role,
+			code,
+			invitedByUserId: input.invitedByUserId,
+			acceptedUserId,
+			acceptedAt,
+			expiresAt: null,
+			createdAt: Math.floor(Date.now() / 1000)
+		} satisfies CalendarTenantInvite
+	}
 }
 
 export async function listPublicCalendarTenantEvents(

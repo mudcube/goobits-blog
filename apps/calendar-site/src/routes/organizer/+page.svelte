@@ -45,10 +45,11 @@
 				<ExternalLink size={18} strokeWidth={1.8} />
 				Public page
 			</a>
+			<a class="organizer-page__icon-button" href="/organizer/settings" aria-label="Organizer settings">
+				<Settings size={18} strokeWidth={1.8} />
+			</a>
 			{#if data.isAdmin}
-				<a class="organizer-page__icon-button" href="/admin/events" aria-label="Admin events">
-					<Settings size={18} strokeWidth={1.8} />
-				</a>
+				<a class="organizer-page__button" href="/admin/events">Admin events</a>
 			{/if}
 		</div>
 	</section>

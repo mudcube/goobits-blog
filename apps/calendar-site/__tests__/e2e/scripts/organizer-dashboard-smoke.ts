@@ -66,6 +66,13 @@ export async function runOrganizerDashboardSmoke() {
 			await page.getByRole('link', { name: 'Create event' }).waitFor({ timeout: 30_000 })
 			await page.getByRole('link', { name: 'Public page' }).first().waitFor({ timeout: 30_000 })
 
+			await gotoWithRetry(page, `${BASE_URL}/organizer/settings`)
+			await page.getByRole('heading', { name: /E2E Organizer.*events/ }).waitFor({ timeout: 30_000 })
+			await page.getByLabel('Email').fill(`collab-${Date.now()}@example.com`)
+			await page.getByLabel('Role').selectOption('admin')
+			await page.getByRole('button', { name: 'Invite' }).click()
+			await page.getByText('Invite saved.').waitFor({ timeout: 30_000 })
+
 			await gotoWithRetry(page, eventUrl)
 			await page.getByRole('heading', { name: title }).waitFor({ timeout: 30_000 })
 			await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => null)
