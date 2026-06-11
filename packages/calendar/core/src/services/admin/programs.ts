@@ -29,14 +29,15 @@ type ProgramRow = {
 }
 
 function toProgram(row: ProgramRow): CalendarProgramState {
-	const calendarBase = getCalendarConfig().routes.calendarBase
+	const calendarBase = getCalendarConfig().routes.calendarBase.replace(/\/+$/, '')
 	const titleLines = row.hero_title_line_2
 		? [row.hero_title_line_1, row.hero_title_line_2] as [string, string]
 		: [row.hero_title_line_1] as [string]
+	const href = `${calendarBase}/${row.slug}`.replace(/^\/{2,}/, '/')
 
 	const base: CalendarProgramState = {
 		slug: row.slug,
-		href: `${calendarBase}/${row.slug}`,
+		href,
 		label: row.label,
 		activityName: row.activity_name,
 		pageTitle: row.page_title,

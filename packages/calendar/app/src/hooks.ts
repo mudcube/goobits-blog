@@ -49,6 +49,17 @@ function isAdminProtectedCalendarApiPath(pathname: string, apiCalendarBase: stri
 	return pathname === `${base}/oauth-start` || pathname === `${base}/webhook/discord`
 }
 
+function isPublicCalendarPagePath(pathname: string, calendarBase: string) {
+	const base = calendarBase.replace(/\/+$/, '')
+	const normalized = pathname.replace(/\/+$/, '') || '/'
+	const withBase = (path: string) => `${base}${path}`.replace(/^\/{2,}/, '/')
+	return normalized === withBase('/') ||
+		normalized === withBase('/register') ||
+		normalized === withBase('/register/success') ||
+		normalized === withBase('/verify-email') ||
+		normalized.startsWith(`${withBase('/t')}/`)
+}
+
 function isAdminRootPath(pathname: string, adminBase: string) {
 	return pathname === adminBase || pathname === `${adminBase}/`
 }
@@ -175,6 +186,7 @@ export function createCalendarAuthHandles(config: CalendarAppHookConfig = {}) {
 			pathname === `${calendarLoginPath}/` ||
 			pathname === calendarLoginRedirectPath ||
 			pathname === `${calendarLoginRedirectPath}/` ||
+			isPublicCalendarPagePath(pathname, calendarBase) ||
 			isRouteUnder(pathname, apiCalendarBase)
 		) {
 			return resolve(event)
