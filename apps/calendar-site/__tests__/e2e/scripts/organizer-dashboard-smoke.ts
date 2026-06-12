@@ -68,10 +68,36 @@ export async function runOrganizerDashboardSmoke() {
 
 			await gotoWithRetry(page, `${BASE_URL}/organizer/settings`)
 			await page.getByRole('heading', { name: /E2E Organizer.*events/ }).waitFor({ timeout: 30_000 })
-			await page.getByLabel('Email').fill(`collab-${Date.now()}@example.com`)
+			const collaboratorEmail = `collab-${Date.now()}@example.com`
+			await page.getByLabel('Email').fill(collaboratorEmail)
 			await page.getByLabel('Role').selectOption('admin')
 			await page.getByRole('button', { name: 'Invite' }).click()
 			await page.getByText('Invite saved.').waitFor({ timeout: 30_000 })
+			const pendingInvite = page.locator('.organizer-settings__person--pending').filter({
+				hasText: collaboratorEmail
+			})
+			const inviteText = await pendingInvite.textContent({ timeout: 30_000 })
+			const tenantInviteCode = inviteText?.match(/[a-f0-9]{24}/)?.[0]
+			if (!tenantInviteCode) throw new Error('tenant collaborator invite code not found')
+
+			await context.clearCookies()
+			await gotoWithRetry(page, `${BASE_URL}/login?invite=${tenantInviteCode}&redirect=${encodeURIComponent('/organizer')}`)
+			await page.getByRole('heading', { name: /Join E2E Organizer.*events/ }).waitFor({ timeout: 30_000 })
+			await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => null)
+			await sleep(500)
+			await page.getByLabel('Your name').fill('E2E Collaborator')
+			await page.getByLabel(/Email for reminders/).fill(collaboratorEmail)
+			const [claimResponse] = await Promise.all([
+				page.waitForResponse((response) => response.url().endsWith('/api/calendar/invite-claim'), {
+					timeout: 30_000
+				}),
+				page.getByRole('button', { name: 'Join with Invite' }).click()
+			])
+			if (!claimResponse.ok()) {
+				throw new Error(`tenant collaborator invite claim failed: ${claimResponse.status()}`)
+			}
+			await page.getByRole('heading', { name: /E2E Organizer.*events/ }).waitFor({ timeout: 30_000 })
+			await page.getByRole('heading', { name: title }).waitFor({ timeout: 30_000 })
 
 			await gotoWithRetry(page, eventUrl)
 			await page.getByRole('heading', { name: title }).waitFor({ timeout: 30_000 })

@@ -5,6 +5,7 @@ import type { OAuthProfile, OAuthTokens, RequestEventLike, User } from '@goobits
 import { dev } from '$app/environment'
 import { consumeInvite, hasUserRedeemedAnyInvite, replaceUserProgramAccess, validateInvite } from '@calendar/core/invites'
 import { getCalendarConfig } from '@calendar/core/config'
+import { acceptCalendarTenantInvite } from '@calendar/core/tenants'
 import { createCalendarAuthAdapters, getDevDb, type D1DatabaseLike } from '@calendar/kit'
 import { redirect } from '@sveltejs/kit'
 import type { Cookies } from '@sveltejs/kit'
@@ -66,8 +67,15 @@ function emailMatchesDomain(email: string, domain: string) {
 	return email.slice(atIndex + 1) === normalizedDomain
 }
 
+function tenantInviteErrorCode(reason: string) {
+	return reason === 'accepted' ? 'invite_exhausted' : `invite_${reason}`
+}
+
 export function normalizeCalendarRedirect(redirectTo: unknown) {
 	const config = getCalendarConfig()
+	if (config.routes.calendarBase === '/') {
+		return normalizeSafeRedirectPath(redirectTo)
+	}
 	const allowedPrefixes = [config.routes.calendarBase, config.routes.adminBase]
 	return normalizeSafeRedirectPath(redirectTo, { allowedPrefixes })
 }
@@ -160,8 +168,21 @@ export async function getCalendarAuth({ event }: { event: { platform?: PlatformL
 					const normalizedEmail = (profile.email || '').trim().toLowerCase()
 					const inviteBypassDomain = config.brand.inviteBypassDomain.trim().toLowerCase()
 					const canBypassInvite = emailMatchesDomain(normalizedEmail, inviteBypassDomain)
+					let acceptedTenantInvite = false
+					if (invite) {
+						const tenantInvite = await acceptCalendarTenantInvite(db, {
+							code: invite,
+							userId: String(user.id),
+							email: profile.email
+						})
+						if (tenantInvite.ok) {
+							acceptedTenantInvite = true
+						} else if (tenantInvite.reason !== 'not_found') {
+							throw redirect(302, `${config.routes.calendarLoginPath}?error=${tenantInviteErrorCode(tenantInvite.reason)}`)
+						}
+					}
 					if (!hasRedeemed) {
-						if (!canBypassInvite) {
+						if (!canBypassInvite && !acceptedTenantInvite) {
 							if (!invite) {
 								throw redirect(302, `${config.routes.calendarLoginPath}?error=invite_required`)
 							}

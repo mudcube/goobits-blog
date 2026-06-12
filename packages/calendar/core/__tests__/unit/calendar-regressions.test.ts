@@ -28,8 +28,12 @@ import {
 } from "../../src/sync/settings.ts";
 import {
   canManageCalendarEvent,
+  acceptCalendarTenantInvite,
   createCalendarTenantForUser,
+  createCalendarTenantInvite,
+  getCalendarTenantRole,
   listPublicCalendarTenantEvents,
+  validateCalendarTenantInvite,
 } from "../../src/tenants.ts";
 import type { D1DatabaseLike } from "../../src/storage/d1.ts";
 
@@ -657,5 +661,51 @@ describe("calendar regression coverage", () => {
       eventId: 999999,
       userId: "owner-1",
     })).resolves.toEqual({ ok: false, reason: "not_found" });
+  });
+
+  it("accepts tenant collaborator invites into tenant membership", async () => {
+    const db = createTestDb();
+    const tenant = await createCalendarTenantForUser(db, {
+      userId: "owner-1",
+      name: "Invite Crew",
+    });
+    const invite = await createCalendarTenantInvite(db, {
+      tenantId: tenant.id,
+      email: "collab@example.com",
+      role: "admin",
+      invitedByUserId: "owner-1",
+    });
+    if (!invite.ok) throw new Error("expected tenant invite");
+
+    await expect(validateCalendarTenantInvite(db, {
+      code: invite.invite.code,
+      email: "collab@example.com",
+    })).resolves.toMatchObject({
+      valid: true,
+      invite: {
+        tenantId: tenant.id,
+        tenantName: "Invite Crew",
+        role: "admin",
+      },
+    });
+
+    await expect(acceptCalendarTenantInvite(db, {
+      code: invite.invite.code,
+      userId: "collab-user",
+      email: "collab@example.com",
+    })).resolves.toEqual({
+      ok: true,
+      tenantId: tenant.id,
+      role: "admin",
+    });
+    await expect(getCalendarTenantRole(db, {
+      tenantId: tenant.id,
+      userId: "collab-user",
+    })).resolves.toBe("admin");
+    await expect(acceptCalendarTenantInvite(db, {
+      code: invite.invite.code,
+      userId: "other-user",
+      email: "collab@example.com",
+    })).resolves.toEqual({ ok: false, reason: "accepted" });
   });
 });

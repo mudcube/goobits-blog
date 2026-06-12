@@ -1,6 +1,7 @@
 import { dev } from '$app/environment'
 import { getCalendarConfig } from '@calendar/core/config'
 import { validateInvite } from '@calendar/core/invites'
+import { validateCalendarTenantInvite } from '@calendar/core/tenants'
 import { buildEnv } from '@calendar/kit'
 import { getCalendarLoginContext, normalizeCalendarRedirect } from '../../../server/auth/calendar'
 import { redirect } from '@sveltejs/kit'
@@ -46,6 +47,8 @@ export const load = async ({ cookies, locals, platform, url }: RequestEvent) => 
 	}
 	let inviteStatus: 'valid' | 'expired' | 'exhausted' | 'not_found' | 'email_mismatch' | 'missing_code' | null = null
 	let inviteEmailRestricted = false
+	let inviteKind: 'member' | 'tenant' | null = null
+	let tenantInvite: { tenantName: string | null; role: string | null } | null = null
 
 	if (inviteCode) {
 		const runtimeEnv = await buildEnv(platform)
@@ -56,17 +59,32 @@ export const load = async ({ cookies, locals, platform, url }: RequestEvent) => 
 		if (result.valid) {
 			inviteStatus = 'valid'
 			inviteEmailRestricted = !!result.invite?.email
+			inviteKind = 'member'
 		} else {
-			switch (result.reason) {
-				case 'expired':
-				case 'exhausted':
-				case 'not_found':
-				case 'email_mismatch':
-				case 'missing_code':
-					inviteStatus = result.reason
-					break
-				default:
-					inviteStatus = 'not_found'
+			const tenantResult = await validateCalendarTenantInvite(runtimeEnv.DB, {
+				code: inviteCode
+			})
+			if (tenantResult.valid) {
+				inviteStatus = 'valid'
+				inviteEmailRestricted = true
+				inviteKind = 'tenant'
+				tenantInvite = {
+					tenantName: tenantResult.invite.tenantName ?? null,
+					role: tenantResult.invite.role
+				}
+			} else {
+				const reason = result.reason === 'not_found' ? tenantResult.reason : result.reason
+				switch (reason) {
+					case 'expired':
+					case 'exhausted':
+					case 'not_found':
+					case 'email_mismatch':
+					case 'missing_code':
+						inviteStatus = reason
+						break
+					default:
+						inviteStatus = 'not_found'
+				}
 			}
 		}
 	}
@@ -79,6 +97,8 @@ export const load = async ({ cookies, locals, platform, url }: RequestEvent) => 
 		inviteCode,
 		inviteStatus,
 		inviteEmailRestricted,
+		inviteKind,
+		tenantInvite,
 		redirectTo
 	}
 }

@@ -32,11 +32,11 @@ function runMigrations(db: Database.Database) {
 	const files = fs
 		.readdirSync(MIGRATIONS_DIR)
 		.filter((f) => f.endsWith('.sql'))
-		.sort()
+	const uniqueFiles = Array.from(new Set(files)).sort()
 
 	const insertApplied = db.prepare(`INSERT INTO migrations (name, applied_at) VALUES (?, strftime('%s','now'))`)
 	const run = db.transaction(() => {
-		for (const file of files) {
+		for (const file of uniqueFiles) {
 			if (applied.has(file)) continue
 			const migrationPath = path.join(MIGRATIONS_DIR, file)
 			const sql = fs.readFileSync(migrationPath, 'utf-8')

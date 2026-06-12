@@ -1,5 +1,6 @@
 import { consumeInvite, replaceUserProgramAccess, validateInvite } from '@calendar/core/invites'
 import { checkRateLimit } from '@calendar/core/storage'
+import { acceptCalendarTenantInvite, validateCalendarTenantInvite } from '@calendar/core/tenants'
 import { parseCalendarInviteClaimInput, TransportValidationError } from '@calendar/core/transport'
 import { apiError, apiOk, apiValidationError, buildEnv } from '@calendar/kit'
 import type { RequestEvent } from '@sveltejs/kit'
@@ -55,6 +56,10 @@ async function enforceInviteClaimRateLimit(event: RequestEvent, db: Awaited<Retu
 	return null
 }
 
+function inviteValidationStatus(reason: string | undefined) {
+	return reason === 'not_found' ? 404 : 403
+}
+
 export async function POST(event: RequestEvent) {
 	let createdUserId: string | null = null
 	let consumedInviteId: number | null = null
@@ -63,19 +68,75 @@ export async function POST(event: RequestEvent) {
 		const csrf = enforceSameOrigin(event)
 		if (csrf) return csrf
 
-			const env = await buildEnv(event.platform)
-			const secureCookies = env['NODE_ENV'] !== 'development'
-			const { code, name, email } = parseCalendarInviteClaimInput(
-				await event.request.json().catch(() => null)
-			)
-			const rateLimited = await enforceInviteClaimRateLimit(event, env.DB, code, email)
-			if (rateLimited) return rateLimited
+		const env = await buildEnv(event.platform)
+		const secureCookies = env['NODE_ENV'] !== 'development'
+		const { code, name, email } = parseCalendarInviteClaimInput(
+			await event.request.json().catch(() => null)
+		)
+		const rateLimited = await enforceInviteClaimRateLimit(event, env.DB, code, email)
+		if (rateLimited) return rateLimited
 
-			const result = await validateInvite({ db: env.DB, code, email })
+		const result = await validateInvite({ db: env.DB, code, email })
 		if (!result.valid || !result.invite || typeof result.invite.id !== 'number') {
-			const reason = result.reason ?? 'invalid'
-			const status = reason === 'not_found' ? 404 : 403
-			return apiError(`Invite ${reason}`, { status, code: `invite_${reason}` })
+			const tenantResult = await validateCalendarTenantInvite(env.DB, { code, email })
+			if (!tenantResult.valid) {
+				const reason = result.reason === 'not_found' ? tenantResult.reason : (result.reason ?? 'invalid')
+				return apiError(`Invite ${reason}`, { status: inviteValidationStatus(reason), code: `invite_${reason}` })
+			}
+			if (!tenantResult.invite.tenantId) {
+				const reason = 'not_found'
+				return apiError(`Invite ${reason}`, { status: inviteValidationStatus(reason), code: `invite_${reason}` })
+			}
+
+			if (!email) {
+				return apiError('This invite requires the matching email address.', {
+					status: 400,
+					code: 'invite_email_required'
+				})
+			}
+
+			const user = await ensureCalendarUserByEmail({
+				db: env.DB,
+				email: email.toLowerCase(),
+				name,
+				emailVerified: tenantResult.invite.email.toLowerCase() === email.toLowerCase(),
+				rejectIfExists: false
+			})
+			if (!user.ok) {
+				return apiError('Could not claim this invite. Use Google or Apple sign-in instead.', {
+					status: 409,
+					code: 'invite_claim_unavailable'
+				})
+			}
+			if (user.created) createdUserId = String(user.userId)
+			const accepted = await acceptCalendarTenantInvite(env.DB, {
+				code,
+				userId: String(user.userId),
+				email
+			})
+			if (!accepted.ok) {
+				if (createdUserId) {
+					await env.DB.prepare(`DELETE FROM calendar_users WHERE id = ?`).bind(createdUserId).run()
+					createdUserId = null
+				}
+				return apiError('This invite can no longer be claimed.', {
+					status: accepted.reason === 'accepted' ? 409 : inviteValidationStatus(accepted.reason),
+					code: `invite_${accepted.reason === 'accepted' ? 'exhausted' : accepted.reason}`
+				})
+			}
+
+			await setCalendarSessionCookie({
+				db: env.DB,
+				cookies: event.cookies,
+				secureCookies,
+				userId: String(user.userId)
+			})
+
+			return apiOk({
+				ok: true,
+				userId: String(user.userId),
+				email: email.toLowerCase()
+			})
 		}
 
 		if (result.invite.email && !email) {

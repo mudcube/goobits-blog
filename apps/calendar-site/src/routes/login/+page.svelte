@@ -27,6 +27,8 @@
         | "missing_code"
         | null;
       inviteEmailRestricted: boolean;
+      inviteKind: "member" | "tenant" | null;
+      tenantInvite: { tenantName: string | null; role: string | null } | null;
       redirectTo: string;
     };
   }>();
@@ -64,6 +66,9 @@
   ];
   const inviteStatus = $derived(data.inviteStatus);
   const hasValidInvite = $derived(!!inviteCode && inviteStatus === "valid");
+  const isTenantInvite = $derived(data.inviteKind === "tenant");
+  const tenantInviteName = $derived(data.tenantInvite?.tenantName || "this organizer");
+  const tenantInviteRole = $derived(data.tenantInvite?.role || "collaborator");
   const inviteStatusMessage = $derived.by(() => {
     if (!inviteCode || hasValidInvite) return "";
     if (inviteStatus === "expired") return "This invite has expired.";
@@ -174,7 +179,9 @@
     <section class="calendar-login__card" aria-label="Members sign in">
       <p class="calendar-login__label">
         {hasValidInvite
-          ? targetActivity
+          ? isTenantInvite
+            ? "Organizer invite"
+            : targetActivity
             ? `${targetActivity.eyebrow} Invite`
             : "Invitation"
           : targetActivity
@@ -183,7 +190,9 @@
       </p>
       <h1 class="calendar-login__title">
         {hasValidInvite
-          ? targetActivity
+          ? isTenantInvite
+            ? `Join ${tenantInviteName}`
+            : targetActivity
             ? `Join ${targetActivity.label} ${targetActivity.icon}`
             : "You're invited ✨"
           : targetActivity
@@ -192,7 +201,9 @@
       </h1>
       <p class="calendar-login__subtitle">
         {hasValidInvite
-          ? "Join instantly without creating an account. Google or Apple sign-in is optional."
+          ? isTenantInvite
+            ? `Accept your ${tenantInviteRole} collaborator invite. Google or Apple sign-in is optional.`
+            : "Join instantly without creating an account. Google or Apple sign-in is optional."
           : targetActivity
             ? `${targetActivity.heroSubtitle} Sign in to continue.`
             : "Sign in to access activities and events."}
@@ -222,8 +233,9 @@
 
       {#if hasValidInvite}
         <div class="calendar-page__invite-notice calendar-login__invite-notice">
-          You're invited. Join instantly with this link, or use Google / Apple
-          below.
+          {isTenantInvite
+            ? `You're invited to help manage ${tenantInviteName}.`
+            : "You're invited. Join instantly with this link, or use Google / Apple below."}
         </div>
         <form class="calendar-login__claim-form" onsubmit={claimInvite}>
           <label class="calendar-login__claim-field" for="calendar-claim-name">

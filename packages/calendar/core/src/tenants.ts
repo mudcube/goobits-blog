@@ -43,6 +43,9 @@ export type CalendarTenantMember = {
 
 export type CalendarTenantInvite = {
 	id: number
+	tenantId?: number
+	tenantSlug?: string
+	tenantName?: string
 	email: string
 	role: CalendarTenantRole
 	code: string
@@ -52,6 +55,14 @@ export type CalendarTenantInvite = {
 	expiresAt: number | null
 	createdAt: number
 }
+
+export type CalendarTenantInviteValidationResult =
+	| { valid: true; invite: CalendarTenantInvite }
+	| { valid: false; reason: 'missing_code' | 'not_found' | 'expired' | 'email_mismatch' }
+
+export type AcceptCalendarTenantInviteResult =
+	| { ok: true; tenantId: number; role: CalendarTenantRole }
+	| { ok: false; reason: 'missing_code' | 'not_found' | 'expired' | 'email_mismatch' | 'accepted' }
 
 type TenantRow = {
 	id: number
@@ -89,6 +100,9 @@ type TenantMemberRow = {
 
 type TenantInviteRow = {
 	id: number
+	tenant_id?: number
+	tenant_slug?: string | null
+	tenant_name?: string | null
 	email: string
 	role: string
 	code: string
@@ -136,7 +150,7 @@ function toPublicTenantEvent(row: TenantPublicEventRow): CalendarTenantPublicEve
 }
 
 function toTenantInvite(row: TenantInviteRow): CalendarTenantInvite {
-	return {
+	const invite: CalendarTenantInvite = {
 		id: row.id,
 		email: row.email,
 		role: normalizeTenantRole(row.role),
@@ -147,6 +161,10 @@ function toTenantInvite(row: TenantInviteRow): CalendarTenantInvite {
 		expiresAt: row.expires_at,
 		createdAt: row.created_at
 	}
+	if (row.tenant_id != null) invite.tenantId = row.tenant_id
+	if (row.tenant_slug) invite.tenantSlug = row.tenant_slug
+	if (row.tenant_name) invite.tenantName = row.tenant_name
+	return invite
 }
 
 export function slugifyTenantName(input: string) {
@@ -396,6 +414,7 @@ export async function createCalendarTenantInvite(
 	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false as const, reason: 'invalid_email' as const }
 	const role = normalizeTenantRole(input.role)
 	const code = crypto.randomUUID().replace(/-/g, '').slice(0, 24)
+	const expiresAt = Math.floor(Date.now() / 1000) + 1209600
 	const existingUser = await db
 		.prepare(`SELECT id FROM calendar_users WHERE lower(email) = lower(?) LIMIT 1`)
 		.bind(email)
@@ -433,10 +452,72 @@ export async function createCalendarTenantInvite(
 			invitedByUserId: input.invitedByUserId,
 			acceptedUserId,
 			acceptedAt,
-			expiresAt: null,
+			expiresAt,
 			createdAt: Math.floor(Date.now() / 1000)
 		} satisfies CalendarTenantInvite
 	}
+}
+
+export async function validateCalendarTenantInvite(
+	db: D1DatabaseLike,
+	input: { code: string; email?: string | null | undefined }
+): Promise<CalendarTenantInviteValidationResult> {
+	const code = input.code.trim()
+	if (!code) return { valid: false, reason: 'missing_code' }
+	const row = await db
+		.prepare(
+			`SELECT i.id, i.tenant_id, t.slug AS tenant_slug, t.name AS tenant_name,
+			        i.email, i.role, i.code, i.invited_by_user_id, i.accepted_user_id,
+			        i.accepted_at, i.expires_at, i.created_at
+			 FROM calendar_tenant_invites i
+			 INNER JOIN calendar_tenants t ON t.id = i.tenant_id
+			 WHERE i.code = ?
+			 LIMIT 1`
+		)
+		.bind(code)
+		.first<TenantInviteRow>()
+	if (!row) return { valid: false, reason: 'not_found' }
+	const now = Math.floor(Date.now() / 1000)
+	if (row.expires_at && now >= row.expires_at) return { valid: false, reason: 'expired' }
+	const email = input.email?.trim().toLowerCase()
+	if (email && row.email.toLowerCase() !== email) return { valid: false, reason: 'email_mismatch' }
+	return { valid: true, invite: toTenantInvite(row) }
+}
+
+export async function acceptCalendarTenantInvite(
+	db: D1DatabaseLike,
+	input: { code: string; userId: string; email?: string | null | undefined }
+): Promise<AcceptCalendarTenantInviteResult> {
+	const validation = await validateCalendarTenantInvite(db, {
+		code: input.code,
+		email: input.email
+	})
+	if (!validation.valid) return { ok: false, reason: validation.reason }
+	const invite = validation.invite
+	if (!invite.tenantId) return { ok: false, reason: 'not_found' }
+	if (invite.acceptedUserId && String(invite.acceptedUserId) !== String(input.userId)) {
+		return { ok: false, reason: 'accepted' }
+	}
+
+	await db
+		.prepare(
+			`INSERT INTO calendar_tenant_members (tenant_id, user_id, role, created_at, updated_at)
+			 VALUES (?, ?, ?, unixepoch(), unixepoch())
+			 ON CONFLICT(tenant_id, user_id) DO UPDATE SET role = excluded.role, updated_at = unixepoch()`
+		)
+		.bind(invite.tenantId, input.userId, invite.role)
+		.run()
+	await db
+		.prepare(
+			`UPDATE calendar_tenant_invites
+			 SET accepted_user_id = COALESCE(accepted_user_id, ?),
+			     accepted_at = COALESCE(accepted_at, unixepoch()),
+			     updated_at = unixepoch()
+			 WHERE id = ?`
+		)
+		.bind(input.userId, invite.id)
+		.run()
+	return { ok: true, tenantId: invite.tenantId, role: invite.role }
 }
 
 export async function listPublicCalendarTenantEvents(
