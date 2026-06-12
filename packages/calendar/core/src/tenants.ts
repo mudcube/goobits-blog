@@ -220,6 +220,19 @@ export async function getCalendarTenantBySlug(db: D1DatabaseLike, slug: string) 
 	return row ? toTenant(row) : null
 }
 
+export async function getCalendarTenantById(db: D1DatabaseLike, id: number) {
+	const row = await db
+		.prepare(
+			`SELECT id, slug, name, owner_user_id, visibility
+			 FROM calendar_tenants
+			 WHERE id = ?
+			 LIMIT 1`
+		)
+		.bind(id)
+		.first<TenantRow>()
+	return row ? toTenant(row) : null
+}
+
 export async function getCalendarTenantForUser(db: D1DatabaseLike, userId: string) {
 	const row = await db
 		.prepare(
@@ -579,6 +592,35 @@ export async function getPublicCalendarTenantEvent(
 		.bind(input.tenantId, input.eventId)
 		.first<TenantPublicEventRow>()
 	return row ? toPublicTenantEvent(row) : null
+}
+
+export async function getCalendarTenantOrganizerEvent(
+	db: D1DatabaseLike,
+	input: { tenantId: number; eventId: number }
+): Promise<CalendarTenantOrganizerEvent | null> {
+	const row = await db
+		.prepare(
+			`SELECT e.id, e.title, e.activity_slug, p.label AS activity_label, e.starts_at, e.ends_at,
+			        e.capacity, e.location, e.note, e.status,
+			        COALESCE((
+			          SELECT SUM(1 + participant.guest_count)
+			          FROM calendar_event_participants participant
+			          WHERE participant.event_id = e.id AND participant.status = 'joined'
+			        ), 0) AS seats_taken,
+			        COALESCE((
+			          SELECT COUNT(*)
+			          FROM calendar_event_participants participant
+			          WHERE participant.event_id = e.id AND participant.status = 'waitlist'
+			        ), 0) AS waitlist_count
+			 FROM calendar_events e
+			 LEFT JOIN calendar_programs p ON p.slug = e.activity_slug
+			 WHERE e.tenant_id = ?
+			   AND e.id = ?
+			 LIMIT 1`
+		)
+		.bind(input.tenantId, input.eventId)
+		.first<TenantOrganizerEventRow>()
+	return row ? { ...toPublicTenantEvent(row), status: row.status } : null
 }
 
 export async function listCalendarTenantOrganizerEvents(

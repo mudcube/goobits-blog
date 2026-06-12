@@ -102,6 +102,7 @@
 								{/if}
 							</div>
 							<div class="organizer-page__event-actions">
+								<a href={`/organizer/events/${event.id}`}>Manage</a>
 								<a href={`/t/${data.tenant.slug}`}>Public page</a>
 								{#if data.isAdmin}
 									<a href={`/admin/events/detail/${event.id}`}>Admin detail</a>

@@ -29,7 +29,7 @@ export async function runOrganizerDashboardSmoke() {
 		const startsAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
 		startsAt.setMinutes(0, 0, 0)
 		const endsAt = new Date(startsAt.getTime() + 60 * 60 * 1000)
-		const title = `E2E Organizer Event ${Date.now()}`
+		let title = `E2E Organizer Event ${Date.now()}`
 
 		const createResponse = await withRequestRetry(
 			'create organizer event',
@@ -65,6 +65,17 @@ export async function runOrganizerDashboardSmoke() {
 			await page.getByRole('heading', { name: title }).waitFor({ timeout: 30_000 })
 			await page.getByRole('link', { name: 'Create event' }).waitFor({ timeout: 30_000 })
 			await page.getByRole('link', { name: 'Public page' }).first().waitFor({ timeout: 30_000 })
+			await page.getByRole('link', { name: 'Manage' }).first().waitFor({ timeout: 30_000 })
+
+			await gotoWithRetry(page, `${BASE_URL}/organizer/events/${eventId}`)
+			await page.getByRole('heading', { name: title }).waitFor({ timeout: 30_000 })
+			const managedTitle = `${title} Updated`
+			await page.getByLabel('Title').fill(managedTitle)
+			await page.getByLabel('Capacity').fill('9')
+			await page.getByRole('button', { name: 'Save event' }).click()
+			await page.getByText('Saved.').waitFor({ timeout: 30_000 })
+			await page.getByRole('heading', { name: managedTitle }).waitFor({ timeout: 30_000 })
+			title = managedTitle
 
 			await gotoWithRetry(page, `${BASE_URL}/organizer/settings`)
 			await page.getByRole('heading', { name: /E2E Organizer.*events/ }).waitFor({ timeout: 30_000 })
