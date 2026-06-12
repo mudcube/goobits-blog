@@ -10,16 +10,23 @@
 
 <div class="organizer-settings">
 	<header class="organizer-settings__header">
-		<p class="organizer-settings__eyebrow">Organizer settings</p>
-		<h1>{data.tenant.name}</h1>
-		<a href="/organizer">Dashboard</a>
+		<div>
+			<p class="organizer-settings__eyebrow">Organizer settings</p>
+			<h1>{data.tenant.name}</h1>
+		</div>
+		<div class="organizer-settings__actions" aria-label="Settings links">
+			<a href="/organizer">Dashboard</a>
+			{#if data.isAdmin}
+				<a href="/admin/settings">Global admin settings</a>
+			{/if}
+		</div>
 	</header>
 
 	<div class="organizer-settings__grid">
 		<section class="organizer-settings__panel" aria-labelledby="tenant-settings-heading">
 			<div class="organizer-settings__panel-head">
 				<Settings size={20} strokeWidth={1.8} />
-				<h2 id="tenant-settings-heading">Profile</h2>
+				<h2 id="tenant-settings-heading">Organizer profile</h2>
 			</div>
 			<form class="organizer-settings__form" method="POST" action="?/updateTenant">
 				<label>
@@ -45,7 +52,7 @@
 		<section class="organizer-settings__panel" aria-labelledby="collaborator-heading">
 			<div class="organizer-settings__panel-head">
 				<UserRoundCog size={20} strokeWidth={1.8} />
-				<h2 id="collaborator-heading">Collaborators</h2>
+				<h2 id="collaborator-heading">Tenant collaborators</h2>
 			</div>
 			<form class="organizer-settings__form" method="POST" action="?/inviteCollaborator">
 				<label>
@@ -74,7 +81,7 @@
 	</div>
 
 	<section class="organizer-settings__people" aria-labelledby="people-heading">
-		<h2 id="people-heading">People</h2>
+		<h2 id="people-heading">Tenant people</h2>
 		<div class="organizer-settings__list">
 			{#each data.members as member}
 				<div class="organizer-settings__person">
@@ -122,9 +129,24 @@
 			letter-spacing: 0;
 		}
 
+	}
+
+	.organizer-settings__actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 0.65rem;
+
 		a {
+			display: inline-flex;
+			align-items: center;
+			min-height: 2.65rem;
+			padding: 0 0.95rem;
+			border: 1px solid color-mix(in srgb, var(--calendar-shell-text) 14%, transparent);
+			border-radius: 0.5rem;
 			color: #76e4b8;
 			font-weight: 800;
+			text-decoration: none;
 		}
 	}
 

@@ -31,7 +31,12 @@ async function loadOrganizerSettings(event: RequestEvent) {
 
 export const load: PageServerLoad = async (event) => {
 	const { tenant, members, invites } = await loadOrganizerSettings(event)
-	return { tenant, members, invites }
+	return {
+		tenant,
+		members,
+		invites,
+		isAdmin: (event.locals as { calendarAdmin?: boolean }).calendarAdmin === true
+	}
 }
 
 function readTenantRole(value: FormDataEntryValue | null): CalendarTenantRole {

@@ -61,4 +61,4 @@
 
 - [ ] Record Pages project id, production deployment id, D1 id, R2 bucket names, OAuth client ids, and payment app ids in the launch ticket.
 - [ ] Attach output from `pnpm --dir apps/calendar-site build`.
-- [ ] Attach output from a post-deploy smoke of `/`, `/login`, `/register`, `/organizer`, `/t/pdx-fun`, `/api/calendar/ics`, and `/admin`.
+- [ ] Attach output from a post-deploy smoke of `/`, `/login`, `/register`, `/organizer`, `/organizer/events/<id>`, `/t/pdx-fun`, `/api/calendar/ics`, and `/admin`.

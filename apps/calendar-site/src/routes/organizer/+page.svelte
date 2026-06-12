@@ -49,7 +49,7 @@
 				<Settings size={18} strokeWidth={1.8} />
 			</a>
 			{#if data.isAdmin}
-				<a class="organizer-page__button" href="/admin/events">Admin events</a>
+				<a class="organizer-page__button" href="/admin/events">Global admin events</a>
 			{/if}
 		</div>
 	</section>
