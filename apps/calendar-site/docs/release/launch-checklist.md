@@ -34,6 +34,7 @@
 - [ ] Square app origin/callbacks point at `https://pdx.fun`.
 - [ ] Browser public IDs are set in Pages vars.
 - [ ] Server secrets are deployed with `pnpm --dir apps/calendar-site deploy:secrets`.
+- [ ] Launch policy: payment providers, payment handles, and payment defaults remain global-admin-managed.
 
 ## Cron
 
@@ -41,6 +42,7 @@
 - [ ] Scheduler runs `pnpm --dir apps/calendar-site calendar:sync`.
 - [ ] Sync queue health is visible in admin.
 - [ ] Production cron includes `Authorization: Bearer $CALENDAR_SYNC_CRON_SECRET`.
+- [ ] Launch policy: calendar provider OAuth, sync queue processing, and provider disconnects remain global-admin-managed.
 
 ## Anti-Abuse
 
