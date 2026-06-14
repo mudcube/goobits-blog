@@ -1,14 +1,13 @@
-# 🎨 miko-art
-Personal website + invite-only social calendar built with **SvelteKit 5** and deployed to **Cloudflare Pages (D1)**.
+# miko-art
+Personal website built with **SvelteKit 5** and deployed to **Cloudflare Pages**.
 
-## ✨ Key Features
-- **📅 Social calendar** - Event feed, join/waitlist, +1, and “memories” recap cards
-- **🛡️ Admin dashboard** - Manage programs, events, rules, members, and integrations
-- **🔄 Google Calendar sync** - Asynchronous sync queue with retries and dead-letter handling
-- **🔐 Auth** - OAuth (Google/Apple) for calendar access + credentials-based registration
-- **🌗 Themes** - `default`, `dark`, and `magic`
+## Key Features
+- **Journal and blog** - Public writing surfaces with RSS and sitemap support.
+- **Portfolio pages** - Art, music, apps, and labs.
+- **Contact flow** - Cloudflare Pages function endpoint with anti-abuse controls.
+- **Themes** - `default`, `dark`, and `magic`.
 
-## 🚀 Quick Start
+## Quick Start
 ```bash
 # Requirements
 node --version    # Node.js 22+
@@ -19,24 +18,19 @@ pnpm install
 # Dev server (http://localhost:3610)
 pnpm dev
 
-# Dev server with the local Cloudflare runtime (D1 bindings)
+# Dev server with the local Cloudflare runtime
 pnpm dev:wrangler
 ```
 
-## ⚙️ Configuration
+## Configuration
 ```bash
 # View the available env vars
-ls -la config/env/.env.example config/env/.env.calendar.example
+ls -la config/env/.env.example
 
 # Edit miko.art local dev secrets (encrypted at rest via dotenvx)
 pnpm exec dotenvx decrypt -f config/env/.env
 # edit config/env/.env
 pnpm exec dotenvx encrypt -f config/env/.env
-
-# Edit calendar-site local dev secrets
-pnpm exec dotenvx decrypt -f config/env/.env.calendar
-# edit config/env/.env.calendar
-pnpm exec dotenvx encrypt -f config/env/.env.calendar
 ```
 
 ### Path Aliases
@@ -53,7 +47,7 @@ Defined in `svelte.config.js`:
 | `@src` | `./src` |
 | `@static` | `./static` |
 
-## 🧪 Testing & Code Quality
+## Testing & Code Quality
 ```bash
 # Types + svelte-check + eslint + circular deps
 pnpm check
@@ -68,13 +62,7 @@ pnpm test:e2e
 pnpm e2e:critical
 ```
 
-## 🔧 Operations
-```bash
-# Process pending Google Calendar sync jobs
-pnpm calendar:sync
-```
-
-## 🚢 Deployment
+## Deployment
 ```bash
 # Standard deploy (build + Pages deploy)
 pnpm deploy:prod
@@ -83,14 +71,12 @@ pnpm deploy:prod
 pnpm deploy:prod:full
 ```
 
-## 📚 Documentation
+## Documentation
 - **`AGENTS.md`** - Repo architecture notes and command map
-- **`ops/runbooks/calendar-sync.md`** - Calendar sync queue operations
 
-## 🔗 Related Packages
-- **`packages/calendar`** - Calendar domain logic (storage, services, transports, migrations)
+## Related Packages
 - **`packages/auth`** - Auth library used by this repo (its own README + tests)
 
-## 📝 License
+## License
 
 Proprietary. Copyright (c) 2026 Goobits. All rights reserved. See [`LICENSE`](./LICENSE).

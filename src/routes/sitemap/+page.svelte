@@ -1,8 +1,6 @@
 <script>
 	import {
 		BookOpen,
-		CalendarClock,
-		CalendarCog,
 		Compass,
 		FileText,
 		Filter,
@@ -47,10 +45,8 @@
 		'Main Pages':     { tone: 'primary',   icon: Compass },
 		'Journal Pages':  { tone: 'primary',   icon: BookOpen },
 		'Journal Posts':  { tone: 'primary',   icon: FileText },
-		'Scheduling':     { tone: 'primary',   icon: CalendarClock },
 		'Admin Pages':    { tone: 'secondary', icon: Shield },
 		'API Routes':     { tone: 'secondary', icon: Terminal },
-		'Scheduling API': { tone: 'secondary', icon: CalendarCog },
 		'Utility Pages':  { tone: 'secondary', icon: Wrench }
 	}
 	const categoryOrder = Object.keys(categoryMeta)

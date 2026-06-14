@@ -22,6 +22,7 @@
     "e2e:admin:promote": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-waitlist-promote.test.ts",
     "e2e:admin:templates": "pnpm exec svelte-kit sync && pnpm exec vitest run --maxWorkers=1 __tests__/e2e/admin-new-event-copy-from.test.ts",
     "calendar:sync": "../../node_modules/.bin/dotenvx run -f ../../config/env/.env.calendar -- node ops/cron/calendar-sync.mjs",
+    "audit:boundaries": "node scripts/audit/check-calendar-boundaries.mjs",
     "deploy:secrets": "../../node_modules/.bin/dotenvx run -f ../../config/env/.env.calendar.production -- node ../../ops/deploy/deploy-secrets.mjs --env-file config/env/.env.calendar.production --project-name calendar-site",
     "seed:calendar": "node scripts/seed/calendar-social.mjs",
     "e2e:oauth:google": "node scripts/e2e/check-google-oauth.mjs"

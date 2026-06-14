@@ -11,9 +11,6 @@ export default {
 			routes: {
 				include: [
 					'/api/*',
-					'/schedule',
-					'/schedule/*',
-					'/invite/*',
 					'/blog',
 					'/blog/*',
 					'/journal',

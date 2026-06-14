@@ -130,8 +130,7 @@ const securityHeadersHandle: Handle = async ({ event, resolve }) => {
 	const noindexPrefixes = [
 		'/api',
 		'/contact/thank-you',
-		'/health',
-		'/schedule'
+		'/health'
 	]
 	const shouldNoindex = noindexPrefixes.some(prefix => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`))
 

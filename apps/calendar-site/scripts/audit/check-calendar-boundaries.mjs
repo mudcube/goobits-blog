@@ -1,10 +1,10 @@
 #!/usr/bin/env node
+import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { execFileSync } from 'node:child_process'
 
-const ROOT = resolve(fileURLToPath(new URL('../..', import.meta.url)))
+const ROOT = resolve(fileURLToPath(new URL('../../../..', import.meta.url)))
 
 const RULES = [
 	{

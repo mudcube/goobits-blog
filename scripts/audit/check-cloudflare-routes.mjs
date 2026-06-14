@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 
 const routesPath = '.svelte-kit/cloudflare/_routes.json'
-const requiredIncludes = ['/api/*', '/schedule', '/schedule/*', '/invite/*']
+const requiredIncludes = ['/api/*', '/blog', '/blog/*', '/journal', '/journal/*', '/contact', '/contact/*']
 
 let routes
 try {

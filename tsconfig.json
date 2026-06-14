@@ -31,10 +31,15 @@
     "src/**/*.ts",
     "src/**/*.svelte",
     "functions/**/*.ts",
-    "packages/**/*.ts",
+    "packages/blog-theme-miko/**/*.ts",
+    "packages/contact/**/*.ts",
+    "packages/nano-banana/**/*.ts",
+    "packages/sitemap/**/*.ts",
+    "packages/ui/**/*.ts",
+    "packages/visibility-mode/**/*.ts",
     "serverless/**/*.ts",
     "vite.config.js",
     "svelte.config.js"
   ],
-  "exclude": ["node_modules", "static", "software", "packages/auth/**", "packages/calendar/**"]
+  "exclude": ["node_modules", "static", "software", "packages/auth/**"]
 }
