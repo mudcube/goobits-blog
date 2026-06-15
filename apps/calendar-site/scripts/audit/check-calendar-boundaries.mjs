@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const ROOT = resolve(fileURLToPath(new URL('../../../..', import.meta.url)))
+const ROOT = resolve(fileURLToPath(new URL('../..', import.meta.url)))
 
 const RULES = [
 	{

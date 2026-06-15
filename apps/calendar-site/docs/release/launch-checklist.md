@@ -5,7 +5,7 @@
 - [ ] Create Cloudflare Pages project `calendar-site` for `apps/calendar-site`.
 - [ ] Set production domain to `pdx.fun`.
 - [ ] Set preview domain and keep it off public indexes.
-- [ ] Confirm `PUBLIC_BASE_URL=https://pdx.fun` in Pages vars and `config/env/.env.calendar.production`.
+- [ ] Confirm `PUBLIC_BASE_URL=https://pdx.fun` in Pages vars and `config/env/.env.production`.
 - [ ] Confirm Pages builds with `pnpm --dir apps/calendar-site build`.
 
 ## Data And Storage

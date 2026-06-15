@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import { sveltekit } from '@sveltejs/kit/vite'
 
 dotenv.config({
-	path: '../../config/env/.env.calendar'
+	path: './config/env/.env'
 })
 
 export default defineConfig({
@@ -40,10 +40,10 @@ export default defineConfig({
 	],
 	resolve: {
 		alias: {
-			'@node-rs/argon2': path.resolve('../../src/lib/stubs/argon2.ts'),
-			'argon2': path.resolve('../../src/lib/stubs/argon2.ts'),
-			'@node-rs/bcrypt': path.resolve('../../src/lib/stubs/bcrypt.ts'),
-			'bcrypt': path.resolve('../../src/lib/stubs/bcrypt.ts')
+			'@node-rs/argon2': path.resolve('src/lib/stubs/argon2.ts'),
+			'argon2': path.resolve('src/lib/stubs/argon2.ts'),
+			'@node-rs/bcrypt': path.resolve('src/lib/stubs/bcrypt.ts'),
+			'bcrypt': path.resolve('src/lib/stubs/bcrypt.ts')
 		},
 		dedupe: [ '@sveltejs/kit', 'svelte' ]
 	},
@@ -52,10 +52,10 @@ export default defineConfig({
 		open: false,
 		port: 3611,
 		watch: {
-			ignored: ['**/.svelte-kit-old/**', '../../.svelte-kit/**']
+			ignored: ['**/.svelte-kit-old/**']
 		},
 		fs: {
-			allow: [path.resolve('.'), path.resolve('../..')]
+			allow: [path.resolve('.')]
 		}
 	}
 })

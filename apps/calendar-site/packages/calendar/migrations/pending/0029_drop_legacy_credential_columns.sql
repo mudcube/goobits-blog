@@ -1,0 +1,33 @@
+-- ============================================================================
+-- PHASE 2 CLEANUP — DO NOT MOVE TO migrations/sql/ UNTIL PHASE 1 IS VERIFIED
+-- ============================================================================
+--
+-- Phase 1 (migration 0027_connections_neutral_credentials.sql) added the
+-- new `primary_credential` / `secondary_credential` columns and backfilled
+-- them. The runtime currently dual-writes to both old and new columns
+-- (storage/d1.ts saveConnection) and dual-reads with new-takes-precedence
+-- (getConnection).
+--
+-- This migration drops the now-redundant `access_token` / `refresh_token`
+-- columns. After it runs:
+--   • saveConnection in storage/d1.ts can be simplified to write only the
+--     new columns.
+--   • getConnection's `row.primary_credential ?? row.access_token` fallback
+--     can collapse to the new column.
+--
+-- ROLLOUT CHECKLIST before promoting this file to migrations/sql/:
+--   ☐ 0027 has been live in production for at least one full deploy cycle.
+--   ☐ No app version older than 0027 is still active anywhere (Cloudflare
+--     deploys are atomic, but verify the build referenced in production
+--     reads from primary_credential first).
+--   ☐ A spot-check of `connections` rows confirms primary_credential and
+--     secondary_credential are populated for every row.
+--   ☐ This migration's runtime-side changes (drop the dual-write branch
+--     in storage/d1.ts saveConnection and the fallback in getConnection)
+--     are queued in the same PR.
+--
+-- SQLite's ALTER TABLE DROP COLUMN was added in 3.35 (March 2021); both
+-- D1 and the dev `better-sqlite3` runtime support it.
+
+ALTER TABLE connections DROP COLUMN access_token;
+ALTER TABLE connections DROP COLUMN refresh_token;

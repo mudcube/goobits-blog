@@ -49,9 +49,9 @@ export default {
 			'@lib': './src/lib',
 			'@src': './src',
 			'@static': './static',
-			'@calendar/app': '../../packages/calendar/app/src',
-			'@calendar/ui': '../../packages/calendar/ui/src',
-			'@goobits/ui': '../../packages/ui/src'
+			'@calendar/app': './packages/calendar/app/src',
+			'@calendar/ui': './packages/calendar/ui/src',
+			'@goobits/ui': './packages/ui/src'
 		}
 	}
 }

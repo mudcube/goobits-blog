@@ -11,7 +11,7 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 binding = "DB"
 database_name = "calendar-site-db"
 database_id = "00000000-0000-0000-0000-000000000000"
-migrations_dir = "../../packages/calendar/migrations/sql"
+migrations_dir = "packages/calendar/migrations/sql"
 
 [[r2_buckets]]
 binding = "MEDIA"

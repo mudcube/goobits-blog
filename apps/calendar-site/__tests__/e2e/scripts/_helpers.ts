@@ -1,15 +1,12 @@
 import { chromium, type BrowserContext, type Page } from 'playwright'
 import { execFileSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
-import { existsSync } from 'node:fs'
 import Database from 'better-sqlite3'
 
 export const BASE_URL = process.env['E2E_BASE_URL'] || 'http://localhost:3611'
 export const ADMIN_URL = `${BASE_URL}/admin/`
-const ENV_FILE =
-	process.env['CALENDAR_SITE_ENV_FILE'] ||
-	(existsSync('config/env/.env.calendar') ? 'config/env/.env.calendar' : '../../config/env/.env.calendar')
-const DEV_DB_FILE = process.env['DEV_DB_FILE'] || '../../.dev/calendar-site.sqlite'
+const ENV_FILE = process.env['CALENDAR_SITE_ENV_FILE'] || 'config/env/.env'
+const DEV_DB_FILE = process.env['DEV_DB_FILE'] || '.dev/calendar-site.sqlite'
 
 export function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
