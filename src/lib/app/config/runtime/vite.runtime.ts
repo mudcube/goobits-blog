@@ -40,14 +40,7 @@ export function getViteRuntimeConfig(
 			__SVELTEKIT_APP_DIR__: JSON.stringify('_app'),
 			__SVELTEKIT_PATHS_RELATIVE__: 'false'
 		},
-		resolve: {
-			alias: {
-				'@node-rs/argon2': path.resolve('src/lib/stubs/argon2.ts'),
-				'argon2': path.resolve('src/lib/stubs/argon2.ts'),
-				'@node-rs/bcrypt': path.resolve('src/lib/stubs/bcrypt.ts'),
-				'bcrypt': path.resolve('src/lib/stubs/bcrypt.ts')
-			}
-		},
+		resolve: {},
 		server
 	}
 }

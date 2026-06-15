@@ -17,7 +17,7 @@ pnpm release:patch:build  # Patch bump + build
 pnpm check        # Types + svelte-check + lint + circular deps
 pnpm test         # Checks + full e2e suite
 pnpm test:e2e     # Direct full e2e suite
-pnpm dev:wrangler # Dev with Cloudflare D1 runtime
+pnpm dev:wrangler # Dev with Cloudflare runtime
 ```
 
 Root tests use Vitest + Playwright under `__tests__/e2e`. `packages/auth` also has Vitest.
@@ -27,14 +27,9 @@ Root tests use Vitest + Playwright under `__tests__/e2e`. `packages/auth` also h
 SvelteKit 5 + Cloudflare Pages monorepo (pnpm workspaces).
 
 **Internal packages:**
-- `packages/calendar/core` (`@calendar/core`) — Booking, D1 storage, Google Calendar, invites, admin auth
 - `packages/auth` (`@goobits/auth`) — OAuth (Google/Apple), sessions, credentials, WebAuthn
 
-**API env bridge:** API route handlers (`src/routes/api/**/+server.ts`) call `buildEnv(platform)` in `packages/calendar/kit/src/runtime/build-env.ts` to access D1 in production and a local SQLite-backed D1 wrapper in dev (`.dev/db.sqlite`, auto-migrates).
-
-**Hooks** (`src/hooks.server.ts`): theme → redirects → admin auth → calendar auth → require user → security headers
-
-**Database:** Migrations in `packages/calendar/migrations/sql/`. Argon2/bcrypt stubbed for browser in `src/lib/stubs/`, aliased in `vite.config.js` and `wrangler.toml`.
+**Hooks** (`src/hooks.server.ts`): theme → redirects → admin auth → require user → security headers
 
 ## Path Aliases (svelte.config.js)
 
@@ -42,7 +37,7 @@ SvelteKit 5 + Cloudflare Pages monorepo (pnpm workspaces).
 
 ## Environment
 
-Env files in `config/env/`, encrypted with dotenvx. Root miko.art uses `config/env/.env` with template `config/env/.env.example`; calendar-site uses `config/env/.env.calendar` with template `config/env/.env.calendar.example`. Production secrets: root `pnpm deploy:secrets`, calendar `pnpm --dir apps/calendar-site deploy:secrets`.
+Env files in `config/env/`, encrypted with dotenvx. Root miko.art uses `config/env/.env` with template `config/env/.env.example`; production secrets use `pnpm deploy:secrets`.
 
 ## CSS Conventions
 

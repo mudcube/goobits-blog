@@ -17,7 +17,6 @@ export default defineConfig({
 		rollupOptions: {
 			external: [
 				'node:dns/promises',
-				'better-sqlite3',
 				'fs',
 				'path'
 			]

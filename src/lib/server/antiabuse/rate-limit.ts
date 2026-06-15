@@ -1,6 +1,5 @@
 /**
- * In-memory rate limiter for anti-abuse — fallback path when D1 isn't
- * available (e.g. local dev without `pnpm dev:wrangler`, or test runs).
+ * In-memory rate limiter for anti-abuse — used in local dev and test runs.
  *
  * Wraps `@goobits/security/rate-limit` so the underlying timestamp-window
  * accounting and store cleanup come from the canonical implementation.

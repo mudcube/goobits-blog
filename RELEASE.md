@@ -43,20 +43,8 @@ Ensure these callback URLs are configured in provider dashboards:
 
 - Google/Auth app redirect: `https://<your-domain>/auth/google/callback`
 - Local dev auth redirect: `http://localhost:3610/auth/google/callback`
-- Calendar admin OAuth callback: `https://<your-domain>/api/calendar/oauth-callback`
-- Local dev calendar callback: `http://localhost:3610/api/calendar/oauth-callback`
 
 If callbacks mismatch, Google returns `redirect_uri_mismatch` before app code runs.
-
-## Database
-
-Before release, verify all migrations in `packages/calendar/migrations/sql/` have been applied to the target environment.
-
-Recent release-sensitive migrations include:
-
-- `0006_email_verification_tokens.sql`
-- `0014_calendar_user_program_access.sql`
-- `0015_calendar_admin_settings.sql`
 
 ## Pre-Launch Gate
 
@@ -81,13 +69,10 @@ Verify these flows after deploy:
 - `/register` submits and verification email flow works.
 - `/verify-email` accepts valid links and rejects invalid links.
 - `/contact` submits successfully.
-- `/schedule/login` loads and redirects correctly after auth.
-- `/schedule/admin` loads for an authenticated admin.
-- Calendar member join, leave, and waitlist flows work.
 
 ## Rollback
 
 1. Re-deploy the previous successful Cloudflare Pages build.
 2. Re-apply the previous secrets set only if env values changed.
 3. Verify auth callback routes.
-4. Verify `/schedule/login`, `/schedule`, `/schedule/admin`, `/register`, and `/contact`.
+4. Verify `/register`, `/verify-email`, and `/contact`.

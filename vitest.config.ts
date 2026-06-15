@@ -4,8 +4,6 @@ export default defineConfig({
 	test: {
 		include: [
 			'__tests__/**/*.test.ts',
-			'packages/calendar/core/__tests__/**/*.test.ts',
-			'packages/calendar/ui/__tests__/**/*.test.ts',
 			'packages/visibility-mode/__tests__/**/*.test.ts'
 		],
 		fileParallelism: false,
