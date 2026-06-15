@@ -83,11 +83,11 @@
 	.shell-nav__inner {
 		max-width: var(--max-width, 1060px);
 		margin: 0 auto;
-		width: var(--shell-nav-inner-width, var(--calendar-nav-inner-width));
-		height: var(--shell-nav-height, var(--calendar-nav-height));
+		width: var(--shell-nav-inner-width, min(100%, 72rem));
+		height: var(--shell-nav-height, 4rem);
 		display: flex;
 		align-items: center;
-		gap: var(--shell-nav-inner-gap, var(--calendar-nav-inner-gap));
+		gap: var(--shell-nav-inner-gap, var(--space-4));
 	}
 
 	.shell-nav__home {
@@ -128,7 +128,7 @@
 
 	.shell-nav__links {
 		display: flex;
-		gap: var(--shell-nav-link-gap, var(--calendar-nav-link-gap));
+		gap: var(--shell-nav-link-gap, var(--space-2));
 		flex: 1;
 		align-items: center;
 		min-width: 0;
@@ -141,7 +141,7 @@
 		text-decoration: none;
 		font-size: 13px;
 		font-weight: var(--font-weight-medium);
-		padding: var(--shell-nav-link-padding, var(--calendar-nav-link-padding));
+		padding: var(--shell-nav-link-padding, var(--space-2) var(--space-3));
 		border-radius: var(--radius-pill);
 		transition: all 0.16s ease;
 	}

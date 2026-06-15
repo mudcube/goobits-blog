@@ -51,7 +51,7 @@
 
 	<h2 class="legal__section-title">Current cookie names</h2>
 	<p class="legal__copy">
-		MIKO.ART does not currently set persistent account, analytics, advertising, or booking cookies. Browser-local
+		MIKO.ART does not currently set persistent account, analytics, advertising, or marketing cookies. Browser-local
 		storage may keep display preferences such as theme state.
 	</p>
 

@@ -3,7 +3,7 @@
 	import { LegalPage } from '@goobits/ui'
 
 	const description =
-		'Terms of use for MIKO.ART, including site usage, bookings, accounts, intellectual property, third-party services, and liability.'
+		'Terms of use for MIKO.ART, including site usage, accounts, intellectual property, third-party services, and liability.'
 </script>
 
 <Seo
@@ -42,11 +42,10 @@
 		<li class="legal__list-item">Do not attempt unauthorized access to accounts, sessions, or admin areas.</li>
 	</ul>
 
-	<h2 class="legal__section-title">Bookings and accounts</h2>
+	<h2 class="legal__section-title">Accounts</h2>
 	<ul class="legal__list">
-		<li class="legal__list-item">When booking events, provide accurate information.</li>
 		<li class="legal__list-item">You are responsible for activity associated with your session or account.</li>
-		<li class="legal__list-item">Bookings may be changed or canceled according to the booking flow and availability rules.</li>
+		<li class="legal__list-item">Provide accurate information when using account-backed features.</li>
 	</ul>
 
 	<h2 class="legal__section-title">Intellectual property</h2>

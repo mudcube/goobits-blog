@@ -157,12 +157,12 @@
 	.ui-button--ghost {
 		background: transparent;
 		border-color: var(--color-white-12, color-mix(in srgb, var(--border) 50%, transparent));
-		color: color-mix(in srgb, var(--calendar-shell-text, var(--text)) 56%, transparent);
+		color: color-mix(in srgb, var(--shell-text, var(--text)) 56%, transparent);
 	}
 
 	.ui-button--ghost:hover:not(.ui-button--disabled) {
 		border-color: var(--color-white-24, color-mix(in srgb, var(--text) 20%, transparent));
-		color: var(--calendar-shell-text, var(--text));
+		color: var(--shell-text, var(--text));
 	}
 
 	.ui-button--danger {

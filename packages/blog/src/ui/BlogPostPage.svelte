@@ -3,7 +3,7 @@
 	import SocialShare from './SocialShare.svelte'
 	import TagCategoryList from './TagCategoryList.svelte'
 	import { blogConfig, defaultMessages } from '@goobits/blog/config'
-	import { Calendar, Clock, Share2, ChevronLeft } from '@lucide/svelte'
+	import { FileText, Clock, Share2, ChevronLeft } from '@lucide/svelte'
 	import {
 		createLogger,
 		formatDate as utilFormatDate,
@@ -139,7 +139,7 @@
 
 			<div class="goo__post-meta">
 				<div class="goo__post-meta-item goo__post-meta-date">
-					<Calendar class="goo__post-meta-icon" />
+					<FileText class="goo__post-meta-icon" />
 					<span>{getMessage('publishedOn', 'Published on')}: {formattedDate}</span>
 				</div>
 

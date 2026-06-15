@@ -6,16 +6,15 @@ Repo-specific facts for this checkout. Keep reusable agent behavior in
 ## Project Summary
 
 - Name: miko-art
-- Purpose: SvelteKit 5 + Cloudflare Pages site with calendar, auth, blog, contact, portfolio, and ops tooling.
+- Purpose: SvelteKit 5 + Cloudflare Pages site with auth, blog, contact, portfolio, and ops tooling.
 - Primary language/framework: TypeScript, SvelteKit 5, SCSS, Cloudflare Pages/D1.
 - Package manager: pnpm 10.
-- Workspace/build system: pnpm workspaces under `packages/*`, `packages/calendar/*`, and `packages/calendar/presets/*`.
+- Workspace/build system: pnpm workspaces under `packages/*`.
 
 ## Repository Layout
 
 - `src/routes/`: SvelteKit app routes and API endpoints.
-- `src/lib/`: app-level runtime, theme, release, blog, and schedule helpers.
-- `packages/calendar/`: calendar federation packages (`core`, `ui`, `kit`, `app`, `theme`, `migrations`).
+- `src/lib/`: app-level runtime, theme, release, and blog helpers.
 - `packages/auth/`: `@goobits/auth` submodule.
 - `packages/security/`, `packages/sitemap/`, `packages/nano-banana/`: submodules or package-local tooling.
 - `config/env/`: dotenvx-managed env files.
@@ -33,7 +32,7 @@ pnpm build        # production build
 pnpm check        # types, svelte-check, lint, package checks, boundaries, circular deps
 pnpm test         # checks, unit/package tests, full e2e
 pnpm test:e2e     # direct full e2e suite
-pnpm dev:wrangler # Cloudflare D1 runtime dev
+pnpm dev:wrangler # Cloudflare runtime dev
 pnpm run aw -- main # open default aw workspace
 ```
 
@@ -75,11 +74,11 @@ pnpm run aw -- main # open default aw workspace
 - File naming: follow local SvelteKit and package conventions.
 - Type/JSDoc expectations: use TypeScript types; add comments only for non-obvious logic.
 - UI/framework conventions: BEM-style classes, nested SCSS, `em` breakpoints.
-- Security/privacy notes: keep calendar auth/session and env handling isolated; do not expose secrets.
+- Security/privacy notes: keep auth/session and env handling isolated; do not expose secrets.
 
 ## Local Cautions
 
 - Active generated folders: `.svelte-kit`, `build`, `dist`, package-local `target`, and nested `node_modules`.
 - Slow/expensive commands: full `pnpm test` and full e2e suite.
-- Shared resources: Cloudflare D1/R2 bindings, OAuth providers, payment providers, dotenvx secrets.
+- Shared resources: Cloudflare bindings, OAuth providers, payment providers, dotenvx secrets.
 - Deployment or credential constraints: production secrets use `pnpm deploy:secrets`; do not edit encrypted envs casually.
