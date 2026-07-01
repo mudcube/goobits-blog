@@ -37,6 +37,9 @@
   ],
   "license": "MIT",
   "type": "module",
+  "dependencies": {
+    "@goobits/keyboard": "workspace:*"
+  },
   "peerDependencies": {
     "@sveltejs/kit": "^2.0.0",
     "svelte": "^5.0.0"

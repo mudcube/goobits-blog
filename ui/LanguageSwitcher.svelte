@@ -16,6 +16,7 @@
 	 * @component
 	 */
 	import './LanguageSwitcher.scss'
+	import { handleKeyboardEscapeKey } from '@goobits/keyboard/dom'
 	import { ClassNames, bemClasses } from '@goobits/blog/utils/index.js'
 
 	/**
@@ -100,8 +101,10 @@
 
 	// Close dropdown on Escape key
 	function handleKeydown(event) {
-		if (event.key === 'Escape') {
-			isOpen = false
+		if (isOpen) {
+			handleKeyboardEscapeKey(event, () => {
+				isOpen = false
+			})
 		}
 	}
 
