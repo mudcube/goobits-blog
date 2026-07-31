@@ -61,3 +61,11 @@ yarn.lock
 
 # Local development
 .local/
+
+# Managed workspace output links
+/.svelte-kit
+/.turbo
+/coverage
+/node_modules
+/playwright-report
+/test-results
