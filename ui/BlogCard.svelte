@@ -16,9 +16,9 @@
 	 */
 	import './BlogCard.scss'
 	import TagsCategories from './TagCategoryList.svelte'
-	import { bemClasses, ClassNames, createMessageGetter } from '@goobits/blog/utils/index.js'
-	import { blogConfig, defaultMessages } from '@goobits/blog/config/index.js'
-	import { getEmojiFromTitle, getPostImageData, getPostCategories, getBlogUrl } from '@goobits/blog/utils/index.js'
+	import { bemClasses, ClassNames, createMessageGetter } from '../utils/index.js'
+	import { blogConfig, defaultMessages } from '../config/index.js'
+	import { getEmojiFromTitle, getPostImageData, getPostCategories, getBlogUrl } from '../utils/index.js'
 
 	/**
 	 * @typedef {Object} BlogCardProps

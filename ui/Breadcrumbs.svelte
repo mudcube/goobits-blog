@@ -13,8 +13,8 @@
 	 * @property {boolean} [firstItemIsCurrent] - When true, the first item is treated as current
 	 */
 
-	import { createMessageGetter } from '@goobits/blog/utils/index.js'
-	import { defaultMessages } from '@goobits/blog/config/index.js'
+	import { createMessageGetter } from '../utils/index.js'
+	import { defaultMessages } from '../config/index.js'
 
 	// Component Props
 	let {

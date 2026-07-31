@@ -16,8 +16,8 @@
 	 * @component
 	 */
 	import './Newsletter.scss'
-	import { createMessageGetter } from '@goobits/blog/utils/index.js'
-	import { defaultMessages } from '@goobits/blog/config/index.js'
+	import { createMessageGetter } from '../utils/index.js'
+	import { defaultMessages } from '../config/index.js'
 
 	/**
 	 * @typedef {Object} Props

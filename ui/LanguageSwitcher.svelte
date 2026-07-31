@@ -17,7 +17,7 @@
 	 */
 	import './LanguageSwitcher.scss'
 	import { handleKeyboardEscapeKey } from '@goobits/keyboard/dom'
-	import { ClassNames, bemClasses } from '@goobits/blog/utils/index.js'
+	import { ClassNames, bemClasses } from '../utils/index.js'
 
 	/**
 	 * @typedef {Object} LanguageSwitcherProps

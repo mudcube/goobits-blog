@@ -15,9 +15,9 @@
 	 * @component
 	 */
 	import './SocialShare.scss'
-	import { createMessageGetter } from '@goobits/blog/utils/index.js'
-	import { defaultMessages } from '@goobits/blog/config/index.js'
-	import { createLogger } from '@goobits/blog/utils/logger.js'
+	import { createMessageGetter } from '../utils/index.js'
+	import { defaultMessages } from '../config/index.js'
+	import { createLogger } from '../utils/logger.js'
 
 	const logger = createLogger('SocialShare')
 

@@ -5,6 +5,8 @@
  * to quickly set up a blog on any website.
  */
 
+import { error as httpError } from '@sveltejs/kit'
+
 import { getAllPosts, generateRssFeed } from '../utils/index.js'
 import {
 	loadBlogIndex,
@@ -84,9 +86,7 @@ export function createBlogSlugHandler(options = {}) {
 
 			// Skip static asset requests (CSS, SCSS, JS, images, etc.)
 			if (normalizedSlug.match(/\.(css|scss|js|ts|jsx|tsx|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i)) {
-				const error = new Error('Not a blog route')
-				error.status = 404
-				throw error
+				httpError(404, 'Not a blog route')
 			}
 
 			if (!normalizedSlug || normalizedSlug === '') {
@@ -109,9 +109,7 @@ export function createBlogSlugHandler(options = {}) {
 			}
 
 			// If no pattern matches, throw 404
-			const error = new Error('Blog page not found')
-			error.status = 404
-			throw error
+			httpError(404, 'Blog page not found')
 		}
 	}
 }
