@@ -18,9 +18,6 @@
   "sideEffects": [
     "**/*.scss"
   ],
-  "scripts": {
-    "test": "echo 'No tests configured'"
-  },
   "files": [
     "index.js",
     "ui",
