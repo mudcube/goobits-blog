@@ -553,7 +553,7 @@ $sidebar-width: 33.333333%;
   }
 
   // Lucide component styling
-  :global(svg) {
+  svg {
     width: 1.125rem;
     height: 1.125rem;
     flex-shrink: 0;
@@ -870,27 +870,6 @@ $sidebar-width: 33.333333%;
   font-weight: 500;
 }
 
-// Note: Direct component styles are also defined in the respective component files
-// This acts as a fallback for global styling
-
-// Specific scoped selectors for known category elements
-:global(.blog-card__category.s-1fha09V63BUh),
-:global(.blog__primary-category.s-xrw6CAgb2VxL),
-:global(.goo__card-category.s-1fha09V63BUh),
-:global(.goo__primary-category.s-xrw6CAgb2VxL) {
-  background-color: var(--blog-category-active-bg) !important;
-  color: var(--blog-category-active-color) !important;
-  border: 1px solid var(--blog-category-active-border) !important;
-  font-weight: 500;
-}
-
-:global(.blog-card__category.s-1fha09V63BUh a),
-:global(.blog__primary-category.s-xrw6CAgb2VxL a),
-:global(.goo__card-category.s-1fha09V63BUh a),
-:global(.goo__primary-category.s-xrw6CAgb2VxL a) {
-  color: white !important;
-}
-
 // Shared tag/category styles
 :root {
   // Base colors for tags
@@ -997,9 +976,7 @@ $sidebar-width: 33.333333%;
 }
 
 // Special styling for the main categories that should always have a solid background
-.goo__card-category, .goo__primary-category,
-:global([class*='s-'] .goo__card-category),
-:global([class*='s-'] .goo__primary-category) {
+.goo__card-category, .goo__primary-category {
   // Inherit basic properties from normal categories
   background-color: var(--blog-category-active-bg) !important;
   color: var(--blog-category-active-color) !important;

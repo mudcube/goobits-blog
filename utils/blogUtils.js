@@ -386,24 +386,24 @@ export async function loadCategoryDescriptions(lang = 'en') {
 	const { promises: fs } = await import('fs')
 	const { join } = await import('path')
 
-	// First try to load language-specific category file if it exists
-	let categoriesPath = join(process.cwd(), `src/content/_categories.${ lang }.md`)
+	const categoryPaths = [
+		join(process.cwd(), `src/content/_categories.${ lang }.md`),
+		join(process.cwd(), 'src/content/_categories.md'),
+	]
 
-	// Check if language-specific file exists, otherwise fall back to default
-	try {
-		await fs.access(categoriesPath)
-	} catch (e) {
-		// Fallback to default if language-specific file doesn't exist
-		categoriesPath = join(process.cwd(), 'src/content/_categories.md')
+	for (const categoriesPath of categoryPaths) {
+		try {
+			const fileContent = await fs.readFile(categoriesPath, 'utf-8')
+			return parseCategoryDescriptions(fileContent)
+		} catch (readError) {
+			if (readError?.code === 'ENOENT') continue
+
+			logger.warn(`Could not read category descriptions file: ${ readError.message }`)
+			return {}
+		}
 	}
 
-	try {
-		const fileContent = await fs.readFile(categoriesPath, 'utf-8')
-		return parseCategoryDescriptions(fileContent)
-	} catch (readError) {
-		logger.warn(`Could not read category descriptions file: ${ readError.message }`)
-		return {}
-	}
+	return {}
 }
 
 /**
