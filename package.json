@@ -1,64 +1,59 @@
 {
   "name": "@goobits/blog",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Reusable blog components for Svelte 5 projects",
-  "main": "index.ts",
-  "svelte": "./index.ts",
-  "types": "./index.ts",
+  "main": "./src/index.ts",
+  "svelte": "./src/index.ts",
+  "types": "./src/index.ts",
   "publishConfig": {
     "access": "public"
   },
   "exports": {
     ".": {
-      "types": "./index.ts",
-      "svelte": "./index.ts",
-      "default": "./index.ts"
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./core": {
+      "types": "./src/core.ts",
+      "default": "./src/core.ts"
     },
     "./ui": {
-      "types": "./ui/index.ts",
-      "svelte": "./ui/index.ts",
-      "default": "./ui/index.ts"
+      "types": "./src/ui/index.ts",
+      "svelte": "./src/ui/index.ts",
+      "default": "./src/ui/index.ts"
     },
-    "./ui/*": {
-      "svelte": "./ui/*",
-      "default": "./ui/*"
+    "./ui/elements": {
+      "types": "./src/ui/elements/index.ts",
+      "svelte": "./src/ui/elements/index.ts",
+      "default": "./src/ui/elements/index.ts"
     },
     "./utils": {
-      "types": "./utils/index.ts",
-      "svelte": "./utils/index.ts",
-      "default": "./utils/index.ts"
+      "types": "./src/utils/index.ts",
+      "svelte": "./src/utils/index.ts",
+      "default": "./src/utils/index.ts"
     },
-    "./utils/*": {
-      "svelte": "./utils/*",
-      "default": "./utils/*"
+    "./utils/remark-table-of-contents": {
+      "types": "./src/utils/remark-table-of-contents.d.ts",
+      "default": "./src/utils/remark-table-of-contents.js"
+    },
+    "./utils/rehype-webp-picture": {
+      "default": "./src/utils/rehype-webp-picture.js"
     },
     "./config": {
-      "types": "./config/index.ts",
-      "svelte": "./config/index.ts",
-      "default": "./config/index.ts"
-    },
-    "./config/*": {
-      "svelte": "./config/*",
-      "default": "./config/*"
+      "types": "./src/config/index.ts",
+      "svelte": "./src/config/index.ts",
+      "default": "./src/config/index.ts"
     },
     "./config/defaults": {
-      "types": "./config/defaults.ts",
-      "svelte": "./config/defaults.ts",
-      "default": "./config/defaults.ts"
-    },
-    "./handlers": {
-      "types": "./handlers/index.ts",
-      "svelte": "./handlers/index.ts",
-      "default": "./handlers/index.ts"
-    },
-    "./handlers/*": {
-      "svelte": "./handlers/*",
-      "default": "./handlers/*"
+      "types": "./src/config/defaults.ts",
+      "svelte": "./src/config/defaults.ts",
+      "default": "./src/config/defaults.ts"
     },
     "./i18n": {
-      "types": "./i18n/index.ts",
-      "svelte": "./i18n/index.ts",
-      "default": "./i18n/index.ts"
+      "types": "./src/i18n/index.ts",
+      "svelte": "./src/i18n/index.ts",
+      "default": "./src/i18n/index.ts"
     }
   },
   "sideEffects": [
@@ -72,17 +67,12 @@
     "typecheck": "tsc --noEmit"
   },
   "files": [
-    "index.ts",
-    "config.ts",
-    "svelte.d.ts",
+    "src",
     "tsconfig.json",
-    "ui",
-    "utils",
-    "config",
-    "handlers",
-    "i18n",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md",
+    "UPGRADE.md"
   ],
   "license": "MIT",
   "type": "module",
@@ -115,14 +105,15 @@
     "pnpm": ">=9.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@typescript-eslint/eslint-plugin": "^8.54.0",
-    "@typescript-eslint/parser": "^8.54.0",
-    "eslint": "^9.39.2",
-    "eslint-plugin-svelte": "^3.14.0",
-    "globals": "^17.2.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.54.0",
-    "vitest": "^4.0.18"
+    "@eslint/js": "^10.0.1",
+    "@sveltejs/kit": "^2.60.1",
+    "@typescript-eslint/eslint-plugin": "^8.59.3",
+    "@typescript-eslint/parser": "^8.59.3",
+    "eslint": "^10.4.0",
+    "eslint-plugin-svelte": "^3.17.1",
+    "globals": "^17.6.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.3",
+    "vitest": "^4.1.6"
   }
 }

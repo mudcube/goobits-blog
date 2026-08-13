@@ -28,9 +28,9 @@ npm install @goobits/blog
 
 ### 1. Configure Your Blog
 
-Create a configuration file at `src/lib/blog-config.js`:
+Create a configuration file at `src/lib/blog/config.ts`:
 
-```js
+```ts
 export const blogConfig = {
   // Basic Information
   name: 'My Blog',
@@ -49,23 +49,32 @@ export const blogConfig = {
 export function getBlogPostFiles() {
   return import.meta.glob('/src/content/Blog/**/*.md')
 }
+
+// Optional: customize infinite-scroll fetches for non-standard mounts/APIs
+export function buildPostsApiUrl(params) {
+  return `/api/blog/posts?${params.toString()}`
+}
 ```
 
 ### 2. Initialize the Configuration
 
-```js
-// src/app.js
-import { initBlogConfig } from '@goobits/blog/config'
-import { blogConfig, getBlogPostFiles } from '$lib/blog-config.js'
+In this repo, the journal integration is centralized in `src/lib/blog/config.ts` and initialized via `ensureJournalBlogConfig()`. A minimal setup looks like this:
 
-initBlogConfig(blogConfig, {
-  getBlogPostFiles
-})
+```ts
+// src/lib/blog/config.ts
+import { initBlogConfig } from '@goobits/blog/config'
+
+export function ensureJournalBlogConfig() {
+  initBlogConfig(blogConfig, {
+    getBlogPostFiles,
+    buildPostsApiUrl
+  })
+}
 ```
 
 ### 3. Create Blog Routes
 
-Create the following route structure in your SvelteKit project:
+Create the following route structure in your SvelteKit project. The route folder name is up to you; `blog` is only an example. The package uses `blogConfig.uri` when generating links.
 
 ```
 src/routes/blog/
@@ -73,12 +82,31 @@ src/routes/blog/
 ├── +page.svelte       # Blog index page
 ├── [...slug]/
 │   ├── +page.server.js  # Load individual post/category/tag
+│   ├── +page.js         # Optional client loader for custom content resolution
 │   └── +page.svelte     # Post display page
 └── rss.xml/
     └── +server.js     # RSS feed endpoint
 ```
 
 Use the route handlers from `@goobits/blog/handlers` to load blog data in your server files.
+
+If your markdown lives outside the package defaults, add a client loader. This repo keeps that wiring in `src/lib/blog/config.ts`, then calls `ensureJournalBlogConfig()` before route handlers run:
+
+```js
+// src/routes/blog/[...slug]/+page.js
+import { createBlogPageLoad } from '@goobits/blog/core'
+
+const modules = import.meta.glob('/src/content/Blog/**/index.md')
+
+export const load = createBlogPageLoad({
+  async loadPostContent({ path }) {
+    const loader = modules[path]
+    if (!loader) return null
+    const module = await loader()
+    return module.default ?? null
+  }
+})
+```
 
 ### 4. Use Components
 
@@ -184,6 +212,13 @@ const getMessage = createMessageGetter({
 - `Breadcrumbs` - Navigation breadcrumbs
 - `LanguageSwitcher` - Language selection for i18n
 
+## Import Surfaces
+
+- `@goobits/blog` for UI components
+- `@goobits/blog/core` for config, handlers, utilities, and i18n helpers
+- `@goobits/blog/ui` for direct UI submodule imports
+- `@goobits/blog/config`, `@goobits/blog/utils`, `@goobits/blog/handlers` for focused imports
+
 ## Styling
 
 Import component-specific SCSS files:
@@ -226,6 +261,13 @@ initBlogConfig({
     enabled: true,
     supportedLanguages: ['en', 'es', 'fr'],
     defaultLanguage: 'en'
+  }
+}, {
+  getBlogPostFiles,
+  buildPostsApiUrl,
+  async loadCategoryDescriptions(lang) {
+    // Optional host-controlled taxonomy metadata loading
+    return {}
   }
 })
 ```
