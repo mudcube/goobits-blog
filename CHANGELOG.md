@@ -5,6 +5,31 @@ All notable changes to the `@goobits/blog` package will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-08-13
+
+### Added
+
+- Instance-owned `createBlogEngine` API with injectable content sources.
+- Normalized direct `BlogPost` model, queries, taxonomy, URLs, related-post
+  scoring, and RSS modules.
+- Markdown source supporting flat and nested paths, frontmatter aliases,
+  localization, caching, explicit import-failure policies, image/link/excerpt
+  derivation, and an injected raw-content reader.
+- SvelteKit route, entry, RSS, and client content-loading adapters.
+- Explicit draft read context required in addition to an all-post query.
+- Safe external-link rehype transform and stable Markdown plugin exports.
+
+### Changed
+
+- Package version advanced to 3.0.0.
+- `@goobits/blog/core` now exposes the instance-based domain API.
+- The richer Miko v2 UI and Markdown behavior is the v3 compatibility floor.
+
+### Fixed
+
+- Markdown images are no longer misclassified as internal content links.
+- Logger methods retain their console receiver under strict linting.
+
 ## [2.0.0] - 2026-05-09
 
 ### Breaking changes
@@ -206,4 +231,3 @@ but it's no longer part of the published `exports` surface.
 
 ### Security
 - No known security issues
-

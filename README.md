@@ -1,281 +1,80 @@
-# @goobits/blog
+# `@goobits/blog`
 
-[![npm version](https://img.shields.io/npm/v/@goobits/blog.svg)](https://npmjs.com/package/@goobits/blog)
-
-Markdown-based blog framework with flexible i18n support and content categorization for Svelte 5.
-
-## 🔒 Security Notice
-
-This package processes user-generated markdown content. Always sanitize markdown on the server-side before rendering. Do not trust user input.
+Instance-based Blog engine, Markdown source, SvelteKit adapters, and Svelte 5 presentation components.
 
 ## Features
 
-- Content in `src/content/Blog/{year}/{month}/`
-- Frontmatter for metadata (title, date, categories, tags)
-- Framework-agnostic i18n support
-- RSS feed generation
-- Category and tag filtering
-- Pagination and search
-- Responsive layouts
+- Direct, normalized `BlogPost` fields at every public boundary
+- Flat and nested Markdown layouts
+- Explicit draft preview authorization
+- Search, sorting, pagination, categories, and tags
+- Localized metadata and aliases
+- Related-post scoring with explainable reasons
+- RSS with canonical URLs and draft exclusion
+- Injectable content sources for future database or API backends
+- TOC, WebP picture, safe external-link, gallery, and prose helpers
 
-## Installation
-
-```bash
-npm install @goobits/blog
-```
-
-## Quick Start
-
-### 1. Configure Your Blog
-
-Create a configuration file at `src/lib/blog/config.ts`:
+## Setup
 
 ```ts
-export const blogConfig = {
-  // Basic Information
-  name: 'My Blog',
-  description: 'Welcome to my blog',
-  uri: '/blog',
-  
-  // Customize settings as needed
-  theme: {
-    colors: {
-      primary: '#3b82f6',
-    }
-  }
-}
+import { createBlogEngine } from '@goobits/blog/core'
+import { createMarkdownContentSource } from '@goobits/blog/markdown'
 
-// Define blog post files location
-export function getBlogPostFiles() {
-  return import.meta.glob('/src/content/Blog/**/*.md')
-}
+const files = import.meta.glob('/src/content/journal/**/*.md')
 
-// Optional: customize infinite-scroll fetches for non-standard mounts/APIs
-export function buildPostsApiUrl(params) {
-  return `/api/blog/posts?${params.toString()}`
-}
+export const blog = createBlogEngine({
+	config: {
+		name: 'Journal',
+		description: 'Notes from the studio',
+		basePath: '/journal',
+		canonicalOrigin: 'https://example.com'
+	},
+	contentSource: createMarkdownContentSource({
+		files,
+		basePath: '/journal',
+		readContent: loadRawMarkdown,
+		resolveSourcePath: path => path.replace('/src/content/journal/', '@journal/')
+	})
+})
 ```
 
-### 2. Initialize the Configuration
+Configuration belongs to the returned engine. Creating one engine does not mutate another engine or any package-level singleton.
 
-In this repo, the journal integration is centralized in `src/lib/blog/config.ts` and initialized via `ensureJournalBlogConfig()`. A minimal setup looks like this:
+## SvelteKit
 
 ```ts
-// src/lib/blog/config.ts
-import { initBlogConfig } from '@goobits/blog/config'
+import { createBlogRouteHandlers } from '@goobits/blog/sveltekit'
+import { blog } from '$lib/blog'
 
-export function ensureJournalBlogConfig() {
-  initBlogConfig(blogConfig, {
-    getBlogPostFiles,
-    buildPostsApiUrl
-  })
-}
-```
-
-### 3. Create Blog Routes
-
-Create the following route structure in your SvelteKit project. The route folder name is up to you; `blog` is only an example. The package uses `blogConfig.uri` when generating links.
-
-```
-src/routes/blog/
-├── +page.server.js    # Load blog posts list
-├── +page.svelte       # Blog index page
-├── [...slug]/
-│   ├── +page.server.js  # Load individual post/category/tag
-│   ├── +page.js         # Optional client loader for custom content resolution
-│   └── +page.svelte     # Post display page
-└── rss.xml/
-    └── +server.js     # RSS feed endpoint
-```
-
-Use the route handlers from `@goobits/blog/handlers` to load blog data in your server files.
-
-If your markdown lives outside the package defaults, add a client loader. This repo keeps that wiring in `src/lib/blog/config.ts`, then calls `ensureJournalBlogConfig()` before route handlers run:
-
-```js
-// src/routes/blog/[...slug]/+page.js
-import { createBlogPageLoad } from '@goobits/blog/core'
-
-const modules = import.meta.glob('/src/content/Blog/**/index.md')
-
-export const load = createBlogPageLoad({
-  async loadPostContent({ path }) {
-    const loader = modules[path]
-    if (!loader) return null
-    const module = await loader()
-    return module.default ?? null
-  }
+export const journalRoutes = createBlogRouteHandlers({
+	engine: blog,
+	getReadContext: event => ({
+		allowDrafts: event.locals.releaseStage === 'preview'
+	})
 })
 ```
 
-### 4. Use Components
+Draft access requires both `visibility: 'all'` and `{ allowDrafts: true }`. Public lists, prerender entries, related posts, and RSS default to published posts only.
 
-```svelte
-<script>
-  import { PostList, Sidebar } from '@goobits/blog/ui'
-  import { defaultMessages } from '@goobits/blog/config'
-  
-  let { posts, categories, tags } = $props()
-</script>
+## Imports
 
-<div class="blog-layout">
-  <PostList {posts} />
-  <Sidebar {categories} {tags} />
-</div>
-```
+| Import | Owner |
+|---|---|
+| `@goobits/blog` | Direct post types and Blog UI |
+| `@goobits/blog/core` | Engine, queries, taxonomy, URLs, related posts, RSS |
+| `@goobits/blog/markdown` | Markdown content source |
+| `@goobits/blog/sveltekit` | Route, page-load, entries, and RSS adapters |
+| `@goobits/blog/ui` | Svelte presentation components and prose elements |
+| `@goobits/blog/i18n` | Framework-neutral translation hooks |
 
-## Internationalization (i18n)
+The package returns normalized SEO data. The consuming app owns the final `<svelte:head>` composition, site identity, and release-stage policy.
 
-The blog package supports full internationalization through multiple integration methods:
-
-### 1. Component-level Translation
-
-All components accept a `messages` prop for direct translation override:
-
-```svelte
-<script>
-  import { BlogCard } from '@goobits/blog'
-  
-  // Custom translations
-  const messages = {
-    readMore: 'Leer más',
-    author: 'Autor',
-    tags: 'Etiquetas'
-  }
-</script>
-
-<BlogCard post={post} {messages} />
-```
-
-### 2. Server Integration
-
-For full i18n with automatic language detection and routing:
+## Markdown Plugins
 
 ```js
-// hooks.server.js
-import { handleBlogI18n } from '@goobits/blog/i18n'
-
-export async function handle({ event, resolve }) {
-  // Add language info to event.locals
-  await handleBlogI18n(event)
-  
-  // Continue with request handling
-  return await resolve(event)
-}
+import { rehypeExternalLinks } from '@goobits/blog/markdown/rehype-external-links'
+import { rehypeWebpPicture } from '@goobits/blog/markdown/rehype-webp-picture'
+import { remarkTableOfContents } from '@goobits/blog/markdown/remark-table-of-contents'
 ```
 
-### 3. Page Integration
-
-Enhance blog pages with i18n data:
-
-```js
-// blog/+page.server.js
-import { loadWithBlogI18n } from '@goobits/blog/i18n'
-
-export const load = async (event) => {
-  return await loadWithBlogI18n(event, async () => {
-    // Your original blog data loading
-    return { posts, categories, tags }
-  })
-}
-```
-
-### 4. Paraglide Integration
-
-For seamless integration with Paraglide (recommended):
-
-```js
-import { createMessageGetter } from '@goobits/blog/i18n'
-import * as m from '$paraglide/messages'
-
-// Map blog message keys to Paraglide translations
-const getMessage = createMessageGetter({
-  readMore: m.readMore,
-  author: m.author,
-  tags: m.tags
-})
-```
-
-## Components
-
-- `BlogRouter` - Main router component
-- `BlogLayout` - Blog layout wrapper
-- `BlogListPage` - Blog index/archive page
-- `BlogPostPage` - Individual post page
-- `BlogCard` - Post preview card
-- `BlogSEO` - SEO meta tags for blog pages
-- `PostList` - List of blog posts with layouts
-- `Sidebar` - Blog sidebar with search/filters
-- `TagCategoryList` - Tag and category display
-- `SocialShare` - Social sharing buttons
-- `Newsletter` - Newsletter subscription form
-- `Breadcrumbs` - Navigation breadcrumbs
-- `LanguageSwitcher` - Language selection for i18n
-
-## Import Surfaces
-
-- `@goobits/blog` for UI components
-- `@goobits/blog/core` for config, handlers, utilities, and i18n helpers
-- `@goobits/blog/ui` for direct UI submodule imports
-- `@goobits/blog/config`, `@goobits/blog/utils`, `@goobits/blog/handlers` for focused imports
-
-## Styling
-
-Import component-specific SCSS files:
-
-```js
-import '@goobits/blog/ui/BlogCard.scss'
-import '@goobits/blog/ui/Sidebar.scss'
-```
-
-## Configuration
-
-Override defaults by passing options to `initBlogConfig`:
-
-```js
-initBlogConfig({
-  // Basic info
-  name: 'My Blog',
-  description: 'Welcome to my blog',
-  uri: '/blog',
-
-  // Content settings (showing defaults)
-  posts: {
-    excerptLength: 160,        // characters
-    relatedPostsCount: 3,
-    readTime: {
-      wordsPerMinute: 225
-    }
-  },
-
-  // Theme (showing defaults)
-  theme: {
-    colors: {
-      primary: '#f59e0b',
-      secondary: '#22c55e'
-    }
-  },
-
-  // i18n (disabled by default)
-  i18n: {
-    enabled: true,
-    supportedLanguages: ['en', 'es', 'fr'],
-    defaultLanguage: 'en'
-  }
-}, {
-  getBlogPostFiles,
-  buildPostsApiUrl,
-  async loadCategoryDescriptions(lang) {
-    // Optional host-controlled taxonomy metadata loading
-    return {}
-  }
-})
-```
-
-## Accessibility
-
-Components include proper ARIA attributes, semantic HTML, and keyboard navigation support.
-
-## License
-
-MIT
+Sanitize untrusted Markdown before rendering it. The external-link transform hardens links but is not a general HTML sanitizer.

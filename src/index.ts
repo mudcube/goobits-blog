@@ -1,5 +1,5 @@
-// UI exports for @goobits/blog package.
-// Import `@goobits/blog/core` for config, handlers, utilities, and i18n helpers.
+export * from './core/index.js'
+
 export { default as BlogCard } from './ui/BlogCard.svelte'
 export { default as BlogLayout } from './ui/BlogLayout.svelte'
 export { default as BlogListPage } from './ui/BlogListPage.svelte'

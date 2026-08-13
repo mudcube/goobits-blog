@@ -1,6 +1,6 @@
 {
   "name": "@goobits/blog",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Reusable blog components for Svelte 5 projects",
   "main": "./src/index.ts",
   "svelte": "./src/index.ts",
@@ -15,8 +15,26 @@
       "default": "./src/index.ts"
     },
     "./core": {
-      "types": "./src/core.ts",
-      "default": "./src/core.ts"
+      "types": "./src/core/index.ts",
+      "default": "./src/core/index.ts"
+    },
+    "./markdown": {
+      "types": "./src/markdown/index.ts",
+      "default": "./src/markdown/index.ts"
+    },
+    "./markdown/remark-table-of-contents": {
+      "types": "./src/markdown/remarkTableOfContents.d.ts",
+      "default": "./src/markdown/remarkTableOfContents.js"
+    },
+    "./markdown/rehype-webp-picture": {
+      "default": "./src/markdown/rehypeWebpPicture.js"
+    },
+    "./markdown/rehype-external-links": {
+      "default": "./src/markdown/rehypeExternalLinks.js"
+    },
+    "./sveltekit": {
+      "types": "./src/sveltekit/index.ts",
+      "default": "./src/sveltekit/index.ts"
     },
     "./ui": {
       "types": "./src/ui/index.ts",
@@ -41,9 +59,8 @@
       "default": "./src/utils/rehype-webp-picture.js"
     },
     "./config": {
-      "types": "./src/config/index.ts",
-      "svelte": "./src/config/index.ts",
-      "default": "./src/config/index.ts"
+      "types": "./src/config/blogConfig.ts",
+      "default": "./src/config/blogConfig.ts"
     },
     "./config/defaults": {
       "types": "./src/config/defaults.ts",
