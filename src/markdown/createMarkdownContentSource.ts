@@ -161,6 +161,10 @@ function normalizeBasePath(path: string): string {
 	return trimmed && trimmed !== '/' ? `/${ trimmed.replace(/^\/+|\/+$/g, '') }` : ''
 }
 
+function stripFrontmatter(content: string): string {
+	return content.replace(/^\uFEFF?---[ \t]*\r?\n[\s\S]*?\r?\n---[ \t]*(?:\r?\n|$)/, '')
+}
+
 function extractFirstImage(content: string): string | undefined {
 	const markdown = content.match(/!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/)?.[1]
 	if (markdown) {
@@ -284,7 +288,8 @@ export function createMarkdownContentSource(options: MarkdownContentSourceOption
 				if (!resolved.slug) {
 					throw new Error('Post path has no usable slug')
 				}
-				const content = options.readContent ? await options.readContent(filePath) : ''
+				const rawContent = options.readContent ? await options.readContent(filePath) : ''
+				const content = stripFrontmatter(rawContent)
 				const categories = [ ...getStringArray(metadata.categories) ]
 				const category = getString(metadata.category)
 				if (category && !categories.includes(category)) {

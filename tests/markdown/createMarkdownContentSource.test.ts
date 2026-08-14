@@ -42,6 +42,24 @@ describe('createMarkdownContentSource', () => {
 		expect(metadata).toEqual({ title: 'Derived', date: '2024-06-01' })
 	})
 
+	it('removes source frontmatter before deriving or returning content', async () => {
+		const source = createMarkdownContentSource({
+			files: {
+				'/content/2024/06/frontmatter.md': () => Promise.resolve({
+					metadata: { title: 'Frontmatter', date: '2024-06-02' }
+				})
+			},
+			readContent: () => Promise.resolve('---\ntitle: Frontmatter\ntags:\n  - hidden\n---\n\nVisible copy.')
+		})
+		const [ post ] = (await source.listPosts({ includeContent: true })).posts
+
+		expect(post).toMatchObject({
+			excerpt: 'Visible copy.',
+			content: '\nVisible copy.'
+		})
+		expect(post?.excerpt).not.toContain('title:')
+	})
+
 	it('resolves relative post assets against the mounted post URL', async () => {
 		const source = createMarkdownContentSource({
 			basePath: '/journal',
