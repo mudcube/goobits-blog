@@ -39,6 +39,9 @@ describe('SvelteKit blog routes', () => {
 		await expect(handlers.loadRoute(event('2024/05/draft', true))).resolves.toMatchObject({
 			post: { title: 'Private Draft' }
 		})
+		const previewIndex = await handlers.loadIndex(event('', true))
+		expect(previewIndex.totalPosts).toBe(3)
+		expect(previewIndex.categories).toContainEqual({ name: 'Notes', slug: 'notes', count: 1 })
 	})
 
 	it('passes paging, search, and sort query state through list routes', async () => {
@@ -51,16 +54,37 @@ describe('SvelteKit blog routes', () => {
 		})
 	})
 
+	it('returns an empty valid taxonomy search without converting it to a 404', async () => {
+		await expect(handlers.loadRoute(event(
+			'category/engineering',
+			false,
+			'?q=definitely-missing'
+		))).resolves.toMatchObject({
+			pageType: 'category',
+			totalPosts: 0,
+			posts: []
+		})
+		await expect(handlers.loadRoute(event(
+			'category/missing',
+			false,
+			'?q=definitely-missing'
+		))).rejects.toMatchObject({ status: 404 })
+	})
+
 	it('generates published entries and RSS only', async () => {
 		const entries = await handlers.entries()
 		expect(entries).toContainEqual({ slug: '2024/03/flat' })
 		expect(entries).not.toContainEqual({ slug: '2024/05/draft' })
 
-		const response = await handlers.GET(event('rss.xml'))
+		const rssEvent = event('rss.xml')
+		rssEvent.url = new URL('https://preview.example/journal/rss.xml')
+		const response = await handlers.GET(rssEvent)
 		const xml = await response.text()
 		expect(response.status).toBe(200)
 		expect(xml).toContain('Flat &amp; Friendly')
 		expect(xml).not.toContain('Private Draft')
+		expect(xml).toContain('https://example.com/journal/2024/03/flat')
+		expect(xml).not.toContain('https://preview.example')
 	})
 
 	it('rejects unknown and static asset routes', async () => {

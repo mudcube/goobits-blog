@@ -3,6 +3,7 @@ import type { BlogPost } from '../core/blogPost.js'
 import type { BlogQuery, BlogReadContext, BlogSort } from '../core/blogQuery.js'
 import type { RelatedPostResult } from '../core/resolveRelatedPosts.js'
 import type { BlogTaxonomyTerm } from '../core/blogTaxonomy.js'
+import { slugify } from '../core/blogUrls.js'
 import { generateBlogEntries, type BlogEntry } from './generateBlogEntries.js'
 
 export interface BlogRouteEvent {
@@ -98,14 +99,11 @@ export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): Blog
 		const lang = getLanguage(event)
 		const context = getReadContext(event)
 		const query = readListQuery(event, engine.config.pageSize)
-		const page = await engine.listPosts({
-			language: lang,
-			...query,
-			visibility: context.allowDrafts === true ? 'all' : 'published'
-		}, context)
-		const [ categories, tags ] = await Promise.all([
-			engine.getCategories({ language: lang }, context),
-			engine.getTags({ language: lang }, context)
+		const visibility = context.allowDrafts === true ? 'all' : 'published'
+		const [ page, categories, tags ] = await Promise.all([
+			engine.listPosts({ language: lang, ...query, visibility }, context),
+			engine.getCategories({ language: lang, visibility }, context),
+			engine.getTags({ language: lang, visibility }, context)
 		])
 		return {
 			pageType: 'index',
@@ -130,19 +128,21 @@ export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): Blog
 		const lang = getLanguage(event)
 		const context = getReadContext(event)
 		const query = readListQuery(event, engine.config.pageSize)
-		const page = await engine.listPosts({
-			language: lang,
-			...query,
-			visibility: context.allowDrafts === true ? 'all' : 'published',
-			...(pageType === 'category' ? { category: term } : { tag: term })
-		}, context)
-		if (page.total === 0) {
+		const visibility = context.allowDrafts === true ? 'all' : 'published'
+		const [ page, categories, tags ] = await Promise.all([
+			engine.listPosts({
+				language: lang,
+				...query,
+				visibility,
+				...(pageType === 'category' ? { category: term } : { tag: term })
+			}, context),
+			engine.getCategories({ language: lang, visibility }, context),
+			engine.getTags({ language: lang, visibility }, context)
+		])
+		const taxonomy = pageType === 'category' ? categories : tags
+		if (!taxonomy.some(item => item.slug === slugify(term))) {
 			throw new BlogRouteError(404, `${ pageType } "${ term }" was not found`)
 		}
-		const [ categories, tags ] = await Promise.all([
-			engine.getCategories({ language: lang }, context),
-			engine.getTags({ language: lang }, context)
-		])
 		return {
 			pageType,
 			term,
@@ -194,7 +194,9 @@ export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): Blog
 		entries: async (): Promise<BlogEntry[]> => await generateBlogEntries(engine),
 		GET: async (event): Promise<Response> => {
 			try {
-				const xml = await engine.generateRss({ siteUrl: event.url.origin })
+				const xml = await engine.generateRss({
+					siteUrl: engine.config.canonicalOrigin ?? event.url.origin
+				})
 				return new Response(xml, {
 					headers: {
 						'Content-Type': 'application/xml; charset=utf-8',
