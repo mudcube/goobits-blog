@@ -6,8 +6,8 @@
  *   <p><a href="..."><img src="..." alt="..." /></a></p>
  *   <p><img src="..." alt="..." /></p>
  *
- * Consecutive qualifying <p> elements are grouped into "sets" (a run ends
- * when a non-image paragraph or other element breaks the sequence).
+ * Consecutive qualifying <p> elements are grouped into "sets" (any other
+ * direct child ends the run).
  *
  * On click of any qualifying image the action dispatches a
  * `gallery:open` CustomEvent that bubbles up from the host element so a
@@ -36,6 +36,7 @@ export type GalleryOpenDetail = {
 
 type CleanupFn = () => void
 type GallerySetEntry = { items: GalleryItem[]; index: number }
+type AttributeState = Record<'aria-label' | 'role' | 'tabindex', string | null>
 
 /**
  * Attach the gallery + lightbox behavior to a prose container.
@@ -45,6 +46,16 @@ type GallerySetEntry = { items: GalleryItem[]; index: number }
  */
 export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 	const cleanups: CleanupFn[] = []
+	const accessibilityState = new Map<HTMLParagraphElement, AttributeState>()
+
+	function isImageContent(element: Element): boolean {
+		if (element.tagName === 'IMG') { return true }
+		if (element.tagName !== 'PICTURE') { return false }
+
+		const children = Array.from(element.children)
+		return children.filter(child => child.tagName === 'IMG').length === 1
+			&& children.every(child => child.tagName === 'SOURCE' || child.tagName === 'IMG')
+	}
 
 	function isImageOnlyParagraph(el: Element): el is HTMLParagraphElement {
 		if (el.tagName !== 'P') { return false }
@@ -56,7 +67,7 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 		})
 		if (children.length !== 1) { return false }
 		const only = children[0] as Element
-		if (only.tagName === 'IMG') { return true }
+		if (isImageContent(only)) { return true }
 		if (only.tagName === 'A') {
 			const anchorChildren = Array.from(only.childNodes).filter(n => {
 				if (n.nodeType === Node.TEXT_NODE) {
@@ -64,7 +75,7 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 				}
 				return n.nodeType === Node.ELEMENT_NODE
 			})
-			return anchorChildren.length === 1 && (anchorChildren[0] as Element).tagName === 'IMG'
+			return anchorChildren.length === 1 && isImageContent(anchorChildren[0] as Element)
 		}
 		return false
 	}
@@ -82,14 +93,12 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 
 	function collectSets(): Map<HTMLParagraphElement, GallerySetEntry> {
 		const sets = new Map<HTMLParagraphElement, GallerySetEntry>()
-		const paragraphs = Array.from(node.querySelectorAll<HTMLParagraphElement>(':scope > p'))
-
 		let currentSet: HTMLParagraphElement[] = []
 		const allSets: HTMLParagraphElement[][] = []
 
-		for (const p of paragraphs) {
-			if (isImageOnlyParagraph(p)) {
-				currentSet.push(p)
+		for (const child of Array.from(node.children)) {
+			if (isImageOnlyParagraph(child)) {
+				currentSet.push(child)
 			} else if (currentSet.length > 0) {
 				allSets.push(currentSet)
 				currentSet = []
@@ -99,7 +108,7 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 			allSets.push(currentSet)
 		}
 
-		for (const set of allSets) {
+		allSets.forEach((set, setIndex) => {
 			const items = set
 				.map(extractItem)
 				.filter((item): item is GalleryItem => item !== null)
@@ -107,20 +116,28 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 				sets.set(p, { items, index })
 				p.setAttribute('data-blog-gallery-tile', '')
 				if (set.length > 1) {
-					p.setAttribute('data-blog-gallery-set', String(allSets.indexOf(set)))
+					p.setAttribute('data-blog-gallery-set', String(setIndex))
+				}
+				if (!p.querySelector('a')) {
+					accessibilityState.set(p, {
+						'aria-label': p.getAttribute('aria-label'),
+						'role': p.getAttribute('role'),
+						'tabindex': p.getAttribute('tabindex')
+					})
+					p.setAttribute('role', 'button')
+					p.setAttribute('tabindex', '0')
+					p.setAttribute('aria-label', items[index]?.alt
+						? `Open image: ${ items[index].alt }`
+						: 'Open image')
 				}
 			})
-		}
+		})
 		return sets
 	}
 
 	const sets = collectSets()
 
-	function handleClick(event: Event): void {
-		const target = event.target as Element | null
-		if (!target) { return }
-		const paragraph = target.closest<HTMLParagraphElement>('p[data-blog-gallery-tile]')
-		if (!paragraph) { return }
+	function openParagraph(paragraph: HTMLParagraphElement, event: Event): void {
 		const entry = sets.get(paragraph)
 		if (!entry || entry.items.length === 0) { return }
 
@@ -140,9 +157,28 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 		)
 	}
 
+	function handleClick(event: Event): void {
+		const target = event.target as Element | null
+		const paragraph = target?.closest<HTMLParagraphElement>('p[data-blog-gallery-tile]')
+		if (paragraph) {
+			openParagraph(paragraph, event)
+		}
+	}
+
+	function handleKeydown(event: KeyboardEvent): void {
+		if (event.key !== 'Enter' && event.key !== ' ') { return }
+		const target = event.target as Element | null
+		const paragraph = target?.closest<HTMLParagraphElement>('p[data-blog-gallery-tile][role="button"]')
+		if (paragraph && target === paragraph) {
+			openParagraph(paragraph, event)
+		}
+	}
+
 	node.addEventListener('click', handleClick)
+	node.addEventListener('keydown', handleKeydown)
 	cleanups.push(() => {
 		node.removeEventListener('click', handleClick)
+		node.removeEventListener('keydown', handleKeydown)
 	})
 
 	// Set cursor affordance on tiles so users know they're clickable
@@ -157,6 +193,16 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 				paragraph.removeAttribute('data-blog-gallery-tile')
 				paragraph.removeAttribute('data-blog-gallery-set')
 				paragraph.classList.remove('blog-gallery__tile')
+				const previous = accessibilityState.get(paragraph)
+				if (previous) {
+					for (const [ attribute, value ] of Object.entries(previous)) {
+						if (value === null) {
+							paragraph.removeAttribute(attribute)
+						} else {
+							paragraph.setAttribute(attribute, value)
+						}
+					}
+				}
 			}
 		}
 	}

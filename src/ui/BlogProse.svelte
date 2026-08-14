@@ -65,6 +65,8 @@
 	 */
 	.blog-prose > :global(p[data-blog-gallery-tile]),
 	.blog-prose > :global(p:has(> a:only-child > img:only-child)),
+	.blog-prose > :global(p:has(> a:only-child > picture:only-child > img)),
+	.blog-prose > :global(p:has(> picture:only-child > img)),
 	.blog-prose > :global(p:has(> img:only-child)) {
 		grid-column: auto;
 		margin: 0;
@@ -81,18 +83,24 @@
 	}
 
 	.blog-prose > :global(p[data-blog-gallery-tile] a),
-	.blog-prose > :global(p:has(> a:only-child > img:only-child) a) {
+	.blog-prose > :global(p:has(> a:only-child > img:only-child) a),
+	.blog-prose > :global(p:has(> a:only-child > picture:only-child > img) a),
+	.blog-prose > :global(p[data-blog-gallery-tile] picture),
+	.blog-prose > :global(p:has(> a:only-child > picture:only-child > img) picture),
+	.blog-prose > :global(p:has(> picture:only-child > img) picture) {
 		display: block;
 		width: 100%;
 	}
 
 	.blog-prose > :global(p[data-blog-gallery-tile] img),
 	.blog-prose > :global(p:has(> a:only-child > img:only-child) img),
+	.blog-prose > :global(p:has(> a:only-child > picture:only-child > img) img),
+	.blog-prose > :global(p:has(> picture:only-child > img) img),
 	.blog-prose > :global(p:has(> img:only-child) img) {
 		display: block;
 		width: 100%;
 		height: auto;
-		object-fit: cover;
+		object-fit: contain;
 		transition: transform 0.5s ease;
 	}
 
@@ -114,6 +122,7 @@
 	 * `:focus-visible` ring sits on the wrapping <p> so it matches the tile
 	 * bounds rather than the anchor's inline box.
 	 */
+	.blog-prose > :global(p[data-blog-gallery-tile]:focus-visible),
 	.blog-prose > :global(p[data-blog-gallery-tile]:has(a:focus-visible)) {
 		outline: 2px solid currentColor;
 		outline-offset: 2px;

@@ -26,28 +26,38 @@
 	const hasPrev = $derived(index > 0)
 	const hasNext = $derived(index < items.length - 1)
 
+	function cancelReveal() {
+		cancelAnimationFrame(revealFrame)
+		revealFrame = 0
+	}
+
 	function open(detail: GalleryOpenDetail) {
 		items = detail.items
 		index = Math.max(0, Math.min(detail.index, detail.items.length - 1))
-		if (dialog && !dialog.open) {
-			if (closeTimer) {
-				clearTimeout(closeTimer)
-				closeTimer = null
-			}
-			isClosing = false
-			isVisible = false
-			dialog.showModal()
-			prefetchAdjacent()
-			cancelAnimationFrame(revealFrame)
-			revealFrame = requestAnimationFrame(() => {
-				revealFrame = requestAnimationFrame(() => {
-					isVisible = true
-				})
-			})
+		if (!dialog) { return }
+		if (closeTimer) {
+			clearTimeout(closeTimer)
+			closeTimer = null
 		}
+		cancelReveal()
+		isClosing = false
+		isVisible = false
+		if (!dialog.open) {
+			dialog.showModal()
+		}
+		prefetchAdjacent()
+		revealFrame = requestAnimationFrame(() => {
+			revealFrame = requestAnimationFrame(() => {
+				revealFrame = 0
+				if (!isClosing && dialog.open) {
+					isVisible = true
+				}
+			})
+		})
 	}
 
 	function finishClose() {
+		cancelReveal()
 		closeTimer = null
 		if (dialog?.open) {
 			dialog.close()
@@ -58,6 +68,7 @@
 		if (!dialog?.open || isClosing) {
 			return
 		}
+		cancelReveal()
 		isClosing = true
 		isVisible = false
 
@@ -69,6 +80,7 @@
 	}
 
 	function handleClose() {
+		cancelReveal()
 		items = []
 		index = 0
 		isVisible = false
@@ -169,7 +181,7 @@
 		document.addEventListener('gallery:open', galleryOpenListener)
 		document.addEventListener('keydown', handleKey)
 		return () => {
-			cancelAnimationFrame(revealFrame)
+			cancelReveal()
 			if (closeTimer) { clearTimeout(closeTimer) }
 			document.removeEventListener('gallery:open', galleryOpenListener)
 			document.removeEventListener('keydown', handleKey)
