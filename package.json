@@ -30,6 +30,7 @@
       "default": "./src/markdown/rehypeWebpPicture.js"
     },
     "./markdown/rehype-external-links": {
+      "types": "./src/markdown/rehypeExternalLinks.d.ts",
       "default": "./src/markdown/rehypeExternalLinks.js"
     },
     "./sveltekit": {
