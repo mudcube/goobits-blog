@@ -76,10 +76,18 @@
 
 .blog-index__filters {
 	display: grid;
-	grid-template-columns: minmax(12rem, 1fr) minmax(10rem, auto) auto;
+	grid-template-columns: minmax(12rem, 1fr) minmax(10rem, auto);
 	gap: 0.65rem;
 	align-items: center;
 	margin-block-start: 1rem;
+}
+
+.blog-index__search {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 0.65rem;
+	align-items: center;
+	min-width: 0;
 }
 
 .blog-card {

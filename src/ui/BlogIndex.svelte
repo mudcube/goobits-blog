@@ -3,6 +3,7 @@
 	import { GooInput } from '@goobits/goo/input'
 	import { GooSelect } from '@goobits/goo/select'
 	import { GooSpinner } from '@goobits/goo/spinner'
+	import { onDestroy, untrack } from 'svelte'
 	import './blogTheme.css'
 
 	import type { BlogConfig } from '../config/blogConfig.js'
@@ -11,6 +12,7 @@
 	import type { BlogPostPage, BlogSort } from '../core/blogQuery.js'
 	import type { BlogTaxonomyTerm } from '../core/blogTaxonomy.js'
 	import BlogCard from './BlogCard.svelte'
+	import { createBlogFilterNavigation, type BlogFilterNavigate } from './blogFilters.js'
 
 	type PaginationMode = 'pages' | 'load-more' | 'infinite'
 
@@ -33,6 +35,7 @@
 		messages?: BlogUiMessagesInput
 		locale?: string
 		class?: string
+		navigate?: BlogFilterNavigate
 	}
 
 	const {
@@ -53,7 +56,8 @@
 		pageHref,
 		messages: messageInput = {},
 		locale = config.defaultLanguage,
-		class: className = ''
+		class: className = '',
+		navigate
 	}: Props = $props()
 
 	const messages = $derived(createBlogUiMessages(messageInput))
@@ -63,6 +67,8 @@
 	let loadedPage = $state<number | null>(null)
 	let loadedHasMore = $state<boolean | null>(null)
 	let loading = $state(false)
+	let searchValue = $state(untrack(() => search))
+	let sortValue = $state<BlogSort>(untrack(() => sort))
 	const visiblePosts = $derived([ ...posts, ...appendedPosts ])
 	const currentPage = $derived(loadedPage ?? page)
 	const canLoadMore = $derived(loadedHasMore ?? hasMorePosts)
@@ -71,6 +77,8 @@
 		oldest: 'Oldest first',
 		title: 'Title'
 	}
+	const navigateAdapter = untrack(() => navigate)
+	const filterNavigation = createBlogFilterNavigation(navigateAdapter ? { navigate: navigateAdapter } : {})
 
 	function getPageHref(pageNumber: number): string {
 		if (pageHref) {return pageHref(pageNumber)}
@@ -86,6 +94,28 @@
 		loadedPage = null
 		loadedHasMore = null
 	})
+
+	$effect(() => {
+		searchValue = search
+		sortValue = sort
+	})
+
+	onDestroy(filterNavigation.cancel)
+
+	function scheduleSearch(value: string): void {
+		searchValue = value
+		filterNavigation.scheduleSearch({ search: value, sort: sortValue })
+	}
+
+	function handleSort(value: string): void {
+		sortValue = value as BlogSort
+		void filterNavigation.apply({ search: searchValue, sort: sortValue })
+	}
+
+	function handleSubmit(event: SubmitEvent): void {
+		event.preventDefault()
+		void filterNavigation.apply({ search: searchValue, sort: sortValue })
+	}
 
 	async function loadNextPage(): Promise<void> {
 		if (!loadPage || loading || !canLoadMore) {return}
@@ -127,16 +157,19 @@
 				{/each}
 			</nav>
 		{/if}
-		<form class="blog-index__filters" method="GET" aria-label="Search and sort posts">
-			<GooInput
-				type="search"
-				name="q"
-				value={search}
-				ariaLabel={messages.searchPlaceholder}
-				placeholder={messages.searchPlaceholder}
-			/>
-			<GooSelect name="sort" value={sort} options={sortOptions} ariaLabel="Sort posts" />
-			<GooButton type="submit" label={messages.search} />
+		<form class="blog-index__filters" method="GET" aria-label="Search and sort posts" onsubmit={handleSubmit}>
+			<div class="blog-index__search">
+				<GooInput
+					type="search"
+					name="q"
+					value={searchValue}
+					oninput={scheduleSearch}
+					ariaLabel={messages.searchPlaceholder}
+					placeholder={messages.searchPlaceholder}
+				/>
+				<GooButton type="submit" label={messages.search} />
+			</div>
+			<GooSelect name="sort" value={sortValue} options={sortOptions} ariaLabel="Sort posts" onchange={handleSort} />
 		</form>
 	</header>
 

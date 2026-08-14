@@ -54,6 +54,9 @@ describe('Blog v3 UI', () => {
 		expect(card).not.toContain('metadata')
 		expect(index).toContain('Field notes')
 		expect(index).toContain('Direct fields')
+		expect(index).toContain('blog-index__search')
+		expect(index.indexOf('name="q"')).toBeLessThan(index.indexOf('>Search</'))
+		expect(index.indexOf('>Search</')).toBeLessThan(index.indexOf('name="sort"'))
 	})
 
 	it('does not render a newsletter without a working host adapter', () => {
