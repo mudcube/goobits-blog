@@ -1,4 +1,7 @@
 <script lang="ts">
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left'
+	import ChevronRight from '@lucide/svelte/icons/chevron-right'
+	import X from '@lucide/svelte/icons/x'
 	import { onMount } from 'svelte'
 	import type { GalleryItem, GalleryOpenDetail } from './actions/galleryLightbox'
 
@@ -152,7 +155,7 @@
 				class="blog-lightbox__close"
 				aria-label="Close gallery"
 				onclick={close}
-			>✕</button>
+			><X size={20} strokeWidth={2} aria-hidden="true" /></button>
 
 			{#if items.length > 1}
 				<button
@@ -161,7 +164,7 @@
 					aria-label="Previous image"
 					disabled={!hasPrev}
 					onclick={goPrev}
-				>‹</button>
+				><ChevronLeft size={24} strokeWidth={2} aria-hidden="true" /></button>
 			{/if}
 
 			<figure class="blog-lightbox__figure">
@@ -193,7 +196,7 @@
 					aria-label="Next image"
 					disabled={!hasNext}
 					onclick={goNext}
-				>›</button>
+				><ChevronRight size={24} strokeWidth={2} aria-hidden="true" /></button>
 			{/if}
 		</div>
 	{/if}
@@ -259,16 +262,19 @@
 		top: 1rem;
 		right: 1rem;
 		z-index: 2;
-		display: grid;
+		display: inline-grid;
 		place-items: center;
+		box-sizing: border-box;
 		width: 2.5rem;
 		height: 2.5rem;
+		min-width: 2.5rem;
+		min-height: 2.5rem;
+		padding: 0;
 		border: 1px solid color-mix(in srgb, var(--blog-lightbox-muted) 40%, transparent);
-		border-radius: 999px;
+		border-radius: 50%;
 		background: var(--blog-lightbox-control-bg);
 		color: var(--blog-lightbox-text);
-		font-size: 1.1rem;
-		font-weight: 500;
+		line-height: 0;
 		cursor: pointer;
 		backdrop-filter: blur(12px);
 		transition: background 0.25s ease, border-color 0.25s ease;
@@ -281,16 +287,19 @@
 
 	.blog-lightbox__nav {
 		z-index: 1;
-		display: grid;
+		display: inline-grid;
 		place-items: center;
+		box-sizing: border-box;
 		width: 3rem;
 		height: 3rem;
+		min-width: 3rem;
+		min-height: 3rem;
+		padding: 0;
 		border: 1px solid color-mix(in srgb, var(--blog-lightbox-muted) 40%, transparent);
-		border-radius: 999px;
+		border-radius: 50%;
 		background: var(--blog-lightbox-control-bg);
 		color: var(--blog-lightbox-text);
-		font-size: 1.6rem;
-		line-height: 1;
+		line-height: 0;
 		cursor: pointer;
 		backdrop-filter: blur(12px);
 		transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
@@ -305,6 +314,13 @@
 	.blog-lightbox__nav:disabled {
 		cursor: not-allowed;
 		opacity: 0.3;
+	}
+
+	.blog-lightbox__close :global(svg),
+	.blog-lightbox__nav :global(svg) {
+		display: block;
+		flex: 0 0 auto;
+		margin: 0;
 	}
 
 	.blog-lightbox__figure {
