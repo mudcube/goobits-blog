@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   taxonomy, gallery, lightbox, and prose components.
 - Goo controls and focused Forms submission/error/status integration.
 - GET-based search, sort, page, load-more, and accessible infinite pagination.
+- Responsive WebP source sets for generated Markdown image variants.
 
 ### Changed
 
@@ -30,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The richer Miko v2 UI and Markdown behavior is the v3 compatibility floor.
 - Related-post text relevance now uses MiniSearch and category-aware diversity.
 - Final SEO markup and newsletter delivery remain consumer-owned.
+- Markdown image dimensions now use `image-size`, including direct WebP files.
 
 ### Removed
 
@@ -42,6 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Markdown images are no longer misclassified as internal content links.
 - Logger methods retain their console receiver under strict linting.
+- Markdown image fallbacks retain their original URL while receiving intrinsic
+  dimensions and lazy/async loading defaults.
 
 ## [2.0.0] - 2026-05-09
 

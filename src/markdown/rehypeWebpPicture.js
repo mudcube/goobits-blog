@@ -1,166 +1,167 @@
 /**
- * Rehype plugin that wraps <img> elements in <picture> with a WebP <source>
- * when a .webp sibling file exists on disk. Adds loading="lazy" and
- * decoding="async" to in-article images for performance.
+ * Rehype plugin that adds responsive WebP sources to Markdown images.
  *
- * Runs at build time during mdsvex compilation.
+ * Runs at build time during mdsvex compilation. Original image URLs remain on
+ * the <img> fallback so direct links and full-resolution viewers keep working.
  */
-import { existsSync, readFileSync } from 'fs'
-import { join, dirname } from 'path'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { basename, dirname, extname, join, posix } from 'node:path'
+import { imageSize } from 'image-size'
 
-const SKIP_EXTENSIONS = new Set(['.webp', '.svg', '.gif'])
+const NON_RESPONSIVE_EXTENSIONS = new Set(['.svg', '.gif'])
+const NON_LOCAL_SOURCE = /^(?:https?:\/\/|\/\/|data:|blob:)/i
 
 function walkNodes(children, visitor) {
-	for (let i = 0; i < children.length; i++) {
-		const child = children[i]
-		if (child.type === 'element') {
-			visitor(child, i, children)
-			if (child.children) {
-				walkNodes(child.children, visitor)
-			}
+	for (let index = 0; index < children.length; index += 1) {
+		const child = children[index]
+		if (child.type !== 'element') continue
+
+		visitor(child, index, children)
+		if (child.children) {
+			walkNodes(child.children, visitor)
 		}
 	}
-}
-
-function readPngDimensions(buffer) {
-	if (
-		buffer.length < 24 ||
-		buffer.readUInt32BE(0) !== 0x89504e47 ||
-		buffer.readUInt32BE(4) !== 0x0d0a1a0a
-	) {
-		return null
-	}
-
-	return {
-		width: buffer.readUInt32BE(16),
-		height: buffer.readUInt32BE(20)
-	}
-}
-
-function readJpegDimensions(buffer) {
-	if (buffer.length < 4 || buffer[0] !== 0xff || buffer[1] !== 0xd8) return null
-
-	let offset = 2
-	while (offset < buffer.length) {
-		if (buffer[offset] !== 0xff) {
-			offset += 1
-			continue
-		}
-
-		const marker = buffer[offset + 1]
-		offset += 2
-
-		if (marker === 0xd9 || marker === 0xda) break
-		if (offset + 2 > buffer.length) break
-
-		const size = buffer.readUInt16BE(offset)
-		if (size < 2 || offset + size > buffer.length) break
-
-		if (
-			(marker >= 0xc0 && marker <= 0xc3) ||
-			(marker >= 0xc5 && marker <= 0xc7) ||
-			(marker >= 0xc9 && marker <= 0xcb) ||
-			(marker >= 0xcd && marker <= 0xcf)
-		) {
-			return {
-				width: buffer.readUInt16BE(offset + 5),
-				height: buffer.readUInt16BE(offset + 3)
-			}
-		}
-
-		offset += size
-	}
-
-	return null
 }
 
 function readImageDimensions(filePath) {
 	try {
-		const buffer = readFileSync(filePath)
-		return readPngDimensions(buffer) || readJpegDimensions(buffer)
+		const { width, height } = imageSize(readFileSync(filePath))
+		return width && height ? { width, height } : null
 	} catch {
 		return null
 	}
 }
 
-export function rehypeWebpPicture() {
+function applyImageDimensions(properties, dimensions) {
+	if (!dimensions) return
+
+	if (!properties.width) properties.width = dimensions.width
+	if (!properties.height) properties.height = dimensions.height
+}
+
+function stripQueryAndFragment(src) {
+	const suffixIndex = src.search(/[?#]/)
+	return suffixIndex === -1 ? src : src.substring(0, suffixIndex)
+}
+
+function decodePathname(pathname) {
+	try {
+		return decodeURIComponent(pathname)
+	} catch {
+		return pathname
+	}
+}
+
+function findGeneratedVariants({ originalDiskPath, publicPath, variantDirectory }) {
+	const generatedDirectory = join(dirname(originalDiskPath), variantDirectory)
+	let filenames
+
+	try {
+		filenames = readdirSync(generatedDirectory)
+	} catch {
+		return []
+	}
+
+	const sourceName = basename(originalDiskPath, extname(originalDiskPath))
+	const filenamePrefix = `${sourceName}-`
+	const publicDirectory = posix.join(posix.dirname(publicPath), variantDirectory)
+
+	return filenames
+		.filter(filename => filename.startsWith(filenamePrefix) && filename.endsWith('.webp'))
+		.map(filename => ({
+			filename,
+			width: Number(filename.substring(filenamePrefix.length, filename.length - '.webp'.length))
+		}))
+		.filter(candidate => Number.isSafeInteger(candidate.width) && candidate.width > 0)
+		.sort((left, right) => left.width - right.width)
+		.map(candidate => ({
+			width: candidate.width,
+			publicPath: posix.join(publicDirectory, candidate.filename)
+		}))
+}
+
+function createPicture(node, sourceProperties) {
+	return {
+		type: 'element',
+		tagName: 'picture',
+		properties: {},
+		children: [
+			{
+				type: 'element',
+				tagName: 'source',
+				properties: sourceProperties,
+				children: []
+			},
+			node
+		]
+	}
+}
+
+export function rehypeWebpPicture(options = {}) {
+	const variantDirectory = options.variantDirectory ?? 'generated'
+	const sizes = options.sizes ?? '100vw'
+
 	return (tree, vFile) => {
 		if (!tree.children) return
 
-		// Resolve the directory of the source markdown file
 		const filePath = vFile?.filename || vFile?.path || vFile?.history?.[0] || ''
-		const fileDir = filePath ? dirname(filePath) : ''
-
-		// Compute the public URL prefix from the file path
-		// e.g. /workspace/static/journal/2010/08/slug/index.md → /journal/2010/08/slug/
+		const fileDirectory = filePath ? dirname(filePath) : ''
 		const staticRoot = join(process.cwd(), 'static')
-		const publicPrefix = fileDir.startsWith(staticRoot)
-			? fileDir.substring(staticRoot.length) + '/'
+		const publicPrefix = fileDirectory.startsWith(staticRoot)
+			? fileDirectory.substring(staticRoot.length) + '/'
 			: ''
 
 		walkNodes(tree.children, (node, index, siblings) => {
 			if (node.tagName !== 'img') return
 
-			const src = node.properties?.src
-			if (!src || typeof src !== 'string') return
+			const properties = node.properties ?? (node.properties = {})
+			if (!properties.loading) properties.loading = 'lazy'
+			if (!properties.decoding) properties.decoding = 'async'
 
-			// Skip external URLs, data URIs, and already-optimal formats
-			if (/^(https?:\/\/|data:)/i.test(src)) return
-			const dotIdx = src.lastIndexOf('.')
-			if (dotIdx === -1) return
-			const ext = src.substring(dotIdx)
-			if (SKIP_EXTENSIONS.has(ext.toLowerCase())) return
+			const src = properties.src
+			if (!src || typeof src !== 'string' || NON_LOCAL_SOURCE.test(src)) return
 
-			const originalDiskPath = src.startsWith('/') ? join(staticRoot, src) : join(fileDir, src)
-			const props = node.properties
-			const dimensions = readImageDimensions(originalDiskPath)
-			if (dimensions && !props.width && !props.height) {
-				props.width = dimensions.width
-				props.height = dimensions.height
-			}
-			if (!props.loading) {
-				props.loading = 'lazy'
-			}
-			if (!props.decoding) {
-				props.decoding = 'async'
-			}
+			const publicPath = stripQueryAndFragment(src)
+			const extension = extname(publicPath).toLowerCase()
+			if (!extension) return
 
-			// Build WebP sibling path (same name, .webp extension)
-			const webpRelative = src.substring(0, dotIdx) + '.webp'
+			const diskPathname = decodePathname(publicPath)
+			const originalDiskPath = diskPathname.startsWith('/')
+				? join(staticRoot, diskPathname)
+				: join(fileDirectory, diskPathname)
+			applyImageDimensions(properties, readImageDimensions(originalDiskPath))
 
-			// Resolve disk path — relative to source markdown file's directory
-			let diskPath
-			let webpPublicPath
-			if (src.startsWith('/')) {
-				diskPath = join(staticRoot, webpRelative)
-				webpPublicPath = webpRelative
-			} else if (fileDir) {
-				diskPath = join(fileDir, webpRelative)
-				webpPublicPath = publicPrefix + webpRelative
-			} else {
+			if (NON_RESPONSIVE_EXTENSIONS.has(extension)) return
+
+			const resolvedPublicPath = publicPath.startsWith('/')
+				? publicPath
+				: publicPrefix + publicPath
+			const variants = findGeneratedVariants({
+				originalDiskPath,
+				publicPath: resolvedPublicPath,
+				variantDirectory
+			})
+
+			if (variants.length > 0) {
+				const sourceProperties = {
+					type: 'image/webp',
+					srcSet: variants.map(variant => `${variant.publicPath} ${variant.width}w`).join(', ')
+				}
+				if (sizes) sourceProperties.sizes = sizes
+				siblings[index] = createPicture(node, sourceProperties)
 				return
 			}
 
-			if (!existsSync(diskPath)) return
+			if (extension === '.webp') return
 
-			// Wrap in <picture>
-			siblings[index] = {
-				type: 'element',
-				tagName: 'picture',
-				properties: {},
-				children: [
-					{
-						type: 'element',
-						tagName: 'source',
-						properties: {
-							type: 'image/webp',
-							srcSet: webpPublicPath
-						},
-						children: []
-					},
-					node
-				]
-			}
+			const webpPublicPath = resolvedPublicPath.substring(0, resolvedPublicPath.length - extension.length) + '.webp'
+			const webpDiskPath = originalDiskPath.substring(0, originalDiskPath.length - extension.length) + '.webp'
+			if (!existsSync(webpDiskPath)) return
+
+			siblings[index] = createPicture(node, {
+				type: 'image/webp',
+				srcSet: webpPublicPath
+			})
 		})
 	}
 }

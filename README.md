@@ -102,4 +102,17 @@ import { rehypeWebpPicture } from '@goobits/blog/markdown/rehype-webp-picture'
 import { remarkTableOfContents } from '@goobits/blog/markdown/remark-table-of-contents'
 ```
 
+`rehypeWebpPicture` adds intrinsic dimensions and lazy/async loading to article
+images. When `generated/<name>-<width>.webp` files exist beside a source image,
+it emits an ordered responsive source set while preserving the original image
+as the fallback. Configure the rendered width for each consumer:
+
+```js
+rehypeWebpPicture({ sizes: '(max-width: 48rem) 100vw, 48rem' })
+```
+
+Set `variantDirectory` only when generated files use a directory other than
+`generated`. A same-name `.webp` sibling remains supported when no responsive
+variants exist.
+
 Sanitize untrusted Markdown before rendering it. The external-link transform hardens links but is not a general HTML sanitizer.

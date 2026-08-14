@@ -26,6 +26,7 @@
     "isolatedModules": true,
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
+    "types": ["node"],
 
     "noEmit": true,
     "skipLibCheck": true

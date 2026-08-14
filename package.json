@@ -27,6 +27,7 @@
       "default": "./src/markdown/remarkTableOfContents.js"
     },
     "./markdown/rehype-webp-picture": {
+      "types": "./src/markdown/rehypeWebpPicture.d.ts",
       "default": "./src/markdown/rehypeWebpPicture.js"
     },
     "./markdown/rehype-external-links": {
@@ -88,6 +89,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "image-size": "^2.0.2",
     "minisearch": "^7.2.0"
   },
   "keywords": [
@@ -118,6 +120,7 @@
     "@lucide/svelte": "^1.28.0",
     "@sveltejs/kit": "^2.60.1",
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^8.59.3",
     "@typescript-eslint/parser": "^8.59.3",
     "eslint": "^10.4.0",
