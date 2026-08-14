@@ -16,6 +16,11 @@
 	let items = $state<GalleryItem[]>([])
 	let index = $state(0)
 	let touchStartX = $state<number | null>(null)
+	let isVisible = $state(false)
+	let isClosing = false
+	let closeTimer: ReturnType<typeof setTimeout> | null = null
+	let revealFrame = 0
+	const TRANSITION_MS = 220
 
 	const current = $derived(items[index] ?? null)
 	const hasPrev = $derived(index > 0)
@@ -25,17 +30,49 @@
 		items = detail.items
 		index = Math.max(0, Math.min(detail.index, detail.items.length - 1))
 		if (dialog && !dialog.open) {
+			if (closeTimer) {
+				clearTimeout(closeTimer)
+				closeTimer = null
+			}
+			isClosing = false
+			isVisible = false
 			dialog.showModal()
 			prefetchAdjacent()
+			cancelAnimationFrame(revealFrame)
+			revealFrame = requestAnimationFrame(() => {
+				revealFrame = requestAnimationFrame(() => {
+					isVisible = true
+				})
+			})
+		}
+	}
+
+	function finishClose() {
+		closeTimer = null
+		if (dialog?.open) {
+			dialog.close()
 		}
 	}
 
 	function close() {
-		if (dialog?.open) {
-			dialog.close()
+		if (!dialog?.open || isClosing) {
+			return
 		}
+		isClosing = true
+		isVisible = false
+
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			finishClose()
+			return
+		}
+		closeTimer = setTimeout(finishClose, TRANSITION_MS)
+	}
+
+	function handleClose() {
 		items = []
 		index = 0
+		isVisible = false
+		isClosing = false
 	}
 
 	function goPrev() {
@@ -95,10 +132,13 @@
 		}
 	}
 
-	function handleBackdropClick(event: MouseEvent) {
-		if (event.target === dialog) {
-			close()
+	function handleDialogClick(event: MouseEvent) {
+		const target = event.target
+		if (target instanceof Element) {
+			if (target.closest('button')) { return }
+			if (target.closest('.blog-lightbox__image')) { return }
 		}
+		close()
 	}
 
 	function handleTouchStart(event: TouchEvent) {
@@ -129,6 +169,8 @@
 		document.addEventListener('gallery:open', galleryOpenListener)
 		document.addEventListener('keydown', handleKey)
 		return () => {
+			cancelAnimationFrame(revealFrame)
+			if (closeTimer) { clearTimeout(closeTimer) }
 			document.removeEventListener('gallery:open', galleryOpenListener)
 			document.removeEventListener('keydown', handleKey)
 		}
@@ -138,9 +180,14 @@
 <dialog
 	bind:this={dialog}
 	class="blog-lightbox"
+	class:blog-lightbox--visible={isVisible}
 	aria-label="Image gallery"
-	onclick={handleBackdropClick}
-	onclose={() => { items = []; index = 0 }}
+	onclick={handleDialogClick}
+	oncancel={(event) => {
+		event.preventDefault()
+		close()
+	}}
+	onclose={handleClose}
 >
 	{#if current}
 		<div
@@ -231,17 +278,29 @@
 		background: transparent;
 		color: var(--blog-lightbox-text);
 		overflow: hidden;
+		opacity: 0;
+		transition: opacity 220ms ease;
 	}
 
 	.blog-lightbox::backdrop {
 		background: var(--blog-lightbox-overlay);
 		backdrop-filter: blur(8px);
 		-webkit-backdrop-filter: blur(8px);
+		opacity: 0;
+		transition: opacity 220ms ease;
 	}
 
 	.blog-lightbox[open] {
 		display: grid;
 		place-items: center;
+	}
+
+	.blog-lightbox--visible {
+		opacity: 1;
+	}
+
+	.blog-lightbox--visible::backdrop {
+		opacity: 1;
 	}
 
 	.blog-lightbox__frame {
@@ -255,6 +314,12 @@
 		height: 100%;
 		padding: clamp(1rem, 4vw, 2.5rem);
 		box-sizing: border-box;
+		transform: scale(0.985);
+		transition: transform 220ms ease;
+	}
+
+	.blog-lightbox--visible .blog-lightbox__frame {
+		transform: scale(1);
 	}
 
 	.blog-lightbox__close {
@@ -396,5 +461,13 @@
 
 		.blog-lightbox__nav--prev { left: 1rem; }
 		.blog-lightbox__nav--next { right: 1rem; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.blog-lightbox,
+		.blog-lightbox::backdrop,
+		.blog-lightbox__frame {
+			transition-duration: 0.01ms;
+		}
 	}
 </style>
