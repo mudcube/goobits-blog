@@ -10,6 +10,7 @@ import type {
 import { canReadDrafts, type BlogPostPage, type BlogQuery, type BlogReadContext } from '../core/blogQuery.js'
 import { hasBlogCategory, hasBlogTag } from '../core/blogTaxonomy.js'
 import { slugify } from '../core/blogUrls.js'
+import { resolveMarkdownUrl } from './resolveMarkdownUrls.js'
 
 export type MarkdownImport = () => Promise<unknown>
 export type MarkdownImportRecord = Record<string, MarkdownImport>
@@ -97,16 +98,8 @@ function getImage(value: unknown, fallbackAlt: string): BlogImage | undefined {
 	}
 }
 
-function resolveAssetPath(path: string, postUrlPath: string): string {
-	if (/^(?:[a-z][a-z\d+.-]*:|\/\/|\/|#)/i.test(path)) {
-		return path
-	}
-
-	return `${ postUrlPath.replace(/\/$/, '') }/${ path.replace(/^\.\//, '') }`
-}
-
 function resolveImagePath(image: BlogImage | undefined, postUrlPath: string): BlogImage | undefined {
-	return image ? { ...image, src: resolveAssetPath(image.src, postUrlPath) } : undefined
+	return image ? { ...image, src: resolveMarkdownUrl(image.src, postUrlPath) } : undefined
 }
 
 function getTranslations(value: unknown): Record<string, BlogPostTranslation> | undefined {
@@ -309,10 +302,10 @@ export function createMarkdownContentSource(options: MarkdownContentSourceOption
 				const updated = getString(metadata.updated)
 				const author = getAuthor(metadata.author)
 				const normalizedAuthor = author?.avatar
-					? { ...author, avatar: resolveAssetPath(author.avatar, urlPath) }
+					? { ...author, avatar: resolveMarkdownUrl(author.avatar, urlPath) }
 					: author
 				const thumbnail = resolveImagePath(getImage(metadata.thumbnail, title), urlPath)
-				const normalizedCoverImage = coverImage ? resolveAssetPath(coverImage, urlPath) : undefined
+				const normalizedCoverImage = coverImage ? resolveMarkdownUrl(coverImage, urlPath) : undefined
 				return {
 					id: resolved.id,
 					slug: resolved.slug,
