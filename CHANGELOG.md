@@ -18,12 +18,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SvelteKit route, entry, RSS, and client content-loading adapters.
 - Explicit draft read context required in addition to an all-post query.
 - Safe external-link rehype transform and stable Markdown plugin exports.
+- Direct-model `BlogIndex`, `BlogCard`, `BlogPost`, newsletter, share,
+  taxonomy, gallery, lightbox, and prose components.
+- Goo controls and focused Forms submission/error/status integration.
+- GET-based search, sort, page, load-more, and accessible infinite pagination.
 
 ### Changed
 
 - Package version advanced to 3.0.0.
 - `@goobits/blog/core` now exposes the instance-based domain API.
 - The richer Miko v2 UI and Markdown behavior is the v3 compatibility floor.
+- Related-post text relevance now uses MiniSearch and category-aware diversity.
+- Final SEO markup and newsletter delivery remain consumer-owned.
+
+### Removed
+
+- Mutable `initBlogConfig` global configuration and legacy handlers/utilities.
+- The nested `metadata.fm` post shape and its consumer adapters.
+- Duplicate Blog controls, layout/router/SEO wrappers, and nonfunctional UI
+  options. Goo, Forms, and the host app now own those concerns.
 
 ### Fixed
 

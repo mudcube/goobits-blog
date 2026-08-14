@@ -1,28 +1,24 @@
-/**
- * Blog i18n utilities
- */
+import type { BlogConfig } from '../config/blogConfig.js'
+import type { BlogPost } from '../core/blogPost.js'
 
-import { createMessageGetter, getMergedMessages } from '../utils/messages.js'
-import {
-	handleBlogI18n,
-	loadWithBlogI18n,
-	layoutLoadWithBlogI18n
-} from './hooks.js'
+export function resolveBlogLanguage(config: BlogConfig, requestedLanguage?: string): string {
+	if (requestedLanguage && config.supportedLanguages.includes(requestedLanguage)) {
+		return requestedLanguage
+	}
 
-// Re-export types for consumers
-export type {
-	I18nHandler,
-	LoadFunction,
-	I18nLoadResult
-} from './hooks.js'
+	return config.defaultLanguage
+}
 
-// Re-export i18n config type from the config module
-export type { I18nConfig } from '../config/defaults.js'
+export function localizeBlogPost(post: BlogPost, requestedLanguage: string): BlogPost {
+	const translation = post.translations?.[requestedLanguage]
+	if (!translation) {return post}
 
-export {
-	createMessageGetter,
-	getMergedMessages,
-	handleBlogI18n,
-	loadWithBlogI18n,
-	layoutLoadWithBlogI18n
+	return {
+		...post,
+		lang: requestedLanguage,
+		title: translation.title ?? post.title,
+		excerpt: translation.excerpt ?? post.excerpt,
+		categories: translation.categories ?? post.categories,
+		tags: translation.tags ?? post.tags
+	}
 }

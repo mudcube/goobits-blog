@@ -1,6 +1,6 @@
 import type { BlogEngine } from '../core/createBlogEngine.js'
 import type { BlogPost } from '../core/blogPost.js'
-import type { BlogReadContext } from '../core/blogQuery.js'
+import type { BlogQuery, BlogReadContext, BlogSort } from '../core/blogQuery.js'
 import type { BlogTaxonomyTerm } from '../core/blogTaxonomy.js'
 import { generateBlogEntries, type BlogEntry } from './generateBlogEntries.js'
 
@@ -17,6 +17,10 @@ interface BlogListData {
 	categories: BlogTaxonomyTerm[]
 	tags: BlogTaxonomyTerm[]
 	lang: string
+	page: number
+	pageSize: number
+	search: string
+	sort: BlogSort
 }
 
 export interface BlogIndexData extends BlogListData {
@@ -71,6 +75,18 @@ function isStaticAsset(slug: string): boolean {
 	return /\.(css|scss|js|ts|jsx|tsx|png|jpg|jpeg|gif|svg|ico|webp|avif|woff2?|ttf|eot|mp3|mp4|pdf)$/i.test(slug)
 }
 
+function readListQuery(event: BlogRouteEvent, pageSize: number): Required<Pick<BlogQuery, 'page' | 'pageSize' | 'search' | 'sort'>> {
+	const requestedPage = Number(event.url.searchParams.get('page') ?? 1)
+	const sortValue = event.url.searchParams.get('sort')
+	const sort: BlogSort = sortValue === 'oldest' || sortValue === 'title' ? sortValue : 'newest'
+	return {
+		page: Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1,
+		pageSize,
+		search: event.url.searchParams.get('q')?.trim() ?? '',
+		sort
+	}
+}
+
 export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): BlogRouteHandlers {
 	const { engine } = options
 	const getLanguage = options.getLanguage ?? (() => engine.config.defaultLanguage)
@@ -79,10 +95,10 @@ export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): Blog
 	const loadIndex = async (event: BlogRouteEvent): Promise<BlogIndexData> => {
 		const lang = getLanguage(event)
 		const context = getReadContext(event)
+		const query = readListQuery(event, engine.config.pageSize)
 		const page = await engine.listPosts({
 			language: lang,
-			page: 1,
-			pageSize: engine.config.pageSize,
+			...query,
 			visibility: context.allowDrafts === true ? 'all' : 'published'
 		}, context)
 		const [ categories, tags ] = await Promise.all([
@@ -96,7 +112,11 @@ export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): Blog
 			hasMorePosts: page.hasNextPage,
 			categories,
 			tags,
-			lang
+			lang,
+			page: page.page,
+			pageSize: page.pageSize,
+			search: query.search,
+			sort: query.sort
 		}
 	}
 
@@ -107,10 +127,10 @@ export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): Blog
 	): Promise<BlogTaxonomyData> => {
 		const lang = getLanguage(event)
 		const context = getReadContext(event)
+		const query = readListQuery(event, engine.config.pageSize)
 		const page = await engine.listPosts({
 			language: lang,
-			page: 1,
-			pageSize: engine.config.pageSize,
+			...query,
 			visibility: context.allowDrafts === true ? 'all' : 'published',
 			...(pageType === 'category' ? { category: term } : { tag: term })
 		}, context)
@@ -129,7 +149,11 @@ export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): Blog
 			hasMorePosts: page.hasNextPage,
 			categories,
 			tags,
-			lang
+			lang,
+			page: page.page,
+			pageSize: page.pageSize,
+			search: query.search,
+			sort: query.sort
 		}
 	}
 

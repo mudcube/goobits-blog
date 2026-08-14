@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { BlogRouteError, createBlogRouteHandlers, type BlogRouteEvent } from '../../src/sveltekit/createBlogRouteHandlers.js'
 import { createFixtureEngine } from '../fixtures/markdownFixture.js'
 
-function event(slug = '', preview = false): BlogRouteEvent {
+function event(slug = '', preview = false, query = ''): BlogRouteEvent {
 	return {
 		params: { slug },
 		locals: { preview },
-		url: new URL(`https://example.com/journal/${ slug }`)
+		url: new URL(`https://example.com/journal/${ slug }${ query }`)
 	}
 }
 
@@ -37,6 +37,16 @@ describe('SvelteKit blog routes', () => {
 		await expect(handlers.loadRoute(event('2024/05/draft'))).rejects.toBeInstanceOf(BlogRouteError)
 		await expect(handlers.loadRoute(event('2024/05/draft', true))).resolves.toMatchObject({
 			post: { title: 'Private Draft' }
+		})
+	})
+
+	it('passes paging, search, and sort query state through list routes', async () => {
+		await expect(handlers.loadIndex(event('', false, '?page=2&q=music&sort=oldest'))).resolves.toMatchObject({
+			page: 2,
+			pageSize: 1,
+			search: 'music',
+			sort: 'oldest',
+			posts: [{ slug: 'nested' }]
 		})
 	})
 

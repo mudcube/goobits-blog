@@ -1,18 +1,11 @@
-import { defineConfig } from 'vitest/config'
-import { resolve } from 'path'
-import { fileURLToPath } from 'url'
-
-const __dirname = fileURLToPath(new URL('.', import.meta.url))
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      '@blog': resolve(__dirname, './__tests__/fixtures')
-    }
-  },
+  plugins: [svelte({ configFile: false })],
   test: {
-    environment: 'node',
-    include: ['__tests__/**/*.test.ts', 'tests/**/*.test.ts'],
-    globals: true
-  }
-})
+    environment: "node",
+    include: ["tests/**/*.test.ts"],
+    globals: true,
+  },
+});

@@ -24,14 +24,11 @@
     "moduleResolution": "bundler",
     "esModuleInterop": true,
     "isolatedModules": true,
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
 
     "noEmit": true,
-    "skipLibCheck": true,
-
-    "paths": {
-      "@blog/*": ["./__tests__/fixtures/*"]
-    }
+    "skipLibCheck": true
   },
   "include": ["**/*.ts", "**/*.svelte"],
   "exclude": ["node_modules", ".svelte-kit", "dist"]

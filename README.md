@@ -9,7 +9,8 @@ Instance-based Blog engine, Markdown source, SvelteKit adapters, and Svelte 5 pr
 - Explicit draft preview authorization
 - Search, sorting, pagination, categories, and tags
 - Localized metadata and aliases
-- Related-post scoring with explainable reasons
+- MiniSearch-backed related-post scoring with editorial, taxonomy, link,
+  recency, and diversity signals
 - RSS with canonical URLs and draft exclusion
 - Injectable content sources for future database or API backends
 - TOC, WebP picture, safe external-link, gallery, and prose helpers
@@ -65,9 +66,33 @@ Draft access requires both `visibility: 'all'` and `{ allowDrafts: true }`. Publ
 | `@goobits/blog/markdown` | Markdown content source |
 | `@goobits/blog/sveltekit` | Route, page-load, entries, and RSS adapters |
 | `@goobits/blog/ui` | Svelte presentation components and prose elements |
+| `@goobits/blog/ui/blogTheme.css` | Theme-variable-based editorial CSS |
 | `@goobits/blog/i18n` | Framework-neutral translation hooks |
 
 The package returns normalized SEO data. The consuming app owns the final `<svelte:head>` composition, site identity, and release-stage policy.
+
+## UI And Forms
+
+`BlogIndex`, `BlogCard`, `BlogPost`, `BlogProse`, `BlogLightbox`, and the
+prose elements consume direct `BlogPost` fields. The index exposes GET-based
+search, sort, page navigation, load-more, and infinite modes. Infinite mode
+retains a visible load-more control.
+
+Newsletter delivery remains app-owned. The form uses Goo controls and Forms
+submission state, and renders nothing until a working adapter is provided:
+
+```svelte
+<script>
+	import { NewsletterForm } from '@goobits/blog/ui'
+
+	const subscribe = async ({ email }) => await newsletterProvider.subscribe(email)
+</script>
+
+<NewsletterForm onSubscribe={subscribe} />
+```
+
+`BlogPost` renders Web Share and copy-link actions. Email, Facebook, and X
+links appear only when explicitly included in `shareNetworks`.
 
 ## Markdown Plugins
 

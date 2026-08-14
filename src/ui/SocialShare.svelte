@@ -1,128 +1,86 @@
-<script>
-	/**
-	 * SocialShare Component
-	 * 
-	 * Provides buttons for sharing content to social media platforms and copying
-	 * links to clipboard, with accessibility features and internationalized labels.
-	 * 
-	 * Features:
-	 * - Share to Facebook, Twitter, and more platforms as needed
-	 * - Copy URL to clipboard with success indicator
-	 * - Full internationalization via Paraglide
-	 * - Accessible button and link labels
-	 * - Visual feedback for copy action
-	 * 
-	 * @component
-	 */
-	import './SocialShare.scss'
+<script lang="ts">
+	import Check from '@lucide/svelte/icons/check'
+	import Copy from '@lucide/svelte/icons/copy'
+	import Mail from '@lucide/svelte/icons/mail'
+	import Share2 from '@lucide/svelte/icons/share-2'
 	import { onDestroy } from 'svelte'
-	import { createLogger, createMessageGetter } from '@goobits/blog/utils'
-	import { defaultMessages } from '@goobits/blog/config'
 
-	const logger = createLogger('SocialShare')
+	import { GooButton } from '@goobits/goo/button'
+	import './blogTheme.css'
+	import { createBlogUiMessages, type BlogUiMessagesInput } from '../config/blogMessages.js'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {string} url - The URL to share
-	 * @property {string} title - The title of the content being shared
-	 * @property {string} [text] - Optional descriptive text for the share
-	 * @property {string} [className] - Optional CSS class name
-	 */
+	type ShareNetwork = 'email' | 'facebook' | 'x'
 
-	/** @type {Props} */
+	interface Props {
+		url: string
+		title: string
+		text?: string
+		networks?: ShareNetwork[]
+		messages?: BlogUiMessagesInput
+		class?: string
+	}
+
 	const {
-		url = typeof window !== 'undefined' ? window.location.href : '',
-		title = 'Check out this content',
+		url,
+		title,
 		text = '',
-		className = '',
-		messages = {}
-	} = $props()
+		networks = [],
+		messages: messageInput = {},
+		class: className = ''
+	}: Props = $props()
 
-	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
+	const messages = $derived(createBlogUiMessages(messageInput))
+	let copied = $state(false)
+	let timeout: ReturnType<typeof setTimeout> | null = null
 
-	// State for copy link success
-	let copySuccess = $state(false)
-	let copyTimeoutId = null
-
-	// Cleanup timeout on component destroy
 	onDestroy(() => {
-		if (copyTimeoutId) {
-			clearTimeout(copyTimeoutId)
-		}
+		if (timeout) {clearTimeout(timeout)}
 	})
 
-	// Function to copy URL to clipboard
-	async function copyLink() {
-		if (typeof navigator !== 'undefined' && navigator.clipboard) {
+	async function share(): Promise<void> {
+		if (typeof navigator !== 'undefined' && navigator.share) {
 			try {
-				await navigator.clipboard.writeText(url)
-				copySuccess = true
-				// Clear any existing timeout
-				if (copyTimeoutId) {
-					clearTimeout(copyTimeoutId)
+				await navigator.share({ title, text, url })
+			} catch (error) {
+				if (!(error instanceof DOMException && error.name === 'AbortError')) {
+					await copy()
 				}
-				copyTimeoutId = setTimeout(() => {
-					copySuccess = false
-					copyTimeoutId = null
-				}, 2000)
-			} catch (err) {
-				logger.error('Failed to copy URL:', err)
 			}
+			return
 		}
+		await copy()
+	}
+
+	async function copy(): Promise<void> {
+		if (typeof navigator === 'undefined' || !navigator.clipboard) {return}
+		try {
+			await navigator.clipboard.writeText(url)
+			copied = true
+			if (timeout) {clearTimeout(timeout)}
+			timeout = setTimeout(() => { copied = false }, 2000)
+		} catch {
+			copied = false
+		}
+	}
+
+	function networkUrl(network: ShareNetwork): string {
+		if (network === 'email') {return `mailto:?subject=${ encodeURIComponent(title) }&body=${ encodeURIComponent(`${ text }\n${ url }`) }`}
+		if (network === 'facebook') {return `https://www.facebook.com/sharer/sharer.php?u=${ encodeURIComponent(url) }`}
+		return `https://x.com/intent/post?url=${ encodeURIComponent(url) }&text=${ encodeURIComponent(title) }`
 	}
 </script>
 
-<div class={`goo__social-share-container ${className}`} role="region" aria-labelledby="social-share-title">
-	<div class="goo__social-share-text">
-		<p id="social-share-title" class="goo__social-share-title">{getMessage('shareTitle', 'Share this post')}</p>
-		<p class="goo__social-share-subtitle">{text || getMessage('shareSubtitle', 'Spread the word on social media')}</p>
-	</div>
-
-	<div class="goo__social-buttons" role="toolbar" aria-label="Sharing options">
-		<a
-			href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`}
-			target="_blank"
-			rel="noopener noreferrer nofollow"
-			class="goo__share-button"
-			aria-label={getMessage('shareFacebook', 'Share on Facebook')}
-			role="button"
-		>
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-				<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-			</svg>
-			<span>Facebook</span>
+<div class={['blog-share', className].filter(Boolean).join(' ')} aria-label="Sharing options">
+	<GooButton ariaLabel={messages.share} title={messages.share} onclick={() => void share()}>
+		<Share2 size={18} aria-hidden="true" /> <span>{messages.share}</span>
+	</GooButton>
+	<GooButton ariaLabel={copied ? messages.copiedLink : messages.copyLink} title={messages.copyLink} onclick={() => void copy()}>
+		{#if copied}<Check size={18} aria-hidden="true" />{:else}<Copy size={18} aria-hidden="true" />{/if}
+		<span>{copied ? messages.copiedLink : messages.copyLink}</span>
+	</GooButton>
+	{#each networks as network (network)}
+		<a class="blog-share__network" href={networkUrl(network)} target={network === 'email' ? undefined : '_blank'} rel={network === 'email' ? undefined : 'noopener noreferrer nofollow'}>
+			{#if network === 'email'}<Mail size={18} aria-hidden="true" />{/if}<span>{network}</span>
 		</a>
-
-		<a
-			href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`}
-			target="_blank"
-			rel="noopener noreferrer nofollow"
-			class="goo__share-button"
-			aria-label={getMessage('shareTwitter', 'Share on Twitter')}
-			role="button"
-		>
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-				<path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-			</svg>
-			<span>Twitter</span>
-		</a>
-
-		<button
-			onclick={copyLink}
-			class={`goo__share-button ${copySuccess ? 'goo__share-button--state-success' : ''}`}
-			aria-label={getMessage('shareCopyLink', 'Copy link')}
-			aria-pressed={copySuccess}
-			aria-live="polite"
-		>
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-				{#if copySuccess}
-					<path d="M20 6L9 17l-5-5"></path>
-				{:else}
-					<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-					<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-				{/if}
-			</svg>
-			<span>{copySuccess ? getMessage('linkCopied', 'Link copied to clipboard') : getMessage('copyLink', 'Copy link')}</span>
-		</button>
-	</div>
+	{/each}
 </div>

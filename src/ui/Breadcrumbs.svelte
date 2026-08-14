@@ -1,106 +1,27 @@
-<script>
-	/**
-	 * A breadcrumb navigation component that shows the user's current location within the site hierarchy
-	 *
-	 * @typedef {Object} BreadcrumbItem
-	 * @property {string} href - The URL for the breadcrumb item
-	 * @property {string} label - The display text for the breadcrumb item
-	 *
-	 * @typedef {Object} Props
-	 * @property {BreadcrumbItem[]} [items] - Array of breadcrumb items
-	 * @property {string} [current] - The current page name (final breadcrumb)
-	 * @property {boolean} [showHome] - Whether to show the Home link at the beginning
-	 * @property {boolean} [firstItemIsCurrent] - When true, the first item is treated as current
-	 */
+<script lang="ts">
+	import './blogTheme.css'
 
-	import { createMessageGetter } from '@goobits/blog/utils'
-	import { defaultMessages, blogConfig } from '@goobits/blog/config'
+	interface BreadcrumbItem {
+		label: string
+		href?: string
+	}
 
-	// Get the configured blog URI
-	const blogUri = blogConfig.uri || '/blog'
+	interface Props {
+		items?: BreadcrumbItem[]
+		label?: string
+	}
 
-	// Component Props
-	const {
-		items = [],
-		current = '',
-		showHome = true,
-		firstItemIsCurrent = false,
-		messages = {}
-	} = $props()
-
-	const getMessage = $derived.by(() => createMessageGetter({ ...defaultMessages, ...messages }))
+	const { items = [], label = 'Breadcrumbs' }: Props = $props()
 </script>
 
-<div class="breadcrumbs">
-	{#if showHome}
-		<a href="/" class="breadcrumbs__link">{getMessage('home', 'Home')}</a>
-		<span class="breadcrumbs__separator">/</span>
-	{/if}
-
-	<!-- Add a Blog link for tags and categories, but not for the blog homepage -->
-	{#if !items.some(item => item.href === blogUri) && items.length > 0}
-		<a href={blogUri} class="breadcrumbs__link">{getMessage('blog', 'Blog')}</a>
-		<span class="breadcrumbs__separator">/</span>
-	{/if}
-
-	{#if firstItemIsCurrent && items.length > 0}
-		<!-- First item is current -->
-		<span class="breadcrumbs__current">{items[0].label}</span>
-	{:else}
-		<!-- Normal breadcrumb rendering -->
-		{#if items.length > 0}
-			{#each items as item, index (item.href)}
-				{#if index > 0}
-					<span class="breadcrumbs__separator">/</span>
-				{/if}
-				<a
-						href={item.href.startsWith('/') ? item.href : `/${item.href}`}
-						class="breadcrumbs__link"
-				>
-					{item.label}
-				</a>
+{#if items.length > 0}
+	<nav class="blog-breadcrumbs" aria-label={label}>
+		<ol>
+			{#each items as item, index (`${ item.label }-${ index }`)}
+				<li>
+					{#if item.href && index < items.length - 1}<a href={item.href}>{item.label}</a>{:else}<span aria-current="page">{item.label}</span>{/if}
+				</li>
 			{/each}
-
-			{#if current}
-				<span class="breadcrumbs__separator">/</span>
-				<span class="breadcrumbs__current">{current}</span>
-			{/if}
-		{:else if current}
-			<!-- Only current item, no intermediate breadcrumbs -->
-			<span class="breadcrumbs__current">{current}</span>
-		{/if}
-	{/if}
-</div>
-
-<style lang="scss">
-	@use 'variables' as *;
-
-	.breadcrumbs {
-		display: flex;
-		align-items: center;
-		gap: $spacing-small;
-		margin-bottom: $spacing-large;
-		font-size: $font-size-small;
-	}
-
-	.breadcrumbs__link {
-		color: var(--color-text-muted);
-	}
-
-	.breadcrumbs__link:hover {
-		color: var(--amber-700);
-	}
-
-	.breadcrumbs__separator {
-		color: var(--color-text-muted);
-	}
-
-	.breadcrumbs__current {
-		color: var(--amber-700);
-		font-weight: $font-weight-medium;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		max-width: 200px;
-	}
-</style>
+		</ol>
+	</nav>
+{/if}

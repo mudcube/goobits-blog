@@ -46,27 +46,11 @@
       "svelte": "./src/ui/elements/index.ts",
       "default": "./src/ui/elements/index.ts"
     },
-    "./utils": {
-      "types": "./src/utils/index.ts",
-      "svelte": "./src/utils/index.ts",
-      "default": "./src/utils/index.ts"
-    },
-    "./utils/remark-table-of-contents": {
-      "types": "./src/utils/remark-table-of-contents.d.ts",
-      "default": "./src/utils/remark-table-of-contents.js"
-    },
-    "./utils/rehype-webp-picture": {
-      "default": "./src/utils/rehype-webp-picture.js"
-    },
     "./config": {
       "types": "./src/config/blogConfig.ts",
       "default": "./src/config/blogConfig.ts"
     },
-    "./config/defaults": {
-      "types": "./src/config/defaults.ts",
-      "svelte": "./src/config/defaults.ts",
-      "default": "./src/config/defaults.ts"
-    },
+    "./ui/blogTheme.css": "./src/ui/blogTheme.css",
     "./i18n": {
       "types": "./src/i18n/index.ts",
       "svelte": "./src/i18n/index.ts",
@@ -74,13 +58,14 @@
     }
   },
   "sideEffects": [
-    "**/*.scss"
+    "**/*.css"
   ],
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
     "typecheck": "tsc --noEmit"
   },
   "files": [
@@ -94,9 +79,15 @@
   "license": "MIT",
   "type": "module",
   "peerDependencies": {
+    "@goobits/forms": "^4.0.0",
+    "@goobits/goo": ">=0.1.0",
+    "@lucide/svelte": ">=1.16.0",
     "@sveltejs/kit": "^2.0.0",
     "svelte": "^5.0.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "minisearch": "^7.2.0"
   },
   "keywords": [
     "svelte",
@@ -123,12 +114,16 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@lucide/svelte": "^1.28.0",
     "@sveltejs/kit": "^2.60.1",
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "@typescript-eslint/eslint-plugin": "^8.59.3",
     "@typescript-eslint/parser": "^8.59.3",
     "eslint": "^10.4.0",
     "eslint-plugin-svelte": "^3.17.1",
     "globals": "^17.6.0",
+    "svelte": "^5.56.8",
+    "svelte-check": "^4.4.5",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.3",
     "vitest": "^4.1.6"
