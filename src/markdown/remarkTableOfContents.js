@@ -4,12 +4,12 @@
  * Assigns each heading an `id` attribute, deduplicating collisions with
  * a numeric suffix (e.g. `introduction`, `introduction-2`, `introduction-3`).
  *
- * @typedef {{ type: 'text', value: string }} MdText
+ * @typedef {{ type: string, value?: string, alt?: string, children?: MdInline[] }} MdInline
  * @typedef {{
  *   type: 'heading',
  *   depth: number,
- *   children: Array<MdText | { type: string, [key: string]: unknown }>,
- *   data?: { hProperties?: { id?: string } }
+ *   children: MdInline[],
+ *   data?: { hProperties?: { id?: string, [key: string]: unknown }, [key: string]: unknown }
  * }} MdHeading
  * @typedef {MdHeading | { type: string, [key: string]: unknown }} MdNode
  * @typedef {{ children: MdNode[] }} MdRoot
@@ -29,8 +29,7 @@ export function remarkTableOfContents() {
 		tree.children.forEach((node, index) => {
 			if (node.type === 'heading') {
 				const headingNode = /** @type {MdHeading} */ (node)
-				const first = headingNode.children[0]
-				const headingText = first && first.type === 'text' ? /** @type {MdText} */ (first).value : ''
+				const headingText = inlineText(headingNode.children)
 				const tocMatch = headingText.match(/^TOC(?::(\d+))?$/)
 				if (tocMatch) {
 					tocIndex = index
@@ -47,7 +46,10 @@ export function remarkTableOfContents() {
 					const seen = seenIds.get(baseId) ?? 0
 					const id = seen === 0 ? baseId : `${baseId}-${seen + 1}`
 					seenIds.set(baseId, seen + 1)
-					headingNode.data = { hProperties: { id } }
+					headingNode.data = {
+						...headingNode.data,
+						hProperties: { ...headingNode.data?.hProperties, id }
+					}
 					headings.push({ depth: headingNode.depth, text: headingText, id })
 				}
 			}
@@ -87,6 +89,22 @@ export function remarkTableOfContents() {
 
 		return tree
 	}
+}
+
+/**
+ * @param {MdInline[]} nodes
+ * @returns {string}
+ */
+function inlineText(nodes) {
+	return nodes.map((node) => {
+		if (node.type === 'text' || node.type === 'inlineCode') {
+			return node.value ?? ''
+		}
+		if (node.type === 'image' || node.type === 'imageReference') {
+			return node.alt ?? ''
+		}
+		return node.children ? inlineText(node.children) : ''
+	}).join('')
 }
 
 /**
