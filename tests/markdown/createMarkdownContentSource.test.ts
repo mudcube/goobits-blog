@@ -42,6 +42,29 @@ describe('createMarkdownContentSource', () => {
 		expect(metadata).toEqual({ title: 'Derived', date: '2024-06-01' })
 	})
 
+	it('resolves relative post assets against the mounted post URL', async () => {
+		const source = createMarkdownContentSource({
+			basePath: '/journal',
+			files: {
+				'/content/2026/08/assets/index.md': () => Promise.resolve({
+					metadata: {
+						title: 'Assets',
+						date: '2026-08-13',
+						coverImage: 'images/hero.jpg',
+						author: { name: 'Miko', avatar: './images/avatar.jpg' }
+					}
+				})
+			}
+		})
+		const [ post ] = (await source.listPosts()).posts
+
+		expect(post).toMatchObject({
+			coverImage: '/journal/2026/08/assets/images/hero.jpg',
+			image: { src: '/journal/2026/08/assets/images/hero.jpg' },
+			author: { avatar: '/journal/2026/08/assets/images/avatar.jpg' }
+		})
+	})
+
 	it('requires both an all-post query and authorized context for drafts', async () => {
 		const engine = createFixtureEngine()
 

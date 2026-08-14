@@ -25,7 +25,8 @@ describe('SvelteKit blog routes', () => {
 		})
 		await expect(handlers.loadRoute(event('2024/03/flat'))).resolves.toMatchObject({
 			pageType: 'post',
-			post: { slug: 'flat' }
+			post: { slug: 'flat' },
+			relatedPosts: [{ post: { slug: 'nested' } }]
 		})
 		await expect(handlers.loadRoute(event('category/engineering'))).resolves.toMatchObject({
 			pageType: 'category',

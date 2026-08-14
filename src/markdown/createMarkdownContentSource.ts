@@ -97,6 +97,18 @@ function getImage(value: unknown, fallbackAlt: string): BlogImage | undefined {
 	}
 }
 
+function resolveAssetPath(path: string, postUrlPath: string): string {
+	if (/^(?:[a-z][a-z\d+.-]*:|\/\/|\/|#)/i.test(path)) {
+		return path
+	}
+
+	return `${ postUrlPath.replace(/\/$/, '') }/${ path.replace(/^\.\//, '') }`
+}
+
+function resolveImagePath(image: BlogImage | undefined, postUrlPath: string): BlogImage | undefined {
+	return image ? { ...image, src: resolveAssetPath(image.src, postUrlPath) } : undefined
+}
+
 function getTranslations(value: unknown): Record<string, BlogPostTranslation> | undefined {
 	if (!isRecord(value)) {
 		return undefined
@@ -281,17 +293,21 @@ export function createMarkdownContentSource(options: MarkdownContentSourceOption
 				const image = getImage(metadata.image, title)
 				const coverImage = getString(metadata.coverImage)
 				const extractedImage = extractFirstImage(content)
-				const finalImage = image ?? (coverImage || extractedImage
-					? { src: coverImage ?? extractedImage ?? '', alt: title }
-					: undefined)
 				const aliases = getStringArray(metadata.aliases)
 				const urlPath = `${ basePath }/${ resolved.year }/${ resolved.month }/${ resolved.slug }`
+				const finalImage = resolveImagePath(image ?? (coverImage || extractedImage
+					? { src: coverImage ?? extractedImage ?? '', alt: title }
+					: undefined), urlPath)
 				const readTime = getNumber(metadata.readTime)
 				const excerpt = getString(metadata.excerpt) ?? createExcerpt(content)
 				const translations = getTranslations(metadata.i18n)
 				const updated = getString(metadata.updated)
 				const author = getAuthor(metadata.author)
-				const thumbnail = getImage(metadata.thumbnail, title)
+				const normalizedAuthor = author?.avatar
+					? { ...author, avatar: resolveAssetPath(author.avatar, urlPath) }
+					: author
+				const thumbnail = resolveImagePath(getImage(metadata.thumbnail, title), urlPath)
+				const normalizedCoverImage = coverImage ? resolveAssetPath(coverImage, urlPath) : undefined
 				return {
 					id: resolved.id,
 					slug: resolved.slug,
@@ -309,10 +325,10 @@ export function createMarkdownContentSource(options: MarkdownContentSourceOption
 					links: [ ...new Set([ ...getStringArray(metadata.links), ...extractLinks(content) ]) ],
 					relatedPostIds: getStringArray(metadata.relatedPosts),
 					...(updated ? { updated } : {}),
-					...(author ? { author } : {}),
+					...(normalizedAuthor ? { author: normalizedAuthor } : {}),
 					...(finalImage ? { image: finalImage } : {}),
 					...(thumbnail ? { thumbnail } : {}),
-					...(coverImage ? { coverImage } : {}),
+					...(normalizedCoverImage ? { coverImage: normalizedCoverImage } : {}),
 					...(content ? { content } : {}),
 					sourcePath: options.resolveSourcePath?.(filePath) ?? filePath,
 					...(translations ? { translations } : {})

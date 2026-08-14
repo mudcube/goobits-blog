@@ -1,6 +1,7 @@
 import type { BlogEngine } from '../core/createBlogEngine.js'
 import type { BlogPost } from '../core/blogPost.js'
 import type { BlogQuery, BlogReadContext, BlogSort } from '../core/blogQuery.js'
+import type { RelatedPostResult } from '../core/resolveRelatedPosts.js'
 import type { BlogTaxonomyTerm } from '../core/blogTaxonomy.js'
 import { generateBlogEntries, type BlogEntry } from './generateBlogEntries.js'
 
@@ -35,6 +36,7 @@ export interface BlogTaxonomyData extends BlogListData {
 export interface BlogPostData {
 	pageType: 'post'
 	post: BlogPost
+	relatedPosts: RelatedPostResult[]
 	lang: string
 }
 
@@ -186,7 +188,8 @@ export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): Blog
 			if (!post) {
 				throw new BlogRouteError(404, 'Blog post was not found')
 			}
-			return { pageType: 'post', post, lang }
+			const relatedPosts = await engine.getRelatedPosts(post, { context })
+			return { pageType: 'post', post, relatedPosts, lang }
 		},
 		entries: async (): Promise<BlogEntry[]> => await generateBlogEntries(engine),
 		GET: async (event): Promise<Response> => {
