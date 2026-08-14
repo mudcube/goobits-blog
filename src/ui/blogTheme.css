@@ -229,14 +229,6 @@
 	gap: 0.65rem;
 }
 
-.blog-share__network {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.35rem;
-	color: var(--blog-accent);
-	text-transform: capitalize;
-}
-
 .blog-breadcrumbs {
 	width: min(100%, 52rem);
 	margin: 0 auto 1.5rem;
@@ -263,7 +255,7 @@
 	color: var(--blog-accent);
 }
 
-:where(.blog-index, .blog-post, .blog-card, .blog-newsletter, .blog-share, .blog-breadcrumbs, .blog-taxonomy-list) a:focus-visible {
+:where(.blog-index, .blog-post, .blog-card, .blog-newsletter, .blog-share, .blog-breadcrumbs, .blog-taxonomy-list) a:not(.goo-button):focus-visible {
 	outline: 2px solid var(--blog-focus);
 	outline-offset: 3px;
 }

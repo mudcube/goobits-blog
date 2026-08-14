@@ -67,19 +67,23 @@ describe('Blog v3 UI', () => {
 		expect(configured).toContain('Email address')
 	})
 
-	it('shows only configured social networks alongside working share and copy actions', () => {
+	it('renders configured share actions through Goo buttons with native link semantics', () => {
 		const {body} = render(SocialShare, {
 			props: {
 				url: 'https://example.com/journal/direct',
 				title: 'Direct fields',
-				networks: [ 'email' ]
+				networks: [ 'email', 'facebook', 'x' ]
 			}
 		})
 
 		expect(body).toContain('Share')
 		expect(body).toContain('Copy link')
+		expect(body.match(/<(?:button|a)\b[^>]*class="goo-button(?: |")/g)).toHaveLength(5)
+		expect(body).toContain('class="goo-button blog-share__network"')
 		expect(body).toContain('mailto:')
-		expect(body).not.toContain('facebook.com')
-		expect(body).not.toContain('x.com/intent')
+		expect(body).toContain('facebook.com/sharer/sharer.php')
+		expect(body).toContain('x.com/intent/post')
+		expect(body.match(/target="_blank"/g)).toHaveLength(2)
+		expect(body.match(/rel="noopener noreferrer nofollow"/g)).toHaveLength(2)
 	})
 })

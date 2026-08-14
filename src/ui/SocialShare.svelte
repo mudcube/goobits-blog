@@ -68,19 +68,30 @@
 		if (network === 'facebook') {return `https://www.facebook.com/sharer/sharer.php?u=${ encodeURIComponent(url) }`}
 		return `https://x.com/intent/post?url=${ encodeURIComponent(url) }&text=${ encodeURIComponent(title) }`
 	}
+
+	function networkLabel(network: ShareNetwork): string {
+		if (network === 'x') {return 'X'}
+		return `${ network.charAt(0).toUpperCase() }${ network.slice(1) }`
+	}
 </script>
 
+{#snippet shareIcon()}<Share2 size={18} aria-hidden="true" />{/snippet}
+{#snippet copyIcon()}
+	{#if copied}<Check size={18} aria-hidden="true" />{:else}<Copy size={18} aria-hidden="true" />{/if}
+{/snippet}
+{#snippet mailIcon()}<Mail size={18} aria-hidden="true" />{/snippet}
+
 <div class={['blog-share', className].filter(Boolean).join(' ')} aria-label="Sharing options">
-	<GooButton ariaLabel={messages.share} title={messages.share} onclick={() => void share()}>
-		<Share2 size={18} aria-hidden="true" /> <span>{messages.share}</span>
-	</GooButton>
-	<GooButton ariaLabel={copied ? messages.copiedLink : messages.copyLink} title={messages.copyLink} onclick={() => void copy()}>
-		{#if copied}<Check size={18} aria-hidden="true" />{:else}<Copy size={18} aria-hidden="true" />{/if}
-		<span>{copied ? messages.copiedLink : messages.copyLink}</span>
-	</GooButton>
+	<GooButton label={messages.share} icon={shareIcon} title={messages.share} onclick={() => void share()} />
+	<GooButton label={copied ? messages.copiedLink : messages.copyLink} icon={copyIcon} title={messages.copyLink} onclick={() => void copy()} />
 	{#each networks as network (network)}
-		<a class="blog-share__network" href={networkUrl(network)} target={network === 'email' ? undefined : '_blank'} rel={network === 'email' ? undefined : 'noopener noreferrer nofollow'}>
-			{#if network === 'email'}<Mail size={18} aria-hidden="true" />{/if}<span>{network}</span>
-		</a>
+		<GooButton
+			class="blog-share__network"
+			label={networkLabel(network)}
+			icon={network === 'email' ? mailIcon : undefined}
+			href={networkUrl(network)}
+			target={network === 'email' ? undefined : '_blank'}
+			rel={network === 'email' ? undefined : 'noopener noreferrer nofollow'}
+		/>
 	{/each}
 </div>
