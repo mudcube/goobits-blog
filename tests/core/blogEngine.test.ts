@@ -31,19 +31,28 @@ describe('Blog engine', () => {
 		expect(urls.feed(config)).toBe('/journal/rss.xml')
 	})
 
-	it('returns taxonomy counts and explainable related results', async () => {
+	it('derives taxonomy counts when the source has no optimized capability', async () => {
 		const engine = createFixtureEngine()
-		const page = await engine.listPosts({ pageSize: 10 })
 		const categories = await engine.getCategories()
-		const sourcePost = page.posts[0]
+
+		expect(categories).toEqual([ { name: 'Engineering', slug: 'engineering', count: 2 } ])
+	})
+
+	it('ranks published related posts with explainable signals', async () => {
+		const engine = createFixtureEngine()
+		const page = await engine.listPosts(
+			{ visibility: 'all', pageSize: 10 },
+			{ allowDrafts: true }
+		)
+		const sourcePost = page.posts.find(post => post.slug === 'nested')
 		expect(sourcePost).toBeDefined()
 		if (!sourcePost) {
 			return
 		}
 		const related = resolveRelatedPosts(sourcePost, page.posts, { now: new Date('2024-06-01') })
 
-		expect(categories).toEqual([ { name: 'Engineering', slug: 'engineering', count: 2 } ])
-		expect(related[0]).toMatchObject({ post: { slug: 'flat' } })
+		expect(related.map(result => result.post.slug)).toEqual([ 'flat' ])
+		expect(related[0]?.reasons).toContain('editorial')
 		expect(related[0]?.reasons).toContain('category')
 	})
 

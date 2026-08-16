@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { BlogReadContext } from '../../src/core/blogQuery.js'
 import {
@@ -83,6 +83,33 @@ describe('createMarkdownBlog', () => {
 			preview: true,
 			viewerId: 'viewer-1'
 		}))).resolves.toMatchObject({ post: { title: 'Draft' } })
+	})
+
+	it('reports content import failures without discarding route data', async () => {
+		const importError = new Error('render failed')
+		const onContentError = vi.fn()
+		const failingModules = {
+			'/content/2026/08/broken/index.md': () => Promise.resolve({
+				metadata: { title: 'Broken', date: '2026-08-03' }
+			})
+		}
+		const failingBlog = createMarkdownBlog<BlogReadContext, PreviewEvent>({
+			modules: failingModules,
+			rawContent: {
+				'/content/2026/08/broken/index.md': '# Broken'
+			},
+			onContentError
+		})
+		const postData = await failingBlog.routes.route(event('2026/08/broken'))
+		failingModules['/content/2026/08/broken/index.md'] = () => Promise.reject(importError)
+
+		await expect(failingBlog.routes.page({ data: postData })).resolves.toMatchObject({
+			pageType: 'post',
+			post: { title: 'Broken' },
+			postContent: null
+		})
+		expect(onContentError).toHaveBeenCalledOnce()
+		expect(onContentError).toHaveBeenCalledWith(importError)
 	})
 
 	it('exposes entries and RSS without bypassing the engine', async () => {

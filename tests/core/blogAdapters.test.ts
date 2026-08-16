@@ -20,7 +20,7 @@ const post = createBlogPost({
 	tags: [ 'Welcome' ]
 })
 
-describe('Blog content source contract', () => {
+describe('Blog adapter contracts', () => {
 	it('normalizes database records into isolated posts', () => {
 		const inputCategories = [ 'Notes' ]
 		const normalized = createBlogPost({
