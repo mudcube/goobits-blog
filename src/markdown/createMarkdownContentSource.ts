@@ -1,4 +1,5 @@
 import type { BlogContentSource } from '../core/blogContentSource.js'
+import { createBlogPost } from '../core/blogPost.js'
 import type {
 	BlogAuthor,
 	BlogImage,
@@ -306,7 +307,7 @@ export function createMarkdownContentSource(options: MarkdownContentSourceOption
 					: author
 				const thumbnail = resolveImagePath(getImage(metadata.thumbnail, title), urlPath)
 				const normalizedCoverImage = coverImage ? resolveMarkdownUrl(coverImage, urlPath) : undefined
-				return {
+				return createBlogPost({
 					id: resolved.id,
 					slug: resolved.slug,
 					title,
@@ -330,7 +331,7 @@ export function createMarkdownContentSource(options: MarkdownContentSourceOption
 					...(content ? { content } : {}),
 					sourcePath: options.resolveSourcePath?.(filePath) ?? filePath,
 					...(translations ? { translations } : {})
-				}
+				})
 			} catch (error) {
 				return handleFailure(filePath, error)
 			}

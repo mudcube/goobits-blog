@@ -53,10 +53,10 @@ export class BlogRouteError extends Error {
 	}
 }
 
-export interface BlogRouteHandlersOptions {
-	engine: BlogEngine
+export interface BlogRouteHandlersOptions<Context extends BlogReadContext = BlogReadContext> {
+	engine: BlogEngine<Context>
 	getLanguage?: (event: BlogRouteEvent) => string
-	getReadContext?: (event: BlogRouteEvent) => BlogReadContext
+	getReadContext?: (event: BlogRouteEvent) => Context
 	prerender?: boolean
 	trailingSlash?: 'always' | 'never' | 'ignore'
 }
@@ -90,16 +90,17 @@ function readListQuery(event: BlogRouteEvent, pageSize: number): Required<Pick<B
 	}
 }
 
-export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): BlogRouteHandlers {
+export function createBlogRouteHandlers<Context extends BlogReadContext = BlogReadContext>(
+	options: BlogRouteHandlersOptions<Context>
+): BlogRouteHandlers {
 	const { engine } = options
 	const getLanguage = options.getLanguage ?? (() => engine.config.defaultLanguage)
-	const getReadContext = options.getReadContext ?? ((): BlogReadContext => ({}))
 
 	const loadIndex = async (event: BlogRouteEvent): Promise<BlogIndexData> => {
 		const lang = getLanguage(event)
-		const context = getReadContext(event)
+		const context = options.getReadContext?.(event)
 		const query = readListQuery(event, engine.config.pageSize)
-		const visibility = context.allowDrafts === true ? 'all' : 'published'
+		const visibility = context?.allowDrafts === true ? 'all' : 'published'
 		const [ page, categories, tags ] = await Promise.all([
 			engine.listPosts({ language: lang, ...query, visibility }, context),
 			engine.getCategories({ language: lang, visibility }, context),
@@ -126,9 +127,9 @@ export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): Blog
 		term: string
 	): Promise<BlogTaxonomyData> => {
 		const lang = getLanguage(event)
-		const context = getReadContext(event)
+		const context = options.getReadContext?.(event)
 		const query = readListQuery(event, engine.config.pageSize)
-		const visibility = context.allowDrafts === true ? 'all' : 'published'
+		const visibility = context?.allowDrafts === true ? 'all' : 'published'
 		const [ page, categories, tags ] = await Promise.all([
 			engine.listPosts({
 				language: lang,
@@ -179,24 +180,25 @@ export function createBlogRouteHandlers(options: BlogRouteHandlersOptions): Blog
 			}
 
 			const lang = getLanguage(event)
-			const context = getReadContext(event)
+			const context = options.getReadContext?.(event)
 			const mountedPath = `${ engine.config.basePath }/${ slug }`.replace(/\/{2,}/g, '/')
 			const post = await engine.getPost(mountedPath, {
 				language: lang,
-				visibility: context.allowDrafts === true ? 'all' : 'published'
+				visibility: context?.allowDrafts === true ? 'all' : 'published'
 			}, context)
 			if (!post) {
 				throw new BlogRouteError(404, 'Blog post was not found')
 			}
-			const relatedPosts = await engine.getRelatedPosts(post, { context })
+			const relatedPosts = await engine.getRelatedPosts(post, context ? { context } : {})
 			return { pageType: 'post', post, relatedPosts, lang }
 		},
 		entries: async (): Promise<BlogEntry[]> => await generateBlogEntries(engine),
 		GET: async (event): Promise<Response> => {
 			try {
+				const context = options.getReadContext?.(event)
 				const xml = await engine.generateRss({
 					siteUrl: engine.config.canonicalOrigin ?? event.url.origin
-				})
+				}, context)
 				return new Response(xml, {
 					headers: {
 						'Content-Type': 'application/xml; charset=utf-8',

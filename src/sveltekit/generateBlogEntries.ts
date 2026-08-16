@@ -12,14 +12,14 @@ function relativeSlug(urlPath: string, basePath: string): string {
 	return path.replace(/\/+$/, '')
 }
 
-export async function generateBlogEntries(
-	engine: BlogEngine,
-	context: BlogReadContext = {}
+export async function generateBlogEntries<Context extends BlogReadContext = BlogReadContext>(
+	engine: BlogEngine<Context>,
+	context?: Context
 ): Promise<BlogEntry[]> {
 	const page = await engine.listPosts({
 		page: 1,
 		pageSize: Number.MAX_SAFE_INTEGER,
-		visibility: context.allowDrafts === true ? 'all' : 'published'
+		visibility: context?.allowDrafts === true ? 'all' : 'published'
 	}, context)
 	const entries = page.posts.map(post => ({
 		slug: relativeSlug(post.urlPath, engine.config.basePath)

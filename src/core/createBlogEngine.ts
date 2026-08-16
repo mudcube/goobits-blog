@@ -6,30 +6,32 @@ import { getBlogCategories, getBlogTags, type BlogTaxonomyTerm } from './blogTax
 import { resolveRelatedPosts, type RelatedPostResult } from './resolveRelatedPosts.js'
 import { generateBlogRssFeed, type BlogRssOptions } from './rssFeed.js'
 
-export interface BlogEngineOptions {
+export interface BlogEngineOptions<Context extends BlogReadContext = BlogReadContext> {
 	config?: BlogConfigInput
-	contentSource: BlogContentSource
+	contentSource: BlogContentSource<Context>
 }
 
-export interface BlogEngine {
+export interface BlogEngine<Context extends BlogReadContext = BlogReadContext> {
 	config: BlogConfig
-	listPosts(query?: BlogQuery, context?: BlogReadContext): Promise<BlogPostPage>
+	listPosts(query?: BlogQuery, context?: Context): Promise<BlogPostPage>
 	getPost(
 		reference: BlogPostReference,
 		query?: Pick<BlogQuery, 'language' | 'includeContent' | 'includeTranslations' | 'visibility'>,
-		context?: BlogReadContext
+		context?: Context
 	): Promise<BlogPost | null>
-	getCategories(query?: BlogQuery, context?: BlogReadContext): Promise<BlogTaxonomyTerm[]>
-	getTags(query?: BlogQuery, context?: BlogReadContext): Promise<BlogTaxonomyTerm[]>
+	getCategories(query?: BlogQuery, context?: Context): Promise<BlogTaxonomyTerm[]>
+	getTags(query?: BlogQuery, context?: Context): Promise<BlogTaxonomyTerm[]>
 	getRelatedPosts(
 		post: BlogPost,
-		options?: { limit?: number; context?: BlogReadContext }
+		options?: { limit?: number; context?: Context }
 	): Promise<RelatedPostResult[]>
-	generateRss(options?: BlogRssOptions): Promise<string>
+	generateRss(options?: BlogRssOptions, context?: Context): Promise<string>
 	invalidate(): void
 }
 
-export function createBlogEngine(options: BlogEngineOptions): BlogEngine {
+export function createBlogEngine<Context extends BlogReadContext = BlogReadContext>(
+	options: BlogEngineOptions<Context>
+): BlogEngine<Context> {
 	const config = createBlogConfig(options.config)
 	const { contentSource } = options
 	const publishedQuery = (query: BlogQuery = {}): BlogQuery => ({
@@ -40,33 +42,41 @@ export function createBlogEngine(options: BlogEngineOptions): BlogEngine {
 
 	return {
 		config,
-		listPosts: async (query = {}, context = {}): Promise<BlogPostPage> =>
+		listPosts: async (query = {}, context): Promise<BlogPostPage> =>
 			await contentSource.listPosts(publishedQuery(query), context),
-		getPost: async (reference, query = {}, context = {}): Promise<BlogPost | null> =>
+		getPost: async (reference, query = {}, context): Promise<BlogPost | null> =>
 			await contentSource.getPost(reference, {
 				language: config.defaultLanguage,
 				...query
 			}, context),
-		getCategories: async (query = {}, context = {}): Promise<BlogTaxonomyTerm[]> => {
+		getCategories: async (query = {}, context): Promise<BlogTaxonomyTerm[]> => {
+			if (contentSource.getCategories) {
+				return await contentSource.getCategories(publishedQuery(query), context)
+			}
 			const page = await contentSource.listPosts({ ...publishedQuery(query), page: 1, pageSize: Number.MAX_SAFE_INTEGER }, context)
 			return getBlogCategories(page.posts)
 		},
-		getTags: async (query = {}, context = {}): Promise<BlogTaxonomyTerm[]> => {
+		getTags: async (query = {}, context): Promise<BlogTaxonomyTerm[]> => {
+			if (contentSource.getTags) {
+				return await contentSource.getTags(publishedQuery(query), context)
+			}
 			const page = await contentSource.listPosts({ ...publishedQuery(query), page: 1, pageSize: Number.MAX_SAFE_INTEGER }, context)
 			return getBlogTags(page.posts)
 		},
 		getRelatedPosts: async (post, relatedOptions = {}): Promise<RelatedPostResult[]> => {
+			const limit = relatedOptions.limit ?? config.relatedPostsLimit
+			if (contentSource.getRelatedPosts) {
+				return await contentSource.getRelatedPosts(post, { limit }, relatedOptions.context)
+			}
 			const page = await contentSource.listPosts({ page: 1, pageSize: Number.MAX_SAFE_INTEGER }, relatedOptions.context)
-			return resolveRelatedPosts(post, page.posts, {
-				limit: relatedOptions.limit ?? config.relatedPostsLimit
-			})
+			return resolveRelatedPosts(post, page.posts, { limit })
 		},
-		generateRss: async (rssOptions = {}): Promise<string> => {
+		generateRss: async (rssOptions = {}, context): Promise<string> => {
 			const page = await contentSource.listPosts({
 				page: 1,
 				pageSize: rssOptions.limit ?? config.feedLimit,
 				visibility: 'published'
-			})
+			}, context)
 			return generateBlogRssFeed(page.posts, config, rssOptions)
 		},
 		invalidate: (): void => {

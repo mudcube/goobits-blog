@@ -28,6 +28,6 @@ export interface BlogPostPage {
 	hasNextPage: boolean
 }
 
-export function canReadDrafts(query: BlogQuery, context: BlogReadContext): boolean {
-	return query.visibility === 'all' && context.allowDrafts === true
+export function canReadDrafts(query: BlogQuery, context?: BlogReadContext): boolean {
+	return query.visibility === 'all' && context?.allowDrafts === true
 }
