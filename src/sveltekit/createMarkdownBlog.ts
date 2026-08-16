@@ -48,11 +48,11 @@ export interface CreateMarkdownBlogOptions<
 }
 
 export interface MarkdownBlogRoutes<Event extends BlogRouteEvent<object> = BlogRouteEvent> {
-	index(event: Event): Promise<BlogIndexData & { config: BlogConfig }>
-	route(event: Event): Promise<BlogRouteData & { config: BlogConfig }>
-	entries(): Promise<BlogEntry[]>
-	rss(event: Event): Promise<Response>
-	page(params: { data: BlogPageServerData }): Promise<BlogPageLoadResult>
+	index: (event: Event) => Promise<BlogIndexData & { config: BlogConfig }>
+	route: (event: Event) => Promise<BlogRouteData & { config: BlogConfig }>
+	entries: () => Promise<BlogEntry[]>
+	rss: (event: Event) => Promise<Response>
+	page: (params: { data: BlogPageServerData }) => Promise<BlogPageLoadResult>
 }
 
 export interface MarkdownBlog<
