@@ -1,5 +1,17 @@
 import type { BlogConfig } from '../config/blogConfig.js'
-import type { BlogPost } from './blogPost.js'
+import type { BlogAuthor, BlogPost } from './blogPost.js'
+
+export type BlogTaxonomyType = 'category' | 'tag'
+
+export interface BlogUrlResolver {
+	blog(config: BlogConfig): string
+	post(post: BlogPost, config: BlogConfig): string
+	taxonomy(type: BlogTaxonomyType, slug: string, config: BlogConfig): string
+	feed(config: BlogConfig): string
+	author(author: BlogAuthor, config: BlogConfig): string | null
+}
+
+export type BlogUrlResolverInput = Partial<BlogUrlResolver>
 
 function ensurePath(path: string): string {
 	return `/${ path.replace(/^\/+/, '').replace(/\/{2,}/g, '/') }`
@@ -19,11 +31,31 @@ export function getBlogPostUrl(post: BlogPost, config?: BlogConfig): string {
 }
 
 export function getBlogTaxonomyUrl(
-	type: 'category' | 'tag',
+	type: BlogTaxonomyType,
 	slug: string,
 	config: BlogConfig
 ): string {
 	return ensurePath(`${ config.basePath }/${ type }/${ slug }`)
+}
+
+export function getBlogFeedUrl(config: BlogConfig): string {
+	return config.feedPath
+}
+
+export function getBlogAuthorUrl(author: BlogAuthor, _config: BlogConfig): string | null {
+	return author.url ?? null
+}
+
+const defaultBlogUrlResolver: BlogUrlResolver = {
+	blog: getBlogUrl,
+	post: getBlogPostUrl,
+	taxonomy: getBlogTaxonomyUrl,
+	feed: getBlogFeedUrl,
+	author: getBlogAuthorUrl
+}
+
+export function createBlogUrlResolver(input: BlogUrlResolverInput = {}): BlogUrlResolver {
+	return { ...defaultBlogUrlResolver, ...input }
 }
 
 export function getCanonicalBlogUrl(path: string, config: BlogConfig): string | null {

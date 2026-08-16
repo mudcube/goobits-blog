@@ -25,11 +25,12 @@
 	const {
 		onSubscribe,
 		messages: messageInput = {},
-		label = 'Newsletter',
+		label,
 		class: className = ''
 	}: Props = $props()
 
 	const messages = $derived(createBlogUiMessages(messageInput))
+	const ariaLabel = $derived(label ?? messages.newsletter)
 	let email = $state('')
 	let submissionState = $state<FormSubmissionState>({ status: 'idle', errors: {}, message: '' })
 
@@ -41,7 +42,7 @@
 			validate: ({ email: inputEmail }: NewsletterSubscriber) => {
 				const normalizedEmail = inputEmail.trim().toLowerCase()
 				if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
-					return invalidFormData({ email: 'Enter a valid email address' })
+					return invalidFormData({ email: messages.invalidEmail })
 				}
 				return validFormData({ email: normalizedEmail })
 			},
@@ -63,7 +64,7 @@
 {#if onSubscribe}
 	<form
 		class={['blog-newsletter', className].filter(Boolean).join(' ')}
-		aria-label={label}
+		aria-label={ariaLabel}
 		onsubmit={(event) => void handleSubmit(event)}
 	>
 		<GooInput

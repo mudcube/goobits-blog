@@ -70,8 +70,9 @@
 	}
 
 	function networkLabel(network: ShareNetwork): string {
-		if (network === 'x') {return 'X'}
-		return `${ network.charAt(0).toUpperCase() }${ network.slice(1) }`
+		if (network === 'email') {return messages.email}
+		if (network === 'facebook') {return messages.facebook}
+		return messages.x
 	}
 </script>
 
@@ -81,7 +82,7 @@
 {/snippet}
 {#snippet mailIcon()}<Mail size={18} aria-hidden="true" />{/snippet}
 
-<div class={['blog-share', className].filter(Boolean).join(' ')} aria-label="Sharing options">
+<div class={['blog-share', className].filter(Boolean).join(' ')} aria-label={messages.sharingOptions}>
 	<GooButton label={messages.share} icon={shareIcon} title={messages.share} onclick={() => void share()} />
 	<GooButton label={copied ? messages.copiedLink : messages.copyLink} icon={copyIcon} title={messages.copyLink} onclick={() => void copy()} />
 	{#each networks as network (network)}

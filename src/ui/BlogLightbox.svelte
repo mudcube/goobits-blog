@@ -3,14 +3,17 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right'
 	import X from '@lucide/svelte/icons/x'
 	import { onMount } from 'svelte'
+	import { createBlogUiMessages, type BlogUiMessagesInput } from '../config/blogMessages.js'
 	import type { GalleryItem, GalleryOpenDetail } from './actions/galleryLightbox'
 
 	type BlogLightboxProps = {
 		/** Show the image caption (alt text) below the full-size image */
 		showCaption?: boolean
+		messages?: BlogUiMessagesInput
 	}
 
-	const { showCaption = true }: BlogLightboxProps = $props()
+	const { showCaption = true, messages: messageInput = {} }: BlogLightboxProps = $props()
+	const messages = $derived(createBlogUiMessages(messageInput))
 
 	let dialog: HTMLDialogElement
 	let items = $state<GalleryItem[]>([])
@@ -193,7 +196,7 @@
 	bind:this={dialog}
 	class="blog-lightbox"
 	class:blog-lightbox--visible={isVisible}
-	aria-label="Image gallery"
+	aria-label={messages.imageGallery}
 	onclick={handleDialogClick}
 	oncancel={(event) => {
 		event.preventDefault()
@@ -205,14 +208,14 @@
 		<div
 			class="blog-lightbox__frame"
 			role="group"
-			aria-label="Gallery frame"
+			aria-label={messages.galleryFrame}
 			ontouchstart={handleTouchStart}
 			ontouchend={handleTouchEnd}
 		>
 			<button
 				type="button"
 				class="blog-lightbox__close"
-				aria-label="Close gallery"
+				aria-label={messages.closeGallery}
 				onclick={close}
 			><X size={20} strokeWidth={2} aria-hidden="true" /></button>
 
@@ -220,7 +223,7 @@
 				<button
 					type="button"
 					class="blog-lightbox__nav blog-lightbox__nav--prev"
-					aria-label="Previous image"
+					aria-label={messages.previousImage}
 					disabled={!hasPrev}
 					onclick={goPrev}
 				><ChevronLeft size={24} strokeWidth={2} aria-hidden="true" /></button>
@@ -238,12 +241,12 @@
 					<figcaption class="blog-lightbox__caption">
 						<span class="blog-lightbox__caption-text">{current.alt}</span>
 						{#if items.length > 1}
-							<span class="blog-lightbox__counter">{index + 1} / {items.length}</span>
+							<span class="blog-lightbox__counter">{messages.galleryPosition(index + 1, items.length)}</span>
 						{/if}
 					</figcaption>
 				{:else if items.length > 1}
 					<figcaption class="blog-lightbox__caption">
-						<span class="blog-lightbox__counter">{index + 1} / {items.length}</span>
+						<span class="blog-lightbox__counter">{messages.galleryPosition(index + 1, items.length)}</span>
 					</figcaption>
 				{/if}
 			</figure>
@@ -252,7 +255,7 @@
 				<button
 					type="button"
 					class="blog-lightbox__nav blog-lightbox__nav--next"
-					aria-label="Next image"
+					aria-label={messages.nextImage}
 					disabled={!hasNext}
 					onclick={goNext}
 				><ChevronRight size={24} strokeWidth={2} aria-hidden="true" /></button>

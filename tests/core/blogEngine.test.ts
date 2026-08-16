@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createBlogConfig } from '../../src/config/blogConfig.js'
-import { getCanonicalBlogUrl, slugify } from '../../src/core/blogUrls.js'
+import { createBlogUrlResolver, getCanonicalBlogUrl, slugify } from '../../src/core/blogUrls.js'
 import { resolveRelatedPosts } from '../../src/core/resolveRelatedPosts.js'
 import { generateBlogRssFeed } from '../../src/core/rssFeed.js'
 import { createFixtureEngine } from '../fixtures/markdownFixture.js'
@@ -18,6 +18,17 @@ describe('Blog engine', () => {
 		const config = createBlogConfig({ canonicalOrigin: 'https://example.com/', basePath: '/journal' })
 		expect(slugify('Q&A: Café Notes')).toBe('q-and-a-cafe-notes')
 		expect(getCanonicalBlogUrl('/journal/post', config)).toBe('https://example.com/journal/post')
+	})
+
+	it('keeps custom URL strategies behind one resolver', () => {
+		const config = createBlogConfig({ basePath: '/journal' })
+		const urls = createBlogUrlResolver({
+			taxonomy: (type, slug) => `/topics/${ type }/${ slug }`
+		})
+
+		expect(urls.blog(config)).toBe('/journal')
+		expect(urls.taxonomy('tag', 'music', config)).toBe('/topics/tag/music')
+		expect(urls.feed(config)).toBe('/journal/rss.xml')
 	})
 
 	it('returns taxonomy counts and explainable related results', async () => {

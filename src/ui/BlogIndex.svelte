@@ -11,6 +11,7 @@
 	import type { BlogPost } from '../core/blogPost.js'
 	import type { BlogPostPage, BlogSort } from '../core/blogQuery.js'
 	import type { BlogTaxonomyTerm } from '../core/blogTaxonomy.js'
+	import { createBlogUrlResolver, type BlogUrlResolverInput } from '../core/blogUrls.js'
 	import BlogCard from './BlogCard.svelte'
 	import { createBlogFilterNavigation, type BlogFilterNavigate } from './blogFilters.js'
 
@@ -33,6 +34,7 @@
 		loadPage?: (_page: number) => Promise<BlogPostPage>
 		pageHref?: (_page: number) => string
 		messages?: BlogUiMessagesInput
+		urlResolver?: BlogUrlResolverInput
 		locale?: string
 		class?: string
 		navigate?: BlogFilterNavigate
@@ -55,12 +57,14 @@
 		loadPage,
 		pageHref,
 		messages: messageInput = {},
+		urlResolver: urlResolverInput = {},
 		locale = config.defaultLanguage,
 		class: className = '',
 		navigate
 	}: Props = $props()
 
 	const messages = $derived(createBlogUiMessages(messageInput))
+	const urlResolver = $derived(createBlogUrlResolver(urlResolverInput))
 	const totalPages = $derived(Math.max(1, Math.ceil(totalPosts / pageSize)))
 	const title = $derived(pageType === 'index' ? config.name : term)
 	let appendedPosts = $state<BlogPost[]>([])
@@ -72,11 +76,11 @@
 	const visiblePosts = $derived([ ...posts, ...appendedPosts ])
 	const currentPage = $derived(loadedPage ?? page)
 	const canLoadMore = $derived(loadedHasMore ?? hasMorePosts)
-	const sortOptions = {
-		newest: 'Newest first',
-		oldest: 'Oldest first',
-		title: 'Title'
-	}
+	const sortOptions = $derived({
+		newest: messages.sortNewest,
+		oldest: messages.sortOldest,
+		title: messages.sortTitle
+	})
 	const navigateAdapter = untrack(() => navigate)
 	const filterNavigation = createBlogFilterNavigation(navigateAdapter ? { navigate: navigateAdapter } : {})
 
@@ -148,16 +152,16 @@
 		<h1 id="blog-index-title">{title}</h1>
 		{#if pageType === 'index' && config.description}<p>{config.description}</p>{/if}
 		{#if categories.length > 0 || tags.length > 0}
-			<nav class="blog-index__discovery" aria-label="Blog topics">
+			<nav class="blog-index__discovery" aria-label={messages.blogTopics}>
 				{#each categories as category (category.slug)}
-					<a href={`${ config.basePath }/category/${ category.slug }`}>{category.name} <span>{category.count}</span></a>
+					<a href={urlResolver.taxonomy('category', category.slug, config)}>{category.name} <span>{category.count}</span></a>
 				{/each}
 				{#each tags as tag (tag.slug)}
-					<a href={`${ config.basePath }/tag/${ tag.slug }`}>#{tag.name} <span>{tag.count}</span></a>
+					<a href={urlResolver.taxonomy('tag', tag.slug, config)}>#{tag.name} <span>{tag.count}</span></a>
 				{/each}
 			</nav>
 		{/if}
-		<form class="blog-index__filters" method="GET" aria-label="Search and sort posts" onsubmit={handleSubmit}>
+		<form class="blog-index__filters" method="GET" aria-label={messages.searchAndSort} onsubmit={handleSubmit}>
 			<div class="blog-index__search">
 				<GooInput
 					type="search"
@@ -169,14 +173,14 @@
 				/>
 				<GooButton type="submit" label={messages.search} />
 			</div>
-			<GooSelect name="sort" value={sortValue} options={sortOptions} ariaLabel="Sort posts" onchange={handleSort} />
+			<GooSelect name="sort" value={sortValue} options={sortOptions} ariaLabel={messages.sort} onchange={handleSort} />
 		</form>
 	</header>
 
 	{#if visiblePosts.length > 0}
 		<div class="blog-index__grid">
 			{#each visiblePosts as post (post.id)}
-				<BlogCard {post} basePath={config.basePath} currentTag={pageType === 'tag' ? term : ''} messages={messageInput} {locale} />
+				<BlogCard {post} {config} currentTag={pageType === 'tag' ? term : ''} messages={messageInput} urlResolver={urlResolverInput} {locale} />
 			{/each}
 		</div>
 	{:else}
@@ -184,10 +188,10 @@
 	{/if}
 
 	{#if paginationMode === 'pages' && totalPages > 1}
-		<nav class="blog-index__pagination" aria-label="Blog pages">
-			{#if currentPage > 1}<a href={getPageHref(currentPage - 1)} rel="prev">Previous</a>{/if}
-			<span>Page {currentPage} of {totalPages}</span>
-			{#if currentPage < totalPages}<a href={getPageHref(currentPage + 1)} rel="next">Next</a>{/if}
+		<nav class="blog-index__pagination" aria-label={messages.blogPages}>
+			{#if currentPage > 1}<a href={getPageHref(currentPage - 1)} rel="prev">{messages.previousPage}</a>{/if}
+			<span>{messages.pageStatus(currentPage, totalPages)}</span>
+			{#if currentPage < totalPages}<a href={getPageHref(currentPage + 1)} rel="next">{messages.nextPage}</a>{/if}
 		</nav>
 	{:else if canLoadMore}
 		<div class="blog-index__more" use:observeInfinite>

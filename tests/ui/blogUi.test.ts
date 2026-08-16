@@ -4,7 +4,8 @@ import { render } from 'svelte/server'
 import { describe, expect, it } from 'vitest'
 
 import { createBlogConfig } from '../../src/config/blogConfig.js'
-import type { BlogPost } from '../../src/core/blogPost.js'
+import type { BlogAuthor, BlogPost } from '../../src/core/blogPost.js'
+import type { BlogTaxonomyType } from '../../src/core/blogUrls.js'
 import BlogCard from '../../src/ui/BlogCard.svelte'
 import BlogIndex from '../../src/ui/BlogIndex.svelte'
 import NewsletterForm from '../../src/ui/NewsletterForm.svelte'
@@ -57,6 +58,50 @@ describe('Blog v3 UI', () => {
 		expect(index).toContain('blog-index__search')
 		expect(index.indexOf('name="q"')).toBeLessThan(index.indexOf('>Search</'))
 		expect(index.indexOf('>Search</')).toBeLessThan(index.indexOf('name="sort"'))
+	})
+
+	it('uses injected URLs and shared author presentation throughout cards', () => {
+		const { body } = render(BlogCard, {
+			props: {
+				post: post({
+					author: { name: 'Miko', avatar: '/miko.jpg', url: '/legacy-author' }
+				}),
+				config,
+				urlResolver: {
+					post: (value: BlogPost) => `/@miko/blog/${ value.slug }`,
+					taxonomy: (type: BlogTaxonomyType, slug: string) => `/@miko/blog/${ type }/${ slug }`,
+					author: (author: BlogAuthor) => `/@${ author.name.toLowerCase() }`
+				}
+			}
+		})
+
+		expect(body).toContain('/@miko/blog/direct')
+		expect(body).toContain('/@miko/blog/category/engineering')
+		expect(body).toContain('/@miko/blog/tag/svelte')
+		expect(body).toContain('href="/@miko"')
+		expect(body).toContain('src="/miko.jpg"')
+	})
+
+	it('localizes sort, discovery, and pagination labels', () => {
+		const { body } = render(BlogIndex, {
+			props: {
+				posts: [ post() ],
+				config: createBlogConfig({ name: 'Journal', pageSize: 1 }),
+				totalPosts: 2,
+				messages: {
+					blogPages: 'Pages du journal',
+					blogTopics: 'Sujets',
+					pageStatus: (current: number, total: number) => `${ current } sur ${ total }`,
+					nextPage: 'Suivant',
+					sortNewest: 'Plus recentes'
+				}
+			}
+		})
+
+		expect(body).toContain('Pages du journal')
+		expect(body).toContain('1 sur 2')
+		expect(body).toContain('Suivant')
+		expect(body).toContain('Plus recentes')
 	})
 
 	it('does not render a newsletter without a working host adapter', () => {
