@@ -16,13 +16,13 @@ import {
 	type BlogPageServerData
 } from './createBlogPageLoad.js'
 import {
-	BlogRouteError,
 	createBlogRouteHandlers,
 	type BlogIndexData,
 	type BlogRouteData,
 	type BlogRouteEvent,
 	type BlogRouteHandlers
 } from './createBlogRouteHandlers.js'
+import { BlogRouteError } from './BlogRouteError.js'
 import type { BlogEntry } from './generateBlogEntries.js'
 
 export type MarkdownRawContent = string | (() => Promise<string>)

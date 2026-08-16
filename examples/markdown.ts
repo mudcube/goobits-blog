@@ -1,4 +1,4 @@
-import { createMarkdownBlog } from '../src/sveltekit/index.js'
+import { createMarkdownBlog } from '@goobits/blog/sveltekit'
 
 const modules = import.meta.glob('/src/content/blog/**/index.md')
 const rawContent = import.meta.glob<string>('/src/content/blog/**/index.md', {

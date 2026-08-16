@@ -4,6 +4,7 @@ import type { BlogQuery, BlogReadContext, BlogSort } from '../core/blogQuery.js'
 import type { RelatedPostResult } from '../core/resolveRelatedPosts.js'
 import type { BlogTaxonomyTerm } from '../core/blogTaxonomy.js'
 import { slugify } from '../core/blogUrls.js'
+import { BlogRouteError } from './BlogRouteError.js'
 import { generateBlogEntries, type BlogEntry } from './generateBlogEntries.js'
 
 export interface BlogRouteEvent<Locals extends object = Record<string, unknown>> {
@@ -42,16 +43,6 @@ export interface BlogPostData {
 }
 
 export type BlogRouteData = BlogIndexData | BlogTaxonomyData | BlogPostData
-
-export class BlogRouteError extends Error {
-	readonly status: number
-
-	constructor(status: number, message: string) {
-		super(message)
-		this.name = 'BlogRouteError'
-		this.status = status
-	}
-}
 
 export interface BlogRouteHandlersOptions<
 	Context extends BlogReadContext = BlogReadContext,

@@ -1,6 +1,6 @@
 export * from '../config/blogConfig.js'
 export type * from './blogContentSource.js'
-export type * from './blogPost.js'
+export * from './blogPost.js'
 export * from './blogQuery.js'
 export * from './blogTaxonomy.js'
 export * from './blogUrls.js'

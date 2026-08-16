@@ -15,14 +15,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `createBlogPost` normalization for database and API adapters.
 - Injectable URL resolution, complete UI messages, linked author presentation,
   and app-owned post extension snippets.
+- Canonical config and gallery-action subpaths for consumers that compose custom UI.
 - Typechecked Markdown, database, and multi-user examples.
 
 ### Changed
 
 - Markdown post creation now uses the same normalizer exposed to adapters.
+- Published examples now compile through package entrypoints rather than source paths.
 - Goo and Forms remain required presentation peers.
 - Taxonomy and related-post queries delegate to source capabilities when
   available and retain the existing in-memory fallback otherwise.
+
+### Fixed
+
+- `createBlogPost` is now available as a runtime export from the documented
+  `@goobits/blog/core` entrypoint.
 
 ## [3.0.0] - 2026-08-13
 

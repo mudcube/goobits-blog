@@ -1,7 +1,12 @@
-import type { BlogContentSource } from '../src/core/blogContentSource.js'
-import { createBlogPost, type BlogPost } from '../src/core/blogPost.js'
-import type { BlogPostPage, BlogQuery, BlogReadContext } from '../src/core/blogQuery.js'
-import type { BlogTaxonomyTerm } from '../src/core/blogTaxonomy.js'
+import {
+	createBlogPost,
+	type BlogContentSource,
+	type BlogPost,
+	type BlogPostPage,
+	type BlogQuery,
+	type BlogReadContext,
+	type BlogTaxonomyTerm
+} from '@goobits/blog/core'
 
 export interface TenantContext extends BlogReadContext {
 	tenantId: string

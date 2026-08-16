@@ -4,7 +4,7 @@
 	import X from '@lucide/svelte/icons/x'
 	import { onMount } from 'svelte'
 	import { createBlogUiMessages, type BlogUiMessagesInput } from '../config/blogMessages.js'
-	import type { GalleryItem, GalleryOpenDetail } from './actions/galleryLightbox'
+	import type { GalleryItem, GalleryOpenDetail } from './actions/galleryLightbox.js'
 
 	type BlogLightboxProps = {
 		/** Show the image caption (alt text) below the full-size image */

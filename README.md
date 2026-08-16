@@ -90,7 +90,9 @@ Markdown and small sources. Use `createBlogPost` to normalize database rows.
 | `@goobits/blog/core` | Engine, queries, taxonomy, URLs, related posts, RSS |
 | `@goobits/blog/markdown` | Markdown content source |
 | `@goobits/blog/sveltekit` | Route, page-load, entries, and RSS adapters |
+| `@goobits/blog/config` | Engine and UI message configuration |
 | `@goobits/blog/ui` | Svelte presentation components and prose elements |
+| `@goobits/blog/ui/gallery-lightbox` | Gallery action and event types for custom prose shells |
 | `@goobits/blog/ui/blogTheme.css` | Theme-variable-based editorial CSS |
 | `@goobits/blog/i18n` | Framework-neutral translation hooks |
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { BlogRouteError, createBlogRouteHandlers, type BlogRouteEvent } from '../../src/sveltekit/createBlogRouteHandlers.js'
+import { BlogRouteError } from '../../src/sveltekit/BlogRouteError.js'
+import { createBlogRouteHandlers, type BlogRouteEvent } from '../../src/sveltekit/createBlogRouteHandlers.js'
 import { createFixtureEngine } from '../fixtures/markdownFixture.js'
 
 function event(slug = '', preview = false, query = ''): BlogRouteEvent {

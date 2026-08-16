@@ -49,9 +49,13 @@
       "svelte": "./src/ui/elements/index.ts",
       "default": "./src/ui/elements/index.ts"
     },
+    "./ui/gallery-lightbox": {
+      "types": "./src/ui/actions/galleryLightbox.ts",
+      "default": "./src/ui/actions/galleryLightbox.ts"
+    },
     "./config": {
-      "types": "./src/config/blogConfig.ts",
-      "default": "./src/config/blogConfig.ts"
+      "types": "./src/config/index.ts",
+      "default": "./src/config/index.ts"
     },
     "./ui/blogTheme.css": "./src/ui/blogTheme.css",
     "./i18n": {

@@ -1,6 +1,5 @@
-import { createBlogEngine } from '../src/core/createBlogEngine.js'
-import type { BlogRouteEvent } from '../src/sveltekit/createBlogRouteHandlers.js'
-import { createBlogRouteHandlers } from '../src/sveltekit/createBlogRouteHandlers.js'
+import { createBlogEngine } from '@goobits/blog/core'
+import { createBlogRouteHandlers, type BlogRouteEvent } from '@goobits/blog/sveltekit'
 import { databaseSource, type TenantContext } from './database.js'
 
 interface BlogLocals {
