@@ -18,23 +18,25 @@ Instance-based Blog engine, Markdown source, SvelteKit adapters, and Svelte 5 pr
 ## Setup
 
 ```ts
-import { createBlogEngine } from '@goobits/blog/core'
-import { createMarkdownContentSource } from '@goobits/blog/markdown'
+import { createMarkdownBlog } from '@goobits/blog/sveltekit'
 
-const files = import.meta.glob('/src/content/journal/**/*.md')
+const modules = import.meta.glob('/src/content/journal/**/index.md')
+const rawContent = import.meta.glob<string>('/src/content/journal/**/index.md', {
+	query: '?raw',
+	import: 'default'
+})
 
-export const blog = createBlogEngine({
+export const blog = createMarkdownBlog({
 	config: {
 		name: 'Journal',
 		description: 'Notes from the studio',
 		basePath: '/journal',
 		canonicalOrigin: 'https://example.com'
 	},
-	contentSource: createMarkdownContentSource({
-		files,
-		basePath: '/journal',
-		readContent: loadRawMarkdown,
-		resolveSourcePath: path => path.replace('/src/content/journal/', '@journal/')
+	modules,
+	rawContent,
+	getContext: event => ({
+		allowDrafts: event.locals.preview === true
 	})
 })
 ```
@@ -44,18 +46,41 @@ Configuration belongs to the returned engine. Creating one engine does not mutat
 ## SvelteKit
 
 ```ts
-import { createBlogRouteHandlers } from '@goobits/blog/sveltekit'
 import { blog } from '$lib/blog'
 
-export const journalRoutes = createBlogRouteHandlers({
-	engine: blog,
-	getReadContext: event => ({
-		allowDrafts: event.locals.releaseStage === 'preview'
-	})
-})
+export const load = blog.routes.index
+export const prerender = blog.prerender
+```
+
+The catch-all post route uses the same instance:
+
+```ts
+export const load = blog.routes.route
+export const entries = blog.routes.entries
+export const trailingSlash = blog.trailingSlash
+```
+
+Client content and RSS routes bind directly as well:
+
+```ts
+export const load = blog.routes.page
+export const GET = blog.routes.rss
 ```
 
 Draft access requires both `visibility: 'all'` and `{ allowDrafts: true }`. Public lists, prerender entries, related posts, and RSS default to published posts only.
+
+The lower-level `createMarkdownContentSource`, `createBlogEngine`,
+`createBlogRouteHandlers`, and `createBlogPageLoad` functions remain available
+for custom pipelines. See the published `examples/` directory for Markdown,
+database, and multi-user integrations.
+
+## Database Sources
+
+A database content source requires only `listPosts` and `getPost`. Make its
+read context generic to carry tenant and viewer identity. Implement
+`getCategories`, `getTags`, and `getRelatedPosts` when the backend can answer
+those queries efficiently; the engine retains its in-memory fallback for
+Markdown and small sources. Use `createBlogPost` to normalize database rows.
 
 ## Imports
 
@@ -93,6 +118,16 @@ submission state, and renders nothing until a working adapter is provided:
 
 `BlogPost` renders Web Share and copy-link actions. Email, Facebook, and X
 links appear only when explicitly included in `shareNetworks`.
+
+Goo and Forms are required peers. Blog uses them as the single control and form
+foundation rather than shipping alternate native controls.
+
+Pass `urlResolver` to `BlogIndex` or `BlogPost` to override post, taxonomy,
+feed, or author paths. The resolver flows to nested cards and taxonomy lists.
+All visible and assistive UI text is configurable through `messages`.
+
+`BlogPost` accepts `actions` and `afterContent` snippets for app-owned edit,
+moderation, comment, or discussion UI. Blog does not implement those policies.
 
 ## Markdown Plugins
 

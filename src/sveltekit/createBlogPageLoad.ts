@@ -3,7 +3,6 @@ import type { BlogPost } from '../core/blogPost.js'
 export interface BlogPageServerData {
 	pageType: 'index' | 'category' | 'tag' | 'post'
 	post?: BlogPost
-	[key: string]: unknown
 }
 
 export interface BlogPageLoadResult extends BlogPageServerData {

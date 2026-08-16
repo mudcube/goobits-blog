@@ -1,5 +1,22 @@
 # Upgrading `@goobits/blog`
 
+## Upgrading From 3.0 To 3.1
+
+Version 3.1 is backward-compatible. Existing engine, Markdown source, and route
+factory integrations continue to work.
+
+- New Markdown consumers can replace their manual composition with
+  `createMarkdownBlog` from `@goobits/blog/sveltekit`.
+- `BlogContentSource`, `BlogEngine`, and route handlers accept a typed read
+  context for tenant and viewer authorization.
+- Database sources can implement optimized taxonomy and related-post methods;
+  existing sources retain the list-based fallback.
+- Shared UI accepts one URL resolver and a complete message catalog.
+- Goo and Forms remain required peers.
+
+The facade is additive. Adopt it when convenient, then remove the superseded
+consumer route adapters and content-loader wrappers.
+
 ## Upgrading From 2.x To 3.0
 
 Version 3 replaces global configuration and nested processed-post objects with

@@ -5,6 +5,25 @@ All notable changes to the `@goobits/blog` package will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-08-16
+
+### Added
+
+- Backward-compatible `createMarkdownBlog` SvelteKit setup facade.
+- Generic authorization contexts across engines, sources, routes, and RSS.
+- Optional optimized taxonomy and related-post source capabilities.
+- `createBlogPost` normalization for database and API adapters.
+- Injectable URL resolution, complete UI messages, linked author presentation,
+  and app-owned post extension snippets.
+- Typechecked Markdown, database, and multi-user examples.
+
+### Changed
+
+- Markdown post creation now uses the same normalizer exposed to adapters.
+- Goo and Forms remain required presentation peers.
+- Taxonomy and related-post queries delegate to source capabilities when
+  available and retain the existing in-memory fallback otherwise.
+
 ## [3.0.0] - 2026-08-13
 
 ### Added

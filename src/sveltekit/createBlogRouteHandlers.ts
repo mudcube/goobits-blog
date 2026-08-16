@@ -6,9 +6,9 @@ import type { BlogTaxonomyTerm } from '../core/blogTaxonomy.js'
 import { slugify } from '../core/blogUrls.js'
 import { generateBlogEntries, type BlogEntry } from './generateBlogEntries.js'
 
-export interface BlogRouteEvent {
+export interface BlogRouteEvent<Locals extends object = Record<string, unknown>> {
 	params: Record<string, string | undefined>
-	locals: Record<string, unknown>
+	locals: Locals
 	url: URL
 }
 
@@ -53,21 +53,24 @@ export class BlogRouteError extends Error {
 	}
 }
 
-export interface BlogRouteHandlersOptions<Context extends BlogReadContext = BlogReadContext> {
+export interface BlogRouteHandlersOptions<
+	Context extends BlogReadContext = BlogReadContext,
+	Event extends BlogRouteEvent<object> = BlogRouteEvent
+> {
 	engine: BlogEngine<Context>
-	getLanguage?: (event: BlogRouteEvent) => string
-	getReadContext?: (event: BlogRouteEvent) => Context
+	getLanguage?: (event: Event) => string
+	getReadContext?: (event: Event) => Context
 	prerender?: boolean
 	trailingSlash?: 'always' | 'never' | 'ignore'
 }
 
-export interface BlogRouteHandlers {
+export interface BlogRouteHandlers<Event extends BlogRouteEvent<object> = BlogRouteEvent> {
 	prerender: boolean
 	trailingSlash: 'always' | 'never' | 'ignore'
-	loadIndex(event: BlogRouteEvent): Promise<BlogIndexData>
-	loadRoute(event: BlogRouteEvent): Promise<BlogRouteData>
+	loadIndex(event: Event): Promise<BlogIndexData>
+	loadRoute(event: Event): Promise<BlogRouteData>
 	entries(): Promise<BlogEntry[]>
-	GET(event: BlogRouteEvent): Promise<Response>
+	GET(event: Event): Promise<Response>
 }
 
 function normalizeSlug(slug: string | undefined): string {
@@ -78,7 +81,7 @@ function isStaticAsset(slug: string): boolean {
 	return /\.(css|scss|js|ts|jsx|tsx|png|jpg|jpeg|gif|svg|ico|webp|avif|woff2?|ttf|eot|mp3|mp4|pdf)$/i.test(slug)
 }
 
-function readListQuery(event: BlogRouteEvent, pageSize: number): Required<Pick<BlogQuery, 'page' | 'pageSize' | 'search' | 'sort'>> {
+function readListQuery(event: { url: URL }, pageSize: number): Required<Pick<BlogQuery, 'page' | 'pageSize' | 'search' | 'sort'>> {
 	const requestedPage = Number(event.url.searchParams.get('page') ?? 1)
 	const sortValue = event.url.searchParams.get('sort')
 	const sort: BlogSort = sortValue === 'oldest' || sortValue === 'title' ? sortValue : 'newest'
@@ -90,13 +93,14 @@ function readListQuery(event: BlogRouteEvent, pageSize: number): Required<Pick<B
 	}
 }
 
-export function createBlogRouteHandlers<Context extends BlogReadContext = BlogReadContext>(
-	options: BlogRouteHandlersOptions<Context>
-): BlogRouteHandlers {
+export function createBlogRouteHandlers<
+	Context extends BlogReadContext = BlogReadContext,
+	Event extends BlogRouteEvent<object> = BlogRouteEvent
+>(options: BlogRouteHandlersOptions<Context, Event>): BlogRouteHandlers<Event> {
 	const { engine } = options
 	const getLanguage = options.getLanguage ?? (() => engine.config.defaultLanguage)
 
-	const loadIndex = async (event: BlogRouteEvent): Promise<BlogIndexData> => {
+	const loadIndex = async (event: Event): Promise<BlogIndexData> => {
 		const lang = getLanguage(event)
 		const context = options.getReadContext?.(event)
 		const query = readListQuery(event, engine.config.pageSize)
@@ -122,7 +126,7 @@ export function createBlogRouteHandlers<Context extends BlogReadContext = BlogRe
 	}
 
 	const loadTaxonomy = async (
-		event: BlogRouteEvent,
+		event: Event,
 		pageType: 'category' | 'tag',
 		term: string
 	): Promise<BlogTaxonomyData> => {

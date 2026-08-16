@@ -26,7 +26,7 @@
     "isolatedModules": true,
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
-    "types": ["node"],
+    "types": ["node", "vite/client"],
 
     "noEmit": true,
     "skipLibCheck": true
