@@ -39,10 +39,7 @@
 		--blog-gallery-shadow: 0 10px 30px -16px rgba(0, 0, 0, 0.5);
 
 		display: grid;
-		grid-template-columns: repeat(
-			auto-fill,
-			minmax(var(--blog-gallery-min-tile), 1fr)
-		);
+		grid-template-columns: repeat(auto-fill, minmax(var(--blog-gallery-min-tile), 1fr));
 		gap: var(--blog-gallery-gap);
 		align-items: start;
 	}

@@ -37,7 +37,9 @@
 	function open(detail: GalleryOpenDetail) {
 		items = detail.items
 		index = Math.max(0, Math.min(detail.index, detail.items.length - 1))
-		if (!dialog) { return }
+		if (!dialog) {
+			return
+		}
 		if (closeTimer) {
 			clearTimeout(closeTimer)
 			closeTimer = null
@@ -115,18 +117,24 @@
 	}
 
 	function prefetchAdjacent() {
-		if (typeof Image === 'undefined') { return }
+		if (typeof Image === 'undefined') {
+			return
+		}
 		for (const offset of [-1, 1]) {
 			const i = index + offset
 			const item = items[i]
-			if (!item) { continue }
+			if (!item) {
+				continue
+			}
 			const img = new Image()
 			img.src = item.href
 		}
 	}
 
 	function handleKey(event: KeyboardEvent) {
-		if (!dialog?.open) { return }
+		if (!dialog?.open) {
+			return
+		}
 		switch (event.key) {
 			case 'ArrowLeft':
 				event.preventDefault()
@@ -150,8 +158,12 @@
 	function handleDialogClick(event: MouseEvent) {
 		const target = event.target
 		if (target instanceof Element) {
-			if (target.closest('button')) { return }
-			if (target.closest('.blog-lightbox__image')) { return }
+			if (target.closest('button')) {
+				return
+			}
+			if (target.closest('.blog-lightbox__image')) {
+				return
+			}
 		}
 		close()
 	}
@@ -161,11 +173,17 @@
 	}
 
 	function handleTouchEnd(event: TouchEvent) {
-		if (touchStartX === null) { return }
+		if (touchStartX === null) {
+			return
+		}
 		const endX = event.changedTouches[0]?.clientX ?? touchStartX
 		const delta = endX - touchStartX
 		if (Math.abs(delta) > 50) {
-			if (delta > 0) { goPrev() } else { goNext() }
+			if (delta > 0) {
+				goPrev()
+			} else {
+				goNext()
+			}
 		}
 		touchStartX = null
 	}
@@ -185,7 +203,9 @@
 		document.addEventListener('keydown', handleKey)
 		return () => {
 			cancelReveal()
-			if (closeTimer) { clearTimeout(closeTimer) }
+			if (closeTimer) {
+				clearTimeout(closeTimer)
+			}
 			document.removeEventListener('gallery:open', galleryOpenListener)
 			document.removeEventListener('keydown', handleKey)
 		}
@@ -216,8 +236,8 @@
 				type="button"
 				class="blog-lightbox__close"
 				aria-label={messages.closeGallery}
-				onclick={close}
-			><X size={20} strokeWidth={2} aria-hidden="true" /></button>
+				onclick={close}><X size={20} strokeWidth={2} aria-hidden="true" /></button
+			>
 
 			{#if items.length > 1}
 				<button
@@ -225,8 +245,8 @@
 					class="blog-lightbox__nav blog-lightbox__nav--prev"
 					aria-label={messages.previousImage}
 					disabled={!hasPrev}
-					onclick={goPrev}
-				><ChevronLeft size={24} strokeWidth={2} aria-hidden="true" /></button>
+					onclick={goPrev}><ChevronLeft size={24} strokeWidth={2} aria-hidden="true" /></button
+				>
 			{/if}
 
 			<figure class="blog-lightbox__figure">
@@ -241,12 +261,16 @@
 					<figcaption class="blog-lightbox__caption">
 						<span class="blog-lightbox__caption-text">{current.alt}</span>
 						{#if items.length > 1}
-							<span class="blog-lightbox__counter">{messages.galleryPosition(index + 1, items.length)}</span>
+							<span class="blog-lightbox__counter"
+								>{messages.galleryPosition(index + 1, items.length)}</span
+							>
 						{/if}
 					</figcaption>
 				{:else if items.length > 1}
 					<figcaption class="blog-lightbox__caption">
-						<span class="blog-lightbox__counter">{messages.galleryPosition(index + 1, items.length)}</span>
+						<span class="blog-lightbox__counter"
+							>{messages.galleryPosition(index + 1, items.length)}</span
+						>
 					</figcaption>
 				{/if}
 			</figure>
@@ -257,8 +281,8 @@
 					class="blog-lightbox__nav blog-lightbox__nav--next"
 					aria-label={messages.nextImage}
 					disabled={!hasNext}
-					onclick={goNext}
-				><ChevronRight size={24} strokeWidth={2} aria-hidden="true" /></button>
+					onclick={goNext}><ChevronRight size={24} strokeWidth={2} aria-hidden="true" /></button
+				>
 			{/if}
 		</div>
 	{/if}
@@ -357,7 +381,9 @@
 		line-height: 0;
 		cursor: pointer;
 		backdrop-filter: blur(12px);
-		transition: background 0.25s ease, border-color 0.25s ease;
+		transition:
+			background 0.25s ease,
+			border-color 0.25s ease;
 	}
 
 	.blog-lightbox__close:hover {
@@ -382,7 +408,10 @@
 		line-height: 0;
 		cursor: pointer;
 		backdrop-filter: blur(12px);
-		transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+		transition:
+			background 0.25s ease,
+			border-color 0.25s ease,
+			transform 0.25s ease;
 	}
 
 	.blog-lightbox__nav:hover:not(:disabled) {
@@ -474,8 +503,12 @@
 			bottom: 1rem;
 		}
 
-		.blog-lightbox__nav--prev { left: 1rem; }
-		.blog-lightbox__nav--next { right: 1rem; }
+		.blog-lightbox__nav--prev {
+			left: 1rem;
+		}
+		.blog-lightbox__nav--next {
+			right: 1rem;
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {

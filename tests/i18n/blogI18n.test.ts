@@ -8,7 +8,7 @@ describe('Blog localization', () => {
 	it('accepts configured languages and falls back to the default', () => {
 		const config = createBlogConfig({
 			defaultLanguage: 'en',
-			supportedLanguages: [ 'en', 'es' ]
+			supportedLanguages: ['en', 'es']
 		})
 
 		expect(resolveBlogLanguage(config, 'es')).toBe('es')
@@ -23,11 +23,11 @@ describe('Blog localization', () => {
 			title: 'Hello',
 			date: '2026-08-01',
 			excerpt: 'Original excerpt',
-			categories: [ 'Notes' ],
-			tags: [ 'Welcome' ],
+			categories: ['Notes'],
+			tags: ['Welcome'],
 			urlPath: '/journal/hello',
 			translations: {
-				es: { title: 'Hola', categories: [ 'Notas' ] }
+				es: { title: 'Hola', categories: ['Notas'] }
 			}
 		})
 
@@ -35,10 +35,10 @@ describe('Blog localization', () => {
 			lang: 'es',
 			title: 'Hola',
 			excerpt: 'Original excerpt',
-			categories: [ 'Notas' ],
-			tags: [ 'Welcome' ]
+			categories: ['Notas'],
+			tags: ['Welcome']
 		})
-		expect(post).toMatchObject({ lang: 'en', title: 'Hello', categories: [ 'Notes' ] })
+		expect(post).toMatchObject({ lang: 'en', title: 'Hello', categories: ['Notes'] })
 		expect(localizeBlogPost(post, 'fr')).toBe(post)
 	})
 })

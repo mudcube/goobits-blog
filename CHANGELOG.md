@@ -96,30 +96,30 @@ wildcard imports.
 
 The following sub-entries have been removed:
 
-  - `./ui/*`        → use `./ui` (the curated barrel) for components
-  - `./config/*`    → use `./config` (the index) for config exports
-  - `./handlers/*`  → use `./handlers` (the index)
-  - `./handlers`    → handler functions are also re-exported from `./core`,
-                      which is the canonical entry. `./handlers` was a
-                      redundant duplicate.
+- `./ui/*` → use `./ui` (the curated barrel) for components
+- `./config/*` → use `./config` (the index) for config exports
+- `./handlers/*` → use `./handlers` (the index)
+- `./handlers` → handler functions are also re-exported from `./core`,
+  which is the canonical entry. `./handlers` was a
+  redundant duplicate.
 
 Two narrow explicit entries replace the previously implicit access via
 `./utils/*` for the mdsvex plugins, which need stable module identity:
 
-  - `./utils/remark-table-of-contents`
-  - `./utils/rehype-webp-picture`
+- `./utils/remark-table-of-contents`
+- `./utils/rehype-webp-picture`
 
 The `./utils` barrel itself is unchanged.
 
 #### Migration
 
-| 1.x import | 2.0 import |
-| --- | --- |
-| `@goobits/blog/ui/BlogCard.svelte` | `@goobits/blog/ui` (then named export) |
-| `@goobits/blog/utils/blogUtils.js` | `@goobits/blog/utils` |
+| 1.x import                                        | 2.0 import                                     |
+| ------------------------------------------------- | ---------------------------------------------- |
+| `@goobits/blog/ui/BlogCard.svelte`                | `@goobits/blog/ui` (then named export)         |
+| `@goobits/blog/utils/blogUtils.js`                | `@goobits/blog/utils`                          |
 | `@goobits/blog/utils/remark-table-of-contents.js` | `@goobits/blog/utils/remark-table-of-contents` |
-| `@goobits/blog/utils/rehype-webp-picture.js` | `@goobits/blog/utils/rehype-webp-picture` |
-| `@goobits/blog/config/defaults` | unchanged |
+| `@goobits/blog/utils/rehype-webp-picture.js`      | `@goobits/blog/utils/rehype-webp-picture`      |
+| `@goobits/blog/config/defaults`                   | unchanged                                      |
 
 If you genuinely need to import a single internal file by path, you
 can still do so — the source is laid out the same way under `src/`,
@@ -170,6 +170,7 @@ but it's no longer part of the published `exports` surface.
 ## [1.2.0] - 2026-02-05
 
 ### Added
+
 - **Full TypeScript Conversion** - Complete migration to strict TypeScript
   - Enabled all strict type checking options (`strict`, `noImplicitAny`, `strictNullChecks`, `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, etc.)
   - Added explicit return types and parameter types throughout codebase
@@ -185,6 +186,7 @@ but it's no longer part of the published `exports` surface.
   - `@typescript-eslint/explicit-function-return-types` for better documentation
 
 ### Changed
+
 - **Type System Cleanup** - Removed redundant type definitions
   - Eliminated local `BlogConfigType` interfaces that duplicated exported types
   - Replaced `as unknown as Type` double casts with direct property access
@@ -195,6 +197,7 @@ but it's no longer part of the published `exports` surface.
   - Better error handling patterns
 
 ### Fixed
+
 - **Test Type Errors** - Resolved strict TypeScript issues in tests
   - Fixed `exactOptionalPropertyTypes` violations in test helpers
   - Proper null checks for regex capture groups
@@ -203,6 +206,7 @@ but it's no longer part of the published `exports` surface.
 ## [1.1.3] - 2025-11-19
 
 ### Added
+
 - **Wildcard Exports** - Enhanced module resolution for direct file imports
   - Added wildcard exports (`./ui/*`, `./utils/*`, `./config/*`, `./handlers/*`) for direct file imports
   - Improved flexibility in importing individual modules
@@ -210,6 +214,7 @@ but it's no longer part of the published `exports` surface.
 ## [1.1.2] - 2025-11-19
 
 ### Added
+
 - **Svelte Export Conditions** - Enhanced SvelteKit compatibility
   - Added `svelte` condition to all export paths in package.json
   - Improved module resolution for Svelte components
@@ -217,11 +222,13 @@ but it's no longer part of the published `exports` surface.
 ## [1.1.0] - 2025-11-19
 
 ### Added
+
 - **SvelteKit SSR Compatibility** - Enhanced server-side rendering support
   - Added `svelte` field to package.json for better SvelteKit integration
   - Improved SSR compatibility with Svelte 5
 
 ### Changed
+
 - **Package Manager** - Standardized on pnpm
   - Added pnpm version requirement (>=9.0.0) in engines
   - Better dependency management
@@ -229,6 +236,7 @@ but it's no longer part of the published `exports` surface.
 ## [1.0.2] - 2025-11-16
 
 ### Added
+
 - **Remote Image Support** - Enhanced image handling for external sources
   - Added `/products/` prefix to remote image detection
   - Added localhost domain to remote image prefixes
@@ -236,6 +244,7 @@ but it's no longer part of the published `exports` surface.
   - Better support for CDN and external image sources
 
 ### Changed
+
 - **Logging Migration** - Replaced `console.*` with structured `@goobits/logger`
   - Consistent logging throughout blog package
   - Better integration with monorepo logging standards
@@ -244,6 +253,7 @@ but it's no longer part of the published `exports` surface.
   - Enhanced layout and component styling
 
 ### Fixed
+
 - **Static Asset Handling** - Skip static asset requests in blog handler
   - Prevents unnecessary processing of static files
   - Improved performance for static resources
@@ -254,6 +264,7 @@ but it's no longer part of the published `exports` surface.
 ## [1.0.1] - 2024-12-15
 
 ### Added
+
 - Initial published release of `@goobits/blog` package
 - Core blog functionality:
   - Markdown blog post rendering
@@ -273,4 +284,5 @@ but it's no longer part of the published `exports` surface.
 - Configuration system for blog customization
 
 ### Security
+
 - No known security issues

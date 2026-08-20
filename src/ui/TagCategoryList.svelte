@@ -45,9 +45,12 @@
 				<a
 					href={urlResolver.taxonomy(route, slugify(item), taxonomyConfig)}
 					aria-current={slugify(item) === slugify(activeItem) ? 'page' : undefined}
-				>{showHashtag ? '#' : ''}{item}</a>
+					>{showHashtag ? '#' : ''}{item}</a
+				>
 			</li>
 		{/each}
-		{#if items.length > maxDisplay}<li aria-label={messages.moreItems(items.length - maxDisplay)}>+{items.length - maxDisplay}</li>{/if}
+		{#if items.length > maxDisplay}<li aria-label={messages.moreItems(items.length - maxDisplay)}>
+				+{items.length - maxDisplay}
+			</li>{/if}
 	</ul>
 {/if}

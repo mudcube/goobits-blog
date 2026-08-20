@@ -35,7 +35,7 @@ export const blog = createMarkdownBlog({
 	},
 	modules,
 	rawContent,
-	getContext: event => ({
+	getContext: (event) => ({
 		allowDrafts: event.locals.preview === true
 	})
 })
@@ -84,17 +84,17 @@ Markdown and small sources. Use `createBlogPost` to normalize database rows.
 
 ## Imports
 
-| Import | Owner |
-|---|---|
-| `@goobits/blog` | Direct post types and Blog UI |
-| `@goobits/blog/core` | Engine, queries, taxonomy, URLs, related posts, RSS |
-| `@goobits/blog/markdown` | Markdown content source |
-| `@goobits/blog/sveltekit` | Route, page-load, entries, and RSS adapters |
-| `@goobits/blog/config` | Engine and UI message configuration |
-| `@goobits/blog/ui` | Svelte presentation components and prose elements |
+| Import                              | Owner                                                  |
+| ----------------------------------- | ------------------------------------------------------ |
+| `@goobits/blog`                     | Direct post types and Blog UI                          |
+| `@goobits/blog/core`                | Engine, queries, taxonomy, URLs, related posts, RSS    |
+| `@goobits/blog/markdown`            | Markdown content source                                |
+| `@goobits/blog/sveltekit`           | Route, page-load, entries, and RSS adapters            |
+| `@goobits/blog/config`              | Engine and UI message configuration                    |
+| `@goobits/blog/ui`                  | Svelte presentation components and prose elements      |
 | `@goobits/blog/ui/gallery-lightbox` | Gallery action and event types for custom prose shells |
-| `@goobits/blog/ui/blogTheme.css` | Theme-variable-based editorial CSS |
-| `@goobits/blog/i18n` | Framework-neutral translation hooks |
+| `@goobits/blog/ui/blogTheme.css`    | Theme-variable-based editorial CSS                     |
+| `@goobits/blog/i18n`                | Framework-neutral translation hooks                    |
 
 The package returns normalized SEO data. The consuming app owns the final `<svelte:head>` composition, site identity, and release-stage policy.
 

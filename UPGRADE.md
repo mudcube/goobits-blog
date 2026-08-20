@@ -32,13 +32,13 @@ an instance-owned engine and one direct `BlogPost` model.
    focused `/core`, `/markdown`, `/sveltekit`, `/config`, and `/ui` entries.
 4. Rename legacy page components to the v3 composition components:
 
-| 2.x | 3.0 |
-|---|---|
-| `BlogListPage` | `BlogIndex` |
-| `BlogPostPage` | `BlogPost` from `@goobits/blog/ui` |
-| `Newsletter` | `NewsletterForm` with `onSubscribe` |
-| `BlogSEO` | App-owned `<svelte:head>` |
-| `BlogRouter` | `createBlogRouteHandlers` |
+| 2.x            | 3.0                                 |
+| -------------- | ----------------------------------- |
+| `BlogListPage` | `BlogIndex`                         |
+| `BlogPostPage` | `BlogPost` from `@goobits/blog/ui`  |
+| `Newsletter`   | `NewsletterForm` with `onSubscribe` |
+| `BlogSEO`      | App-owned `<svelte:head>`           |
+| `BlogRouter`   | `createBlogRouteHandlers`           |
 
 The root package exports the `BlogPost` model type and aliases the component as
 `BlogPostView`. The UI entry exports the component as `BlogPost`.

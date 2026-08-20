@@ -67,14 +67,14 @@ function findGeneratedVariants({ originalDiskPath, publicPath, variantDirectory 
 	const publicDirectory = posix.join(posix.dirname(publicPath), variantDirectory)
 
 	return filenames
-		.filter(filename => filename.startsWith(filenamePrefix) && filename.endsWith('.webp'))
-		.map(filename => ({
+		.filter((filename) => filename.startsWith(filenamePrefix) && filename.endsWith('.webp'))
+		.map((filename) => ({
 			filename,
 			width: Number(filename.substring(filenamePrefix.length, filename.length - '.webp'.length))
 		}))
-		.filter(candidate => Number.isSafeInteger(candidate.width) && candidate.width > 0)
+		.filter((candidate) => Number.isSafeInteger(candidate.width) && candidate.width > 0)
 		.sort((left, right) => left.width - right.width)
-		.map(candidate => ({
+		.map((candidate) => ({
 			width: candidate.width,
 			publicPath: posix.join(publicDirectory, candidate.filename)
 		}))
@@ -133,9 +133,7 @@ export function rehypeWebpPicture(options = {}) {
 
 			if (NON_RESPONSIVE_EXTENSIONS.has(extension)) return
 
-			const resolvedPublicPath = publicPath.startsWith('/')
-				? publicPath
-				: publicPrefix + publicPath
+			const resolvedPublicPath = publicPath.startsWith('/') ? publicPath : publicPrefix + publicPath
 			const variants = findGeneratedVariants({
 				originalDiskPath,
 				publicPath: resolvedPublicPath,
@@ -145,7 +143,7 @@ export function rehypeWebpPicture(options = {}) {
 			if (variants.length > 0) {
 				const sourceProperties = {
 					type: 'image/webp',
-					srcSet: variants.map(variant => `${variant.publicPath} ${variant.width}w`).join(', ')
+					srcSet: variants.map((variant) => `${variant.publicPath} ${variant.width}w`).join(', ')
 				}
 				if (sizes) sourceProperties.sizes = sizes
 				siblings[index] = createPicture(node, sourceProperties)
@@ -154,8 +152,10 @@ export function rehypeWebpPicture(options = {}) {
 
 			if (extension === '.webp') return
 
-			const webpPublicPath = resolvedPublicPath.substring(0, resolvedPublicPath.length - extension.length) + '.webp'
-			const webpDiskPath = originalDiskPath.substring(0, originalDiskPath.length - extension.length) + '.webp'
+			const webpPublicPath =
+				resolvedPublicPath.substring(0, resolvedPublicPath.length - extension.length) + '.webp'
+			const webpDiskPath =
+				originalDiskPath.substring(0, originalDiskPath.length - extension.length) + '.webp'
 			if (!existsSync(webpDiskPath)) return
 
 			siblings[index] = createPicture(node, {

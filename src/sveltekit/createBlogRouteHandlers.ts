@@ -69,10 +69,15 @@ function normalizeSlug(slug: string | undefined): string {
 }
 
 function isStaticAsset(slug: string): boolean {
-	return /\.(css|scss|js|ts|jsx|tsx|png|jpg|jpeg|gif|svg|ico|webp|avif|woff2?|ttf|eot|mp3|mp4|pdf)$/i.test(slug)
+	return /\.(css|scss|js|ts|jsx|tsx|png|jpg|jpeg|gif|svg|ico|webp|avif|woff2?|ttf|eot|mp3|mp4|pdf)$/i.test(
+		slug
+	)
 }
 
-function readListQuery(event: { url: URL }, pageSize: number): Required<Pick<BlogQuery, 'page' | 'pageSize' | 'search' | 'sort'>> {
+function readListQuery(
+	event: { url: URL },
+	pageSize: number
+): Required<Pick<BlogQuery, 'page' | 'pageSize' | 'search' | 'sort'>> {
 	const requestedPage = Number(event.url.searchParams.get('page') ?? 1)
 	const sortValue = event.url.searchParams.get('sort')
 	const sort: BlogSort = sortValue === 'oldest' || sortValue === 'title' ? sortValue : 'newest'
@@ -96,7 +101,7 @@ export function createBlogRouteHandlers<
 		const context = options.getReadContext?.(event)
 		const query = readListQuery(event, engine.config.pageSize)
 		const visibility = context?.allowDrafts === true ? 'all' : 'published'
-		const [ page, categories, tags ] = await Promise.all([
+		const [page, categories, tags] = await Promise.all([
 			engine.listPosts({ language: lang, ...query, visibility }, context),
 			engine.getCategories({ language: lang, visibility }, context),
 			engine.getTags({ language: lang, visibility }, context)
@@ -125,19 +130,22 @@ export function createBlogRouteHandlers<
 		const context = options.getReadContext?.(event)
 		const query = readListQuery(event, engine.config.pageSize)
 		const visibility = context?.allowDrafts === true ? 'all' : 'published'
-		const [ page, categories, tags ] = await Promise.all([
-			engine.listPosts({
-				language: lang,
-				...query,
-				visibility,
-				...(pageType === 'category' ? { category: term } : { tag: term })
-			}, context),
+		const [page, categories, tags] = await Promise.all([
+			engine.listPosts(
+				{
+					language: lang,
+					...query,
+					visibility,
+					...(pageType === 'category' ? { category: term } : { tag: term })
+				},
+				context
+			),
 			engine.getCategories({ language: lang, visibility }, context),
 			engine.getTags({ language: lang, visibility }, context)
 		])
 		const taxonomy = pageType === 'category' ? categories : tags
-		if (!taxonomy.some(item => item.slug === slugify(term))) {
-			throw new BlogRouteError(404, `${ pageType } "${ term }" was not found`)
+		if (!taxonomy.some((item) => item.slug === slugify(term))) {
+			throw new BlogRouteError(404, `${pageType} "${term}" was not found`)
 		}
 		return {
 			pageType,
@@ -176,11 +184,15 @@ export function createBlogRouteHandlers<
 
 			const lang = getLanguage(event)
 			const context = options.getReadContext?.(event)
-			const mountedPath = `${ engine.config.basePath }/${ slug }`.replace(/\/{2,}/g, '/')
-			const post = await engine.getPost(mountedPath, {
-				language: lang,
-				visibility: context?.allowDrafts === true ? 'all' : 'published'
-			}, context)
+			const mountedPath = `${engine.config.basePath}/${slug}`.replace(/\/{2,}/g, '/')
+			const post = await engine.getPost(
+				mountedPath,
+				{
+					language: lang,
+					visibility: context?.allowDrafts === true ? 'all' : 'published'
+				},
+				context
+			)
 			if (!post) {
 				throw new BlogRouteError(404, 'Blog post was not found')
 			}
@@ -191,9 +203,12 @@ export function createBlogRouteHandlers<
 		GET: async (event): Promise<Response> => {
 			try {
 				const context = options.getReadContext?.(event)
-				const xml = await engine.generateRss({
-					siteUrl: engine.config.canonicalOrigin ?? event.url.origin
-				}, context)
+				const xml = await engine.generateRss(
+					{
+						siteUrl: engine.config.canonicalOrigin ?? event.url.origin
+					},
+					context
+				)
 				return new Response(xml, {
 					headers: {
 						'Content-Type': 'application/xml; charset=utf-8',

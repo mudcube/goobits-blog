@@ -18,7 +18,7 @@ export const blog = createBlogEngine<TenantContext>({
 export const routes = createBlogRouteHandlers<TenantContext, TenantEvent>({
 	engine: blog,
 	prerender: false,
-	getReadContext: event => ({
+	getReadContext: (event) => ({
 		tenantId: event.locals.tenantId,
 		...(event.locals.viewerId ? { viewerId: event.locals.viewerId } : {}),
 		allowDrafts: event.locals.roles.includes('editor')

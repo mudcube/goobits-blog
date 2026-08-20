@@ -34,7 +34,9 @@
 	let timeout: ReturnType<typeof setTimeout> | null = null
 
 	onDestroy(() => {
-		if (timeout) {clearTimeout(timeout)}
+		if (timeout) {
+			clearTimeout(timeout)
+		}
 	})
 
 	async function share(): Promise<void> {
@@ -52,39 +54,69 @@
 	}
 
 	async function copy(): Promise<void> {
-		if (typeof navigator === 'undefined' || !navigator.clipboard) {return}
+		if (typeof navigator === 'undefined' || !navigator.clipboard) {
+			return
+		}
 		try {
 			await navigator.clipboard.writeText(url)
 			copied = true
-			if (timeout) {clearTimeout(timeout)}
-			timeout = setTimeout(() => { copied = false }, 2000)
+			if (timeout) {
+				clearTimeout(timeout)
+			}
+			timeout = setTimeout(() => {
+				copied = false
+			}, 2000)
 		} catch {
 			copied = false
 		}
 	}
 
 	function networkUrl(network: ShareNetwork): string {
-		if (network === 'email') {return `mailto:?subject=${ encodeURIComponent(title) }&body=${ encodeURIComponent(`${ text }\n${ url }`) }`}
-		if (network === 'facebook') {return `https://www.facebook.com/sharer/sharer.php?u=${ encodeURIComponent(url) }`}
-		return `https://x.com/intent/post?url=${ encodeURIComponent(url) }&text=${ encodeURIComponent(title) }`
+		if (network === 'email') {
+			return `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${text}\n${url}`)}`
+		}
+		if (network === 'facebook') {
+			return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
+		}
+		return `https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`
 	}
 
 	function networkLabel(network: ShareNetwork): string {
-		if (network === 'email') {return messages.email}
-		if (network === 'facebook') {return messages.facebook}
+		if (network === 'email') {
+			return messages.email
+		}
+		if (network === 'facebook') {
+			return messages.facebook
+		}
 		return messages.x
 	}
 </script>
 
 {#snippet shareIcon()}<Share2 size={18} aria-hidden="true" />{/snippet}
 {#snippet copyIcon()}
-	{#if copied}<Check size={18} aria-hidden="true" />{:else}<Copy size={18} aria-hidden="true" />{/if}
+	{#if copied}<Check size={18} aria-hidden="true" />{:else}<Copy
+			size={18}
+			aria-hidden="true"
+		/>{/if}
 {/snippet}
 {#snippet mailIcon()}<Mail size={18} aria-hidden="true" />{/snippet}
 
-<div class={['blog-share', className].filter(Boolean).join(' ')} aria-label={messages.sharingOptions}>
-	<GooButton label={messages.share} icon={shareIcon} title={messages.share} onclick={() => void share()} />
-	<GooButton label={copied ? messages.copiedLink : messages.copyLink} icon={copyIcon} title={messages.copyLink} onclick={() => void copy()} />
+<div
+	class={['blog-share', className].filter(Boolean).join(' ')}
+	aria-label={messages.sharingOptions}
+>
+	<GooButton
+		label={messages.share}
+		icon={shareIcon}
+		title={messages.share}
+		onclick={() => void share()}
+	/>
+	<GooButton
+		label={copied ? messages.copiedLink : messages.copyLink}
+		icon={copyIcon}
+		title={messages.copyLink}
+		onclick={() => void copy()}
+	/>
 	{#each networks as network (network)}
 		<GooButton
 			class="blog-share__network"

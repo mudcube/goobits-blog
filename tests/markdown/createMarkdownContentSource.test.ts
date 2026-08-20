@@ -8,14 +8,14 @@ describe('createMarkdownContentSource', () => {
 		const page = await engine.listPosts({ pageSize: 10 })
 
 		expect(page.posts).toHaveLength(2)
-		expect(page.posts.map(post => post.urlPath)).toEqual([
+		expect(page.posts.map((post) => post.urlPath)).toEqual([
 			'/journal/2024/04/nested',
 			'/journal/2024/03/flat'
 		])
 		expect(page.posts[1]).toMatchObject({
 			title: 'Flat & Friendly',
-			categories: [ 'Engineering' ],
-			tags: [ 'Svelte', 'Music' ],
+			categories: ['Engineering'],
+			tags: ['Svelte', 'Music'],
 			status: 'published',
 			sourcePath: '@journal/2024/03/flat.md'
 		})
@@ -29,14 +29,15 @@ describe('createMarkdownContentSource', () => {
 		}
 		const source = createMarkdownContentSource({
 			files: { '/content/2024/06/derived.md': () => Promise.resolve({ metadata }) },
-			readContent: () => Promise.resolve('![Hero](/hero.jpg) Some useful copy. [Other](/blog/other).')
+			readContent: () =>
+				Promise.resolve('![Hero](/hero.jpg) Some useful copy. [Other](/blog/other).')
 		})
 		const page = await source.listPosts({ includeContent: true })
 
 		expect(page.posts[0]).toMatchObject({
 			excerpt: 'Some useful copy. Other.',
 			image: { src: '/hero.jpg', alt: 'Derived' },
-			links: [ '/blog/other' ],
+			links: ['/blog/other'],
 			readTimeMinutes: 1
 		})
 		expect(metadata).toEqual({ title: 'Derived', date: '2024-06-01' })
@@ -45,13 +46,15 @@ describe('createMarkdownContentSource', () => {
 	it('removes source frontmatter before deriving or returning content', async () => {
 		const source = createMarkdownContentSource({
 			files: {
-				'/content/2024/06/frontmatter.md': () => Promise.resolve({
-					metadata: { title: 'Frontmatter', date: '2024-06-02' }
-				})
+				'/content/2024/06/frontmatter.md': () =>
+					Promise.resolve({
+						metadata: { title: 'Frontmatter', date: '2024-06-02' }
+					})
 			},
-			readContent: () => Promise.resolve('---\ntitle: Frontmatter\ntags:\n  - hidden\n---\n\nVisible copy.')
+			readContent: () =>
+				Promise.resolve('---\ntitle: Frontmatter\ntags:\n  - hidden\n---\n\nVisible copy.')
 		})
-		const [ post ] = (await source.listPosts({ includeContent: true })).posts
+		const [post] = (await source.listPosts({ includeContent: true })).posts
 
 		expect(post).toMatchObject({
 			excerpt: 'Visible copy.',
@@ -64,17 +67,18 @@ describe('createMarkdownContentSource', () => {
 		const source = createMarkdownContentSource({
 			basePath: '/journal',
 			files: {
-				'/content/2026/08/assets/index.md': () => Promise.resolve({
-					metadata: {
-						title: 'Assets',
-						date: '2026-08-13',
-						coverImage: 'images/hero.jpg',
-						author: { name: 'Miko', avatar: './images/avatar.jpg' }
-					}
-				})
+				'/content/2026/08/assets/index.md': () =>
+					Promise.resolve({
+						metadata: {
+							title: 'Assets',
+							date: '2026-08-13',
+							coverImage: 'images/hero.jpg',
+							author: { name: 'Miko', avatar: './images/avatar.jpg' }
+						}
+					})
 			}
 		})
-		const [ post ] = (await source.listPosts()).posts
+		const [post] = (await source.listPosts()).posts
 
 		expect(post).toMatchObject({
 			coverImage: '/journal/2026/08/assets/images/hero.jpg',
@@ -88,13 +92,13 @@ describe('createMarkdownContentSource', () => {
 
 		expect((await engine.listPosts({ pageSize: 10 })).total).toBe(2)
 		expect((await engine.listPosts({ visibility: 'all', pageSize: 10 })).total).toBe(2)
-		expect((await engine.listPosts(
-			{ visibility: 'all', pageSize: 10 },
-			{ allowDrafts: true }
-		)).total).toBe(3)
+		expect(
+			(await engine.listPosts({ visibility: 'all', pageSize: 10 }, { allowDrafts: true })).total
+		).toBe(3)
 		expect(await engine.getPost('draft')).toBeNull()
-		expect(await engine.getPost('draft', { visibility: 'all' }, { allowDrafts: true }))
-			.toMatchObject({ status: 'draft' })
+		expect(
+			await engine.getPost('draft', { visibility: 'all' }, { allowDrafts: true })
+		).toMatchObject({ status: 'draft' })
 	})
 
 	it('supports pagination, search, category, tag, aliases, and localization', async () => {
@@ -102,7 +106,9 @@ describe('createMarkdownContentSource', () => {
 		const firstPage = await engine.listPosts()
 		expect(firstPage).toMatchObject({ total: 2, page: 1, pageSize: 1, hasNextPage: true })
 		expect((await engine.listPosts({ search: 'music', pageSize: 10 })).posts).toHaveLength(2)
-		expect((await engine.listPosts({ category: 'engineering', pageSize: 10 })).posts).toHaveLength(2)
+		expect((await engine.listPosts({ category: 'engineering', pageSize: 10 })).posts).toHaveLength(
+			2
+		)
 		expect((await engine.listPosts({ tag: 'music', pageSize: 10 })).posts).toHaveLength(1)
 		expect(await engine.getPost('/journal/old-flat', { language: 'es' })).toMatchObject({
 			title: 'Plano y amable',
@@ -116,7 +122,11 @@ describe('createMarkdownContentSource', () => {
 			'/content/invalid.md': () => Promise.reject(new Error('broken import'))
 		}
 		const warn = vi.fn()
-		const warningSource = createMarkdownContentSource({ files, importFailureMode: 'warn', logger: { warn } })
+		const warningSource = createMarkdownContentSource({
+			files,
+			importFailureMode: 'warn',
+			logger: { warn }
+		})
 		expect((await warningSource.listPosts({ pageSize: 10 })).total).toBe(2)
 		expect(warn).toHaveBeenCalledOnce()
 

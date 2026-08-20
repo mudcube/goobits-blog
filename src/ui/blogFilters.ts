@@ -31,13 +31,12 @@ function navigateBrowser(href: string): void {
 
 function comparableHref(value: string | URL): string {
 	const url = value instanceof URL ? value : new URL(value, PLACEHOLDER_ORIGIN)
-	return `${ url.pathname }${ url.search }${ url.hash }`
+	return `${url.pathname}${url.search}${url.hash}`
 }
 
 export function buildBlogFilterHref(currentUrl: string | URL, values: BlogFilterValues): string {
-	const url = currentUrl instanceof URL
-		? new URL(currentUrl)
-		: new URL(currentUrl, PLACEHOLDER_ORIGIN)
+	const url =
+		currentUrl instanceof URL ? new URL(currentUrl) : new URL(currentUrl, PLACEHOLDER_ORIGIN)
 	const query = values.search.trim()
 
 	url.searchParams.delete('page')
@@ -55,7 +54,9 @@ export function buildBlogFilterHref(currentUrl: string | URL, values: BlogFilter
 	return comparableHref(url)
 }
 
-export function createBlogFilterNavigation(options: BlogFilterNavigationOptions = {}): BlogFilterNavigation {
+export function createBlogFilterNavigation(
+	options: BlogFilterNavigationOptions = {}
+): BlogFilterNavigation {
 	const currentUrl = options.currentUrl ?? currentBrowserUrl
 	const navigate = options.navigate ?? navigateBrowser
 	const debounceMs = Math.max(0, options.debounceMs ?? 250)

@@ -35,14 +35,14 @@ export function normalizeBlogPath(path: string): string {
 		return ''
 	}
 
-	return `/${ trimmed.replace(/^\/+|\/+$/g, '') }`
+	return `/${trimmed.replace(/^\/+|\/+$/g, '')}`
 }
 
 export function createBlogConfig(input: BlogConfigInput = {}): BlogConfig {
 	const basePath = normalizeBlogPath(input.basePath ?? '/blog')
-	const feedPath = normalizeBlogPath(input.feedPath ?? `${ basePath }/rss.xml`) || '/rss.xml'
+	const feedPath = normalizeBlogPath(input.feedPath ?? `${basePath}/rss.xml`) || '/rss.xml'
 	const defaultLanguage = input.defaultLanguage?.trim() || 'en'
-	const supportedLanguages = [ ...new Set(input.supportedLanguages ?? [ defaultLanguage ]) ]
+	const supportedLanguages = [...new Set(input.supportedLanguages ?? [defaultLanguage])]
 
 	if (!supportedLanguages.includes(defaultLanguage)) {
 		supportedLanguages.unshift(defaultLanguage)
@@ -52,7 +52,9 @@ export function createBlogConfig(input: BlogConfigInput = {}): BlogConfig {
 		name: input.name?.trim() || 'Blog',
 		description: input.description?.trim() || '',
 		basePath,
-		...(input.canonicalOrigin ? { canonicalOrigin: input.canonicalOrigin.replace(/\/+$/, '') } : {}),
+		...(input.canonicalOrigin
+			? { canonicalOrigin: input.canonicalOrigin.replace(/\/+$/, '') }
+			: {}),
 		defaultLanguage,
 		supportedLanguages,
 		pageSize: Math.max(1, Math.floor(input.pageSize ?? 12)),

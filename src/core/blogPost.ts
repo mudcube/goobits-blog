@@ -55,7 +55,7 @@ export type BlogPostInput = Pick<BlogPost, 'id' | 'slug' | 'title' | 'urlPath'> 
 function normalizeDate(value: string | Date, field: 'date' | 'updated'): string {
 	const date = value instanceof Date ? value : new Date(value)
 	if (Number.isNaN(date.getTime())) {
-		throw new TypeError(`Blog post ${ field } must be a valid date`)
+		throw new TypeError(`Blog post ${field} must be a valid date`)
 	}
 	return date.toISOString()
 }
@@ -67,16 +67,16 @@ export function createBlogPost(input: BlogPostInput): BlogPost {
 		title: input.title,
 		date: normalizeDate(input.date, 'date'),
 		excerpt: input.excerpt ?? '',
-		categories: [ ...(input.categories ?? []) ],
-		tags: [ ...(input.tags ?? []) ],
+		categories: [...(input.categories ?? [])],
+		tags: [...(input.tags ?? [])],
 		featured: input.featured ?? false,
 		lang: input.lang ?? 'en',
 		status: input.status ?? 'published',
 		urlPath: input.urlPath,
 		readTimeMinutes: Math.max(1, input.readTimeMinutes ?? 1),
-		aliases: [ ...(input.aliases ?? []) ],
-		links: [ ...(input.links ?? []) ],
-		relatedPostIds: [ ...(input.relatedPostIds ?? []) ],
+		aliases: [...(input.aliases ?? [])],
+		links: [...(input.links ?? [])],
+		relatedPostIds: [...(input.relatedPostIds ?? [])],
 		...(input.updated !== undefined ? { updated: normalizeDate(input.updated, 'updated') } : {}),
 		...(input.author ? { author: { ...input.author } } : {}),
 		...(input.image ? { image: { ...input.image } } : {}),
@@ -84,16 +84,20 @@ export function createBlogPost(input: BlogPostInput): BlogPost {
 		...(input.coverImage ? { coverImage: input.coverImage } : {}),
 		...(input.content !== undefined ? { content: input.content } : {}),
 		...(input.sourcePath ? { sourcePath: input.sourcePath } : {}),
-		...(input.translations ? {
-			translations: Object.fromEntries(Object.entries(input.translations).map(([ language, translation ]) => [
-				language,
-				{
-					...translation,
-					...(translation.categories ? { categories: [ ...translation.categories ] } : {}),
-					...(translation.tags ? { tags: [ ...translation.tags ] } : {})
+		...(input.translations
+			? {
+					translations: Object.fromEntries(
+						Object.entries(input.translations).map(([language, translation]) => [
+							language,
+							{
+								...translation,
+								...(translation.categories ? { categories: [...translation.categories] } : {}),
+								...(translation.tags ? { tags: [...translation.tags] } : {})
+							}
+						])
+					)
 				}
-			]))
-		} : {})
+			: {})
 	}
 }
 

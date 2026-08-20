@@ -1,36 +1,36 @@
 {
-  "compilerOptions": {
-    // Strict checking. `strict: true` enables noImplicitAny / strictNullChecks
-    // / strictFunctionTypes / strictBindCallApply / strictPropertyInitialization
-    // / noImplicitThis / useUnknownInCatchVariables / alwaysStrict — those
-    // don't need to be re-listed.
-    "strict": true,
+	"compilerOptions": {
+		// Strict checking. `strict: true` enables noImplicitAny / strictNullChecks
+		// / strictFunctionTypes / strictBindCallApply / strictPropertyInitialization
+		// / noImplicitThis / useUnknownInCatchVariables / alwaysStrict — those
+		// don't need to be re-listed.
+		"strict": true,
 
-    // Stricter checks not implied by `strict`.
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
+		// Stricter checks not implied by `strict`.
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"exactOptionalPropertyTypes": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+		"noPropertyAccessFromIndexSignature": true,
 
-    // Module resolution. `moduleResolution: bundler` lets consumers'
-    // bundlers resolve our .ts source files; `isolatedModules` keeps
-    // each file independently compilable.
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "types": ["node", "vite/client"],
+		// Module resolution. `moduleResolution: bundler` lets consumers'
+		// bundlers resolve our .ts source files; `isolatedModules` keeps
+		// each file independently compilable.
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"esModuleInterop": true,
+		"isolatedModules": true,
+		"allowImportingTsExtensions": true,
+		"resolveJsonModule": true,
+		"types": ["node", "vite/client"],
 
-    "noEmit": true,
-    "skipLibCheck": true
-  },
-  "include": ["**/*.ts", "**/*.svelte"],
-  "exclude": ["node_modules", ".svelte-kit", "dist"]
+		"noEmit": true,
+		"skipLibCheck": true
+	},
+	"include": ["**/*.ts", "**/*.svelte"],
+	"exclude": ["node_modules", ".svelte-kit", "dist"]
 }

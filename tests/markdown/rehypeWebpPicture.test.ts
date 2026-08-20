@@ -2,7 +2,10 @@ import { afterAll, describe, expect, it } from 'vitest'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { rehypeWebpPicture, type RehypeWebpPictureOptions } from '../../src/markdown/rehypeWebpPicture.js'
+import {
+	rehypeWebpPicture,
+	type RehypeWebpPictureOptions
+} from '../../src/markdown/rehypeWebpPicture.js'
 
 interface ElementNode {
 	type: 'element'
@@ -50,7 +53,7 @@ function transform(
 		properties: { src, alt: 'Fixture', ...initialProperties },
 		children: []
 	}
-	const tree: RootNode = { type: 'root', children: [ image ] }
+	const tree: RootNode = { type: 'root', children: [image] }
 	rehypeWebpPicture(options)(tree, { filename: markdownPath })
 	return { tree, image }
 }
@@ -76,14 +79,17 @@ describe('rehypeWebpPicture', () => {
 
 		expect(picture).toMatchObject({
 			tagName: 'picture',
-			children: [ {
-				tagName: 'source',
-				properties: {
-					type: 'image/webp',
-					sizes,
-					srcSet: `${publicPrefix}/images/generated/photo-320.webp 320w, ${publicPrefix}/images/generated/photo-640.webp 640w`
-				}
-			}, image ]
+			children: [
+				{
+					tagName: 'source',
+					properties: {
+						type: 'image/webp',
+						sizes,
+						srcSet: `${publicPrefix}/images/generated/photo-320.webp 320w, ${publicPrefix}/images/generated/photo-640.webp 640w`
+					}
+				},
+				image
+			]
 		})
 		expect(image.properties).toMatchObject({
 			src: 'images/photo.png',
@@ -124,15 +130,15 @@ describe('rehypeWebpPicture', () => {
 
 	it('leaves missing local images intact and fails soft', () => {
 		const { tree, image } = transform('images/missing.jpg')
-		expect(tree.children).toEqual([ image ])
+		expect(tree.children).toEqual([image])
 		expect(image.properties).toMatchObject({ loading: 'lazy', decoding: 'async' })
 		expect(image.properties).not.toHaveProperty('width')
 	})
 
 	it('applies loading policy before skipping external and data sources', () => {
-		for (const src of [ 'https://images.example/photo.jpg', 'data:image/png;base64,abc' ]) {
+		for (const src of ['https://images.example/photo.jpg', 'data:image/png;base64,abc']) {
 			const { tree, image } = transform(src)
-			expect(tree.children).toEqual([ image ])
+			expect(tree.children).toEqual([image])
 			expect(image.properties).toMatchObject({ loading: 'lazy', decoding: 'async' })
 		}
 	})

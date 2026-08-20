@@ -22,12 +22,7 @@
 		class?: string
 	}
 
-	const {
-		onSubscribe,
-		messages: messageInput = {},
-		label,
-		class: className = ''
-	}: Props = $props()
+	const { onSubscribe, messages: messageInput = {}, label, class: className = '' }: Props = $props()
 
 	const messages = $derived(createBlogUiMessages(messageInput))
 	const ariaLabel = $derived(label ?? messages.newsletter)
@@ -35,29 +30,39 @@
 	let submissionState = $state<FormSubmissionState>({ status: 'idle', errors: {}, message: '' })
 
 	const formErrors = $derived({ _errors: Object.values(submissionState.errors).filter(Boolean) })
-	const submitting = $derived(submissionState.status === 'validating' || submissionState.status === 'submitting')
+	const submitting = $derived(
+		submissionState.status === 'validating' || submissionState.status === 'submitting'
+	)
 
-	const submission = $derived(onSubscribe
-		? createFormSubmission({
-			validate: ({ email: inputEmail }: NewsletterSubscriber) => {
-				const normalizedEmail = inputEmail.trim().toLowerCase()
-				if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
-					return invalidFormData({ email: messages.invalidEmail })
-				}
-				return validFormData({ email: normalizedEmail })
-			},
-			submit: onSubscribe,
-			onStateChange: (nextState: FormSubmissionState) => { submissionState = nextState },
-			successMessage: messages.subscribed,
-			errorMessage: messages.subscribeError
-		})
-		: null)
+	const submission = $derived(
+		onSubscribe
+			? createFormSubmission({
+					validate: ({ email: inputEmail }: NewsletterSubscriber) => {
+						const normalizedEmail = inputEmail.trim().toLowerCase()
+						if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+							return invalidFormData({ email: messages.invalidEmail })
+						}
+						return validFormData({ email: normalizedEmail })
+					},
+					submit: onSubscribe,
+					onStateChange: (nextState: FormSubmissionState) => {
+						submissionState = nextState
+					},
+					successMessage: messages.subscribed,
+					errorMessage: messages.subscribeError
+				})
+			: null
+	)
 
 	async function handleSubmit(event: SubmitEvent): Promise<void> {
 		event.preventDefault()
-		if (!submission) {return}
+		if (!submission) {
+			return
+		}
 		const nextState = await submission.submit({ email })
-		if (nextState.status === 'success') {email = ''}
+		if (nextState.status === 'success') {
+			email = ''
+		}
 	}
 </script>
 

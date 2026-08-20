@@ -25,8 +25,8 @@ function post(overrides: Partial<BlogPost> = {}): BlogPost {
 		title: 'Direct fields',
 		date: '2026-08-13T00:00:00.000Z',
 		excerpt: 'Direct normalized fields.',
-		categories: [ 'Engineering' ],
-		tags: [ 'Svelte' ],
+		categories: ['Engineering'],
+		tags: ['Svelte'],
 		featured: false,
 		lang: 'en',
 		status: 'published',
@@ -44,7 +44,7 @@ describe('Blog v3 UI', () => {
 		const card = render(BlogCard, { props: { post: post(), basePath: config.basePath } }).body
 		const index = render(BlogIndex, {
 			props: {
-				posts: [ post() ],
+				posts: [post()],
 				config,
 				categories: [{ name: 'Engineering', slug: 'engineering', count: 1 }]
 			}
@@ -68,9 +68,9 @@ describe('Blog v3 UI', () => {
 				}),
 				config,
 				urlResolver: {
-					post: (value: BlogPost) => `/@miko/blog/${ value.slug }`,
-					taxonomy: (type: BlogTaxonomyType, slug: string) => `/@miko/blog/${ type }/${ slug }`,
-					author: (author: BlogAuthor) => `/@${ author.name.toLowerCase() }`
+					post: (value: BlogPost) => `/@miko/blog/${value.slug}`,
+					taxonomy: (type: BlogTaxonomyType, slug: string) => `/@miko/blog/${type}/${slug}`,
+					author: (author: BlogAuthor) => `/@${author.name.toLowerCase()}`
 				}
 			}
 		})
@@ -85,13 +85,13 @@ describe('Blog v3 UI', () => {
 	it('localizes sort, discovery, and pagination labels', () => {
 		const { body } = render(BlogIndex, {
 			props: {
-				posts: [ post() ],
+				posts: [post()],
 				config: createBlogConfig({ name: 'Journal', pageSize: 1 }),
 				totalPosts: 2,
 				messages: {
 					blogPages: 'Pages du journal',
 					blogTopics: 'Sujets',
-					pageStatus: (current: number, total: number) => `${ current } sur ${ total }`,
+					pageStatus: (current: number, total: number) => `${current} sur ${total}`,
 					nextPage: 'Suivant',
 					sortNewest: 'Plus recentes'
 				}
@@ -116,11 +116,11 @@ describe('Blog v3 UI', () => {
 	})
 
 	it('renders configured share actions through Goo buttons with native link semantics', () => {
-		const {body} = render(SocialShare, {
+		const { body } = render(SocialShare, {
 			props: {
 				url: 'https://example.com/journal/direct',
 				title: 'Direct fields',
-				networks: [ 'email', 'facebook', 'x' ]
+				networks: ['email', 'facebook', 'x']
 			}
 		})
 

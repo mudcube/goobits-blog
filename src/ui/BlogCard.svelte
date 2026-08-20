@@ -4,11 +4,7 @@
 
 	import { createBlogConfig, type BlogConfig } from '../config/blogConfig.js'
 	import type { BlogPost } from '../core/blogPost.js'
-	import {
-		createBlogUrlResolver,
-		slugify,
-		type BlogUrlResolverInput
-	} from '../core/blogUrls.js'
+	import { createBlogUrlResolver, slugify, type BlogUrlResolverInput } from '../core/blogUrls.js'
 	import { createBlogUiMessages, type BlogUiMessagesInput } from '../config/blogMessages.js'
 	import Byline from './elements/Byline.svelte'
 
@@ -40,12 +36,18 @@
 
 	const messages = $derived(createBlogUiMessages(messageInput))
 	const urlResolver = $derived(createBlogUrlResolver(urlResolverInput))
-	const image = $derived(post.thumbnail ?? post.image ?? (post.coverImage ? { src: post.coverImage, alt: post.title } : null))
+	const image = $derived(
+		post.thumbnail ??
+			post.image ??
+			(post.coverImage ? { src: post.coverImage, alt: post.title } : null)
+	)
 	const category = $derived(post.categories[0] ?? '')
-	const tags = $derived(post.tags.filter(tag => tag !== currentTag))
+	const tags = $derived(post.tags.filter((tag) => tag !== currentTag))
 	const cardConfig = $derived(config ?? createBlogConfig({ basePath }))
 	const postUrl = $derived(urlResolver.post(post, cardConfig))
-	const classes = $derived([ 'blog-card', compact ? 'blog-card--compact' : '', className ].filter(Boolean).join(' '))
+	const classes = $derived(
+		['blog-card', compact ? 'blog-card--compact' : '', className].filter(Boolean).join(' ')
+	)
 </script>
 
 <article class={classes}>
@@ -56,13 +58,24 @@
 	{/if}
 	<div class="blog-card__body">
 		{#if category}
-			<a class="blog-card__category" href={urlResolver.taxonomy('category', slugify(category), cardConfig)}>{category}</a>
+			<a
+				class="blog-card__category"
+				href={urlResolver.taxonomy('category', slugify(category), cardConfig)}>{category}</a
+			>
 		{/if}
 		<h2 class="blog-card__title"><a href={postUrl}>{post.title || messages.untitledPost}</a></h2>
 		<div class="blog-card__meta">
-			<time datetime={post.date}>{new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(post.date))}</time>
+			<time datetime={post.date}
+				>{new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(
+					new Date(post.date)
+				)}</time
+			>
 			<span>{messages.minuteRead(post.readTimeMinutes)}</span>
-			{#if post.author}<Byline author={post.author} href={urlResolver.author(post.author, cardConfig)} layout="inline" />{/if}
+			{#if post.author}<Byline
+					author={post.author}
+					href={urlResolver.author(post.author, cardConfig)}
+					layout="inline"
+				/>{/if}
 		</div>
 		{#if post.excerpt}<p class="blog-card__excerpt">{post.excerpt}</p>{/if}
 		{#if tags.length > 0}
@@ -72,6 +85,8 @@
 				{/each}
 			</ul>
 		{/if}
-		<a class="blog-card__more" href={postUrl}>{messages.readMore}<ArrowRight size={16} aria-hidden="true" /></a>
+		<a class="blog-card__more" href={postUrl}
+			>{messages.readMore}<ArrowRight size={16} aria-hidden="true" /></a
+		>
 	</div>
 </article>

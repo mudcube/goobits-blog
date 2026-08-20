@@ -22,14 +22,15 @@ interface RelatedSearchDocument {
 }
 
 function intersectCount(left: string[], right: string[]): number {
-	const values = new Set(left.map(value => value.toLowerCase()))
+	const values = new Set(left.map((value) => value.toLowerCase()))
 	return right.reduce((count, value) => count + (values.has(value.toLowerCase()) ? 1 : 0), 0)
 }
 
 function textTokens(post: BlogPost): Set<string> {
-	return new Set(`${ post.title } ${ post.excerpt } ${ post.tags.join(' ') }`
-		.toLowerCase()
-		.match(/[a-z0-9]{3,}/g) ?? [])
+	return new Set(
+		`${post.title} ${post.excerpt} ${post.tags.join(' ')}`.toLowerCase().match(/[a-z0-9]{3,}/g) ??
+			[]
+	)
 }
 
 function getTextScores(post: BlogPost, candidates: BlogPost[]): Map<string, number> {
@@ -41,8 +42,8 @@ function getTextScores(post: BlogPost, candidates: BlogPost[]): Map<string, numb
 		tags: candidate.tags.join(' ')
 	}))
 	const search = new MiniSearch<RelatedSearchDocument>({
-		fields: [ 'title', 'excerpt', 'categories', 'tags' ],
-		storeFields: [ 'id' ],
+		fields: ['title', 'excerpt', 'categories', 'tags'],
+		storeFields: ['id'],
 		searchOptions: {
 			boost: { title: 3, tags: 2, categories: 2 },
 			combineWith: 'OR',
@@ -51,23 +52,27 @@ function getTextScores(post: BlogPost, candidates: BlogPost[]): Map<string, numb
 		}
 	})
 	search.addAll(documents)
-	const results = search.search(`${ post.title } ${ post.excerpt } ${ post.categories.join(' ') } ${ post.tags.join(' ') }`)
+	const results = search.search(
+		`${post.title} ${post.excerpt} ${post.categories.join(' ')} ${post.tags.join(' ')}`
+	)
 	const maximum = results[0]?.score ?? 0
-	return new Map(results.map(result => [
-		String(result.id),
-		maximum > 0 ? Math.min(16, (result.score / maximum) * 16) : 0
-	]))
+	return new Map(
+		results.map((result) => [
+			String(result.id),
+			maximum > 0 ? Math.min(16, (result.score / maximum) * 16) : 0
+		])
+	)
 }
 
 function diversify(results: RelatedPostResult[], limit: number): RelatedPostResult[] {
-	const remaining = [ ...results ]
+	const remaining = [...results]
 	const selected: RelatedPostResult[] = []
 	const categoryCounts = new Map<string, number>()
 
 	while (selected.length < limit && remaining.length > 0) {
 		let bestIndex = 0
 		let bestAdjustedScore = Number.NEGATIVE_INFINITY
-		for (const [ index, result ] of remaining.entries()) {
+		for (const [index, result] of remaining.entries()) {
 			const primaryCategory = result.post.categories[0]?.toLowerCase() ?? ''
 			const repetitionPenalty = primaryCategory ? (categoryCounts.get(primaryCategory) ?? 0) * 6 : 0
 			const adjustedScore = result.score - repetitionPenalty
@@ -76,11 +81,15 @@ function diversify(results: RelatedPostResult[], limit: number): RelatedPostResu
 				bestIndex = index
 			}
 		}
-		const [ next ] = remaining.splice(bestIndex, 1)
-		if (!next) {break}
+		const [next] = remaining.splice(bestIndex, 1)
+		if (!next) {
+			break
+		}
 		selected.push(next)
 		const primaryCategory = next.post.categories[0]?.toLowerCase()
-		if (primaryCategory) {categoryCounts.set(primaryCategory, (categoryCounts.get(primaryCategory) ?? 0) + 1)}
+		if (primaryCategory) {
+			categoryCounts.set(primaryCategory, (categoryCounts.get(primaryCategory) ?? 0) + 1)
+		}
 	}
 
 	return selected
@@ -94,14 +103,19 @@ export function resolveRelatedPosts(
 	const limit = Math.max(0, options.limit ?? 4)
 	const now = options.now ?? new Date()
 	const sourceTokens = textTokens(post)
-	const publishedCandidates = candidates.filter(candidate => candidate.id !== post.id && candidate.status === 'published')
+	const publishedCandidates = candidates.filter(
+		(candidate) => candidate.id !== post.id && candidate.status === 'published'
+	)
 	const textScores = getTextScores(post, publishedCandidates)
 
 	const ranked = publishedCandidates
-		.map(candidate => {
+		.map((candidate) => {
 			const reasons: RelatedPostResult['reasons'] = []
 			let score = 0
-			if (post.relatedPostIds.includes(candidate.id) || post.relatedPostIds.includes(candidate.slug)) {
+			if (
+				post.relatedPostIds.includes(candidate.id) ||
+				post.relatedPostIds.includes(candidate.slug)
+			) {
 				reasons.push('editorial')
 				score += 100
 			}
@@ -119,7 +133,9 @@ export function resolveRelatedPosts(
 				reasons.push('link')
 				score += 24
 			}
-			const sharedTokens = [ ...textTokens(candidate) ].filter(token => sourceTokens.has(token)).length
+			const sharedTokens = [...textTokens(candidate)].filter((token) =>
+				sourceTokens.has(token)
+			).length
 			const textScore = textScores.get(candidate.id) ?? 0
 			if (sharedTokens > 0 || textScore > 0) {
 				reasons.push('text')
@@ -134,8 +150,11 @@ export function resolveRelatedPosts(
 
 			return { post: candidate, reasons, score }
 		})
-		.filter(result => result.score > 0)
-		.sort((a, b) => b.score - a.score || new Date(b.post.date).getTime() - new Date(a.post.date).getTime())
+		.filter((result) => result.score > 0)
+		.sort(
+			(a, b) =>
+				b.score - a.score || new Date(b.post.date).getTime() - new Date(a.post.date).getTime()
+		)
 
 	return diversify(ranked, limit)
 }

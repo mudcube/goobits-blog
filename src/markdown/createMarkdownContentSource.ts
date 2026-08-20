@@ -8,7 +8,12 @@ import type {
 	BlogPostReference,
 	BlogPostTranslation
 } from '../core/blogPost.js'
-import { canReadDrafts, type BlogPostPage, type BlogQuery, type BlogReadContext } from '../core/blogQuery.js'
+import {
+	canReadDrafts,
+	type BlogPostPage,
+	type BlogQuery,
+	type BlogReadContext
+} from '../core/blogQuery.js'
 import { hasBlogCategory, hasBlogTag } from '../core/blogTaxonomy.js'
 import { slugify } from '../core/blogUrls.js'
 import { resolveMarkdownUrl } from './resolveMarkdownUrls.js'
@@ -53,9 +58,9 @@ function getStringArray(value: unknown): string[] {
 		return []
 	}
 
-	return value.flatMap(item => {
+	return value.flatMap((item) => {
 		const text = getString(item)
-		return text ? [ text ] : []
+		return text ? [text] : []
 	})
 }
 
@@ -99,7 +104,10 @@ function getImage(value: unknown, fallbackAlt: string): BlogImage | undefined {
 	}
 }
 
-function resolveImagePath(image: BlogImage | undefined, postUrlPath: string): BlogImage | undefined {
+function resolveImagePath(
+	image: BlogImage | undefined,
+	postUrlPath: string
+): BlogImage | undefined {
 	return image ? { ...image, src: resolveMarkdownUrl(image.src, postUrlPath) } : undefined
 }
 
@@ -108,7 +116,7 @@ function getTranslations(value: unknown): Record<string, BlogPostTranslation> | 
 		return undefined
 	}
 	const translations: Record<string, BlogPostTranslation> = {}
-	for (const [ language, translation ] of Object.entries(value)) {
+	for (const [language, translation] of Object.entries(value)) {
 		if (!isRecord(translation)) {
 			continue
 		}
@@ -131,7 +139,7 @@ function resolvePath(filePath: string, date: Date, explicitSlug?: string): Resol
 	const parts = filePath.replace(/\\/g, '/').split('/').filter(Boolean)
 	const filename = (parts.at(-1) ?? '').replace(/\.(md|svx|mdx)$/i, '')
 	const nested = filename === 'index'
-	const pathSlug = nested ? parts.at(-2) ?? '' : filename
+	const pathSlug = nested ? (parts.at(-2) ?? '') : filename
 	let yearIndex = -1
 	for (let index = parts.length - 1; index >= 0; index -= 1) {
 		if (/^\d{4}$/.test(parts[index] ?? '')) {
@@ -140,19 +148,20 @@ function resolvePath(filePath: string, date: Date, explicitSlug?: string): Resol
 		}
 	}
 	const monthPart = yearIndex >= 0 ? parts[yearIndex + 1] : undefined
-	const year = yearIndex >= 0 ? parts[yearIndex] ?? '' : String(date.getUTCFullYear())
-	const month = monthPart && /^\d{1,2}$/.test(monthPart)
-		? monthPart.padStart(2, '0')
-		: String(date.getUTCMonth() + 1).padStart(2, '0')
+	const year = yearIndex >= 0 ? (parts[yearIndex] ?? '') : String(date.getUTCFullYear())
+	const month =
+		monthPart && /^\d{1,2}$/.test(monthPart)
+			? monthPart.padStart(2, '0')
+			: String(date.getUTCMonth() + 1).padStart(2, '0')
 	const slug = slugify(explicitSlug ?? pathSlug)
-	const idPath = nested ? parts.slice(0, -1) : [ ...parts.slice(0, -1), filename ]
+	const idPath = nested ? parts.slice(0, -1) : [...parts.slice(0, -1), filename]
 
 	return { id: idPath.join('/'), slug, year, month }
 }
 
 function normalizeBasePath(path: string): string {
 	const trimmed = path.trim()
-	return trimmed && trimmed !== '/' ? `/${ trimmed.replace(/^\/+|\/+$/g, '') }` : ''
+	return trimmed && trimmed !== '/' ? `/${trimmed.replace(/^\/+|\/+$/g, '')}` : ''
 }
 
 function stripFrontmatter(content: string): string {
@@ -179,7 +188,7 @@ function extractLinks(content: string): string[] {
 			links.add(href)
 		}
 	}
-	return [ ...links ]
+	return [...links]
 }
 
 function createExcerpt(content: string, length = 220): string {
@@ -192,7 +201,7 @@ function createExcerpt(content: string, length = 220): string {
 		.replace(/\s+/g, ' ')
 		.trim()
 
-	return text.length <= length ? text : `${ text.slice(0, length).trimEnd() }...`
+	return text.length <= length ? text : `${text.slice(0, length).trimEnd()}...`
 }
 
 function calculateReadTime(content: string, wordsPerMinute: number): number {
@@ -208,11 +217,11 @@ function localizePost(post: BlogPost, language: string, includeTranslations: boo
 		lang: translation ? language : post.lang,
 		title: translation?.title ?? post.title,
 		excerpt: translation?.excerpt ?? post.excerpt,
-		categories: translation?.categories ?? [ ...post.categories ],
-		tags: translation?.tags ?? [ ...post.tags ],
-		aliases: [ ...post.aliases ],
-		links: [ ...post.links ],
-		relatedPostIds: [ ...post.relatedPostIds ],
+		categories: translation?.categories ?? [...post.categories],
+		tags: translation?.tags ?? [...post.tags],
+		aliases: [...post.aliases],
+		links: [...post.links],
+		relatedPostIds: [...post.relatedPostIds],
 		...(includeTranslations && translations ? { translations } : {})
 	}
 }
@@ -240,7 +249,9 @@ function isMarkdownModule(value: unknown): value is MarkdownModule {
 	return isRecord(value) && isRecord(value['metadata'])
 }
 
-export function createMarkdownContentSource(options: MarkdownContentSourceOptions): BlogContentSource {
+export function createMarkdownContentSource(
+	options: MarkdownContentSourceOptions
+): BlogContentSource {
 	const basePath = normalizeBasePath(options.basePath ?? '/blog')
 	const defaultLanguage = options.defaultLanguage ?? 'en'
 	const wordsPerMinute = Math.max(1, options.wordsPerMinute ?? 220)
@@ -252,10 +263,10 @@ export function createMarkdownContentSource(options: MarkdownContentSourceOption
 	const handleFailure = (filePath: string, error: unknown): null => {
 		if (failureMode === 'throw') {
 			const message = error instanceof Error ? error.message : String(error)
-			throw new Error(`Failed to import blog post "${ filePath }": ${ message }`)
+			throw new Error(`Failed to import blog post "${filePath}": ${message}`)
 		}
 		if (failureMode === 'warn') {
-			logger.warn(`Skipping blog post "${ filePath }" after import failure`, error)
+			logger.warn(`Skipping blog post "${filePath}" after import failure`, error)
 		}
 		return null
 	}
@@ -265,100 +276,116 @@ export function createMarkdownContentSource(options: MarkdownContentSourceOption
 			return cache.posts
 		}
 		const files = typeof options.files === 'function' ? options.files() : options.files
-		const loaded = await Promise.all(Object.entries(files).map(async ([ filePath, load ]): Promise<BlogPost | null> => {
-			try {
-				const module = await load()
-				if (!isMarkdownModule(module)) {
-					throw new Error('Markdown module does not export metadata')
+		const loaded = await Promise.all(
+			Object.entries(files).map(async ([filePath, load]): Promise<BlogPost | null> => {
+				try {
+					const module = await load()
+					if (!isMarkdownModule(module)) {
+						throw new Error('Markdown module does not export metadata')
+					}
+					const { metadata } = module
+					const dateValue = getString(metadata.date)
+					const date = dateValue ? new Date(dateValue) : new Date(Number.NaN)
+					if (!dateValue || Number.isNaN(date.getTime())) {
+						throw new Error('Post metadata has no valid date')
+					}
+					const title = getString(metadata.title) ?? 'Untitled post'
+					const resolved = resolvePath(filePath, date, getString(metadata.slug))
+					if (!resolved.slug) {
+						throw new Error('Post path has no usable slug')
+					}
+					const rawContent = options.readContent ? await options.readContent(filePath) : ''
+					const content = stripFrontmatter(rawContent)
+					const categories = [...getStringArray(metadata.categories)]
+					const category = getString(metadata.category)
+					if (category && !categories.includes(category)) {
+						categories.push(category)
+					}
+					const image = getImage(metadata.image, title)
+					const coverImage = getString(metadata.coverImage)
+					const extractedImage = extractFirstImage(content)
+					const aliases = getStringArray(metadata.aliases)
+					const urlPath = `${basePath}/${resolved.year}/${resolved.month}/${resolved.slug}`
+					const finalImage = resolveImagePath(
+						image ??
+							(coverImage || extractedImage
+								? { src: coverImage ?? extractedImage ?? '', alt: title }
+								: undefined),
+						urlPath
+					)
+					const readTime = getNumber(metadata.readTime)
+					const excerpt = getString(metadata.excerpt) ?? createExcerpt(content)
+					const translations = getTranslations(metadata.i18n)
+					const updated = getString(metadata.updated)
+					const author = getAuthor(metadata.author)
+					const normalizedAuthor = author?.avatar
+						? { ...author, avatar: resolveMarkdownUrl(author.avatar, urlPath) }
+						: author
+					const thumbnail = resolveImagePath(getImage(metadata.thumbnail, title), urlPath)
+					const normalizedCoverImage = coverImage
+						? resolveMarkdownUrl(coverImage, urlPath)
+						: undefined
+					return createBlogPost({
+						id: resolved.id,
+						slug: resolved.slug,
+						title,
+						date: date.toISOString(),
+						excerpt,
+						categories,
+						tags: getStringArray(metadata.tags),
+						featured: metadata.featured === true,
+						lang: defaultLanguage,
+						status: metadata.draft === true ? 'draft' : 'published',
+						urlPath,
+						readTimeMinutes:
+							readTime === undefined
+								? calculateReadTime(content, wordsPerMinute)
+								: Math.max(1, readTime),
+						aliases,
+						links: [...new Set([...getStringArray(metadata.links), ...extractLinks(content)])],
+						relatedPostIds: getStringArray(metadata.relatedPosts),
+						...(updated ? { updated } : {}),
+						...(normalizedAuthor ? { author: normalizedAuthor } : {}),
+						...(finalImage ? { image: finalImage } : {}),
+						...(thumbnail ? { thumbnail } : {}),
+						...(normalizedCoverImage ? { coverImage: normalizedCoverImage } : {}),
+						...(content ? { content } : {}),
+						sourcePath: options.resolveSourcePath?.(filePath) ?? filePath,
+						...(translations ? { translations } : {})
+					})
+				} catch (error) {
+					return handleFailure(filePath, error)
 				}
-				const { metadata } = module
-				const dateValue = getString(metadata.date)
-				const date = dateValue ? new Date(dateValue) : new Date(Number.NaN)
-				if (!dateValue || Number.isNaN(date.getTime())) {
-					throw new Error('Post metadata has no valid date')
-				}
-				const title = getString(metadata.title) ?? 'Untitled post'
-				const resolved = resolvePath(filePath, date, getString(metadata.slug))
-				if (!resolved.slug) {
-					throw new Error('Post path has no usable slug')
-				}
-				const rawContent = options.readContent ? await options.readContent(filePath) : ''
-				const content = stripFrontmatter(rawContent)
-				const categories = [ ...getStringArray(metadata.categories) ]
-				const category = getString(metadata.category)
-				if (category && !categories.includes(category)) {
-					categories.push(category)
-				}
-				const image = getImage(metadata.image, title)
-				const coverImage = getString(metadata.coverImage)
-				const extractedImage = extractFirstImage(content)
-				const aliases = getStringArray(metadata.aliases)
-				const urlPath = `${ basePath }/${ resolved.year }/${ resolved.month }/${ resolved.slug }`
-				const finalImage = resolveImagePath(image ?? (coverImage || extractedImage
-					? { src: coverImage ?? extractedImage ?? '', alt: title }
-					: undefined), urlPath)
-				const readTime = getNumber(metadata.readTime)
-				const excerpt = getString(metadata.excerpt) ?? createExcerpt(content)
-				const translations = getTranslations(metadata.i18n)
-				const updated = getString(metadata.updated)
-				const author = getAuthor(metadata.author)
-				const normalizedAuthor = author?.avatar
-					? { ...author, avatar: resolveMarkdownUrl(author.avatar, urlPath) }
-					: author
-				const thumbnail = resolveImagePath(getImage(metadata.thumbnail, title), urlPath)
-				const normalizedCoverImage = coverImage ? resolveMarkdownUrl(coverImage, urlPath) : undefined
-				return createBlogPost({
-					id: resolved.id,
-					slug: resolved.slug,
-					title,
-					date: date.toISOString(),
-					excerpt,
-					categories,
-					tags: getStringArray(metadata.tags),
-					featured: metadata.featured === true,
-					lang: defaultLanguage,
-					status: metadata.draft === true ? 'draft' : 'published',
-					urlPath,
-					readTimeMinutes: readTime === undefined ? calculateReadTime(content, wordsPerMinute) : Math.max(1, readTime),
-					aliases,
-					links: [ ...new Set([ ...getStringArray(metadata.links), ...extractLinks(content) ]) ],
-					relatedPostIds: getStringArray(metadata.relatedPosts),
-					...(updated ? { updated } : {}),
-					...(normalizedAuthor ? { author: normalizedAuthor } : {}),
-					...(finalImage ? { image: finalImage } : {}),
-					...(thumbnail ? { thumbnail } : {}),
-					...(normalizedCoverImage ? { coverImage: normalizedCoverImage } : {}),
-					...(content ? { content } : {}),
-					sourcePath: options.resolveSourcePath?.(filePath) ?? filePath,
-					...(translations ? { translations } : {})
-				})
-			} catch (error) {
-				return handleFailure(filePath, error)
-			}
-		}))
+			})
+		)
 
 		const posts = loaded.filter((post): post is BlogPost => post !== null)
 		cache = { posts, createdAt: Date.now() }
 		return posts
 	}
 
-	const listPosts = async (query: BlogQuery = {}, context: BlogReadContext = {}): Promise<BlogPostPage> => {
+	const listPosts = async (
+		query: BlogQuery = {},
+		context: BlogReadContext = {}
+	): Promise<BlogPostPage> => {
 		const language = query.language ?? defaultLanguage
 		let posts = (await loadPosts())
-			.filter(post => post.status === 'published' || canReadDrafts(query, context))
-			.map(post => localizePost(post, language, query.includeTranslations === true))
+			.filter((post) => post.status === 'published' || canReadDrafts(query, context))
+			.map((post) => localizePost(post, language, query.includeTranslations === true))
 
 		if (query.category) {
-			posts = posts.filter(post => hasBlogCategory(post, query.category ?? ''))
+			posts = posts.filter((post) => hasBlogCategory(post, query.category ?? ''))
 		}
 		if (query.tag) {
-			posts = posts.filter(post => hasBlogTag(post, query.tag ?? ''))
+			posts = posts.filter((post) => hasBlogTag(post, query.tag ?? ''))
 		}
 		const search = query.search?.trim().toLowerCase()
 		if (search) {
-			posts = posts.filter(post => `${ post.title } ${ post.excerpt } ${ post.categories.join(' ') } ${ post.tags.join(' ') } ${ post.content ?? '' }`
-				.toLowerCase()
-				.includes(search))
+			posts = posts.filter((post) =>
+				`${post.title} ${post.excerpt} ${post.categories.join(' ')} ${post.tags.join(' ')} ${post.content ?? ''}`
+					.toLowerCase()
+					.includes(search)
+			)
 		}
 
 		sortPosts(posts, query.sort ?? 'newest')
@@ -366,23 +393,34 @@ export function createMarkdownContentSource(options: MarkdownContentSourceOption
 		const page = Math.max(1, Math.floor(query.page ?? 1))
 		const pageSize = Math.max(1, Math.floor(query.pageSize ?? 12))
 		const start = (page - 1) * pageSize
-		const pagePosts = posts.slice(start, start + pageSize)
-			.map(post => stripContent(post, query.includeContent === true))
+		const pagePosts = posts
+			.slice(start, start + pageSize)
+			.map((post) => stripContent(post, query.includeContent === true))
 
 		return { posts: pagePosts, total, page, pageSize, hasNextPage: start + pageSize < total }
 	}
 
 	return {
 		listPosts,
-		getPost: async (reference: BlogPostReference, query = {}, context = {}): Promise<BlogPost | null> => {
+		getPost: async (
+			reference: BlogPostReference,
+			query = {},
+			context = {}
+		): Promise<BlogPost | null> => {
 			const key = typeof reference === 'string' ? reference : reference.id
-			const page = await listPosts({ ...query, page: 1, pageSize: Number.MAX_SAFE_INTEGER }, context)
-			return page.posts.find(post =>
-				post.id === key ||
-				post.slug === key ||
-				post.urlPath === key ||
-				post.aliases.includes(key)
-			) ?? null
+			const page = await listPosts(
+				{ ...query, page: 1, pageSize: Number.MAX_SAFE_INTEGER },
+				context
+			)
+			return (
+				page.posts.find(
+					(post) =>
+						post.id === key ||
+						post.slug === key ||
+						post.urlPath === key ||
+						post.aliases.includes(key)
+				) ?? null
+			)
 		},
 		invalidate: (): void => {
 			cache = null

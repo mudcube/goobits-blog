@@ -8,15 +8,18 @@ afterEach(() => {
 
 describe('buildBlogFilterHref', () => {
 	it('preserves unrelated state while resetting pagination and normalizing defaults', () => {
-		expect(buildBlogFilterHref(
-			'https://example.com/journal/?page=4&lang=es&sort=oldest#archive',
-			{ search: '  color piano  ', sort: 'newest' }
-		)).toBe('/journal/?lang=es&q=color+piano#archive')
+		expect(
+			buildBlogFilterHref('https://example.com/journal/?page=4&lang=es&sort=oldest#archive', {
+				search: '  color piano  ',
+				sort: 'newest'
+			})
+		).toBe('/journal/?lang=es&q=color+piano#archive')
 	})
 
 	it('removes an empty search and writes non-default sorting', () => {
-		expect(buildBlogFilterHref('/journal/?q=old&page=2', { search: ' ', sort: 'title' }))
-			.toBe('/journal/?sort=title')
+		expect(buildBlogFilterHref('/journal/?q=old&page=2', { search: ' ', sort: 'title' })).toBe(
+			'/journal/?sort=title'
+		)
 	})
 })
 

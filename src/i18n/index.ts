@@ -11,7 +11,9 @@ export function resolveBlogLanguage(config: BlogConfig, requestedLanguage?: stri
 
 export function localizeBlogPost(post: BlogPost, requestedLanguage: string): BlogPost {
 	const translation = post.translations?.[requestedLanguage]
-	if (!translation) {return post}
+	if (!translation) {
+		return post
+	}
 
 	return {
 		...post,

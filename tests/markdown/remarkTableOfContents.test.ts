@@ -37,9 +37,17 @@ describe('remarkTableOfContents', () => {
 		})
 		expect(tree.children[1]).toMatchObject({
 			type: 'list',
-			children: [{
-				children: [{ children: [{ url: '#line-breaks-in-canvas', children: [{ value: 'Line-breaks in <canvas>' }] }] }]
-			}]
+			children: [
+				{
+					children: [
+						{
+							children: [
+								{ url: '#line-breaks-in-canvas', children: [{ value: 'Line-breaks in <canvas>' }] }
+							]
+						}
+					]
+				}
+			]
 		})
 		expect(tree.children[2]).toMatchObject({
 			data: {
@@ -56,8 +64,19 @@ describe('remarkTableOfContents', () => {
 		const tree: MdRoot = {
 			children: [
 				{ type: 'heading', depth: 2, children: [{ type: 'text', value: 'TOC:6' }] },
-				{ type: 'heading', depth: 2, children: [{ type: 'text', value: 'API ' }, { type: 'inlineCode', value: 'Guide' }] },
-				{ type: 'heading', depth: 2, children: [{ type: 'strong', children: [{ type: 'text', value: 'API Guide' }] }] }
+				{
+					type: 'heading',
+					depth: 2,
+					children: [
+						{ type: 'text', value: 'API ' },
+						{ type: 'inlineCode', value: 'Guide' }
+					]
+				},
+				{
+					type: 'heading',
+					depth: 2,
+					children: [{ type: 'strong', children: [{ type: 'text', value: 'API Guide' }] }]
+				}
 			]
 		}
 

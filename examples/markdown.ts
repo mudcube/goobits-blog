@@ -15,7 +15,7 @@ export const blog = createMarkdownBlog({
 	},
 	modules,
 	rawContent,
-	getContext: event => ({
+	getContext: (event) => ({
 		allowDrafts: event.locals['preview'] === true
 	})
 })

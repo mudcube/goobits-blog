@@ -11,11 +11,14 @@ describe('Blog engine', () => {
 		const notes = createBlogConfig({ name: 'Notes', defaultLanguage: 'fr' })
 
 		expect(journal).toMatchObject({ name: 'Journal', basePath: '/journal', defaultLanguage: 'en' })
-		expect(notes).toMatchObject({ name: 'Notes', basePath: '/blog', supportedLanguages: [ 'fr' ] })
+		expect(notes).toMatchObject({ name: 'Notes', basePath: '/blog', supportedLanguages: ['fr'] })
 	})
 
 	it('normalizes slugs and canonical URLs', () => {
-		const config = createBlogConfig({ canonicalOrigin: 'https://example.com/', basePath: '/journal' })
+		const config = createBlogConfig({
+			canonicalOrigin: 'https://example.com/',
+			basePath: '/journal'
+		})
 		expect(slugify('Q&A: Café Notes')).toBe('q-and-a-cafe-notes')
 		expect(getCanonicalBlogUrl('/journal/post', config)).toBe('https://example.com/journal/post')
 	})
@@ -23,7 +26,7 @@ describe('Blog engine', () => {
 	it('keeps custom URL strategies behind one resolver', () => {
 		const config = createBlogConfig({ basePath: '/journal' })
 		const urls = createBlogUrlResolver({
-			taxonomy: (type, slug) => `/topics/${ type }/${ slug }`
+			taxonomy: (type, slug) => `/topics/${type}/${slug}`
 		})
 
 		expect(urls.blog(config)).toBe('/journal')
@@ -35,23 +38,20 @@ describe('Blog engine', () => {
 		const engine = createFixtureEngine()
 		const categories = await engine.getCategories()
 
-		expect(categories).toEqual([ { name: 'Engineering', slug: 'engineering', count: 2 } ])
+		expect(categories).toEqual([{ name: 'Engineering', slug: 'engineering', count: 2 }])
 	})
 
 	it('ranks published related posts with explainable signals', async () => {
 		const engine = createFixtureEngine()
-		const page = await engine.listPosts(
-			{ visibility: 'all', pageSize: 10 },
-			{ allowDrafts: true }
-		)
-		const sourcePost = page.posts.find(post => post.slug === 'nested')
+		const page = await engine.listPosts({ visibility: 'all', pageSize: 10 }, { allowDrafts: true })
+		const sourcePost = page.posts.find((post) => post.slug === 'nested')
 		expect(sourcePost).toBeDefined()
 		if (!sourcePost) {
 			return
 		}
 		const related = resolveRelatedPosts(sourcePost, page.posts, { now: new Date('2024-06-01') })
 
-		expect(related.map(result => result.post.slug)).toEqual([ 'flat' ])
+		expect(related.map((result) => result.post.slug)).toEqual(['flat'])
 		expect(related[0]?.reasons).toContain('editorial')
 		expect(related[0]?.reasons).toContain('category')
 	})
@@ -59,7 +59,9 @@ describe('Blog engine', () => {
 	it('excludes drafts and escapes unsafe feed values', async () => {
 		const engine = createFixtureEngine()
 		const page = await engine.listPosts({ visibility: 'all', pageSize: 10 }, { allowDrafts: true })
-		const xml = generateBlogRssFeed(page.posts, engine.config, { buildDate: new Date('2024-06-01') })
+		const xml = generateBlogRssFeed(page.posts, engine.config, {
+			buildDate: new Date('2024-06-01')
+		})
 
 		expect(xml).toContain('Flat &amp; Friendly')
 		expect(xml).not.toContain('Private Draft')

@@ -96,15 +96,17 @@ export function remarkTableOfContents() {
  * @returns {string}
  */
 function inlineText(nodes) {
-	return nodes.map((node) => {
-		if (node.type === 'text' || node.type === 'inlineCode') {
-			return node.value ?? ''
-		}
-		if (node.type === 'image' || node.type === 'imageReference') {
-			return node.alt ?? ''
-		}
-		return node.children ? inlineText(node.children) : ''
-	}).join('')
+	return nodes
+		.map((node) => {
+			if (node.type === 'text' || node.type === 'inlineCode') {
+				return node.value ?? ''
+			}
+			if (node.type === 'image' || node.type === 'imageReference') {
+				return node.alt ?? ''
+			}
+			return node.children ? inlineText(node.children) : ''
+		})
+		.join('')
 }
 
 /**

@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { BlogRouteError } from '../../src/sveltekit/BlogRouteError.js'
-import { createBlogRouteHandlers, type BlogRouteEvent } from '../../src/sveltekit/createBlogRouteHandlers.js'
+import {
+	createBlogRouteHandlers,
+	type BlogRouteEvent
+} from '../../src/sveltekit/createBlogRouteHandlers.js'
 import { createFixtureEngine } from '../fixtures/markdownFixture.js'
 
 function event(slug = '', preview = false, query = ''): BlogRouteEvent {
 	return {
 		params: { slug },
 		locals: { preview },
-		url: new URL(`https://example.com/journal/${ slug }${ query }`)
+		url: new URL(`https://example.com/journal/${slug}${query}`)
 	}
 }
 
@@ -15,7 +18,7 @@ describe('SvelteKit blog routes', () => {
 	const engine = createFixtureEngine()
 	const handlers = createBlogRouteHandlers({
 		engine,
-		getReadContext: routeEvent => ({ allowDrafts: routeEvent.locals['preview'] === true })
+		getReadContext: (routeEvent) => ({ allowDrafts: routeEvent.locals['preview'] === true })
 	})
 
 	it('loads mounted index, post, and taxonomy routes', async () => {
@@ -46,7 +49,9 @@ describe('SvelteKit blog routes', () => {
 	})
 
 	it('passes paging, search, and sort query state through list routes', async () => {
-		await expect(handlers.loadIndex(event('', false, '?page=2&q=music&sort=oldest'))).resolves.toMatchObject({
+		await expect(
+			handlers.loadIndex(event('', false, '?page=2&q=music&sort=oldest'))
+		).resolves.toMatchObject({
 			page: 2,
 			pageSize: 1,
 			search: 'music',
@@ -56,20 +61,16 @@ describe('SvelteKit blog routes', () => {
 	})
 
 	it('returns an empty valid taxonomy search without converting it to a 404', async () => {
-		await expect(handlers.loadRoute(event(
-			'category/engineering',
-			false,
-			'?q=definitely-missing'
-		))).resolves.toMatchObject({
+		await expect(
+			handlers.loadRoute(event('category/engineering', false, '?q=definitely-missing'))
+		).resolves.toMatchObject({
 			pageType: 'category',
 			totalPosts: 0,
 			posts: []
 		})
-		await expect(handlers.loadRoute(event(
-			'category/missing',
-			false,
-			'?q=definitely-missing'
-		))).rejects.toMatchObject({ status: 404 })
+		await expect(
+			handlers.loadRoute(event('category/missing', false, '?q=definitely-missing'))
+		).rejects.toMatchObject({ status: 404 })
 	})
 
 	it('generates published entries and RSS only', async () => {

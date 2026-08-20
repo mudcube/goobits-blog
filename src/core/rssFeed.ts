@@ -33,21 +33,21 @@ export function generateBlogRssFeed(
 
 	const feedPath = options.feedPath ?? config.feedPath
 	const items = posts
-		.filter(post => post.status === 'published')
+		.filter((post) => post.status === 'published')
 		.slice(0, options.limit ?? config.feedLimit)
-		.map(post => {
-			const url = `${ siteUrl }${ getBlogPostUrl(post, config) }`
-			const categories = [ ...new Set([ ...post.categories, ...post.tags ]) ]
-				.map(category => `    <category>${ escapeXml(category) }</category>`)
+		.map((post) => {
+			const url = `${siteUrl}${getBlogPostUrl(post, config)}`
+			const categories = [...new Set([...post.categories, ...post.tags])]
+				.map((category) => `    <category>${escapeXml(category)}</category>`)
 				.join('\n')
 			const author = post.author?.name ?? config.messages.defaultAuthor
 			return `  <item>
-    <title>${ escapeXml(post.title) }</title>
-    <link>${ escapeXml(url) }</link>
-    <guid isPermaLink="true">${ escapeXml(url) }</guid>
-    <pubDate>${ new Date(post.date).toUTCString() }</pubDate>
-    <description>${ escapeXml(post.excerpt || config.messages.missingExcerpt) }</description>
-    <author>${ escapeXml(author) }</author>${ categories ? `\n${ categories }` : '' }
+    <title>${escapeXml(post.title)}</title>
+    <link>${escapeXml(url)}</link>
+    <guid isPermaLink="true">${escapeXml(url)}</guid>
+    <pubDate>${new Date(post.date).toUTCString()}</pubDate>
+    <description>${escapeXml(post.excerpt || config.messages.missingExcerpt)}</description>
+    <author>${escapeXml(author)}</author>${categories ? `\n${categories}` : ''}
   </item>`
 		})
 		.join('\n')
@@ -55,13 +55,13 @@ export function generateBlogRssFeed(
 	return `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-  <title>${ escapeXml(options.title ?? config.name) }</title>
-  <link>${ siteUrl }${ config.basePath || '/' }</link>
-  <description>${ escapeXml(options.description ?? config.description) }</description>
-  <language>${ escapeXml(options.language ?? config.defaultLanguage) }</language>
-  <lastBuildDate>${ (options.buildDate ?? new Date()).toUTCString() }</lastBuildDate>
-  <atom:link href="${ siteUrl }${ feedPath }" rel="self" type="application/rss+xml" />
-${ items }
+  <title>${escapeXml(options.title ?? config.name)}</title>
+  <link>${siteUrl}${config.basePath || '/'}</link>
+  <description>${escapeXml(options.description ?? config.description)}</description>
+  <language>${escapeXml(options.language ?? config.defaultLanguage)}</language>
+  <lastBuildDate>${(options.buildDate ?? new Date()).toUTCString()}</lastBuildDate>
+  <atom:link href="${siteUrl}${feedPath}" rel="self" type="application/rss+xml" />
+${items}
 </channel>
 </rss>`
 }

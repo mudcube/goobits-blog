@@ -28,15 +28,16 @@ import type { BlogEntry } from './generateBlogEntries.js'
 export type MarkdownRawContent = string | (() => Promise<string>)
 export type MarkdownRawContentRecord = Record<string, MarkdownRawContent>
 
-type MarkdownRecordInput<RecordType extends Record<string, unknown>> = RecordType | (() => RecordType)
+type MarkdownRecordInput<RecordType extends Record<string, unknown>> =
+	RecordType | (() => RecordType)
 
 export interface CreateMarkdownBlogOptions<
 	Context extends BlogReadContext = BlogReadContext,
 	Event extends BlogRouteEvent<object> = BlogRouteEvent
 > extends Pick<
-		MarkdownContentSourceOptions,
-		'resolveSourcePath' | 'importFailureMode' | 'cacheTtlMs' | 'logger'
-	> {
+	MarkdownContentSourceOptions,
+	'resolveSourcePath' | 'importFailureMode' | 'cacheTtlMs' | 'logger'
+> {
 	config?: BlogConfigInput
 	modules: MarkdownRecordInput<MarkdownImportRecord>
 	rawContent: MarkdownRecordInput<MarkdownRawContentRecord>
@@ -68,7 +69,9 @@ export interface MarkdownBlog<
 	trailingSlash: 'always' | 'never' | 'ignore'
 }
 
-function resolveRecord<RecordType extends Record<string, unknown>>(input: MarkdownRecordInput<RecordType>): RecordType {
+function resolveRecord<RecordType extends Record<string, unknown>>(
+	input: MarkdownRecordInput<RecordType>
+): RecordType {
 	return typeof input === 'function' ? input() : input
 }
 
@@ -78,7 +81,7 @@ async function loadRawContent(
 ): Promise<string> {
 	const content = resolveRecord(recordInput)[filePath]
 	if (content === undefined) {
-		throw new Error(`Missing raw blog content for "${ filePath }"`)
+		throw new Error(`Missing raw blog content for "${filePath}"`)
 	}
 	return typeof content === 'string' ? content : await content()
 }
@@ -97,7 +100,7 @@ export function createMarkdownBlog<
 		basePath: config.basePath,
 		defaultLanguage: config.defaultLanguage,
 		wordsPerMinute: config.wordsPerMinute,
-		readContent: async filePath => await loadRawContent(options.rawContent, filePath),
+		readContent: async (filePath) => await loadRawContent(options.rawContent, filePath),
 		...(options.resolveSourcePath ? { resolveSourcePath: options.resolveSourcePath } : {}),
 		...(options.importFailureMode ? { importFailureMode: options.importFailureMode } : {}),
 		...(options.cacheTtlMs !== undefined ? { cacheTtlMs: options.cacheTtlMs } : {}),
@@ -112,16 +115,16 @@ export function createMarkdownBlog<
 		...(options.trailingSlash ? { trailingSlash: options.trailingSlash } : {})
 	})
 	const page = createBlogPageLoad({
-		loadPostContent: async sourcePath => {
+		loadPostContent: async (sourcePath) => {
 			const modules = resolveRecord(options.modules)
-			const moduleEntry = Object.entries(modules).find(([ filePath ]) =>
-				(options.resolveSourcePath?.(filePath) ?? filePath) === sourcePath
+			const moduleEntry = Object.entries(modules).find(
+				([filePath]) => (options.resolveSourcePath?.(filePath) ?? filePath) === sourcePath
 			)
 			if (!moduleEntry) {
-				throw new Error(`Missing blog module for "${ sourcePath }"`)
+				throw new Error(`Missing blog module for "${sourcePath}"`)
 			}
 			const module = await moduleEntry[1]()
-			return isModule(module) ? module.default ?? null : null
+			return isModule(module) ? (module.default ?? null) : null
 		},
 		...(options.onContentError ? { onError: options.onContentError } : {})
 	})
@@ -145,16 +148,16 @@ export function createMarkdownBlog<
 		prerender: handlers.prerender,
 		trailingSlash: handlers.trailingSlash,
 		routes: {
-			index: async event => ({
-				...await withRouteErrors(async () => await handlers.loadIndex(event)),
+			index: async (event) => ({
+				...(await withRouteErrors(async () => await handlers.loadIndex(event))),
 				config
 			}),
-			route: async event => ({
-				...await withRouteErrors(async () => await handlers.loadRoute(event)),
+			route: async (event) => ({
+				...(await withRouteErrors(async () => await handlers.loadRoute(event))),
 				config
 			}),
 			entries: async () => await handlers.entries(),
-			rss: async event => await handlers.GET(event),
+			rss: async (event) => await handlers.GET(event),
 			page
 		}
 	}

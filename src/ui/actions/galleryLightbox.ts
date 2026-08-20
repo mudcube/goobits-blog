@@ -49,27 +49,39 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 	const accessibilityState = new Map<HTMLParagraphElement, AttributeState>()
 
 	function isImageContent(element: Element): boolean {
-		if (element.tagName === 'IMG') { return true }
-		if (element.tagName !== 'PICTURE') { return false }
+		if (element.tagName === 'IMG') {
+			return true
+		}
+		if (element.tagName !== 'PICTURE') {
+			return false
+		}
 
 		const children = Array.from(element.children)
-		return children.filter(child => child.tagName === 'IMG').length === 1
-			&& children.every(child => child.tagName === 'SOURCE' || child.tagName === 'IMG')
+		return (
+			children.filter((child) => child.tagName === 'IMG').length === 1 &&
+			children.every((child) => child.tagName === 'SOURCE' || child.tagName === 'IMG')
+		)
 	}
 
 	function isImageOnlyParagraph(el: Element): el is HTMLParagraphElement {
-		if (el.tagName !== 'P') { return false }
-		const children = Array.from(el.childNodes).filter(n => {
+		if (el.tagName !== 'P') {
+			return false
+		}
+		const children = Array.from(el.childNodes).filter((n) => {
 			if (n.nodeType === Node.TEXT_NODE) {
 				return (n.textContent || '').trim().length > 0
 			}
 			return n.nodeType === Node.ELEMENT_NODE
 		})
-		if (children.length !== 1) { return false }
+		if (children.length !== 1) {
+			return false
+		}
 		const only = children[0] as Element
-		if (isImageContent(only)) { return true }
+		if (isImageContent(only)) {
+			return true
+		}
 		if (only.tagName === 'A') {
-			const anchorChildren = Array.from(only.childNodes).filter(n => {
+			const anchorChildren = Array.from(only.childNodes).filter((n) => {
 				if (n.nodeType === Node.TEXT_NODE) {
 					return (n.textContent || '').trim().length > 0
 				}
@@ -82,12 +94,16 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 
 	function extractItem(paragraph: HTMLParagraphElement): GalleryItem | null {
 		const img = paragraph.querySelector('img')
-		if (!img) { return null }
+		if (!img) {
+			return null
+		}
 		const anchor = img.closest('a')
 		const href = anchor?.getAttribute('href') || img.getAttribute('src') || ''
 		const src = img.getAttribute('src') || ''
 		const alt = img.getAttribute('alt') || ''
-		if (!src) { return null }
+		if (!src) {
+			return null
+		}
 		return { href, src, alt }
 	}
 
@@ -109,9 +125,7 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 		}
 
 		allSets.forEach((set, setIndex) => {
-			const items = set
-				.map(extractItem)
-				.filter((item): item is GalleryItem => item !== null)
+			const items = set.map(extractItem).filter((item): item is GalleryItem => item !== null)
 			set.forEach((p, index) => {
 				sets.set(p, { items, index })
 				p.setAttribute('data-blog-gallery-tile', '')
@@ -121,14 +135,15 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 				if (!p.querySelector('a')) {
 					accessibilityState.set(p, {
 						'aria-label': p.getAttribute('aria-label'),
-						'role': p.getAttribute('role'),
-						'tabindex': p.getAttribute('tabindex')
+						role: p.getAttribute('role'),
+						tabindex: p.getAttribute('tabindex')
 					})
 					p.setAttribute('role', 'button')
 					p.setAttribute('tabindex', '0')
-					p.setAttribute('aria-label', items[index]?.alt
-						? `Open image: ${ items[index].alt }`
-						: 'Open image')
+					p.setAttribute(
+						'aria-label',
+						items[index]?.alt ? `Open image: ${items[index].alt}` : 'Open image'
+					)
 				}
 			})
 		})
@@ -139,7 +154,9 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 
 	function openParagraph(paragraph: HTMLParagraphElement, event: Event): void {
 		const entry = sets.get(paragraph)
-		if (!entry || entry.items.length === 0) { return }
+		if (!entry || entry.items.length === 0) {
+			return
+		}
 
 		event.preventDefault()
 		event.stopPropagation()
@@ -166,9 +183,13 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 	}
 
 	function handleKeydown(event: KeyboardEvent): void {
-		if (event.key !== 'Enter' && event.key !== ' ') { return }
+		if (event.key !== 'Enter' && event.key !== ' ') {
+			return
+		}
 		const target = event.target as Element | null
-		const paragraph = target?.closest<HTMLParagraphElement>('p[data-blog-gallery-tile][role="button"]')
+		const paragraph = target?.closest<HTMLParagraphElement>(
+			'p[data-blog-gallery-tile][role="button"]'
+		)
 		if (paragraph && target === paragraph) {
 			openParagraph(paragraph, event)
 		}
@@ -188,14 +209,16 @@ export function galleryLightbox(node: HTMLElement): { destroy: () => void } {
 
 	return {
 		destroy(): void {
-			for (const fn of cleanups) { fn() }
+			for (const fn of cleanups) {
+				fn()
+			}
 			for (const paragraph of sets.keys()) {
 				paragraph.removeAttribute('data-blog-gallery-tile')
 				paragraph.removeAttribute('data-blog-gallery-set')
 				paragraph.classList.remove('blog-gallery__tile')
 				const previous = accessibilityState.get(paragraph)
 				if (previous) {
-					for (const [ attribute, value ] of Object.entries(previous)) {
+					for (const [attribute, value] of Object.entries(previous)) {
 						if (value === null) {
 							paragraph.removeAttribute(attribute)
 						} else {

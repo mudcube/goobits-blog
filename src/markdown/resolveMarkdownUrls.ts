@@ -2,7 +2,7 @@ const ABSOLUTE_URL = /^(?:[a-z][a-z\d+.-]*:|\/\/|\/|#)/i
 const PLACEHOLDER_ORIGIN = 'https://blog.invalid'
 
 function withTrailingSlash(value: string): string {
-	return value.endsWith('/') ? value : `${ value }/`
+	return value.endsWith('/') ? value : `${value}/`
 }
 
 export function resolveMarkdownUrl(value: string, baseUrl: string): string {
@@ -12,24 +12,27 @@ export function resolveMarkdownUrl(value: string, baseUrl: string): string {
 
 	const absoluteBase = /^[a-z][a-z\d+.-]*:/i.test(baseUrl)
 		? withTrailingSlash(baseUrl)
-		: new URL(withTrailingSlash(baseUrl.startsWith('/') ? baseUrl : `/${ baseUrl }`), PLACEHOLDER_ORIGIN)
+		: new URL(
+				withTrailingSlash(baseUrl.startsWith('/') ? baseUrl : `/${baseUrl}`),
+				PLACEHOLDER_ORIGIN
+			)
 	const resolved = new URL(value, absoluteBase)
 
 	return typeof absoluteBase === 'string'
 		? resolved.href
-		: `${ resolved.pathname }${ resolved.search }${ resolved.hash }`
+		: `${resolved.pathname}${resolved.search}${resolved.hash}`
 }
 
 function rewriteHtmlAttributes(value: string, baseUrl: string): string {
 	return value.replace(
 		/(\b(?:href|poster|src)\s*=\s*)(["'])([^"']+)\2/gi,
 		(_match, prefix: string, quote: string, url: string) =>
-			`${ prefix }${ quote }${ resolveMarkdownUrl(url, baseUrl) }${ quote }`
+			`${prefix}${quote}${resolveMarkdownUrl(url, baseUrl)}${quote}`
 	)
 }
 
 function rewriteHtmlTags(value: string, baseUrl: string): string {
-	return value.replace(/<\/?[a-z][^>]*>/gi, tag => rewriteHtmlAttributes(tag, baseUrl))
+	return value.replace(/<\/?[a-z][^>]*>/gi, (tag) => rewriteHtmlAttributes(tag, baseUrl))
 }
 
 function destinationEnd(value: string, start: number): number {
@@ -82,7 +85,7 @@ function rewriteInlineDestinations(value: string, baseUrl: string): string {
 		const angled = value[start] === '<'
 		const rawUrl = value.slice(start + (angled ? 1 : 0), end - (angled ? 1 : 0))
 		const resolved = resolveMarkdownUrl(rawUrl, baseUrl)
-		result += value.slice(cursor, start) + (angled ? `<${ resolved }>` : resolved)
+		result += value.slice(cursor, start) + (angled ? `<${resolved}>` : resolved)
 		cursor = end
 	}
 
@@ -92,9 +95,15 @@ function rewriteInlineDestinations(value: string, baseUrl: string): string {
 function rewriteReferenceDefinition(value: string, baseUrl: string): string {
 	return value.replace(
 		/^(\s{0,3}\[[^\]\n]+\]:\s*)(<([^>\n]+)>|(\S+))/,
-		(_match, prefix: string, _destination: string, angledUrl: string | undefined, plainUrl: string | undefined) => {
+		(
+			_match,
+			prefix: string,
+			_destination: string,
+			angledUrl: string | undefined,
+			plainUrl: string | undefined
+		) => {
 			const resolved = resolveMarkdownUrl(angledUrl ?? plainUrl ?? '', baseUrl)
-			return `${ prefix }${ angledUrl === undefined ? resolved : `<${ resolved }>` }`
+			return `${prefix}${angledUrl === undefined ? resolved : `<${resolved}>`}`
 		}
 	)
 }
@@ -102,7 +111,8 @@ function rewriteReferenceDefinition(value: string, baseUrl: string): string {
 function rewriteOutsideCodeSpans(value: string, baseUrl: string): string {
 	let cursor = 0
 	let result = ''
-	const rewrite = (prose: string): string => rewriteInlineDestinations(rewriteHtmlTags(prose, baseUrl), baseUrl)
+	const rewrite = (prose: string): string =>
+		rewriteInlineDestinations(rewriteHtmlTags(prose, baseUrl), baseUrl)
 
 	while (cursor < value.length) {
 		const opening = value.indexOf('`', cursor)
@@ -131,7 +141,7 @@ function rewriteOutsideCodeSpans(value: string, baseUrl: string): string {
 export function resolveMarkdownUrls(markdown: string, baseUrl: string): string {
 	let fence: { character: string; length: number } | null = null
 
-	return markdown.replace(/^.*(?:\r?\n|$)/gm, line => {
+	return markdown.replace(/^.*(?:\r?\n|$)/gm, (line) => {
 		const body = line.replace(/\r?\n$/, '')
 		const ending = line.slice(body.length)
 		const fenceMatch = body.match(/^ {0,3}(`{3,}|~{3,})/)
@@ -149,6 +159,6 @@ export function resolveMarkdownUrls(markdown: string, baseUrl: string): string {
 		}
 
 		const definition = rewriteReferenceDefinition(body, baseUrl)
-		return `${ rewriteOutsideCodeSpans(definition, baseUrl) }${ ending }`
+		return `${rewriteOutsideCodeSpans(definition, baseUrl)}${ending}`
 	})
 }

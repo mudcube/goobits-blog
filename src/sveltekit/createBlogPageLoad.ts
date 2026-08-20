@@ -14,8 +14,9 @@ export interface BlogPageLoadOptions {
 	onError?: (error: unknown) => void
 }
 
-export function createBlogPageLoad(options: BlogPageLoadOptions = {}):
-	(params: { data: BlogPageServerData }) => Promise<BlogPageLoadResult> {
+export function createBlogPageLoad(
+	options: BlogPageLoadOptions = {}
+): (params: { data: BlogPageServerData }) => Promise<BlogPageLoadResult> {
 	return async ({ data }): Promise<BlogPageLoadResult> => {
 		let postContent: unknown = null
 		if (data.pageType === 'post' && data.post?.sourcePath && options.loadPostContent) {

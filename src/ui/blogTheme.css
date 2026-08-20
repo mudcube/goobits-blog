@@ -1,4 +1,12 @@
-:where(.blog-index, .blog-post, .blog-card, .blog-newsletter, .blog-share, .blog-breadcrumbs, .blog-taxonomy-list) {
+:where(
+	.blog-index,
+	.blog-post,
+	.blog-card,
+	.blog-newsletter,
+	.blog-share,
+	.blog-breadcrumbs,
+	.blog-taxonomy-list
+) {
 	--blog-text: var(--text, #191b20);
 	--blog-muted: var(--text-muted, #626771);
 	--blog-surface: var(--surface, #ffffff);
@@ -263,7 +271,16 @@
 	color: var(--blog-accent);
 }
 
-:where(.blog-index, .blog-post, .blog-card, .blog-newsletter, .blog-share, .blog-breadcrumbs, .blog-taxonomy-list) a:not(.goo-button):focus-visible {
+:where(
+		.blog-index,
+		.blog-post,
+		.blog-card,
+		.blog-newsletter,
+		.blog-share,
+		.blog-breadcrumbs,
+		.blog-taxonomy-list
+	)
+	a:not(.goo-button):focus-visible {
 	outline: 2px solid var(--blog-focus);
 	outline-offset: 3px;
 }

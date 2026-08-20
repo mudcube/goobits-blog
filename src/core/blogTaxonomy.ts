@@ -25,23 +25,23 @@ function collectTerms(posts: BlogPost[], select: (post: BlogPost) => string[]): 
 		}
 	}
 
-	return [ ...terms.values() ].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+	return [...terms.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
 }
 
 export function getBlogCategories(posts: BlogPost[]): BlogTaxonomyTerm[] {
-	return collectTerms(posts, post => post.categories)
+	return collectTerms(posts, (post) => post.categories)
 }
 
 export function getBlogTags(posts: BlogPost[]): BlogTaxonomyTerm[] {
-	return collectTerms(posts, post => post.tags)
+	return collectTerms(posts, (post) => post.tags)
 }
 
 export function hasBlogCategory(post: BlogPost, category: string): boolean {
 	const target = slugify(category)
-	return post.categories.some(value => slugify(value) === target)
+	return post.categories.some((value) => slugify(value) === target)
 }
 
 export function hasBlogTag(post: BlogPost, tag: string): boolean {
 	const target = slugify(tag)
-	return post.tags.some(value => slugify(value) === target)
+	return post.tags.some((value) => slugify(value) === target)
 }

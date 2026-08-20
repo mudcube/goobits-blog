@@ -14,7 +14,7 @@ export interface BlogUrlResolver {
 export type BlogUrlResolverInput = Partial<BlogUrlResolver>
 
 function ensurePath(path: string): string {
-	return `/${ path.replace(/^\/+/, '').replace(/\/{2,}/g, '/') }`
+	return `/${path.replace(/^\/+/, '').replace(/\/{2,}/g, '/')}`
 }
 
 export function getBlogUrl(config: BlogConfig): string {
@@ -23,11 +23,11 @@ export function getBlogUrl(config: BlogConfig): string {
 
 export function getBlogPostUrl(post: BlogPost, config?: BlogConfig): string {
 	const path = ensurePath(post.urlPath)
-	if (!config?.basePath || path === config.basePath || path.startsWith(`${ config.basePath }/`)) {
+	if (!config?.basePath || path === config.basePath || path.startsWith(`${config.basePath}/`)) {
 		return path
 	}
 
-	return ensurePath(`${ config.basePath }/${ path }`)
+	return ensurePath(`${config.basePath}/${path}`)
 }
 
 export function getBlogTaxonomyUrl(
@@ -35,7 +35,7 @@ export function getBlogTaxonomyUrl(
 	slug: string,
 	config: BlogConfig
 ): string {
-	return ensurePath(`${ config.basePath }/${ type }/${ slug }`)
+	return ensurePath(`${config.basePath}/${type}/${slug}`)
 }
 
 export function getBlogFeedUrl(config: BlogConfig): string {
@@ -63,7 +63,7 @@ export function getCanonicalBlogUrl(path: string, config: BlogConfig): string | 
 		return null
 	}
 
-	return `${ config.canonicalOrigin }${ ensurePath(path) }`
+	return `${config.canonicalOrigin}${ensurePath(path)}`
 }
 
 export function slugify(value: string): string {

@@ -3,6 +3,4 @@ export interface RehypeExternalLinksOptions {
 	nofollow?: boolean
 }
 
-export function rehypeExternalLinks(
-	options?: RehypeExternalLinksOptions
-): (tree: unknown) => void
+export function rehypeExternalLinks(options?: RehypeExternalLinksOptions): (tree: unknown) => void

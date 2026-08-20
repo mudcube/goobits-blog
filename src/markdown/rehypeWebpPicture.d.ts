@@ -20,6 +20,4 @@ export type RehypeWebpPictureTransformer = (
 	file?: RehypeWebpPictureFile
 ) => void
 
-export function rehypeWebpPicture(
-	options?: RehypeWebpPictureOptions
-): RehypeWebpPictureTransformer
+export function rehypeWebpPicture(options?: RehypeWebpPictureOptions): RehypeWebpPictureTransformer

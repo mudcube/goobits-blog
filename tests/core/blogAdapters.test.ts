@@ -16,13 +16,13 @@ const post = createBlogPost({
 	title: 'Hello',
 	date: new Date('2026-08-01T12:00:00Z'),
 	urlPath: '/journal/2026/08/hello',
-	categories: [ 'Notes' ],
-	tags: [ 'Welcome' ]
+	categories: ['Notes'],
+	tags: ['Welcome']
 })
 
 describe('Blog adapter contracts', () => {
 	it('normalizes database records into isolated posts', () => {
-		const inputCategories = [ 'Notes' ]
+		const inputCategories = ['Notes']
 		const normalized = createBlogPost({
 			id: 'post-2',
 			slug: 'normalized',
@@ -35,7 +35,7 @@ describe('Blog adapter contracts', () => {
 
 		expect(normalized).toMatchObject({
 			date: '2026-08-02T00:00:00.000Z',
-			categories: [ 'Notes' ],
+			categories: ['Notes'],
 			status: 'published',
 			readTimeMinutes: 1
 		})
@@ -43,17 +43,20 @@ describe('Blog adapter contracts', () => {
 
 	it('passes typed context to optimized source capabilities', async () => {
 		const listPosts = vi.fn<BlogContentSource<TenantContext>['listPosts']>().mockResolvedValue({
-			posts: [ post ],
+			posts: [post],
 			total: 1,
 			page: 1,
 			pageSize: 12,
 			hasNextPage: false
 		})
-		const getCategories = vi.fn<NonNullable<BlogContentSource<TenantContext>['getCategories']>>()
+		const getCategories = vi
+			.fn<NonNullable<BlogContentSource<TenantContext>['getCategories']>>()
 			.mockResolvedValue([{ name: 'Optimized', slug: 'optimized', count: 1 }])
-		const getTags = vi.fn<NonNullable<BlogContentSource<TenantContext>['getTags']>>()
+		const getTags = vi
+			.fn<NonNullable<BlogContentSource<TenantContext>['getTags']>>()
 			.mockResolvedValue([{ name: 'Fast', slug: 'fast', count: 1 }])
-		const getRelatedPosts = vi.fn<NonNullable<BlogContentSource<TenantContext>['getRelatedPosts']>>()
+		const getRelatedPosts = vi
+			.fn<NonNullable<BlogContentSource<TenantContext>['getRelatedPosts']>>()
 			.mockResolvedValue([])
 		const source: BlogContentSource<TenantContext> = {
 			listPosts,
@@ -73,6 +76,9 @@ describe('Blog adapter contracts', () => {
 		expect(getCategories).toHaveBeenCalledWith(expect.any(Object), context)
 		expect(getTags).toHaveBeenCalledWith(expect.any(Object), context)
 		expect(getRelatedPosts).toHaveBeenCalledWith(post, { limit: 4 }, context)
-		expect(listPosts).toHaveBeenLastCalledWith(expect.objectContaining({ visibility: 'published' }), context)
+		expect(listPosts).toHaveBeenLastCalledWith(
+			expect.objectContaining({ visibility: 'published' }),
+			context
+		)
 	})
 })
