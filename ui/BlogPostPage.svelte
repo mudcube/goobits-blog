@@ -262,7 +262,15 @@
 						{#each similarPosts as post}
 							<div class="goo__related-post">
 								<a href={`${blogConfig.uri || '/blog'}${post.urlPath}`} class="goo__related-post-image-container">
-									{#if post.metadata?.fm?.image?.src}
+									{#if post.enhancedCoverImage}
+										<enhanced:img
+											src={post.enhancedCoverImage}
+											alt={post.metadata.fm.image?.alt || post.metadata.fm.title}
+											class="goo__image"
+											loading="lazy"
+											sizes="(max-width: 767px) calc(100vw - 8rem), 240px"
+										/>
+									{:else if post.metadata?.fm?.image?.src}
 										<img
 											src={getRelatedPostImage(post)}
 											alt={post.metadata.fm.image.alt || post.metadata.fm.title}
