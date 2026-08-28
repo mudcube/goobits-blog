@@ -209,10 +209,16 @@ export async function loadPost(year, month, postSlug, lang, config = null) {
 			throw error
 		}
 
+		// Full Markdown is needed above to calculate accurate read times, but the
+		// compiled post component owns rendering. Do not serialize every article's
+		// raw source into the page payload.
+		const postsWithoutContent = allPosts.map(({ content: _content, ...post }) => post)
+		const postWithoutContent = postsWithoutContent.find(post => post.path === foundPost.path)
+
 		return {
 			pageType: 'post',
-			post: foundPost,
-			allPosts,
+			post: postWithoutContent,
+			allPosts: postsWithoutContent,
 			lang
 		}
 	} catch (err) {
