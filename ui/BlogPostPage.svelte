@@ -5,7 +5,6 @@
 	import { blogConfig, defaultMessages } from '../config/index.js'
 	import { Calendar, Clock, Share2, ChevronLeft } from '@lucide/svelte'
 	import { createLogger } from '../utils/logger.js'
-	import { onMount } from 'svelte'
 	import {
 		formatDate as utilFormatDate,
 		slugify,
@@ -74,30 +73,8 @@
 		}
 	}
 
-	let postContentComponent = $state(null)
-	let loadingError = $state(null)
-	let isImporting = $state(false)
-	let contentLoaded = $state(false)
+	const postContentComponent = $derived(data.postContent || null)
 	let copySuccess = $state(false)
-
-	// Log initial state
-	// Create constant values for the initial state to avoid reactivity warnings
-	// Don't capture reactive values in closures
-	const hasInitialPostContent = $derived(!!data.postContent)
-	const isContentLoadedInitially = false
-	const hasInitialComponent = false
-
-	// Initial state:
-	// {
-	//   hasPostContent: hasInitialPostContent,
-	//   contentLoaded: isContentLoadedInitially,
-	//   postContentComponent: hasInitialComponent
-	// }
-
-	// Update contentLoaded when postContentComponent changes
-	$effect(() => {
-		contentLoaded = postContentComponent !== null
-	})
 
 	/**
 	 * Copies the current page URL to the clipboard.
@@ -116,46 +93,6 @@
 			}
 		}
 	}
-
-	// Load content when component mounts
-	onMount(() => {
-		// Component mounted:
-		// {
-		//   hasPost: !!data.post,
-		//   hasPostPath: data.post?.path ? true : false,
-		//   hasPostContent: !!data.postContent,
-		//   contentLoaded,
-		//   hasComponent: !!postContentComponent
-		// }
-
-		// Only load content client-side if it wasn't loaded during SSR
-		if (data.post?.path && !postContentComponent) {
-			const loadContent = async () => {
-				loadingError = null
-				isImporting = true
-				contentLoaded = false
-
-				const contentPath = data.post.path
-
-				try {
-					const module = await import(/* @vite-ignore */ contentPath)
-					if (module && module.default) {
-						postContentComponent = module.default
-						contentLoaded = true
-					} else {
-						logger.error('Module imported but no default export found for path:', contentPath)
-						loadingError = getMessage('loadingError', 'Error loading content')
-					}
-				} catch (error) {
-					logger.error('Error importing post content from path:', contentPath, error)
-					loadingError = getMessage('loadingError', 'Error loading content')
-				} finally {
-					isImporting = false
-				}
-			}
-			loadContent()
-		}
-	})
 
 	// Initialize metadata values directly (not as reactive state) for SSR
 	const isPostPage = $derived(data.pageType === 'post' && data.post)
@@ -268,14 +205,7 @@
 			</div>
 
 			<div class="goo__article-content">
-				{#if isImporting}
-					<div class="goo__loading-content">
-						<div class="goo__loading-spinner"></div>
-						<h2>{getMessage('loading', 'Loading...')}</h2>
-					</div>
-				{:else if loadingError}
-					<p class="goo__error-message">{loadingError}</p>
-				{:else if postContentComponent}
+				{#if postContentComponent}
 					{@const SvelteComponent = postContentComponent}
 					<article class="goo__content">
 						<SvelteComponent />
@@ -287,7 +217,7 @@
 
 			{#if data.post.metadata.fm.tags?.length}
 				<div class="goo__post-tags">
-					<h3 class="goo__post-tags-heading">{getMessage('tags', 'Tags')}:</h3>
+					<h2 class="goo__post-tags-heading">{getMessage('tags', 'Tags')}:</h2>
 					<TagCategoryList
 						items={data.post.metadata.fm.tags}
 						showHashtag={true}

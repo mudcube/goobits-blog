@@ -382,13 +382,13 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5rem;
-	color: var(--amber-700);
+	color: white;
 	text-decoration: none;
 	font-weight: 500;
 	transition: color 0.2s ease;
 
 	&:hover {
-		color: var(--amber-800);
+		color: white;
 	}
 }
 
