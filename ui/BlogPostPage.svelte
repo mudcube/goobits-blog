@@ -173,13 +173,25 @@
 
 			{#if data.post.metadata.fm.image?.src}
 				<div class="goo__featured-image">
-					<img
-						src={coverImage}
-						alt={data.post.metadata.fm.image?.alt || data.post.metadata.fm.title || "Post image"}
-						class="goo__image"
-						loading="lazy"
-						decoding="async"
-					/>
+					{#if data.post.enhancedCoverImage}
+						<enhanced:img
+							src={data.post.enhancedCoverImage}
+							alt={data.post.metadata.fm.image?.alt || data.post.metadata.fm.title || "Post image"}
+							class="goo__image"
+							loading="eager"
+							fetchpriority="high"
+							sizes="(max-width: 640px) calc(100vw - 8rem), 900px"
+						/>
+					{:else}
+						<img
+							src={coverImage}
+							alt={data.post.metadata.fm.image?.alt || data.post.metadata.fm.title || "Post image"}
+							class="goo__image"
+							loading="eager"
+							fetchpriority="high"
+							decoding="async"
+						/>
+					{/if}
 				</div>
 			{:else}
 				<div class="goo__featured-image--placeholder">
@@ -189,14 +201,23 @@
 
 			<div class="goo__author-section">
 				<div class="goo__author-avatar">
-					<img
-						src={authorAvatar}
-						alt={data.post.metadata.fm.author?.name || blogConfig.name}
-						width={50}
-						height={50}
-						loading="lazy"
-						class="goo__author-avatar-img"
-					/>
+					{#if data.post.enhancedAuthorAvatar}
+						<enhanced:img
+							src={data.post.enhancedAuthorAvatar}
+							alt={data.post.metadata.fm.author?.name || blogConfig.name}
+							loading="lazy"
+							class="goo__author-avatar-img"
+						/>
+					{:else}
+						<img
+							src={authorAvatar}
+							alt={data.post.metadata.fm.author?.name || blogConfig.name}
+							width={50}
+							height={50}
+							loading="lazy"
+							class="goo__author-avatar-img"
+						/>
+					{/if}
 				</div>
 				<div>
 					<p class="goo__author-name">{data.post.metadata.fm.author?.name || blogConfig.name}</p>

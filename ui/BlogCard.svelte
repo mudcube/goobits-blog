@@ -58,6 +58,7 @@
 	const imageData = $derived(getPostImageData(post))
 	const imageSource = $derived(imageData.src)
 	const imageAlt = $derived(imageData.alt)
+	const imageLoading = $derived(post?.metadata?.fm?.featured ? 'eager' : 'lazy')
 
 	// Get emoji for placeholder from post metadata or generate from title,
 	// falling back to configured default emoji
@@ -109,12 +110,22 @@
 		{#if !hideImage}
 			<div class="goo__card-image">
 				<a href={`${blogConfig.uri}${post?.urlPath || ''}`} class="goo__card-image-link">
-					{#if imageSource}
+					{#if post?.enhancedCoverImage}
+						<enhanced:img
+							src={post.enhancedCoverImage}
+							alt={imageAlt}
+							class="goo__card-image-element"
+							loading={imageLoading}
+							fetchpriority={imageLoading === 'eager' ? 'high' : undefined}
+							sizes="(max-width: 767px) calc(100vw - 6rem), 650px"
+						/>
+					{:else if imageSource}
 						<img
 								src={imageSource}
 								alt={imageAlt}
 								data-ratio={imageRatio}
-								loading="lazy"
+								loading={imageLoading}
+								fetchpriority={imageLoading === 'eager' ? 'high' : undefined}
 								decoding="async"
 								class="goo__card-image-element"
 						/>
