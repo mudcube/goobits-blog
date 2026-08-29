@@ -10,7 +10,7 @@
 </script>
 
 {#key data.pageType + (data.category || '') + (data.tag || '') + (data.post?.path || '')}
-	<main class="goo__container">
+	<div class="goo__container">
 		<Breadcrumbs
 			items={breadcrumbConfig.items}
 			current={breadcrumbConfig.current}
@@ -19,5 +19,5 @@
 		/>
 
 		{@render children()}
-	</main>
+	</div>
 {/key}

@@ -5,6 +5,7 @@
 	import { blogConfig, defaultMessages } from '../config/index.js'
 	import { Calendar, Clock, Share2, ChevronLeft } from '@lucide/svelte'
 	import { createLogger } from '../utils/logger.js'
+	import { page } from '$app/state'
 	import {
 		formatDate as utilFormatDate,
 		slugify,
@@ -107,6 +108,7 @@
 	const formattedDate = $derived(isPostPage ? getFormattedDate() : undefined)
 	const postTitle = $derived(isPostPage ? data.post.metadata.fm.title : undefined)
 	const postExcerpt = $derived(isPostPage ? (data.post.metadata.fm.excerpt || '') : '')
+	const canonicalUrl = $derived(new URL(page.url.pathname, blogConfig.siteUrl || page.url.origin).toString())
 	const postTags = $derived(isPostPage ? (data.post.metadata.fm.tags?.join(',') || '') : '')
 	const coverImage = $derived(isPostPage ? getCoverImageUrl(data.post) : undefined)
 	const authorAvatar = $derived(
@@ -262,7 +264,7 @@
 			{/if}
 
 			<SocialShare
-				url={typeof window !== 'undefined' ? window.location.href : ''}
+				url={canonicalUrl}
 				title={postTitle}
 				messages={messages}
 			/>
