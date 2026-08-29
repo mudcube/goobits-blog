@@ -119,6 +119,13 @@
 	background: var(--blog-surface-subtle);
 }
 
+.blog-card__media picture,
+.blog-post__hero picture {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
 .blog-card__media img,
 .blog-post__hero img {
 	display: block;

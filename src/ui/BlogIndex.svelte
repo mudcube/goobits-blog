@@ -212,7 +212,7 @@
 
 	{#if visiblePosts.length > 0}
 		<div class="blog-index__grid">
-			{#each visiblePosts as post (post.id)}
+			{#each visiblePosts as post, index (post.id)}
 				<BlogCard
 					{post}
 					{config}
@@ -220,6 +220,7 @@
 					messages={messageInput}
 					urlResolver={urlResolverInput}
 					{locale}
+					priority={index === 0 && currentPage === 1}
 				/>
 			{/each}
 		</div>

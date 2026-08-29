@@ -13,6 +13,7 @@
 	} from '../core/blogUrls.js'
 	import type { RelatedPostResult } from '../core/resolveRelatedPosts.js'
 	import BlogCard from './BlogCard.svelte'
+	import BlogImage from './BlogImage.svelte'
 	import BlogProse from './BlogProse.svelte'
 	import Breadcrumbs from './Breadcrumbs.svelte'
 	import SocialShare from './SocialShare.svelte'
@@ -104,12 +105,10 @@
 
 	{#if image}
 		<figure class="blog-post__hero">
-			<img
-				src={image.src}
-				alt={image.alt}
-				width={image.width}
-				height={image.height}
-				decoding="async"
+			<BlogImage
+				{image}
+				sizes="(max-width: 48rem) calc(100vw - 3rem), 56rem"
+				loading="eager"
 				fetchpriority="high"
 			/>
 		</figure>

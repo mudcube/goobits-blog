@@ -6,6 +6,7 @@
 	import type { BlogPost } from '../core/blogPost.js'
 	import { createBlogUrlResolver, slugify, type BlogUrlResolverInput } from '../core/blogUrls.js'
 	import { createBlogUiMessages, type BlogUiMessagesInput } from '../config/blogMessages.js'
+	import BlogImage from './BlogImage.svelte'
 	import Byline from './elements/Byline.svelte'
 
 	interface Props {
@@ -18,6 +19,7 @@
 		messages?: BlogUiMessagesInput
 		urlResolver?: BlogUrlResolverInput
 		locale?: string
+		priority?: boolean
 		class?: string
 	}
 
@@ -31,6 +33,7 @@
 		messages: messageInput = {},
 		urlResolver: urlResolverInput = {},
 		locale = 'en',
+		priority = false,
 		class: className = ''
 	}: Props = $props()
 
@@ -53,7 +56,12 @@
 <article class={classes}>
 	{#if !hideImage && image}
 		<a class="blog-card__media" href={postUrl} aria-label={post.title || messages.untitledPost}>
-			<img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
+			<BlogImage
+				{image}
+				sizes="(max-width: 47.99rem) calc(100vw - 3rem), 22rem"
+				loading={priority ? 'eager' : 'lazy'}
+				fetchpriority={priority ? 'high' : 'auto'}
+			/>
 		</a>
 	{/if}
 	<div class="blog-card__body">

@@ -9,6 +9,11 @@ export interface BlogImage {
 	alt: string
 	width?: number
 	height?: number
+	sizes?: string
+	sources?: {
+		avif?: string
+		webp?: string
+	}
 }
 
 export interface BlogPostTranslation {
@@ -52,6 +57,13 @@ export type BlogPostInput = Pick<BlogPost, 'id' | 'slug' | 'title' | 'urlPath'> 
 		updated?: string | Date
 	}
 
+function cloneBlogImage(image: BlogImage): BlogImage {
+	return {
+		...image,
+		...(image.sources ? { sources: { ...image.sources } } : {})
+	}
+}
+
 function normalizeDate(value: string | Date, field: 'date' | 'updated'): string {
 	const date = value instanceof Date ? value : new Date(value)
 	if (Number.isNaN(date.getTime())) {
@@ -79,8 +91,8 @@ export function createBlogPost(input: BlogPostInput): BlogPost {
 		relatedPostIds: [...(input.relatedPostIds ?? [])],
 		...(input.updated !== undefined ? { updated: normalizeDate(input.updated, 'updated') } : {}),
 		...(input.author ? { author: { ...input.author } } : {}),
-		...(input.image ? { image: { ...input.image } } : {}),
-		...(input.thumbnail ? { thumbnail: { ...input.thumbnail } } : {}),
+		...(input.image ? { image: cloneBlogImage(input.image) } : {}),
+		...(input.thumbnail ? { thumbnail: cloneBlogImage(input.thumbnail) } : {}),
 		...(input.coverImage ? { coverImage: input.coverImage } : {}),
 		...(input.content !== undefined ? { content: input.content } : {}),
 		...(input.sourcePath ? { sourcePath: input.sourcePath } : {}),
