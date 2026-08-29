@@ -18,7 +18,13 @@
 	import TagsCategories from './TagCategoryList.svelte'
 	import { bemClasses, ClassNames, createMessageGetter } from '../utils/index.js'
 	import { blogConfig, defaultMessages } from '../config/index.js'
-	import { getEmojiFromTitle, getPostImageData, getPostCategories, getBlogUrl } from '../utils/index.js'
+	import {
+		getBlogUrl,
+		getEmojiFromTitle,
+		getPostCategories,
+		getPostImageData,
+		parseBlogDate
+	} from '../utils/index.js'
 
 	/**
 	 * @typedef {Object} BlogCardProps
@@ -157,7 +163,9 @@
 
 			<div class="goo__card-meta">
 				{#if !hideDate}
-					<time class="goo__card-date">{post?.date ? new Intl.DateTimeFormat(locale).format(new Date(post.date)) : ''}</time>
+					<time class="goo__card-date">{post?.date
+						? new Intl.DateTimeFormat(locale, { timeZone: 'UTC' }).format(parseBlogDate(post.date))
+						: ''}</time>
 				{/if}
 
 				{#if !hideReadTime}

@@ -86,7 +86,7 @@ export function formatDate(dateString, shortFormat = false) {
  * @param {string|Date} value
  * @returns {Date}
  */
-function parseBlogDate(value) {
+export function parseBlogDate(value) {
 	if (value instanceof Date) {
 		return value
 	}

@@ -12,7 +12,8 @@
 		getAuthorAvatarUrl,
 		getEmojiFromTitle,
 		getSimilarPosts,
-		createMessageGetter
+		createMessageGetter,
+		parseBlogDate
 	} from '../utils/index.js'
 
 	const logger = createLogger('BlogPostPage')
@@ -42,8 +43,12 @@
 	 */
 	function getFormattedDate() {
 		try {
-			return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' })
-				.format(new Date(data?.post?.date || Date.now()))
+			return new Intl.DateTimeFormat(locale, {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+				timeZone: 'UTC'
+			}).format(parseBlogDate(data?.post?.date || new Date()))
 		} catch (error) {
 			logger.error('Error formatting date with Intl:', error)
 			return utilFormatDate(data?.post?.date || new Date())
@@ -149,6 +154,13 @@
 			<h1 class="goo__post-title">
 				{data.post.metadata.fm.title}
 			</h1>
+
+			{#if data.post.metadata.fm.archived}
+				<aside class="goo__archive-notice" aria-label="Archived article notice">
+					<strong>Archived article.</strong>
+					This post is preserved as a historical record. Features, prices, availability, and external links may have changed since publication.
+				</aside>
+			{/if}
 
 			<div class="goo__post-meta">
 				<div class="goo__post-meta-item goo__post-meta-date">
@@ -300,8 +312,9 @@
 										<span>{new Intl.DateTimeFormat(locale, {
 											year: 'numeric',
 											month: 'long',
-											day: 'numeric'
-										}).format(new Date(post.date))}</span>
+											day: 'numeric',
+											timeZone: 'UTC'
+										}).format(parseBlogDate(post.date))}</span>
 										<span>•</span>
 										<span>{getMessage('minRead', `${post.metadata?.fm?.readTime || 5} min read`, post.metadata?.fm?.readTime || 5)}</span>
 									</div>

@@ -3,14 +3,13 @@
 	 * Sidebar Component
 	 *
 	 * A blog sidebar component that provides navigation to categories and tags,
-	 * RSS subscription, and newsletter signup. Dynamically adjusts display order
+	 * and RSS subscription. Dynamically adjusts display order
 	 * based on the current page context and highlights active items.
 	 *
 	 * Features:
 	 * - Displays popular categories and tags with active item highlighting
 	 * - Context-aware ordering (shows relevant taxonomy first)
 	 * - RSS feed subscription link
-	 * - Newsletter signup form
 	 * - URL-based active item detection with fallback to props
 	 * - Fully internationalized labels via messages prop
 	 * - Responsive design for various screen sizes
@@ -18,7 +17,6 @@
 	 * @component
 	 */
 	import './Sidebar.scss'
-	import Newsletter from './Newsletter.svelte'
 	import TagsCategories from './TagCategoryList.svelte'
 	import { blogConfig, defaultMessages } from '../config/index.js'
 	import { getAllCategories, getAllTags, createMessageGetter } from '../utils/index.js'
@@ -128,9 +126,4 @@
 		</svg>
 		{getMessage('subscribeRSS', 'Subscribe to RSS')}
 	</a>
-</div>
-
-<!-- Newsletter Signup -->
-<div class="goo__sidebar-newsletter-container">
-	<Newsletter {messages} {locale} />
 </div>
