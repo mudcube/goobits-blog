@@ -60,6 +60,35 @@ describe('Blog v3 UI', () => {
 		expect(index.indexOf('>Search</')).toBeLessThan(index.indexOf('name="sort"'))
 	})
 
+	it('renders responsive cover sources with consumer-owned sizing and priority', () => {
+		const { body } = render(BlogCard, {
+			props: {
+				post: post({
+					image: {
+						src: '/cover.jpg',
+						alt: 'Responsive cover',
+						width: 940,
+						height: 529,
+						sizes: '(max-width: 40rem) 100vw, 30rem',
+						sources: {
+							avif: '/cover-480.avif 480w, /cover-940.avif 940w',
+							webp: '/cover-480.webp 480w, /cover-940.webp 940w'
+						}
+					}
+				}),
+				config,
+				priority: true
+			}
+		})
+
+		expect(body).toContain('<picture>')
+		expect(body).toContain('type="image/avif"')
+		expect(body).toContain('srcset="/cover-480.avif 480w, /cover-940.avif 940w"')
+		expect(body).toContain('sizes="(max-width: 40rem) 100vw, 30rem"')
+		expect(body).toContain('loading="eager"')
+		expect(body).toContain('fetchpriority="high"')
+	})
+
 	it('uses injected URLs and shared author presentation throughout cards', () => {
 		const { body } = render(BlogCard, {
 			props: {

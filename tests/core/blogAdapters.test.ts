@@ -23,21 +23,33 @@ const post = createBlogPost({
 describe('Blog adapter contracts', () => {
 	it('normalizes database records into isolated posts', () => {
 		const inputCategories = ['Notes']
+		const inputSources = { avif: '/normalized-480.avif 480w' }
 		const normalized = createBlogPost({
 			id: 'post-2',
 			slug: 'normalized',
 			title: 'Normalized',
 			date: '2026-08-02',
 			urlPath: '/journal/normalized',
-			categories: inputCategories
+			categories: inputCategories,
+			image: {
+				src: '/normalized.jpg',
+				alt: 'Normalized cover',
+				sizes: '(max-width: 48rem) 100vw, 48rem',
+				sources: inputSources
+			}
 		})
 		inputCategories.push('Changed')
+		inputSources.avif = '/changed.avif 480w'
 
 		expect(normalized).toMatchObject({
 			date: '2026-08-02T00:00:00.000Z',
 			categories: ['Notes'],
 			status: 'published',
-			readTimeMinutes: 1
+			readTimeMinutes: 1,
+			image: {
+				sizes: '(max-width: 48rem) 100vw, 48rem',
+				sources: { avif: '/normalized-480.avif 480w' }
+			}
 		})
 	})
 

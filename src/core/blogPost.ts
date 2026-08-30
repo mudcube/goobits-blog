@@ -4,12 +4,19 @@ export interface BlogAuthor {
 	url?: string
 }
 
+/** Responsive image metadata consumed by Blog presentation components. */
 export interface BlogImage {
+	/** Fallback image URL used by clients without a matching responsive source. */
 	src: string
+	/** Accessible alternative text for the image. */
 	alt: string
+	/** Intrinsic image width in CSS pixels. */
 	width?: number
+	/** Intrinsic image height in CSS pixels. */
 	height?: number
+	/** Browser `sizes` expression describing the rendered image width. */
 	sizes?: string
+	/** Format-specific responsive source sets. */
 	sources?: {
 		avif?: string
 		webp?: string

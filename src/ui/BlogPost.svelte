@@ -107,7 +107,7 @@
 		<figure class="blog-post__hero">
 			<BlogImage
 				{image}
-				sizes="(max-width: 48rem) calc(100vw - 3rem), 56rem"
+				sizes={image.sizes ?? '(max-width: 48rem) calc(100vw - 3rem), 52rem'}
 				loading="eager"
 				fetchpriority="high"
 			/>

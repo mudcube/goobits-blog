@@ -6,7 +6,8 @@
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { basename, dirname, extname, join, posix } from 'node:path'
-import { imageSize } from 'image-size'
+
+import { readImageDimensions } from './imageDimensions.js'
 
 const NON_RESPONSIVE_EXTENSIONS = new Set(['.svg', '.gif'])
 const NON_LOCAL_SOURCE = /^(?:https?:\/\/|\/\/|data:|blob:)/i
@@ -23,10 +24,9 @@ function walkNodes(children, visitor) {
 	}
 }
 
-function readImageDimensions(filePath) {
+function readLocalImageDimensions(filePath) {
 	try {
-		const { width, height } = imageSize(readFileSync(filePath))
-		return width && height ? { width, height } : null
+		return readImageDimensions(readFileSync(filePath))
 	} catch {
 		return null
 	}
@@ -129,7 +129,7 @@ export function rehypeWebpPicture(options = {}) {
 			const originalDiskPath = diskPathname.startsWith('/')
 				? join(staticRoot, diskPathname)
 				: join(fileDirectory, diskPathname)
-			applyImageDimensions(properties, readImageDimensions(originalDiskPath))
+			applyImageDimensions(properties, readLocalImageDimensions(originalDiskPath))
 
 			if (NON_RESPONSIVE_EXTENSIONS.has(extension)) return
 

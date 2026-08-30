@@ -58,7 +58,7 @@
 		<a class="blog-card__media" href={postUrl} aria-label={post.title || messages.untitledPost}>
 			<BlogImage
 				{image}
-				sizes="(max-width: 47.99rem) calc(100vw - 3rem), 22rem"
+				sizes={image.sizes ?? '(max-width: 47.99rem) calc(100vw - 3rem), 22rem'}
 				loading={priority ? 'eager' : 'lazy'}
 				fetchpriority={priority ? 'high' : 'auto'}
 			/>

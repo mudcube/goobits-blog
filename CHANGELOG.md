@@ -5,6 +5,23 @@ All notable changes to the `@goobits/blog` package will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Responsive AVIF and WebP cover metadata for Blog cards and posts.
+
+### Changed
+
+- Blog presentation honors consumer-provided image sizing while retaining safe
+  component defaults.
+- Development dependencies and the standalone pnpm toolchain are current.
+
+### Fixed
+
+- Markdown image dimensions use a bounded parser for common web formats instead
+  of the unpatched `image-size` dependency.
+
 ## [3.1.0] - 2026-08-16
 
 ### Added

@@ -86,6 +86,26 @@ Database sources need only `listPosts` and `getPost`. Optional taxonomy and
 related-post methods let a backend answer those queries efficiently; otherwise,
 the engine derives those results from `listPosts` in memory.
 
+## Responsive images
+
+Cover images may include AVIF and WebP source sets. Keep asset imports and
+layout policy in the consuming app, then pass normalized responsive metadata
+through `BlogImage`; Blog components honor the supplied `sizes` expression.
+
+```ts
+const image = {
+  src: '/media/cover.jpg',
+  alt: 'Editorial cover',
+  width: 940,
+  height: 529,
+  sizes: '(max-width: 48rem) 100vw, 32rem',
+  sources: {
+    avif: '/media/cover-480.avif 480w, /media/cover-940.avif 940w',
+    webp: '/media/cover-480.webp 480w, /media/cover-940.webp 940w',
+  },
+}
+```
+
 ## Ownership and safety
 
 Draft access requires both a visibility request and an authorized
@@ -125,3 +145,4 @@ pnpm typecheck
 ## License
 
 [MIT](LICENSE) © 2024 HoneyFarmer.com
+

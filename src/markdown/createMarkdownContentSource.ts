@@ -22,6 +22,11 @@ export type MarkdownImport = () => Promise<unknown>
 export type MarkdownImportRecord = Record<string, MarkdownImport>
 export type MarkdownFailureMode = 'throw' | 'warn' | 'skip'
 
+/** Minimal logging boundary used when Markdown imports fail. */
+export interface MarkdownContentLogger {
+	warn(message: string, detail?: unknown): void
+}
+
 export interface MarkdownContentSourceOptions {
 	files: MarkdownImportRecord | (() => MarkdownImportRecord)
 	basePath?: string
@@ -31,7 +36,7 @@ export interface MarkdownContentSourceOptions {
 	resolveSourcePath?: (filePath: string) => string
 	importFailureMode?: MarkdownFailureMode
 	cacheTtlMs?: number
-	logger?: Pick<Console, 'warn'>
+	logger?: MarkdownContentLogger
 }
 
 interface MarkdownModule {
