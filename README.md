@@ -1,155 +1,127 @@
-# `@goobits/blog`
+<h1 align="center">@goobits/blog</h1>
 
-Instance-based Blog engine, Markdown source, SvelteKit adapters, and Svelte 5 presentation components.
+<p align="center"><strong>An instance-based blog engine for Markdown, custom content sources, SvelteKit, and Svelte 5.</strong></p>
+<p align="center">Compose content queries and RSS through one engine, then add draft-aware SvelteKit routes and Svelte presentation explicitly.</p>
 
-## Features
+<p align="center">
+  <a href="#why-blog">Why Blog</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#public-surface">Public surface</a> ·
+  <a href="#ownership-and-safety">Boundaries</a>
+</p>
 
-- Direct, normalized `BlogPost` fields at every public boundary
-- Flat and nested Markdown layouts
-- Explicit draft preview authorization
-- Search, sorting, pagination, categories, and tags
-- Localized metadata and aliases
-- MiniSearch-backed related-post scoring with editorial, taxonomy, link,
-  recency, and diversity signals
-- RSS with canonical URLs and draft exclusion
-- Injectable content sources for future database or API backends
-- TOC, WebP picture, safe external-link, gallery, and prose helpers
+---
 
-## Setup
+## Why Blog
+
+`@goobits/blog` normalizes content from flat or nested Markdown and injectable
+database or API sources into one `BlogPost` shape. `createBlogEngine` owns one
+configuration, content source, and the query, taxonomy, related-post, and RSS
+operations built over it. `createMarkdownBlog` composes that engine with
+Markdown loading, draft-aware SvelteKit handlers, and route bindings. UI
+messages remain component inputs. Neither path mutates a package-level
+singleton.
+
+The package also provides Svelte 5 article and index components, prose elements,
+gallery behavior, table-of-contents and image transforms, search, sorting,
+pagination, categories, tags, localized metadata, and canonical URL helpers.
+
+## Quick start
+
+Use Node.js 22 for the maintained source graph. Blog's own manifest declares
+Node.js 18 or newer, but its Forms peer depends on the source-only
+`@goobits/logger` workspace package, whose runtime baseline is Node.js 22.
+
+This revision is workspace-first, not a verified registry-only install. Check
+out Blog, Forms, Goo, Logger, and Security in one pnpm workspace, then declare
+Blog as a workspace dependency of the host application. The host also supplies
+`@lucide/svelte`, SvelteKit 2, Svelte 5, and TypeScript 5 or 6. Forms currently
+resolves Goo, Logger, and Security through `workspace:*`; Logger explicitly has
+no npm-publish flow, so a standalone `pnpm add @goobits/blog` path is not
+supported by the maintained source graph.
 
 ```ts
 import { createMarkdownBlog } from '@goobits/blog/sveltekit'
 
 const modules = import.meta.glob('/src/content/journal/**/index.md')
-const rawContent = import.meta.glob<string>('/src/content/journal/**/index.md', {
-	query: '?raw',
-	import: 'default'
-})
+const rawContent = import.meta.glob<string>(
+  '/src/content/journal/**/index.md',
+  { query: '?raw', import: 'default' },
+)
 
 export const blog = createMarkdownBlog({
-	config: {
-		name: 'Journal',
-		description: 'Notes from the studio',
-		basePath: '/journal',
-		canonicalOrigin: 'https://example.com'
-	},
-	modules,
-	rawContent,
-	getContext: (event) => ({
-		allowDrafts: event.locals.preview === true
-	})
+  modules,
+  rawContent,
+  config: {
+    name: 'Journal',
+    description: 'Notes from the studio',
+    basePath: '/journal',
+    canonicalOrigin: 'https://example.com',
+  },
+  getContext: (event) => ({ allowDrafts: event.locals['preview'] === true }),
 })
 ```
 
-Configuration belongs to the returned engine. Creating one engine does not mutate another engine or any package-level singleton.
+Bind `blog.routes.index`, `blog.routes.route`, `blog.routes.page`, and
+`blog.routes.rss` to the matching SvelteKit route files. The Markdown example is
+a concrete package setup. The database and multi-user examples are typechecked
+adapter sketches: the package does not ship their declared repository,
+database, tenant lookup, or authentication.
 
-## SvelteKit
+## Public surface
 
-```ts
-import { blog } from '$lib/blog'
+| Import | Responsibility |
+| --- | --- |
+| `@goobits/blog` | Blog types and primary UI |
+| `@goobits/blog/core` | Engine, queries, taxonomy, URLs, related posts, and RSS |
+| `@goobits/blog/markdown` | Markdown source |
+| `@goobits/blog/sveltekit` | Route, page-load, entries, and RSS adapters |
+| `@goobits/blog/ui` | Svelte presentation and prose elements |
+| `@goobits/blog/config` | Engine and message configuration |
+| `@goobits/blog/i18n` | Framework-neutral translation hooks |
+| `@goobits/blog/markdown/remark-table-of-contents`, `@goobits/blog/markdown/rehype-webp-picture`, `@goobits/blog/markdown/rehype-external-links` | Maintained Markdown transforms |
+| `@goobits/blog/ui/elements`, `@goobits/blog/ui/gallery-lightbox`, `@goobits/blog/ui/blogTheme.css` | Prose elements, gallery action, and theme CSS |
 
-export const load = blog.routes.index
-export const prerender = blog.prerender
+Database sources need only `listPosts` and `getPost`. Optional taxonomy and
+related-post methods let a backend answer those queries efficiently; otherwise,
+the engine derives those results from `listPosts` in memory.
+
+## Ownership and safety
+
+Draft access requires both a visibility request and an authorized
+`allowDrafts` context. Public lists, prerender entries, related posts, and RSS
+exclude drafts by default.
+
+The package returns normalized SEO data; the application owns final
+`<svelte:head>` composition, site identity, and release policy. Newsletter
+delivery, authentication, moderation, comments, and discussions are also
+application-owned. Goo supplies controls and Forms supplies submission state.
+
+Sanitize untrusted Markdown before rendering it. The external-link transform
+hardens links but is not a general HTML sanitizer. Markdown import failures warn
+and skip the affected post by default; use the source's `throw` failure mode when
+a release must fail closed.
+
+## Documentation
+
+- [Upgrade guide](UPGRADE.md)
+- [Changelog](CHANGELOG.md)
+
+The 2.x and older changelog entries describe historical surfaces. The current
+package exports and 3.x upgrade guidance define the maintained API.
+
+## Development
+
+After hydrating the complete source workspace and its peer packages, the Blog
+repository exposes these verification gates:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm test
+pnpm check
+pnpm typecheck
 ```
 
-The catch-all post route uses the same instance:
+## License
 
-```ts
-export const load = blog.routes.route
-export const entries = blog.routes.entries
-export const trailingSlash = blog.trailingSlash
-```
-
-Client content and RSS routes bind directly as well:
-
-```ts
-export const load = blog.routes.page
-export const GET = blog.routes.rss
-```
-
-Draft access requires both `visibility: 'all'` and `{ allowDrafts: true }`. Public lists, prerender entries, related posts, and RSS default to published posts only.
-
-The lower-level `createMarkdownContentSource`, `createBlogEngine`,
-`createBlogRouteHandlers`, and `createBlogPageLoad` functions remain available
-for custom pipelines. See the published `examples/` directory for Markdown,
-database, and multi-user integrations.
-
-## Database Sources
-
-A database content source requires only `listPosts` and `getPost`. Make its
-read context generic to carry tenant and viewer identity. Implement
-`getCategories`, `getTags`, and `getRelatedPosts` when the backend can answer
-those queries efficiently; the engine retains its in-memory fallback for
-Markdown and small sources. Use `createBlogPost` to normalize database rows.
-
-## Imports
-
-| Import                              | Owner                                                  |
-| ----------------------------------- | ------------------------------------------------------ |
-| `@goobits/blog`                     | Direct post types and Blog UI                          |
-| `@goobits/blog/core`                | Engine, queries, taxonomy, URLs, related posts, RSS    |
-| `@goobits/blog/markdown`            | Markdown content source                                |
-| `@goobits/blog/sveltekit`           | Route, page-load, entries, and RSS adapters            |
-| `@goobits/blog/config`              | Engine and UI message configuration                    |
-| `@goobits/blog/ui`                  | Svelte presentation components and prose elements      |
-| `@goobits/blog/ui/gallery-lightbox` | Gallery action and event types for custom prose shells |
-| `@goobits/blog/ui/blogTheme.css`    | Theme-variable-based editorial CSS                     |
-| `@goobits/blog/i18n`                | Framework-neutral translation hooks                    |
-
-The package returns normalized SEO data. The consuming app owns the final `<svelte:head>` composition, site identity, and release-stage policy.
-
-## UI And Forms
-
-`BlogIndex`, `BlogCard`, `BlogPost`, `BlogProse`, `BlogLightbox`, and the
-prose elements consume direct `BlogPost` fields. The index exposes GET-based
-search, sort, page navigation, load-more, and infinite modes. Infinite mode
-retains a visible load-more control.
-
-Newsletter delivery remains app-owned. The form uses Goo controls and Forms
-submission state, and renders nothing until a working adapter is provided:
-
-```svelte
-<script>
-	import { NewsletterForm } from '@goobits/blog/ui'
-
-	const subscribe = async ({ email }) => await newsletterProvider.subscribe(email)
-</script>
-
-<NewsletterForm onSubscribe={subscribe} />
-```
-
-`BlogPost` renders Web Share and copy-link actions. Email, Facebook, and X
-links appear only when explicitly included in `shareNetworks`.
-
-Goo and Forms are required peers. Blog uses them as the single control and form
-foundation rather than shipping alternate native controls.
-
-Pass `urlResolver` to `BlogIndex` or `BlogPost` to override post, taxonomy,
-feed, or author paths. The resolver flows to nested cards and taxonomy lists.
-All visible and assistive UI text is configurable through `messages`.
-
-`BlogPost` accepts `actions` and `afterContent` snippets for app-owned edit,
-moderation, comment, or discussion UI. Blog does not implement those policies.
-
-## Markdown Plugins
-
-```js
-import { rehypeExternalLinks } from '@goobits/blog/markdown/rehype-external-links'
-import { rehypeWebpPicture } from '@goobits/blog/markdown/rehype-webp-picture'
-import { remarkTableOfContents } from '@goobits/blog/markdown/remark-table-of-contents'
-```
-
-`rehypeWebpPicture` adds intrinsic dimensions and lazy/async loading to article
-images. When `generated/<name>-<width>.webp` files exist beside a source image,
-it emits an ordered responsive source set while preserving the original image
-as the fallback. Configure the rendered width for each consumer:
-
-```js
-rehypeWebpPicture({ sizes: '(max-width: 48rem) 100vw, 48rem' })
-```
-
-Set `variantDirectory` only when generated files use a directory other than
-`generated`. A same-name `.webp` sibling remains supported when no responsive
-variants exist.
-
-Sanitize untrusted Markdown before rendering it. The external-link transform hardens links but is not a general HTML sanitizer.
+[MIT](LICENSE) © 2024 HoneyFarmer.com
