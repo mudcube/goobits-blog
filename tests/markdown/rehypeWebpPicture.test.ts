@@ -94,9 +94,7 @@ describe('rehypeWebpPicture', () => {
 			loading: 'lazy',
 			decoding: 'async'
 		})
-		expect(resolveImageDimensions).toHaveBeenCalledWith(
-			join(fixtureDirectory, 'images/photo.png')
-		)
+		expect(resolveImageDimensions).toHaveBeenCalledWith(join(fixtureDirectory, 'images/photo.png'))
 	})
 
 	it('keeps the same-name WebP fallback when no generated variants exist', () => {
@@ -165,11 +163,15 @@ describe('rehypeWebpPicture', () => {
 
 	it('preserves explicitly configured loading and dimensions', () => {
 		const resolveImageDimensions = vi.fn(() => ({ width: 2, height: 3 }))
-		const { image } = transform('images/photo.png', { resolveImageDimensions }, {
-			loading: 'eager',
-			width: 200,
-			height: 300
-		})
+		const { image } = transform(
+			'images/photo.png',
+			{ resolveImageDimensions },
+			{
+				loading: 'eager',
+				width: 200,
+				height: 300
+			}
+		)
 		expect(image.properties).toMatchObject({
 			loading: 'eager',
 			width: 200,

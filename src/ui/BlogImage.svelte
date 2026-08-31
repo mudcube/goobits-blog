@@ -8,12 +8,7 @@
 		fetchpriority?: 'high' | 'low' | 'auto'
 	}
 
-	const {
-		image,
-		sizes = image.sizes,
-		loading = 'lazy',
-		fetchpriority = 'auto'
-	}: Props = $props()
+	const { image, sizes = image.sizes, loading = 'lazy', fetchpriority = 'auto' }: Props = $props()
 </script>
 
 <picture>

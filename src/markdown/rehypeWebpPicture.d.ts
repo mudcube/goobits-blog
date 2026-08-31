@@ -9,9 +9,7 @@ export interface RehypeWebpPictureOptions {
 	/** Responsive image sizes expression. Defaults to `100vw`. */
 	sizes?: string
 	/** Optional synchronous host resolver for intrinsic image dimensions. */
-	resolveImageDimensions?: (
-		filePath: string
-	) => RehypeWebpPictureDimensions | null | undefined
+	resolveImageDimensions?: (filePath: string) => RehypeWebpPictureDimensions | null | undefined
 }
 
 export interface RehypeWebpPictureFile {
