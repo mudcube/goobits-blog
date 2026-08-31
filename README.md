@@ -145,4 +145,3 @@ pnpm typecheck
 ## License
 
 [MIT](LICENSE) © 2024 HoneyFarmer.com
-
