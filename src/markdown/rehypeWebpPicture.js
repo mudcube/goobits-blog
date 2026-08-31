@@ -4,9 +4,8 @@
  * Runs at build time during mdsvex compilation. Original image URLs remain on
  * the <img> fallback so direct links and full-resolution viewers keep working.
  */
-import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readdirSync } from 'node:fs'
 import { basename, dirname, extname, join, posix } from 'node:path'
-import { imageSize } from 'image-size'
 
 const NON_RESPONSIVE_EXTENSIONS = new Set(['.svg', '.gif'])
 const NON_LOCAL_SOURCE = /^(?:https?:\/\/|\/\/|data:|blob:)/i
@@ -23,10 +22,21 @@ function walkNodes(children, visitor) {
 	}
 }
 
-function readImageDimensions(filePath) {
+function getImageDimensions(resolveImageDimensions, filePath) {
+	if (!resolveImageDimensions) return null
+
 	try {
-		const { width, height } = imageSize(readFileSync(filePath))
-		return width && height ? { width, height } : null
+		const dimensions = resolveImageDimensions(filePath)
+		if (
+			!dimensions ||
+			!Number.isSafeInteger(dimensions.width) ||
+			dimensions.width <= 0 ||
+			!Number.isSafeInteger(dimensions.height) ||
+			dimensions.height <= 0
+		) {
+			return null
+		}
+		return dimensions
 	} catch {
 		return null
 	}
@@ -100,6 +110,7 @@ function createPicture(node, sourceProperties) {
 export function rehypeWebpPicture(options = {}) {
 	const variantDirectory = options.variantDirectory ?? 'generated'
 	const sizes = options.sizes ?? '100vw'
+	const resolveImageDimensions = options.resolveImageDimensions
 
 	return (tree, vFile) => {
 		if (!tree.children) return
@@ -129,7 +140,12 @@ export function rehypeWebpPicture(options = {}) {
 			const originalDiskPath = diskPathname.startsWith('/')
 				? join(staticRoot, diskPathname)
 				: join(fileDirectory, diskPathname)
-			applyImageDimensions(properties, readImageDimensions(originalDiskPath))
+			if (!properties.width || !properties.height) {
+				applyImageDimensions(
+					properties,
+					getImageDimensions(resolveImageDimensions, originalDiskPath)
+				)
+			}
 
 			if (NON_RESPONSIVE_EXTENSIONS.has(extension)) return
 

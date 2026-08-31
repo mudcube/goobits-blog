@@ -68,6 +68,7 @@
 		"**/*.css"
 	],
 	"scripts": {
+		"audit:dependencies": "pnpm audit --audit-level low --registry=https://registry.npmjs.org/",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"lint": "eslint .",
@@ -122,6 +123,8 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
+		"@goobits/forms": "workspace:^",
+		"@goobits/goo": "workspace:*",
 		"@lucide/svelte": "^1.33.0",
 		"@sveltejs/kit": "^2.70.3",
 		"@sveltejs/vite-plugin-svelte": "^7.3.0",
@@ -135,6 +138,7 @@
 		"svelte-check": "^4.7.6",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.67.0",
+		"vite": "^8.2.2",
 		"vitest": "^4.1.11"
 	}
 }

@@ -139,14 +139,27 @@ import { rehypeWebpPicture } from '@goobits/blog/markdown/rehype-webp-picture'
 import { remarkTableOfContents } from '@goobits/blog/markdown/remark-table-of-contents'
 ```
 
-`rehypeWebpPicture` adds intrinsic dimensions and lazy/async loading to article
-images. When `generated/<name>-<width>.webp` files exist beside a source image,
-it emits an ordered responsive source set while preserving the original image
-as the fallback. Configure the rendered width for each consumer:
+`rehypeWebpPicture` adds lazy/async loading to article images. When
+`generated/<name>-<width>.webp` files exist beside a source image, it emits an
+ordered responsive source set while preserving the original image as the
+fallback. Configure the rendered width for each consumer:
 
 ```js
 rehypeWebpPicture({ sizes: '(max-width: 48rem) 100vw, 48rem' })
 ```
+
+The plugin does not parse image binaries. To add intrinsic dimensions, inject
+the synchronous metadata lookup already owned by the host asset pipeline:
+
+```js
+rehypeWebpPicture({
+	resolveImageDimensions: (filePath) => imageMetadata.get(filePath)
+})
+```
+
+The resolver may return `{ width, height }`, `null`, or `undefined`.
+Resolver errors and invalid dimensions fail soft without changing the image.
+Explicit image dimensions always win.
 
 Set `variantDirectory` only when generated files use a directory other than
 `generated`. A same-name `.webp` sibling remains supported when no responsive

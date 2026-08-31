@@ -5,6 +5,17 @@ All notable changes to the `@goobits/blog` package will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Markdown image dimensions are now supplied through the optional synchronous
+  `resolveImageDimensions` host callback.
+
+### Security
+
+- Removed the vulnerable `image-size` parser from the runtime and lockfile.
+
 ## [3.1.0] - 2026-08-16
 
 ### Added

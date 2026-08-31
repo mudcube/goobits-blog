@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, it } from 'vitest'
+import { afterAll, describe, expect, it, vi } from 'vitest'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -19,21 +19,13 @@ interface RootNode {
 	children: ElementNode[]
 }
 
-const PNG = Buffer.from(
-	'iVBORw0KGgoAAAANSUhEUgAAAAIAAAADCAIAAAA7HLUcAAAAD0lEQVR4nGP4z8DAwMAAAAYAAeIhvDMAAAAASUVORK5CYII=',
-	'base64'
-)
-const WEBP = Buffer.from(
-	'UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEALmk0mk0iIiIiIgBoSygABc6zbAAA',
-	'base64'
-)
 const staticRoot = join(process.cwd(), 'static')
 mkdirSync(staticRoot, { recursive: true })
 const fixtureDirectory = mkdtempSync(join(staticRoot, 'rehype-webp-'))
 const publicPrefix = fixtureDirectory.substring(staticRoot.length)
 const markdownPath = join(fixtureDirectory, 'index.md')
 
-function writeFixture(relativePath: string, contents = WEBP): void {
+function writeFixture(relativePath: string, contents = 'fixture'): void {
 	const filePath = join(fixtureDirectory, relativePath)
 	mkdirSync(join(filePath, '..'), { recursive: true })
 	writeFileSync(filePath, contents)
@@ -58,11 +50,11 @@ function transform(
 	return { tree, image }
 }
 
-writeFixture('images/photo.png', PNG)
+writeFixture('images/photo.png')
 writeFixture('images/generated/photo-640.webp')
 writeFixture('images/generated/photo-320.webp')
 writeFixture('images/generated/photo-invalid.webp')
-writeFixture('images/legacy.jpg', PNG)
+writeFixture('images/legacy.jpg')
 writeFixture('images/legacy.webp')
 writeFixture('images/direct.webp')
 writeFixture('images/generated/direct-320.webp')
@@ -74,7 +66,11 @@ afterAll(() => {
 describe('rehypeWebpPicture', () => {
 	it('emits ordered generated variants and preserves the original fallback', () => {
 		const sizes = '(max-width: 700px) 100vw, 700px'
-		const { tree, image } = transform('images/photo.png', { sizes })
+		const resolveImageDimensions = vi.fn(() => ({ width: 2, height: 3 }))
+		const { tree, image } = transform('images/photo.png', {
+			sizes,
+			resolveImageDimensions
+		})
 		const picture = tree.children[0]
 
 		expect(picture).toMatchObject({
@@ -98,6 +94,9 @@ describe('rehypeWebpPicture', () => {
 			loading: 'lazy',
 			decoding: 'async'
 		})
+		expect(resolveImageDimensions).toHaveBeenCalledWith(
+			join(fixtureDirectory, 'images/photo.png')
+		)
 	})
 
 	it('keeps the same-name WebP fallback when no generated variants exist', () => {
@@ -112,8 +111,10 @@ describe('rehypeWebpPicture', () => {
 		})
 	})
 
-	it('reads direct WebP dimensions and uses its generated variants', () => {
-		const { tree, image } = transform('images/direct.webp?cache=1')
+	it('uses resolved direct WebP dimensions and generated variants', () => {
+		const { tree, image } = transform('images/direct.webp?cache=1', {
+			resolveImageDimensions: () => ({ width: 1, height: 1 })
+		})
 		expect(tree.children[0]).toMatchObject({ tagName: 'picture' })
 		expect(tree.children[0]?.children[0]).toMatchObject({
 			properties: {
@@ -135,6 +136,25 @@ describe('rehypeWebpPicture', () => {
 		expect(image.properties).not.toHaveProperty('width')
 	})
 
+	it('omits inferred dimensions when no host resolver is configured', () => {
+		const { image } = transform('images/photo.png')
+		expect(image.properties).not.toHaveProperty('width')
+		expect(image.properties).not.toHaveProperty('height')
+	})
+
+	it('fails soft when the host dimension resolver throws or returns invalid values', () => {
+		for (const resolveImageDimensions of [
+			() => {
+				throw new Error('metadata unavailable')
+			},
+			() => ({ width: 0, height: 3 })
+		]) {
+			const { image } = transform('images/photo.png', { resolveImageDimensions })
+			expect(image.properties).not.toHaveProperty('width')
+			expect(image.properties).not.toHaveProperty('height')
+		}
+	})
+
 	it('applies loading policy before skipping external and data sources', () => {
 		for (const src of ['https://images.example/photo.jpg', 'data:image/png;base64,abc']) {
 			const { tree, image } = transform(src)
@@ -144,7 +164,8 @@ describe('rehypeWebpPicture', () => {
 	})
 
 	it('preserves explicitly configured loading and dimensions', () => {
-		const { image } = transform('images/photo.png', undefined, {
+		const resolveImageDimensions = vi.fn(() => ({ width: 2, height: 3 }))
+		const { image } = transform('images/photo.png', { resolveImageDimensions }, {
 			loading: 'eager',
 			width: 200,
 			height: 300
@@ -154,5 +175,6 @@ describe('rehypeWebpPicture', () => {
 			width: 200,
 			height: 300
 		})
+		expect(resolveImageDimensions).not.toHaveBeenCalled()
 	})
 })
